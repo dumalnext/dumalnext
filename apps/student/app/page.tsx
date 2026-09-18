@@ -32,6 +32,8 @@ function StudentHomeContent() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginProgress, setLoginProgress] = useState(0);
+  const [loginStatusText, setLoginStatusText] = useState("");
 
   // Registration Form State (Phase 1: Email First)
   const [regForm, setRegForm] = useState({
@@ -44,6 +46,9 @@ function StudentHomeContent() {
   });
   const [regErrors, setRegErrors] = useState<Record<string, string>>({});
   const [isRegistering, setIsRegistering] = useState(false);
+  const [regProgress, setRegProgress] = useState(0);
+  const [regStatusText, setRegStatusText] = useState("");
+  const [regSuccessNotice, setRegSuccessNotice] = useState("");
 
   // Authenticated User Submitted Application State
   const [userApplication, setUserApplication] = useState<any | null>(null);
@@ -71,7 +76,7 @@ function StudentHomeContent() {
     }
   }, [user]);
 
-  // Handle Sign In Submit
+  // Handle Sign In Submit with System Verification Delay
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
@@ -86,19 +91,48 @@ function StudentHomeContent() {
     }
 
     setIsLoggingIn(true);
+    setLoginProgress(20);
+    setLoginStatusText("Validating student account credentials...");
+
     try {
+      // Realistic Institutional Verification Delay
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      setLoginProgress(55);
+      setLoginStatusText("Verifying credentials with Dumalneg NHS learner database...");
+
       const res = await login(loginEmail, loginPassword);
-      if (res.success) {
-        router.push("/enroll");
-      } else {
+      if (!res.success) {
         setLoginError(res.error || "Invalid email or password. Please try again.");
+        setIsLoggingIn(false);
+        setLoginProgress(0);
+        return;
       }
+
+      setLoginProgress(90);
+      setLoginStatusText("Credentials verified. Initializing student dashboard session...");
+      await new Promise((resolve) => setTimeout(resolve, 450));
+
+      setLoginProgress(100);
+      setLoginStatusText("Welcome! Redirecting to Student Console...");
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Successfully authenticated
+      setLoginPassword("");
+      setRegSuccessNotice("");
+      setLoginError("");
+
+      if (typeof window !== "undefined") {
+        window.history.replaceState(null, "", "/");
+      }
+      router.push("/");
     } finally {
       setIsLoggingIn(false);
+      setLoginProgress(0);
+      setLoginStatusText("");
     }
   };
 
-  // Handle Registration Submit
+  // Handle Registration Submit with System Storage Delay & Redirect to Login/Home
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
@@ -119,22 +153,70 @@ function StudentHomeContent() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsRegistering(true);
+    setRegProgress(20);
+    setRegStatusText("Validating learner applicant information...");
+
     try {
-      const res = await register({
-        lastName: regForm.lastName.trim().toUpperCase(),
-        firstName: regForm.firstName.trim().toUpperCase(),
-        middleName: regForm.middleName.trim().toUpperCase(),
-        email: regForm.email.trim().toLowerCase(),
-        password: regForm.password,
+      // Step 1: Pre-save verification delay
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      setRegProgress(55);
+      setRegStatusText("Saving applicant credentials in DepEd Dumalneg NHS registry...");
+
+      const res = await register(
+        {
+          lastName: regForm.lastName.trim().toUpperCase(),
+          firstName: regForm.firstName.trim().toUpperCase(),
+          middleName: regForm.middleName.trim().toUpperCase(),
+          email: regForm.email.trim().toLowerCase(),
+          password: regForm.password,
+        },
+        false // Do not auto-login session so they sign in cleanly from Home
+      );
+
+      if (!res.success) {
+        setRegErrors({ form: res.error || "Registration failed. Please try again." });
+        setIsRegistering(false);
+        setRegProgress(0);
+        return;
+      }
+
+      setRegProgress(85);
+      setRegStatusText("Account created successfully! Preparing sign-in console...");
+      await new Promise((resolve) => setTimeout(resolve, 450));
+
+      setRegProgress(100);
+      setRegStatusText("Redirecting to Student Login...");
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const registeredEmail = regForm.email.trim().toLowerCase();
+      const applicantFullName = `${regForm.firstName.trim().toUpperCase()} ${regForm.lastName.trim().toUpperCase()}`;
+
+      // Pre-fill email in login form
+      setLoginEmail(registeredEmail);
+      setLoginPassword("");
+      setRegSuccessNotice(
+        `Account for [ ${applicantFullName} ] created successfully! Please enter your password to sign in.`
+      );
+
+      // Clear reg form
+      setRegForm({
+        lastName: "",
+        firstName: "",
+        middleName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
       });
 
-      if (res.success) {
-        router.push("/enroll");
-      } else {
-        setRegErrors({ form: res.error || "Registration failed. Please try again." });
+      // Switch to Sign In tab and update URL
+      setActiveTab("signin");
+      if (typeof window !== "undefined") {
+        window.history.replaceState(null, "", "/?tab=signin");
       }
     } finally {
       setIsRegistering(false);
+      setRegProgress(0);
+      setRegStatusText("");
     }
   };
 
@@ -416,6 +498,7 @@ function StudentHomeContent() {
               onClick={() => {
                 setActiveTab("register");
                 setRegErrors({});
+                setRegSuccessNotice("");
               }}
               className={`py-3.5 sm:py-4 px-2 sm:px-4 text-[11px] sm:text-xs min-h-[44px] transition-colors ${
                 activeTab === "register"
@@ -445,6 +528,36 @@ function StudentHomeContent() {
                   </p>
                 </div>
 
+                {regSuccessNotice && (
+                  <div className="p-4 bg-emerald-50 border-2 border-emerald-600 shadow-xs">
+                    <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider block mb-1">
+                      [ REGISTRATION SUCCESSFUL &bull; ACCOUNT CREATED ]
+                    </span>
+                    <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+                      {regSuccessNotice}
+                    </p>
+                  </div>
+                )}
+
+                {/* Real-time Authentication Progress Bar & Status */}
+                {isLoggingIn && (
+                  <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
+                      <span>[ SYSTEM AUTHENTICATING ]</span>
+                      <span>{loginProgress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
+                      <div
+                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
+                        style={{ width: `${loginProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-800 font-medium">
+                      {loginStatusText || "Verifying credentials with Dumalneg NHS learner database..."}
+                    </p>
+                  </div>
+                )}
+
                 {loginError && (
                   <div className="p-3 bg-red-50 border-2 border-red-400">
                     <p className="text-xs font-bold text-red-900 leading-normal">
@@ -466,7 +579,8 @@ function StudentHomeContent() {
                         if (loginError) setLoginError("");
                       }}
                       placeholder="e.g. student@example.com"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none"
+                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
+                      disabled={isLoggingIn}
                       required
                     />
                     <p className="text-[10px] text-slate-500 mt-1">
@@ -486,7 +600,8 @@ function StudentHomeContent() {
                         if (loginError) setLoginError("");
                       }}
                       placeholder="Enter account password"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
+                      disabled={isLoggingIn}
                       required
                     />
                   </div>
@@ -495,9 +610,9 @@ function StudentHomeContent() {
                     <button
                       type="submit"
                       disabled={isLoggingIn}
-                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5"
+                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {isLoggingIn ? "Authenticating Account..." : "Sign In & Proceed to Enrollment"}
+                      {isLoggingIn ? "[ AUTHENTICATING... PLEASE WAIT ]" : "Sign In & Proceed to Student Portal"}
                     </button>
                   </div>
                 </form>
@@ -522,6 +637,25 @@ function StudentHomeContent() {
                   </p>
                 </div>
 
+                {/* Real-time Registration Progress Bar & Status */}
+                {isRegistering && (
+                  <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
+                      <span>[ SYSTEM REGISTERING APPLICANT ]</span>
+                      <span>{regProgress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
+                      <div
+                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
+                        style={{ width: `${regProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-800 font-medium">
+                      {regStatusText || "Saving applicant credentials in DepEd Dumalneg NHS registry..."}
+                    </p>
+                  </div>
+                )}
+
                 {regErrors.form && (
                   <div className="p-3 bg-red-50 border-2 border-red-400">
                     <p className="text-xs font-bold text-red-900 leading-normal">
@@ -542,7 +676,8 @@ function StudentHomeContent() {
                         value={regForm.lastName}
                         onChange={(e) => setRegForm({ ...regForm, lastName: e.target.value })}
                         placeholder="e.g. AGCAOILI"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100"
+                        disabled={isRegistering}
                         required
                       />
                       {regErrors.lastName && (
@@ -559,7 +694,8 @@ function StudentHomeContent() {
                         value={regForm.firstName}
                         onChange={(e) => setRegForm({ ...regForm, firstName: e.target.value })}
                         placeholder="e.g. MARK ANTHONY"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100"
+                        disabled={isRegistering}
                         required
                       />
                       {regErrors.firstName && (
@@ -576,7 +712,8 @@ function StudentHomeContent() {
                         value={regForm.middleName}
                         onChange={(e) => setRegForm({ ...regForm, middleName: e.target.value })}
                         placeholder="e.g. CASTRO"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100"
+                        disabled={isRegistering}
                       />
                     </div>
                   </div>
@@ -591,7 +728,8 @@ function StudentHomeContent() {
                       value={regForm.email}
                       onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
                       placeholder="e.g. mark.agcaoili@example.com"
-                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none disabled:bg-slate-100"
+                      disabled={isRegistering}
                       required
                     />
                     <p className="text-[10px] text-slate-500 mt-1">
@@ -613,7 +751,8 @@ function StudentHomeContent() {
                         value={regForm.password}
                         onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
                         placeholder="At least 6 characters"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
+                        disabled={isRegistering}
                         required
                       />
                       {regErrors.password && (
@@ -630,7 +769,8 @@ function StudentHomeContent() {
                         value={regForm.confirmPassword}
                         onChange={(e) => setRegForm({ ...regForm, confirmPassword: e.target.value })}
                         placeholder="Re-type password"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
+                        disabled={isRegistering}
                         required
                       />
                       {regErrors.confirmPassword && (
@@ -651,9 +791,9 @@ function StudentHomeContent() {
                     <button
                       type="submit"
                       disabled={isRegistering}
-                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5"
+                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {isRegistering ? "Creating Account..." : "Create Account & Start Online Enrollment"}
+                      {isRegistering ? "[ CREATING ACCOUNT... PLEASE WAIT ]" : "Create Account & Register"}
                     </button>
                   </div>
                 </form>

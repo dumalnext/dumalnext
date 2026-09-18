@@ -18,14 +18,17 @@ interface AuthContextType {
   user: StudentUser | null;
   isLoading: boolean;
   login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (data: {
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-    lrn?: string;
-    email: string;
-    password: string;
-  }) => Promise<{ success: boolean; error?: string }>;
+  register: (
+    data: {
+      firstName: string;
+      middleName?: string;
+      lastName: string;
+      lrn?: string;
+      email: string;
+      password: string;
+    },
+    autoLogin?: boolean
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -114,14 +117,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Student Account Registration (Aligned with Class Diagram: Name, LRN, Email, Password - No mobile)
-  const register = async (data: {
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-    lrn?: string;
-    email: string;
-    password: string;
-  }): Promise<{ success: boolean; error?: string }> => {
+  const register = async (
+    data: {
+      firstName: string;
+      middleName?: string;
+      lastName: string;
+      lrn?: string;
+      email: string;
+      password: string;
+    },
+    autoLogin: boolean = true
+  ): Promise<{ success: boolean; error?: string }> => {
     const cleanEmail = data.email.trim().toLowerCase();
     const cleanFirst = data.firstName.trim().toUpperCase();
     const cleanLast = data.lastName.trim().toUpperCase();
@@ -192,20 +198,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         storedUsers.push(newUserRecord);
         localStorage.setItem("dumalnext_student_users", JSON.stringify(storedUsers));
 
-        const sessionUser: StudentUser = {
-          id: newUserRecord.id,
-          userId: newUserRecord.userId,
-          email: newUserRecord.email,
-          fullName: newUserRecord.fullName,
-          firstName: newUserRecord.firstName,
-          middleName: newUserRecord.middleName,
-          lastName: newUserRecord.lastName,
-          lrn: newUserRecord.lrn,
-          userRole: "student",
-        };
+        if (autoLogin) {
+          const sessionUser: StudentUser = {
+            id: newUserRecord.id,
+            userId: newUserRecord.userId,
+            email: newUserRecord.email,
+            fullName: newUserRecord.fullName,
+            firstName: newUserRecord.firstName,
+            middleName: newUserRecord.middleName,
+            lastName: newUserRecord.lastName,
+            lrn: newUserRecord.lrn,
+            userRole: "student",
+          };
 
-        setUser(sessionUser);
-        localStorage.setItem("dumalnext_student_session", JSON.stringify(sessionUser));
+          setUser(sessionUser);
+          localStorage.setItem("dumalnext_student_session", JSON.stringify(sessionUser));
+        }
+
         return { success: true };
       }
 
