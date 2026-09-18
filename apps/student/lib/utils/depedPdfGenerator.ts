@@ -88,10 +88,11 @@ export async function generateDepEdEnrollmentPdf(data: FullEnrollmentFormData): 
 
     const isJHS = Number(data.step1.targetGradeLevel) <= 10;
     if (isJHS && (data.jhsProgram === "SPS" || data.step1.jhsProgram === "SPS")) {
-      page1.drawText("(SPS - SPORTS)", {
-        x: 260,
+      const sportLabel = data.spsSport ? `(SPS: ${data.spsSport})` : "(SPS - SPORTS)";
+      page1.drawText(sportLabel, {
+        x: 250,
         y: 768,
-        size: 8,
+        size: 7.5,
         font: fontBold,
         color: textColor,
       });

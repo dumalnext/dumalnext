@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
 import Step2LearnerProfile from "./Step2LearnerProfile";
 import Step3FamilyBackground from "./Step3FamilyBackground";
+import Step4CurriculumModality from "./Step4CurriculumModality";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
 export interface FullEnrollmentFormData {
@@ -64,12 +65,13 @@ export interface FullEnrollmentFormData {
   guardianRelationship?: string;
   primaryContactPerson?: "Father" | "Mother" | "Guardian";
 
-  // Step 4: SHS, SNEd, & Modalities
+  // Step 4: Curriculum (JHS / SHS), SNEd, & Modalities
   isSned: boolean;
   snedCategory: "Diagnosis" | "Manifestations" | "";
   snedDetails: string[];
   hasPwdId: boolean;
   jhsProgram?: "Regular" | "SPS";
+  spsSport?: string;
   targetSemester: "1st Semester" | "2nd Semester" | "";
   targetTrack: string;
   targetStrand: string;
@@ -150,6 +152,8 @@ const initialFormData: FullEnrollmentFormData = {
   snedCategory: "",
   snedDetails: [],
   hasPwdId: false,
+  jhsProgram: "Regular",
+  spsSport: "",
   targetSemester: "1st Semester",
   targetTrack: "Academic Track",
   targetStrand: "",
@@ -163,7 +167,7 @@ const STEP_LABELS = [
   { step: 1, label: "Classification", sublabel: "Learner Category" },
   { step: 2, label: "Learner Profile", sublabel: "Personal & Address" },
   { step: 3, label: "Family Background", sublabel: "Parent & Guardian" },
-  { step: 4, label: "Curriculum & Modality", sublabel: "SHS Strand & SNEd" },
+  { step: 4, label: "Curriculum & Modality", sublabel: "Program, SNEd & Mode" },
   { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
@@ -291,32 +295,12 @@ export default function EnrollmentStepper() {
         )}
 
         {currentStep === 4 && (
-          <div className="bg-white p-8 border border-slate-300 space-y-6">
-            <div className="border-b border-slate-200 pb-4">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Step 4 of 5: Senior High School Track &amp; Strand, SNEd, and Modality ]
-              </span>
-              <h2 className="text-xl font-bold text-slate-900">
-                Strand Selection, Cross-Strand Electives, and Distance Learning Modalities
-              </h2>
-            </div>
-            <div className="flex justify-between pt-4 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={prevStep}
-                className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Back to Step 3
-              </button>
-              <button
-                type="button"
-                onClick={nextStep}
-                className="btn-primary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Proceed to Step 5
-              </button>
-            </div>
-          </div>
+          <Step4CurriculumModality
+            data={formData}
+            onChange={handleFormDataChange}
+            onNext={nextStep}
+            onBack={prevStep}
+          />
         )}
 
         {currentStep === 5 && (

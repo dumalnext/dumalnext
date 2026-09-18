@@ -1,5 +1,5 @@
 // ==============================================================================
-// DUMAL-NEXT: TYPESCRIPT ENROLLMENT DEFINITIONS
+// DUMAL-NEXT: TYPESCRIPT ENROLLMENT DEFINITIONS (STUDENT PORTAL)
 // 100% Aligned with DepEd Basic Education Enrollment Form (Revised 06/01/2025)
 // ==============================================================================
 
@@ -78,6 +78,8 @@ export interface StudentProfile {
 
   // Academic Placement
   gradeLevel: number; // 7 - 12
+  jhsProgram?: 'Regular' | 'SPS';
+  spsSport?: string;
   strand?: string; // STEM, HUMSS, TVL, etc.
   isReturning: boolean;
   currentSectionId?: string;
@@ -92,6 +94,7 @@ export interface EnrollmentApplication {
   isGraded: boolean;
   targetGradeLevel: number;
   jhsProgram?: 'Regular' | 'SPS'; // Junior High School Curricular Program
+  spsSport?: string; // Sports specialization under SPS
   targetSemester?: '1st Semester' | '2nd Semester' | '';
   targetTrack?: string; // Academic, TVL
   targetStrand?: string; // STEM, HUMSS, TVL-Agri-Fishery, TVL-ICT, TVL-HE
@@ -171,3 +174,34 @@ export const SHS_STRANDS = [
   { code: 'TVL-AFA', name: 'TVL: Agri-Fishery Arts', track: 'Technical-Vocational-Livelihood Track' },
   { code: 'TVL-HE', name: 'TVL: Home Economics', track: 'Technical-Vocational-Livelihood Track' }
 ] as const;
+
+export const JHS_PROGRAMS = [
+  {
+    code: 'Regular',
+    title: 'Regular Junior High School Curriculum',
+    subtitle: 'DepEd K-12 / MATATAG Curriculum Standard',
+    description:
+      'Standard high school secondary curriculum encompassing core learning areas (English, Mathematics, Science, Filipino, Araling Panlipunan, MAPEH, TLE, and Edukasyon sa Pagpapakatao).',
+  },
+  {
+    code: 'SPS',
+    title: 'Special Program in Sports (SPS)',
+    subtitle: 'Competitive Athletic & Academic Curriculum',
+    description:
+      'Specialized secondary program designed for students with demonstrated athletic aptitude. Combines academic courses with intensive sports training, coaching, and athletic representation for Dumalneg NHS in Division, Regional (CAVRAA/R1AA), and Palarong Pambansa meets.',
+  },
+] as const;
+
+export const SPS_SPORTS = [
+  'Athletics (Track & Field / Running)',
+  'Badminton',
+  'Basketball',
+  'Volleyball',
+  'Sepak Takraw',
+  'Table Tennis',
+  'Chess',
+  'Archery',
+  'Taekwondo / Combative Sports',
+  'Other Sports Discipline',
+] as const;
+
