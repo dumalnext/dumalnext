@@ -41,26 +41,68 @@ Sentral na lagakan ng account credentials para sa lahat ng 4 na aktor.
 
 ---
 
-### TABLE 2: `students` (Sub-Class ng User)
-Naglalaman ng personal at akademikong tala ng bawat estudyante ng Dumalneg NHS.
+### TABLE 2: `students` (Sub-Class ng User / Opisyal na Talaan ng Mag-aaral)
+Naglalaman ng personal, kultural, tirahan, at akademikong tala ng bawat estudyante ng Dumalneg NHS alinsunod sa DepEd Basic Education Enrollment Form (Revised 06/01/2025).
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `id` | UUID | No | PRIMARY KEY | uuid_generate_v4() | Internal record ID |
 | `userId` | UUID | No | FOREIGN KEY | None | Ugnayan sa `users.id` (ON DELETE CASCADE) |
-| `studentID` | VARCHAR(20) | No | UNIQUE | None | Learner Reference Number (LRN) / Student ID |
+| `studentID` | VARCHAR(20) | No | UNIQUE | None | DNHS Student ID / LRN Identifier |
+| `lrn` | VARCHAR(12) | Yes | None | NULL | Opisyal na 12-digit DepEd Learner Reference Number |
+| `psaBirthCertNo` | VARCHAR(50) | Yes | None | NULL | Numero ng PSA Birth Certificate |
 | `firstName` | VARCHAR(50) | No | None | None | Unang pangalan |
 | `middleName` | VARCHAR(50) | Yes | None | NULL | Gitnang pangalan |
 | `lastName` | VARCHAR(50) | No | None | None | Apelyido |
+| `extensionName` | VARCHAR(10) | Yes | None | NULL | Extension (e.g., Jr., III, IV) |
 | `dateOfBirth` | DATE | Yes | None | NULL | Araw ng kapanganakan |
-| `gender` | VARCHAR(10) | Yes | None | NULL | Kasarian |
-| `contactNumber`| VARCHAR(20) | Yes | None | NULL | Contact number ng mag-aaral/magulang |
-| `barangay` | VARCHAR(100) | No | None | None | Barangay sa Dumalneg (e.g., Cabaritan, Kalaw, San Isidro) |
-| `gradeLevel` | INT | No | CHECK (7-12) | None | Antas (Grade 7 hanggang 12) |
-| `strand` | VARCHAR(50) | Yes | None | NULL | Strand kung Senior High (STEM, TVL, HUMSS, ABM) |
+| `age` | INT | Yes | None | NULL | Edad ng mag-aaral |
+| `gender` | VARCHAR(10) | Yes | CHECK | NULL | Kasarian ('Male', 'Female') |
+| `placeOfBirth` | VARCHAR(100) | Yes | None | NULL | Bayan/Lungsod ng Kapanganakan |
+| `religion` | VARCHAR(50) | Yes | None | NULL | Relihiyon ng mag-aaral |
+| `motherTongue` | VARCHAR(50) | Yes | None | NULL | Katutubong wika (Ilokano, Isnag, atbp.) |
+| `contactNumber`| VARCHAR(20) | Yes | None | NULL | Numero ng telepono |
+| `isIpCommunity` | BOOLEAN | No | None | FALSE | TRUE kung kabilang sa Indigenous Peoples (IP) |
+| `ipCommunityName`| VARCHAR(100)| Yes | None | NULL | Pangalan ng IP Community (e.g., Isnag, Tingguian) |
+| `is4psBeneficiary`| BOOLEAN | No | None | FALSE | TRUE kung benepisyaryo ng 4Ps |
+| `householdId4ps`| VARCHAR(30) | Yes | None | NULL | 16-digit 4Ps Household ID Number |
+| `currentHouseNo`| VARCHAR(50) | Yes | None | NULL | House Number ng kasalukuyang tirahan |
+| `currentSitio` | VARCHAR(100) | Yes | None | NULL | Sitio o kalye ng kasalukuyang tirahan |
+| `currentBarangay`| VARCHAR(100)| No | None | 'Cabaritan' | Barangay (Cabaritan, Kalabakan, Quibel, San Isidro) |
+| `currentMunicipality`| VARCHAR(100)| No | None | 'Dumalneg' | Munisipalidad |
+| `currentProvince`| VARCHAR(100)| No | None | 'Ilocos Norte'| Lalawigan |
+| `currentCountry`| VARCHAR(50) | No | None | 'Philippines'| Bansa |
+| `currentZipCode`| VARCHAR(10) | No | None | '2921' | Postal Zip Code ng Dumalneg |
+| `isPermanentSameAsCurrent`| BOOLEAN | No | None | TRUE | TRUE kung pareho ang kasalukuyan at permanenteng tirahan |
+| `permanentHouseNo`| VARCHAR(50)| Yes | None | NULL | House Number ng permanenteng tirahan |
+| `permanentSitio`| VARCHAR(100)| Yes | None | NULL | Sitio/Kalye ng permanenteng tirahan |
+| `permanentBarangay`| VARCHAR(100)| Yes | None | NULL | Barangay ng permanenteng tirahan |
+| `permanentMunicipality`| VARCHAR(100)| Yes | None | NULL | Munisipalidad ng permanenteng tirahan |
+| `permanentProvince`| VARCHAR(100)| Yes | None | NULL | Lalawigan ng permanenteng tirahan |
+| `permanentCountry`| VARCHAR(50)| Yes | None | NULL | Bansa ng permanenteng tirahan |
+| `permanentZipCode`| VARCHAR(10)| Yes | None | NULL | Zip Code ng permanenteng tirahan |
+| `fatherLastName`| VARCHAR(50)| Yes | None | NULL | Apelyido ng ama |
+| `fatherFirstName`| VARCHAR(50)| Yes | None | NULL | Pangalan ng ama |
+| `fatherMiddleName`| VARCHAR(50)| Yes | None | NULL | Gitnang pangalan ng ama |
+| `fatherContactNumber`| VARCHAR(20)| Yes | None | NULL | Contact number ng ama |
+| `motherMaidenLastName`| VARCHAR(50)| Yes | None | NULL | Apelyido sa pagkadalaga ng ina |
+| `motherFirstName`| VARCHAR(50)| Yes | None | NULL | Pangalan ng ina |
+| `motherMiddleName`| VARCHAR(50)| Yes | None | NULL | Gitnang pangalan ng ina |
+| `motherContactNumber`| VARCHAR(20)| Yes | None | NULL | Contact number ng ina |
+| `guardianLastName`| VARCHAR(50)| Yes | None | NULL | Apelyido ng legal guardian |
+| `guardianFirstName`| VARCHAR(50)| Yes | None | NULL | Pangalan ng legal guardian |
+| `guardianMiddleName`| VARCHAR(50)| Yes | None | NULL | Gitnang pangalan ng guardian |
+| `guardianContactNumber`| VARCHAR(20)| Yes | None | NULL | Contact number ng guardian |
+| `isSned` | BOOLEAN | No | None | FALSE | TRUE kung nasa ilalim ng Special Needs Education |
+| `snedCategory` | VARCHAR(50) | Yes | None | NULL | 'Diagnosis' o 'Manifestations' |
+| `snedDetails` | JSONB | Yes | None | '[]'::jsonb | Array ng mga na-diagnose o napansing kondisyon |
+| `hasPwdId` | BOOLEAN | No | None | FALSE | TRUE kung may hawak na opisyal na PWD ID Card |
+| `gradeLevel` | INT | No | CHECK (7-12) | None | Kasalukuyang antas (Grade 7 hanggang 12) |
+| `strand` | VARCHAR(50) | Yes | None | NULL | Strand kung Senior High (STEM, TVL, HUMSS) |
 | `isReturning` | BOOLEAN | No | None | FALSE | TRUE kung auto-renewed na dating estudyante |
 | `currentSectionId`| UUID | Yes | FOREIGN KEY | NULL | Kasalukuyang pangkat ng estudyante |
 | `createdAt` | TIMESTAMPTZ | No | None | NOW() | Petsa ng pagkakatala |
+| `updatedAt` | TIMESTAMPTZ | No | None | NOW() | Petsa ng huling pagbabago |
 
 ---
 
@@ -198,21 +240,30 @@ Ugnayan ng oras, guro, silid, seksyon, at asignatura.
 ---
 
 ### TABLE 11: `enrollment_applications` (Mga Aplikasyon sa Pagpapatala)
-Nangangasiwa sa mga aplikasyon kung saan ang status at late enrollment flag ay nakabatay sa dynamic setting ng IT Support.
+Nangangasiwa sa mga aplikasyon kung saan ang status, academic snapshot, Balik-Aral/Transferee history, at learning modalities ay naka-align sa DepEd Basic Education Enrollment Form (Revised 06/01/2025).
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `id` | UUID | No | PRIMARY KEY | uuid_generate_v4() | Internal record ID |
-| `applicationId` | VARCHAR(30) | No | UNIQUE | None | Tracking code para sa estudyante |
+| `applicationId` | VARCHAR(30) | No | UNIQUE | None | Tracking code para sa estudyante (e.g. DNHS-2026-0001) |
 | `studentId` | UUID | No | FOREIGN KEY | None | Ugnayan sa `students.id` |
 | `applicantType` | VARCHAR(20) | No | CHECK | None | 'Grade 7', 'Grade 11', 'Transferee', 'Returning' |
 | `schoolYear` | VARCHAR(20) | No | None | None | Taong panuruan ng aplikasyon |
-| `targetGradeLevel`| INT | No | CHECK (7-12) | None | Antas na papasukan |
-| `targetStrand` | VARCHAR(50) | Yes | None | NULL | Piniling strand kung Senior High |
+| `isGraded` | BOOLEAN | No | None | TRUE | TRUE kung Graded; FALSE kung Non-Graded (SNEd Only) |
+| `targetGradeLevel`| INT | No | CHECK (7-12) | None | Antas na papasukan (Grade 7 hanggang 12) |
+| `targetTrack` | VARCHAR(50) | Yes | None | NULL | Senior High Track ('Academic Track', 'TVL Track') |
+| `targetStrand` | VARCHAR(50) | Yes | None | NULL | Piniling strand kung Senior High (STEM, HUMSS, TVL) |
+| `lastGradeCompleted`| INT | Yes | None | NULL | Huling antas na natapos (para sa Balik-Aral / Transferee) |
+| `lastSchoolYearCompleted`| VARCHAR(20)| Yes | None | NULL | Huling taong panuruan na natapos |
+| `lastSchoolAttended`| VARCHAR(150)| Yes | None | NULL | Pangalan ng dating pinapasukang paaralan |
+| `lastSchoolId` | VARCHAR(10) | Yes | None | NULL | 6-digit opisyal na DepEd School ID ng dating paaralan |
+| `preferredModalities`| JSONB | No | None | '[]'::jsonb | Array ng mga piniling modalities (Blended, Modular, atbp.) |
 | `status` | VARCHAR(20) | No | CHECK | 'Pending' | 'Pending', 'Approved', 'Needs Revision' |
 | `isLateEnrollee` | BOOLEAN | No | None | FALSE | TRUE kung lumampas sa regular registration window |
-| `submittedDocuments`| JSONB | No | None | '[]'::jsonb | Mga paths ng dokumento sa S3 bucket |
-| `selectedElectives` | JSONB | Yes | None | '[]'::jsonb | Mga piniling cross-strand electives |
-| `adminFeedback` | TEXT | Yes | None | NULL | Dahilan kung minarkahang 'Needs Revision' |
+| `submittedDocuments`| JSONB | No | None | '[]'::jsonb | Mga paths at metadata ng dokumento sa S3 bucket |
+| `selectedElectives` | JSONB | Yes | None | '[]'::jsonb | Mga piniling cross-strand electives (max 5 core limit) |
+| `adminFeedback` | TEXT | Yes | None | NULL | Dahilan o komento kung minarkahang 'Needs Revision' |
 | `reviewedBy` | UUID | Yes | FOREIGN KEY | NULL | Ugnayan sa `school_administrators.id` |
 | `submissionDate`| DATE | No | None | CURRENT_DATE | Petsa ng pagsusumite |
+| `createdAt` | TIMESTAMPTZ | No | None | NOW() | Petsa at oras ng pagpasa |
+| `updatedAt` | TIMESTAMPTZ | No | None | NOW() | Petsa at oras ng huling pagsusuri |

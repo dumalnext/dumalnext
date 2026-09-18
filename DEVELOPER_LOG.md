@@ -116,3 +116,9 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
   - Ang mga petsa ng bawat termino (Term 1, Term 2, Term 3), school year, exam dates, at report card distribution ay HINDI naka-hardcode.
   - Dinamiko itong ise-set at iko-configure ng **IT Support** o **School Administrator** taon-taon batay sa inilalabas na taunang DepEd Order.
   - Ang schema sa `academic_terms` ay handa para sa dynamic creation ng school year configurations.
+- [x] **Unang Hakbang: Pag-align ng Database sa DepEd Enrollment Form (Revised 06/01/2025)**:
+  - Pinalawak ang `students` table sa `supabase/schema.sql` upang suportahan ang opisyal na DepEd fields: LRN (12 digits), PSA No., buong pangalan at extension name, lugar ng kapanganakan, relihiyon, wika, Indigenous Peoples (IP) status at pamayanan, 4Ps beneficiary at 16-digit ID, detalyadong tirahan (Cabaritan, Kalabakan, Quibel, San Isidro), magulang at legal guardian na may hiwalay na contact numbers, at SNEd/PWD status.
+  - Pinalawak ang `enrollment_applications` table upang maglaman ng snapshot fields para sa Balik-Aral at Transferee history (huling antas, taon, paaralan, at 6-digit School ID), graded vs non-graded indicator, at distance learning modality preferences (Section 8).
+  - Ginawa ang migration file: `supabase/migrations/20260918_deped_enrollment_fields.sql`.
+  - Ginawa ang TypeScript type definitions at constants: `lib/types/enrollment.ts`.
+  - In-update ang Technical Data Dictionary: `DATABASE_DICTIONARY.md` (Table 2 at Table 11).

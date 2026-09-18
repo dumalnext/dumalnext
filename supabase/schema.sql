@@ -20,20 +20,78 @@ CREATE TABLE IF NOT EXISTS public.users (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. STUDENTS PROFILE TABLE
+-- 3. STUDENTS PROFILE TABLE (Aligned with DepEd Basic Education Enrollment Form Revised 06/01/2025)
 CREATE TABLE IF NOT EXISTS public.students (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "userId" UUID REFERENCES public.users(id) ON DELETE CASCADE,
-    "studentID" VARCHAR(20) UNIQUE NOT NULL, -- LRN or DNHS Student ID
+    "studentID" VARCHAR(20) UNIQUE NOT NULL, -- DNHS Student ID or LRN
+    "lrn" VARCHAR(12), -- 12-digit DepEd Learner Reference Number
+    "psaBirthCertNo" VARCHAR(50),
     "firstName" VARCHAR(50) NOT NULL,
     "middleName" VARCHAR(50),
     "lastName" VARCHAR(50) NOT NULL,
+    "extensionName" VARCHAR(10), -- Jr., III, IV, etc.
     "dateOfBirth" DATE,
-    gender VARCHAR(10),
+    age INT,
+    gender VARCHAR(10), -- Male / Female
+    "placeOfBirth" VARCHAR(100),
+    religion VARCHAR(50),
+    "motherTongue" VARCHAR(50),
     "contactNumber" VARCHAR(20),
-    barangay VARCHAR(100) NOT NULL, -- Dumalneg barangays (e.g., Cabaritan, Kalaw, San Isidro, Quibel)
+    
+    -- Indigenous Peoples (IP) Data (Vital for Dumalneg Ancestral Domain)
+    "isIpCommunity" BOOLEAN DEFAULT FALSE,
+    "ipCommunityName" VARCHAR(100), -- e.g., Isnag/Isneg, Tingguian/Itneg
+    
+    -- 4Ps Beneficiary Information
+    "is4psBeneficiary" BOOLEAN DEFAULT FALSE,
+    "householdId4ps" VARCHAR(30), -- 16-digit 4Ps Household ID
+    
+    -- Current Residential Address
+    "currentHouseNo" VARCHAR(50),
+    "currentSitio" VARCHAR(100),
+    "currentBarangay" VARCHAR(100) NOT NULL DEFAULT 'Cabaritan', -- Cabaritan, Kalabakan, Quibel, San Isidro
+    "currentMunicipality" VARCHAR(100) NOT NULL DEFAULT 'Dumalneg',
+    "currentProvince" VARCHAR(100) NOT NULL DEFAULT 'Ilocos Norte',
+    "currentCountry" VARCHAR(50) NOT NULL DEFAULT 'Philippines',
+    "currentZipCode" VARCHAR(10) NOT NULL DEFAULT '2921',
+    barangay VARCHAR(100) NOT NULL DEFAULT 'Cabaritan', -- Legacy backward compatibility
+    
+    -- Permanent Residential Address
+    "isPermanentSameAsCurrent" BOOLEAN DEFAULT TRUE,
+    "permanentHouseNo" VARCHAR(50),
+    "permanentSitio" VARCHAR(100),
+    "permanentBarangay" VARCHAR(100),
+    "permanentMunicipality" VARCHAR(100),
+    "permanentProvince" VARCHAR(100),
+    "permanentCountry" VARCHAR(50),
+    "permanentZipCode" VARCHAR(10),
+    
+    -- Parents & Legal Guardian Details
+    "fatherLastName" VARCHAR(50),
+    "fatherFirstName" VARCHAR(50),
+    "fatherMiddleName" VARCHAR(50),
+    "fatherContactNumber" VARCHAR(20),
+    
+    "motherMaidenLastName" VARCHAR(50),
+    "motherFirstName" VARCHAR(50),
+    "motherMiddleName" VARCHAR(50),
+    "motherContactNumber" VARCHAR(20),
+    
+    "guardianLastName" VARCHAR(50),
+    "guardianFirstName" VARCHAR(50),
+    "guardianMiddleName" VARCHAR(50),
+    "guardianContactNumber" VARCHAR(20),
+    
+    -- Special Needs Education (SNEd) Program
+    "isSned" BOOLEAN DEFAULT FALSE,
+    "snedCategory" VARCHAR(50), -- 'Diagnosis' or 'Manifestations'
+    "snedDetails" JSONB DEFAULT '[]'::jsonb, -- Array of selected diagnosed conditions or manifestations
+    "hasPwdId" BOOLEAN DEFAULT FALSE,
+    
+    -- Academic Placement
     "gradeLevel" INT NOT NULL CHECK ("gradeLevel" BETWEEN 7 AND 12),
-    strand VARCHAR(50), -- STEM, ABM, HUMSS, TVL (For Grades 11-12)
+    strand VARCHAR(50), -- STEM, TVL, HUMSS, ABM (For Grades 11-12)
     "isReturning" BOOLEAN DEFAULT FALSE, -- True if renewed/transcribed automatically
     "currentSectionId" UUID,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -149,18 +207,30 @@ CREATE TABLE IF NOT EXISTS public.class_schedules (
     CONSTRAINT check_time_order CHECK ("startTime" < "endTime")
 );
 
--- 12. ENROLLMENT APPLICATIONS TABLE
+-- 12. ENROLLMENT APPLICATIONS TABLE (DepEd Basic Education Enrollment Form Aligned)
 CREATE TABLE IF NOT EXISTS public.enrollment_applications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "applicationId" VARCHAR(30) UNIQUE NOT NULL,
     "studentId" UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
     "applicantType" VARCHAR(20) NOT NULL CHECK ("applicantType" IN ('Grade 7', 'Grade 11', 'Transferee', 'Returning')),
     "schoolYear" VARCHAR(20) NOT NULL,
+    "isGraded" BOOLEAN DEFAULT TRUE, -- Graded vs Non-Graded (SNEd)
     "targetGradeLevel" INT NOT NULL CHECK ("targetGradeLevel" BETWEEN 7 AND 12),
-    "targetStrand" VARCHAR(50), -- For SHS
+    "targetTrack" VARCHAR(50), -- Academic, TVL
+    "targetStrand" VARCHAR(50), -- For SHS: STEM, HUMSS, TVL-Agri-Fishery, TVL-ICT, TVL-HE
+    
+    -- Returning Learner (Balik-Aral) and Transferee / Move-In History
+    "lastGradeCompleted" INT,
+    "lastSchoolYearCompleted" VARCHAR(20),
+    "lastSchoolAttended" VARCHAR(150),
+    "lastSchoolId" VARCHAR(10), -- 6-digit DepEd School ID
+    
+    -- Distance Learning Modality Preferences (Section 8)
+    "preferredModalities" JSONB DEFAULT '[]'::jsonb, -- e.g. ['Blended', 'Modular (Print)', 'Online']
+    
     status VARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Needs Revision')),
     "isLateEnrollee" BOOLEAN DEFAULT FALSE,
-    "submittedDocuments" JSONB DEFAULT '[]'::jsonb, -- S3 Bucket keys: birth_certificate, form_137, id_picture
+    "submittedDocuments" JSONB DEFAULT '[]'::jsonb, -- S3 Bucket keys: birth_certificate, form_138, id_picture
     "selectedElectives" JSONB DEFAULT '[]'::jsonb, -- Cross-strand electives
     "adminFeedback" TEXT, -- Note if "Needs Revision"
     "reviewedBy" UUID REFERENCES public.school_administrators(id),
