@@ -30,6 +30,34 @@ export default function Step1ApplicantType({
 }: Step1ApplicantTypeProps) {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
+  // Feeder school detection: Grade 7 defaults to Dumalneg Elementary School (100050), Grade 11 to Dumalneg NHS (300017)
+  const isElementaryFeeder =
+    data.applicantType === "Grade 7" ||
+    ((data.applicantType === "Transferee" || data.applicantType === "Returning") &&
+      Number(data.targetGradeLevel) === 7);
+
+  const defaultFeederSchoolName = isElementaryFeeder
+    ? "Dumalneg Elementary School"
+    : "Dumalneg National High School";
+
+  const defaultFeederSchoolId = isElementaryFeeder ? "100050" : "300017";
+
+  const isDefaultSchool =
+    Boolean(data.lastSchoolAttended) &&
+    data.lastSchoolAttended === defaultFeederSchoolName &&
+    data.lastSchoolId === defaultFeederSchoolId;
+
+  // Auto-preset feeder school if applicant type is chosen and no school attended is yet specified
+  React.useEffect(() => {
+    if (data.applicantType && !data.lastSchoolAttended) {
+      onChange({
+        lastSchoolAttended: defaultFeederSchoolName,
+        lastSchoolId: defaultFeederSchoolId,
+        lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
+      });
+    }
+  }, [data.applicantType, defaultFeederSchoolName, defaultFeederSchoolId]);
+
   // When applicant type changes, set appropriate default grade levels and conditional parameters
   const handleSelectApplicantType = (type: ApplicantType) => {
     if (type === "Grade 7") {
@@ -41,6 +69,9 @@ export default function Step1ApplicantType({
         targetTrack: "",
         targetStrand: "",
         targetSemester: "",
+        lastSchoolAttended: "Dumalneg Elementary School",
+        lastSchoolId: "100050",
+        lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
       });
     } else if (type === "Grade 11") {
       onChange({
@@ -51,10 +82,14 @@ export default function Step1ApplicantType({
         targetTrack: data.targetTrack || "Academic Track",
         targetStrand: data.targetStrand || "STEM",
         targetSemester: data.targetSemester || "1st Semester",
+        lastSchoolAttended: "Dumalneg National High School",
+        lastSchoolId: "300017",
+        lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
       });
     } else if (type === "Transferee" || type === "Returning") {
       const currentTarget = typeof data.targetGradeLevel === "number" ? data.targetGradeLevel : 7;
       const isSHS = currentTarget >= 11;
+      const isG7 = currentTarget === 7;
       onChange({
         applicantType: type,
         targetGradeLevel: currentTarget,
@@ -63,6 +98,9 @@ export default function Step1ApplicantType({
         targetTrack: isSHS ? (data.targetTrack || "Academic Track") : "",
         targetStrand: isSHS ? (data.targetStrand || "STEM") : "",
         targetSemester: isSHS ? (data.targetSemester || "1st Semester") : "",
+        lastSchoolAttended: data.lastSchoolAttended || (isG7 ? "Dumalneg Elementary School" : "Dumalneg National High School"),
+        lastSchoolId: data.lastSchoolId || (isG7 ? "100050" : "300017"),
+        lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
       });
     }
 
@@ -676,60 +714,203 @@ export default function Step1ApplicantType({
               )}
             </div>
 
-            {/* Last School Attended */}
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                {data.applicantType === "Grade 7"
-                  ? "Official Name of Elementary School Graduated / Last Attended"
-                  : data.applicantType === "Grade 11"
-                  ? "Official Name of Junior High School Completed / Last Attended"
-                  : "Official Registered Name of Last School Attended"}{" "}
-                <span className="text-red-700">*</span>
-              </label>
-              <input
-                type="text"
-                value={data.lastSchoolAttended || ""}
-                onChange={(e) => onChange({ lastSchoolAttended: e.target.value })}
-                placeholder={
-                  data.applicantType === "Grade 7"
-                    ? "e.g. Dumalneg Central Elementary School / Cabaritan Elementary School"
-                    : "e.g. Dumalneg National High School / Pagudpud National High School"
-                }
-                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
-              />
-              {errors.lastSchoolAttended && (
-                <span className="text-xs text-red-700 font-semibold mt-1 block">
-                  {errors.lastSchoolAttended}
-                </span>
-              )}
-            </div>
-
-            {/* School ID (6-digit) */}
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Previous DepEd School ID (6 Numeric Digits) <span className="text-red-700">*</span>
-              </label>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <input
-                  type="text"
-                  maxLength={6}
-                  value={data.lastSchoolId || ""}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, "");
-                    onChange({ lastSchoolId: val });
-                  }}
-                  placeholder="300123"
-                  className="w-48 p-3 bg-white border-2 border-slate-300 text-base font-mono tracking-widest font-bold focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none text-center"
-                />
-                <span className="text-xs text-slate-500 leading-relaxed">
-                  Official 6-digit DepEd School ID registered in the Learner Information System (LIS). 
-                  Visible on the learner&apos;s Form 138 / Report Card header.
-                </span>
+            {/* School Attended Selector: 2 Choices (Dumalneg Elementary School vs Others) */}
+            <div className="sm:col-span-2 space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-900 uppercase">
+                  {data.applicantType === "Grade 7"
+                    ? "Official Name of Elementary School Graduated / Last Attended"
+                    : data.applicantType === "Grade 11"
+                    ? "Official Name of Junior High School Completed / Last Attended"
+                    : "Official Registered Name of Last School Attended"}{" "}
+                  <span className="text-red-700">*</span>
+                </label>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Select your completed feeder school or choose &apos;Others&apos; to specify a different institution.
+                </p>
               </div>
-              {errors.lastSchoolId && (
-                <span className="text-xs text-red-700 font-semibold mt-1 block">
-                  {errors.lastSchoolId}
-                </span>
+
+              {/* 2 Interactive Option Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Choice 1: Default Feeder School (Dumalneg Elementary School / Dumalneg NHS) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange({
+                      lastSchoolAttended: defaultFeederSchoolName,
+                      lastSchoolId: defaultFeederSchoolId,
+                    });
+                    if (errors.lastSchoolAttended || errors.lastSchoolId) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.lastSchoolAttended;
+                        delete next.lastSchoolId;
+                        return next;
+                      });
+                    }
+                  }}
+                  className={`p-4 border-2 text-left transition-all ${
+                    isDefaultSchool
+                      ? "border-[#002060] bg-blue-50/70 shadow-sm ring-1 ring-[#002060]"
+                      : "border-slate-300 bg-white hover:border-slate-400"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span
+                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                        isDefaultSchool
+                          ? "bg-[#002060] text-white"
+                          : "bg-slate-200 text-slate-700"
+                      }`}
+                    >
+                      [ {isDefaultSchool ? "SELECTED" : "SELECT"} ]
+                    </span>
+                    <span className="text-[11px] font-mono font-bold text-[#002060]">
+                      ID: {defaultFeederSchoolId}
+                    </span>
+                  </div>
+                  <div className="text-sm font-bold text-slate-900">
+                    {defaultFeederSchoolName}
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                    Official public feeder school in Dumalneg. DepEd School ID ({defaultFeederSchoolId}) is automatically filled and verified.
+                  </p>
+                </button>
+
+                {/* Choice 2: Others (Specify) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isDefaultSchool) {
+                      onChange({
+                        lastSchoolAttended: "",
+                        lastSchoolId: "",
+                      });
+                    }
+                  }}
+                  className={`p-4 border-2 text-left transition-all ${
+                    !isDefaultSchool
+                      ? "border-[#002060] bg-blue-50/70 shadow-sm ring-1 ring-[#002060]"
+                      : "border-slate-300 bg-white hover:border-slate-400"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span
+                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                        !isDefaultSchool
+                          ? "bg-[#002060] text-white"
+                          : "bg-slate-200 text-slate-700"
+                      }`}
+                    >
+                      [ {!isDefaultSchool ? "SELECTED" : "SELECT"} ]
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase font-bold">
+                      MANUAL ENTRY
+                    </span>
+                  </div>
+                  <div className="text-sm font-bold text-slate-900">
+                    Others (Specify School &amp; ID)
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                    Select if transferring or graduated from another school outside Dumalneg (e.g., Pagudpud, Bangui, Adams, private school).
+                  </p>
+                </button>
+              </div>
+
+              {/* Verified Feeder Confirmation Banner */}
+              {isDefaultSchool && (
+                <div className="p-3.5 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                  <div>
+                    <span className="font-bold text-emerald-950 uppercase block">
+                      Automatic Feeder Applied: {defaultFeederSchoolName}
+                    </span>
+                    <span className="text-[11px] text-emerald-800">
+                      DepEd School ID: <strong>{defaultFeederSchoolId}</strong> (Division of Ilocos Norte). Ready for verification.
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto">
+                    [ AUTO-PRESET VERIFIED ]
+                  </span>
+                </div>
+              )}
+
+              {/* Manual Entry Inputs when "Others (Specify)" is selected */}
+              {!isDefaultSchool && (
+                <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner">
+                  <div className="border-b border-slate-200 pb-2">
+                    <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                      [ Manual School Specification ]
+                    </span>
+                    <p className="text-[11px] text-slate-600 mt-0.5">
+                      Enter the registered name and 6-digit DepEd School ID found on the learner&apos;s Form 138 / SF9 Report Card.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      Official School Name <span className="text-red-700">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={data.lastSchoolAttended || ""}
+                      onChange={(e) => {
+                        onChange({ lastSchoolAttended: e.target.value.toUpperCase() });
+                        if (errors.lastSchoolAttended) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next.lastSchoolAttended;
+                            return next;
+                          });
+                        }
+                      }}
+                      placeholder={
+                        data.applicantType === "Grade 7"
+                          ? "e.g. CABARITAN ELEMENTARY SCHOOL / BANGUI CENTRAL SCHOOL"
+                          : "e.g. PAGUDPUD NATIONAL HIGH SCHOOL / ADAMS NATIONAL HIGH SCHOOL"
+                      }
+                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                        errors.lastSchoolAttended ? "border-red-600 bg-red-50" : "border-slate-300"
+                      }`}
+                    />
+                    {errors.lastSchoolAttended && (
+                      <p className="text-[11px] font-bold text-red-700 mt-1">{errors.lastSchoolAttended}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      DepEd School ID (6 Numeric Digits) <span className="text-red-700">*</span>
+                    </label>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      <input
+                        type="text"
+                        maxLength={6}
+                        value={data.lastSchoolId || ""}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                          onChange({ lastSchoolId: val });
+                          if (errors.lastSchoolId) {
+                            setErrors((prev) => {
+                              const next = { ...prev };
+                              delete next.lastSchoolId;
+                              return next;
+                            });
+                          }
+                        }}
+                        placeholder="100XXX"
+                        className={`w-40 p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-widest text-center focus:border-[#002060] outline-none ${
+                          errors.lastSchoolId ? "border-red-600 bg-red-50" : "border-slate-300"
+                        }`}
+                      />
+                      <span className="text-xs text-slate-500">
+                        Official 6-digit DepEd School ID registered in LIS. Found on the report card header.
+                      </span>
+                    </div>
+                    {errors.lastSchoolId && (
+                      <p className="text-[11px] font-bold text-red-700 mt-1">{errors.lastSchoolId}</p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           </div>

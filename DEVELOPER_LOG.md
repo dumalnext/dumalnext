@@ -201,6 +201,12 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
     - Bawal i-tag ang lahat bilang "Not Available" nang walang lehitimong legal custodian.
   - **Zero Emojis & Strict Academic English**: Pormal na DepEd Navy Blue (`#002060`) at Pure White (`#FFFFFF`).
   - Na-verify gamit ang `npm run build:student` at `npx tsc --noEmit` (0 errors), at naka-commit at push sa GitHub `main`.
+- [x] **Smart Feeder School Selector (Section 6: Previous School Attended)**:
+  - Pinalitan ang dating blangkong text field sa Section 6 ng dalawang (2) intuitive at mabilis na pagpipilian:
+    1. **`Dumalneg Elementary School`** (o `Dumalneg National High School` para sa Grade 11 / JHS completers): Awtomatikong naglalagay ng opisyal na pangalan ng paaralan at verified 6-digit DepEd School ID (`100050` para sa Dumalneg ES, `300017` para sa Dumalneg NHS). May kasamang verified green badge upang mapadali ang pag-enroll ng mayorya ng mga residente sa Dumalneg nang hindi na kailangang mag-type nang mano-mano.
+    2. **`Others (Specify)`**: Para sa mga lumipat o nagtapos sa ibang bayan o pribadong paaralan (hal. Pagudpud, Bangui, Adams, Laoag); inilalabas ang manual text inputs para sa School Name at 6-digit DepEd School ID.
+  - May automated `useEffect` hook na agad nagpe-preset sa `Dumalneg Elementary School` kapag pinili ang Grade 7 enrollees upang maiwasan ang anumang human input error o validation stall.
+
 
 
 
