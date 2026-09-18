@@ -10,13 +10,16 @@
 1. **BAWAL ANG EMOJI AT ICONS SA UI AT CODE**:
    - Huwag gagamit ng mga emoji (tulad ng checkmark emojis, warning emojis, smileys) o decorative icons.
    - Ang disenyo ay dapat pormal, academic, at sumusunod sa **DepEd Color Scheme: Navy Blue (`#002060`) at Pure White (`#FFFFFF`)**.
-   - Gamitin ang malinaw na text labels sa halip na icons (hal. "[ Approved ]", "[ Pending ]", "[ Needs Revision ]", "Bumalik", "Isumite", "I-print").
+   - Gamitin ang malinaw na text labels sa halip na icons (hal. "[ Approved ]", "[ Pending ]", "[ Needs Revision ]", "Back", "Submit", "Print").
 
-2. **DOKUMENTASYON SA BAWAT PAGBABAGO**:
+2. **STRICT FORMAL ENGLISH SA LAHAT NG UI AT FORMS**:
+   - Ang buong User Interface (UI), online enrollment forms, stepper, button labels, notifications, at modal alerts ay dapat 100% nasa **pormal at opisyal na wikang Ingles (Formal Academic English)** alinsunod sa pamantayan ng Department of Education (DepEd).
+
+3. **DOKUMENTASYON SA BAWAT PAGBABAGO**:
    - Bawat bagong file, database table, o API na gagawin ay dapat idagdag dito sa `DEVELOPER_LOG.md`.
    - Bago mag-commit o mag-push sa GitHub, suriin muna ang listahan dito para walang nagkakasalungat na code.
 
-3. **STRICT MVC (Model-View-Controller)**:
+4. **STRICT MVC (Model-View-Controller)**:
    - **View Layer**: React / Next.js Components (`app/`)
    - **Controller Layer**: Next.js Server Actions (`app/actions/`)
    - **Model Layer**: PostgreSQL / Supabase Tables at RLS (`supabase/schema.sql`, `lib/supabase/`)

@@ -8,15 +8,15 @@ export default function Home() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-bold tracking-widest text-[#002060] uppercase">
-              [ Opisyal na Anunsyo ng Paaralan ]
+              [ Official School Announcement ]
             </span>
             <h2 className="text-lg font-bold text-slate-900 mt-1">
-              Bukas na ang Online Enrollment para sa Taong Panuruan 2026-2027
+              Online Enrollment is Now Open for Incoming and Returning Students
             </h2>
             <p className="text-sm text-slate-600 mt-2 max-w-3xl leading-relaxed">
-              Ang sistemang ito ay opisyal na inilaan para sa mga mag-aaral ng Dumalneg National High School, 
-              lalo na sa mga malalayong barangay upang hindi na kailangang bumiyahe nang malayo para magsumite 
-              ng mga kinakailangang dokumento. May built-in image compression upang mabilis makapag-upload kahit mahina ang signal.
+              This official web portal serves the students and parents of Dumalneg National High School, 
+              particularly across remote and far-flung barangays, eliminating geographical barriers for enrollment. 
+              Equipped with client-side image compression to guarantee rapid document submissions even under low-bandwidth network conditions.
             </p>
           </div>
           <div className="shrink-0">
@@ -24,7 +24,7 @@ export default function Home() {
               href="/student/enroll"
               className="btn-primary block text-center uppercase tracking-wider text-xs px-6 py-3 font-bold"
             >
-              Magsimula ng Enrollment
+              Proceed to Online Enrollment
             </Link>
           </div>
         </div>
@@ -33,7 +33,7 @@ export default function Home() {
       {/* Target Audiences Grid: G7, G11, Transferees, Returning Students */}
       <section className="bg-slate-100 p-6 border border-slate-200">
         <h3 className="text-sm font-bold tracking-wider text-slate-700 uppercase mb-4">
-          [ Gabay sa Pagpapatala ayon sa Antas ng Mag-aaral ]
+          [ Enrollment Classification Guidelines ]
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 border border-slate-300">
@@ -42,9 +42,9 @@ export default function Home() {
             </div>
             <h4 className="text-base font-bold text-slate-900 mb-2">Junior High School</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Para sa mga magtatapos ng Grade 6. Mag-upload ng PSA Birth Certificate at Form 138 (Report Card).
+              For Grade 6 elementary completers. Upload official PSA Birth Certificate and Form 138 (Learner&apos;s Progress Report Card).
             </p>
-            <span className="badge-status badge-pending">Kinakailangan ng Online Form</span>
+            <span className="badge-status badge-pending">Online Registration Required</span>
           </div>
 
           <div className="bg-white p-4 border border-slate-300">
@@ -53,20 +53,20 @@ export default function Home() {
             </div>
             <h4 className="text-base font-bold text-slate-900 mb-2">Senior High School</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Pumili ng Strand (STEM, TVL, HUMSS) at Cross-Strand Electives. May limitasyong hanggang 5 core subjects bawat trisem.
+              Select Senior High Track, Strand (STEM, TVL, HUMSS), and Cross-Strand Electives. Maximum of 5 core subjects per trimester.
             </p>
-            <span className="badge-status badge-pending">Kinakailangan ng Online Form</span>
+            <span className="badge-status badge-pending">Online Registration Required</span>
           </div>
 
           <div className="bg-white p-4 border border-slate-300">
             <div className="text-xs font-bold text-emerald-800 uppercase mb-1">
-              [ 03 ] Returning Students (G8-G10, G12)
+              [ 03 ] Returning Students (Grades 8-10, Grade 12)
             </div>
-            <h4 className="text-base font-bold text-slate-900 mb-2">Awtomatikong Na-Renew</h4>
+            <h4 className="text-base font-bold text-slate-900 mb-2">Continuing Enrollment</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Ang mga datihang mag-aaral ng DNHS ay awtomatikong inililipat sa susunod na baitang. I-verify lamang ang inyong talaan.
+              Regular continuing students of DNHS are automatically transcribed in the database. Verify record status via LRN lookup.
             </p>
-            <span className="badge-status badge-approved">Auto-Transcribed sa Database</span>
+            <span className="badge-status badge-approved">Database Auto-Transcribed</span>
           </div>
         </div>
       </section>
@@ -75,13 +75,13 @@ export default function Home() {
       <section className="space-y-4">
         <div>
           <span className="text-xs font-bold tracking-widest text-[#002060] uppercase">
-            [ Portal Navigation ]
+            [ Portal Workstation Directory ]
           </span>
           <h3 className="text-lg font-bold text-slate-900">
-            Pumili ng Portal ayon sa Inyong Tungkulin
+            Select Your Designated Workstation Portal
           </h3>
           <p className="text-xs text-slate-500">
-            Segregated Role-Based Access Control para sa mga estudyante, guro, admin, at IT staff.
+            Strictly segregated role-based access control for students, faculty, school administrators, and IT systems staff.
           </p>
         </div>
 
@@ -92,15 +92,15 @@ export default function Home() {
               <div className="text-xs font-mono font-bold text-slate-500 mb-2">[ PORTAL 01 ]</div>
               <h4 className="text-base font-bold text-[#002060] mb-2">Student Portal</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Online registration, pag-upload ng dokumento, pagpili ng electives, at pagsubaybay sa application status.
+                Online registration, client-side document upload, elective selection, and real-time application status tracking.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-200">
               <Link
                 href="/student"
-                className="btn-primary w-full text-center text-xs uppercase tracking-wider"
+                className="btn-primary w-full text-center text-xs uppercase tracking-wider block"
               >
-                Buksan ang Portal
+                Enter Student Portal
               </Link>
             </div>
           </div>
@@ -111,15 +111,15 @@ export default function Home() {
               <div className="text-xs font-mono font-bold text-slate-500 mb-2">[ PORTAL 02 ]</div>
               <h4 className="text-base font-bold text-[#002060] mb-2">Faculty / Teacher</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Tingnan ang assigned teaching schedule (JHS at SHS cross-level loads) at one-click student class roster lookup.
+                Review assigned teaching loads (JHS & SHS cross-level loads), schedules, and generate student class rosters.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-200">
               <Link
                 href="/teacher"
-                className="btn-secondary w-full text-center text-xs uppercase tracking-wider"
+                className="btn-secondary w-full text-center text-xs uppercase tracking-wider block"
               >
-                Guro Mag-Login
+                Faculty Login
               </Link>
             </div>
           </div>
@@ -130,15 +130,15 @@ export default function Home() {
               <div className="text-xs font-mono font-bold text-slate-500 mb-2">[ PORTAL 03 ]</div>
               <h4 className="text-base font-bold text-[#002060] mb-2">School Administrator</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Pagsusuri ng submissions (Approve / Needs Revision), master records, automated deconfliction, at section quota limits.
+                Review enrollment applications (Approve / Needs Revision), master records, automated deconfliction, and section quotas.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-200">
               <Link
                 href="/admin"
-                className="btn-secondary w-full text-center text-xs uppercase tracking-wider"
+                className="btn-secondary w-full text-center text-xs uppercase tracking-wider block"
               >
-                Admin Dashboard
+                Administrator Portal
               </Link>
             </div>
           </div>
@@ -149,15 +149,15 @@ export default function Home() {
               <div className="text-xs font-mono font-bold text-slate-500 mb-2">[ PORTAL 04 ]</div>
               <h4 className="text-base font-bold text-[#002060] mb-2">IT Support & System</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Konfigurasyon ng academic year at trisem, RBAC role permissions, session management, at audit logs.
+                Dynamic academic year and trimester calendar configuration, RBAC permissions, session control, and audit logs.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-200">
               <Link
                 href="/it-support"
-                className="btn-secondary w-full text-center text-xs uppercase tracking-wider"
+                className="btn-secondary w-full text-center text-xs uppercase tracking-wider block"
               >
-                IT Portal
+                IT Support Portal
               </Link>
             </div>
           </div>
@@ -167,24 +167,24 @@ export default function Home() {
       {/* System Specifications Compliance Section */}
       <section className="bg-white p-6 border border-slate-200">
         <h3 className="text-sm font-bold tracking-wider text-slate-700 uppercase mb-3">
-          [ Mga Alituntunin at Regulasyon ng Sistema (DNHS Academic Specs) ]
+          [ Institutional Academic Policies & System Specifications ]
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600">
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <strong className="text-slate-900 block mb-1">1. Trimestral (Trisem) System:</strong>
-            Ang akademikong taon ay nahahati sa tatlong trisem para sa maayos na pag-aaral ng mga core at specialized subjects.
+            <strong className="text-slate-900 block mb-1">1. Three-Term (Trimester) Academic Calendar:</strong>
+            The school year is structured into three instructional terms to support comprehensive mastery of core and specialized subjects.
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
             <strong className="text-slate-900 block mb-1">2. Senior High School Core Subject Limit:</strong>
-            Limitado sa pinakamataas na limang (5) core subjects bawat trisem ang bawat SHS student ayon sa kurikulum ng paaralan.
+            Senior High School students are strictly limited to a maximum of five (5) core subjects per trimester in accordance with school policy.
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
             <strong className="text-slate-900 block mb-1">3. Automated Schedule Deconfliction:</strong>
-            Awtomatikong sinusuri ng algorithm kung may conflict sa oras ng guro (cross-level load), silid-aralan, at mga asignatura.
+            The scheduling engine automatically validates and resolves conflicts across faculty cross-level teaching loads, rooms, and subjects.
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
             <strong className="text-slate-900 block mb-1">4. Cross-Strand Electives & Strand Switching:</strong>
-            Maaaring kumuha ng electives mula sa ibang strand at magpalit ng strand bago pumasok sa Grade 12.
+            Senior High students may elect interdisciplinary subjects, and may request strand realignment prior to entering Grade 12.
           </div>
         </div>
       </section>

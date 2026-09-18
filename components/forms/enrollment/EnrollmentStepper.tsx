@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
-import { StudentProfile, EnrollmentApplication } from "@/lib/types/enrollment";
 
 export interface FullEnrollmentFormData {
   // Step 1: Classification
@@ -143,11 +142,11 @@ const initialFormData: FullEnrollmentFormData = {
 };
 
 const STEP_LABELS = [
-  { step: 1, label: "Klasipikasyon", sublabel: "Uri ng Mag-aaral" },
-  { step: 2, label: "Personal na Tala", sublabel: "Tirahan at LRN" },
-  { step: 3, label: "Magulang / Guardian", sublabel: "Impormasyon ng Pamilya" },
-  { step: 4, label: "Kurikulum & Modality", sublabel: "Strand at SNEd" },
-  { step: 5, label: "Dokumento at Rebyu", sublabel: "Pag-compress at Pagpasa" },
+  { step: 1, label: "Classification", sublabel: "Learner Category" },
+  { step: 2, label: "Learner Profile", sublabel: "Personal & Address" },
+  { step: 3, label: "Family Background", sublabel: "Parent & Guardian" },
+  { step: 4, label: "Curriculum & Modality", sublabel: "SHS Strand & SNEd" },
+  { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
 export default function EnrollmentStepper() {
@@ -179,10 +178,10 @@ export default function EnrollmentStepper() {
           </div>
           <div className="text-right">
             <span className="text-xs font-mono font-bold text-slate-600 block">
-              Hakbang {currentStep} ng 5
+              Step {currentStep} of 5
             </span>
             <span className="text-[10px] text-slate-500 uppercase tracking-wider">
-              {Math.round((currentStep / 5) * 100)}% Kumpleto
+              {Math.round((currentStep / 5) * 100)}% Complete
             </span>
           </div>
         </div>
@@ -235,15 +234,15 @@ export default function EnrollmentStepper() {
           <div className="bg-white p-8 border border-slate-300 space-y-6">
             <div className="border-b border-slate-200 pb-4">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Hakbang 2 ng 5: Personal na Impormasyon ng Mag-aaral ]
+                [ Step 2 of 5: Learner&apos;s Personal Information ]
               </span>
               <h2 className="text-xl font-bold text-slate-900">
-                Pangalan, Kapanganakan, LRN, Katutubong Pamayanan (IP), at Tirahan
+                Full Name, Birthdate, LRN, Indigenous Cultural Community (IP), and Residential Address
               </h2>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-700">
-              Nakahanda na ang data para sa susunod na hakbang. Ang inyong napili sa Hakbang 1 ay:{" "}
+              Selected in Step 1:{" "}
               <strong>{formData.step1.applicantType}</strong> (Grade {formData.step1.targetGradeLevel}).
             </div>
 
@@ -253,14 +252,14 @@ export default function EnrollmentStepper() {
                 onClick={prevStep}
                 className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Bumalik sa Hakbang 1
+                Back to Step 1
               </button>
               <button
                 type="button"
                 onClick={nextStep}
                 className="btn-primary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Magpatuloy sa Hakbang 3
+                Proceed to Step 3
               </button>
             </div>
           </div>
@@ -270,10 +269,10 @@ export default function EnrollmentStepper() {
           <div className="bg-white p-8 border border-slate-300 space-y-6">
             <div className="border-b border-slate-200 pb-4">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Hakbang 3 ng 5: Impormasyon ng Magulang at Legal Guardian ]
+                [ Step 3 of 5: Parent &amp; Legal Guardian Information ]
               </span>
               <h2 className="text-xl font-bold text-slate-900">
-                Impormasyon ng Ama, Dalagang Pangalan ng Ina, at Guardian
+                Father, Mother&apos;s Maiden Name, and Legal Guardian Background
               </h2>
             </div>
             <div className="flex justify-between pt-4 border-t border-slate-200">
@@ -282,14 +281,14 @@ export default function EnrollmentStepper() {
                 onClick={prevStep}
                 className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Bumalik sa Hakbang 2
+                Back to Step 2
               </button>
               <button
                 type="button"
                 onClick={nextStep}
                 className="btn-primary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Magpatuloy sa Hakbang 4
+                Proceed to Step 4
               </button>
             </div>
           </div>
@@ -299,10 +298,10 @@ export default function EnrollmentStepper() {
           <div className="bg-white p-8 border border-slate-300 space-y-6">
             <div className="border-b border-slate-200 pb-4">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Hakbang 4 ng 5: Senior High School Track & Strand, SNEd, at Modality ]
+                [ Step 4 of 5: Senior High School Track &amp; Strand, SNEd, and Modality ]
               </span>
               <h2 className="text-xl font-bold text-slate-900">
-                Pagpili ng Strand, Electives, at Learning Modalities
+                Strand Selection, Cross-Strand Electives, and Distance Learning Modalities
               </h2>
             </div>
             <div className="flex justify-between pt-4 border-t border-slate-200">
@@ -311,14 +310,14 @@ export default function EnrollmentStepper() {
                 onClick={prevStep}
                 className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Bumalik sa Hakbang 3
+                Back to Step 3
               </button>
               <button
                 type="button"
                 onClick={nextStep}
                 className="btn-primary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Magpatuloy sa Hakbang 5
+                Proceed to Step 5
               </button>
             </div>
           </div>
@@ -328,10 +327,10 @@ export default function EnrollmentStepper() {
           <div className="bg-white p-8 border border-slate-300 space-y-6">
             <div className="border-b border-slate-200 pb-4">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Hakbang 5 ng 5: Client-Side Document Upload at Pagsumite ]
+                [ Step 5 of 5: Client-Side Document Upload &amp; Review ]
               </span>
               <h2 className="text-xl font-bold text-slate-900">
-                Pag-upload ng Dokumento gamit ang HTML5 Canvas Compressor (&lt;350KB)
+                Official Document Upload via HTML5 Canvas Compressor (&lt;350KB)
               </h2>
             </div>
             <div className="flex justify-between pt-4 border-t border-slate-200">
@@ -340,14 +339,14 @@ export default function EnrollmentStepper() {
                 onClick={prevStep}
                 className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
               >
-                Bumalik sa Hakbang 4
+                Back to Step 4
               </button>
               <button
                 type="button"
                 disabled
                 className="bg-slate-300 text-slate-600 cursor-not-allowed text-xs uppercase font-bold py-2.5 px-6"
               >
-                Isumite ang Aplikasyon
+                Submit Application
               </button>
             </div>
           </div>

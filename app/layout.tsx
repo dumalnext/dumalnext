@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Dumal-NEXT | Dumalneg National High School",
-  description: "Web-Based Enrollment and Class Scheduling System for Dumalneg National High School",
+  description: "Official Web-Based Enrollment and Schedule Deconfliction System for Dumalneg National High School",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fil" className="h-full">
+    <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         {/* DepEd & DNHS Institutional Banner (Navy Blue & Pure White, Zero Emojis/Icons) */}
         <header className="deped-header px-6 py-4 shadow-sm">
@@ -25,12 +25,12 @@ export default function RootLayout({
                 DUMALNEG NATIONAL HIGH SCHOOL
               </h1>
               <p className="text-xs text-slate-300 font-medium">
-                Dumal-NEXT: Web-Based Enrollment & Class Scheduling Management System
+                Dumal-NEXT: Web-Based Enrollment & Schedule Deconfliction System
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="bg-blue-900 border border-blue-400/40 text-white px-3 py-1 font-mono">
-                S.Y. 2026-2027 | Trimester System
+                Official Institutional Portal | Trimester System
               </span>
             </div>
           </div>
@@ -49,7 +49,7 @@ export default function RootLayout({
                 Dumalneg National High School - Dumal-NEXT System
               </p>
               <p className="mt-1">
-                Municipality of Dumalneg, Ilocos Norte, Philippines
+                Municipality of Dumalneg, Province of Ilocos Norte, Philippines
               </p>
             </div>
             <div className="text-right">

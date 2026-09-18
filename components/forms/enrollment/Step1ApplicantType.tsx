@@ -30,13 +30,12 @@ export default function Step1ApplicantType({
     let defaultGrade: number | "" = data.targetGradeLevel;
     if (type === "Grade 7") defaultGrade = 7;
     if (type === "Grade 11") defaultGrade = 11;
-    
+
     onChange({
       applicantType: type,
       targetGradeLevel: defaultGrade,
     });
-    
-    // Clear error for applicantType if set
+
     if (errors.applicantType) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -50,26 +49,26 @@ export default function Step1ApplicantType({
     const newErrors: Record<string, string> = {};
 
     if (!data.applicantType) {
-      newErrors.applicantType = "Kinakailangang pumili ng uri ng mag-aaral.";
+      newErrors.applicantType = "Please select a learner classification category.";
     }
 
     if (!data.targetGradeLevel) {
-      newErrors.targetGradeLevel = "Kinakailangang tukuyin ang baitang na papasukan.";
+      newErrors.targetGradeLevel = "Target grade level is required.";
     }
 
     // Validation for Transferee / Returning (Balik-Aral)
     if (data.applicantType === "Transferee" || data.applicantType === "Returning") {
       if (!data.lastGradeCompleted) {
-        newErrors.lastGradeCompleted = "Ilagay ang huling natapos na antas.";
+        newErrors.lastGradeCompleted = "Last grade level completed is required.";
       }
       if (!data.lastSchoolYearCompleted || data.lastSchoolYearCompleted.trim() === "") {
-        newErrors.lastSchoolYearCompleted = "Ilagay ang huling taong panuruan na natapos (hal. 2024-2025).";
+        newErrors.lastSchoolYearCompleted = "Last school year completed is required (e.g., 2024-2025).";
       }
       if (!data.lastSchoolAttended || data.lastSchoolAttended.trim() === "") {
-        newErrors.lastSchoolAttended = "Ilagay ang pangalan ng dating pinapasukang paaralan.";
+        newErrors.lastSchoolAttended = "Official name of last school attended is required.";
       }
       if (!data.lastSchoolId || data.lastSchoolId.trim().length !== 6) {
-        newErrors.lastSchoolId = "Ang DepEd School ID ay dapat eksaktong 6 na numero.";
+        newErrors.lastSchoolId = "Previous DepEd School ID must be exactly 6 digits.";
       }
     }
 
@@ -88,20 +87,20 @@ export default function Step1ApplicantType({
       {/* Step Header */}
       <div className="border-b border-slate-200 pb-4">
         <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-          [ Hakbang 1 ng 5: Klasipikasyon at Antas ng Mag-aaral ]
+          [ Step 1 of 5: Learner Classification & Target Grade Level ]
         </span>
         <h2 className="text-xl font-bold text-slate-900">
-          Piliin ang Uri ng Aplikante at Antas na Papasukan
+          Select Learner Classification & Target Grade Level
         </h2>
         <p className="text-xs text-slate-600 mt-1">
-          Batay sa Seksiyon 2 at Seksiyon 6 ng Opisyal na DepEd Basic Education Enrollment Form.
+          In strict compliance with Section 2 and Section 6 of the Official DepEd Basic Education Enrollment Form (Revised 06/01/2025).
         </p>
       </div>
 
       {/* Part A: Graded vs Non-Graded (SNEd Only) */}
       <div className="space-y-3">
         <label className="text-xs font-bold text-slate-800 uppercase tracking-wide block">
-          Uri ng Programa (Seksiyon 2)
+          Curriculum Program (Section 2)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
@@ -114,11 +113,11 @@ export default function Step1ApplicantType({
             }`}
           >
             <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.isGraded ? "Napili" : "Piliin"} ]
+              [ {data.isGraded ? "Selected" : "Select"} ]
             </div>
             <div className="text-sm font-bold text-slate-900">Graded Program</div>
             <div className="text-xs text-slate-600 mt-1">
-              Para sa regular na mag-aaral ng Junior High School (G7-G10) at Senior High School (G11-G12).
+              Standard secondary education curriculum for Junior High School (Grades 7–10) and Senior High School (Grades 11–12).
             </div>
           </button>
 
@@ -132,11 +131,11 @@ export default function Step1ApplicantType({
             }`}
           >
             <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {!data.isGraded ? "Napili" : "Piliin"} ]
+              [ {!data.isGraded ? "Selected" : "Select"} ]
             </div>
             <div className="text-sm font-bold text-slate-900">Non-Graded Program (SNEd Only)</div>
             <div className="text-xs text-slate-600 mt-1">
-              Inilaan eksklusibo para sa mga mag-aaral sa ilalim ng Special Needs Education Program.
+              Reserved exclusively for learners enrolled under the Special Needs Education (SNEd) Program.
             </div>
           </button>
         </div>
@@ -145,12 +144,12 @@ export default function Step1ApplicantType({
       {/* Part B: Applicant Classification */}
       <div className="space-y-3">
         <label className="text-xs font-bold text-slate-800 uppercase tracking-wide block">
-          Kategorya ng Mag-aaral (Pumili ng isa)
+          Learner Classification (Select One)
         </label>
 
         {errors.applicantType && (
           <div className="p-3 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-medium">
-            [ Paalala ]: {errors.applicantType}
+            [ Notice ]: {errors.applicantType}
           </div>
         )}
 
@@ -166,11 +165,11 @@ export default function Step1ApplicantType({
             }`}
           >
             <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Grade 7" ? "Aktibo" : "Piliin" } ] Kategorya 01
+              [ {data.applicantType === "Grade 7" ? "Active" : "Select"} ] Category 01
             </div>
             <div className="text-sm font-bold text-slate-900">Incoming Grade 7</div>
             <div className="text-xs text-slate-600 mt-1">
-              Nagtapos ng Grade 6 sa elementarya at papasok sa Unang Taon ng Junior High School.
+              Elementary Grade 6 completers transitioning into the First Year of Junior High School.
             </div>
           </button>
 
@@ -185,11 +184,11 @@ export default function Step1ApplicantType({
             }`}
           >
             <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Grade 11" ? "Aktibo" : "Piliin" } ] Kategorya 02
+              [ {data.applicantType === "Grade 11" ? "Active" : "Select"} ] Category 02
             </div>
             <div className="text-sm font-bold text-slate-900">Incoming Grade 11</div>
             <div className="text-xs text-slate-600 mt-1">
-              Junior High School (Grade 10) Completer na magpapatala sa Senior High School.
+              Junior High School (Grade 10) completers enrolling in Senior High School.
             </div>
           </button>
 
@@ -204,11 +203,11 @@ export default function Step1ApplicantType({
             }`}
           >
             <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Transferee" ? "Aktibo" : "Piliin" } ] Kategorya 03
+              [ {data.applicantType === "Transferee" ? "Active" : "Select"} ] Category 03
             </div>
-            <div className="text-sm font-bold text-slate-900">Transferee (Lumipat ng Paaralan)</div>
+            <div className="text-sm font-bold text-slate-900">Transferee (Move-In)</div>
             <div className="text-xs text-slate-600 mt-1">
-              Galing sa ibang pampubliko o pribadong paaralan na lilipat sa Dumalneg NHS (G7-G12).
+              Learners originating from another public or private secondary institution transferring to Dumalneg NHS.
             </div>
           </button>
 
@@ -223,11 +222,11 @@ export default function Step1ApplicantType({
             }`}
           >
             <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Returning" ? "Aktibo" : "Piliin" } ] Kategorya 04
+              [ {data.applicantType === "Returning" ? "Active" : "Select"} ] Category 04
             </div>
-            <div className="text-sm font-bold text-slate-900">Returning Student (Balik-Aral)</div>
+            <div className="text-sm font-bold text-slate-900">Returning Learner (Balik-Aral)</div>
             <div className="text-xs text-slate-600 mt-1">
-              Mag-aaral na huminto ng pag-aaral noong nakaraang taon at muling magbabalik sa eskwela.
+              Learners who previously discontinued schooling for one or more school years and are now resuming their studies.
             </div>
           </button>
         </div>
@@ -237,10 +236,10 @@ export default function Step1ApplicantType({
       {isTransfereeOrReturning && (
         <div className="space-y-3 p-5 bg-slate-50 border border-slate-300">
           <label className="text-xs font-bold text-slate-800 uppercase tracking-wide block">
-            Antas na Papasukan sa Dumalneg NHS (Grade Level)
+            Target Grade Level at Dumalneg NHS
           </label>
           <p className="text-xs text-slate-600 mb-2">
-            Piliin kung saang antas ka magpapatala ngayong taon.
+            Specify the grade level you are registering for in the upcoming academic term.
           </p>
 
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -262,7 +261,7 @@ export default function Step1ApplicantType({
 
           {errors.targetGradeLevel && (
             <span className="text-xs text-red-700 font-medium block">
-              [ Paalala ]: {errors.targetGradeLevel}
+              [ Notice ]: {errors.targetGradeLevel}
             </span>
           )}
         </div>
@@ -273,10 +272,10 @@ export default function Step1ApplicantType({
         <div className="space-y-4 p-5 bg-slate-50 border border-slate-300">
           <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Seksiyon 6: Para sa Returning Learner (Balik-Aral) at Transferee ]
+              [ Section 6: For Returning Learner (Balik-Aral) and Transferee / Move-In ]
             </span>
             <p className="text-xs text-slate-600 mt-1">
-              Impormasyon ng huling natapos na antas at dating pinasukang paaralan.
+              Academic history and details from the previous school attended.
             </p>
           </div>
 
@@ -284,7 +283,7 @@ export default function Step1ApplicantType({
             {/* Last Grade Completed */}
             <div>
               <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                Huling Antas na Natapos <span className="text-red-700">*</span>
+                Last Grade Level Completed <span className="text-red-700">*</span>
               </label>
               <select
                 value={data.lastGradeCompleted || ""}
@@ -295,7 +294,7 @@ export default function Step1ApplicantType({
                 }
                 className="w-full p-2.5 bg-white border border-slate-300 text-sm focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               >
-                <option value="">-- Pumili ng Antas --</option>
+                <option value="">-- Select Grade Level --</option>
                 <option value="6">Grade 6 (Elementary)</option>
                 <option value="7">Grade 7</option>
                 <option value="8">Grade 8</option>
@@ -313,13 +312,13 @@ export default function Step1ApplicantType({
             {/* Last School Year Completed */}
             <div>
               <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                Huling Taong Panuruan na Natapos <span className="text-red-700">*</span>
+                Last School Year Completed <span className="text-red-700">*</span>
               </label>
               <input
                 type="text"
                 value={data.lastSchoolYearCompleted || ""}
                 onChange={(e) => onChange({ lastSchoolYearCompleted: e.target.value })}
-                placeholder="Halimbawa: 2024-2025"
+                placeholder="e.g. 2024-2025"
                 className="w-full p-2.5 bg-white border border-slate-300 text-sm focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
               {errors.lastSchoolYearCompleted && (
@@ -332,13 +331,13 @@ export default function Step1ApplicantType({
             {/* Last School Attended */}
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                Pangalan ng Huling Paaralang Pinasukan <span className="text-red-700">*</span>
+                Official Name of Last School Attended <span className="text-red-700">*</span>
               </label>
               <input
                 type="text"
                 value={data.lastSchoolAttended || ""}
                 onChange={(e) => onChange({ lastSchoolAttended: e.target.value })}
-                placeholder="Buong pangalan ng dating paaralan"
+                placeholder="Full official school name"
                 className="w-full p-2.5 bg-white border border-slate-300 text-sm focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
               {errors.lastSchoolAttended && (
@@ -351,7 +350,7 @@ export default function Step1ApplicantType({
             {/* School ID (6-digit) */}
             <div>
               <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                School ID ng Dating Paaralan (6 Digits) <span className="text-red-700">*</span>
+                Previous School ID (6 Digits) <span className="text-red-700">*</span>
               </label>
               <input
                 type="text"
@@ -361,11 +360,11 @@ export default function Step1ApplicantType({
                   const val = e.target.value.replace(/\D/g, "");
                   onChange({ lastSchoolId: val });
                 }}
-                placeholder="Hal. 300123"
+                placeholder="e.g. 300123"
                 className="w-full p-2.5 bg-white border border-slate-300 text-sm font-mono tracking-widest focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
               <span className="text-xs text-slate-500 mt-1 block">
-                6-digit opisyal na numero ng paaralan na matatagpuan sa Report Card (Form 138).
+                6-digit official DepEd School ID indicated on Form 138 (Learner&apos;s Progress Report Card).
               </span>
               {errors.lastSchoolId && (
                 <span className="text-xs text-red-700 font-medium mt-1 block">
@@ -381,17 +380,17 @@ export default function Step1ApplicantType({
       {data.applicantType && data.targetGradeLevel && (
         <div className="p-4 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1">
           <div className="font-bold text-[#002060] uppercase">
-            [ Kumpirmasyon ng Antas at Programa ]
+            [ Enrollment Classification Confirmation ]
           </div>
           <p className="text-slate-800">
-            Ikaw ay magpapatala bilang:{" "}
+            Applying as:{" "}
             <strong>
               {data.applicantType === "Grade 7" && "Incoming Grade 7 (Junior High School)"}
               {data.applicantType === "Grade 11" && "Incoming Grade 11 (Senior High School)"}
-              {data.applicantType === "Transferee" && `Transferee para sa Grade ${data.targetGradeLevel}`}
-              {data.applicantType === "Returning" && `Returning Student (Balik-Aral) para sa Grade ${data.targetGradeLevel}`}
+              {data.applicantType === "Transferee" && `Transferee for Grade ${data.targetGradeLevel}`}
+              {data.applicantType === "Returning" && `Returning Learner (Balik-Aral) for Grade ${data.targetGradeLevel}`}
             </strong>{" "}
-            sa ilalim ng <strong>{data.isGraded ? "Graded Program" : "Non-Graded Program (SNEd)"}</strong>.
+            under the <strong>{data.isGraded ? "Graded Program" : "Non-Graded Program (SNEd Only)"}</strong>.
           </p>
         </div>
       )}
@@ -403,7 +402,7 @@ export default function Step1ApplicantType({
           onClick={validateAndProceed}
           className="btn-primary text-xs uppercase tracking-wider font-bold py-3 px-8 text-center"
         >
-          Susunod: Personal na Impormasyon (Hakbang 2)
+          Proceed: Learner&apos;s Personal Information (Step 2)
         </button>
       </div>
     </div>
