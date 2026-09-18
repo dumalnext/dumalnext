@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ApplicantType } from "@/lib/types/enrollment";
 
 export interface Step1Data {
@@ -26,14 +26,30 @@ export default function Step1ApplicantType({
 }: Step1ApplicantTypeProps) {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
+  // When applicant type changes, set appropriate default grade levels
   const handleSelectApplicantType = (type: ApplicantType) => {
-    let defaultGrade: number | "" = data.targetGradeLevel;
-    if (type === "Grade 7") defaultGrade = 7;
-    if (type === "Grade 11") defaultGrade = 11;
+    let defaultTargetGrade: number | "" = data.targetGradeLevel;
+    let defaultLastGrade: number | "" = data.lastGradeCompleted || "";
+
+    if (type === "Grade 7") {
+      defaultTargetGrade = 7;
+      defaultLastGrade = 6;
+    } else if (type === "Grade 11") {
+      defaultTargetGrade = 11;
+      defaultLastGrade = 10;
+    } else if (type === "Transferee" || type === "Returning") {
+      if (!defaultTargetGrade) {
+        defaultTargetGrade = 7;
+        defaultLastGrade = 6;
+      } else {
+        defaultLastGrade = typeof defaultTargetGrade === "number" ? defaultTargetGrade - 1 : 6;
+      }
+    }
 
     onChange({
       applicantType: type,
-      targetGradeLevel: defaultGrade,
+      targetGradeLevel: defaultTargetGrade,
+      lastGradeCompleted: defaultLastGrade,
     });
 
     if (errors.applicantType) {
@@ -43,6 +59,74 @@ export default function Step1ApplicantType({
         return next;
       });
     }
+  };
+
+  // Smart level tracker: When target grade level changes, automatically adjust valid completed grade
+  const handleTargetGradeChange = (newTargetGrade: number) => {
+    // Standard academic progression: Last completed grade is target - 1
+    const standardLastCompleted = newTargetGrade - 1;
+
+    // Check if the current lastGradeCompleted is logically impossible (greater than or equal to target grade)
+    let updatedLastCompleted: number = standardLastCompleted;
+    if (
+      typeof data.lastGradeCompleted === "number" &&
+      data.lastGradeCompleted < newTargetGrade &&
+      data.lastGradeCompleted >= standardLastCompleted - 1
+    ) {
+      updatedLastCompleted = data.lastGradeCompleted;
+    }
+
+    onChange({
+      targetGradeLevel: newTargetGrade,
+      lastGradeCompleted: updatedLastCompleted,
+    });
+
+    if (errors.targetGradeLevel || errors.lastGradeCompleted) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.targetGradeLevel;
+        delete next.lastGradeCompleted;
+        return next;
+      });
+    }
+  };
+
+  // Compute valid available options for "Last Grade Level Completed" based on Target Grade Level
+  const getAvailableCompletedGrades = (targetGrade: number | "") => {
+    if (!targetGrade || typeof targetGrade !== "number") {
+      return [{ value: 6, label: "Grade 6 (Elementary Completer)" }];
+    }
+
+    const options: { value: number; label: string }[] = [];
+
+    // The primary valid completed grade is targetGrade - 1
+    const prerequisiteGrade = targetGrade - 1;
+
+    if (prerequisiteGrade === 6) {
+      options.push({ value: 6, label: "Grade 6 (Elementary Completer)" });
+    } else {
+      // Allow the direct prerequisite grade (standard promo)
+      options.push({
+        value: prerequisiteGrade,
+        label: prerequisiteGrade === 10 ? "Grade 10 (Junior High School Completer)" : `Grade ${prerequisiteGrade}`,
+      });
+
+      // Also allow repeating the current grade level if repeating / balik-aral
+      options.push({
+        value: targetGrade,
+        label: `Grade ${targetGrade} (Repeater / Discontinued during Grade ${targetGrade})`,
+      });
+
+      // Allow 1 grade lower if returning after drop out
+      if (prerequisiteGrade - 1 >= 6) {
+        options.push({
+          value: prerequisiteGrade - 1,
+          label: prerequisiteGrade - 1 === 6 ? "Grade 6 (Elementary Completer)" : `Grade ${prerequisiteGrade - 1}`,
+        });
+      }
+    }
+
+    return options;
   };
 
   const validateAndProceed = () => {
@@ -60,7 +144,13 @@ export default function Step1ApplicantType({
     if (data.applicantType === "Transferee" || data.applicantType === "Returning") {
       if (!data.lastGradeCompleted) {
         newErrors.lastGradeCompleted = "Last grade level completed is required.";
+      } else if (
+        typeof data.targetGradeLevel === "number" &&
+        Number(data.lastGradeCompleted) > Number(data.targetGradeLevel)
+      ) {
+        newErrors.lastGradeCompleted = `Invalid academic sequence: Cannot enroll in Grade ${data.targetGradeLevel} after already completing Grade ${data.lastGradeCompleted}.`;
       }
+
       if (!data.lastSchoolYearCompleted || data.lastSchoolYearCompleted.trim() === "") {
         newErrors.lastSchoolYearCompleted = "Last school year completed is required (e.g., 2024-2025).";
       }
@@ -68,7 +158,7 @@ export default function Step1ApplicantType({
         newErrors.lastSchoolAttended = "Official name of last school attended is required.";
       }
       if (!data.lastSchoolId || data.lastSchoolId.trim().length !== 6) {
-        newErrors.lastSchoolId = "Previous DepEd School ID must be exactly 6 digits.";
+        newErrors.lastSchoolId = "Previous DepEd School ID must be exactly 6 numeric digits.";
       }
     }
 
@@ -82,207 +172,302 @@ export default function Step1ApplicantType({
   const isTransfereeOrReturning =
     data.applicantType === "Transferee" || data.applicantType === "Returning";
 
+  const availableCompletedGrades = getAvailableCompletedGrades(data.targetGradeLevel);
+
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-8 border border-slate-300">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm">
       {/* Step Header */}
-      <div className="border-b border-slate-200 pb-4">
-        <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-          [ Step 1 of 5: Learner Classification & Target Grade Level ]
-        </span>
-        <h2 className="text-xl font-bold text-slate-900">
-          Select Learner Classification & Target Grade Level
+      <div className="border-b-2 border-slate-200 pb-5">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider">
+            STEP 01 OF 05
+          </span>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            DepEd Form Sections 2 &amp; 6
+          </span>
+        </div>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          Learner Classification &amp; Target Grade Level
         </h2>
-        <p className="text-xs text-slate-600 mt-1">
-          In strict compliance with Section 2 and Section 6 of the Official DepEd Basic Education Enrollment Form (Revised 06/01/2025).
+        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+          Select the appropriate education program and academic classification for the enrolling student.
         </p>
       </div>
 
       {/* Part A: Graded vs Non-Graded (SNEd Only) */}
       <div className="space-y-3">
-        <label className="text-xs font-bold text-slate-800 uppercase tracking-wide block">
-          Curriculum Program (Section 2)
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="border-l-4 border-[#002060] pl-3">
+          <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+            1. Curriculum Program (DepEd Section 2)
+          </label>
+          <span className="text-xs text-slate-500">
+            Specify standard basic education curriculum or specialized SNEd program.
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          {/* Graded Program */}
           <button
             type="button"
             onClick={() => onChange({ isGraded: true })}
-            className={`p-4 border text-left transition-colors ${
+            className={`p-5 border-2 text-left transition-all relative ${
               data.isGraded
-                ? "border-[#002060] bg-blue-50/50 ring-2 ring-[#002060]"
-                : "border-slate-300 bg-white hover:border-slate-400"
+                ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
+                : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.isGraded ? "Selected" : "Select"} ]
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                  data.isGraded
+                    ? "bg-[#002060] text-white"
+                    : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                [ {data.isGraded ? "SELECTED" : "CLICK TO SELECT"} ]
+              </span>
+              <span className="text-[11px] font-bold text-slate-400 font-mono">CODE: GRADED</span>
             </div>
-            <div className="text-sm font-bold text-slate-900">Graded Program</div>
-            <div className="text-xs text-slate-600 mt-1">
-              Standard secondary education curriculum for Junior High School (Grades 7–10) and Senior High School (Grades 11–12).
-            </div>
+            <div className="text-base font-bold text-slate-900">Graded Curriculum Program</div>
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              Standard secondary basic education program for Junior High School (Grades 7–10) and Senior High School (Grades 11–12).
+            </p>
           </button>
 
+          {/* Non-Graded Program */}
           <button
             type="button"
             onClick={() => onChange({ isGraded: false })}
-            className={`p-4 border text-left transition-colors ${
+            className={`p-5 border-2 text-left transition-all relative ${
               !data.isGraded
-                ? "border-[#002060] bg-blue-50/50 ring-2 ring-[#002060]"
-                : "border-slate-300 bg-white hover:border-slate-400"
+                ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
+                : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {!data.isGraded ? "Selected" : "Select"} ]
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                  !data.isGraded
+                    ? "bg-[#002060] text-white"
+                    : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                [ {!data.isGraded ? "SELECTED" : "CLICK TO SELECT"} ]
+              </span>
+              <span className="text-[11px] font-bold text-slate-400 font-mono">CODE: SNED-ONLY</span>
             </div>
-            <div className="text-sm font-bold text-slate-900">Non-Graded Program (SNEd Only)</div>
-            <div className="text-xs text-slate-600 mt-1">
-              Reserved exclusively for learners enrolled under the Special Needs Education (SNEd) Program.
-            </div>
+            <div className="text-base font-bold text-slate-900">Non-Graded Program (SNEd Only)</div>
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              Tailored individualized educational program reserved exclusively for learners with special education needs (SNEd).
+            </p>
           </button>
         </div>
       </div>
 
       {/* Part B: Applicant Classification */}
-      <div className="space-y-3">
-        <label className="text-xs font-bold text-slate-800 uppercase tracking-wide block">
-          Learner Classification (Select One)
-        </label>
+      <div className="space-y-3 pt-2">
+        <div className="border-l-4 border-[#002060] pl-3">
+          <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+            2. Learner Classification Category
+          </label>
+          <span className="text-xs text-slate-500">
+            Identify the applicant&apos;s current enrollment status.
+          </span>
+        </div>
 
         {errors.applicantType && (
-          <div className="p-3 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-medium">
-            [ Notice ]: {errors.applicantType}
+          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs">
+            [ Validation Required ]: {errors.applicantType}
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           {/* 1. Incoming Grade 7 */}
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 7")}
-            className={`p-4 border text-left transition-colors ${
+            className={`p-5 border-2 text-left transition-all ${
               data.applicantType === "Grade 7"
-                ? "border-[#002060] bg-blue-50/50 ring-2 ring-[#002060]"
-                : "border-slate-300 bg-white hover:border-slate-400"
+                ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
+                : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Grade 7" ? "Active" : "Select"} ] Category 01
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                  data.applicantType === "Grade 7"
+                    ? "bg-[#002060] text-white"
+                    : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                [ {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} ] CATEGORY 01
+              </span>
+              <span className="text-xs font-bold text-[#002060]">JHS Grade 7</span>
             </div>
-            <div className="text-sm font-bold text-slate-900">Incoming Grade 7</div>
-            <div className="text-xs text-slate-600 mt-1">
-              Elementary Grade 6 completers transitioning into the First Year of Junior High School.
-            </div>
+            <div className="text-base font-bold text-slate-900">Incoming Grade 7</div>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Elementary Grade 6 completers transitioning into the First Year of Junior High School at Dumalneg NHS.
+            </p>
           </button>
 
           {/* 2. Incoming Grade 11 */}
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 11")}
-            className={`p-4 border text-left transition-colors ${
+            className={`p-5 border-2 text-left transition-all ${
               data.applicantType === "Grade 11"
-                ? "border-[#002060] bg-blue-50/50 ring-2 ring-[#002060]"
-                : "border-slate-300 bg-white hover:border-slate-400"
+                ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
+                : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Grade 11" ? "Active" : "Select"} ] Category 02
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                  data.applicantType === "Grade 11"
+                    ? "bg-[#002060] text-white"
+                    : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                [ {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} ] CATEGORY 02
+              </span>
+              <span className="text-xs font-bold text-[#002060]">SHS Grade 11</span>
             </div>
-            <div className="text-sm font-bold text-slate-900">Incoming Grade 11</div>
-            <div className="text-xs text-slate-600 mt-1">
-              Junior High School (Grade 10) completers enrolling in Senior High School.
-            </div>
+            <div className="text-base font-bold text-slate-900">Incoming Grade 11</div>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Junior High School (Grade 10) completers enrolling in Senior High School Academic or TVL tracks.
+            </p>
           </button>
 
           {/* 3. Transferee */}
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Transferee")}
-            className={`p-4 border text-left transition-colors ${
+            className={`p-5 border-2 text-left transition-all ${
               data.applicantType === "Transferee"
-                ? "border-[#002060] bg-blue-50/50 ring-2 ring-[#002060]"
-                : "border-slate-300 bg-white hover:border-slate-400"
+                ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
+                : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Transferee" ? "Active" : "Select"} ] Category 03
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                  data.applicantType === "Transferee"
+                    ? "bg-[#002060] text-white"
+                    : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                [ {data.applicantType === "Transferee" ? "ACTIVE" : "SELECT"} ] CATEGORY 03
+              </span>
+              <span className="text-xs font-bold text-amber-800">Grades 7–12</span>
             </div>
-            <div className="text-sm font-bold text-slate-900">Transferee (Move-In)</div>
-            <div className="text-xs text-slate-600 mt-1">
-              Learners originating from another public or private secondary institution transferring to Dumalneg NHS.
-            </div>
+            <div className="text-base font-bold text-slate-900">Transferee (Move-In)</div>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Learners transferring from another public or private secondary school into Dumalneg NHS.
+            </p>
           </button>
 
           {/* 4. Returning Student (Balik-Aral) */}
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Returning")}
-            className={`p-4 border text-left transition-colors ${
+            className={`p-5 border-2 text-left transition-all ${
               data.applicantType === "Returning"
-                ? "border-[#002060] bg-blue-50/50 ring-2 ring-[#002060]"
-                : "border-slate-300 bg-white hover:border-slate-400"
+                ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
+                : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ {data.applicantType === "Returning" ? "Active" : "Select"} ] Category 04
+            <div className="flex items-center justify-between mb-2">
+              <span
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                  data.applicantType === "Returning"
+                    ? "bg-[#002060] text-white"
+                    : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                [ {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} ] CATEGORY 04
+              </span>
+              <span className="text-xs font-bold text-indigo-800">Balik-Aral</span>
             </div>
-            <div className="text-sm font-bold text-slate-900">Returning Learner (Balik-Aral)</div>
-            <div className="text-xs text-slate-600 mt-1">
-              Learners who previously discontinued schooling for one or more school years and are now resuming their studies.
-            </div>
+            <div className="text-base font-bold text-slate-900">Returning Learner (Balik-Aral)</div>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Learners who previously dropped out or stopped schooling and are resuming their studies.
+            </p>
           </button>
         </div>
       </div>
 
-      {/* Part C: Dynamic Target Grade Level for Transferee / Returning */}
+      {/* Part C: Target Grade Level Selector (for Transferee / Returning) */}
       {isTransfereeOrReturning && (
-        <div className="space-y-3 p-5 bg-slate-50 border border-slate-300">
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wide block">
-            Target Grade Level at Dumalneg NHS
-          </label>
-          <p className="text-xs text-slate-600 mb-2">
-            Specify the grade level you are registering for in the upcoming academic term.
-          </p>
+        <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
+          <div className="border-l-4 border-[#002060] pl-3">
+            <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+              3. Target Grade Level at Dumalneg NHS (Grades 7 to 12)
+            </label>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Select the grade level you intend to enroll in for the upcoming school year.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {[7, 8, 9, 10, 11, 12].map((lvl) => (
-              <button
-                key={lvl}
-                type="button"
-                onClick={() => onChange({ targetGradeLevel: lvl })}
-                className={`py-3 px-2 border text-center font-bold text-sm transition-colors ${
-                  data.targetGradeLevel === lvl
-                    ? "bg-[#002060] text-white border-[#002060]"
-                    : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
-                }`}
-              >
-                Grade {lvl}
-              </button>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 pt-1">
+            {[7, 8, 9, 10, 11, 12].map((lvl) => {
+              const isSelected = data.targetGradeLevel === lvl;
+              const isJHS = lvl <= 10;
+
+              return (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => handleTargetGradeChange(lvl)}
+                  className={`p-3.5 border-2 text-center font-bold transition-all relative ${
+                    isSelected
+                      ? "bg-[#002060] text-white border-[#002060] shadow-sm"
+                      : "bg-white text-slate-800 border-slate-300 hover:border-[#002060] hover:bg-slate-100"
+                  }`}
+                >
+                  <div className="text-xs uppercase font-mono tracking-wider opacity-80">
+                    {isJHS ? "JHS" : "SHS"}
+                  </div>
+                  <div className="text-base sm:text-lg font-bold">Grade {lvl}</div>
+                  {isSelected && (
+                    <span className="block text-[10px] font-mono uppercase text-blue-200 mt-0.5">
+                      [ TARGET ]
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {errors.targetGradeLevel && (
-            <span className="text-xs text-red-700 font-medium block">
-              [ Notice ]: {errors.targetGradeLevel}
+            <span className="text-xs text-red-700 font-semibold block">
+              [ Validation Required ]: {errors.targetGradeLevel}
             </span>
           )}
         </div>
       )}
 
-      {/* Part D: Dynamic Previous School Information (DepEd Section 6) */}
+      {/* Part D: Smart Section 6 Academic History Tracker (DepEd Section 6) */}
       {isTransfereeOrReturning && (
-        <div className="space-y-4 p-5 bg-slate-50 border border-slate-300">
-          <div className="border-b border-slate-200 pb-2">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section 6: For Returning Learner (Balik-Aral) and Transferee / Move-In ]
-            </span>
+        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+          <div className="border-b-2 border-slate-200 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                [ DepEd Section 6: Academic Background &amp; Previous School Attended ]
+              </span>
+              <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold">
+                [ SMART PREREQUISITE VALIDATION ACTIVE ]
+              </span>
+            </div>
             <p className="text-xs text-slate-600 mt-1">
-              Academic history and details from the previous school attended.
+              Based on your target of <strong>Grade {data.targetGradeLevel || 7}</strong>, 
+              impossible higher grade levels have been automatically filtered out.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Last Grade Completed */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* Last Grade Level Completed (SMART FILTERED) */}
             <div>
-              <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Last Grade Level Completed <span className="text-red-700">*</span>
               </label>
               <select
@@ -292,18 +477,20 @@ export default function Step1ApplicantType({
                     lastGradeCompleted: e.target.value ? Number(e.target.value) : "",
                   })
                 }
-                className="w-full p-2.5 bg-white border border-slate-300 text-sm focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               >
-                <option value="">-- Select Grade Level --</option>
-                <option value="6">Grade 6 (Elementary)</option>
-                <option value="7">Grade 7</option>
-                <option value="8">Grade 8</option>
-                <option value="9">Grade 9</option>
-                <option value="10">Grade 10</option>
-                <option value="11">Grade 11</option>
+                <option value="">-- Select Completed Grade Level --</option>
+                {availableCompletedGrades.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
+              <span className="text-[11px] text-slate-500 mt-1 block">
+                Prerequisite for Grade {data.targetGradeLevel || 7}: Successful completion of Grade {(Number(data.targetGradeLevel) || 7) - 1}.
+              </span>
               {errors.lastGradeCompleted && (
-                <span className="text-xs text-red-700 font-medium mt-1 block">
+                <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.lastGradeCompleted}
                 </span>
               )}
@@ -311,7 +498,7 @@ export default function Step1ApplicantType({
 
             {/* Last School Year Completed */}
             <div>
-              <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Last School Year Completed <span className="text-red-700">*</span>
               </label>
               <input
@@ -319,10 +506,13 @@ export default function Step1ApplicantType({
                 value={data.lastSchoolYearCompleted || ""}
                 onChange={(e) => onChange({ lastSchoolYearCompleted: e.target.value })}
                 placeholder="e.g. 2024-2025"
-                className="w-full p-2.5 bg-white border border-slate-300 text-sm focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
+              <span className="text-[11px] text-slate-500 mt-1 block">
+                Format: 4-digit start year - 4-digit end year (e.g. 2024-2025).
+              </span>
               {errors.lastSchoolYearCompleted && (
-                <span className="text-xs text-red-700 font-medium mt-1 block">
+                <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.lastSchoolYearCompleted}
                 </span>
               )}
@@ -330,44 +520,47 @@ export default function Step1ApplicantType({
 
             {/* Last School Attended */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                Official Name of Last School Attended <span className="text-red-700">*</span>
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                Official Registered Name of Last School Attended <span className="text-red-700">*</span>
               </label>
               <input
                 type="text"
                 value={data.lastSchoolAttended || ""}
                 onChange={(e) => onChange({ lastSchoolAttended: e.target.value })}
-                placeholder="Full official school name"
-                className="w-full p-2.5 bg-white border border-slate-300 text-sm focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+                placeholder="e.g. Pagudpud National High School / Bangui Central School"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
               {errors.lastSchoolAttended && (
-                <span className="text-xs text-red-700 font-medium mt-1 block">
+                <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.lastSchoolAttended}
                 </span>
               )}
             </div>
 
             {/* School ID (6-digit) */}
-            <div>
-              <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                Previous School ID (6 Digits) <span className="text-red-700">*</span>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                Previous School ID (6 Numeric Digits) <span className="text-red-700">*</span>
               </label>
-              <input
-                type="text"
-                maxLength={6}
-                value={data.lastSchoolId || ""}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, "");
-                  onChange({ lastSchoolId: val });
-                }}
-                placeholder="e.g. 300123"
-                className="w-full p-2.5 bg-white border border-slate-300 text-sm font-mono tracking-widest focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
-              />
-              <span className="text-xs text-slate-500 mt-1 block">
-                6-digit official DepEd School ID indicated on Form 138 (Learner&apos;s Progress Report Card).
-              </span>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={data.lastSchoolId || ""}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    onChange({ lastSchoolId: val });
+                  }}
+                  placeholder="300123"
+                  className="w-48 p-3 bg-white border-2 border-slate-300 text-base font-mono tracking-widest font-bold focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none text-center"
+                />
+                <span className="text-xs text-slate-500 leading-relaxed">
+                  Official 6-digit DepEd School ID registered in the Learner Information System (LIS). 
+                  Visible on the learner&apos;s Form 138 / Report Card header.
+                </span>
+              </div>
               {errors.lastSchoolId && (
-                <span className="text-xs text-red-700 font-medium mt-1 block">
+                <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.lastSchoolId}
                 </span>
               )}
@@ -378,29 +571,35 @@ export default function Step1ApplicantType({
 
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
-        <div className="p-4 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1">
-          <div className="font-bold text-[#002060] uppercase">
-            [ Enrollment Classification Confirmation ]
+        <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs">
+          <div className="font-bold text-[#002060] uppercase tracking-wider flex items-center justify-between">
+            <span>[ ENROLLMENT CLASSIFICATION SUMMARY ]</span>
+            <span className="font-mono text-[11px] text-blue-900">VERIFIED</span>
           </div>
-          <p className="text-slate-800">
-            Applying as:{" "}
-            <strong>
+          <p className="text-slate-900 leading-relaxed">
+            Applicant is registering as:{" "}
+            <strong className="text-[#002060]">
               {data.applicantType === "Grade 7" && "Incoming Grade 7 (Junior High School)"}
               {data.applicantType === "Grade 11" && "Incoming Grade 11 (Senior High School)"}
               {data.applicantType === "Transferee" && `Transferee for Grade ${data.targetGradeLevel}`}
               {data.applicantType === "Returning" && `Returning Learner (Balik-Aral) for Grade ${data.targetGradeLevel}`}
             </strong>{" "}
-            under the <strong>{data.isGraded ? "Graded Program" : "Non-Graded Program (SNEd Only)"}</strong>.
+            under the <strong>{data.isGraded ? "Graded Curriculum Program" : "Non-Graded Program (SNEd Only)"}</strong>.
+            {isTransfereeOrReturning && (
+              <span className="block mt-1 text-slate-700 font-medium">
+                Academic Prerequisite: Completed Grade {data.lastGradeCompleted || ((Number(data.targetGradeLevel) || 7) - 1)}.
+              </span>
+            )}
           </p>
         </div>
       )}
 
       {/* Navigation Footer */}
-      <div className="border-t border-slate-200 pt-6 flex flex-col sm:flex-row justify-end gap-3">
+      <div className="border-t-2 border-slate-200 pt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs uppercase tracking-wider font-bold py-3 px-8 text-center"
+          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm"
         >
           Proceed: Learner&apos;s Personal Information (Step 2)
         </button>
