@@ -43,18 +43,33 @@ export default function Step3FamilyBackground({
     data.motherMiddleName === "N/A" || data.motherMiddleName === "NONE"
   );
 
-  // Guardian living arrangement & middle name states
-  const [isLivingWithParents, setIsLivingWithParents] = useState<boolean>(
-    !data.guardianLastName && !data.guardianFirstName
+  // Guardian availability & middle name states (open by default, optional if living with parents)
+  const [hasNoGuardian, setHasNoGuardian] = useState<boolean>(
+    data.guardianLastName === "N/A"
   );
   const [hasNoGuardianMiddleName, setHasNoGuardianMiddleName] = useState<boolean>(
     data.guardianMiddleName === "N/A" || data.guardianMiddleName === "NONE"
   );
 
-  // Primary Emergency Contact selection
+  // Primary Emergency Contact selection - freely selectable among Father, Mother, or Guardian
   const [primaryContact, setPrimaryContact] = useState<"Father" | "Mother" | "Guardian">(
     data.primaryContactPerson || (isFatherNotAvailable ? (isMotherNotAvailable ? "Guardian" : "Mother") : "Father")
   );
+
+  const handleSelectPrimaryContact = (contact: "Father" | "Mother" | "Guardian") => {
+    setPrimaryContact(contact);
+    if (contact === "Guardian" && hasNoGuardian) {
+      setHasNoGuardian(false);
+      onChange({
+        guardianLastName: "",
+        guardianFirstName: "",
+        guardianMiddleName: "",
+        primaryContactPerson: "Guardian",
+      });
+    } else {
+      onChange({ primaryContactPerson: contact });
+    }
+  };
 
   // Toggle Father availability
   const handleFatherAvailabilityToggle = (notAvailable: boolean) => {
@@ -104,10 +119,10 @@ export default function Step3FamilyBackground({
     }
   };
 
-  // Toggle Living with Parents (disables or enables separate guardian)
-  const handleLivingWithParentsToggle = (livingWithParents: boolean) => {
-    setIsLivingWithParents(livingWithParents);
-    if (livingWithParents) {
+  // Toggle Guardian availability
+  const handleGuardianAvailabilityToggle = (noGuardian: boolean) => {
+    setHasNoGuardian(noGuardian);
+    if (noGuardian) {
       onChange({
         guardianLastName: "",
         guardianFirstName: "",
@@ -116,7 +131,7 @@ export default function Step3FamilyBackground({
         guardianRelationship: "",
       });
       if (primaryContact === "Guardian") {
-        setPrimaryContact(isMotherNotAvailable ? "Father" : "Mother");
+        setPrimaryContact(!isFatherNotAvailable ? "Father" : "Mother");
       }
     }
   };
@@ -126,7 +141,7 @@ export default function Step3FamilyBackground({
     const newErrors: Record<string, string> = {};
 
     // Check that not all contacts are marked unavailable
-    if (isFatherNotAvailable && isMotherNotAvailable && isLivingWithParents) {
+    if (isFatherNotAvailable && isMotherNotAvailable && hasNoGuardian) {
       newErrors.general =
         "DepEd Compliance: Learner must have at least one active parent or legal guardian on official school records.";
     }
@@ -170,7 +185,20 @@ export default function Step3FamilyBackground({
     }
 
     // 3. Legal Guardian Validation
-    if (!isLivingWithParents) {
+    // Guardian is required if: primary contact is Guardian, OR both parents are unavailable, OR user entered guardian details
+    const hasEnteredGuardianData = Boolean(
+      (data.guardianLastName && data.guardianLastName.trim() !== "") ||
+      (data.guardianFirstName && data.guardianFirstName.trim() !== "") ||
+      (data.guardianRelationship && data.guardianRelationship.trim() !== "") ||
+      (data.guardianContactNumber && data.guardianContactNumber.trim() !== "")
+    );
+
+    const isGuardianMandatory =
+      primaryContact === "Guardian" ||
+      (isFatherNotAvailable && isMotherNotAvailable) ||
+      (!hasNoGuardian && hasEnteredGuardianData);
+
+    if (!hasNoGuardian && isGuardianMandatory) {
       if (!data.guardianLastName || data.guardianLastName.trim() === "") {
         newErrors.guardianLastName = "Guardian's official last name is required.";
       }
@@ -205,7 +233,7 @@ export default function Step3FamilyBackground({
       data.motherContactNumber.replace(/\D/g, "").startsWith("09");
 
     const validGuardianContact =
-      !isLivingWithParents &&
+      !hasNoGuardian &&
       data.guardianContactNumber &&
       data.guardianContactNumber.replace(/\D/g, "").length === 11 &&
       data.guardianContactNumber.replace(/\D/g, "").startsWith("09");
@@ -286,7 +314,7 @@ export default function Step3FamilyBackground({
               value="Father"
               checked={primaryContact === "Father" && !isFatherNotAvailable}
               disabled={isFatherNotAvailable}
-              onChange={() => setPrimaryContact("Father")}
+              onChange={() => handleSelectPrimaryContact("Father")}
               className="accent-[#002060]"
             />
             <div className="text-xs">
@@ -312,7 +340,7 @@ export default function Step3FamilyBackground({
               value="Mother"
               checked={primaryContact === "Mother" && !isMotherNotAvailable}
               disabled={isMotherNotAvailable}
-              onChange={() => setPrimaryContact("Mother")}
+              onChange={() => handleSelectPrimaryContact("Mother")}
               className="accent-[#002060]"
             />
             <div className="text-xs">
@@ -325,10 +353,8 @@ export default function Step3FamilyBackground({
 
           <label
             className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
-              primaryContact === "Guardian" && !isLivingWithParents
+              primaryContact === "Guardian"
                 ? "bg-[#002060] text-white border-[#002060]"
-                : isLivingWithParents
-                ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
                 : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
             }`}
           >
@@ -336,14 +362,13 @@ export default function Step3FamilyBackground({
               type="radio"
               name="primaryContact"
               value="Guardian"
-              checked={primaryContact === "Guardian" && !isLivingWithParents}
-              disabled={isLivingWithParents}
-              onChange={() => setPrimaryContact("Guardian")}
+              checked={primaryContact === "Guardian"}
+              onChange={() => handleSelectPrimaryContact("Guardian")}
               className="accent-[#002060]"
             />
             <div className="text-xs">
               <div className="font-bold uppercase">Legal Guardian</div>
-              <div className={primaryContact === "Guardian" && !isLivingWithParents ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
+              <div className={primaryContact === "Guardian" ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
                 Authorized Custodian
               </div>
             </div>
@@ -735,17 +760,17 @@ export default function Step3FamilyBackground({
           <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300">
             <input
               type="checkbox"
-              checked={isLivingWithParents}
-              onChange={(e) => handleLivingWithParentsToggle(e.target.checked)}
+              checked={hasNoGuardian}
+              onChange={(e) => handleGuardianAvailabilityToggle(e.target.checked)}
               className="accent-[#002060]"
             />
-            <span className="font-bold">Living with Parents (No Separate Guardian)</span>
+            <span className="font-bold">No Separate Legal Guardian (Living with Parents)</span>
           </label>
         </div>
 
-        {isLivingWithParents ? (
+        {hasNoGuardian ? (
           <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic">
-            The learner is designated as living with parents. A separate legal guardian entry is not required.
+            The learner is designated as living with parents. A separate legal guardian entry is not required. (Uncheck this box or select Legal Guardian as Primary Contact above to enter guardian details.)
           </div>
         ) : (
           <div className="space-y-4">
