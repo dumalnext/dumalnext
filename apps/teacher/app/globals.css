@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --deped-navy: #002060;
+  --deped-navy-dark: #001744;
+  --deped-navy-light: #0d3882;
+  --deped-white: #ffffff;
+  --deped-surface: #f8fafc;
+  --deped-border: #cbd5e1;
+  --deped-text-main: #0f172a;
+  --deped-text-muted: #475569;
+}
+
+body {
+  background-color: var(--deped-surface);
+  color: var(--deped-text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Formal DepEd Academic Components */
+.deped-header {
+  background-color: var(--deped-navy);
+  color: var(--deped-white);
+  border-bottom: 3px solid var(--deped-navy-dark);
+}
+
+.btn-primary {
+  background-color: var(--deped-navy);
+  color: var(--deped-white);
+  border: 1px solid var(--deped-navy-dark);
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  transition: background-color 0.15s ease-in-out;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary:hover {
+  background-color: var(--deped-navy-light);
+}
+
+.btn-secondary {
+  background-color: var(--deped-white);
+  color: var(--deped-navy);
+  border: 1px solid var(--deped-navy);
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background-color: #f1f5f9;
+}
+
+.badge-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-pending {
+  background-color: #fffbeb;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.badge-approved {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.badge-revision {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}

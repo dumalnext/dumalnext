@@ -2,11 +2,22 @@
   "name": "dumalnext",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:student": "npm run dev --workspace=@dumalnext/student",
+    "build:student": "npm run build --workspace=@dumalnext/student",
+    "dev:teacher": "npm run dev --workspace=@dumalnext/teacher",
+    "build:teacher": "npm run build --workspace=@dumalnext/teacher",
+    "dev:admin": "npm run dev --workspace=@dumalnext/admin",
+    "build:admin": "npm run build --workspace=@dumalnext/admin",
+    "dev:it": "npm run dev --workspace=@dumalnext/it-support",
+    "build:it": "npm run build --workspace=@dumalnext/it-support"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -27,37 +27,47 @@
 
 ---
 
-## 2. ESTRUKTURA NG PROYEKTO (FOLDER STRUCTURE)
+## 2. ESTRUKTURA NG PROYEKTO (4 STANDALONE WEBSITES / MONOREPO)
 
 ```
 dumalnext/
-├── app/
-│   ├── (auth)/                # Login at Register para sa 4 na user roles
-│   ├── (portals)/
-│   │   ├── student/           # Student Workstation (Enrollment form, Schedule, Elective Cart)
-│   │   ├── teacher/           # Faculty Portal (Class Rosters, Teaching Loads)
-│   │   ├── admin/             # Administrator Dashboard (Approvals, Sectioning, Schedules)
-│   │   └── it-support/        # IT Support Portal (Academic Year Setup, RBAC, Logs)
-│   ├── actions/               # Server Actions (Controller logic: deconfliction, approvals)
-│   ├── globals.css            # DepEd Navy Blue & Pure White Stylesheet
-│   ├── layout.tsx             # Main Root Layout
-│   └── page.tsx               # Landing Page & Portal Switcher
-├── components/                # Reusable UI Components (Puro formal, zero emoji/icons)
-│   ├── ui/                    # Form inputs, tables, cards, modal alerts
-│   └── forms/                 # Multi-step enrollment stepper with Canvas compressor
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts          # Browser Supabase Client
-│   │   └── server.ts          # Server-side Supabase Client
-│   ├── engines/
-│   │   └── deconfliction.ts   # Schedule Deconfliction Engine (Teacher, Room, Student)
-│   └── utils/
-│       └── image-compressor.ts# Client-side HTML5 Canvas Compressor (<350KB WebP/JPEG)
+├── apps/
+│   ├── student/               # WEBSITE 1: Student Online Portal (dumalnext-student.vercel.app)
+│   │   ├── app/
+│   │   │   ├── layout.tsx     # Student dedicated layout & institutional banner
+│   │   │   ├── page.tsx       # Student Hub (Registration & Application Tracker)
+│   │   │   └── enroll/        # 5-step Multi-step Enrollment Stepper
+│   │   ├── components/        # Student Form Stepper & Canvas Compressor
+│   │   ├── lib/               # Types, utils, and Supabase client
+│   │   └── package.json       # @dumalnext/student (Port 3000)
+│   │
+│   ├── teacher/               # WEBSITE 2: Faculty Workstation (dumalnext-teacher.vercel.app)
+│   │   ├── app/
+│   │   │   ├── layout.tsx     # Faculty dedicated layout
+│   │   │   └── page.tsx       # Teacher Login, Teaching Loads, & Class Rosters
+│   │   ├── lib/               # Supabase auth & client
+│   │   └── package.json       # @dumalnext/teacher (Port 3001)
+│   │
+│   ├── admin/                 # WEBSITE 3: School Administrator (dumalnext-admin.vercel.app)
+│   │   ├── app/
+│   │   │   ├── layout.tsx     # Administrator executive layout
+│   │   │   └── page.tsx       # Admin Sign-In, Admissions Review, & Section Quotas
+│   │   ├── lib/               # Deconfliction engine, Supabase server/client
+│   │   └── package.json       # @dumalnext/admin (Port 3002)
+│   │
+│   └── it-support/            # WEBSITE 4: IT Support Console (dumalnext-itsupport.vercel.app)
+│       ├── app/
+│       │   ├── layout.tsx     # IT Support security layout
+│       │   └── page.tsx       # IT Auth, Dynamic Academic Calendar (No Hardcoded Dates!), RBAC
+│       ├── lib/               # Supabase server/client
+│       └── package.json       # @dumalnext/it-support (Port 3003)
+│
 ├── supabase/
-│   └── schema.sql             # Buong PostgreSQL Database Script (Tables, RLS, Functions)
+│   ├── schema.sql             # Buong PostgreSQL Database Script (Tables, RLS, Functions)
+│   └── migrations/            # Incremental SQL migration scripts
 ├── DATABASE_DICTIONARY.md     # Pormal na Data Dictionary na 100% naka-align sa Class Diagram para sa Professor
 ├── DEVELOPER_LOG.md           # ITO ITO - Ang Notepad ninyong 3 developers
-└── .env.local                 # Supabase Project URL at API Keys (Huwag i-commit sa git!)
+└── package.json               # Root Monorepo configuration (NPM Workspaces)
 ```
 
 ---
@@ -130,3 +140,11 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
   - Ginawa ang `components/forms/enrollment/Step1ApplicantType.tsx` para sa Graded vs Non-Graded (SNEd), pagpili ng Incoming G7, Incoming G11, Transferee, o Returning (Balik-Aral), at dinamikong patlang para sa dating pinasukang paaralan at 6-digit School ID.
   - Ginawa ang mga ruta sa App Router: `/student` (Student Hub & Application Status Lookup) at `/student/enroll` (Online Enrollment Stepper).
   - 100% nasunod ang DepEd Navy Blue (`#002060`) at Pure White theme na walang kahit anong emoji o decorative icons.
+- [x] **Arkitektura ng Apat (4) na Ganap na Magkakahiwalay na Websites (Monorepo)**:
+  - Naitatag ang apat na magkakahiwalay na standalone web applications sa loob ng iisang repository gamit ang NPM Workspaces:
+    1. `apps/student` (`@dumalnext/student` - Port 3000): Dedicated Student Portal at Online Enrollment Form. Walang anumang admin/teacher links.
+    2. `apps/teacher` (`@dumalnext/teacher` - Port 3001): Dedicated Faculty Workstation para sa teaching loads at class rosters.
+    3. `apps/admin` (`@dumalnext/admin` - Port 3002): Dedicated School Administrator Portal para sa admissions review, section quotas, at automated deconfliction.
+    4. `apps/it-support` (`@dumalnext/it-support` - Port 3003): Dedicated IT Systems Console para sa dynamic calendar setup (no hardcoded dates) at RBAC audit logs.
+  - Ang lahat ng apat na web apps ay may sari-sariling `npm run build` na 100% matagumpay at walang errors.
+  - Handa para sa apat (4) na magkakahiwalay na live Vercel deployments (`dumalnext-student.vercel.app`, `dumalnext-teacher.vercel.app`, `dumalnext-admin.vercel.app`, `dumalnext-itsupport.vercel.app`).
