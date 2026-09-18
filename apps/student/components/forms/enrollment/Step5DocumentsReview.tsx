@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { compressImage } from "@/lib/utils/image-compressor";
 import { useAuth } from "@/lib/auth/authContext";
+import { createClient } from "@/lib/supabase/client";
 
 interface Step5DocumentsReviewProps {
   data: FullEnrollmentFormData;
@@ -214,6 +215,70 @@ export default function Step5DocumentsReview({
         formData: data,
       };
 
+      // 1. Cloud Database Synchronization: Save to Supabase 'enrollment_applications'
+      try {
+        const supabase = createClient();
+
+        // Check if student profile exists in Supabase
+        let studentUuid = user?.id;
+        const { data: existingStudent } = await supabase
+          .from("students")
+          .select("id")
+          .or(`student_id.eq.${data.lrn || user?.userId},user_id.eq.${user?.id}`)
+          .limit(1);
+
+        if (existingStudent && existingStudent.length > 0) {
+          studentUuid = existingStudent[0].id;
+        } else {
+          // Insert student profile record
+          const { data: createdStudent } = await supabase
+            .from("students")
+            .insert({
+              user_id: user?.id && user.id.length === 36 ? user.id : null,
+              student_id: data.lrn || user?.userId || `STU-${Date.now()}`,
+              first_name: data.firstName,
+              middle_name: data.middleName || null,
+              last_name: data.lastName,
+              date_of_birth: data.dateOfBirth || null,
+              gender: data.gender || null,
+              contact_number: applicationPayload.contactNumber,
+              barangay: data.currentBarangay || "Cabaritan",
+              grade_level: data.step1.targetGradeLevel,
+              strand: data.targetStrand || null,
+            })
+            .select()
+            .single();
+
+          if (createdStudent) {
+            studentUuid = createdStudent.id;
+          }
+        }
+
+        if (studentUuid) {
+          const { error: appErr } = await supabase
+            .from("enrollment_applications")
+            .insert({
+              application_id: generatedRef,
+              student_id: studentUuid,
+              applicant_type: data.step1.applicantType,
+              school_year: "2025-2026",
+              target_grade_level: data.step1.targetGradeLevel,
+              target_strand: data.targetStrand || null,
+              status: "Pending",
+              submitted_documents: Object.entries(docs)
+                .filter(([_, v]) => v !== null)
+                .map(([k, v]) => ({ docType: k, fileName: v?.file.name, sizeKb: v?.compressedSizeKb })),
+            });
+
+          if (appErr) {
+            console.warn("Supabase enrollment_applications insert notice:", appErr.message);
+          }
+        }
+      } catch (suAppErr) {
+        console.warn("Supabase application submission exception:", suAppErr);
+      }
+
+      // 2. Local Storage Persistence for Instant Offline Durability
       if (typeof window !== "undefined") {
         const existingRegistry = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
         existingRegistry.unshift(applicationPayload);
