@@ -747,13 +747,13 @@ export default function Step2LearnerProfile({
                 Barangay <span className="text-red-700">*</span>
               </label>
               <select
-                value={data.currentBarangay || "Cabaritan"}
-                onChange={(e) => handleCurrentAddressChange({ currentBarangay: e.target.value })}
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                value={(data.currentBarangay || "CABARITAN").toUpperCase()}
+                onChange={(e) => handleCurrentAddressChange({ currentBarangay: e.target.value.toUpperCase() })}
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
               >
                 {DUMALNEG_BARANGAYS.map((brgy) => (
-                  <option key={brgy} value={brgy}>
-                    Brgy. {brgy}
+                  <option key={brgy} value={brgy.toUpperCase()} className="uppercase font-bold">
+                    BRGY. {brgy.toUpperCase()}
                   </option>
                 ))}
               </select>

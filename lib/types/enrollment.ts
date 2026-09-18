@@ -120,10 +120,10 @@ export interface EnrollmentApplication {
 }
 
 export const DUMALNEG_BARANGAYS = [
-  'Cabaritan',
-  'Kalabakan',
-  'Quibel',
-  'San Isidro'
+  'CABARITAN',
+  'KALABAKAN',
+  'QUIBEL',
+  'SAN ISIDRO'
 ] as const;
 
 export const SNED_DIAGNOSES = [
