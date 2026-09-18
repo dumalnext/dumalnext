@@ -1,10 +1,10 @@
 [
   {
     "route": "/enroll",
-    "firstLoadUncompressedJsBytes": 487003,
+    "firstLoadUncompressedJsBytes": 487100,
     "firstLoadChunkPaths": [
       ".next\\static\\chunks\\3fntmmi971322.js",
-      ".next\\static\\chunks\\3plzo2_sjz222.js",
+      ".next\\static\\chunks\\3597_n8hc6grm.js",
       ".next\\static\\chunks\\310vm2bl3xxpt.js",
       ".next\\static\\chunks\\19mx3mg6lkumu.js",
       ".next\\static\\chunks\\27t_qfc-3_lzs.js",

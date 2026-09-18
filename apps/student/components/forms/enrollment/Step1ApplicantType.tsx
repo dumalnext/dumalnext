@@ -94,36 +94,36 @@ export default function Step1ApplicantType({
   // Compute valid available options for "Last Grade Level Completed" based on Target Grade Level
   const getAvailableCompletedGrades = (targetGrade: number | "") => {
     if (!targetGrade || typeof targetGrade !== "number") {
-      return [{ value: 6, label: "Grade 6 (Elementary Completer)" }];
+      return [
+        { value: 6, label: "Grade 6 (Elementary Completer)" },
+        { value: 7, label: "Grade 7 (Repeater / Discontinued during Grade 7)" },
+      ];
     }
 
     const options: { value: number; label: string }[] = [];
-
-    // The primary valid completed grade is targetGrade - 1
     const prerequisiteGrade = targetGrade - 1;
 
+    // 1. Standard Progression / Prerequisite Option
     if (prerequisiteGrade === 6) {
       options.push({ value: 6, label: "Grade 6 (Elementary Completer)" });
+    } else if (prerequisiteGrade === 10) {
+      options.push({ value: 10, label: "Grade 10 (Junior High School Completer)" });
     } else {
-      // Allow the direct prerequisite grade (standard promo)
-      options.push({
-        value: prerequisiteGrade,
-        label: prerequisiteGrade === 10 ? "Grade 10 (Junior High School Completer)" : `Grade ${prerequisiteGrade}`,
-      });
+      options.push({ value: prerequisiteGrade, label: `Grade ${prerequisiteGrade}` });
+    }
 
-      // Also allow repeating the current grade level if repeating / balik-aral
-      options.push({
-        value: targetGrade,
-        label: `Grade ${targetGrade} (Repeater / Discontinued during Grade ${targetGrade})`,
-      });
+    // 2. Repeater Option (Always available for all levels including Grade 7)
+    options.push({
+      value: targetGrade,
+      label: `Grade ${targetGrade} (Repeater / Retained in Grade ${targetGrade} / Discontinued)`,
+    });
 
-      // Allow 1 grade lower if returning after drop out
-      if (prerequisiteGrade - 1 >= 6) {
-        options.push({
-          value: prerequisiteGrade - 1,
-          label: prerequisiteGrade - 1 === 6 ? "Grade 6 (Elementary Completer)" : `Grade ${prerequisiteGrade - 1}`,
-        });
-      }
+    // 3. Fallback for returning students who dropped out earlier
+    if (prerequisiteGrade - 1 >= 6) {
+      options.push({
+        value: prerequisiteGrade - 1,
+        label: prerequisiteGrade - 1 === 6 ? "Grade 6 (Elementary Completer)" : `Grade ${prerequisiteGrade - 1}`,
+      });
     }
 
     return options;
