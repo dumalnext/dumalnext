@@ -106,8 +106,8 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
 - [x] Zero-emoji/zero-icon design system enforced
 - [x] Developer Log (`DEVELOPER_LOG.md`) created as shared team notebook
 - [x] Supabase SDKs installed (`@supabase/supabase-js`, `@supabase/ssr`)
-- [ ] Supabase SQL Schema (`supabase/schema.sql`) created and tested
-- [ ] Git Repository initialized with clean `.gitignore`
-- [ ] `.env.example` created for Supabase keys
-- [ ] GitHub Remote instructions prepared
-- [ ] Vercel Deployment readiness validated
+- [x] Supabase SQL Schema (`supabase/schema.sql`) created
+- [x] Git Repository initialized and pushed to `dumalnext/dumalnext` on GitHub
+- [x] `.env.local` configured with Supabase Project `fvybtqghtuarjzlpbwnr`
+- [ ] Supabase SQL schema executed in Supabase SQL Editor
+- [ ] Vercel deployment connected to GitHub repo
