@@ -52,6 +52,7 @@ dumalnext/
 │       └── image-compressor.ts# Client-side HTML5 Canvas Compressor (<350KB WebP/JPEG)
 ├── supabase/
 │   └── schema.sql             # Buong PostgreSQL Database Script (Tables, RLS, Functions)
+├── DATABASE_DICTIONARY.md     # Pormal na Data Dictionary na 100% naka-align sa Class Diagram para sa Professor
 ├── DEVELOPER_LOG.md           # ITO ITO - Ang Notepad ninyong 3 developers
 └── .env.local                 # Supabase Project URL at API Keys (Huwag i-commit sa git!)
 ```
