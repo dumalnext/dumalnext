@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
+import { createClient } from "@/lib/supabase/client";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -54,25 +55,58 @@ function StudentHomeContent() {
   const [userApplication, setUserApplication] = useState<any | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
-  // Check for submitted applications belonging to the logged-in user
+  // Check for submitted applications belonging to the logged-in user from Supabase
   useEffect(() => {
-    if (user && typeof window !== "undefined") {
-      try {
-        const stored = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
-        const found = stored.find(
-          (app: any) =>
-            (app.accountEmail && app.accountEmail.toLowerCase() === user.email.toLowerCase()) ||
-            (app.userAccountId && app.userAccountId === user.userId) ||
-            (user.lrn && app.lrn === user.lrn)
-        );
-        if (found) {
-          setUserApplication(found);
-        } else {
-          setUserApplication(null);
+    if (user) {
+      let isMounted = true;
+      (async () => {
+        try {
+          const supabase = createClient();
+          // Find student by student_id or user_id in Supabase
+          const { data: stData } = await supabase
+            .from("students")
+            .select("id")
+            .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
+            .limit(1);
+
+          if (stData && stData.length > 0) {
+            const { data: appData } = await supabase
+              .from("enrollment_applications")
+              .select("*")
+              .eq("student_id", stData[0].id)
+              .order("created_at", { ascending: false })
+              .limit(1);
+
+            if (isMounted && appData && appData.length > 0) {
+              const a = appData[0];
+              setUserApplication({
+                referenceNumber: a.application_id,
+                applicationDate: a.created_at,
+                status: a.status,
+                fullName: `${user.lastName}, ${user.firstName} ${user.middleName || ""}`.trim(),
+                gradeLevel: a.target_grade_level,
+                applicantType: a.applicant_type,
+                targetTrack: a.target_strand ? "Senior High School" : "Junior High School",
+                targetStrand: a.target_strand,
+                remarks: a.admin_feedback,
+              });
+              return;
+            }
+          }
+          if (isMounted) {
+            setUserApplication(null);
+          }
+        } catch (e) {
+          console.error("Error reading Supabase applications:", e);
+          if (isMounted) setUserApplication(null);
         }
-      } catch (e) {
-        console.error("Error reading stored applications:", e);
-      }
+      })();
+
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      setUserApplication(null);
     }
   }, [user]);
 

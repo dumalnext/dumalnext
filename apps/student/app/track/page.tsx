@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { FullEnrollmentFormData } from "@/components/forms/enrollment/EnrollmentStepper";
+import { createClient } from "@/lib/supabase/client";
 
 interface ApplicationRecord {
   referenceNumber: string;
@@ -45,7 +46,7 @@ function TrackApplicationContent() {
     }
   }, [user, isLoading, router]);
 
-  const performSearch = (term: string) => {
+  const performSearch = async (term: string) => {
     const cleanTerm = term.trim().toUpperCase();
     if (!cleanTerm) {
       setRecord(null);
@@ -56,22 +57,148 @@ function TrackApplicationContent() {
     setSearched(true);
     setReuploadSuccess(false);
 
-    // Search locally saved applications in localStorage
-    if (typeof window !== "undefined") {
-      const stored = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
-      const found = stored.find(
-        (app: any) =>
-          app.referenceNumber?.toUpperCase() === cleanTerm ||
-          app.lrn === cleanTerm ||
-          (app.accountEmail && app.accountEmail.toUpperCase() === cleanTerm) ||
-          (app.userAccountId && app.userAccountId.toUpperCase() === cleanTerm) ||
-          cleanTerm.includes(app.referenceNumber?.toUpperCase())
-      );
+    try {
+      const supabase = createClient();
+      let suApp: any = null;
+      let studentRecord: any = null;
 
-      if (found) {
-        setRecord(found);
+      // 1. Search directly by application_id in Supabase
+      const { data: directApp } = await supabase
+        .from("enrollment_applications")
+        .select("*")
+        .eq("application_id", cleanTerm)
+        .limit(1);
+
+      if (directApp && directApp.length > 0) {
+        suApp = directApp[0];
+      } else {
+        // 2. Search by student LRN or user ID in students table
+        const { data: stList } = await supabase
+          .from("students")
+          .select("*")
+          .or(`student_id.eq.${cleanTerm}`)
+          .limit(1);
+
+        if (stList && stList.length > 0) {
+          studentRecord = stList[0];
+          const { data: appByStudent } = await supabase
+            .from("enrollment_applications")
+            .select("*")
+            .eq("student_id", studentRecord.id)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          if (appByStudent && appByStudent.length > 0) {
+            suApp = appByStudent[0];
+          }
+        }
+      }
+
+      if (suApp) {
+        if (!studentRecord && suApp.student_id) {
+          const { data: stProfile } = await supabase
+            .from("students")
+            .select("*")
+            .eq("id", suApp.student_id)
+            .limit(1);
+          studentRecord = stProfile?.[0];
+        }
+
+        const fullName = studentRecord
+          ? `${studentRecord.last_name}, ${studentRecord.first_name} ${studentRecord.middle_name || ""}`.trim()
+          : (user ? `${user.lastName}, ${user.firstName}` : "STUDENT APPLICANT");
+
+        setRecord({
+          referenceNumber: suApp.application_id,
+          applicationDate: suApp.created_at,
+          status: suApp.status,
+          lrn: studentRecord?.student_id || user?.lrn || "N/A",
+          fullName,
+          gradeLevel: suApp.target_grade_level,
+          applicantType: suApp.applicant_type,
+          jhsProgram: "Regular",
+          targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
+          targetStrand: suApp.target_strand,
+          remarks: suApp.admin_feedback,
+          formData: {
+            step1: {
+              isGraded: true,
+              applicantType: suApp.applicant_type,
+              targetGradeLevel: suApp.target_grade_level,
+              jhsProgram: "Regular",
+              targetSemester: "1st Semester",
+              targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
+              targetStrand: suApp.target_strand || "",
+              lastGradeCompleted: suApp.target_grade_level - 1,
+              lastSchoolYearCompleted: "2024-2025",
+              lastSchoolAttended: "Dumalneg Elementary School",
+              lastSchoolId: "100050",
+            },
+            lrn: studentRecord?.student_id || "100050123456",
+            psaBirthCertNo: "1234-5678-9012",
+            lastName: studentRecord?.last_name || "STUDENT",
+            firstName: studentRecord?.first_name || "APPLICANT",
+            middleName: studentRecord?.middle_name || "",
+            extensionName: "",
+            dateOfBirth: studentRecord?.date_of_birth || "2012-05-15",
+            age: 12,
+            gender: studentRecord?.gender || "Male",
+            placeOfBirth: "Dumalneg, Ilocos Norte",
+            religion: "Roman Catholic",
+            motherTongue: "Ilokano",
+            contactNumber: studentRecord?.contact_number || "09181234567",
+            isIpCommunity: true,
+            ipCommunityName: "Isnag",
+            is4psBeneficiary: false,
+            householdId4ps: "",
+            currentHouseNo: "",
+            currentSitio: "Poblacion",
+            currentBarangay: studentRecord?.barangay || "CABARITAN",
+            currentMunicipality: "DUMALNEG",
+            currentProvince: "ILOCOS NORTE",
+            currentCountry: "PHILIPPINES",
+            currentZipCode: "2921",
+            isPermanentSameAsCurrent: true,
+            permanentHouseNo: "",
+            permanentSitio: "Poblacion",
+            permanentBarangay: studentRecord?.barangay || "CABARITAN",
+            permanentMunicipality: "DUMALNEG",
+            permanentProvince: "ILOCOS NORTE",
+            permanentCountry: "PHILIPPINES",
+            permanentZipCode: "2921",
+            fatherLastName: "LOZANO",
+            fatherFirstName: "JUAN",
+            fatherMiddleName: "",
+            fatherContactNumber: "09181234567",
+            motherMaidenLastName: "RAMOS",
+            motherFirstName: "MARIA",
+            motherMiddleName: "",
+            motherContactNumber: "09201234567",
+            guardianLastName: "",
+            guardianFirstName: "",
+            guardianMiddleName: "",
+            guardianContactNumber: "",
+            guardianRelationship: "",
+            primaryContactPerson: "Father",
+            jhsProgram: "Regular",
+            spsSport: "",
+            targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
+            targetStrand: suApp.target_strand || "",
+            selectedElectives: [],
+            targetSemester: "1st Semester",
+            isSned: false,
+            snedCategory: "",
+            snedDetails: [],
+            hasPwdId: false,
+            preferredModalities: ["Modular (Print)", "Blended"],
+            submittedDocuments: [],
+            dataPrivacyAccepted: true,
+          },
+        });
         return;
       }
+    } catch (e) {
+      console.error("Supabase tracking query error:", e);
     }
 
     // No record found

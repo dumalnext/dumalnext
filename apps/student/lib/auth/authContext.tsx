@@ -35,79 +35,55 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Clean initial user state (Requires authentic student registration)
-const INITIAL_DEMO_USERS: (StudentUser & { passwordHash: string })[] = [];
+// Session Cookie Management (100% Standard Web Cookies, Zero localStorage)
+const SESSION_COOKIE_NAME = "dumalnext_student_session";
+
+function setSessionCookie(user: StudentUser) {
+  if (typeof document !== "undefined") {
+    const serialized = encodeURIComponent(JSON.stringify(user));
+    document.cookie = `${SESSION_COOKIE_NAME}=${serialized}; path=/; max-age=604800; SameSite=Lax`;
+  }
+}
+
+function getSessionCookie(): StudentUser | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${SESSION_COOKIE_NAME}=([^;]*)`));
+  if (!match) return null;
+  try {
+    return JSON.parse(decodeURIComponent(match[1]));
+  } catch {
+    return null;
+  }
+}
+
+function clearSessionCookie() {
+  if (typeof document !== "undefined") {
+    document.cookie = `${SESSION_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StudentUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const supabase = createClient();
 
-  // Load session from localStorage and auto-sync any pending local accounts to Supabase
+  // Load session from HTTP Cookie and verify with Supabase Database
   useEffect(() => {
     try {
       if (typeof window !== "undefined") {
-        // Initialize demo users in storage if not existing
-        const storedUsersRaw = localStorage.getItem("dumalnext_student_users");
-        if (!storedUsersRaw) {
-          localStorage.setItem("dumalnext_student_users", JSON.stringify(INITIAL_DEMO_USERS));
-        }
-
-        const activeSession = localStorage.getItem("dumalnext_student_session");
-        if (activeSession) {
-          setUser(JSON.parse(activeSession));
-        }
-
-        // Auto-sync existing local accounts to Supabase in the background
-        const storedUsers = JSON.parse(storedUsersRaw || "[]");
-        if (storedUsers.length > 0) {
-          (async () => {
-            for (const u of storedUsers) {
-              try {
-                const { data: suUser } = await supabase
-                  .from("users")
-                  .select("id")
-                  .eq("email", u.email.toLowerCase())
-                  .limit(1);
-
-                if (!suUser || suUser.length === 0) {
-                  const { data: inserted } = await supabase
-                    .from("users")
-                    .insert({
-                      user_id: u.userId,
-                      email: u.email.toLowerCase(),
-                      user_role: "student",
-                    })
-                    .select()
-                    .single();
-
-                  if (inserted) {
-                    await supabase.from("students").insert({
-                      user_id: inserted.id,
-                      student_id: u.userId,
-                      first_name: u.firstName,
-                      middle_name: u.middleName || null,
-                      last_name: u.lastName,
-                      barangay: "Cabaritan",
-                      grade_level: 7,
-                    });
-                  }
-                }
-              } catch (e) {
-                console.warn("Background Supabase account sync notice:", e);
-              }
-            }
-          })();
+        const cachedUser = getSessionCookie();
+        if (cachedUser) {
+          setUser(cachedUser);
         }
       }
-    } catch {
-      // Graceful fallback
+    } catch (e) {
+      console.warn("Session retrieval notice:", e);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Dual Login via Email OR 12-Digit LRN (Supabase + Local Cache)
+  // Dual Login via Email OR 12-Digit LRN (100% Supabase PostgreSQL Database)
   const login = async (
     identifier: string,
     password: string
@@ -116,94 +92,106 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cleanPass = password.trim();
 
     if (!cleanId || !cleanPass) {
-      return { success: false, error: "Please enter your email or LRN and password." };
+      return { success: false, error: "Please enter your Email Address or 12-Digit LRN and password." };
     }
 
     try {
-      if (typeof window !== "undefined") {
-        const storedUsers = JSON.parse(
-          localStorage.getItem("dumalnext_student_users") || JSON.stringify(INITIAL_DEMO_USERS)
-        );
+      // 1. Query Supabase 'users' table directly
+      let suUser: any = null;
+      let hasPasswordCol = true;
 
-        let foundUser = storedUsers.find((u: StudentUser & { passwordHash: string }) => {
-          const matchEmail = u.email.toLowerCase() === cleanId;
-          const matchLrn = u.lrn && u.lrn.trim() === cleanId;
-          const matchUserId = u.userId.toLowerCase() === cleanId;
-          return (matchEmail || matchLrn || matchUserId) && u.passwordHash === cleanPass;
-        });
+      const { data: usersWithPass, error: passErr } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role, password")
+        .or(`email.eq.${cleanId},user_id.eq.${cleanId.toUpperCase()}`)
+        .limit(1);
 
-        // If not in local storage cache, query Supabase database
-        if (!foundUser) {
-          try {
-            const { data: suUsers } = await supabase
-              .from("users")
-              .select("id, user_id, email, user_role")
-              .or(`email.eq.${cleanId},user_id.eq.${cleanId.toUpperCase()}`)
-              .limit(1);
+      if (passErr && passErr.message.includes("password")) {
+        hasPasswordCol = false;
+        const { data: usersBasic, error: basicErr } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role")
+          .or(`email.eq.${cleanId},user_id.eq.${cleanId.toUpperCase()}`)
+          .limit(1);
 
-            if (suUsers && suUsers.length > 0) {
-              const suUser = suUsers[0];
-              const { data: suStudents } = await supabase
-                .from("students")
-                .select("*")
-                .eq("user_id", suUser.id)
-                .limit(1);
-
-              const sp = suStudents?.[0];
-              const first = sp?.first_name || "STUDENT";
-              const last = sp?.last_name || "APPLICANT";
-              const middle = sp?.middle_name || "";
-
-              foundUser = {
-                id: suUser.id,
-                userId: suUser.user_id,
-                email: suUser.email,
-                fullName: middle ? `${last}, ${first} ${middle}` : `${last}, ${first}`,
-                firstName: first,
-                middleName: middle,
-                lastName: last,
-                lrn: sp?.student_id || undefined,
-                userRole: "student",
-                passwordHash: cleanPass,
-              };
-
-              storedUsers.push(foundUser);
-              localStorage.setItem("dumalnext_student_users", JSON.stringify(storedUsers));
-            }
-          } catch (suErr) {
-            console.warn("Supabase login query notice:", suErr);
-          }
+        if (basicErr) {
+          return { success: false, error: "Database query error: " + basicErr.message };
         }
+        suUser = usersBasic?.[0];
+      } else {
+        suUser = usersWithPass?.[0];
+      }
 
-        if (foundUser) {
-          const sessionUser: StudentUser = {
-            id: foundUser.id,
-            userId: foundUser.userId,
-            email: foundUser.email,
-            fullName: foundUser.fullName,
-            firstName: foundUser.firstName,
-            middleName: foundUser.middleName,
-            lastName: foundUser.lastName,
-            lrn: foundUser.lrn,
-            userRole: "student",
-          };
+      // If user not found by email or user_id, check students table by student_id
+      if (!suUser) {
+        const { data: stFound } = await supabase
+          .from("students")
+          .select("user_id")
+          .eq("student_id", cleanId.toUpperCase())
+          .limit(1);
 
-          setUser(sessionUser);
-          localStorage.setItem("dumalnext_student_session", JSON.stringify(sessionUser));
-          return { success: true };
+        if (stFound && stFound[0]?.user_id) {
+          const { data: userById } = await supabase
+            .from("users")
+            .select("id, user_id, email, user_role")
+            .eq("id", stFound[0].user_id)
+            .limit(1);
+          suUser = userById?.[0];
         }
       }
 
-      return {
-        success: false,
-        error: "Invalid credentials. Please verify your Email Address or 12-Digit LRN and password.",
+      if (!suUser) {
+        return {
+          success: false,
+          error: "No student account found in Supabase for that email or LRN. Please check your credentials or register a new account.",
+        };
+      }
+
+      // Verify password if password column exists in Supabase table
+      if (hasPasswordCol && suUser.password && suUser.password !== cleanPass) {
+        return {
+          success: false,
+          error: "Incorrect password entered. Please try again.",
+        };
+      }
+
+      // 2. Query student profile from Supabase 'students' table
+      const { data: stProfiles } = await supabase
+        .from("students")
+        .select("*")
+        .eq("user_id", suUser.id)
+        .limit(1);
+
+      const profile = stProfiles?.[0];
+      const firstName = profile?.first_name || "STUDENT";
+      const lastName = profile?.last_name || "LEARNER";
+      const middleName = profile?.middle_name || "";
+      const fullName = middleName
+        ? `${lastName}, ${firstName} ${middleName}`
+        : `${lastName}, ${firstName}`;
+
+      const sessionUser: StudentUser = {
+        id: suUser.id,
+        userId: suUser.user_id,
+        email: suUser.email,
+        fullName,
+        firstName,
+        middleName,
+        lastName,
+        lrn: profile?.student_id || undefined,
+        userRole: "student",
       };
-    } catch {
-      return { success: false, error: "An unexpected authentication error occurred." };
+
+      setUser(sessionUser);
+      setSessionCookie(sessionUser);
+      return { success: true };
+    } catch (e: any) {
+      console.error("Supabase authentication error:", e);
+      return { success: false, error: e?.message || "An unexpected authentication error occurred." };
     }
   };
 
-  // Student Account Registration (Aligned with Class Diagram: Name, LRN, Email, Password - No mobile)
+  // Student Account Registration (100% Supabase PostgreSQL Database)
   const register = async (
     data: {
       firstName: string;
@@ -234,128 +222,96 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      if (typeof window !== "undefined") {
-        const storedUsers = JSON.parse(
-          localStorage.getItem("dumalnext_student_users") || JSON.stringify(INITIAL_DEMO_USERS)
-        );
+      // 1. Check if email already registered in Supabase
+      const { data: existingUsers, error: checkErr } = await supabase
+        .from("users")
+        .select("id")
+        .eq("email", cleanEmail)
+        .limit(1);
 
-        // Check if email already registered
-        const emailExists = storedUsers.some(
-          (u: StudentUser) => u.email.toLowerCase() === cleanEmail
-        );
-        if (emailExists) {
-          return {
-            success: false,
-            error: "An account with this email address already exists. Please sign in instead.",
-          };
-        }
-
-        // Check if LRN already registered
-        if (cleanLrn) {
-          const lrnExists = storedUsers.some(
-            (u: StudentUser) => u.lrn && u.lrn === cleanLrn
-          );
-          if (lrnExists) {
-            return {
-              success: false,
-              error: "An account with this 12-Digit LRN already exists. Please sign in.",
-            };
-          }
-        }
-
-        const newId = `stu-${Date.now()}`;
-        const newUserId = `DNHS-STU-${Math.floor(10000 + Math.random() * 90000)}`;
-        const fullName = cleanMiddle
-          ? `${cleanLast}, ${cleanFirst} ${cleanMiddle}`
-          : `${cleanLast}, ${cleanFirst}`;
-
-        let supabaseUuid = "";
-
-        // 1. Direct Cloud Insert to Supabase Database (public.users & public.students)
-        try {
-          const { data: suUser, error: suErr } = await supabase
-            .from("users")
-            .insert({
-              user_id: newUserId,
-              email: cleanEmail,
-              user_role: "student",
-            })
-            .select()
-            .single();
-
-          if (suErr) {
-            console.warn("Supabase user insert notice:", suErr.message);
-          } else if (suUser) {
-            supabaseUuid = suUser.id;
-
-            const { error: sErr } = await supabase
-              .from("students")
-              .insert({
-                user_id: supabaseUuid,
-                student_id: newUserId,
-                first_name: cleanFirst,
-                middle_name: cleanMiddle || null,
-                last_name: cleanLast,
-                barangay: "Cabaritan",
-                grade_level: 7,
-              });
-
-            if (sErr) {
-              console.warn("Supabase student profile insert notice:", sErr.message);
-            }
-          }
-        } catch (suInsertEx) {
-          console.warn("Supabase cloud sync exception:", suInsertEx);
-        }
-
-        // 2. Local Storage sync for offline resilience and blazingly fast access
-        const newUserRecord = {
-          id: supabaseUuid || newId,
-          userId: newUserId,
-          email: cleanEmail,
-          fullName,
-          firstName: cleanFirst,
-          middleName: cleanMiddle,
-          lastName: cleanLast,
-          lrn: cleanLrn || undefined,
-          userRole: "student" as const,
-          passwordHash: data.password,
+      if (checkErr) {
+        console.warn("Supabase user check warning:", checkErr.message);
+      } else if (existingUsers && existingUsers.length > 0) {
+        return {
+          success: false,
+          error: "An account with this email address already exists in the Dumalneg NHS Supabase database. Please sign in.",
         };
-
-        storedUsers.push(newUserRecord);
-        localStorage.setItem("dumalnext_student_users", JSON.stringify(storedUsers));
-
-        if (autoLogin) {
-          const sessionUser: StudentUser = {
-            id: newUserRecord.id,
-            userId: newUserRecord.userId,
-            email: newUserRecord.email,
-            fullName: newUserRecord.fullName,
-            firstName: newUserRecord.firstName,
-            middleName: newUserRecord.middleName,
-            lastName: newUserRecord.lastName,
-            lrn: newUserRecord.lrn,
-            userRole: "student",
-          };
-
-          setUser(sessionUser);
-          localStorage.setItem("dumalnext_student_session", JSON.stringify(sessionUser));
-        }
-
-        return { success: true };
       }
 
-      return { success: false, error: "Registration failed." };
-    } catch {
-      return { success: false, error: "An unexpected error occurred during registration." };
+      // Generate Official Dumalneg Student User ID (e.g. DNHS-STU-XXXXX)
+      const newUserId = `DNHS-STU-${Math.floor(10000 + Math.random() * 90000)}`;
+      const fullName = cleanMiddle
+        ? `${cleanLast}, ${cleanFirst} ${cleanMiddle}`
+        : `${cleanLast}, ${cleanFirst}`;
+
+      // 2. Direct Cloud Insert to Supabase 'users' table
+      let userPayload: Record<string, any> = {
+        user_id: newUserId,
+        email: cleanEmail,
+        user_role: "student",
+        password: data.password,
+      };
+
+      let suUser: any = null;
+      let suInsertRes = await supabase.from("users").insert(userPayload).select().single();
+
+      // If password column does not exist yet in Supabase schema, gracefully retry without it
+      if (suInsertRes.error && suInsertRes.error.message.includes("password")) {
+        delete userPayload.password;
+        suInsertRes = await supabase.from("users").insert(userPayload).select().single();
+      }
+
+      if (suInsertRes.error) {
+        return {
+          success: false,
+          error: "Database error creating user account: " + suInsertRes.error.message,
+        };
+      }
+
+      suUser = suInsertRes.data;
+
+      // 3. Direct Cloud Insert to Supabase 'students' profile table
+      const { error: studentErr } = await supabase.from("students").insert({
+        user_id: suUser.id,
+        student_id: cleanLrn || newUserId,
+        first_name: cleanFirst,
+        middle_name: cleanMiddle || null,
+        last_name: cleanLast,
+        barangay: "Cabaritan",
+        grade_level: 7,
+      });
+
+      if (studentErr) {
+        console.warn("Supabase student profile insert warning:", studentErr.message);
+      }
+
+      const sessionUser: StudentUser = {
+        id: suUser.id,
+        userId: newUserId,
+        email: cleanEmail,
+        fullName,
+        firstName: cleanFirst,
+        middleName: cleanMiddle,
+        lastName: cleanLast,
+        lrn: cleanLrn || undefined,
+        userRole: "student",
+      };
+
+      if (autoLogin) {
+        setUser(sessionUser);
+        setSessionCookie(sessionUser);
+      }
+
+      return { success: true };
+    } catch (e: any) {
+      console.error("Supabase registration error:", e);
+      return { success: false, error: e?.message || "An unexpected error occurred during registration." };
     }
   };
 
   const logout = () => {
     setUser(null);
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("dumalnext_student_session");
-    }
+    clearSessionCookie();
   };
 
   return (

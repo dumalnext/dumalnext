@@ -3,34 +3,54 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/authContext";
+import { createClient } from "@/lib/supabase/client";
 
 export default function StudentHeaderNav() {
   const { user, logout } = useAuth();
   const [appStatus, setAppStatus] = useState<string | null>(null);
   const [appRef, setAppRef] = useState<string | null>(null);
 
-  // Smart Live Status Tracker: Check submitted application state for active user
+  // Smart Live Status Tracker: Check submitted application state directly from Supabase
   useEffect(() => {
-    if (user && typeof window !== "undefined") {
-      try {
-        const stored = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
-        const found = stored.find(
-          (app: any) =>
-            (app.accountEmail && app.accountEmail.toLowerCase() === user.email.toLowerCase()) ||
-            (app.userAccountId && app.userAccountId === user.userId) ||
-            (user.lrn && app.lrn === user.lrn)
-        );
-        if (found) {
-          setAppStatus(found.status);
-          setAppRef(found.referenceNumber);
-        } else {
-          setAppStatus(null);
-          setAppRef(null);
+    if (user) {
+      let isMounted = true;
+      (async () => {
+        try {
+          const supabase = createClient();
+          const { data: stData } = await supabase
+            .from("students")
+            .select("id")
+            .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
+            .limit(1);
+
+          if (stData && stData.length > 0) {
+            const { data: appData } = await supabase
+              .from("enrollment_applications")
+              .select("application_id, status")
+              .eq("student_id", stData[0].id)
+              .order("created_at", { ascending: false })
+              .limit(1);
+
+            if (isMounted && appData && appData.length > 0) {
+              setAppStatus(appData[0].status);
+              setAppRef(appData[0].application_id);
+              return;
+            }
+          }
+          if (isMounted) {
+            setAppStatus(null);
+            setAppRef(null);
+          }
+        } catch {
+          if (isMounted) {
+            setAppStatus(null);
+            setAppRef(null);
+          }
         }
-      } catch {
-        setAppStatus(null);
-        setAppRef(null);
-      }
+      })();
+      return () => {
+        isMounted = false;
+      };
     } else {
       setAppStatus(null);
       setAppRef(null);

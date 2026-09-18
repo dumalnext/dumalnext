@@ -189,7 +189,7 @@ export default function Step5DocumentsReview({
       const randomSuffix = Math.floor(10000 + Math.random() * 90000);
       const generatedRef = `DNHS-2025-${randomSuffix}`;
 
-      // Save to localStorage application registry for local and offline resilience
+      // 1. Cloud Database Synchronization: Save directly to Supabase
       const applicationPayload = {
         referenceNumber: generatedRef,
         applicationDate: new Date().toISOString(),
@@ -276,14 +276,6 @@ export default function Step5DocumentsReview({
         }
       } catch (suAppErr) {
         console.warn("Supabase application submission exception:", suAppErr);
-      }
-
-      // 2. Local Storage Persistence for Instant Offline Durability
-      if (typeof window !== "undefined") {
-        const existingRegistry = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
-        existingRegistry.unshift(applicationPayload);
-        localStorage.setItem("dumalnext_applications", JSON.stringify(existingRegistry));
-        localStorage.setItem("dumalnext_last_submitted_ref", generatedRef);
       }
 
       // Simulate network latency for realism
