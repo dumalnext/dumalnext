@@ -65,6 +65,7 @@ export interface FullEnrollmentFormData {
   snedCategory: "Diagnosis" | "Manifestations" | "";
   snedDetails: string[];
   hasPwdId: boolean;
+  jhsProgram?: "Regular" | "SPS";
   targetSemester: "1st Semester" | "2nd Semester" | "";
   targetTrack: string;
   targetStrand: string;
@@ -86,6 +87,7 @@ const initialFormData: FullEnrollmentFormData = {
     isGraded: true,
     applicantType: "",
     targetGradeLevel: "",
+    jhsProgram: "Regular",
     targetSemester: "1st Semester",
     targetTrack: "Academic Track",
     targetStrand: "",
@@ -168,6 +170,7 @@ export default function EnrollmentStepper() {
     setFormData((prev) => ({
       ...prev,
       step1: { ...prev.step1, ...fields },
+      ...(fields.jhsProgram !== undefined ? { jhsProgram: fields.jhsProgram } : {}),
       ...(fields.targetTrack !== undefined ? { targetTrack: fields.targetTrack } : {}),
       ...(fields.targetStrand !== undefined ? { targetStrand: fields.targetStrand } : {}),
       ...(fields.targetSemester !== undefined ? { targetSemester: fields.targetSemester } : {}),

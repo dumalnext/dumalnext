@@ -85,6 +85,17 @@ export async function generateDepEdEnrollmentPdf(data: FullEnrollmentFormData): 
       font: fontBold,
       color: textColor,
     });
+
+    const isJHS = Number(data.step1.targetGradeLevel) <= 10;
+    if (isJHS && (data.jhsProgram === "SPS" || data.step1.jhsProgram === "SPS")) {
+      page1.drawText("(SPS - SPORTS)", {
+        x: 260,
+        y: 768,
+        size: 8,
+        font: fontBold,
+        color: textColor,
+      });
+    }
   } else {
     // Non-Graded (SNEd Only)
     page1.drawText("X", { x: 59, y: 736, size: 9, font: fontBold, color: textColor });

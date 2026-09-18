@@ -91,6 +91,7 @@ export interface EnrollmentApplication {
   schoolYear: string;
   isGraded: boolean;
   targetGradeLevel: number;
+  jhsProgram?: 'Regular' | 'SPS'; // Junior High School Curricular Program
   targetSemester?: '1st Semester' | '2nd Semester' | '';
   targetTrack?: string; // Academic, TVL
   targetStrand?: string; // STEM, HUMSS, TVL-Agri-Fishery, TVL-ICT, TVL-HE

@@ -156,4 +156,10 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
   - Inilagay ang opisyal na 2-page DepEd Basic Education Enrollment Form template (Revised as of 06/01/2025) sa `apps/student/public/forms/deped-enrollment-p1.jpg` at `p2.jpg`.
   - Ginawa ang `apps/student/lib/utils/depedPdfGenerator.ts` na awtomatikong nagpi-print at nagpapatong (superimpose) ng bawat input ng mag-aaral: 12-digit LRN boxes, PSA, buong pangalan, petsa ng kapanganakan, edad, kasarian `[X]`, IP community, 16-digit 4Ps ID boxes, tirahan, magulang/guardian, SNEd status, dating paaralan at 6-digit School ID, SHS track at strand, at distance learning modalities.
   - May "Download Accomplished DepEd Form (PDF)" button para agad makapag-print ang mag-aaral o administrador ng opisyal na DepEd form.
+- [x] **Junior High School Curricular Program (Regular vs SPS)**:
+  - Idinagdag para sa lahat ng Grade 7 hanggang Grade 10 enrollees ang pagpili sa pagitan ng:
+    1. **Regular Basic Education Curriculum (Standard JHS)**
+    2. **Special Program in Sports (SPS - DepEd Special Curricular Program)**
+  - Naka-map sa database at awtomatikong lumalabas sa PDF form at enrollment summary bilang gabay sa Sectioning at Sports Coaching schedule deconfliction.
+
 
