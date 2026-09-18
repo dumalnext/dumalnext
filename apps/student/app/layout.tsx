@@ -28,10 +28,25 @@ export default function StudentLayout({
                 Student Online Portal &amp; Basic Education Enrollment System
               </p>
             </div>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="bg-blue-900 border border-blue-400/40 text-white px-3 py-1 font-mono">
-                Official Student Portal
-              </span>
+            <div className="flex flex-wrap items-center gap-3 text-xs">
+              <a
+                href="/"
+                className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
+              >
+                Portal Home
+              </a>
+              <a
+                href="/enroll"
+                className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
+              >
+                Online Enrollment
+              </a>
+              <a
+                href="/track"
+                className="bg-blue-900 border border-blue-400/50 text-white font-bold uppercase tracking-wider py-1 px-3 hover:bg-blue-800 transition-colors"
+              >
+                Track Application
+              </a>
             </div>
           </div>
         </header>

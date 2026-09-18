@@ -72,19 +72,21 @@ export default function StudentHomePage() {
             </p>
           </div>
           <div className="pt-4 border-t border-slate-200">
-            <div className="flex gap-2">
+            <form action="/track" method="GET" className="flex gap-2">
               <input
                 type="text"
+                name="query"
                 placeholder="Enter Application ID or 12-Digit LRN"
                 className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs focus:border-[#002060] outline-none font-mono"
+                required
               />
               <button
-                type="button"
+                type="submit"
                 className="btn-secondary text-xs uppercase font-bold px-4 shrink-0"
               >
                 Search Record
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </section>

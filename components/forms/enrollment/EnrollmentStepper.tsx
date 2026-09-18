@@ -5,6 +5,7 @@ import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
 import Step2LearnerProfile from "./Step2LearnerProfile";
 import Step3FamilyBackground from "./Step3FamilyBackground";
 import Step4CurriculumModality from "./Step4CurriculumModality";
+import Step5DocumentsReview from "./Step5DocumentsReview";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
 export interface FullEnrollmentFormData {
@@ -304,61 +305,11 @@ export default function EnrollmentStepper() {
         )}
 
         {currentStep === 5 && (
-          <div className="bg-white p-8 border border-slate-300 space-y-6">
-            <div className="border-b border-slate-200 pb-4">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Step 5 of 5: Client-Side Document Upload &amp; Review ]
-              </span>
-              <h2 className="text-xl font-bold text-slate-900">
-                Official Document Upload via HTML5 Canvas Compressor (&lt;350KB)
-              </h2>
-            </div>
-
-            {/* Smart Feature: Automated DepEd PDF Form Filler */}
-            <div className="p-6 bg-blue-50 border-2 border-[#002060] space-y-3 shadow-xs">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#002060]">
-                  [ SMART FEATURE: AUTOMATED DEPED FORM FILLER (PDF) ]
-                </span>
-                <span className="text-[11px] font-mono bg-[#002060] text-white px-2 py-0.5 font-bold">
-                  DEPED FORM REVISED 06/01/2025
-                </span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                All submitted learner credentials, previous school history, LRN, 4Ps data, and senior high school selections
-                are automatically mapped onto the official 2-page DepEd Basic Education Enrollment Form template.
-              </p>
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={handleDownloadPdf}
-                  disabled={isGeneratingPdf}
-                  className="btn-primary text-xs uppercase tracking-wider font-bold py-3 px-6 shadow-sm flex items-center justify-center"
-                >
-                  {isGeneratingPdf
-                    ? "[ GENERATING OFFICIAL DEPED FORM... ]"
-                    : "[ DOWNLOAD ACCOMPLISHED DEPED FORM (PDF) ]"}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={prevStep}
-                className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Back to Step 4
-              </button>
-              <button
-                type="button"
-                disabled
-                className="bg-slate-300 text-slate-600 cursor-not-allowed text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Submit Application
-              </button>
-            </div>
-          </div>
+          <Step5DocumentsReview
+            data={formData}
+            onChange={handleFormDataChange}
+            onBack={prevStep}
+          />
         )}
       </div>
     </div>
