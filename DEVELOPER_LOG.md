@@ -107,8 +107,14 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
 - [x] Zero-emoji/zero-icon design system enforced
 - [x] Developer Log (`DEVELOPER_LOG.md`) created as shared team notebook
 - [x] Supabase SDKs installed (`@supabase/supabase-js`, `@supabase/ssr`)
-- [x] Supabase SQL Schema (`supabase/schema.sql`) created
+- [x] Supabase SQL Schema (`supabase/schema.sql`) created and updated
 - [x] Git Repository initialized and pushed to `dumalnext/dumalnext` on GitHub
 - [x] `.env.local` configured with Supabase Project `fvybtqghtuarjzlpbwnr`
 - [x] Supabase SQL schema executed in Supabase SQL Editor (All tables, RLS, & seed data active)
 - [x] Vercel deployment connected to GitHub repo and Supabase
+- [x] **DepEd ORDER No. 009, s. 2026 Integrated**:
+  - Three-Term Calendar (Term 1: 69 days, Term 2: 65 days, Term 3: 67 days = 201 Class Days)
+  - Regular Enrollment: June 1–5, 2026
+  - Late Enrollment Cutoff: July 28, 2026 (Date ng 2nd Summative Test ng Term 1)
+  - Official DepEd Curriculum Subjects para sa JHS (Table 5) at SHS (Table 6: Max 5 Core Subjects)
+  - End-of-Term 10-day cycle (Araw 1–5 ARAL/Grado, Araw 6 Report Cards, Araw 7–8 INSET, Araw 9–10 Wellness Break)
