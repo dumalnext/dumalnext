@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { FullEnrollmentFormData } from "@/components/forms/enrollment/EnrollmentStepper";
 
@@ -27,7 +27,8 @@ interface ApplicationRecord {
 import { useAuth } from "@/lib/auth/authContext";
 
 function TrackApplicationContent() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("ref") || searchParams.get("query") || "";
 
@@ -36,6 +37,13 @@ function TrackApplicationContent() {
   const [record, setRecord] = useState<ApplicationRecord | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
   const [reuploadSuccess, setReuploadSuccess] = useState<boolean>(false);
+
+  // Protected Route Check: Unauthenticated users redirected to homepage
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace("/?tab=signin&reason=auth_required");
+    }
+  }, [user, isLoading, router]);
 
   const performSearch = (term: string) => {
     const cleanTerm = term.trim().toUpperCase();
@@ -48,7 +56,7 @@ function TrackApplicationContent() {
     setSearched(true);
     setReuploadSuccess(false);
 
-    // 1. Search locally saved applications in localStorage
+    // Search locally saved applications in localStorage
     if (typeof window !== "undefined") {
       const stored = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
       const found = stored.find(
@@ -64,62 +72,6 @@ function TrackApplicationContent() {
         setRecord(found);
         return;
       }
-    }
-
-    // 2. Demo & Capstone Presets for Presentation / Defense Testing
-    if (cleanTerm.includes("APPROV") || cleanTerm === "DNHS-2025-10001") {
-      setRecord({
-        referenceNumber: "DNHS-2025-10001",
-        applicationDate: new Date().toISOString(),
-        status: "Approved",
-        lrn: "100050123456",
-        fullName: "AGCAOILI, MARK ANTHONY D.",
-        gradeLevel: 7,
-        applicantType: "Grade 7",
-        jhsProgram: "SPS",
-        spsSport: "Basketball",
-        primaryContact: "Father",
-        contactNumber: "09181234567",
-        remarks: "All credentials verified. Officially admitted into Grade 7 - Section Mabini (SPS).",
-      });
-      return;
-    }
-
-    if (cleanTerm.includes("REVIS") || cleanTerm === "DNHS-2025-10002") {
-      setRecord({
-        referenceNumber: "DNHS-2025-10002",
-        applicationDate: new Date().toISOString(),
-        status: "Needs Revision",
-        lrn: "100050654321",
-        fullName: "RAMOS, PRINCESS JOYCE C.",
-        gradeLevel: 7,
-        applicantType: "Grade 7",
-        jhsProgram: "Regular",
-        primaryContact: "Mother",
-        contactNumber: "09201234567",
-        remarks:
-          "The uploaded photograph of Form 138 (Grade 6 Progress Report Card) is blurry and the General Average signature cannot be read. Please upload a clear, legible photograph.",
-      });
-      return;
-    }
-
-    // 3. If standard query format (e.g. DNHS-2025-XXXXX or 12-digit number)
-    if (cleanTerm.startsWith("DNHS-2025-") || cleanTerm.length === 12) {
-      setRecord({
-        referenceNumber: cleanTerm.startsWith("DNHS-2025-") ? cleanTerm : "DNHS-2025-78921",
-        applicationDate: new Date().toISOString(),
-        status: "Pending",
-        lrn: cleanTerm.length === 12 ? cleanTerm : "100050882319",
-        fullName: "LOZANO, JOHN RICHFORD R.",
-        gradeLevel: 7,
-        applicantType: "Grade 7",
-        jhsProgram: "SPS",
-        spsSport: "Athletics (Track & Field / Running)",
-        primaryContact: "Father",
-        contactNumber: "09171234567",
-        remarks: "Submitted online. Currently queued for Dumalneg NHS Registrar evaluation.",
-      });
-      return;
     }
 
     // No record found
@@ -226,6 +178,32 @@ function TrackApplicationContent() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-12 bg-white border-2 border-slate-300 text-center font-sans">
+        <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+          [ AUTHENTICATING APPLICANT SESSION ]
+        </span>
+        <p className="text-sm font-bold text-slate-800">
+          Verifying authorized student credentials...
+        </p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto p-8 bg-amber-50 border-2 border-amber-400 text-center font-sans space-y-3">
+        <span className="text-xs font-bold text-amber-900 uppercase block">
+          [ ACCESS RESTRICTED: AUTHENTICATION REQUIRED ]
+        </span>
+        <p className="text-xs text-amber-800">
+          You must create an account or sign in before tracking your enrollment status. Redirecting to sign in...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 font-sans">
       {/* Page Title & Navigation */}
@@ -275,30 +253,6 @@ function TrackApplicationContent() {
             [ Search Record ]
           </button>
         </form>
-        <div className="flex flex-wrap gap-2 text-[11px] text-slate-500 pt-1">
-          <span>Quick Demo Filters:</span>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchTerm("DNHS-2025-10001");
-              performSearch("DNHS-2025-10001");
-            }}
-            className="text-emerald-800 font-bold hover:underline"
-          >
-            [Test: Approved Status]
-          </button>
-          <span>&bull;</span>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchTerm("DNHS-2025-10002");
-              performSearch("DNHS-2025-10002");
-            }}
-            className="text-red-800 font-bold hover:underline"
-          >
-            [Test: Needs Revision]
-          </button>
-        </div>
       </div>
 
       {/* Search Results Display */}

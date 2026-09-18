@@ -10,6 +10,7 @@ function StudentHomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabQuery = searchParams.get("tab");
+  const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
   const { user, login, register, logout } = useAuth();
 
   // Active Tab for Visitors: "signin" | "register"
@@ -62,21 +63,7 @@ function StudentHomeContent() {
         if (found) {
           setUserApplication(found);
         } else {
-          // Check for demo preset
-          if (user.email.includes("mark")) {
-            setUserApplication({
-              referenceNumber: "DNHS-2025-10001",
-              applicationDate: new Date().toISOString(),
-              status: "Approved",
-              lrn: user.lrn || "100050123456",
-              fullName: "AGCAOILI, MARK ANTHONY D.",
-              gradeLevel: 7,
-              applicantType: "Grade 7",
-              jhsProgram: "SPS",
-              spsSport: "Athletics (Track & Field)",
-              remarks: "All credentials verified. Officially admitted into Grade 7 - Section Mabini (SPS).",
-            });
-          }
+          setUserApplication(null);
         }
       } catch (e) {
         console.error("Error reading stored applications:", e);
@@ -151,15 +138,6 @@ function StudentHomeContent() {
     }
   };
 
-  // Quick Demo Login Helper for Defense
-  const handleDemoLogin = (email: string, pass: string) => {
-    setLoginEmail(email);
-    setLoginPassword(pass);
-    login(email, pass).then((res) => {
-      if (res.success) router.push("/enroll");
-    });
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-8 font-sans">
       {/* DepEd & DNHS Institutional Banner */}
@@ -175,6 +153,19 @@ function StudentHomeContent() {
           Serving incoming Grade 7, Grade 11 (SHS), Transferees, and Returning Learners across Barangays Cabaritan, Kalabakan, Quibel, and San Isidro.
         </p>
       </section>
+
+      {/* Access Restriction Notice (When redirected from protected routes) */}
+      {noticeQuery === "auth_required" && (
+        <div className="p-4 bg-amber-50 border-2 border-amber-500 shadow-xs">
+          <span className="text-xs font-bold text-amber-900 uppercase tracking-wider block mb-1">
+            [ ACCESS RESTRICTED: AUTHENTICATION REQUIRED ]
+          </span>
+          <p className="text-xs text-amber-900 leading-relaxed font-medium">
+            You must <strong>Sign In</strong> to your student account or <strong>Create a New Account</strong> below 
+            before you can access the Online Enrollment Form or track an existing application.
+          </p>
+        </div>
+      )}
 
       {/* =========================================================================
           VIEW A: AUTHENTICATED USER CONSOLE (ALREADY SIGNED IN)
@@ -510,29 +501,6 @@ function StudentHomeContent() {
                     </button>
                   </div>
                 </form>
-
-                {/* Capstone Presentation Demo Fill Helper */}
-                <div className="pt-4 border-t border-slate-200 space-y-2">
-                  <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block text-center">
-                    [ Capstone Defense Quick-Login Presets ]
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleDemoLogin("mark.agcaoili@example.com", "Password123")}
-                      className="p-2 bg-slate-50 border border-slate-300 text-[11px] font-bold text-slate-700 hover:bg-slate-100 text-left"
-                    >
-                      Mark Agcaoili (Grade 7 - SPS)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDemoLogin("john.lozano@example.com", "Password123")}
-                      className="p-2 bg-slate-50 border border-slate-300 text-[11px] font-bold text-slate-700 hover:bg-slate-100 text-left"
-                    >
-                      John Lozano (Grade 7 - Regular)
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
 

@@ -16,13 +16,13 @@ export default function StudentHeaderNav() {
         Home
       </Link>
       <Link
-        href="/enroll"
+        href={user ? "/enroll" : "/?tab=signin&reason=auth_required"}
         className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
       >
         Enrollment
       </Link>
       <Link
-        href="/track"
+        href={user ? "/track" : "/?tab=signin&reason=auth_required"}
         className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
       >
         Track Status

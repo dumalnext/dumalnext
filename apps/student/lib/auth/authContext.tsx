@@ -31,33 +31,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Default seed users for Capstone Defense / testing
-const INITIAL_DEMO_USERS: (StudentUser & { passwordHash: string })[] = [
-  {
-    id: "stu-001",
-    userId: "DNHS-STU-10001",
-    email: "mark.agcaoili@example.com",
-    fullName: "AGCAOILI, MARK ANTHONY D.",
-    firstName: "MARK ANTHONY",
-    middleName: "DELA CRUZ",
-    lastName: "AGCAOILI",
-    lrn: "100050123456",
-    userRole: "student",
-    passwordHash: "password123",
-  },
-  {
-    id: "stu-002",
-    userId: "DNHS-STU-10002",
-    email: "john.lozano@example.com",
-    fullName: "LOZANO, JOHN RICHFORD R.",
-    firstName: "JOHN RICHFORD",
-    middleName: "RAMOS",
-    lastName: "LOZANO",
-    lrn: "100050882319",
-    userRole: "student",
-    passwordHash: "password123",
-  },
-];
+// Clean initial user state (Requires authentic student registration)
+const INITIAL_DEMO_USERS: (StudentUser & { passwordHash: string })[] = [];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StudentUser | null>(null);
