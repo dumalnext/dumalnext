@@ -1,148 +1,714 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth/authContext";
+import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
 export default function StudentHomePage() {
+  const router = useRouter();
+  const { user, login, register, logout } = useAuth();
+
+  // Active Tab for Visitors: "signin" | "register"
+  const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
+
+  // Sign In Form State (Phase 1: Email First)
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Registration Form State (Phase 1: Email First)
+  const [regForm, setRegForm] = useState({
+    lastName: "",
+    firstName: "",
+    middleName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [regErrors, setRegErrors] = useState<Record<string, string>>({});
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  // Authenticated User Submitted Application State
+  const [userApplication, setUserApplication] = useState<any | null>(null);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
+  // Check for submitted applications belonging to the logged-in user
+  useEffect(() => {
+    if (user && typeof window !== "undefined") {
+      try {
+        const stored = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
+        const found = stored.find(
+          (app: any) =>
+            (app.accountEmail && app.accountEmail.toLowerCase() === user.email.toLowerCase()) ||
+            (app.userAccountId && app.userAccountId === user.userId) ||
+            (user.lrn && app.lrn === user.lrn)
+        );
+        if (found) {
+          setUserApplication(found);
+        } else {
+          // Check for demo preset
+          if (user.email.includes("mark")) {
+            setUserApplication({
+              referenceNumber: "DNHS-2025-10001",
+              applicationDate: new Date().toISOString(),
+              status: "Approved",
+              lrn: user.lrn || "100050123456",
+              fullName: "AGCAOILI, MARK ANTHONY D.",
+              gradeLevel: 7,
+              applicantType: "Grade 7",
+              jhsProgram: "SPS",
+              spsSport: "Athletics (Track & Field)",
+              remarks: "All credentials verified. Officially admitted into Grade 7 - Section Mabini (SPS).",
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Error reading stored applications:", e);
+      }
+    }
+  }, [user]);
+
+  // Handle Sign In Submit
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+
+    if (!loginEmail.trim()) {
+      setLoginError("Please enter your registered Email Address.");
+      return;
+    }
+    if (!loginPassword) {
+      setLoginError("Please enter your account password.");
+      return;
+    }
+
+    setIsLoggingIn(true);
+    try {
+      const res = await login(loginEmail, loginPassword);
+      if (res.success) {
+        router.push("/enroll");
+      } else {
+        setLoginError(res.error || "Invalid email or password. Please try again.");
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  // Handle Registration Submit
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: Record<string, string> = {};
+
+    if (!regForm.lastName.trim()) newErrors.lastName = "Official Last Name is required.";
+    if (!regForm.firstName.trim()) newErrors.firstName = "Official First Name is required.";
+    if (!regForm.email.trim() || !regForm.email.includes("@")) {
+      newErrors.email = "A valid email address is required.";
+    }
+    if (!regForm.password || regForm.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+    if (regForm.password !== regForm.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    setRegErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    setIsRegistering(true);
+    try {
+      const res = await register({
+        lastName: regForm.lastName.trim().toUpperCase(),
+        firstName: regForm.firstName.trim().toUpperCase(),
+        middleName: regForm.middleName.trim().toUpperCase(),
+        email: regForm.email.trim().toLowerCase(),
+        password: regForm.password,
+      });
+
+      if (res.success) {
+        router.push("/enroll");
+      } else {
+        setRegErrors({ form: res.error || "Registration failed. Please try again." });
+      }
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  // Quick Demo Login Helper for Defense
+  const handleDemoLogin = (email: string, pass: string) => {
+    setLoginEmail(email);
+    setLoginPassword(pass);
+    login(email, pass).then((res) => {
+      if (res.success) router.push("/enroll");
+    });
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Official Student Notice */}
+    <div className="max-w-4xl mx-auto space-y-8 font-sans">
+      {/* DepEd & DNHS Institutional Banner */}
       <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <span className="text-xs font-bold tracking-widest text-[#002060] uppercase">
-              [ Official School Announcement ]
-            </span>
-            <h2 className="text-lg font-bold text-slate-900 mt-1">
-              Online Enrollment is Now Open for Incoming, Transferee, &amp; Returning Students
-            </h2>
-            <p className="text-sm text-slate-600 mt-2 max-w-3xl leading-relaxed">
-              Welcome to the official Dumalneg National High School Student Online Portal. 
-              This portal allows students and parents from all barangays of Dumalneg to complete their enrollment 
-              and upload required credentials online without travelling to campus.
-            </p>
-          </div>
-          <div className="shrink-0">
-            <Link
-              href="/enroll"
-              className="btn-primary block text-center uppercase tracking-wider text-xs px-6 py-3 font-bold"
-            >
-              Start Online Enrollment
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Student Actions Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Action 1: Online Enrollment Form */}
-        <div className="bg-white p-6 border-2 border-[#002060] flex flex-col justify-between">
-          <div>
-            <div className="text-xs font-mono font-bold text-[#002060] uppercase mb-2">
-              [ Service 01: Registration ]
-            </div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">
-              Basic Education Online Enrollment Form
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Designed for Incoming Grade 7, Incoming Grade 11, Transferees, and Returning Learners (Balik-Aral). 
-              A 5-step guided form with client-side image compression (&lt;350KB) for seamless uploads of Form 138 and PSA Birth Certificates.
-            </p>
-          </div>
-          <div className="pt-4 border-t border-slate-200">
-            <Link
-              href="/enroll"
-              className="btn-primary block text-center text-xs uppercase tracking-wider font-bold py-3"
-            >
-              Proceed to Enrollment Form
-            </Link>
-          </div>
-        </div>
-
-        {/* Action 2: Track Existing Application */}
-        <div className="bg-white p-6 border border-slate-300 flex flex-col justify-between">
-          <div>
-            <div className="text-xs font-mono font-bold text-slate-600 uppercase mb-2">
-              [ Service 02: Verification ]
-            </div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">
-              Track Enrollment Application Status
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Already submitted your application? Enter your Application Tracking ID or 12-digit Learner Reference Number (LRN) 
-              to verify if your submission is [ Pending ], [ Approved ], or [ Needs Revision ].
-            </p>
-          </div>
-          <div className="pt-4 border-t border-slate-200">
-            <form action="/track" method="GET" className="flex gap-2">
-              <input
-                type="text"
-                name="query"
-                placeholder="Enter Application ID or 12-Digit LRN"
-                className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs focus:border-[#002060] outline-none font-mono"
-                required
-              />
-              <button
-                type="submit"
-                className="btn-secondary text-xs uppercase font-bold px-4 shrink-0"
-              >
-                Search Record
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      {/* Target Audiences Grid: G7, G11, Transferees, Returning Students */}
-      <section className="bg-slate-100 p-6 border border-slate-200">
-        <h3 className="text-sm font-bold tracking-wider text-slate-700 uppercase mb-4">
-          [ Learner Classification Guidelines ]
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 border border-slate-300">
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ 01 ] Incoming Grade 7
-            </div>
-            <h4 className="text-base font-bold text-slate-900 mb-2">Junior High School</h4>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              For Grade 6 elementary completers. Upload official PSA Birth Certificate and Form 138 (Learner&apos;s Progress Report Card).
-            </p>
-            <span className="badge-status badge-pending">Online Registration Required</span>
-          </div>
-
-          <div className="bg-white p-4 border border-slate-300">
-            <div className="text-xs font-bold text-[#002060] uppercase mb-1">
-              [ 02 ] Incoming Grade 11 &amp; Transferees
-            </div>
-            <h4 className="text-base font-bold text-slate-900 mb-2">Senior High School</h4>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Select Senior High Track, Strand (STEM, TVL, HUMSS), and Cross-Strand Electives. Maximum 5 core subjects per trimester.
-            </p>
-            <span className="badge-status badge-pending">Online Registration Required</span>
-          </div>
-
-          <div className="bg-white p-4 border border-slate-300">
-            <div className="text-xs font-bold text-emerald-800 uppercase mb-1">
-              [ 03 ] Returning Students (Grades 8-10, Grade 12)
-            </div>
-            <h4 className="text-base font-bold text-slate-900 mb-2">Continuing Enrollment</h4>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Continuing students of DNHS are automatically transcribed in the database. Verify your existing student record via LRN lookup.
-            </p>
-            <span className="badge-status badge-approved">Database Auto-Transcribed</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Notice on Continuing Students */}
-      <section className="bg-white border border-slate-300 p-5 text-xs text-slate-700 space-y-2">
-        <span className="font-bold text-[#002060] uppercase block">
-          [ Important Notice for Continuing Students (Grades 8, 9, 10, and 12) ]
+        <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
+          [ DepEd Region I &bull; Schools Division of Ilocos Norte &bull; Dumalneg NHS ]
         </span>
-        <p>
-          Regular continuing students enrolled in Dumalneg NHS during the preceding school year are automatically promoted and transcribed 
-          by school administrators in the database. Resubmission of the full enrollment form is not required unless requesting an approved 
-          Senior High School strand realignment prior to Grade 12.
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          Basic Education Online Enrollment &amp; Admission Portal
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+          Official admission gateway for Dumalneg National High School (School ID: 300017). 
+          Serving incoming Grade 7, Grade 11 (SHS), Transferees, and Returning Learners across Barangays Cabaritan, Kalabakan, Quibel, and San Isidro.
         </p>
+      </section>
+
+      {/* =========================================================================
+          VIEW A: AUTHENTICATED USER CONSOLE (ALREADY SIGNED IN)
+          ========================================================================= */}
+      {user ? (
+        <div className="space-y-6">
+          {/* Welcome User Banner */}
+          <div className="bg-white border-2 border-[#002060] p-6 sm:p-8 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+              <div>
+                <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-0.5">
+                  [ Authenticated Applicant Account ]
+                </span>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                  Welcome back, {user.firstName} {user.lastName}
+                </h2>
+                <p className="text-xs text-slate-600 mt-1">
+                  Registered Email: <strong className="text-slate-900">{user.email}</strong> &bull; Account ID: <span className="font-mono">{user.userId}</span>
+                  {user.lrn && (
+                    <> &bull; DepEd LRN: <span className="font-mono font-bold text-[#002060]">{user.lrn}</span></>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="btn-secondary text-xs uppercase font-bold py-2 px-3 shrink-0"
+                >
+                  [ Sign Out ]
+                </button>
+              </div>
+            </div>
+
+            {/* Application Status Card */}
+            {userApplication ? (
+              <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-300 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-500 uppercase block">
+                      Submitted Enrollment Application
+                    </span>
+                    <span className="text-base font-bold font-mono text-[#002060]">
+                      {userApplication.referenceNumber}
+                    </span>
+                  </div>
+                  <div>
+                    {userApplication.status === "Approved" ? (
+                      <span className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-900 border-2 border-emerald-500">
+                        [ STATUS: APPROVED &amp; OFFICIALLY ENROLLED ]
+                      </span>
+                    ) : userApplication.status === "Needs Revision" ? (
+                      <span className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-red-50 text-red-900 border-2 border-red-500">
+                        [ STATUS: NEEDS REVISION / ACTION REQUIRED ]
+                      </span>
+                    ) : (
+                      <span className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border-2 border-amber-400">
+                        [ STATUS: PENDING REGISTRAR VERIFICATION ]
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <span className="text-slate-500 block">Learner Name:</span>
+                    <strong className="text-slate-900">{userApplication.fullName}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Grade &amp; Curriculum:</span>
+                    <strong className="text-slate-900">
+                      Grade {userApplication.gradeLevel} {userApplication.jhsProgram ? `(${userApplication.jhsProgram})` : ""}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Submission Date:</span>
+                    <strong className="text-slate-900 font-mono">
+                      {new Date(userApplication.applicationDate).toLocaleDateString()}
+                    </strong>
+                  </div>
+                </div>
+
+                {userApplication.remarks && (
+                  <div className="p-3 bg-white border border-slate-200 text-xs">
+                    <span className="font-bold text-slate-700 block mb-0.5 uppercase tracking-wide">
+                      Registrar Notes / Remarks:
+                    </span>
+                    <p className="text-slate-800">{userApplication.remarks}</p>
+                  </div>
+                )}
+
+                {/* Actions for Application */}
+                <div className="pt-2 flex flex-wrap gap-3">
+                  <Link
+                    href={`/track?ref=${userApplication.referenceNumber}`}
+                    className="btn-primary text-xs uppercase font-bold py-2.5 px-4"
+                  >
+                    View / Track Application Details
+                  </Link>
+
+                  {userApplication.status === "Approved" && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setIsDownloadingPdf(true);
+                        try {
+                          await downloadDepEdEnrollmentPdf(
+                            userApplication.formData || {
+                              step1: {
+                                isGraded: true,
+                                applicantType: (userApplication.applicantType as any) || "Grade 7",
+                                targetGradeLevel: Number(userApplication.gradeLevel) || 7,
+                                jhsProgram: (userApplication.jhsProgram as any) || "Regular",
+                                targetSemester: "1st Semester",
+                                targetTrack: userApplication.targetTrack || "Academic Track",
+                                targetStrand: userApplication.targetStrand || "STEM",
+                                lastGradeCompleted: 6,
+                                lastSchoolYearCompleted: "2024-2025",
+                                lastSchoolAttended: "Dumalneg Elementary School",
+                                lastSchoolId: "100050",
+                              },
+                              lrn: userApplication.lrn || "100050123456",
+                              psaBirthCertNo: "1234-5678-9012",
+                              lastName: user.lastName,
+                              firstName: user.firstName,
+                              middleName: user.middleName || "DUMALNEG",
+                              extensionName: "",
+                              dateOfBirth: "2012-05-15",
+                              age: 12,
+                              gender: "Male",
+                              placeOfBirth: "Dumalneg, Ilocos Norte",
+                              religion: "Roman Catholic",
+                              motherTongue: "Ilokano",
+                              contactNumber: "09181234567",
+                              isIpCommunity: true,
+                              ipCommunityName: "Isnag",
+                              is4psBeneficiary: false,
+                              householdId4ps: "",
+                              currentHouseNo: "",
+                              currentSitio: "Poblacion",
+                              currentBarangay: "CABARITAN",
+                              currentMunicipality: "DUMALNEG",
+                              currentProvince: "ILOCOS NORTE",
+                              currentCountry: "PHILIPPINES",
+                              currentZipCode: "2921",
+                              isPermanentSameAsCurrent: true,
+                              permanentHouseNo: "",
+                              permanentSitio: "Poblacion",
+                              permanentBarangay: "CABARITAN",
+                              permanentMunicipality: "DUMALNEG",
+                              permanentProvince: "ILOCOS NORTE",
+                              permanentCountry: "PHILIPPINES",
+                              permanentZipCode: "2921",
+                              fatherLastName: "LOZANO",
+                              fatherFirstName: "JUAN",
+                              fatherMiddleName: "CASTRO",
+                              fatherContactNumber: "09181234567",
+                              motherMaidenLastName: "RAMOS",
+                              motherFirstName: "MARIA",
+                              motherMiddleName: "DELA CRUZ",
+                              motherContactNumber: "09201234567",
+                              guardianLastName: "",
+                              guardianFirstName: "",
+                              guardianMiddleName: "",
+                              guardianContactNumber: "",
+                              guardianRelationship: "",
+                              primaryContactPerson: "Father",
+                              hasNoGuardian: true,
+                              jhsProgram: userApplication.jhsProgram || "Regular",
+                              spsSport: userApplication.spsSport || "",
+                              targetTrack: userApplication.targetTrack || "",
+                              targetStrand: userApplication.targetStrand || "",
+                              targetSemester: "1st Semester",
+                              isSned: false,
+                              snedCategory: "None",
+                              hasPwdId: false,
+                              snedManifestations: [],
+                              preferredModalities: ["Modular (Print)", "Blended"],
+                              emergencyContactPerson: "Father",
+                              emergencyContactNumber: "09181234567",
+                              documents: {
+                                psaBirthCertificateUrl: "uploaded_psa_cert.jpg",
+                                reportCardUrl: "uploaded_form138.jpg",
+                                idPictureUrl: "uploaded_2x2.jpg",
+                              },
+                            }
+                          );
+                        } finally {
+                          setIsDownloadingPdf(false);
+                        }
+                      }}
+                      disabled={isDownloadingPdf}
+                      className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase px-4 py-2.5 transition-colors"
+                    >
+                      {isDownloadingPdf ? "Generating Official PDF..." : "Download Official DepEd Form (PDF)"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* User has not yet submitted an enrollment application */
+              <div className="p-6 bg-slate-50 border border-slate-300 space-y-4 text-center">
+                <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
+                  [ Online Enrollment Status: Not Yet Submitted ]
+                </span>
+                <h3 className="text-base font-bold text-slate-900">
+                  Ready to Complete Your Basic Education Enrollment?
+                </h3>
+                <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
+                  Your student account is active. Click below to begin filling out the 5-step official enrollment form. 
+                  Your registered learner details will be automatically pre-filled.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href="/enroll"
+                    className="btn-primary inline-block text-xs uppercase tracking-wider font-bold py-3 px-8"
+                  >
+                    Start 5-Step Online Enrollment Form
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* =========================================================================
+           VIEW B: UNAUTHENTICATED APPLICANT PORTAL (LOGIN OR REGISTER FIRST)
+           ========================================================================= */
+        <div className="bg-white border-2 border-[#002060] shadow-sm">
+          {/* Tab Selector: Sign In vs Create Account */}
+          <div className="grid grid-cols-2 border-b-2 border-slate-200 text-center font-bold text-xs uppercase tracking-wider">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("signin");
+                setLoginError("");
+              }}
+              className={`py-4 px-4 transition-colors ${
+                activeTab === "signin"
+                  ? "bg-[#002060] text-white border-b-2 border-[#002060]"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              [ Tab 1: Sign In to Account ]
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("register");
+                setRegErrors({});
+              }}
+              className={`py-4 px-4 transition-colors ${
+                activeTab === "register"
+                  ? "bg-[#002060] text-white border-b-2 border-[#002060]"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              [ Tab 2: Create New Account ]
+            </button>
+          </div>
+
+          <div className="p-6 sm:p-8">
+            {/* -----------------------------------------------------------------
+                TAB 1: SIGN IN FORM (PHASE 1: EMAIL FIRST)
+                ----------------------------------------------------------------- */}
+            {activeTab === "signin" && (
+              <div className="max-w-md mx-auto space-y-6">
+                <div className="border-b border-slate-200 pb-3 text-center">
+                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+                    [ Phase 1: Student Account Authentication ]
+                  </span>
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Sign In to Student Portal
+                  </h2>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Enter your registered <strong>Email Address</strong> and password to access online enrollment and track records.
+                  </p>
+                </div>
+
+                {loginError && (
+                  <div className="p-3 bg-red-50 border-2 border-red-400">
+                    <p className="text-xs font-bold text-red-900 leading-normal">
+                      [ AUTHENTICATION ERROR ]: {loginError}
+                    </p>
+                  </div>
+                )}
+
+                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      Registered Email Address <span className="text-red-700">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={loginEmail}
+                      onChange={(e) => {
+                        setLoginEmail(e.target.value);
+                        if (loginError) setLoginError("");
+                      }}
+                      placeholder="e.g. student@example.com"
+                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none"
+                      required
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Enter the email address registered during account creation.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      Account Password <span className="text-red-700">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      value={loginPassword}
+                      onChange={(e) => {
+                        setLoginPassword(e.target.value);
+                        if (loginError) setLoginError("");
+                      }}
+                      placeholder="Enter account password"
+                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isLoggingIn}
+                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5"
+                    >
+                      {isLoggingIn ? "Authenticating Account..." : "Sign In & Proceed to Enrollment"}
+                    </button>
+                  </div>
+                </form>
+
+                {/* Capstone Presentation Demo Fill Helper */}
+                <div className="pt-4 border-t border-slate-200 space-y-2">
+                  <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block text-center">
+                    [ Capstone Defense Quick-Login Presets ]
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDemoLogin("mark.agcaoili@example.com", "Password123")}
+                      className="p-2 bg-slate-50 border border-slate-300 text-[11px] font-bold text-slate-700 hover:bg-slate-100 text-left"
+                    >
+                      Mark Agcaoili (Grade 7 - SPS)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoLogin("john.lozano@example.com", "Password123")}
+                      className="p-2 bg-slate-50 border border-slate-300 text-[11px] font-bold text-slate-700 hover:bg-slate-100 text-left"
+                    >
+                      John Lozano (Grade 7 - Regular)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* -----------------------------------------------------------------
+                TAB 2: CREATE ACCOUNT FORM (PHASE 1: EMAIL FIRST)
+                ----------------------------------------------------------------- */}
+            {activeTab === "register" && (
+              <div className="max-w-xl mx-auto space-y-6">
+                <div className="border-b border-slate-200 pb-3 text-center">
+                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+                    [ Phase 1: New Learner Registration ]
+                  </span>
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Create Student Applicant Account
+                  </h2>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Register with your official name and <strong>Email Address</strong>. 
+                    Your account will track your enrollment submission and link your documents.
+                  </p>
+                </div>
+
+                {regErrors.form && (
+                  <div className="p-3 bg-red-50 border-2 border-red-400">
+                    <p className="text-xs font-bold text-red-900 leading-normal">
+                      [ REGISTRATION NOTICE ]: {regErrors.form}
+                    </p>
+                  </div>
+                )}
+
+                <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                        Last Name <span className="text-red-700">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={regForm.lastName}
+                        onChange={(e) => setRegForm({ ...regForm, lastName: e.target.value })}
+                        placeholder="e.g. AGCAOILI"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                        required
+                      />
+                      {regErrors.lastName && (
+                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.lastName}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                        First Name <span className="text-red-700">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={regForm.firstName}
+                        onChange={(e) => setRegForm({ ...regForm, firstName: e.target.value })}
+                        placeholder="e.g. MARK ANTHONY"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                        required
+                      />
+                      {regErrors.firstName && (
+                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.firstName}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                        Middle Name
+                      </label>
+                      <input
+                        type="text"
+                        value={regForm.middleName}
+                        onChange={(e) => setRegForm({ ...regForm, middleName: e.target.value })}
+                        placeholder="e.g. CASTRO"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email Address */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      Account Email Address <span className="text-red-700">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={regForm.email}
+                      onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
+                      placeholder="e.g. mark.agcaoili@example.com"
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                      required
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Official notifications, application reference numbers, and verification updates will be sent to this email.
+                    </p>
+                    {regErrors.email && (
+                      <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.email}</p>
+                    )}
+                  </div>
+
+                  {/* Passwords */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                        Security Password <span className="text-red-700">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        value={regForm.password}
+                        onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
+                        placeholder="At least 6 characters"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+                        required
+                      />
+                      {regErrors.password && (
+                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.password}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                        Confirm Password <span className="text-red-700">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        value={regForm.confirmPassword}
+                        onChange={(e) => setRegForm({ ...regForm, confirmPassword: e.target.value })}
+                        placeholder="Re-type password"
+                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+                        required
+                      />
+                      {regErrors.confirmPassword && (
+                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.confirmPassword}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-600">
+                    <strong className="text-slate-800 block mb-0.5 uppercase tracking-wide">
+                      [ DepEd Enrollment Notice ]:
+                    </strong>
+                    Your 12-digit Learner Reference Number (LRN), Dumalneg Elementary School background, and document attachments 
+                    (PSA Birth Certificate, Form 138 / SF9 Report Card) will be encoded inside the 5-step enrollment form after registration.
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isRegistering}
+                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5"
+                    >
+                      {isRegistering ? "Creating Account..." : "Create Account & Start Online Enrollment"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Institutional Services Reference Section */}
+      <section className="bg-slate-100 p-6 border border-slate-200">
+        <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase mb-3">
+          [ Dumalneg National High School Enrollment Services ]
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="bg-white p-4 border border-slate-300">
+            <strong className="text-slate-900 block mb-1">1. 5-Step Enrollment Stepper:</strong>
+            <p className="text-slate-600">
+              Grade 7 &amp; Grade 11 online enrollment with JHS Regular vs SPS programs, feeder school auto-select, and compressed document uploads.
+            </p>
+          </div>
+          <div className="bg-white p-4 border border-slate-300">
+            <strong className="text-slate-900 block mb-1">2. Live Application Tracking:</strong>
+            <p className="text-slate-600">
+              Real-time colored status badges ([ Pending ], [ Approved ], [ Needs Revision ]) with registrar feedback and document re-upload.
+            </p>
+          </div>
+          <div className="bg-white p-4 border border-slate-300">
+            <strong className="text-slate-900 block mb-1">3. Official DepEd PDF Form:</strong>
+            <p className="text-slate-600">
+              Securely generated 2-page DepEd Basic Education Enrollment Form, unlocked automatically upon School Registrar approval.
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   );
 }
+

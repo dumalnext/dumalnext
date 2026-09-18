@@ -52,7 +52,7 @@ export default function LoginPage() {
           Student Portal Sign In
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-sm mx-auto">
-          Sign in using your registered <strong>Email Address</strong> or <strong>12-Digit Learner Reference Number (LRN)</strong> to access online enrollment and admission records.
+          Sign in using your registered <strong>Email Address</strong> to access online enrollment and track admission records.
         </p>
       </div>
 
@@ -68,10 +68,10 @@ export default function LoginPage() {
       {/* Sign In Card */}
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Dual Identifier: Email or 12-Digit LRN */}
+          {/* Identifier: Email First */}
           <div>
             <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-              Email Address or 12-Digit LRN <span className="text-red-700">*</span>
+              Registered Email Address <span className="text-red-700">*</span>
             </label>
             <input
               type="text"
@@ -80,12 +80,12 @@ export default function LoginPage() {
                 setIdentifier(e.target.value);
                 if (error) setError("");
               }}
-              placeholder="e.g. 100050123456 or student@example.com"
+              placeholder="e.g. student@example.com"
               className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none"
               required
             />
             <p className="text-[10px] text-slate-500 mt-1">
-              Supports both your 12-digit DepEd LRN or account email address.
+              Enter your registered account email. (12-digit DepEd LRN is also accepted if already linked).
             </p>
           </div>
 
