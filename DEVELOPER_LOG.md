@@ -109,5 +109,5 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
 - [x] Supabase SQL Schema (`supabase/schema.sql`) created
 - [x] Git Repository initialized and pushed to `dumalnext/dumalnext` on GitHub
 - [x] `.env.local` configured with Supabase Project `fvybtqghtuarjzlpbwnr`
-- [ ] Supabase SQL schema executed in Supabase SQL Editor
-- [ ] Vercel deployment connected to GitHub repo
+- [x] Supabase SQL schema executed in Supabase SQL Editor (All tables, RLS, & seed data active)
+- [x] Vercel deployment connected to GitHub repo and Supabase
