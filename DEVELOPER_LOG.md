@@ -122,3 +122,8 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
   - Ginawa ang migration file: `supabase/migrations/20260918_deped_enrollment_fields.sql`.
   - Ginawa ang TypeScript type definitions at constants: `lib/types/enrollment.ts`.
   - In-update ang Technical Data Dictionary: `DATABASE_DICTIONARY.md` (Table 2 at Table 11).
+- [x] **Paggawa ng Hakbang 1 (Klasipikasyon at Antas) sa Student Portal**:
+  - Ginawa ang master component na `components/forms/enrollment/EnrollmentStepper.tsx` na nagpapatakbo ng 5-step progress indicator, state management, at validation.
+  - Ginawa ang `components/forms/enrollment/Step1ApplicantType.tsx` para sa Graded vs Non-Graded (SNEd), pagpili ng Incoming G7, Incoming G11, Transferee, o Returning (Balik-Aral), at dinamikong patlang para sa dating pinasukang paaralan at 6-digit School ID.
+  - Ginawa ang mga ruta sa App Router: `/student` (Student Hub & Application Status Lookup) at `/student/enroll` (Online Enrollment Stepper).
+  - 100% nasunod ang DepEd Navy Blue (`#002060`) at Pure White theme na walang kahit anong emoji o decorative icons.
