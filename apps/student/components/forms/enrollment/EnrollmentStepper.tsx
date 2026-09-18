@@ -269,14 +269,60 @@ export default function EnrollmentStepper() {
             <span className="text-xs font-mono font-bold text-slate-600 block">
               Step {currentStep} of 5
             </span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+            <span className="text-[10px] text-[#002060] font-bold uppercase tracking-wider">
               {Math.round((currentStep / 5) * 100)}% Complete
             </span>
           </div>
         </div>
 
-        {/* Stepper Steps Breadcrumbs */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+        {/* Smart Linear Progress Bar (Universal for all devices) */}
+        <div className="w-full bg-slate-200 h-2 overflow-hidden mb-4">
+          <div
+            className="bg-[#002060] h-full transition-all duration-300 ease-out"
+            style={{ width: `${(currentStep / 5) * 100}%` }}
+          />
+        </div>
+
+        {/* MOBILE VIEW (< sm): Clean Compact Step Navigation Pills */}
+        <div className="sm:hidden space-y-2">
+          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200">
+            <span className="font-bold text-[#002060] uppercase text-[11px]">
+              Active: {STEP_LABELS[currentStep - 1].label}
+            </span>
+            <span className="text-[10px] text-slate-500">
+              {STEP_LABELS[currentStep - 1].sublabel}
+            </span>
+          </div>
+          <div className="grid grid-cols-5 gap-1.5">
+            {STEP_LABELS.map((item) => {
+              const isActive = currentStep === item.step;
+              const isDone = currentStep > item.step;
+
+              return (
+                <button
+                  key={item.step}
+                  type="button"
+                  onClick={() => {
+                    if (item.step < currentStep) setCurrentStep(item.step);
+                  }}
+                  disabled={item.step > currentStep}
+                  className={`py-2 text-center text-xs font-mono font-bold border transition-all ${
+                    isActive
+                      ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                      : isDone
+                      ? "bg-emerald-50 text-emerald-900 border-emerald-400"
+                      : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                  }`}
+                >
+                  0{item.step}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* TABLET & DESKTOP VIEW (>= sm): Full 5-Card Step Grid */}
+        <div className="hidden sm:grid sm:grid-cols-5 gap-2 text-xs">
           {STEP_LABELS.map((item) => {
             const isActive = currentStep === item.step;
             const isDone = currentStep > item.step;
@@ -284,12 +330,15 @@ export default function EnrollmentStepper() {
             return (
               <div
                 key={item.step}
+                onClick={() => {
+                  if (item.step < currentStep) setCurrentStep(item.step);
+                }}
                 className={`p-2.5 border transition-colors ${
                   isActive
                     ? "bg-[#002060] text-white border-[#002060]"
                     : isDone
-                    ? "bg-blue-50 text-[#002060] border-blue-200"
-                    : "bg-slate-50 text-slate-500 border-slate-200"
+                    ? "bg-blue-50 text-[#002060] border-blue-200 cursor-pointer"
+                    : "bg-slate-50 text-slate-500 border-slate-200 cursor-not-allowed"
                 }`}
               >
                 <div className="font-mono font-bold text-[10px] uppercase">

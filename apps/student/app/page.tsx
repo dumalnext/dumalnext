@@ -403,13 +403,13 @@ function StudentHomeContent() {
                 setActiveTab("signin");
                 setLoginError("");
               }}
-              className={`py-4 px-4 transition-colors ${
+              className={`py-3.5 sm:py-4 px-2 sm:px-4 text-[11px] sm:text-xs min-h-[44px] transition-colors ${
                 activeTab === "signin"
                   ? "bg-[#002060] text-white border-b-2 border-[#002060]"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              [ Tab 1: Sign In to Account ]
+              [ Tab 1: Sign In ]
             </button>
             <button
               type="button"
@@ -417,17 +417,17 @@ function StudentHomeContent() {
                 setActiveTab("register");
                 setRegErrors({});
               }}
-              className={`py-4 px-4 transition-colors ${
+              className={`py-3.5 sm:py-4 px-2 sm:px-4 text-[11px] sm:text-xs min-h-[44px] transition-colors ${
                 activeTab === "register"
                   ? "bg-[#002060] text-white border-b-2 border-[#002060]"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              [ Tab 2: Create New Account ]
+              [ Tab 2: Create Account ]
             </button>
           </div>
 
-          <div className="p-6 sm:p-8">
+          <div className="p-4 sm:p-8">
             {/* -----------------------------------------------------------------
                 TAB 1: SIGN IN FORM (PHASE 1: EMAIL FIRST)
                 ----------------------------------------------------------------- */}

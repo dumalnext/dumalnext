@@ -1,9 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Student Portal | Dumalneg National High School",
   description: "Official Student Online Enrollment and Academic Workstation for Dumalneg National High School",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#002060",
 };
 
 import StudentProviders from "@/components/providers/StudentProviders";
@@ -16,19 +23,19 @@ export default function StudentLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
         <StudentProviders>
           {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
-          <header className="deped-header px-6 py-4 shadow-sm">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <header className="deped-header px-3 sm:px-6 py-3 sm:py-4 shadow-sm">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div>
-                <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">
+                <p className="text-[10px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase">
                   Republic of the Philippines | Department of Education | Region I
                 </p>
-                <h1 className="text-xl font-bold tracking-tight text-white mt-1">
+                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white mt-0.5 sm:mt-1">
                   DUMALNEG NATIONAL HIGH SCHOOL
                 </h1>
-                <p className="text-xs text-slate-300 font-medium">
+                <p className="text-[11px] sm:text-xs text-slate-300 font-medium">
                   Student Online Portal &amp; Basic Education Enrollment System
                 </p>
               </div>
@@ -36,8 +43,8 @@ export default function StudentLayout({
             </div>
           </header>
 
-          {/* Main Content Area */}
-          <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+          {/* Main Content Area with Adaptive Mobile & Tablet Padding */}
+          <main className="flex-1 max-w-7xl w-full mx-auto px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
             {children}
           </main>
         </StudentProviders>
