@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
 import Step2LearnerProfile from "./Step2LearnerProfile";
+import Step3FamilyBackground from "./Step3FamilyBackground";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
 export interface FullEnrollmentFormData {
@@ -60,6 +61,8 @@ export interface FullEnrollmentFormData {
   guardianFirstName: string;
   guardianMiddleName: string;
   guardianContactNumber: string;
+  guardianRelationship?: string;
+  primaryContactPerson?: "Father" | "Mother" | "Guardian";
 
   // Step 4: SHS, SNEd, & Modalities
   isSned: boolean;
@@ -141,6 +144,8 @@ const initialFormData: FullEnrollmentFormData = {
   guardianFirstName: "",
   guardianMiddleName: "",
   guardianContactNumber: "",
+  guardianRelationship: "",
+  primaryContactPerson: "Father",
   isSned: false,
   snedCategory: "",
   snedDetails: [],
@@ -178,7 +183,7 @@ export default function EnrollmentStepper() {
     }));
   };
 
-  const handleStep2Change = (fields: Partial<FullEnrollmentFormData>) => {
+  const handleFormDataChange = (fields: Partial<FullEnrollmentFormData>) => {
     setFormData((prev) => ({
       ...prev,
       ...fields,
@@ -270,39 +275,19 @@ export default function EnrollmentStepper() {
         {currentStep === 2 && (
           <Step2LearnerProfile
             data={formData}
-            onChange={handleStep2Change}
+            onChange={handleFormDataChange}
             onNext={nextStep}
             onBack={prevStep}
           />
         )}
 
         {currentStep === 3 && (
-          <div className="bg-white p-8 border border-slate-300 space-y-6">
-            <div className="border-b border-slate-200 pb-4">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Step 3 of 5: Parent &amp; Legal Guardian Information ]
-              </span>
-              <h2 className="text-xl font-bold text-slate-900">
-                Father, Mother&apos;s Maiden Name, and Legal Guardian Background
-              </h2>
-            </div>
-            <div className="flex justify-between pt-4 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={prevStep}
-                className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Back to Step 2
-              </button>
-              <button
-                type="button"
-                onClick={nextStep}
-                className="btn-primary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Proceed to Step 4
-              </button>
-            </div>
-          </div>
+          <Step3FamilyBackground
+            data={formData}
+            onChange={handleFormDataChange}
+            onNext={nextStep}
+            onBack={prevStep}
+          />
         )}
 
         {currentStep === 4 && (

@@ -180,6 +180,28 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
     - Opisyal na 11-digit mobile contact number (`09XXXXXXXXX`).
   - **Zero Emojis & Strict Academic English**: Ganap na walang emojis at decorative icons alinsunod sa DepEd Navy Blue (`#002060`) identity.
   - Na-verify sa pamamagitan ng `npm run build:student` at `npx tsc --noEmit` na may 0 errors, at naka-commit at push na sa GitHub `main`.
+- [x] **Hakbang 3: Family Background (Parent & Legal Guardian Information) sa Student Portal**:
+  - Matagumpay na nagawa at ikinonekta ang `apps/student/components/forms/enrollment/Step3FamilyBackground.tsx` at ang katapat nitong kopya sa root `components/forms/enrollment/Step3FamilyBackground.tsx`.
+  - **Primary School Contact / Custodian Dispatcher**:
+    - Radio selectors para sa agarang pagpili kung sino ang uunahing tawagan ng Dumalneg NHS sa oras ng emergency, opisyal na paunawa, o paglabas ng report card: Father, Mother, o Legal Guardian.
+  - **Section A: Father's Legal Information**:
+    - Last Name, First Name, Middle Name na may *"No Middle Name"* checkbox.
+    - 11-digit Philippine mobile contact number (`09XXXXXXXXX`).
+    - *"Deceased / Unknown / Not Available"* toggle para sa mga mag-aaral na solo parent o pumanaw na ang ama, na awtomatikong nagdi-disable sa input at nag-e-exempt sa validation.
+  - **Section B: Mother's Maiden Legal Information**:
+    - Malinaw na paalala at gabay sa pagpasok ng opisyal na **Maiden Last Name** (apelyido sa pagkadalaga) alinsunod sa DepEd Civil Registry verification laban sa PSA Birth Certificate.
+    - First Name, Middle Name na may *"No Middle Name"* checkbox.
+    - 11-digit mobile contact number (`09XXXXXXXXX`).
+    - *"Deceased / Unknown / Not Available"* toggle para sa legal exemptions.
+  - **Section C: Legal Guardian / Authorized Custodian**:
+    - *"Living with Parents (No Separate Guardian)"* smart toggle na naka-enable by default upang hindi na kailangang mag-input ng guardian ang mga mag-aaral na kapiling ang kanilang magulang.
+    - Kapag may guardian (e.g., OFW ang mga magulang o nakatira sa kamag-anak sa Dumalneg): Dropdown ng relasyon sa mag-aaral (*Grandparent*, *Aunt/Uncle*, *Older Sibling*, *Authorized Relative*, *Legal Custodian*, *Other Authorized Adult*), Last Name, First Name, Middle Name, at 11-digit mobile number.
+  - **DepEd Safety & Emergency Validation Engine**:
+    - Mahigpit na tinitiyak ng sistema na mayroong kahit man lang ISANG (1) aktibong 11-digit mobile number na maikokontak ang paaralan sa pagitan ng ama, ina, o guardian.
+    - Bawal i-tag ang lahat bilang "Not Available" nang walang lehitimong legal custodian.
+  - **Zero Emojis & Strict Academic English**: Pormal na DepEd Navy Blue (`#002060`) at Pure White (`#FFFFFF`).
+  - Na-verify gamit ang `npm run build:student` at `npx tsc --noEmit` (0 errors), at naka-commit at push sa GitHub `main`.
+
 
 
 
