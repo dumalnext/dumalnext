@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
+import Step2LearnerProfile from "./Step2LearnerProfile";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
 export interface FullEnrollmentFormData {
@@ -177,6 +178,13 @@ export default function EnrollmentStepper() {
     }));
   };
 
+  const handleStep2Change = (fields: Partial<FullEnrollmentFormData>) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...fields,
+    }));
+  };
+
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
     try {
@@ -260,38 +268,12 @@ export default function EnrollmentStepper() {
         )}
 
         {currentStep === 2 && (
-          <div className="bg-white p-8 border border-slate-300 space-y-6">
-            <div className="border-b border-slate-200 pb-4">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block mb-1">
-                [ Step 2 of 5: Learner&apos;s Personal Information ]
-              </span>
-              <h2 className="text-xl font-bold text-slate-900">
-                Full Name, Birthdate, LRN, Indigenous Cultural Community (IP), and Residential Address
-              </h2>
-            </div>
-
-            <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-700">
-              Selected in Step 1:{" "}
-              <strong>{formData.step1.applicantType}</strong> (Grade {formData.step1.targetGradeLevel}).
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={prevStep}
-                className="btn-secondary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Back to Step 1
-              </button>
-              <button
-                type="button"
-                onClick={nextStep}
-                className="btn-primary text-xs uppercase font-bold py-2.5 px-6"
-              >
-                Proceed to Step 3
-              </button>
-            </div>
-          </div>
+          <Step2LearnerProfile
+            data={formData}
+            onChange={handleStep2Change}
+            onNext={nextStep}
+            onBack={prevStep}
+          />
         )}
 
         {currentStep === 3 && (
