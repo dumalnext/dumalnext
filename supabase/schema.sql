@@ -4,20 +4,20 @@
 -- Based strictly on Lab Activity 4 (Class Diagram) & Activity 5 (Architecture)
 -- ==============================================================================
 
--- Enable UUID extension
+-- 1. Enable UUID Extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. BASE USERS TABLE (Authentication & Role-Based Access Control)
+-- 2. BASE USERS TABLE (Authentication & Role-Based Access Control)
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id VARCHAR(20) UNIQUE NOT NULL, -- DNHS Institutional ID (e.g., DNHS-2026-001)
+    user_id VARCHAR(20) UNIQUE NOT NULL, -- DNHS ID (e.g., DNHS-2026-001)
     email VARCHAR(100) UNIQUE NOT NULL,
     user_role VARCHAR(20) NOT NULL CHECK (user_role IN ('student', 'teacher', 'admin', 'it_support')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. STUDENTS PROFILE TABLE
+-- 3. STUDENTS PROFILE TABLE
 CREATE TABLE IF NOT EXISTS public.students (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.students (
     date_of_birth DATE,
     gender VARCHAR(10),
     contact_number VARCHAR(20),
-    barangay VARCHAR(100) NOT NULL, -- Dumalneg barangays (e.g., Cabaritan, Kalaw, San Isidro, etc.)
+    barangay VARCHAR(100) NOT NULL, -- Dumalneg barangays (e.g., Cabaritan, Kalaw, San Isidro, Quibel)
     grade_level INT NOT NULL CHECK (grade_level BETWEEN 7 AND 12),
     strand VARCHAR(50), -- STEM, ABM, HUMSS, TVL (Required if Grade 11 or 12)
     is_returning BOOLEAN DEFAULT FALSE, -- True if renewed/transcribed automatically
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.students (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. TEACHERS PROFILE TABLE (Faculty handling JHS & SHS cross-level loads)
+-- 4. TEACHERS PROFILE TABLE (Faculty handling JHS & SHS cross-level loads)
 CREATE TABLE IF NOT EXISTS public.teachers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS public.teachers (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. SCHOOL ADMINISTRATORS TABLE
+-- 5. SCHOOL ADMINISTRATORS TABLE
 CREATE TABLE IF NOT EXISTS public.school_administrators (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS public.school_administrators (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. IT SUPPORT TABLE
+-- 6. IT SUPPORT TABLE
 CREATE TABLE IF NOT EXISTS public.it_supports (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS public.it_supports (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 6. SECTIONS TABLE
+-- 7. SECTIONS TABLE
 CREATE TABLE IF NOT EXISTS public.sections (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     section_name VARCHAR(50) NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS public.sections (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 7. CLASSROOMS TABLE
+-- 8. CLASSROOMS TABLE
 CREATE TABLE IF NOT EXISTS public.classrooms (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     classroom_id VARCHAR(20) UNIQUE NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS public.classrooms (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 8. COURSE SUBJECTS TABLE (Supporting Trimestral & Core Subject Limits)
+-- 9. COURSE SUBJECTS TABLE (Supporting Trimestral & Core Subject Limits)
 CREATE TABLE IF NOT EXISTS public.course_subjects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     subject_code VARCHAR(20) UNIQUE NOT NULL,
@@ -99,11 +99,11 @@ CREATE TABLE IF NOT EXISTS public.course_subjects (
     subject_type VARCHAR(20) NOT NULL CHECK (subject_type IN ('Core', 'Elective', 'Applied', 'Specialized')),
     grade_level INT NOT NULL CHECK (grade_level BETWEEN 7 AND 12),
     trimester INT NOT NULL CHECK (trimester IN (1, 2, 3)), -- 1st, 2nd, 3rd Trimester
-    strand VARCHAR(50), -- Optional: specific to SHS strand, or General
+    strand VARCHAR(50), -- Specific to SHS strand, or General
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 9. CLASS SCHEDULES TABLE (Hub for Automated Schedule Deconfliction Engine)
+-- 10. CLASS SCHEDULES TABLE (Hub for Automated Schedule Deconfliction Engine)
 CREATE TABLE IF NOT EXISTS public.class_schedules (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     schedule_code VARCHAR(30) UNIQUE NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS public.class_schedules (
     CONSTRAINT check_time_order CHECK (start_time < end_time)
 );
 
--- 10. ENROLLMENT APPLICATIONS TABLE
+-- 11. ENROLLMENT APPLICATIONS TABLE
 CREATE TABLE IF NOT EXISTS public.enrollment_applications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     application_id VARCHAR(30) UNIQUE NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS public.enrollment_applications (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 11. ROW-LEVEL SECURITY (RLS) ENFORCEMENT
+-- 12. ROW-LEVEL SECURITY (RLS) & POLICIES SETUP
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.teachers ENABLE ROW LEVEL SECURITY;
@@ -151,8 +151,19 @@ ALTER TABLE public.course_subjects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.class_schedules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.enrollment_applications ENABLE ROW LEVEL SECURITY;
 
--- 12. STORAGE BUCKETS SETUP (For S3 Compatible Supabase Storage)
--- Insert standard buckets if storage schema exists
+-- Standard Permissive Policies for Capstone Project Testing
+CREATE POLICY "Allow public read on sections" ON public.sections FOR SELECT USING (true);
+CREATE POLICY "Allow public read on classrooms" ON public.classrooms FOR SELECT USING (true);
+CREATE POLICY "Allow public read on course_subjects" ON public.course_subjects FOR SELECT USING (true);
+CREATE POLICY "Allow public read on class_schedules" ON public.class_schedules FOR SELECT USING (true);
+CREATE POLICY "Allow all on users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on students" ON public.students FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on teachers" ON public.teachers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on school_administrators" ON public.school_administrators FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on it_supports" ON public.it_supports FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on enrollment_applications" ON public.enrollment_applications FOR ALL USING (true) WITH CHECK (true);
+
+-- 13. STORAGE BUCKETS SETUP (For S3 Compatible Supabase Storage)
 INSERT INTO storage.buckets (id, name, public)
 VALUES 
     ('student-ids', 'student-ids', true),
@@ -160,7 +171,7 @@ VALUES
     ('receipts', 'receipts', false)
 ON CONFLICT (id) DO NOTHING;
 
--- 13. SEED INITIAL DATA (Dumalneg National High School Defaults)
+-- 14. SEED INITIAL DATA (Dumalneg National High School Defaults)
 -- Sections
 INSERT INTO public.sections (section_name, grade_level, strand, capacity) VALUES
 ('Grade 7 - Rizal', 7, NULL, 40),
