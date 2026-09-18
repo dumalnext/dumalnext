@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
 import Step2LearnerProfile from "./Step2LearnerProfile";
 import Step3FamilyBackground from "./Step3FamilyBackground";
 import Step4CurriculumModality from "./Step4CurriculumModality";
 import Step5DocumentsReview from "./Step5DocumentsReview";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
+import { useAuth } from "@/lib/auth/authContext";
 
 export interface FullEnrollmentFormData {
   // Step 1: Classification
@@ -173,9 +174,23 @@ const STEP_LABELS = [
 ];
 
 export default function EnrollmentStepper() {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [formData, setFormData] = useState<FullEnrollmentFormData>(initialFormData);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
+
+  // Auto pre-fill if student is logged in
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        lastName: prev.lastName || user.lastName,
+        firstName: prev.firstName || user.firstName,
+        middleName: prev.middleName || user.middleName || "",
+        lrn: prev.lrn || user.lrn || "",
+      }));
+    }
+  }, [user]);
 
   const handleStep1Change = (fields: Partial<Step1Data>) => {
     setFormData((prev) => ({
@@ -212,6 +227,33 @@ export default function EnrollmentStepper() {
 
   return (
     <div className="space-y-6">
+      {/* Authenticated Applicant Status Banner */}
+      {user ? (
+        <div className="p-3 bg-blue-50 border border-blue-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span className="text-slate-700">
+            Authenticated Applicant Account: <strong>{user.fullName}</strong> ({user.email})
+          </span>
+          <span className="font-mono text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0">
+            LINKED ACCOUNT: {user.userId}
+          </span>
+        </div>
+      ) : (
+        <div className="p-3 bg-amber-50 border border-amber-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span className="text-amber-900">
+            You are currently filling out this enrollment form as a Guest. To link this submission to your personal student account for easier tracking, please sign in or register.
+          </span>
+          <div className="flex gap-2 shrink-0">
+            <a href="/login" className="font-bold text-[#002060] hover:underline uppercase text-[11px]">
+              Sign In
+            </a>
+            <span>&bull;</span>
+            <a href="/register" className="font-bold text-[#002060] hover:underline uppercase text-[11px]">
+              Register Account
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
       <div className="bg-white border border-slate-300 p-4 sm:p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">

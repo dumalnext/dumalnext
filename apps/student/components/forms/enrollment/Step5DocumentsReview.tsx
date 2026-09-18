@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { compressImage } from "@/lib/utils/image-compressor";
+import { useAuth } from "@/lib/auth/authContext";
 
 interface Step5DocumentsReviewProps {
   data: FullEnrollmentFormData;
@@ -23,6 +24,7 @@ export default function Step5DocumentsReview({
   onChange,
   onBack,
 }: Step5DocumentsReviewProps) {
+  const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
@@ -191,6 +193,9 @@ export default function Step5DocumentsReview({
         referenceNumber: generatedRef,
         applicationDate: new Date().toISOString(),
         status: "Pending",
+        userId: user?.id || null,
+        userAccountId: user?.userId || null,
+        accountEmail: user?.email || null,
         lrn: data.lrn,
         fullName: `${data.lastName}, ${data.firstName} ${data.middleName || ""} ${data.extensionName || ""}`.trim(),
         gradeLevel: data.step1.targetGradeLevel,
@@ -326,6 +331,12 @@ export default function Step5DocumentsReview({
                   ? data.motherContactNumber
                   : data.guardianContactNumber}
                 )
+              </span>
+            </div>
+            <div>
+              <span className="font-bold text-slate-500 block uppercase text-[10px]">Linked Student Account</span>
+              <span className="font-bold text-[#002060]">
+                {user ? `${user.fullName} (${user.email})` : "Guest / Direct Submission"}
               </span>
             </div>
           </div>

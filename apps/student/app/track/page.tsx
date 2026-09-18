@@ -24,7 +24,10 @@ interface ApplicationRecord {
   formData?: FullEnrollmentFormData;
 }
 
+import { useAuth } from "@/lib/auth/authContext";
+
 function TrackApplicationContent() {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("ref") || searchParams.get("query") || "";
 
@@ -49,9 +52,11 @@ function TrackApplicationContent() {
     if (typeof window !== "undefined") {
       const stored = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
       const found = stored.find(
-        (app: ApplicationRecord) =>
+        (app: any) =>
           app.referenceNumber?.toUpperCase() === cleanTerm ||
           app.lrn === cleanTerm ||
+          (app.accountEmail && app.accountEmail.toUpperCase() === cleanTerm) ||
+          (app.userAccountId && app.userAccountId.toUpperCase() === cleanTerm) ||
           cleanTerm.includes(app.referenceNumber?.toUpperCase())
       );
 
@@ -123,9 +128,14 @@ function TrackApplicationContent() {
 
   useEffect(() => {
     if (initialQuery) {
+      setSearchTerm(initialQuery);
       performSearch(initialQuery);
+    } else if (user) {
+      const targetQuery = user.lrn || user.email || user.userId;
+      setSearchTerm(targetQuery);
+      performSearch(targetQuery);
     }
-  }, [initialQuery]);
+  }, [initialQuery, user]);
 
   const handleDownloadApprovedPdf = async () => {
     if (!record) return;

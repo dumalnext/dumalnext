@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: "Official Student Online Enrollment and Academic Workstation for Dumalneg National High School",
 };
 
+import StudentProviders from "@/components/providers/StudentProviders";
+import StudentHeaderNav from "@/components/layout/StudentHeaderNav";
+
 export default function StudentLayout({
   children,
 }: {
@@ -14,47 +17,30 @@ export default function StudentLayout({
   return (
     <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
-        {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
-        <header className="deped-header px-6 py-4 shadow-sm">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">
-                Republic of the Philippines | Department of Education | Region I
-              </p>
-              <h1 className="text-xl font-bold tracking-tight text-white mt-1">
-                DUMALNEG NATIONAL HIGH SCHOOL
-              </h1>
-              <p className="text-xs text-slate-300 font-medium">
-                Student Online Portal &amp; Basic Education Enrollment System
-              </p>
+        <StudentProviders>
+          {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
+          <header className="deped-header px-6 py-4 shadow-sm">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">
+                  Republic of the Philippines | Department of Education | Region I
+                </p>
+                <h1 className="text-xl font-bold tracking-tight text-white mt-1">
+                  DUMALNEG NATIONAL HIGH SCHOOL
+                </h1>
+                <p className="text-xs text-slate-300 font-medium">
+                  Student Online Portal &amp; Basic Education Enrollment System
+                </p>
+              </div>
+              <StudentHeaderNav />
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-              <a
-                href="/"
-                className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
-              >
-                Portal Home
-              </a>
-              <a
-                href="/enroll"
-                className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
-              >
-                Online Enrollment
-              </a>
-              <a
-                href="/track"
-                className="bg-blue-900 border border-blue-400/50 text-white font-bold uppercase tracking-wider py-1 px-3 hover:bg-blue-800 transition-colors"
-              >
-                Track Application
-              </a>
-            </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Main Content Area */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
+          {/* Main Content Area */}
+          <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+            {children}
+          </main>
+        </StudentProviders>
 
         {/* DepEd Institutional Footer */}
         <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 text-xs py-6 px-6 mt-12">
