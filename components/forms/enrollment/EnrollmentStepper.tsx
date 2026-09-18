@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
+import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
 export interface FullEnrollmentFormData {
   // Step 1: Classification
@@ -34,6 +35,7 @@ export interface FullEnrollmentFormData {
   currentBarangay: string;
   currentMunicipality: string;
   currentProvince: string;
+  currentCountry: string;
   currentZipCode: string;
   isPermanentSameAsCurrent: boolean;
   permanentHouseNo: string;
@@ -41,6 +43,7 @@ export interface FullEnrollmentFormData {
   permanentBarangay: string;
   permanentMunicipality: string;
   permanentProvince: string;
+  permanentCountry: string;
   permanentZipCode: string;
 
   // Step 3: Family / Guardian
@@ -62,6 +65,7 @@ export interface FullEnrollmentFormData {
   snedCategory: "Diagnosis" | "Manifestations" | "";
   snedDetails: string[];
   hasPwdId: boolean;
+  targetSemester: "1st Semester" | "2nd Semester" | "";
   targetTrack: string;
   targetStrand: string;
   selectedElectives: string[];
@@ -82,6 +86,9 @@ const initialFormData: FullEnrollmentFormData = {
     isGraded: true,
     applicantType: "",
     targetGradeLevel: "",
+    targetSemester: "1st Semester",
+    targetTrack: "Academic Track",
+    targetStrand: "",
     lastGradeCompleted: "",
     lastSchoolYearCompleted: "",
     lastSchoolAttended: "",
@@ -109,6 +116,7 @@ const initialFormData: FullEnrollmentFormData = {
   currentBarangay: "Cabaritan",
   currentMunicipality: "Dumalneg",
   currentProvince: "Ilocos Norte",
+  currentCountry: "Philippines",
   currentZipCode: "2921",
   isPermanentSameAsCurrent: true,
   permanentHouseNo: "",
@@ -116,6 +124,7 @@ const initialFormData: FullEnrollmentFormData = {
   permanentBarangay: "Cabaritan",
   permanentMunicipality: "Dumalneg",
   permanentProvince: "Ilocos Norte",
+  permanentCountry: "Philippines",
   permanentZipCode: "2921",
   fatherLastName: "",
   fatherFirstName: "",
@@ -133,6 +142,7 @@ const initialFormData: FullEnrollmentFormData = {
   snedCategory: "",
   snedDetails: [],
   hasPwdId: false,
+  targetSemester: "1st Semester",
   targetTrack: "Academic Track",
   targetStrand: "",
   selectedElectives: [],
@@ -152,12 +162,28 @@ const STEP_LABELS = [
 export default function EnrollmentStepper() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [formData, setFormData] = useState<FullEnrollmentFormData>(initialFormData);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
 
   const handleStep1Change = (fields: Partial<Step1Data>) => {
     setFormData((prev) => ({
       ...prev,
       step1: { ...prev.step1, ...fields },
+      ...(fields.targetTrack !== undefined ? { targetTrack: fields.targetTrack } : {}),
+      ...(fields.targetStrand !== undefined ? { targetStrand: fields.targetStrand } : {}),
+      ...(fields.targetSemester !== undefined ? { targetSemester: fields.targetSemester } : {}),
     }));
+  };
+
+  const handleDownloadPdf = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      await downloadDepEdEnrollmentPdf(formData);
+    } catch (err) {
+      console.error("Failed to generate DepEd Enrollment PDF:", err);
+      alert("Error generating PDF. Please ensure all required fields are filled.");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
@@ -333,6 +359,35 @@ export default function EnrollmentStepper() {
                 Official Document Upload via HTML5 Canvas Compressor (&lt;350KB)
               </h2>
             </div>
+
+            {/* Smart Feature: Automated DepEd PDF Form Filler */}
+            <div className="p-6 bg-blue-50 border-2 border-[#002060] space-y-3 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#002060]">
+                  [ SMART FEATURE: AUTOMATED DEPED FORM FILLER (PDF) ]
+                </span>
+                <span className="text-[11px] font-mono bg-[#002060] text-white px-2 py-0.5 font-bold">
+                  DEPED FORM REVISED 06/01/2025
+                </span>
+              </div>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                All submitted learner credentials, previous school history, LRN, 4Ps data, and senior high school selections
+                are automatically mapped onto the official 2-page DepEd Basic Education Enrollment Form template.
+              </p>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="btn-primary text-xs uppercase tracking-wider font-bold py-3 px-6 shadow-sm flex items-center justify-center"
+                >
+                  {isGeneratingPdf
+                    ? "[ GENERATING OFFICIAL DEPED FORM... ]"
+                    : "[ DOWNLOAD ACCOMPLISHED DEPED FORM (PDF) ]"}
+                </button>
+              </div>
+            </div>
+
             <div className="flex justify-between pt-4 border-t border-slate-200">
               <button
                 type="button"

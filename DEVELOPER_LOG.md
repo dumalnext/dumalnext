@@ -148,3 +148,12 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
     4. `apps/it-support` (`@dumalnext/it-support` - Port 3003): Dedicated IT Systems Console para sa dynamic calendar setup (no hardcoded dates) at RBAC audit logs.
   - Ang lahat ng apat na web apps ay may sari-sariling `npm run build` na 100% matagumpay at walang errors.
   - Handa para sa apat (4) na magkakahiwalay na live Vercel deployments (`dumalnext-student.vercel.app`, `dumalnext-teacher.vercel.app`, `dumalnext-admin.vercel.app`, `dumalnext-itsupport.vercel.app`).
+- [x] **Pagpapahusay sa Hakbang 1 (Smart Prerequisite Level Tracker & Conditional SHS Selection)**:
+  - **Category 01 (Incoming Grade 7)**: Naka-lock sa Grade 7, humihingi ng Elementary School credentials (Pangalan, 6-digit School ID, SY), at pre-set sa Grade 6 completer (may option din para sa Grade 7 repeater).
+  - **Category 02 (Incoming Grade 11)**: Naka-lock sa Grade 11, humihingi ng JHS credentials (Pangalan, 6-digit School ID, SY, Grade 10 completer o Grade 11 repeater), at agarang inilalabas ang **DepEd Section 7 (SHS Track & Strand Selection: STEM, HUMSS, TVL-ICT, TVL-AFA, TVL-HE at Semester)**.
+  - **Category 03 (Transferee) & Category 04 (Returning / Balik-Aral)**: May Target Grade selector (7–12), may **Smart Prerequisite Level Tracker** na awtomatikong nag-e-exclude ng imposibleng mas matataas na baitang habang may repeater option sa lahat ng baitang 7 hanggang 12, at awtomatikong inilalabas ang Section 7 kapag Grade 11 o 12 ang pinili.
+- [x] **Automated Official DepEd PDF Form Generator (`pdf-lib`)**:
+  - Inilagay ang opisyal na 2-page DepEd Basic Education Enrollment Form template (Revised as of 06/01/2025) sa `apps/student/public/forms/deped-enrollment-p1.jpg` at `p2.jpg`.
+  - Ginawa ang `apps/student/lib/utils/depedPdfGenerator.ts` na awtomatikong nagpi-print at nagpapatong (superimpose) ng bawat input ng mag-aaral: 12-digit LRN boxes, PSA, buong pangalan, petsa ng kapanganakan, edad, kasarian `[X]`, IP community, 16-digit 4Ps ID boxes, tirahan, magulang/guardian, SNEd status, dating paaralan at 6-digit School ID, SHS track at strand, at distance learning modalities.
+  - May "Download Accomplished DepEd Form (PDF)" button para agad makapag-print ang mag-aaral o administrador ng opisyal na DepEd form.
+

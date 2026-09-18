@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { ApplicantType } from "@/lib/types/enrollment";
+import React from "react";
+import { ApplicantType, SHS_STRANDS } from "@/lib/types/enrollment";
 
 export interface Step1Data {
   isGraded: boolean;
   applicantType: ApplicantType | "";
   targetGradeLevel: number | "";
+  targetSemester?: "1st Semester" | "2nd Semester" | "";
+  targetTrack?: string;
+  targetStrand?: string;
   lastGradeCompleted?: number | "";
   lastSchoolYearCompleted?: string;
   lastSchoolAttended?: string;
@@ -26,31 +29,38 @@ export default function Step1ApplicantType({
 }: Step1ApplicantTypeProps) {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
-  // When applicant type changes, set appropriate default grade levels
+  // When applicant type changes, set appropriate default grade levels and conditional parameters
   const handleSelectApplicantType = (type: ApplicantType) => {
-    let defaultTargetGrade: number | "" = data.targetGradeLevel;
-    let defaultLastGrade: number | "" = data.lastGradeCompleted || "";
-
     if (type === "Grade 7") {
-      defaultTargetGrade = 7;
-      defaultLastGrade = 6;
+      onChange({
+        applicantType: "Grade 7",
+        targetGradeLevel: 7,
+        lastGradeCompleted: 6,
+        targetTrack: "",
+        targetStrand: "",
+        targetSemester: "",
+      });
     } else if (type === "Grade 11") {
-      defaultTargetGrade = 11;
-      defaultLastGrade = 10;
+      onChange({
+        applicantType: "Grade 11",
+        targetGradeLevel: 11,
+        lastGradeCompleted: 10,
+        targetTrack: data.targetTrack || "Academic Track",
+        targetStrand: data.targetStrand || "STEM",
+        targetSemester: data.targetSemester || "1st Semester",
+      });
     } else if (type === "Transferee" || type === "Returning") {
-      if (!defaultTargetGrade) {
-        defaultTargetGrade = 7;
-        defaultLastGrade = 6;
-      } else {
-        defaultLastGrade = typeof defaultTargetGrade === "number" ? defaultTargetGrade - 1 : 6;
-      }
+      const currentTarget = typeof data.targetGradeLevel === "number" ? data.targetGradeLevel : 7;
+      const isSHS = currentTarget >= 11;
+      onChange({
+        applicantType: type,
+        targetGradeLevel: currentTarget,
+        lastGradeCompleted: currentTarget === 7 ? 6 : currentTarget - 1,
+        targetTrack: isSHS ? (data.targetTrack || "Academic Track") : "",
+        targetStrand: isSHS ? (data.targetStrand || "STEM") : "",
+        targetSemester: isSHS ? (data.targetSemester || "1st Semester") : "",
+      });
     }
-
-    onChange({
-      applicantType: type,
-      targetGradeLevel: defaultTargetGrade,
-      lastGradeCompleted: defaultLastGrade,
-    });
 
     if (errors.applicantType) {
       setErrors((prev) => {
@@ -61,16 +71,16 @@ export default function Step1ApplicantType({
     }
   };
 
-  // Smart level tracker: When target grade level changes, automatically adjust valid completed grade
+  // Smart level tracker: When target grade level changes for Transferee / Returning
   const handleTargetGradeChange = (newTargetGrade: number) => {
-    // Standard academic progression: Last completed grade is target - 1
-    const standardLastCompleted = newTargetGrade - 1;
+    const standardLastCompleted = newTargetGrade === 7 ? 6 : newTargetGrade - 1;
+    const isSHS = newTargetGrade >= 11;
 
-    // Check if the current lastGradeCompleted is logically impossible (greater than or equal to target grade)
+    // Check if the current lastGradeCompleted is logically valid for this new target
     let updatedLastCompleted: number = standardLastCompleted;
     if (
       typeof data.lastGradeCompleted === "number" &&
-      data.lastGradeCompleted < newTargetGrade &&
+      data.lastGradeCompleted <= newTargetGrade &&
       data.lastGradeCompleted >= standardLastCompleted - 1
     ) {
       updatedLastCompleted = data.lastGradeCompleted;
@@ -79,6 +89,9 @@ export default function Step1ApplicantType({
     onChange({
       targetGradeLevel: newTargetGrade,
       lastGradeCompleted: updatedLastCompleted,
+      targetTrack: isSHS ? (data.targetTrack || "Academic Track") : "",
+      targetStrand: isSHS ? (data.targetStrand || "STEM") : "",
+      targetSemester: isSHS ? (data.targetSemester || "1st Semester") : "",
     });
 
     if (errors.targetGradeLevel || errors.lastGradeCompleted) {
@@ -86,6 +99,26 @@ export default function Step1ApplicantType({
         const next = { ...prev };
         delete next.targetGradeLevel;
         delete next.lastGradeCompleted;
+        return next;
+      });
+    }
+  };
+
+  // Track selection change handler for SHS
+  const handleTrackChange = (newTrack: string) => {
+    const availableForTrack = SHS_STRANDS.filter((s) => s.track === newTrack);
+    const firstStrand = availableForTrack.length > 0 ? availableForTrack[0].code : "";
+
+    onChange({
+      targetTrack: newTrack,
+      targetStrand: firstStrand,
+    });
+
+    if (errors.targetTrack || errors.targetStrand) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.targetTrack;
+        delete next.targetStrand;
         return next;
       });
     }
@@ -109,25 +142,40 @@ export default function Step1ApplicantType({
     } else if (prerequisiteGrade === 10) {
       options.push({ value: 10, label: "Grade 10 (Junior High School Completer)" });
     } else {
-      options.push({ value: prerequisiteGrade, label: `Grade ${prerequisiteGrade}` });
+      options.push({ value: prerequisiteGrade, label: `Grade ${prerequisiteGrade} Completer` });
     }
 
-    // 2. Repeater Option (Always available for all levels including Grade 7)
+    // 2. Repeater Option (Always available for every grade level 7 to 12)
     options.push({
       value: targetGrade,
       label: `Grade ${targetGrade} (Repeater / Retained in Grade ${targetGrade} / Discontinued)`,
     });
 
-    // 3. Fallback for returning students who dropped out earlier
+    // 3. Fallback for returning students who stopped earlier
     if (prerequisiteGrade - 1 >= 6) {
       options.push({
         value: prerequisiteGrade - 1,
-        label: prerequisiteGrade - 1 === 6 ? "Grade 6 (Elementary Completer)" : `Grade ${prerequisiteGrade - 1}`,
+        label: prerequisiteGrade - 1 === 6 ? "Grade 6 (Elementary Completer)" : `Grade ${prerequisiteGrade - 1} Completer`,
       });
     }
 
     return options;
   };
+
+  const isSHS =
+    data.applicantType === "Grade 11" ||
+    ((data.applicantType === "Transferee" || data.applicantType === "Returning") &&
+      typeof data.targetGradeLevel === "number" &&
+      data.targetGradeLevel >= 11);
+
+  const isTransfereeOrReturning =
+    data.applicantType === "Transferee" || data.applicantType === "Returning";
+
+  const availableCompletedGrades = getAvailableCompletedGrades(data.targetGradeLevel);
+
+  const availableStrands = SHS_STRANDS.filter(
+    (s) => !data.targetTrack || s.track === data.targetTrack
+  );
 
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
@@ -140,25 +188,38 @@ export default function Step1ApplicantType({
       newErrors.targetGradeLevel = "Target grade level is required.";
     }
 
-    // Validation for Transferee / Returning (Balik-Aral)
-    if (data.applicantType === "Transferee" || data.applicantType === "Returning") {
-      if (!data.lastGradeCompleted) {
-        newErrors.lastGradeCompleted = "Last grade level completed is required.";
-      } else if (
-        typeof data.targetGradeLevel === "number" &&
-        Number(data.lastGradeCompleted) > Number(data.targetGradeLevel)
-      ) {
-        newErrors.lastGradeCompleted = `Invalid academic sequence: Cannot enroll in Grade ${data.targetGradeLevel} after already completing Grade ${data.lastGradeCompleted}.`;
-      }
+    // Section 6 Validation for all categories (since all learners must have previous school data)
+    if (!data.lastGradeCompleted) {
+      newErrors.lastGradeCompleted = "Last grade level completed is required.";
+    } else if (
+      typeof data.targetGradeLevel === "number" &&
+      Number(data.lastGradeCompleted) > Number(data.targetGradeLevel)
+    ) {
+      newErrors.lastGradeCompleted = `Invalid academic sequence: Cannot enroll in Grade ${data.targetGradeLevel} after completing Grade ${data.lastGradeCompleted}.`;
+    }
 
-      if (!data.lastSchoolYearCompleted || data.lastSchoolYearCompleted.trim() === "") {
-        newErrors.lastSchoolYearCompleted = "Last school year completed is required (e.g., 2024-2025).";
+    if (!data.lastSchoolYearCompleted || data.lastSchoolYearCompleted.trim() === "") {
+      newErrors.lastSchoolYearCompleted = "Last school year completed is required (e.g., 2024-2025).";
+    }
+
+    if (!data.lastSchoolAttended || data.lastSchoolAttended.trim() === "") {
+      newErrors.lastSchoolAttended = "Official name of last school attended is required.";
+    }
+
+    if (!data.lastSchoolId || data.lastSchoolId.trim().length !== 6) {
+      newErrors.lastSchoolId = "DepEd School ID must be exactly 6 numeric digits.";
+    }
+
+    // Section 7 Validation for Senior High School
+    if (isSHS) {
+      if (!data.targetTrack || data.targetTrack.trim() === "") {
+        newErrors.targetTrack = "Please select a Senior High School Track (Academic or TVL).";
       }
-      if (!data.lastSchoolAttended || data.lastSchoolAttended.trim() === "") {
-        newErrors.lastSchoolAttended = "Official name of last school attended is required.";
+      if (!data.targetStrand || data.targetStrand.trim() === "") {
+        newErrors.targetStrand = "Please select a Senior High School Strand.";
       }
-      if (!data.lastSchoolId || data.lastSchoolId.trim().length !== 6) {
-        newErrors.lastSchoolId = "Previous DepEd School ID must be exactly 6 numeric digits.";
+      if (!data.targetSemester || data.targetSemester.trim() === "") {
+        newErrors.targetSemester = "Please select an academic semester.";
       }
     }
 
@@ -169,11 +230,6 @@ export default function Step1ApplicantType({
     }
   };
 
-  const isTransfereeOrReturning =
-    data.applicantType === "Transferee" || data.applicantType === "Returning";
-
-  const availableCompletedGrades = getAvailableCompletedGrades(data.targetGradeLevel);
-
   return (
     <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm">
       {/* Step Header */}
@@ -183,18 +239,18 @@ export default function Step1ApplicantType({
             STEP 01 OF 05
           </span>
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            DepEd Form Sections 2 &amp; 6
+            DepEd Form Sections 2, 6 &amp; 7
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Learner Classification &amp; Target Grade Level
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Select the appropriate education program and academic classification for the enrolling student.
+          Select the education program, learner category, previous academic background, and Senior High School strand (if applicable).
         </p>
       </div>
 
-      {/* Part A: Graded vs Non-Graded (SNEd Only) */}
+      {/* Part 1: Curriculum Program (DepEd Section 2) */}
       <div className="space-y-3">
         <div className="border-l-4 border-[#002060] pl-3">
           <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
@@ -264,7 +320,7 @@ export default function Step1ApplicantType({
         </div>
       </div>
 
-      {/* Part B: Applicant Classification */}
+      {/* Part 2: Learner Classification Category */}
       <div className="space-y-3 pt-2">
         <div className="border-l-4 border-[#002060] pl-3">
           <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
@@ -302,7 +358,7 @@ export default function Step1ApplicantType({
               >
                 [ {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} ] CATEGORY 01
               </span>
-              <span className="text-xs font-bold text-[#002060]">JHS Grade 7</span>
+              <span className="text-xs font-bold text-[#002060]">Target: Grade 7</span>
             </div>
             <div className="text-base font-bold text-slate-900">Incoming Grade 7</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -330,7 +386,7 @@ export default function Step1ApplicantType({
               >
                 [ {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} ] CATEGORY 02
               </span>
-              <span className="text-xs font-bold text-[#002060]">SHS Grade 11</span>
+              <span className="text-xs font-bold text-[#002060]">Target: Grade 11</span>
             </div>
             <div className="text-base font-bold text-slate-900">Incoming Grade 11</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -386,7 +442,7 @@ export default function Step1ApplicantType({
               >
                 [ {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} ] CATEGORY 04
               </span>
-              <span className="text-xs font-bold text-indigo-800">Balik-Aral</span>
+              <span className="text-xs font-bold text-indigo-800">Balik-Aral (Grades 7–12)</span>
             </div>
             <div className="text-base font-bold text-slate-900">Returning Learner (Balik-Aral)</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -396,7 +452,7 @@ export default function Step1ApplicantType({
         </div>
       </div>
 
-      {/* Part C: Target Grade Level Selector (for Transferee / Returning) */}
+      {/* Part 3: Target Grade Level Selector (for Transferee / Returning) */}
       {isTransfereeOrReturning && (
         <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
           <div className="border-l-4 border-[#002060] pl-3">
@@ -404,7 +460,7 @@ export default function Step1ApplicantType({
               3. Target Grade Level at Dumalneg NHS (Grades 7 to 12)
             </label>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select the grade level you intend to enroll in for the upcoming school year.
+              Select the target grade level you intend to enroll in for the upcoming school year.
             </p>
           </div>
 
@@ -446,26 +502,36 @@ export default function Step1ApplicantType({
         </div>
       )}
 
-      {/* Part D: Smart Section 6 Academic History Tracker (DepEd Section 6) */}
-      {isTransfereeOrReturning && (
+      {/* Part 4: DepEd Section 6: Previous School & Academic Prerequisite Background */}
+      {data.applicantType && (
         <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
           <div className="border-b-2 border-slate-200 pb-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                [ DepEd Section 6: Academic Background &amp; Previous School Attended ]
+                [ DepEd Section 6: Previous School Attended &amp; Academic History ]
               </span>
               <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold">
                 [ SMART PREREQUISITE VALIDATION ACTIVE ]
               </span>
             </div>
             <p className="text-xs text-slate-600 mt-1">
-              Based on your target of <strong>Grade {data.targetGradeLevel || 7}</strong>, 
-              impossible higher grade levels have been automatically filtered out.
+              {data.applicantType === "Grade 7" && (
+                <>Provide credentials of the graduated Elementary School. Prerequisite: Completed Grade 6.</>
+              )}
+              {data.applicantType === "Grade 11" && (
+                <>Provide credentials of the completed Junior High School. Prerequisite: Completed Grade 10.</>
+              )}
+              {isTransfereeOrReturning && (
+                <>
+                  Based on target <strong>Grade {data.targetGradeLevel || 7}</strong>, 
+                  impossible future grade levels have been automatically excluded.
+                </>
+              )}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {/* Last Grade Level Completed (SMART FILTERED) */}
+            {/* Last Grade Level Completed */}
             <div>
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Last Grade Level Completed <span className="text-red-700">*</span>
@@ -509,7 +575,7 @@ export default function Step1ApplicantType({
                 className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
               <span className="text-[11px] text-slate-500 mt-1 block">
-                Format: 4-digit start year - 4-digit end year (e.g. 2024-2025).
+                Format: 4-digit start year - 4-digit end year (e.g., 2024-2025).
               </span>
               {errors.lastSchoolYearCompleted && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -521,13 +587,22 @@ export default function Step1ApplicantType({
             {/* Last School Attended */}
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Official Registered Name of Last School Attended <span className="text-red-700">*</span>
+                {data.applicantType === "Grade 7"
+                  ? "Official Name of Elementary School Graduated / Last Attended"
+                  : data.applicantType === "Grade 11"
+                  ? "Official Name of Junior High School Completed / Last Attended"
+                  : "Official Registered Name of Last School Attended"}{" "}
+                <span className="text-red-700">*</span>
               </label>
               <input
                 type="text"
                 value={data.lastSchoolAttended || ""}
                 onChange={(e) => onChange({ lastSchoolAttended: e.target.value })}
-                placeholder="e.g. Pagudpud National High School / Bangui Central School"
+                placeholder={
+                  data.applicantType === "Grade 7"
+                    ? "e.g. Dumalneg Central Elementary School / Cabaritan Elementary School"
+                    : "e.g. Dumalneg National High School / Pagudpud National High School"
+                }
                 className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
               />
               {errors.lastSchoolAttended && (
@@ -540,9 +615,9 @@ export default function Step1ApplicantType({
             {/* School ID (6-digit) */}
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Previous School ID (6 Numeric Digits) <span className="text-red-700">*</span>
+                Previous DepEd School ID (6 Numeric Digits) <span className="text-red-700">*</span>
               </label>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <input
                   type="text"
                   maxLength={6}
@@ -569,6 +644,148 @@ export default function Step1ApplicantType({
         </div>
       )}
 
+      {/* Part 5: DepEd Section 7: Senior High School Program Selection (Grades 11 & 12 Only) */}
+      {isSHS && (
+        <div className="space-y-5 p-6 bg-slate-50 border-2 border-[#002060]/40">
+          <div className="border-b-2 border-slate-200 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                [ DepEd Section 7: Senior High School Track &amp; Strand Selection ]
+              </span>
+              <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-2 py-0.5 font-bold">
+                MANDATORY FOR GRADES 11 &amp; 12
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              Select your academic semester, track, and specialized Senior High School strand offered at Dumalneg NHS.
+            </p>
+          </div>
+
+          {/* Academic Semester */}
+          <div>
+            <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
+              Semester <span className="text-red-700">*</span>
+            </label>
+            <div className="grid grid-cols-2 gap-3 sm:w-80">
+              {(["1st Semester", "2nd Semester"] as const).map((sem) => (
+                <button
+                  key={sem}
+                  type="button"
+                  onClick={() => onChange({ targetSemester: sem })}
+                  className={`p-3 border-2 text-center text-xs font-bold uppercase transition-all ${
+                    data.targetSemester === sem
+                      ? "bg-[#002060] text-white border-[#002060]"
+                      : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
+                  }`}
+                >
+                  {sem}
+                </button>
+              ))}
+            </div>
+            {errors.targetSemester && (
+              <span className="text-xs text-red-700 font-semibold mt-1 block">
+                {errors.targetSemester}
+              </span>
+            )}
+          </div>
+
+          {/* Track Selection */}
+          <div>
+            <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
+              Senior High School Track <span className="text-red-700">*</span>
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                {
+                  id: "Academic Track",
+                  title: "Academic Track",
+                  desc: "College preparatory curriculum (STEM, HUMSS).",
+                },
+                {
+                  id: "Technical-Vocational-Livelihood Track",
+                  title: "Technical-Vocational-Livelihood (TVL) Track",
+                  desc: "Skills-based certification curriculum (ICT, Agri-Fishery, Home Economics).",
+                },
+              ].map((trk) => {
+                const isSelected = data.targetTrack === trk.id;
+                return (
+                  <button
+                    key={trk.id}
+                    type="button"
+                    onClick={() => handleTrackChange(trk.id)}
+                    className={`p-4 border-2 text-left transition-all ${
+                      isSelected
+                        ? "border-[#002060] bg-blue-50 ring-1 ring-[#002060]"
+                        : "border-slate-300 bg-white hover:border-[#002060]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-slate-900">{trk.title}</span>
+                      <span
+                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 uppercase ${
+                          isSelected ? "bg-[#002060] text-white" : "bg-slate-200 text-slate-600"
+                        }`}
+                      >
+                        {isSelected ? "SELECTED" : "SELECT"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-normal">{trk.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+            {errors.targetTrack && (
+              <span className="text-xs text-red-700 font-semibold mt-1 block">
+                {errors.targetTrack}
+              </span>
+            )}
+          </div>
+
+          {/* Strand Selection */}
+          <div>
+            <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
+              Specialized Strand at Dumalneg NHS <span className="text-red-700">*</span>
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {availableStrands.map((strand) => {
+                const isSelected = data.targetStrand === strand.code;
+                return (
+                  <button
+                    key={strand.code}
+                    type="button"
+                    onClick={() => onChange({ targetStrand: strand.code })}
+                    className={`p-4 border-2 text-left transition-all ${
+                      isSelected
+                        ? "border-[#002060] bg-blue-50 ring-1 ring-[#002060]"
+                        : "border-slate-300 bg-white hover:border-[#002060]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5">
+                        {strand.code}
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 uppercase ${
+                          isSelected ? "bg-[#002060] text-white" : "bg-slate-200 text-slate-600"
+                        }`}
+                      >
+                        {isSelected ? "ACTIVE" : "CHOOSE"}
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">{strand.name}</div>
+                  </button>
+                );
+              })}
+            </div>
+            {errors.targetStrand && (
+              <span className="text-xs text-red-700 font-semibold mt-1 block">
+                {errors.targetStrand}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
         <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs">
@@ -585,9 +802,15 @@ export default function Step1ApplicantType({
               {data.applicantType === "Returning" && `Returning Learner (Balik-Aral) for Grade ${data.targetGradeLevel}`}
             </strong>{" "}
             under the <strong>{data.isGraded ? "Graded Curriculum Program" : "Non-Graded Program (SNEd Only)"}</strong>.
-            {isTransfereeOrReturning && (
+            {isSHS && data.targetStrand && (
+              <span className="block mt-1 text-slate-800 font-semibold">
+                Senior High Placement: {data.targetSemester} | {data.targetTrack} ({data.targetStrand})
+              </span>
+            )}
+            {data.lastGradeCompleted && (
               <span className="block mt-1 text-slate-700 font-medium">
-                Academic Prerequisite: Completed Grade {data.lastGradeCompleted || ((Number(data.targetGradeLevel) || 7) - 1)}.
+                Academic Background: Completed Grade {data.lastGradeCompleted}
+                {data.lastSchoolAttended ? ` at ${data.lastSchoolAttended}` : ""}.
               </span>
             )}
           </p>
