@@ -3,8 +3,8 @@
 **Department**: Department of Information Technology  
 **Project Title**: Dumal-NEXT: Enrollment System for Dumalneg National High School  
 **Proponents**: Lozano, Digap, Julian, Magdaong, Tumpap  
-**Policy Alignment**: **DepEd ORDER No. 009, s. 2026** (Guidelines on the Implementation of the Three-Term School Calendar in Basic Education)  
-**System Architecture**: Strictly Aligned with Lab Activity 4 (Class Diagram) & Lab Activity 5 (Architecture)
+**System Architecture**: Strictly Aligned with Lab Activity 4 (Class Diagram) & Lab Activity 5 (Architecture)  
+**Calendar Mechanism**: **Dynamic Academic Year & Three-Term Configuration** (Managed dynamically by IT Support / School Administrator)
 
 ---
 
@@ -12,12 +12,13 @@
 
 Ang database ng **Dumal-NEXT** ay dinisenyo sa **PostgreSQL / Supabase** na sumusunod sa:
 1. **Third Normal Form (3NF)**: Walang redundant data o update anomalies.
-2. **Strict DepEd Order No. 009, s. 2026 Compliance**:
-   - Pormal na pagpapatupad ng **Three-Term School Calendar** (Term 1, Term 2, Term 3) para sa kabuuang **201 Class Days** sa SY 2026–2027.
-   - **Late Enrollment Hard Cutoff**: Hulyo 28, 2026 (Ika-2 Summative Assessment sa Term 1 ayon sa Item 34).
-   - **Senior High School Core Limit**: Eksaktong limang (5) Core Subjects bawat trisem ayon sa Table 6 ng Kautusan.
-3. **Inheritance (Is-A Hierarchy)**: Ang `User` class ang base table para sa `Student`, `Teacher`, `SchoolAdministrator`, at `ITSupport`.
-4. **Row-Level Security (RLS)**: Proteksyon sa kernel-level ng PostgreSQL kung saan nakahiwalay ang access ng estudyante, guro, at kawani.
+2. **Dinamikong Kalendaryo (Zero Hardcoded Dates)**:
+   - Ang mga petsa ng school year, trimester start/end dates, exam dates, at report card distribution dates ay **HINDI naka-hardcode**.
+   - Ito ay dinamikong inaayos, binabago, at pinapagana taon-taon ng **IT Support** o **School Administrator** sa pamamagitan ng kanilang portal ayon sa pinakabagong memo o DepEd Order ng gobyerno.
+3. **Senior High School Core Limit & Cross-Strand Electives**:
+   - Sinusunod ang patakaran na maximum 5 Core Subjects bawat trisem para sa SHS at pagpapahintulot sa cross-strand electives.
+4. **Inheritance (Is-A Hierarchy)**: Ang `User` class ang base table para sa `Student`, `Teacher`, `SchoolAdministrator`, at `ITSupport`.
+5. **Row-Level Security (RLS)**: Proteksyon sa kernel-level ng PostgreSQL kung saan nakahiwalay ang access ng bawat aktor.
 
 ---
 
@@ -31,7 +32,7 @@ Sentral na lagakan ng account credentials para sa lahat ng 4 na aktor.
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `id` | UUID | No | PRIMARY KEY | uuid_generate_v4() | Internal record ID |
-| `userId` | VARCHAR(20) | No | UNIQUE | None | Opisyal na DNHS account ID (e.g., DNHS-2026-001) |
+| `userId` | VARCHAR(20) | No | UNIQUE | None | Opisyal na DNHS account ID (e.g., DNHS-USR-001) |
 | `email` | VARCHAR(100) | No | UNIQUE | None | Email address ng account |
 | `password` | VARCHAR(255) | No | None | None | Hashed security password |
 | `userRole` | VARCHAR(50) | No | CHECK | None | 'student', 'teacher', 'admin', 'it_support' |
@@ -96,7 +97,7 @@ Tanggapan ng punong-guro at kawaning humahalili sa mga tungkulin ng registrar.
 ---
 
 ### TABLE 5: `it_supports` (Sub-Class ng User)
-Nangangasiwa sa mga teknikal na setting at role security ng Dumal-NEXT.
+Nangangasiwa sa dynamic setup ng school year, academic terms, at role security ng Dumal-NEXT.
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -108,34 +109,34 @@ Nangangasiwa sa mga teknikal na setting at role security ng Dumal-NEXT.
 
 ---
 
-### TABLE 6: `academic_terms` (DepEd Order No. 009, s. 2026 Three-Term Calendar)
-Opisyal na master table para sa tatlong termino ng Taong Panuruan 2026–2027.
+### TABLE 6: `academic_terms` (Dinamikong Kalendaryo na Iniaayos ng IT Support)
+Naglalaman ng bawat taong panuruan at tatlong termino. **Walang hardcoded dates**—lahat ay mae-edit sa IT Support portal taon-taon.
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `id` | UUID | No | PRIMARY KEY | uuid_generate_v4() | Internal record ID |
-| `schoolYear` | VARCHAR(20) | No | None | '2026-2027' | Taong panuruan |
+| `schoolYear` | VARCHAR(20) | No | None | None | Taong panuruan (e.g., '2026-2027', '2027-2028') |
 | `termNumber` | INT | No | CHECK (1-3) | None | Termino: 1, 2, o 3 |
 | `termName` | VARCHAR(50) | No | None | None | Pangalan ng termino ('Term 1', 'Term 2', 'Term 3') |
-| `totalClassDays`| INT | No | None | None | Kabuuang araw (Term 1: 69, Term 2: 65, Term 3: 67) |
-| `startDate` | DATE | No | None | None | Petsa ng pagsisimula ng termino |
-| `endDate` | DATE | No | None | None | Petsa ng pagtatapos ng termino |
-| `openingBlockStart`| DATE | Yes | None | NULL | Simula ng BOSY Opening Block (June 8, 2026) |
-| `openingBlockEnd` | DATE | Yes | None | NULL | Tapos ng BOSY Opening Block (June 11, 2026) |
-| `instructionalStart`| DATE| No | None | None | Simula ng pagtuturo |
-| `instructionalEnd` | DATE | No | None | None | Pagtatapos ng regular classes |
-| `endOfTermStart` | DATE | No | None | None | Simula ng 10-day End-of-Term Block |
-| `endOfTermEnd` | DATE | No | None | None | Pagtatapos ng End-of-Term Block |
+| `totalClassDays`| INT | Yes | None | NULL | Bilang ng araw ng klase sa terminong ito |
+| `startDate` | DATE | Yes | None | NULL | Petsa ng pagsisimula ng termino |
+| `endDate` | DATE | Yes | None | NULL | Petsa ng pagtatapos ng termino |
+| `openingBlockStart`| DATE | Yes | None | NULL | Simula ng BOSY Opening Block |
+| `openingBlockEnd` | DATE | Yes | None | NULL | Tapos ng BOSY Opening Block |
+| `instructionalStart`| DATE| Yes | None | NULL | Simula ng regular na pagtuturo |
+| `instructionalEnd` | DATE | Yes | None | NULL | Pagtatapos ng regular na pagtuturo |
+| `endOfTermStart` | DATE | Yes | None | NULL | Simula ng End-of-Term Block |
+| `endOfTermEnd` | DATE | Yes | None | NULL | Pagtatapos ng End-of-Term Block |
 | `summative1Date` | DATE | Yes | None | NULL | Petsa ng 1st Summative Test |
-| `summative2Date` | DATE | Yes | None | NULL | Petsa ng 2nd Summative Test (**Late Enrollment Cutoff: July 28, 2026**) |
+| `summative2Date` | DATE | Yes | None | NULL | Petsa ng 2nd Summative Test (Late Enrollment Cutoff) |
 | `termExamDates` | VARCHAR(100)| Yes | None | NULL | Mga petsa ng Term Examinations |
-| `reportCardDate` | DATE | No | None | None | Araw ng Pamamahagi ng Report Cards sa Magulang (PTC) |
+| `reportCardDate` | DATE | Yes | None | NULL | Araw ng Pamamahagi ng Report Cards sa Magulang (PTC) |
 | `isActive` | BOOLEAN | No | None | FALSE | TRUE kung ito ang kasalukuyang aktibong term |
 
 ---
 
 ### TABLE 7: `sections` (Mga Pangkat)
-Nagtatakda ng mga seksyon at quota capacity.
+Nagtatakda ng mga seksyon at quota capacity para sa bawat baitang at school year.
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -145,7 +146,7 @@ Nagtatakda ng mga seksyon at quota capacity.
 | `gradeLevel` | INT | No | CHECK (7-12) | None | Antas ng klase |
 | `strand` | VARCHAR(50) | Yes | None | NULL | Strand kung SHS; NULL kung JHS |
 | `capacity` | INT | No | CHECK (> 0) | 40 | Quota capacity ng pangkat |
-| `schoolYear` | VARCHAR(20) | No | None | '2026-2027' | Taong panuruan |
+| `schoolYear` | VARCHAR(20) | No | None | None | Taong panuruan ng seksyon |
 
 ---
 
@@ -163,7 +164,7 @@ Pasilidad ng paaralan upang maiwasan ang room clashes.
 ---
 
 ### TABLE 9: `course_subjects` (Mga Asignatura)
-Sumusunod sa opisyal na DepEd 2026 Three-Term Curriculum (Table 5 at Table 6 ng DepEd Order No. 009, s. 2026).
+Sumusuporta sa mga asignatura para sa Junior at Senior High School bawat trimester.
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -192,12 +193,12 @@ Ugnayan ng oras, guro, silid, seksyon, at asignatura.
 | `startTime` | TIME | No | None | None | Simula ng klase (e.g., 08:00) |
 | `endTime` | TIME | No | CHECK (> startTime)| None | Tapos ng klase (e.g., 09:00) |
 | `trimester` | INT | No | CHECK (1-3) | None | Termino kung kailan gaganapin |
-| `schoolYear` | VARCHAR(20) | No | None | '2026-2027' | Taong panuruan |
+| `schoolYear` | VARCHAR(20) | No | None | None | Taong panuruan |
 
 ---
 
 ### TABLE 11: `enrollment_applications` (Mga Aplikasyon sa Pagpapatala)
-Nangangasiwa sa mga aplikasyon kasama ang Late Enrollment verification.
+Nangangasiwa sa mga aplikasyon kung saan ang status at late enrollment flag ay nakabatay sa dynamic setting ng IT Support.
 
 | Column Name | Data Type | Nullable | Constraint | Default | Deskripsyon / Paliwanag |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -205,11 +206,11 @@ Nangangasiwa sa mga aplikasyon kasama ang Late Enrollment verification.
 | `applicationId` | VARCHAR(30) | No | UNIQUE | None | Tracking code para sa estudyante |
 | `studentId` | UUID | No | FOREIGN KEY | None | Ugnayan sa `students.id` |
 | `applicantType` | VARCHAR(20) | No | CHECK | None | 'Grade 7', 'Grade 11', 'Transferee', 'Returning' |
-| `schoolYear` | VARCHAR(20) | No | None | '2026-2027' | Taong panuruan ng aplikasyon |
+| `schoolYear` | VARCHAR(20) | No | None | None | Taong panuruan ng aplikasyon |
 | `targetGradeLevel`| INT | No | CHECK (7-12) | None | Antas na papasukan |
 | `targetStrand` | VARCHAR(50) | Yes | None | NULL | Piniling strand kung Senior High |
 | `status` | VARCHAR(20) | No | CHECK | 'Pending' | 'Pending', 'Approved', 'Needs Revision' |
-| `isLateEnrollee` | BOOLEAN | No | None | FALSE | TRUE kung naisumite pagkalipas ng June 5, 2026 |
+| `isLateEnrollee` | BOOLEAN | No | None | FALSE | TRUE kung lumampas sa regular registration window |
 | `submittedDocuments`| JSONB | No | None | '[]'::jsonb | Mga paths ng dokumento sa S3 bucket |
 | `selectedElectives` | JSONB | Yes | None | '[]'::jsonb | Mga piniling cross-strand electives |
 | `adminFeedback` | TEXT | Yes | None | NULL | Dahilan kung minarkahang 'Needs Revision' |

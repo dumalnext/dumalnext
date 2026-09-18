@@ -112,9 +112,7 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
 - [x] `.env.local` configured with Supabase Project `fvybtqghtuarjzlpbwnr`
 - [x] Supabase SQL schema executed in Supabase SQL Editor (All tables, RLS, & seed data active)
 - [x] Vercel deployment connected to GitHub repo and Supabase
-- [x] **DepEd ORDER No. 009, s. 2026 Integrated**:
-  - Three-Term Calendar (Term 1: 69 days, Term 2: 65 days, Term 3: 67 days = 201 Class Days)
-  - Regular Enrollment: June 1–5, 2026
-  - Late Enrollment Cutoff: July 28, 2026 (Date ng 2nd Summative Test ng Term 1)
-  - Official DepEd Curriculum Subjects para sa JHS (Table 5) at SHS (Table 6: Max 5 Core Subjects)
-  - End-of-Term 10-day cycle (Araw 1–5 ARAL/Grado, Araw 6 Report Cards, Araw 7–8 INSET, Araw 9–10 Wellness Break)
+- [x] **Dinamikong DepEd Three-Term Calendar (Walang Hardcoded Dates)**:
+  - Ang mga petsa ng bawat termino (Term 1, Term 2, Term 3), school year, exam dates, at report card distribution ay HINDI naka-hardcode.
+  - Dinamiko itong ise-set at iko-configure ng **IT Support** o **School Administrator** taon-taon batay sa inilalabas na taunang DepEd Order.
+  - Ang schema sa `academic_terms` ay handa para sa dynamic creation ng school year configurations.
