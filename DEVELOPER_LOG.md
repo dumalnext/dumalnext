@@ -161,5 +161,25 @@ Base sa naaprubahang Class Diagram (Activity 4) at System Architecture (Activity
     1. **Regular Basic Education Curriculum (Standard JHS)**
     2. **Special Program in Sports (SPS - DepEd Special Curricular Program)**
   - Naka-map sa database at awtomatikong lumalabas sa PDF form at enrollment summary bilang gabay sa Sectioning at Sports Coaching schedule deconfliction.
+- [x] **Hakbang 2: Learner's Personal Information (Learner Profile) sa Student Portal**:
+  - Matagumpay na nagawa at ikinonekta ang `apps/student/components/forms/enrollment/Step2LearnerProfile.tsx` at ang katapat nitong kopya sa root `components/forms/enrollment/Step2LearnerProfile.tsx`.
+  - **Part A: Official DepEd Identifiers**:
+    - 12-digit Learner Reference Number (LRN) validation na may "No LRN yet (For first-time enrollees without prior LIS registration)" toggle para sa bagong papasok na mag-aaral.
+    - Philippine Statistics Authority (PSA) Birth Certificate Number field.
+  - **Part B: Civil Registry Full Legal Name**:
+    - Last Name, First Name, Middle Name (may "No Middle Name" checkbox para sa mga may civil registry status na walang middle name), at Name Extension (Jr., III, etc.).
+  - **Part C: Demographics & Smart Age Calculator**:
+    - Date of Birth selector na may **Smart Age Calculator** na awtomatikong nagko-compute ng tumpak na edad ng mag-aaral sa oras na piliin ang kanyang kaarawan nang hindi na kailangang manual na kalkulahin o ipasok.
+    - Sex Selection (Male / Female), Place of Birth (Municipality/City), Mother Tongue (Ilokano bilang default para sa Dumalneg), at Relihiyon.
+  - **Part D: Indigenous Cultural Community (IP) & 4Ps Beneficiary**:
+    - Indigenous Cultural Community (IP) toggle na may quick preset buttons para sa mga katutubong pamayanan sa Dumalneg at karatig-bayan: **Isnag**, **Itneg**, at **Tingguian**.
+    - Pantawid Pamilyang Pilipino Program (4Ps) Beneficiary toggle na may strict validation para sa 16-digit 4Ps Household ID Number.
+  - **Part E: Residential Address & Smart Mirroring**:
+    - Kasalukuyang Tirahan (House No., Sitio/Purok, Barangay na may opisyal na dropdown ng 4 na barangay ng Dumalneg: Cabaritan, Kalabakan, Quibel, San Isidro, Municipality: Dumalneg, Province: Ilocos Norte, Zip Code: 2921).
+    - Permanenteng Tirahan na may "Same as Current Address" smart toggle na awtomatikong nagko-kopya at nagmi-mirror ng kasalukuyang tirahan nang walang paulit-ulit na pag-type.
+    - Opisyal na 11-digit mobile contact number (`09XXXXXXXXX`).
+  - **Zero Emojis & Strict Academic English**: Ganap na walang emojis at decorative icons alinsunod sa DepEd Navy Blue (`#002060`) identity.
+  - Na-verify sa pamamagitan ng `npm run build:student` at `npx tsc --noEmit` na may 0 errors, at naka-commit at push na sa GitHub `main`.
+
 
 
