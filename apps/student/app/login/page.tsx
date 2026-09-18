@@ -9,6 +9,10 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
+  React.useEffect(() => {
+    router.replace("/?tab=signin");
+  }, [router]);
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

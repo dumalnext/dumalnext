@@ -44,13 +44,13 @@ export default function StudentHeaderNav() {
       ) : (
         <div className="flex items-center gap-2 pl-2 border-l border-blue-400/40">
           <Link
-            href="/login"
+            href="/?tab=signin"
             className="text-slate-200 hover:text-white font-bold uppercase tracking-wider py-1 px-2.5 hover:bg-blue-900/60 transition-colors"
           >
             Sign In
           </Link>
           <Link
-            href="/register"
+            href="/?tab=register"
             className="bg-white text-[#002060] font-bold uppercase tracking-wider py-1 px-3 hover:bg-slate-100 transition-colors shadow-xs"
           >
             Register

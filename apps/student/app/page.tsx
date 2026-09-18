@@ -1,17 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 
-export default function StudentHomePage() {
+function StudentHomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabQuery = searchParams.get("tab");
   const { user, login, register, logout } = useAuth();
 
   // Active Tab for Visitors: "signin" | "register"
-  const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
+  const [activeTab, setActiveTab] = useState<"signin" | "register">(
+    tabQuery === "register" ? "register" : "signin"
+  );
+
+  // Sync tab with URL query parameter
+  useEffect(() => {
+    if (tabQuery === "register") {
+      setActiveTab("register");
+    } else if (tabQuery === "signin") {
+      setActiveTab("signin");
+    }
+  }, [tabQuery]);
 
   // Sign In Form State (Phase 1: Email First)
   const [loginEmail, setLoginEmail] = useState("");
@@ -709,6 +722,20 @@ export default function StudentHomePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function StudentHomePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-8 text-center text-xs font-mono text-slate-500">
+          Loading Dumalneg NHS Student Portal...
+        </div>
+      }
+    >
+      <StudentHomeContent />
+    </Suspense>
   );
 }
 

@@ -9,6 +9,10 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
 
+  React.useEffect(() => {
+    router.replace("/?tab=register");
+  }, [router]);
+
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
