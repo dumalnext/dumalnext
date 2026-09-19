@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAdminAuth } from "@/lib/auth/authContext";
 
 interface AdminHeaderNavProps {
@@ -10,10 +11,33 @@ interface AdminHeaderNavProps {
 }
 
 export default function AdminHeaderNav({
-  activeSection = "adjudication",
+  activeSection,
   onSelectSection,
 }: AdminHeaderNavProps) {
   const { user, logout } = useAdminAuth();
+  const pathname = usePathname() || "";
+
+  // Determine active tab from URL path or prop fallback
+  const isAdjudication =
+    activeSection === "adjudication" ||
+    pathname === "/adjudication" ||
+    pathname === "/" ||
+    pathname === "/1";
+
+  const isSections =
+    activeSection === "sections" ||
+    pathname.startsWith("/sections") ||
+    pathname === "/2";
+
+  const isScheduling =
+    activeSection === "scheduling" ||
+    pathname.startsWith("/scheduling") ||
+    pathname === "/3";
+
+  const isControl =
+    activeSection === "control" ||
+    pathname.startsWith("/control-room") ||
+    pathname === "/4";
 
   return (
     <header className="deped-header border-b-4 border-[#002060] bg-white text-slate-900 shadow-sm font-sans">
@@ -75,50 +99,50 @@ export default function AdminHeaderNav({
       {user && (
         <div className="bg-slate-100 border-t border-b border-slate-300 px-4 sm:px-8">
           <div className="max-w-7xl mx-auto flex flex-wrap gap-1 text-xs font-bold uppercase tracking-wider">
-            <button
-              type="button"
+            <Link
+              href="/adjudication"
               onClick={() => onSelectSection?.("adjudication")}
               className={`py-3 px-4 border-b-2 transition-colors ${
-                activeSection === "adjudication"
+                isAdjudication
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
               1. Enrollment Adjudication Console
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href="/sections"
               onClick={() => onSelectSection?.("sections")}
               className={`py-3 px-4 border-b-2 transition-colors ${
-                activeSection === "sections"
+                isSections
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
               2. Section Quota &amp; Capacity Control
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href="/scheduling"
               onClick={() => onSelectSection?.("scheduling")}
               className={`py-3 px-4 border-b-2 transition-colors ${
-                activeSection === "scheduling"
+                isScheduling
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
               3. Automated Schedule Deconfliction
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href="/control-room"
               onClick={() => onSelectSection?.("control")}
               className={`py-3 px-4 border-b-2 transition-colors ${
-                activeSection === "control"
+                isControl
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
               4. Enrollment Control Room &amp; Operations
-            </button>
+            </Link>
           </div>
         </div>
       )}
