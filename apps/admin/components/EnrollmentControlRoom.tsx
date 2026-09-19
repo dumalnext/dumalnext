@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export interface EnrollmentControlSettings {
   isEnrollmentOpen: boolean;
@@ -31,7 +32,10 @@ export default function EnrollmentControlRoom() {
   const loadSettings = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/enrollment-control", { cache: "no-store" });
+      const res = await fetch(`/api/enrollment-control?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Pragma": "no-cache" },
+      });
       if (res.ok) {
         const data = await res.json();
         setSettings({
@@ -58,9 +62,8 @@ export default function EnrollmentControlRoom() {
     loadSettings();
   }, []);
 
-  // Save settings
-  const handleSave = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  // Save settings and broadcast in real-time across Supabase and BroadcastChannel
+  const saveAndBroadcast = async (targetSettings: EnrollmentControlSettings) => {
     setIsSaving(true);
     setSaveSuccess("");
     setSaveError("");
@@ -69,7 +72,7 @@ export default function EnrollmentControlRoom() {
       const res = await fetch("/api/enrollment-control", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(targetSettings),
       });
 
       if (!res.ok) {
@@ -79,9 +82,40 @@ export default function EnrollmentControlRoom() {
       const data = await res.json();
       if (data.success) {
         setSettings(data.settings);
+        const statusText = data.settings.isEnrollmentOpen ? "OPEN (Active)" : "CLOSED (Offline)";
         setSaveSuccess(
-          `Enrollment Control settings successfully saved and locked for School Year ${data.settings.schoolYear}. Student portal updated in real-time.`
+          `Real-Time Broadcast: Online Enrollment is now ${statusText} for School Year ${data.settings.schoolYear}. Student portal updated instantly.`
         );
+
+        // 1. Supabase Realtime WebSocket Push (instant sync across any port or device)
+        try {
+          const supabase = createClient();
+          const channel = supabase.channel("enrollment-control-realtime");
+          channel.subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              channel.send({
+                type: "broadcast",
+                event: "enrollment-settings-updated",
+                payload: data.settings,
+              });
+            }
+          });
+        } catch (e) {
+          console.warn("Supabase realtime broadcast notice:", e);
+        }
+
+        // 2. BroadcastChannel for instant local cross-tab / cross-port communication
+        try {
+          if (typeof BroadcastChannel !== "undefined") {
+            const bc = new BroadcastChannel("dumalnext-enrollment-control");
+            bc.postMessage(data.settings);
+            bc.close();
+          }
+        } catch (e) {
+          console.warn("BroadcastChannel notice:", e);
+        }
+
+        // 3. Window events
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
           window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
@@ -94,6 +128,24 @@ export default function EnrollmentControlRoom() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Instant toggle switch handler: Saves and broadcasts immediately on click!
+  const handleToggleSwitch = async () => {
+    const nextState = !settings.isEnrollmentOpen;
+    const updated: EnrollmentControlSettings = {
+      ...settings,
+      isEnrollmentOpen: nextState,
+      updatedAt: new Date().toISOString(),
+    };
+    setSettings(updated);
+    await saveAndBroadcast(updated);
+  };
+
+  // Save settings from form submission
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    await saveAndBroadcast(settings);
   };
 
   return (
@@ -216,24 +268,24 @@ export default function EnrollmentControlRoom() {
           <div className="shrink-0 flex flex-col items-end gap-1.5">
             <button
               type="button"
-              onClick={() => {
-                setSettings((prev) => ({
-                  ...prev,
-                  isEnrollmentOpen: !prev.isEnrollmentOpen,
-                }));
-              }}
-              className={`px-6 py-3.5 text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-sm border-2 cursor-pointer ${
+              onClick={handleToggleSwitch}
+              disabled={isSaving}
+              className={`px-6 py-3.5 text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-sm border-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
                 settings.isEnrollmentOpen
                   ? "bg-red-700 hover:bg-red-800 text-white border-red-900"
                   : "bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-900"
               }`}
             >
-              {settings.isEnrollmentOpen
-                ? "[ TURN OFF / CLOSE ENROLLMENT ]"
-                : "[ TURN ON / OPEN ENROLLMENT ]"}
+              {isSaving ? (
+                "[ BROADCASTING REALTIME STATUS... ]"
+              ) : settings.isEnrollmentOpen ? (
+                "[ TURN OFF / CLOSE ENROLLMENT ]"
+              ) : (
+                "[ TURN ON / OPEN ENROLLMENT ]"
+              )}
             </button>
             <span className="text-[10px] font-mono text-slate-500">
-              Click to toggle state &bull; Remember to click &ldquo;Save Controls&rdquo; below
+              Click to toggle &bull; Broadcasts instantly to student portal in real-time
             </span>
           </div>
         </div>

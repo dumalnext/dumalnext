@@ -2,14 +2,19 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// Path to shared configuration file at monorepo root
-const configPath = path.resolve(process.cwd(), "../../config/enrollment-control.json");
-const fallbackConfigPath = path.resolve(process.cwd(), "config/enrollment-control.json");
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function getConfigFilePath(): string {
-  if (fs.existsSync(configPath)) return configPath;
-  if (fs.existsSync(fallbackConfigPath)) return fallbackConfigPath;
-  return configPath;
+  const possiblePaths = [
+    path.resolve(process.cwd(), "config/enrollment-control.json"),
+    path.resolve(process.cwd(), "../../config/enrollment-control.json"),
+    path.resolve(process.cwd(), "../config/enrollment-control.json"),
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return possiblePaths[0];
 }
 
 const defaultSettings = {
@@ -24,6 +29,12 @@ const defaultSettings = {
   updatedBy: "School Administrator (DNHS-ADM-001)",
 };
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  "Pragma": "no-cache",
+  "Expires": "0",
+};
+
 export async function GET() {
   try {
     const filePath = getConfigFilePath();
@@ -31,7 +42,7 @@ export async function GET() {
       const content = fs.readFileSync(filePath, "utf-8");
       const data = JSON.parse(content);
       return NextResponse.json(data, {
-        headers: { "Cache-Control": "no-store, max-age=0" },
+        headers: NO_CACHE_HEADERS,
       });
     }
   } catch (err) {
@@ -39,7 +50,7 @@ export async function GET() {
   }
 
   return NextResponse.json(defaultSettings, {
-    headers: { "Cache-Control": "no-store, max-age=0" },
+    headers: NO_CACHE_HEADERS,
   });
 }
 
@@ -75,13 +86,13 @@ export async function POST(req: Request) {
     fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), "utf-8");
 
     return NextResponse.json({ success: true, settings: updated }, {
-      headers: { "Cache-Control": "no-store, max-age=0" },
+      headers: NO_CACHE_HEADERS,
     });
   } catch (err: any) {
     console.error("Error writing enrollment control config:", err);
     return NextResponse.json(
       { success: false, error: err?.message || "Failed to update enrollment control settings." },
-      { status: 500 }
+      { status: 500, headers: NO_CACHE_HEADERS }
     );
   }
 }

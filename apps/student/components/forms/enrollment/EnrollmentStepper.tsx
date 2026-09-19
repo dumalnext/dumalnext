@@ -177,7 +177,15 @@ const STEP_LABELS = [
   { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
-export default function EnrollmentStepper({ schoolYear = "2026–2027" }: { schoolYear?: string }) {
+export default function EnrollmentStepper({
+  schoolYear = "2026–2027",
+  isEnrollmentOpen = true,
+  closedMessage,
+}: {
+  schoolYear?: string;
+  isEnrollmentOpen?: boolean;
+  closedMessage?: string;
+}) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [formData, setFormData] = useState<FullEnrollmentFormData>(() => ({
@@ -357,6 +365,52 @@ export default function EnrollmentStepper({ schoolYear = "2026–2027" }: { scho
         <p className="text-sm text-slate-700">
           Verifying student application status with Dumalneg NHS Registrar...
         </p>
+      </div>
+    );
+  }
+
+  // 1.5. Lockout State: Online Enrollment is Closed
+  if (!isEnrollmentOpen) {
+    return (
+      <div className="bg-white border-2 border-red-500 p-6 sm:p-10 text-center space-y-6 font-sans shadow-sm">
+        <div className="border-b-2 border-red-200 pb-4">
+          <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#002060] block">
+            DEPARTMENT OF EDUCATION &bull; REGION I &bull; DUMALNEG NHS
+          </span>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 uppercase tracking-tight">
+            Online Basic Education Enrollment is Currently Closed
+          </h2>
+          <div className="text-xs font-mono text-slate-500 mt-1">
+            SCHOOL YEAR: <strong className="text-[#002060] text-sm">{schoolYear}</strong>
+          </div>
+        </div>
+
+        <div className="p-5 bg-red-50 border-2 border-red-400 text-left space-y-2 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block shrink-0" />
+            <span className="text-xs font-mono font-bold text-red-950 uppercase">
+              [ DEPED OFFICIAL NOTICE: SUBMISSION SYSTEM TEMPORARILY LOCKED ]
+            </span>
+          </div>
+          <p className="text-xs text-red-900 leading-relaxed whitespace-pre-line">
+            {closedMessage || "Online basic education enrollment is currently closed by the Registrar's Office. Please await official announcements regarding enrollment schedules."}
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Link
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider shadow-xs"
+          >
+            Return to Student Home
+          </Link>
+          <Link
+            href="/track"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs uppercase tracking-wider"
+          >
+            Track Existing Application
+          </Link>
+        </div>
       </div>
     );
   }
@@ -660,6 +714,7 @@ export default function EnrollmentStepper({ schoolYear = "2026–2027" }: { scho
         {currentStep === 5 && (
           <Step5DocumentsReview
             data={{ ...formData, schoolYear }}
+            isEnrollmentOpen={isEnrollmentOpen}
             onChange={handleFormDataChange}
             onBack={prevStep}
             existingApplication={existingApp}

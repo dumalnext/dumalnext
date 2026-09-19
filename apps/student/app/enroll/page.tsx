@@ -158,7 +158,11 @@ export default function StudentEnrollPage() {
       </div>
 
       {/* Main Enrollment Stepper */}
-      <EnrollmentStepper schoolYear={schoolYear} />
+      <EnrollmentStepper
+        schoolYear={schoolYear}
+        isEnrollmentOpen={isEnrollmentOpen}
+        closedMessage={closedMessage}
+      />
     </div>
   );
 }

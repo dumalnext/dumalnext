@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export interface EnrollmentControlSettings {
   isEnrollmentOpen: boolean;
@@ -27,7 +28,10 @@ export function useEnrollmentControl() {
 
   const fetchSettings = useCallback(async () => {
     try {
-      const res = await fetch("/api/enrollment-control", { cache: "no-store" });
+      const res = await fetch(`/api/enrollment-control?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Pragma": "no-cache" },
+      });
       if (res.ok) {
         const data = await res.json();
         setSettings({
@@ -51,18 +55,78 @@ export function useEnrollmentControl() {
   }, []);
 
   useEffect(() => {
+    // 1. Initial immediate fetch
     fetchSettings();
 
-    const onFocus = () => fetchSettings();
-    window.addEventListener("focus", onFocus);
-    window.addEventListener("dumalnext:data-changed", onFocus);
+    // 2. Supabase Realtime WebSocket Push (0-millisecond sync across any port/device)
+    const supabase = createClient();
+    const realtimeChannel = supabase
+      .channel("enrollment-control-realtime")
+      .on(
+        "broadcast",
+        { event: "enrollment-settings-updated" },
+        (payload: any) => {
+          const data = payload?.payload;
+          if (data) {
+            setSettings({
+              isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
+              schoolYear: data.schoolYear || "2026–2027",
+              semester: data.semester || "1st Semester",
+              enrollmentStartDate: data.enrollmentStartDate,
+              enrollmentEndDate: data.enrollmentEndDate,
+              closedMessage:
+                data.closedMessage ||
+                "DepEd Official Advisory: Dumalneg National High School Online Enrollment is currently closed.",
+              updatedAt: data.updatedAt,
+              updatedBy: data.updatedBy,
+            });
+            setIsLoading(false);
+          }
+        }
+      )
+      .subscribe();
 
-    // 6-second polling to ensure instant sync when admin changes settings
-    const interval = setInterval(fetchSettings, 6000);
+    // 3. Browser BroadcastChannel for instant local cross-tab communication
+    let bc: BroadcastChannel | null = null;
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        bc = new BroadcastChannel("dumalnext-enrollment-control");
+        bc.onmessage = (event) => {
+          const data = event?.data;
+          if (data) {
+            setSettings({
+              isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
+              schoolYear: data.schoolYear || "2026–2027",
+              semester: data.semester || "1st Semester",
+              enrollmentStartDate: data.enrollmentStartDate,
+              enrollmentEndDate: data.enrollmentEndDate,
+              closedMessage:
+                data.closedMessage ||
+                "DepEd Official Advisory: Dumalneg National High School Online Enrollment is currently closed.",
+              updatedAt: data.updatedAt,
+              updatedBy: data.updatedBy,
+            });
+            setIsLoading(false);
+          }
+        };
+      } catch {}
+    }
+
+    // 4. Window focus & custom events listeners
+    const onSync = () => fetchSettings();
+    window.addEventListener("focus", onSync);
+    window.addEventListener("dumalnext:data-changed", onSync);
+    window.addEventListener("dumalnext:admin-data-changed", onSync);
+
+    // 5. 2-Second Silent Fallback Polling (bypasses cache with timestamp)
+    const interval = setInterval(fetchSettings, 2000);
 
     return () => {
-      window.removeEventListener("focus", onFocus);
-      window.removeEventListener("dumalnext:data-changed", onFocus);
+      supabase.removeChannel(realtimeChannel);
+      if (bc) bc.close();
+      window.removeEventListener("focus", onSync);
+      window.removeEventListener("dumalnext:data-changed", onSync);
+      window.removeEventListener("dumalnext:admin-data-changed", onSync);
       clearInterval(interval);
     };
   }, [fetchSettings]);

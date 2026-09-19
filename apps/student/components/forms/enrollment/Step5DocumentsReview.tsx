@@ -11,6 +11,7 @@ interface Step5DocumentsReviewProps {
   onChange: (fields: Partial<FullEnrollmentFormData>) => void;
   onBack: () => void;
   existingApplication?: any;
+  isEnrollmentOpen?: boolean;
 }
 
 interface UploadedDocState {
@@ -26,6 +27,7 @@ export default function Step5DocumentsReview({
   onChange,
   onBack,
   existingApplication,
+  isEnrollmentOpen = true,
 }: Step5DocumentsReviewProps) {
   const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -231,6 +233,34 @@ export default function Step5DocumentsReview({
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+
+    // Guard: Online Enrollment must be open to submit
+    if (isEnrollmentOpen === false) {
+      alert(
+        `DepEd Official Notice:\nOnline basic education enrollment is currently CLOSED for School Year ${data.schoolYear || "2026–2027"}.\n\nSubmissions cannot be processed at this time.`
+      );
+      if (typeof window !== "undefined") {
+        window.location.href = "/enroll";
+      }
+      return;
+    }
+
+    // Live Server Re-verification: Double check live API with cache busting
+    try {
+      const checkRes = await fetch(`/api/enrollment-control?_t=${Date.now()}`, { cache: "no-store" });
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.isEnrollmentOpen === false) {
+          alert(
+            `DepEd Official Notice:\nOnline basic education enrollment is currently CLOSED for School Year ${checkData.schoolYear || "2026–2027"}.\n\n${checkData.closedMessage || "Submissions cannot be processed at this time."}`
+          );
+          if (typeof window !== "undefined") {
+            window.location.href = "/enroll";
+          }
+          return;
+        }
+      }
+    } catch {}
 
     // Proceed with submission
     setIsSubmitting(true);
