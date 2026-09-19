@@ -120,12 +120,11 @@ export default function Step1ApplicantType({
     const standardLastCompleted = newTargetGrade === 7 ? 6 : newTargetGrade - 1;
     const isSHS = newTargetGrade >= 11;
 
-    // Check if the current lastGradeCompleted is logically valid for this new target
+    // Check if the current lastGradeCompleted is logically valid for this new target (strictly prerequisite or repeater)
     let updatedLastCompleted: number = standardLastCompleted;
     if (
       typeof data.lastGradeCompleted === "number" &&
-      data.lastGradeCompleted <= newTargetGrade &&
-      data.lastGradeCompleted >= standardLastCompleted - 1
+      (data.lastGradeCompleted === standardLastCompleted || data.lastGradeCompleted === newTargetGrade)
     ) {
       updatedLastCompleted = data.lastGradeCompleted;
     }
@@ -169,19 +168,19 @@ export default function Step1ApplicantType({
     }
   };
 
-  // Compute valid available options for "Last Grade Level Completed" based on Target Grade Level
+  // Compute valid available options for "Last Grade Level Completed" based on Target Grade Level (Strictly 2 options)
   const getAvailableCompletedGrades = (targetGrade: number | "") => {
     if (!targetGrade || typeof targetGrade !== "number") {
       return [
         { value: 6, label: "Grade 6 (Elementary Completer)" },
-        { value: 7, label: "Grade 7 (Repeater / Discontinued during Grade 7)" },
+        { value: 7, label: "Grade 7 (Repeater / Retained in Grade 7)" },
       ];
     }
 
-    const options: { value: number; label: string }[] = [];
     const prerequisiteGrade = targetGrade - 1;
+    const options: { value: number; label: string }[] = [];
 
-    // 1. Standard Progression / Prerequisite Option
+    // 1. Standard Progression / Prerequisite Option (Completed the immediately preceding grade)
     if (prerequisiteGrade === 6) {
       options.push({ value: 6, label: "Grade 6 (Elementary Completer)" });
     } else if (prerequisiteGrade === 10) {
@@ -190,19 +189,11 @@ export default function Step1ApplicantType({
       options.push({ value: prerequisiteGrade, label: `Grade ${prerequisiteGrade} Completer` });
     }
 
-    // 2. Repeater Option (Always available for every grade level 7 to 12)
+    // 2. Repeater Option (Retained or repeating the same target grade level)
     options.push({
       value: targetGrade,
-      label: `Grade ${targetGrade} (Repeater / Retained in Grade ${targetGrade} / Discontinued)`,
+      label: `Grade ${targetGrade} (Repeater / Retained in Grade ${targetGrade})`,
     });
-
-    // 3. Fallback for returning students who stopped earlier
-    if (prerequisiteGrade - 1 >= 6) {
-      options.push({
-        value: prerequisiteGrade - 1,
-        label: prerequisiteGrade - 1 === 6 ? "Grade 6 (Elementary Completer)" : `Grade ${prerequisiteGrade - 1} Completer`,
-      });
-    }
 
     return options;
   };
