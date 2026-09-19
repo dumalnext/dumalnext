@@ -38,10 +38,22 @@ export interface EnrolledStudent {
   barangay?: string | null;
 }
 
+export interface RegisteredTeacher {
+  id: string;
+  teacher_id?: string;
+  first_name: string;
+  middle_name?: string | null;
+  last_name: string;
+  email?: string | null;
+  department?: string | null;
+  fullName: string;
+}
+
 export default function SectionQuotaConsole() {
   const supabase = createClient();
 
   const [sections, setSections] = useState<SectionDetail[]>([]);
+  const [teachersList, setTeachersList] = useState<RegisteredTeacher[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [gradeFilter, setGradeFilter] = useState<string>("ALL");
 
@@ -206,10 +218,47 @@ export default function SectionQuotaConsole() {
     }
   };
 
+  // Fetch registered teachers for adviser dropdown
+  const fetchTeachers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("teachers")
+        .select("id, teacher_id, first_name, middle_name, last_name, email, department")
+        .order("last_name", { ascending: true })
+        .order("first_name", { ascending: true });
+
+      if (error) {
+        console.warn("Notice querying teachers for dropdown:", error.message);
+        return;
+      }
+
+      if (data) {
+        const mapped: RegisteredTeacher[] = data.map((t: any) => {
+          const middle = t.middle_name ? ` ${t.middle_name}` : "";
+          const fullName = `${t.first_name}${middle} ${t.last_name}`.trim();
+          return {
+            id: t.id,
+            teacher_id: t.teacher_id,
+            first_name: t.first_name,
+            middle_name: t.middle_name,
+            last_name: t.last_name,
+            email: t.email,
+            department: t.department,
+            fullName: fullName || t.email || "Faculty Member",
+          };
+        });
+        setTeachersList(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to fetch teachers for dropdown:", err);
+    }
+  };
+
   useEffect(() => {
     fetchSections();
+    fetchTeachers();
 
-    // Real-time subscription to sections and students
+    // Real-time subscription to sections, teachers, students, and enrollment_applications
     const channel = supabase
       .channel("admin-sections-quota-channel")
       .on(
@@ -220,7 +269,10 @@ export default function SectionQuotaConsole() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "teachers" },
-        () => fetchSections(true)
+        () => {
+          fetchSections(true);
+          fetchTeachers();
+        }
       )
       .on(
         "postgres_changes",
@@ -234,9 +286,13 @@ export default function SectionQuotaConsole() {
       )
       .subscribe();
 
-    const handleCustomEvent = () => fetchSections(true);
+    const handleCustomEvent = () => {
+      fetchSections(true);
+      fetchTeachers();
+    };
     if (typeof window !== "undefined") {
       window.addEventListener("dumalnext:data-changed", handleCustomEvent);
+      window.addEventListener("dumalnext:teacher-data-changed", handleCustomEvent);
       window.addEventListener("dumalnext:admin-data-changed", handleCustomEvent);
     }
 
@@ -244,6 +300,7 @@ export default function SectionQuotaConsole() {
       supabase.removeChannel(channel);
       if (typeof window !== "undefined") {
         window.removeEventListener("dumalnext:data-changed", handleCustomEvent);
+        window.removeEventListener("dumalnext:teacher-data-changed", handleCustomEvent);
         window.removeEventListener("dumalnext:admin-data-changed", handleCustomEvent);
       }
     };
@@ -887,16 +944,31 @@ export default function SectionQuotaConsole() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Class Adviser Name
-                  </label>
-                  <input
-                    type="text"
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                      Class Adviser / Teacher
+                    </label>
+                    <span className="text-[10px] font-mono text-[#002060] uppercase">
+                      [ Registered Faculty: {teachersList.length} ]
+                    </span>
+                  </div>
+                  <select
                     value={newAdviser}
                     onChange={(e) => setNewAdviser(e.target.value)}
-                    placeholder="e.g. Ms. Maria Santos"
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none"
-                  />
+                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
+                  >
+                    <option value="">-- Select Registered Teacher (Optional) --</option>
+                    {teachersList.map((t) => (
+                      <option key={t.id} value={t.fullName}>
+                        {t.fullName} {t.email ? `(${t.email})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                  {teachersList.length === 0 && (
+                    <p className="text-[11px] text-amber-700 mt-1">
+                      No registered faculty accounts found in database.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -1026,16 +1098,32 @@ export default function SectionQuotaConsole() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Class Adviser Name
-                  </label>
-                  <input
-                    type="text"
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                      Class Adviser / Teacher
+                    </label>
+                    <span className="text-[10px] font-mono text-[#002060] uppercase">
+                      [ Registered Faculty: {teachersList.length} ]
+                    </span>
+                  </div>
+                  <select
                     value={editAdviser}
                     onChange={(e) => setEditAdviser(e.target.value)}
-                    placeholder="e.g. Ms. Maria Santos"
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none"
-                  />
+                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
+                  >
+                    <option value="">-- Select Registered Teacher (Unassigned) --</option>
+                    {/* If editAdviser is already set to a custom or legacy name not yet in teachersList, preserve it as an option */}
+                    {editAdviser && !teachersList.some((t) => t.fullName === editAdviser) && (
+                      <option value={editAdviser}>
+                        {editAdviser} (Current Adviser)
+                      </option>
+                    )}
+                    {teachersList.map((t) => (
+                      <option key={t.id} value={t.fullName}>
+                        {t.fullName} {t.email ? `(${t.email})` : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
