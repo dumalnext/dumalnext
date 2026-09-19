@@ -43,9 +43,9 @@ export default function Step3FamilyBackground({
     data.motherMiddleName === "N/A" || data.motherMiddleName === "NONE"
   );
 
-  // Guardian availability & middle name states (open by default, optional if living with parents)
+  // Guardian availability: Checked by default if living with parents (optional unless learner lives with a guardian)
   const [hasNoGuardian, setHasNoGuardian] = useState<boolean>(
-    data.guardianLastName === "N/A"
+    data.guardianLastName === "N/A" || (!data.guardianLastName && data.primaryContactPerson !== "Guardian")
   );
   const [hasNoGuardianMiddleName, setHasNoGuardianMiddleName] = useState<boolean>(
     data.guardianMiddleName === "N/A" || data.guardianMiddleName === "NONE"
@@ -751,10 +751,10 @@ export default function Step3FamilyBackground({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section C: Legal Guardian / Authorized Custodian ]
+              [ Section C: Legal Guardian / Authorized Custodian (Optional) ]
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
-              Fill out if the learner is living with a relative, grandparent, or guardian (e.g., parents working away or OFW).
+              Fill out ONLY if the learner lives with a relative, grandparent, or guardian (e.g. OFW parents). If living with parents, keep the box checked.
             </p>
           </div>
           <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300">
@@ -769,8 +769,13 @@ export default function Step3FamilyBackground({
         </div>
 
         {hasNoGuardian ? (
-          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic">
-            The learner is designated as living with parents. A separate legal guardian entry is not required. (Uncheck this box or select Legal Guardian as Primary Contact above to enter guardian details.)
+          <div className="p-4 bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 font-medium space-y-1">
+            <div className="font-bold uppercase tracking-wider text-emerald-900">
+              [ LIVING WITH PARENTS &bull; NO GUARDIAN ENTRY REQUIRED ]
+            </div>
+            <p>
+              The learner lives with their parents (Father and/or Mother). A separate legal guardian is not required. (If the student lives with a relative or guardian instead, uncheck the box above or select Legal Guardian as Primary Contact).
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
