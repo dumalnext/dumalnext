@@ -369,15 +369,18 @@ function StudentHomeContent() {
                   </div>
                   <div>
                     {userApplication.status === "Approved" ? (
-                      <span className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-900 border-2 border-emerald-500">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-emerald-600 border border-emerald-700 shrink-0" />
                         [ STATUS: APPROVED &amp; OFFICIALLY ENROLLED ]
                       </span>
                     ) : userApplication.status === "Needs Revision" ? (
-                      <span className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-red-50 text-red-900 border-2 border-red-500">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-red-50 text-red-900 border-2 border-red-500 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-red-600 border border-red-700 shrink-0" />
                         [ STATUS: NEEDS REVISION / ACTION REQUIRED ]
                       </span>
                     ) : (
-                      <span className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border-2 border-amber-400">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 border border-amber-600 shrink-0" />
                         [ STATUS: PENDING REGISTRAR VERIFICATION ]
                       </span>
                     )}
