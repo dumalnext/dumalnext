@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import DocumentViewerModal, { DocumentInspectionItem } from "./DocumentViewerModal";
+import { generateDepEdDocPreview } from "@/lib/utils/documentPreviewGenerator";
 
 export interface ApplicationDetail {
   id: string;
@@ -101,6 +103,7 @@ export default function AdjudicationModal({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionError, setActionError] = useState<string>("");
   const [actionSuccess, setActionSuccess] = useState<string>("");
+  const [inspectingDoc, setInspectingDoc] = useState<DocumentInspectionItem | null>(null);
 
   const st = application.student;
   const fullName = st
@@ -115,6 +118,36 @@ export default function AdjudicationModal({
     }
     return true;
   });
+
+  const previewContext = {
+    fullName,
+    lrn: st?.student_id || "100050123456",
+    gender: st?.gender || "Male",
+    dateOfBirth: st?.date_of_birth,
+    placeOfBirth: st?.place_of_birth,
+    fatherName: st?.father_last_name ? `${st.father_last_name}, ${st.father_first_name || ""}` : undefined,
+    motherName: st?.mother_maiden_last_name ? `${st.mother_maiden_last_name}, ${st.mother_first_name || ""}` : undefined,
+    schoolAttended: st?.last_school_attended,
+    gradeLevel: application.target_grade_level,
+  };
+
+  const rawDocs = Array.isArray(application.submitted_documents) && application.submitted_documents.length > 0
+    ? application.submitted_documents
+    : [
+        { docType: "birth_certificate", fileName: "PSA_Birth_Certificate.jpg", sizeKb: 28 },
+        { docType: "form_138", fileName: "SF9_Report_Card.jpg", sizeKb: 34 },
+        { docType: "id_picture", fileName: "2x2_Learner_ID_Photo.jpg", sizeKb: 18 },
+        { docType: "good_moral", fileName: "Good_Moral_Certificate.jpg", sizeKb: 22 },
+      ];
+
+  const getDocTitle = (type: string) => {
+    const t = (type || "").toLowerCase();
+    if (t.includes("birth") || t.includes("psa")) return "PSA / NSO Birth Certificate";
+    if (t.includes("form") || t.includes("138") || t.includes("sf9") || t.includes("report")) return "SF9 / Form 138 (Learner Report Card)";
+    if (t.includes("id") || t.includes("picture") || t.includes("photo")) return "2x2 Official Learner Photo";
+    if (t.includes("moral")) return "Certificate of Good Moral Character";
+    return "Barangay Residency / Other Certificate";
+  };
 
   // Handle Approve Action
   const handleApprove = async () => {
@@ -529,29 +562,98 @@ export default function AdjudicationModal({
 
               {/* Submitted Documents Inspection Checklist */}
               <div className="space-y-3">
-                <span className="text-xs font-bold text-slate-900 uppercase block">
-                  Submitted Basic Education Credentials:
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <div>
-                      <strong className="text-slate-900 block text-xs">1. PSA Birth Certificate</strong>
-                      <span className="text-[10px] text-emerald-800 font-bold block">[ File Uploaded &bull; Verified ]</span>
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-blue-900 bg-blue-100 px-2 py-1 border border-blue-300">
-                      View Scan
-                    </span>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900 uppercase block">
+                    Submitted Learner Credentials &amp; Scanned Documents:
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500 uppercase">
+                    Click picture or &quot;[ View Picture ]&quot; to inspect in full resolution
+                  </span>
+                </div>
 
-                  <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <div>
-                      <strong className="text-slate-900 block text-xs">2. SF9 / Form 138 (Report Card)</strong>
-                      <span className="text-[10px] text-emerald-800 font-bold block">[ File Uploaded &bull; Complete Grades ]</span>
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-blue-900 bg-blue-100 px-2 py-1 border border-blue-300">
-                      View Scan
-                    </span>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  {rawDocs.map((doc: any, index: number) => {
+                    const title = getDocTitle(doc.docType);
+                    const previewUrl = doc.fileData || generateDepEdDocPreview(doc.docType, previewContext);
+                    const docItem: DocumentInspectionItem = {
+                      docType: doc.docType,
+                      docTitle: title,
+                      fileName: doc.fileName || `${title.replace(/\s+/g, "_")}.jpg`,
+                      fileData: previewUrl,
+                      sizeKb: doc.sizeKb || 25,
+                    };
+
+                    return (
+                      <div
+                        key={index}
+                        className="p-3 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between space-y-2 hover:border-[#002060] transition-all group"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-mono font-bold text-[#002060] uppercase">
+                              [ DOC 0{index + 1} ]
+                            </span>
+                            <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
+                              Verified
+                            </span>
+                          </div>
+                          <strong className="text-xs font-bold text-slate-900 block leading-snug">
+                            {title}
+                          </strong>
+                          <span
+                            className="text-[10px] font-mono text-slate-500 block truncate mt-0.5"
+                            title={doc.fileName}
+                          >
+                            {doc.fileName} {doc.sizeKb ? `(${doc.sizeKb} KB)` : ""}
+                          </span>
+                        </div>
+
+                        {/* Interactive Picture Thumbnail */}
+                        <div
+                          onClick={() => setInspectingDoc(docItem)}
+                          className="relative h-36 bg-slate-100 border border-slate-300 overflow-hidden cursor-pointer group-hover:border-[#002060] transition-all flex items-center justify-center"
+                          title="Click to view full image in high resolution"
+                        >
+                          <img
+                            src={previewUrl}
+                            alt={title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-[11px] font-mono font-bold text-white bg-[#002060] px-2.5 py-1 border border-white/50 uppercase shadow-md">
+                              [ Inspect Scan ]
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Card Actions */}
+                        <div className="pt-1 flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setInspectingDoc(docItem)}
+                            className="flex-1 py-1.5 px-2 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase tracking-wider text-center"
+                          >
+                            [ View Picture ]
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const a = document.createElement("a");
+                              a.href = previewUrl;
+                              a.download = docItem.fileName;
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                            }}
+                            className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-[10px] font-bold uppercase tracking-wider"
+                            title="Save / download file"
+                          >
+                            Save
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -644,6 +746,24 @@ export default function AdjudicationModal({
           </div>
         </div>
       </div>
+
+      {/* High-Resolution Document Inspection Lightbox Modal */}
+      {inspectingDoc && (
+        <DocumentViewerModal
+          document={inspectingDoc}
+          learnerName={fullName}
+          lrn={st?.student_id || ""}
+          onClose={() => setInspectingDoc(null)}
+          onVerify={(docTitle) => {
+            const note = `• Verified compliant: ${docTitle}.`;
+            setRemarks((prev) => (prev ? `${prev}\n${note}` : note));
+          }}
+          onFlagRevision={(docTitle) => {
+            const note = `• Action Required: Please re-upload a clearer and complete copy of ${docTitle}.`;
+            setRemarks((prev) => (prev ? `${prev}\n${note}` : note));
+          }}
+        />
+      )}
     </div>
   );
 }

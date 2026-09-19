@@ -88,8 +88,12 @@ export default function Step5DocumentsReview({
         finalDataUrl = result.dataUrl;
         compressedKb = Math.round(result.compressedSize / 1024);
       } else {
-        // PDF or other document
-        finalDataUrl = URL.createObjectURL(file);
+        // PDF or other document - convert to Data URL
+        finalDataUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string || "");
+          reader.readAsDataURL(file);
+        });
       }
 
       setDocs((prev) => ({
@@ -267,7 +271,12 @@ export default function Step5DocumentsReview({
               status: "Pending",
               submitted_documents: Object.entries(docs)
                 .filter(([_, v]) => v !== null)
-                .map(([k, v]) => ({ docType: k, fileName: v?.file.name, sizeKb: v?.compressedSizeKb })),
+                .map(([k, v]) => ({
+                  docType: k,
+                  fileName: v?.file.name,
+                  sizeKb: v?.compressedSizeKb,
+                  fileData: v?.previewUrl || null,
+                })),
             });
 
           if (appErr) {
