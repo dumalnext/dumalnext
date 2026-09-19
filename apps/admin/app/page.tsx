@@ -525,29 +525,11 @@ export default function AdminHomePage() {
                 </h2>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2">
                 {/* Live Real-time Status Badge */}
                 <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 border border-emerald-300 text-xs font-mono font-bold text-emerald-950">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="uppercase">Real-Time Live Sync</span>
-                </div>
-
-                {/* Grade Level Selector */}
-                <div className="flex items-center gap-1.5 bg-white border-2 border-slate-300 px-2.5 py-1 shadow-2xs">
-                  <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Grade:</span>
-                  <select
-                    value={gradeFilter}
-                    onChange={(e) => setGradeFilter(e.target.value)}
-                    className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer font-mono"
-                  >
-                    <option value="ALL">All Grade Levels</option>
-                    <option value="7">Grade 7</option>
-                    <option value="8">Grade 8</option>
-                    <option value="9">Grade 9</option>
-                    <option value="10">Grade 10</option>
-                    <option value="11">Grade 11 (SHS)</option>
-                    <option value="12">Grade 12 (SHS)</option>
-                  </select>
                 </div>
               </div>
             </div>
