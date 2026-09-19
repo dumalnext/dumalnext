@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ApplicantType, SHS_STRANDS } from "@/lib/types/enrollment";
+import { ApplicantType } from "@/lib/types/enrollment";
 
 export interface Step1Data {
   isGraded: boolean;
@@ -148,26 +148,6 @@ export default function Step1ApplicantType({
     }
   };
 
-  // Track selection change handler for SHS
-  const handleTrackChange = (newTrack: string) => {
-    const availableForTrack = SHS_STRANDS.filter((s) => s.track === newTrack);
-    const firstStrand = availableForTrack.length > 0 ? availableForTrack[0].code : "";
-
-    onChange({
-      targetTrack: newTrack,
-      targetStrand: firstStrand,
-    });
-
-    if (errors.targetTrack || errors.targetStrand) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next.targetTrack;
-        delete next.targetStrand;
-        return next;
-      });
-    }
-  };
-
   // Compute valid available options for "Last Grade Level Completed" based on Target Grade Level (Strictly 2 options)
   const getAvailableCompletedGrades = (targetGrade: number | "") => {
     if (!targetGrade || typeof targetGrade !== "number") {
@@ -215,10 +195,6 @@ export default function Step1ApplicantType({
 
   const availableCompletedGrades = getAvailableCompletedGrades(data.targetGradeLevel);
 
-  const availableStrands = SHS_STRANDS.filter(
-    (s) => !data.targetTrack || s.track === data.targetTrack
-  );
-
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
 
@@ -252,19 +228,6 @@ export default function Step1ApplicantType({
       newErrors.lastSchoolId = "DepEd School ID must be exactly 6 numeric digits.";
     }
 
-    // Section 7 Validation for Senior High School
-    if (isSHS) {
-      if (!data.targetTrack || data.targetTrack.trim() === "") {
-        newErrors.targetTrack = "Please select a Senior High School Track (Academic or TVL).";
-      }
-      if (!data.targetStrand || data.targetStrand.trim() === "") {
-        newErrors.targetStrand = "Please select a Senior High School Strand.";
-      }
-      if (!data.targetSemester || data.targetSemester.trim() === "") {
-        newErrors.targetSemester = "Please select an academic semester.";
-      }
-    }
-
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
@@ -288,7 +251,7 @@ export default function Step1ApplicantType({
           Learner Classification &amp; Target Grade Level
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Select the education program, learner category, previous academic background, and curricular program or strand.
+          Select the education program, learner category, and previous academic background.
         </p>
       </div>
 
@@ -544,88 +507,7 @@ export default function Step1ApplicantType({
         </div>
       )}
 
-      {/* Part 4: Junior High School Curricular Program (Regular vs SPS) - Grades 7 to 10 */}
-      {isJHS && data.applicantType && (
-        <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
-          <div className="border-l-4 border-[#002060] pl-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
-                Junior High School Curricular Program (DepEd SCP)
-              </label>
-              <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-2 py-0.5 font-bold">
-                JHS CURRICULUM
-              </span>
-            </div>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Select whether the student is enrolling in the standard basic education curriculum or the Special Program in Sports (SPS).
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            {/* Regular JHS */}
-            <button
-              type="button"
-              onClick={() => onChange({ jhsProgram: "Regular" })}
-              className={`p-5 border-2 text-left transition-all ${
-                (data.jhsProgram || "Regular") === "Regular"
-                  ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
-                  : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span
-                  className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
-                    (data.jhsProgram || "Regular") === "Regular"
-                      ? "bg-[#002060] text-white"
-                      : "bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  [ {(data.jhsProgram || "Regular") === "Regular" ? "SELECTED" : "CHOOSE"} ]
-                </span>
-                <span className="text-xs font-bold text-[#002060]">STANDARD JHS</span>
-              </div>
-              <div className="text-base font-bold text-slate-900">
-                Regular Basic Education Curriculum
-              </div>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Standard secondary basic education curriculum covering core subject areas: English, Science, Mathematics, Filipino, Araling Panlipunan, MAPEH, ESP, and TLE.
-              </p>
-            </button>
-
-            {/* SPS */}
-            <button
-              type="button"
-              onClick={() => onChange({ jhsProgram: "SPS" })}
-              className={`p-5 border-2 text-left transition-all ${
-                data.jhsProgram === "SPS"
-                  ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
-                  : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span
-                  className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
-                    data.jhsProgram === "SPS"
-                      ? "bg-[#002060] text-white"
-                      : "bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  [ {data.jhsProgram === "SPS" ? "SELECTED" : "CHOOSE"} ]
-                </span>
-                <span className="text-xs font-bold text-emerald-800 font-mono">DEPED SCP</span>
-              </div>
-              <div className="text-base font-bold text-slate-900">
-                Special Program in Sports (SPS)
-              </div>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Specialized curricular track for student-athletes with proven athletic competence, combining core academic coursework with dedicated athletic conditioning and sports training.
-              </p>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Part 5: DepEd Section 6: Previous School & Academic Prerequisite Background */}
+      {/* Part 4: DepEd Section 6: Previous School & Academic Prerequisite Background */}
       {data.applicantType && (
         <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
           <div className="border-b-2 border-slate-200 pb-3">
@@ -910,148 +792,6 @@ export default function Step1ApplicantType({
         </div>
       )}
 
-      {/* Part 6: DepEd Section 7: Senior High School Program Selection (Grades 11 & 12 Only) */}
-      {isSHS && (
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-[#002060]/40">
-          <div className="border-b-2 border-slate-200 pb-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                [ DepEd Section 7: Senior High School Track &amp; Strand Selection ]
-              </span>
-              <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-2 py-0.5 font-bold">
-                MANDATORY FOR GRADES 11 &amp; 12
-              </span>
-            </div>
-            <p className="text-xs text-slate-600 mt-1">
-              Select your academic semester, track, and specialized Senior High School strand offered at Dumalneg NHS.
-            </p>
-          </div>
-
-          {/* Academic Semester */}
-          <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
-              Semester <span className="text-red-700">*</span>
-            </label>
-            <div className="grid grid-cols-2 gap-3 sm:w-80">
-              {(["1st Semester", "2nd Semester"] as const).map((sem) => (
-                <button
-                  key={sem}
-                  type="button"
-                  onClick={() => onChange({ targetSemester: sem })}
-                  className={`p-3 border-2 text-center text-xs font-bold uppercase transition-all ${
-                    data.targetSemester === sem
-                      ? "bg-[#002060] text-white border-[#002060]"
-                      : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
-                  }`}
-                >
-                  {sem}
-                </button>
-              ))}
-            </div>
-            {errors.targetSemester && (
-              <span className="text-xs text-red-700 font-semibold mt-1 block">
-                {errors.targetSemester}
-              </span>
-            )}
-          </div>
-
-          {/* Track Selection */}
-          <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
-              Senior High School Track <span className="text-red-700">*</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                {
-                  id: "Academic Track",
-                  title: "Academic Track",
-                  desc: "College preparatory curriculum (STEM, HUMSS).",
-                },
-                {
-                  id: "Technical-Vocational-Livelihood Track",
-                  title: "Technical-Vocational-Livelihood (TVL) Track",
-                  desc: "Skills-based certification curriculum (ICT, Agri-Fishery, Home Economics).",
-                },
-              ].map((trk) => {
-                const isSelected = data.targetTrack === trk.id;
-                return (
-                  <button
-                    key={trk.id}
-                    type="button"
-                    onClick={() => handleTrackChange(trk.id)}
-                    className={`p-4 border-2 text-left transition-all ${
-                      isSelected
-                        ? "border-[#002060] bg-blue-50 ring-1 ring-[#002060]"
-                        : "border-slate-300 bg-white hover:border-[#002060]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-slate-900">{trk.title}</span>
-                      <span
-                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 uppercase ${
-                          isSelected ? "bg-[#002060] text-white" : "bg-slate-200 text-slate-600"
-                        }`}
-                      >
-                        {isSelected ? "SELECTED" : "SELECT"}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-normal">{trk.desc}</p>
-                  </button>
-                );
-              })}
-            </div>
-            {errors.targetTrack && (
-              <span className="text-xs text-red-700 font-semibold mt-1 block">
-                {errors.targetTrack}
-              </span>
-            )}
-          </div>
-
-          {/* Strand Selection */}
-          <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
-              Specialized Strand at Dumalneg NHS <span className="text-red-700">*</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {availableStrands.map((strand) => {
-                const isSelected = data.targetStrand === strand.code;
-                return (
-                  <button
-                    key={strand.code}
-                    type="button"
-                    onClick={() => onChange({ targetStrand: strand.code })}
-                    className={`p-4 border-2 text-left transition-all ${
-                      isSelected
-                        ? "border-[#002060] bg-blue-50 ring-1 ring-[#002060]"
-                        : "border-slate-300 bg-white hover:border-[#002060]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5">
-                        {strand.code}
-                      </span>
-                      <span
-                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 uppercase ${
-                          isSelected ? "bg-[#002060] text-white" : "bg-slate-200 text-slate-600"
-                        }`}
-                      >
-                        {isSelected ? "ACTIVE" : "CHOOSE"}
-                      </span>
-                    </div>
-                    <div className="text-xs font-bold text-slate-900 mt-1">{strand.name}</div>
-                  </button>
-                );
-              })}
-            </div>
-            {errors.targetStrand && (
-              <span className="text-xs text-red-700 font-semibold mt-1 block">
-                {errors.targetStrand}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
         <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs">
@@ -1068,16 +808,6 @@ export default function Step1ApplicantType({
               {data.applicantType === "Returning" && `Returning Learner (Balik-Aral) for Grade ${data.targetGradeLevel}`}
             </strong>{" "}
             under the <strong>{data.isGraded ? "Graded Curriculum Program" : "Non-Graded Program (SNEd Only)"}</strong>.
-            {isJHS && (
-              <span className="block mt-1 text-slate-800 font-semibold">
-                JHS Curricular Program: {(data.jhsProgram || "Regular") === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education Curriculum"}
-              </span>
-            )}
-            {isSHS && data.targetStrand && (
-              <span className="block mt-1 text-slate-800 font-semibold">
-                Senior High Placement: {data.targetSemester} | {data.targetTrack} ({data.targetStrand})
-              </span>
-            )}
             {data.lastGradeCompleted && (
               <span className="block mt-1 text-slate-700 font-medium">
                 Academic Background: Completed Grade {data.lastGradeCompleted}
