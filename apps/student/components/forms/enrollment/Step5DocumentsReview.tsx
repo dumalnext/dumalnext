@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { compressImage } from "@/lib/utils/image-compressor";
 import { useAuth } from "@/lib/auth/authContext";
@@ -43,17 +43,30 @@ export default function Step5DocumentsReview({
     pwd_id: null,
   });
 
-  // Pre-populate docs if existingApplication has submitted_documents or data has documents
+  // Track keys that the learner explicitly removed during this session
+  const removedKeysRef = useRef<Set<string>>(new Set());
+  const hasInitializedDocsRef = useRef<boolean>(false);
+
+  // Pre-populate docs ONCE on mount or when data/existingApplication becomes available
   useEffect(() => {
-    if (existingApplication && Array.isArray(existingApplication.submitted_documents) && existingApplication.submitted_documents.length > 0) {
+    if (hasInitializedDocsRef.current) return;
+
+    const sourceList =
+      data.submittedDocuments && data.submittedDocuments.length > 0
+        ? data.submittedDocuments
+        : existingApplication && Array.isArray(existingApplication.submitted_documents)
+        ? existingApplication.submitted_documents
+        : null;
+
+    if (sourceList && sourceList.length > 0) {
       setDocs((prev) => {
         const next = { ...prev };
-        existingApplication.submitted_documents.forEach((d: any) => {
-          const key = d.docType;
-          if (key && !next[key] && (d.fileData || d.fileName)) {
+        sourceList.forEach((d: any) => {
+          const key = d.docType || d.type;
+          if (key && !removedKeysRef.current.has(key) && (d.fileData || d.fileUrl || d.fileName)) {
             next[key] = {
               file: new File([], d.fileName || `${key}.jpg`),
-              previewUrl: d.fileData || "",
+              previewUrl: d.fileData || d.fileUrl || "",
               originalSizeKb: d.sizeKb || 25,
               compressedSizeKb: d.sizeKb || 25,
               isCompressing: false,
@@ -62,23 +75,7 @@ export default function Step5DocumentsReview({
         });
         return next;
       });
-    } else if (data.submittedDocuments && data.submittedDocuments.length > 0) {
-      setDocs((prev) => {
-        const next = { ...prev };
-        data.submittedDocuments.forEach((d: any) => {
-          const key = d.type || d.docType;
-          if (key && !next[key] && (d.fileUrl || d.fileData || d.fileName)) {
-            next[key] = {
-              file: new File([], d.fileName || `${key}.jpg`),
-              previewUrl: d.fileUrl || d.fileData || "",
-              originalSizeKb: d.sizeKb || 25,
-              compressedSizeKb: d.sizeKb || 25,
-              isCompressing: false,
-            };
-          }
-        });
-        return next;
-      });
+      hasInitializedDocsRef.current = true;
     }
   }, [existingApplication, data.submittedDocuments]);
 
@@ -95,10 +92,12 @@ export default function Step5DocumentsReview({
   // File Upload Handler with HTML5 Canvas Compression (<350KB)
   const handleFileUpload = async (
     docKey: string,
-    docType: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "other",
     file: File | null
   ) => {
     if (!file) return;
+
+    // Unmark as removed since learner is uploading a new file for this slot
+    removedKeysRef.current.delete(docKey);
 
     // Set loading indicator for this slot
     setDocs((prev) => ({
@@ -132,7 +131,7 @@ export default function Step5DocumentsReview({
         // PDF or other document - convert to Data URL
         finalDataUrl = await new Promise<string>((resolve) => {
           const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string || "");
+          reader.onloadend = () => resolve((reader.result as string) || "");
           reader.readAsDataURL(file);
         });
       }
@@ -149,16 +148,18 @@ export default function Step5DocumentsReview({
       }));
 
       // Update parent formData submittedDocuments array
-      const existingDocs = (data.submittedDocuments || []).filter((d) => d.type !== docType);
+      const existingDocs = (data.submittedDocuments || []).filter(
+        (d) => d.type !== docKey && (d as any).docType !== docKey
+      );
       const newDocEntry = {
-        type: docType,
+        type: docKey,
         fileName: finalFile.name,
         fileUrl: finalDataUrl,
         sizeKb: compressedKb,
       };
 
       onChange({
-        submittedDocuments: [...existingDocs, newDocEntry],
+        submittedDocuments: [...existingDocs, newDocEntry as any],
       });
 
       // Clear any errors for this doc
@@ -179,12 +180,17 @@ export default function Step5DocumentsReview({
   };
 
   // Remove uploaded document
-  const handleRemoveDoc = (
-    docKey: string,
-    docType: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "other"
-  ) => {
+  const handleRemoveDoc = (docKey: string) => {
+    // 1. Mark as permanently removed so no auto-fill can resurrect it
+    removedKeysRef.current.add(docKey);
+
+    // 2. Clear from local slot state
     setDocs((prev) => ({ ...prev, [docKey]: null }));
-    const updated = (data.submittedDocuments || []).filter((d) => d.type !== docType);
+
+    // 3. Clear from parent form data
+    const updated = (data.submittedDocuments || []).filter(
+      (d) => d.type !== docKey && (d as any).docType !== docKey
+    );
     onChange({ submittedDocuments: updated });
   };
 
@@ -603,18 +609,31 @@ export default function Step5DocumentsReview({
             </p>
             {docs.birth_certificate ? (
               <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.birth_certificate.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.birth_certificate.originalSizeKb}KB &rarr; {docs.birth_certificate.compressedSizeKb}KB (Compressed)
-                  </span>
+                <div className="flex items-center gap-3 min-w-0">
+                  {docs.birth_certificate.previewUrl && (docs.birth_certificate.previewUrl.startsWith("data:image/") || docs.birth_certificate.previewUrl.startsWith("blob:") || docs.birth_certificate.previewUrl.startsWith("http")) ? (
+                    <img
+                      src={docs.birth_certificate.previewUrl}
+                      alt={docs.birth_certificate.file.name}
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                      DOC
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
+                      {docs.birth_certificate.file.name}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono block">
+                      {docs.birth_certificate.originalSizeKb}KB &rarr; {docs.birth_certificate.compressedSizeKb}KB (Compressed)
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleRemoveDoc("birth_certificate", "birth_certificate")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
+                  onClick={() => handleRemoveDoc("birth_certificate")}
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
                 >
                   Remove
                 </button>
@@ -625,7 +644,7 @@ export default function Step5DocumentsReview({
                   type="file"
                   accept="image/*,.pdf"
                   onChange={(e) =>
-                    handleFileUpload("birth_certificate", "birth_certificate", e.target.files?.[0] || null)
+                    handleFileUpload("birth_certificate", e.target.files?.[0] || null)
                   }
                   className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
                 />
@@ -653,18 +672,31 @@ export default function Step5DocumentsReview({
             </p>
             {docs.form_138 ? (
               <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.form_138.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.form_138.originalSizeKb}KB &rarr; {docs.form_138.compressedSizeKb}KB (Compressed)
-                  </span>
+                <div className="flex items-center gap-3 min-w-0">
+                  {docs.form_138.previewUrl && (docs.form_138.previewUrl.startsWith("data:image/") || docs.form_138.previewUrl.startsWith("blob:") || docs.form_138.previewUrl.startsWith("http")) ? (
+                    <img
+                      src={docs.form_138.previewUrl}
+                      alt={docs.form_138.file.name}
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                      DOC
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
+                      {docs.form_138.file.name}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono block">
+                      {docs.form_138.originalSizeKb}KB &rarr; {docs.form_138.compressedSizeKb}KB (Compressed)
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleRemoveDoc("form_138", "form_138")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
+                  onClick={() => handleRemoveDoc("form_138")}
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
                 >
                   Remove
                 </button>
@@ -674,7 +706,7 @@ export default function Step5DocumentsReview({
                 <input
                   type="file"
                   accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload("form_138", "form_138", e.target.files?.[0] || null)}
+                  onChange={(e) => handleFileUpload("form_138", e.target.files?.[0] || null)}
                   className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
                 />
               </div>
@@ -697,18 +729,31 @@ export default function Step5DocumentsReview({
             </p>
             {docs.id_picture ? (
               <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.id_picture.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.id_picture.originalSizeKb}KB &rarr; {docs.id_picture.compressedSizeKb}KB (Compressed)
-                  </span>
+                <div className="flex items-center gap-3 min-w-0">
+                  {docs.id_picture.previewUrl && (docs.id_picture.previewUrl.startsWith("data:image/") || docs.id_picture.previewUrl.startsWith("blob:") || docs.id_picture.previewUrl.startsWith("http")) ? (
+                    <img
+                      src={docs.id_picture.previewUrl}
+                      alt={docs.id_picture.file.name}
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                      DOC
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
+                      {docs.id_picture.file.name}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono block">
+                      {docs.id_picture.originalSizeKb}KB &rarr; {docs.id_picture.compressedSizeKb}KB (Compressed)
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleRemoveDoc("id_picture", "id_picture")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
+                  onClick={() => handleRemoveDoc("id_picture")}
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
                 >
                   Remove
                 </button>
@@ -718,7 +763,7 @@ export default function Step5DocumentsReview({
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => handleFileUpload("id_picture", "id_picture", e.target.files?.[0] || null)}
+                  onChange={(e) => handleFileUpload("id_picture", e.target.files?.[0] || null)}
                   className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
                 />
               </div>
@@ -744,18 +789,31 @@ export default function Step5DocumentsReview({
             </p>
             {docs.good_moral ? (
               <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.good_moral.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.good_moral.originalSizeKb}KB &rarr; {docs.good_moral.compressedSizeKb}KB (Compressed)
-                  </span>
+                <div className="flex items-center gap-3 min-w-0">
+                  {docs.good_moral.previewUrl && (docs.good_moral.previewUrl.startsWith("data:image/") || docs.good_moral.previewUrl.startsWith("blob:") || docs.good_moral.previewUrl.startsWith("http")) ? (
+                    <img
+                      src={docs.good_moral.previewUrl}
+                      alt={docs.good_moral.file.name}
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                      DOC
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
+                      {docs.good_moral.file.name}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono block">
+                      {docs.good_moral.originalSizeKb}KB &rarr; {docs.good_moral.compressedSizeKb}KB (Compressed)
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleRemoveDoc("good_moral", "good_moral")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
+                  onClick={() => handleRemoveDoc("good_moral")}
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
                 >
                   Remove
                 </button>
@@ -765,7 +823,7 @@ export default function Step5DocumentsReview({
                 <input
                   type="file"
                   accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload("good_moral", "good_moral", e.target.files?.[0] || null)}
+                  onChange={(e) => handleFileUpload("good_moral", e.target.files?.[0] || null)}
                   className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
                 />
               </div>
@@ -789,18 +847,31 @@ export default function Step5DocumentsReview({
               </p>
               {docs.household_4ps ? (
                 <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                      {docs.household_4ps.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      {docs.household_4ps.originalSizeKb}KB &rarr; {docs.household_4ps.compressedSizeKb}KB (Compressed)
-                    </span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {docs.household_4ps.previewUrl && (docs.household_4ps.previewUrl.startsWith("data:image/") || docs.household_4ps.previewUrl.startsWith("blob:") || docs.household_4ps.previewUrl.startsWith("http")) ? (
+                      <img
+                        src={docs.household_4ps.previewUrl}
+                        alt={docs.household_4ps.file.name}
+                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                        DOC
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
+                        {docs.household_4ps.file.name}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono block">
+                        {docs.household_4ps.originalSizeKb}KB &rarr; {docs.household_4ps.compressedSizeKb}KB (Compressed)
+                      </span>
+                    </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleRemoveDoc("household_4ps", "other")}
-                    className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
+                    onClick={() => handleRemoveDoc("household_4ps")}
+                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
                   >
                     Remove
                   </button>
@@ -810,7 +881,7 @@ export default function Step5DocumentsReview({
                   <input
                     type="file"
                     accept="image/*,.pdf"
-                    onChange={(e) => handleFileUpload("household_4ps", "other", e.target.files?.[0] || null)}
+                    onChange={(e) => handleFileUpload("household_4ps", e.target.files?.[0] || null)}
                     className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
                   />
                 </div>
@@ -832,18 +903,31 @@ export default function Step5DocumentsReview({
               </p>
               {docs.pwd_id ? (
                 <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                      {docs.pwd_id.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      {docs.pwd_id.originalSizeKb}KB &rarr; {docs.pwd_id.compressedSizeKb}KB (Compressed)
-                    </span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {docs.pwd_id.previewUrl && (docs.pwd_id.previewUrl.startsWith("data:image/") || docs.pwd_id.previewUrl.startsWith("blob:") || docs.pwd_id.previewUrl.startsWith("http")) ? (
+                      <img
+                        src={docs.pwd_id.previewUrl}
+                        alt={docs.pwd_id.file.name}
+                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                        DOC
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
+                        {docs.pwd_id.file.name}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono block">
+                        {docs.pwd_id.originalSizeKb}KB &rarr; {docs.pwd_id.compressedSizeKb}KB (Compressed)
+                      </span>
+                    </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleRemoveDoc("pwd_id", "other")}
-                    className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
+                    onClick={() => handleRemoveDoc("pwd_id")}
+                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
                   >
                     Remove
                   </button>
@@ -853,7 +937,7 @@ export default function Step5DocumentsReview({
                   <input
                     type="file"
                     accept="image/*,.pdf"
-                    onChange={(e) => handleFileUpload("pwd_id", "other", e.target.files?.[0] || null)}
+                    onChange={(e) => handleFileUpload("pwd_id", e.target.files?.[0] || null)}
                     className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
                   />
                 </div>

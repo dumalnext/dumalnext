@@ -84,7 +84,7 @@ export interface FullEnrollmentFormData {
 
   // Step 5: Documents & Agreements
   submittedDocuments: {
-    type: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "other";
+    type: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "household_4ps" | "pwd_id" | "other" | string;
     fileName: string;
     fileUrl: string;
     sizeKb: number;
