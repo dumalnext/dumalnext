@@ -330,7 +330,7 @@ export default function AdminHomePage() {
                   type="text"
                   value={adminId}
                   onChange={(e) => setAdminId(e.target.value)}
-                  placeholder="e.g. DNHS-ADM-001 or admin@dumalneg.deped.gov.ph"
+                  placeholder="e.g. admin@gmail.com or DNHS-ADM-001"
                   className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
                   disabled={isLoggingIn}
                   required
@@ -363,21 +363,45 @@ export default function AdminHomePage() {
               </div>
             </form>
 
-            {/* Quick Demo Fill Button */}
-            <div className="pt-3 border-t border-slate-200">
-              <span className="text-[10px] text-slate-500 uppercase block mb-1">
-                Official Capstone Administrator Preset:
+            {/* Quick Demo Fill Buttons */}
+            <div className="pt-3 border-t border-slate-200 space-y-1.5">
+              <span className="text-[10px] text-slate-500 uppercase block font-medium">
+                Administrator Quick-Fill Presets:
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminId("admin@dumalneg.deped.gov.ph");
-                  setAdminPassword("admin123");
-                }}
-                className="text-[11px] text-[#002060] font-bold uppercase underline hover:text-blue-950"
-              >
-                [ Auto-Fill: admin@dumalneg.deped.gov.ph / admin123 ]
-              </button>
+              <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminId("admin@gmail.com");
+                    setAdminPassword("admin123");
+                  }}
+                  className="text-[#002060] font-bold uppercase underline hover:text-blue-950"
+                >
+                  [ admin@gmail.com ]
+                </button>
+                <span className="text-slate-300">&bull;</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminId("admin@dumalneg.deped.gov.ph");
+                    setAdminPassword("admin123");
+                  }}
+                  className="text-[#002060] font-bold uppercase underline hover:text-blue-950"
+                >
+                  [ admin@dumalneg.deped.gov.ph ]
+                </button>
+                <span className="text-slate-300">&bull;</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminId("DNHS-ADM-001");
+                    setAdminPassword("admin123");
+                  }}
+                  className="text-[#002060] font-bold uppercase underline hover:text-blue-950"
+                >
+                  [ DNHS-ADM-001 ]
+                </button>
+              </div>
             </div>
           </div>
 

@@ -143,6 +143,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       // Self-provisioning: If standard admin credential used and no record exists, provision it in Supabase
       const isDefaultAdminCred =
         (cleanId === "admin@dumalneg.deped.gov.ph" ||
+          cleanId === "admin@gmail.com" ||
           cleanId === "dnhs-adm-001" ||
           cleanId === "admin") &&
         cleanPass === "admin123";
@@ -151,7 +152,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         // Auto-seed default Administrator in Supabase
         const newAdminPayload: any = {
           user_id: "DNHS-ADM-001",
-          email: "admin@dumalneg.deped.gov.ph",
+          email: cleanId.includes("@") ? cleanId : "admin@dumalneg.deped.gov.ph",
           user_role: "admin",
           password: "admin123",
         };
