@@ -99,6 +99,7 @@ export default function AdjudicationModal({
   const [selectedSectionId, setSelectedSectionId] = useState<string>(
     application.student?.current_section_id || ""
   );
+  const [sectionError, setSectionError] = useState<boolean>(false);
   const [remarks, setRemarks] = useState<string>(application.admin_feedback || "");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionError, setActionError] = useState<string>("");
@@ -155,11 +156,28 @@ export default function AdjudicationModal({
   });
   const idPhotoUrl = idDoc?.fileData || null;
 
-  // Handle Approve Action
+  // Handle Approve Action - DepEd Quota Control Guard
   const handleApprove = async () => {
+    // MANDATORY CHECK: Section assignment is strictly required before approval
+    if (!selectedSectionId) {
+      setActiveTab("documents");
+      setSectionError(true);
+      setActionError(
+        "DepEd Quota Control Requirement: You cannot approve this application without assigning an Official Section / Class Group. Please select an eligible section below."
+      );
+      setTimeout(() => {
+        const secElem = document.getElementById("section-assignment-box");
+        if (secElem) {
+          secElem.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+      return;
+    }
+
     setIsSubmitting(true);
     setActionError("");
     setActionSuccess("");
+    setSectionError(false);
 
     try {
       // 1. Update enrollment_applications status in Supabase
@@ -174,9 +192,9 @@ export default function AdjudicationModal({
 
       if (appErr) throw appErr;
 
-      // 2. If section selected, assign student to section
-      if (selectedSectionId && application.student_id) {
-        await supabase
+      // 2. Assign student to selected section and update grade level in Supabase
+      if (application.student_id) {
+        const { error: stErr } = await supabase
           .from("students")
           .update({
             current_section_id: selectedSectionId,
@@ -184,9 +202,13 @@ export default function AdjudicationModal({
             updated_at: new Date().toISOString(),
           })
           .eq("id", application.student_id);
+
+        if (stErr) {
+          console.warn("Notice updating student section:", stErr);
+        }
       }
 
-      setActionSuccess("Application officially APPROVED & ENROLLED. Student portal has been updated in real-time.");
+      setActionSuccess("Application officially APPROVED & ENROLLED with official section assignment. Real-time rosters updated.");
       setTimeout(() => {
         onAdjudicationSuccess();
         onClose();
@@ -325,13 +347,22 @@ export default function AdjudicationModal({
           <button
             type="button"
             onClick={() => setActiveTab("documents")}
-            className={`py-3 px-3.5 border-b-2 transition-colors ${
+            className={`py-3 px-3.5 border-b-2 transition-colors flex items-center gap-1.5 ${
               activeTab === "documents"
                 ? "border-[#002060] bg-white text-[#002060]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
-            4. Requirements &amp; Sectioning
+            <span>4. Requirements &amp; Sectioning</span>
+            {!selectedSectionId ? (
+              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-amber-200 text-amber-950 border border-amber-400 uppercase">
+                Section Required
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
+                Section Assigned
+              </span>
+            )}
           </button>
         </div>
 
@@ -715,30 +746,88 @@ export default function AdjudicationModal({
               </div>
 
               {/* Section Assignment with Smart Capacity Quota Counter */}
-              <div className="p-4 bg-blue-50/60 border-2 border-[#002060] space-y-3">
+              <div
+                id="section-assignment-box"
+                className={`p-4 border-2 transition-all space-y-3 ${
+                  sectionError
+                    ? "bg-red-50 border-red-500 shadow-md ring-2 ring-red-400"
+                    : selectedSectionId
+                    ? "bg-emerald-50/60 border-emerald-600"
+                    : "bg-blue-50/60 border-[#002060]"
+                }`}
+              >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                  <label className="text-xs font-bold text-[#002060] uppercase block">
-                    Assign Official Section / Class Group (Quota Control):
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold text-[#002060] uppercase block">
+                      Assign Official Section / Class Group (Quota Control): <span className="text-red-600">*</span>
+                    </label>
+                    <span className="text-[10px] font-mono font-bold text-red-700 uppercase bg-red-100 px-1.5 py-0.5 border border-red-300">
+                      MANDATORY FOR APPROVAL
+                    </span>
+                  </div>
                   <span className="text-[10px] font-mono text-slate-600">
                     DepEd Standard Capacity: 40 Students/Section
                   </span>
                 </div>
 
-                <select
-                  value={selectedSectionId}
-                  onChange={(e) => setSelectedSectionId(e.target.value)}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold text-slate-900 focus:border-[#002060] outline-none"
-                >
-                  <option value="">-- Select Section Assignment (Optional Upon Approval) --</option>
-                  {eligibleSections.map((sec) => (
-                    <option key={sec.id} value={sec.id}>
-                      {sec.section_name} (Capacity: {sec.enrolledCount || 0}/{sec.capacity})
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[10px] text-slate-600">
-                  Selecting a section will register the learner in that class group and increment its capacity counter.
+                {eligibleSections.length === 0 ? (
+                  <div className="p-3 bg-red-100 border border-red-400 text-xs text-red-950 space-y-1">
+                    <strong className="block">[ NO ELIGIBLE SECTIONS FOUND IN DATABASE ]</strong>
+                    <p className="text-[11px]">
+                      There are currently no active sections configured for Grade {application.target_grade_level}
+                      {application.target_strand ? ` (${application.target_strand})` : ""}.
+                      Please create or activate sections in the Sections console before approving this student.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <select
+                      value={selectedSectionId}
+                      onChange={(e) => {
+                        setSelectedSectionId(e.target.value);
+                        if (e.target.value) {
+                          setSectionError(false);
+                          if (actionError.includes("Official Section")) {
+                            setActionError("");
+                          }
+                        }
+                      }}
+                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
+                        sectionError
+                          ? "border-red-600 bg-red-50/20"
+                          : selectedSectionId
+                          ? "border-emerald-600"
+                          : "border-slate-400 focus:border-[#002060]"
+                      }`}
+                    >
+                      <option value="">-- Select Section Assignment (Required for Official Approval) --</option>
+                      {eligibleSections.map((sec) => {
+                        const isFull = (sec.enrolledCount || 0) >= sec.capacity;
+                        return (
+                          <option key={sec.id} value={sec.id}>
+                            {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
+                            {isFull ? " [AT FULL CAPACITY]" : ""}
+                          </option>
+                        );
+                      })}
+                    </select>
+
+                    {sectionError && (
+                      <p className="text-[11px] font-bold text-red-700">
+                        [ Section Required ]: You must select an official class section before you can approve this application.
+                      </p>
+                    )}
+
+                    {selectedSectionId && (
+                      <p className="text-[11px] text-emerald-900 font-bold">
+                        [ Confirmed ]: Learner will be officially enrolled in {sections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <p className="text-[10px] text-slate-600 leading-normal">
+                  Under DepEd Quota Control rules, an applicant cannot be admitted without an official section assignment to prevent class overcrowding.
                 </p>
               </div>
             </div>
@@ -746,6 +835,57 @@ export default function AdjudicationModal({
 
           {/* Adjudication Feedback & Action Box (Sticky at bottom of inspection) */}
           <div className="pt-3 border-t-2 border-slate-300 space-y-3">
+            {/* Persistent Section Assignment Status Banner (Visible across all tabs) */}
+            {!selectedSectionId ? (
+              <div className="p-3 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-amber-200 border border-amber-400 text-[10px] font-mono font-bold uppercase text-amber-950 shrink-0">
+                    SECTION REQUIRED
+                  </span>
+                  <span className="text-xs text-amber-950">
+                    Official Section has <strong>not yet been assigned</strong>. DepEd Quota Control requires assigning an official section before approval.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("documents");
+                    setTimeout(() => {
+                      const secElem = document.getElementById("section-assignment-box");
+                      if (secElem) secElem.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }, 100);
+                  }}
+                  className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase tracking-wider shrink-0 transition-colors"
+                >
+                  [ Assign Section Now &rarr; ]
+                </button>
+              </div>
+            ) : (
+              <div className="p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 text-[10px] font-mono font-bold uppercase text-emerald-900 shrink-0">
+                    SECTION READY
+                  </span>
+                  <span className="text-xs text-emerald-950">
+                    Assigned Section: <strong>{sections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level})
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("documents");
+                    setTimeout(() => {
+                      const secElem = document.getElementById("section-assignment-box");
+                      if (secElem) secElem.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }, 100);
+                  }}
+                  className="text-[#002060] font-bold text-[11px] uppercase hover:underline shrink-0"
+                >
+                  Change Section
+                </button>
+              </div>
+            )}
+
             <label className="block text-xs font-bold text-slate-900 uppercase">
               Registrar Evaluation Remarks / Official Notice to Student:
             </label>
@@ -794,9 +934,18 @@ export default function AdjudicationModal({
                   type="button"
                   onClick={handleApprove}
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs disabled:opacity-50"
+                  className={`px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs ${
+                    !selectedSectionId
+                      ? "bg-amber-500 hover:bg-amber-600 text-slate-950 border-2 border-amber-600 font-extrabold"
+                      : "bg-[#002060] hover:bg-blue-950 text-white border-2 border-[#002060]"
+                  } disabled:opacity-50`}
+                  title={!selectedSectionId ? "Assign a section in Tab 4 first to approve" : "Approve and confirm enrollment"}
                 >
-                  {isSubmitting ? "Approving Enrollment..." : "[ Approve & Confirm Enrollment ]"}
+                  {isSubmitting
+                    ? "Approving Enrollment..."
+                    : !selectedSectionId
+                    ? "[ Assign Section to Approve ]"
+                    : "[ Approve & Confirm Enrollment ]"}
                 </button>
               </div>
             </div>
