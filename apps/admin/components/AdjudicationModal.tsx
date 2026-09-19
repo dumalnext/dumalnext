@@ -180,12 +180,18 @@ export default function AdjudicationModal({
     setSectionError(false);
 
     try {
-      // 1. Update enrollment_applications status in Supabase
+      // 1. Resolve smart approval remarks if left empty by admin
+      const assignedSection = sections.find((s) => s.id === selectedSectionId);
+      const sectionName = assignedSection ? assignedSection.section_name : "";
+      const smartApprovalNotice = `You're enrolled at Dumalneg National High School for School Year 2025–2026 under Grade ${application.target_grade_level}${sectionName ? ` (${sectionName})` : ""}. Welcome to Dumalneg NHS!`;
+      const finalRemarks = remarks.trim() || smartApprovalNotice;
+
+      // Update enrollment_applications status in Supabase
       const { error: appErr } = await supabase
         .from("enrollment_applications")
         .update({
           status: "Approved",
-          admin_feedback: remarks.trim() || "Enrollment application verified and approved by the Dumalneg NHS Registrar.",
+          admin_feedback: finalRemarks,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id);
@@ -221,30 +227,30 @@ export default function AdjudicationModal({
     }
   };
 
-  // Handle Needs Revision Action
+  // Handle Needs Revision Action - Smart Auto-Notice on Empty
   const handleNeedsRevision = async () => {
-    if (!remarks.trim()) {
-      setActionError("Please enter registrar evaluation feedback explaining what needs revision.");
-      return;
-    }
-
     setIsSubmitting(true);
     setActionError("");
     setActionSuccess("");
+
+    // Smart default revision feedback if admin left it empty
+    const smartRevisionNotice =
+      "Double check your submitted documentary requirements and learner profile details for accuracy. Please replace or re-upload any incomplete, unclear, or flagged credentials before resubmitting.";
+    const finalRemarks = remarks.trim() || smartRevisionNotice;
 
     try {
       const { error: appErr } = await supabase
         .from("enrollment_applications")
         .update({
           status: "Needs Revision",
-          admin_feedback: remarks.trim(),
+          admin_feedback: finalRemarks,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id);
 
       if (appErr) throw appErr;
 
-      setActionSuccess("Status updated to [ Needs Revision ]. Feedback dispatched to student portal in real-time.");
+      setActionSuccess("Status updated to [ Needs Revision ]. Smart feedback dispatched to student portal in real-time.");
       setTimeout(() => {
         onAdjudicationSuccess();
         onClose();
@@ -886,16 +892,85 @@ export default function AdjudicationModal({
               </div>
             )}
 
-            <label className="block text-xs font-bold text-slate-900 uppercase">
-              Registrar Evaluation Remarks / Official Notice to Student:
-            </label>
-            <textarea
-              rows={2}
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="e.g. Application and credentials verified. Officially admitted for SY 2025–2026. Or specify required document revisions..."
-              className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none"
-            />
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <label className="text-xs font-bold text-slate-900 uppercase">
+                  Registrar Evaluation Remarks / Official Notice to Student:
+                </label>
+                <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 border border-slate-200">
+                  [ Smart Auto-Notice System Active ]
+                </span>
+              </div>
+
+              {/* Smart Quick-Presets */}
+              <div className="flex flex-wrap items-center gap-1.5 text-[10px] pb-1">
+                <span className="font-mono font-bold text-slate-600 uppercase shrink-0">
+                  [ Quick Presets ]:
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRemarks(
+                      "Double check your submitted documentary requirements and learner profile details for accuracy. Please replace or re-upload any incomplete or unclear credentials."
+                    )
+                  }
+                  className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-900 border border-red-300 font-semibold transition-colors cursor-pointer"
+                  title="Insert revision notice"
+                >
+                  ⚡ &ldquo;Double check your requirements...&rdquo;
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRemarks(
+                      "Double check your PSA Birth Certificate and SF9 Report Card. Ensure clear full-page scans are provided."
+                    )
+                  }
+                  className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-900 border border-red-300 font-semibold transition-colors cursor-pointer"
+                  title="Insert document revision notice"
+                >
+                  ⚡ &ldquo;Double check your PSA &amp; SF9...&rdquo;
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const assignedSection = sections.find((s) => s.id === selectedSectionId);
+                    const sName = assignedSection ? ` (${assignedSection.section_name})` : "";
+                    setRemarks(
+                      `You're enrolled at Dumalneg National High School for School Year 2025–2026 under Grade ${application.target_grade_level}${sName}. Welcome to Dumalneg NHS!`
+                    );
+                  }}
+                  className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-semibold transition-colors cursor-pointer"
+                  title="Insert enrollment approval notice"
+                >
+                  ⚡ &ldquo;You&apos;re enrolled at Dumalneg NHS...&rdquo;
+                </button>
+                {remarks && (
+                  <button
+                    type="button"
+                    onClick={() => setRemarks("")}
+                    className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 font-semibold transition-colors cursor-pointer"
+                  >
+                    Reset (Auto-Notice)
+                  </button>
+                )}
+              </div>
+
+              <textarea
+                rows={2}
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+                placeholder="Leave blank for smart auto-dispatch ('Double check your...' on revision or 'You're enrolled...' on approval) or type custom remarks..."
+                className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none font-sans"
+              />
+
+              {!remarks.trim() && (
+                <div className="text-[10px] text-slate-500 font-mono bg-slate-50 p-1.5 border border-slate-200 flex flex-wrap items-center gap-2">
+                  <span className="font-bold text-[#002060]">SMART DISPATCH:</span>
+                  <span>Empty box auto-sends <strong>&ldquo;Double check your...&rdquo;</strong> on revision, or <strong>&ldquo;You&apos;re enrolled...&rdquo;</strong> on approval.</span>
+                </div>
+              )}
+            </div>
 
             {actionError && (
               <div className="p-2.5 bg-red-50 border border-red-400 text-xs text-red-900 font-bold">
@@ -965,7 +1040,7 @@ export default function AdjudicationModal({
             setRemarks((prev) => (prev ? `${prev}\n${note}` : note));
           }}
           onFlagRevision={(docTitle) => {
-            const note = `• Action Required: Please re-upload a clearer and complete copy of ${docTitle}.`;
+            const note = `• Double check your ${docTitle}: Please re-upload a clearer and complete copy.`;
             setRemarks((prev) => (prev ? `${prev}\n${note}` : note));
           }}
         />

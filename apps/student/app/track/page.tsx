@@ -477,8 +477,12 @@ function TrackApplicationContent() {
               <div className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
                 Official Enrollment Confirmed
               </div>
+              <p className="text-xs text-emerald-950 leading-relaxed font-bold">
+                {record.remarks ||
+                  "You're enrolled at Dumalneg National High School for School Year 2025–2026. Welcome to your official class section!"}
+              </p>
               <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                Congratulations! The Dumalneg National High School Registrar has approved your application and verified your credentials for School Year 2025–2026. Your official accomplished DepEd enrollment form is ready for download below.
+                The Dumalneg National High School Registrar has approved your application, verified your credentials, and assigned your official class section. Your official accomplished DepEd enrollment form is ready for download below.
               </p>
               <div className="pt-2">
                 <button
