@@ -339,7 +339,7 @@ function StudentHomeContent() {
                 </h2>
                 <p className="text-xs text-slate-600 mt-1">
                   Registered Email: <strong className="text-slate-900">{user.email}</strong> &bull; Account ID: <span className="font-mono">{user.userId}</span>
-                  {user.lrn && (
+                  {user.lrn && /^\d{12}$/.test(user.lrn) && (
                     <> &bull; DepEd LRN: <span className="font-mono font-bold text-[#002060]">{user.lrn}</span></>
                   )}
                 </p>

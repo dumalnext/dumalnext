@@ -317,21 +317,27 @@ export default function Step5DocumentsReview({
         } else {
           // Check if student profile exists in Supabase
           let studentUuid = user?.id;
-          const { data: existingStudent } = await supabase
-            .from("students")
-            .select("id")
-            .or(`student_id.eq.${data.lrn || user?.userId},user_id.eq.${user?.id}`)
-            .limit(1);
+          const numericLrn = data.lrn && /^\d{12}$/.test(data.lrn) ? data.lrn : null;
+          let studentQuery = supabase.from("students").select("id");
+          if (numericLrn && user?.id) {
+            studentQuery = studentQuery.or(`student_id.eq.${numericLrn},user_id.eq.${user.id}`);
+          } else if (user?.id) {
+            studentQuery = studentQuery.eq("user_id", user.id);
+          } else if (numericLrn) {
+            studentQuery = studentQuery.eq("student_id", numericLrn);
+          }
+          const { data: existingStudent } = await studentQuery.limit(1);
 
           if (existingStudent && existingStudent.length > 0) {
             studentUuid = existingStudent[0].id;
           } else {
             // Insert student profile record
+            const assignedStudentId = numericLrn || `100050${Math.floor(100000 + Math.random() * 900000)}`;
             const { data: createdStudent } = await supabase
               .from("students")
               .insert({
                 user_id: user?.id && user.id.length === 36 ? user.id : null,
-                student_id: data.lrn || user?.userId || `STU-${Date.now()}`,
+                student_id: assignedStudentId,
                 first_name: data.firstName,
                 middle_name: data.middleName || null,
                 last_name: data.lastName,

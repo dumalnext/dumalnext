@@ -250,7 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         firstName,
         middleName,
         lastName,
-        lrn: profile?.student_id || undefined,
+        lrn: profile?.student_id && /^\d{12}$/.test(profile.student_id) ? profile.student_id : undefined,
         userRole: "student",
       };
 
@@ -346,9 +346,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       suUser = suInsertRes.data;
 
       // 3. Direct Cloud Insert to Supabase 'students' profile table
+      // DepEd LRN is strictly 12 numeric digits. If no LRN yet, assign a 12-digit provisional LIS sequence.
+      const validLrn = cleanLrn && /^\d{12}$/.test(cleanLrn) ? cleanLrn : null;
+      const assignedNumericLrn = validLrn || `100050${Math.floor(100000 + Math.random() * 900000)}`;
+
       const { error: studentErr } = await supabase.from("students").insert({
         user_id: suUser.id,
-        student_id: cleanLrn || newUserId,
+        student_id: assignedNumericLrn,
         first_name: cleanFirst,
         middle_name: cleanMiddle || null,
         last_name: cleanLast,
@@ -368,7 +372,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         firstName: cleanFirst,
         middleName: cleanMiddle,
         lastName: cleanLast,
-        lrn: cleanLrn || undefined,
+        lrn: validLrn || undefined,
         userRole: "student",
       };
 

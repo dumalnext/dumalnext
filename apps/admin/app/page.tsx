@@ -238,7 +238,7 @@ export default function AdminHomePage() {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       const refMatch = app.application_id?.toLowerCase().includes(q);
-      const lrnMatch = app.student?.student_id?.toLowerCase().includes(q);
+      const lrnMatch = Boolean(app.student?.student_id && /^\d{12}$/.test(app.student.student_id) && app.student.student_id.includes(q));
       const firstMatch = app.student?.first_name?.toLowerCase().includes(q);
       const lastMatch = app.student?.last_name?.toLowerCase().includes(q);
       const emailMatch = app.userAccount?.email?.toLowerCase().includes(q);
@@ -672,8 +672,12 @@ export default function AdminHomePage() {
                               </span>
                             )}
                           </td>
-                          <td className="p-3 font-mono text-slate-800">
-                            {st?.student_id || "N/A"}
+                          <td className="p-3 font-mono">
+                            {st?.student_id && /^\d{12}$/.test(st.student_id) ? (
+                              <span className="font-bold text-slate-900">{st.student_id}</span>
+                            ) : (
+                              <span className="text-slate-400 italic font-sans text-[11px]">No LRN (Pending LIS)</span>
+                            )}
                           </td>
                           <td className="p-3">
                             <span className="font-bold text-slate-900 block">

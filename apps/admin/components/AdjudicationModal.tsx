@@ -122,7 +122,7 @@ export default function AdjudicationModal({
 
   const previewContext = {
     fullName,
-    lrn: st?.student_id || "100050123456",
+    lrn: st?.student_id && /^\d{12}$/.test(st.student_id) ? st.student_id : "Pending LIS Assignment",
     gender: st?.gender || "Male",
     dateOfBirth: st?.date_of_birth,
     placeOfBirth: st?.place_of_birth,
@@ -353,22 +353,13 @@ export default function AdjudicationModal({
           <button
             type="button"
             onClick={() => setActiveTab("documents")}
-            className={`py-3 px-3.5 border-b-2 transition-colors flex items-center gap-1.5 ${
+            className={`py-3 px-3.5 border-b-2 transition-colors ${
               activeTab === "documents"
                 ? "border-[#002060] bg-white text-[#002060]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             }`}
           >
-            <span>4. Requirements &amp; Sectioning</span>
-            {!selectedSectionId ? (
-              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-amber-200 text-amber-950 border border-amber-400 uppercase">
-                Section Required
-              </span>
-            ) : (
-              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
-                Section Assigned
-              </span>
-            )}
+            4. Requirements &amp; Sectioning
           </button>
         </div>
 
@@ -431,7 +422,9 @@ export default function AdjudicationModal({
                   <div className="bg-slate-50 p-3 border border-slate-200">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">12-Digit LRN</span>
                     <span className="font-mono font-bold text-sm text-[#002060]">
-                      {st?.student_id || "No LRN Yet (New Learner)"}
+                      {st?.student_id && /^\d{12}$/.test(st.student_id)
+                        ? st.student_id
+                        : "No LRN Yet (Pending LIS Assignment)"}
                     </span>
                   </div>
                   <div className="bg-slate-50 p-3 border border-slate-200">
@@ -841,10 +834,10 @@ export default function AdjudicationModal({
 
           {/* Adjudication Feedback & Action Box (Sticky at bottom of inspection) */}
           <div className="pt-3 border-t-2 border-slate-300 space-y-3">
-            {/* Persistent Section Assignment Status Banner (Visible across all tabs) */}
-            {!selectedSectionId ? (
-              <div className="p-3 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
+            {/* Section Assignment Status (Visible only on Tab 4: Requirements & Sectioning) */}
+            {activeTab === "documents" && (
+              !selectedSectionId ? (
+                <div className="p-2.5 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 flex items-center gap-2">
                   <span className="px-2 py-0.5 bg-amber-200 border border-amber-400 text-[10px] font-mono font-bold uppercase text-amber-950 shrink-0">
                     SECTION REQUIRED
                   </span>
@@ -852,44 +845,16 @@ export default function AdjudicationModal({
                     Official Section has <strong>not yet been assigned</strong>. DepEd Quota Control requires assigning an official section before approval.
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("documents");
-                    setTimeout(() => {
-                      const secElem = document.getElementById("section-assignment-box");
-                      if (secElem) secElem.scrollIntoView({ behavior: "smooth", block: "center" });
-                    }, 100);
-                  }}
-                  className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase tracking-wider shrink-0 transition-colors"
-                >
-                  [ Assign Section Now &rarr; ]
-                </button>
-              </div>
-            ) : (
-              <div className="p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
+              ) : (
+                <div className="p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex items-center gap-2">
                   <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 text-[10px] font-mono font-bold uppercase text-emerald-900 shrink-0">
-                    SECTION READY
+                    SECTION ASSIGNED
                   </span>
                   <span className="text-xs text-emerald-950">
-                    Assigned Section: <strong>{sections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level})
+                    Assigned Section: <strong>{sections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level}).
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("documents");
-                    setTimeout(() => {
-                      const secElem = document.getElementById("section-assignment-box");
-                      if (secElem) secElem.scrollIntoView({ behavior: "smooth", block: "center" });
-                    }, 100);
-                  }}
-                  className="text-[#002060] font-bold text-[11px] uppercase hover:underline shrink-0"
-                >
-                  Change Section
-                </button>
-              </div>
+              )
             )}
 
             <div className="space-y-1.5">
@@ -1033,7 +998,7 @@ export default function AdjudicationModal({
         <DocumentViewerModal
           document={inspectingDoc}
           learnerName={fullName}
-          lrn={st?.student_id || ""}
+          lrn={st?.student_id && /^\d{12}$/.test(st.student_id) ? st.student_id : "Pending LIS"}
           onClose={() => setInspectingDoc(null)}
           onVerify={(docTitle) => {
             const note = `• Verified compliant: ${docTitle}.`;

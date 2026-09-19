@@ -54,7 +54,11 @@ function TrackApplicationContent() {
       referenceNumber: suApp.application_id,
       applicationDate: suApp.created_at,
       status: suApp.status || "Pending",
-      lrn: studentRecord?.student_id || user?.lrn || "N/A",
+      lrn: (studentRecord?.student_id && /^\d{12}$/.test(studentRecord.student_id))
+        ? studentRecord.student_id
+        : (user?.lrn && /^\d{12}$/.test(user.lrn))
+        ? user.lrn
+        : "Pending LIS Assignment",
       fullName,
       gradeLevel: suApp.target_grade_level || 7,
       applicantType: suApp.applicant_type || "Grade 7",
@@ -78,7 +82,11 @@ function TrackApplicationContent() {
           lastSchoolAttended: "Dumalneg Elementary School",
           lastSchoolId: "100050",
         },
-        lrn: studentRecord?.student_id || user?.lrn || "100050123456",
+        lrn: (studentRecord?.student_id && /^\d{12}$/.test(studentRecord.student_id))
+          ? studentRecord.student_id
+          : (user?.lrn && /^\d{12}$/.test(user.lrn))
+          ? user.lrn
+          : "",
         psaBirthCertNo: "1234-5678-9012",
         lastName: studentRecord?.last_name || user?.lastName || "STUDENT",
         firstName: studentRecord?.first_name || user?.firstName || "APPLICANT",
@@ -539,7 +547,9 @@ function TrackApplicationContent() {
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">12-Digit LRN</span>
-                <span className="font-mono font-bold text-slate-900">{record.lrn}</span>
+                <span className="font-mono font-bold text-slate-900">
+                  {/^\d{12}$/.test(record.lrn) ? record.lrn : "Pending LIS Assignment (No LRN Yet)"}
+                </span>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">Grade Level &amp; Type</span>
