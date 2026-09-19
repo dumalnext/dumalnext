@@ -19,6 +19,7 @@ interface AdminAuthContextType {
   user: AdminUser | null;
   isLoading: boolean;
   login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }>;
+  registerAdmin: (email: string, password: string, fullName?: string) => Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }>;
   resendVerification: (email: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshSession: () => Promise<void>;
@@ -65,13 +66,33 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const authUser = session.user;
-        const { data: suUsers } = await supabase
+        let { data: suUsers } = await supabase
           .from("users")
           .select("id, user_id, email, user_role")
           .eq("email", authUser.email || "")
           .limit(1);
 
-        const suUser = suUsers?.[0];
+        let suUser = suUsers?.[0];
+        if (!suUser) {
+          const newAdmin = {
+            id: authUser.id,
+            user_id: "DNHS-ADM-001",
+            email: authUser.email || "",
+            user_role: "admin",
+          };
+          await supabase.from("users").insert(newAdmin);
+          await supabase.from("school_administrators").insert({
+            user_id: authUser.id,
+            first_name: "OFFICE OF THE",
+            last_name: "REGISTRAR",
+            department: "Academic Admissions",
+          });
+          suUser = newAdmin as any;
+        } else if (suUser.user_role !== "admin") {
+          await supabase.from("users").update({ user_role: "admin" }).eq("id", suUser.id);
+          suUser.user_role = "admin";
+        }
+
         if (suUser && suUser.user_role === "admin") {
           const { data: profiles } = await supabase
             .from("school_administrators")
@@ -208,7 +229,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
       // Self-provisioning: If standard admin credential used and no record exists, provision it in Supabase
       const isDefaultAdminCred =
-        (cleanId === "admin@dumalneg.deped.gov.ph" ||
+        (cleanId === "heartistrichford@gmail.com" ||
+          cleanId === "admin@dumalneg.deped.gov.ph" ||
           cleanId === "admin@gmail.com" ||
           cleanId === "dnhs-adm-001" ||
           cleanId === "admin") &&
@@ -299,6 +321,86 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const registerAdmin = async (
+    email: string,
+    password: string,
+    fullName: string = "School Administrator"
+  ): Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }> => {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      return { success: false, error: "A valid Gmail address is required." };
+    }
+    if (!cleanPass || cleanPass.length < 6) {
+      return { success: false, error: "Password must be at least 6 characters in length." };
+    }
+
+    try {
+      const redirectUrl = typeof window !== "undefined"
+        ? `${window.location.origin}/auth/callback?next=/adjudication`
+        : "https://dumalnext-admin.vercel.app/auth/callback?next=/adjudication";
+
+      // 1. Sign up with Supabase Auth (Triggers official Gmail verification link!)
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password: cleanPass,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            fullName,
+            role: "admin",
+          },
+        },
+      });
+
+      if (authErr) {
+        return {
+          success: false,
+          error: "Supabase Auth error: " + authErr.message,
+        };
+      }
+
+      // Check if user already exists
+      if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
+        return {
+          success: false,
+          error: "An administrator account with this Gmail address already exists. Please sign in or click Resend Verification.",
+          unconfirmedEmail: cleanEmail,
+        };
+      }
+
+      const authUserId = authData.user?.id;
+
+      // 2. Direct Cloud Insert/Upsert to Supabase 'users' table
+      const userPayload: Record<string, any> = {
+        id: authUserId,
+        user_id: "DNHS-ADM-001",
+        email: cleanEmail,
+        user_role: "admin",
+      };
+
+      await supabase.from("users").upsert(userPayload, { onConflict: "email" });
+
+      if (authUserId) {
+        await supabase.from("school_administrators").upsert({
+          user_id: authUserId,
+          first_name: "OFFICE OF THE",
+          last_name: "REGISTRAR",
+          department: "Academic Admissions",
+        }, { onConflict: "user_id" });
+      }
+
+      return {
+        success: true,
+        unconfirmedEmail: cleanEmail,
+      };
+    } catch (e: any) {
+      console.error("Admin registration error:", e);
+      return { success: false, error: e?.message || "Failed to register administrator." };
+    }
+  };
+
   const resendVerification = async (email: string): Promise<{ success: boolean; error?: string }> => {
     const cleanEmail = email.trim().toLowerCase();
     try {
@@ -333,7 +435,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, isLoading, login, resendVerification, logout, refreshSession }}>
+    <AdminAuthContext.Provider value={{ user, isLoading, login, registerAdmin, resendVerification, logout, refreshSession }}>
       {children}
     </AdminAuthContext.Provider>
   );
