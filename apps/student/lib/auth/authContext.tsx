@@ -86,7 +86,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .limit(1);
 
       if (verified && verified.length > 0) {
-        setUser(cachedUser);
+        setUser((prev) => {
+          if (
+            prev &&
+            prev.id === cachedUser.id &&
+            prev.userId === cachedUser.userId &&
+            prev.email === cachedUser.email &&
+            prev.lrn === cachedUser.lrn &&
+            prev.fullName === cachedUser.fullName
+          ) {
+            return prev;
+          }
+          return cachedUser;
+        });
       } else {
         // Account was deleted or invalid in Supabase! Immediately invalidate stale browser cookie
         clearSessionCookie();
@@ -109,19 +121,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const handleVisibilitySync = () => {
       if (document.visibilityState === "visible") {
         refreshSession();
-        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
       }
     };
     window.addEventListener("focus", handleVisibilitySync);
     document.addEventListener("visibilitychange", handleVisibilitySync);
 
-    // 3. 3-Second Heartbeat Polling: Guarantees zero stale state even without web socket
+    // 3. 15-Second Heartbeat Polling: Guarantees active state check without excessive re-renders
     const heartbeatTimer = setInterval(() => {
       const cachedUser = getSessionCookie();
       if (cachedUser) {
         refreshSession();
       }
-    }, 3000);
+    }, 15000);
 
     // 4. Supabase Realtime Channel: Listen to instant INSERT/UPDATE/DELETE on 'users'
     const authChannel = supabase

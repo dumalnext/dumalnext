@@ -124,8 +124,8 @@ function StudentHomeContent() {
     };
     window.addEventListener("dumalnext:data-changed", onDataChanged);
 
-    // 4. 3-Second Heartbeat Polling
-    const heartbeat = setInterval(fetchApp, 3000);
+    // 4. 10-Second Silent Heartbeat Polling
+    const heartbeat = setInterval(fetchApp, 10000);
 
     // 5. Supabase Realtime Channel: Instant live update on application changes
     const channel = supabase
@@ -147,7 +147,7 @@ function StudentHomeContent() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id, user?.lrn]);
 
   // Handle Sign In Submit with System Verification Delay
   const handleLoginSubmit = async (e: React.FormEvent) => {

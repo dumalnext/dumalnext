@@ -73,8 +73,8 @@ export default function StudentHeaderNav() {
     };
     window.addEventListener("dumalnext:data-changed", onDataChanged);
 
-    // 4. 3-Second Heartbeat Polling
-    const heartbeat = setInterval(fetchStatus, 3000);
+    // 4. 10-Second Silent Heartbeat Polling
+    const heartbeat = setInterval(fetchStatus, 10000);
 
     // 5. Supabase Realtime Channel: Instant live push from database
     const channel = supabase
@@ -96,7 +96,7 @@ export default function StudentHeaderNav() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id, user?.lrn]);
 
   return (
     <nav className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">

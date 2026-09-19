@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
@@ -39,6 +39,7 @@ function TrackApplicationContent() {
   const [reuploadSuccess, setReuploadSuccess] = useState<boolean>(false);
   const [showManualSearch, setShowManualSearch] = useState<boolean>(false);
   const [searchError, setSearchError] = useState<string>("");
+  const hasLoadedOnceRef = useRef<boolean>(false);
 
   // Protected Route Check: Unauthenticated visitors redirected to sign in
   useEffect(() => {
@@ -152,7 +153,8 @@ function TrackApplicationContent() {
     const supabase = createClient();
 
     const fetchRecord = async (silent: boolean = false) => {
-      if (!silent) {
+      // Only display the loading card if this is the very first load and not silent
+      if (!silent && !hasLoadedOnceRef.current) {
         setIsFetchingRecord(true);
       }
       setSearchError("");
@@ -175,6 +177,7 @@ function TrackApplicationContent() {
               .limit(1);
 
             setRecord(mapSupabaseToRecord(appData[0], stProfile?.[0] || null));
+            hasLoadedOnceRef.current = true;
             setIsFetchingRecord(false);
             return;
           }
@@ -198,6 +201,7 @@ function TrackApplicationContent() {
 
           if (isMounted && appData && appData.length > 0) {
             setRecord(mapSupabaseToRecord(appData[0], studentRecord));
+            hasLoadedOnceRef.current = true;
             setIsFetchingRecord(false);
             return;
           }
@@ -206,21 +210,23 @@ function TrackApplicationContent() {
         // No record submitted yet
         if (isMounted) {
           setRecord(null);
+          hasLoadedOnceRef.current = true;
           setIsFetchingRecord(false);
         }
       } catch (err) {
         console.error("Error auto-fetching application record:", err);
         if (isMounted) {
           setRecord(null);
+          hasLoadedOnceRef.current = true;
           setIsFetchingRecord(false);
         }
       }
     };
 
-    // 1. Initial fetch
-    fetchRecord(false);
+    // 1. Initial fetch (silent if already loaded once)
+    fetchRecord(hasLoadedOnceRef.current);
 
-    // 2. Window Focus & Visibility sync
+    // 2. Window Focus & Visibility sync (silent)
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         fetchRecord(true);
@@ -229,16 +235,16 @@ function TrackApplicationContent() {
     window.addEventListener("focus", handleVisibilityChange);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // 3. Custom Application/Data Changed event
+    // 3. Custom Application/Data Changed event (silent)
     const handleDataChanged = () => {
       fetchRecord(true);
     };
     window.addEventListener("dumalnext:data-changed", handleDataChanged);
 
-    // 4. 3-Second Heartbeat Polling
+    // 4. 10-Second Silent Heartbeat Polling
     const heartbeat = setInterval(() => {
       fetchRecord(true);
-    }, 3000);
+    }, 10000);
 
     // 5. Supabase Realtime Channel: Instant push on enrollment_applications changes
     const channel = supabase
@@ -260,7 +266,7 @@ function TrackApplicationContent() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
-  }, [user, initialQuery]);
+  }, [user?.id, user?.lrn, initialQuery]);
 
   // Manual Search Handler (For looking up other reference numbers if needed)
   const handleManualSearch = async (term: string) => {
@@ -271,6 +277,7 @@ function TrackApplicationContent() {
     }
 
     setIsFetchingRecord(true);
+    hasLoadedOnceRef.current = false;
     setSearchError("");
     setReuploadSuccess(false);
 
@@ -330,6 +337,7 @@ function TrackApplicationContent() {
       console.error("Manual search error:", e);
       setSearchError("An error occurred while connecting to the database.");
     } finally {
+      hasLoadedOnceRef.current = true;
       setIsFetchingRecord(false);
     }
   };
