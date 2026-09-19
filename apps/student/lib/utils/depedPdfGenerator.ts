@@ -56,11 +56,11 @@ export async function generateDepEdEnrollmentPdf(data: FullEnrollmentFormData): 
     height: imgPage1.height,
   });
 
-  // 1. School Year (e.g., 2025 - 2026)
-  const currentSY = "2025-2026";
+  // 1. School Year (e.g., 2026 - 2027)
+  const currentSY = (data.schoolYear || "2026-2027").replace("–", "-");
   const [syStart, syEnd] = currentSY.split("-");
-  page1.drawText(syStart || "2025", { x: 142, y: 804, size: 9, font: fontBold, color: textColor });
-  page1.drawText(syEnd || "2026", { x: 224, y: 804, size: 9, font: fontBold, color: textColor });
+  page1.drawText(syStart || "2026", { x: 142, y: 804, size: 9, font: fontBold, color: textColor });
+  page1.drawText(syEnd || "2027", { x: 224, y: 804, size: 9, font: fontBold, color: textColor });
 
   // 1. LRN: 12-digit Learner Reference Number in boxes
   const rawLrn = (data.lrn || "").replace(/\D/g, "").slice(0, 12);

@@ -276,6 +276,7 @@ export default function Step5DocumentsReview({
             .from("enrollment_applications")
             .update({
               applicant_type: data.step1.applicantType,
+              school_year: (data.schoolYear || "2026-2027").replace("–", "-"),
               target_grade_level: data.step1.targetGradeLevel,
               target_strand: data.targetStrand || null,
               status: "Pending", // Reset back to Pending for registrar evaluation
@@ -363,7 +364,7 @@ export default function Step5DocumentsReview({
                 application_id: generatedRef,
                 student_id: studentUuid,
                 applicant_type: data.step1.applicantType,
-                school_year: "2025-2026",
+                school_year: (data.schoolYear || "2026-2027").replace("–", "-"),
                 target_grade_level: data.step1.targetGradeLevel,
                 target_strand: data.targetStrand || null,
                 status: "Pending",

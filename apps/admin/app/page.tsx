@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import AdminHeaderNav from "@/components/AdminHeaderNav";
 import AdjudicationModal, { ApplicationDetail, SectionItem } from "@/components/AdjudicationModal";
+import EnrollmentControlRoom from "@/components/EnrollmentControlRoom";
 import { useAdminAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 
@@ -10,8 +11,8 @@ export default function AdminHomePage() {
   const { user, isLoading: isAuthLoading, login } = useAdminAuth();
   const supabase = createClient();
 
-  // Active Main Section: "adjudication" | "sections" | "scheduling"
-  const [activeSection, setActiveSection] = useState<"adjudication" | "sections" | "scheduling">("adjudication");
+  // Active Main Section: "adjudication" | "sections" | "scheduling" | "control"
+  const [activeSection, setActiveSection] = useState<"adjudication" | "sections" | "scheduling" | "control">("adjudication");
 
   // Sign-In Form State
   const [adminId, setAdminId] = useState<string>("admin@dumalneg.deped.gov.ph");
@@ -1029,6 +1030,11 @@ export default function AdminHomePage() {
             </div>
           </div>
         )}
+
+        {/* =====================================================================
+            MODULE 4: ENROLLMENT CONTROL ROOM & MASTER SYSTEM OPERATIONS
+            ===================================================================== */}
+        {activeSection === "control" && <EnrollmentControlRoom />}
       </main>
 
       {/* Adjudication Inspection Modal */}

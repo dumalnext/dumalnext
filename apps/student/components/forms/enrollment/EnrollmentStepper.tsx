@@ -90,9 +90,11 @@ export interface FullEnrollmentFormData {
     sizeKb: number;
   }[];
   dataPrivacyAccepted: boolean;
+  schoolYear?: string;
 }
 
 const initialFormData: FullEnrollmentFormData = {
+  schoolYear: "2026–2027",
   step1: {
     isGraded: true,
     applicantType: "",
@@ -175,26 +177,35 @@ const STEP_LABELS = [
   { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
-export default function EnrollmentStepper() {
+export default function EnrollmentStepper({ schoolYear = "2026–2027" }: { schoolYear?: string }) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [formData, setFormData] = useState<FullEnrollmentFormData>(initialFormData);
+  const [formData, setFormData] = useState<FullEnrollmentFormData>(() => ({
+    ...initialFormData,
+    schoolYear,
+  }));
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [existingApp, setExistingApp] = useState<any | null>(null);
   const [isCheckingApp, setIsCheckingApp] = useState<boolean>(true);
 
-  // Auto pre-fill basic account names if student is logged in
+  // Auto pre-fill basic account names if student is logged in and sync schoolYear
   useEffect(() => {
     if (user) {
       setFormData((prev) => ({
         ...prev,
+        schoolYear: schoolYear || prev.schoolYear || "2026–2027",
         lastName: prev.lastName || user.lastName,
         firstName: prev.firstName || user.firstName,
         middleName: prev.middleName || user.middleName || "",
         lrn: prev.lrn || (user.lrn && /^\d{12}$/.test(user.lrn) ? user.lrn : ""),
       }));
+    } else if (schoolYear) {
+      setFormData((prev) => ({
+        ...prev,
+        schoolYear,
+      }));
     }
-  }, [user]);
+  }, [user, schoolYear]);
 
   // Check if student already has an active enrollment application in Supabase
   useEffect(() => {
@@ -374,7 +385,7 @@ export default function EnrollmentStepper() {
             </span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed">
-            You have already submitted an official enrollment application for School Year 2025–2026. Under DepEd Basic Education enrollment guidelines, each learner is permitted only one (1) active application at a time.
+            You have already submitted an official enrollment application for School Year {schoolYear}. Under DepEd Basic Education enrollment guidelines, each learner is permitted only one (1) active application at a time.
           </p>
           <p className="text-xs text-amber-900 leading-relaxed">
             Your application is currently queued for evaluation by the Dumalneg NHS Registrar. If any correction or re-submission is necessary, the registrar will unlock your dossier for revision.
@@ -423,7 +434,7 @@ export default function EnrollmentStepper() {
             </span>
           </div>
           <p className="text-xs text-emerald-900 leading-relaxed">
-            Congratulations! You are officially enrolled at Dumalneg National High School for School Year 2025–2026. Your section assignment has been established and your official accomplished DepEd registration slip is ready.
+            Congratulations! You are officially enrolled at Dumalneg National High School for School Year {schoolYear}. Your section assignment has been established and your official accomplished DepEd registration slip is ready.
           </p>
         </div>
 
@@ -613,6 +624,7 @@ export default function EnrollmentStepper() {
         {currentStep === 1 && (
           <Step1ApplicantType
             data={formData.step1}
+            schoolYear={schoolYear}
             onChange={handleStep1Change}
             onNext={nextStep}
           />
@@ -647,7 +659,7 @@ export default function EnrollmentStepper() {
 
         {currentStep === 5 && (
           <Step5DocumentsReview
-            data={formData}
+            data={{ ...formData, schoolYear }}
             onChange={handleFormDataChange}
             onBack={prevStep}
             existingApplication={existingApp}

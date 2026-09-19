@@ -21,12 +21,14 @@ interface Step1ApplicantTypeProps {
   data: Step1Data;
   onChange: (fields: Partial<Step1Data>) => void;
   onNext: () => void;
+  schoolYear?: string;
 }
 
 export default function Step1ApplicantType({
   data,
   onChange,
   onNext,
+  schoolYear = "2026–2027",
 }: Step1ApplicantTypeProps) {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
@@ -282,16 +284,16 @@ export default function Step1ApplicantType({
   return (
     <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm">
       {/* Step Header */}
-      <div className="border-b-2 border-slate-200 pb-5">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider">
-            STEP 01 OF 05
+      <div className="border-b border-slate-200 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="font-mono text-xs font-bold text-[#002060] uppercase tracking-wider">
+            [ Step 1 of 5 &bull; Academic Classification ]
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            DepEd Form Sections 2, 6 &amp; 7
+          <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold uppercase tracking-wider shadow-xs">
+            School Year: {schoolYear}
           </span>
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-1">
           Learner Classification &amp; Target Grade Level
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">

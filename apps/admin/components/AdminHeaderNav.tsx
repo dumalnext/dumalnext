@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useAdminAuth } from "@/lib/auth/authContext";
 
 interface AdminHeaderNavProps {
-  activeSection?: "adjudication" | "sections" | "scheduling";
-  onSelectSection?: (section: "adjudication" | "sections" | "scheduling") => void;
+  activeSection?: "adjudication" | "sections" | "scheduling" | "control";
+  onSelectSection?: (section: "adjudication" | "sections" | "scheduling" | "control") => void;
 }
 
 export default function AdminHeaderNav({
@@ -107,6 +107,17 @@ export default function AdminHeaderNav({
               }`}
             >
               3. Automated Schedule Deconfliction
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectSection?.("control")}
+              className={`py-3 px-4 border-b-2 transition-colors ${
+                activeSection === "control"
+                  ? "border-[#002060] bg-white text-[#002060]"
+                  : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+              }`}
+            >
+              4. Enrollment Control Room &amp; Operations
             </button>
           </div>
         </div>

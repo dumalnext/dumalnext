@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { createClient } from "@/lib/supabase/client";
+import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -13,6 +14,7 @@ function StudentHomeContent() {
   const tabQuery = searchParams.get("tab");
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
   const { user, login, register, logout } = useAuth();
+  const { isEnrollmentOpen, schoolYear, closedMessage } = useEnrollmentControl();
 
   // Active Tab for Visitors: "signin" | "register"
   const [activeTab, setActiveTab] = useState<"signin" | "register">(
@@ -93,6 +95,7 @@ function StudentHomeContent() {
               targetTrack: a.target_strand ? "Senior High School" : "Junior High School",
               targetStrand: a.target_strand,
               remarks: a.admin_feedback,
+              schoolYear: a.school_year || schoolYear || "2026-2027",
             });
             return;
           }
@@ -525,23 +528,44 @@ function StudentHomeContent() {
               </div>
             ) : (
               /* User has not yet submitted an enrollment application */
-              <div className="p-6 bg-slate-50 border border-slate-300 space-y-4 text-center">
-                <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
-                  [ Online Enrollment Status: Not Yet Submitted ]
-                </span>
+              <div className={`p-6 border space-y-4 text-center ${
+                !isEnrollmentOpen ? "bg-red-50/60 border-red-300" : "bg-slate-50 border-slate-300"
+              }`}>
+                <div className="flex items-center justify-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${
+                    isEnrollmentOpen ? "bg-emerald-500" : "bg-red-500"
+                  }`} />
+                  <span className={`text-xs font-mono font-bold uppercase ${
+                    isEnrollmentOpen ? "text-emerald-900" : "text-red-900"
+                  }`}>
+                    [ ONLINE ENROLLMENT: {isEnrollmentOpen ? `OPEN FOR S.Y. ${schoolYear}` : `CLOSED FOR S.Y. ${schoolYear}`} ]
+                  </span>
+                </div>
+
                 <h3 className="text-base font-bold text-slate-900">
-                  Ready to Complete Your Basic Education Enrollment?
+                  {isEnrollmentOpen
+                    ? `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear}?`
+                    : `Basic Education Online Enrollment is Currently Closed`}
                 </h3>
+
                 <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
-                  Your student account is active. Click below to begin filling out the 5-step official enrollment form. 
-                  Your registered learner details will be automatically pre-filled.
+                  {isEnrollmentOpen
+                    ? `Your student account is active. Click below to begin filling out the 5-step official enrollment form for School Year ${schoolYear}. Your registered learner details will be automatically pre-filled.`
+                    : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
                 </p>
+
                 <div className="pt-2">
                   <Link
                     href="/enroll"
-                    className="btn-primary inline-block text-xs uppercase tracking-wider font-bold py-3 px-8"
+                    className={`inline-block text-xs uppercase tracking-wider font-bold py-3 px-8 ${
+                      isEnrollmentOpen
+                        ? "btn-primary"
+                        : "bg-red-800 hover:bg-red-900 text-white shadow-xs"
+                    }`}
                   >
-                    Start 5-Step Online Enrollment Form
+                    {isEnrollmentOpen
+                      ? `Start 5-Step Online Enrollment Form (S.Y. ${schoolYear})`
+                      : "[ View Official Enrollment Notice & Advisory ]"}
                   </Link>
                 </div>
               </div>
