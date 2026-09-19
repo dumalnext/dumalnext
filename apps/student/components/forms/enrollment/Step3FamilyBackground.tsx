@@ -43,32 +43,24 @@ export default function Step3FamilyBackground({
     data.motherMiddleName === "N/A" || data.motherMiddleName === "NONE"
   );
 
-  // Guardian availability: Checked by default if living with parents (optional unless learner lives with a guardian)
-  const [hasNoGuardian, setHasNoGuardian] = useState<boolean>(
-    data.guardianLastName === "N/A" || (!data.guardianLastName && data.primaryContactPerson !== "Guardian")
-  );
+  // Guardian middle name state
   const [hasNoGuardianMiddleName, setHasNoGuardianMiddleName] = useState<boolean>(
     data.guardianMiddleName === "N/A" || data.guardianMiddleName === "NONE"
   );
 
-  // Primary Emergency Contact selection - freely selectable among Father, Mother, or Guardian
+  // Smart Detection: Are BOTH parents marked unavailable?
+  const isBothParentsUnavailable = isFatherNotAvailable && isMotherNotAvailable;
+
+  // Primary Emergency Contact selection
   const [primaryContact, setPrimaryContact] = useState<"Father" | "Mother" | "Guardian">(
-    data.primaryContactPerson || (isFatherNotAvailable ? (isMotherNotAvailable ? "Guardian" : "Mother") : "Father")
+    isBothParentsUnavailable
+      ? "Guardian"
+      : data.primaryContactPerson || (isFatherNotAvailable ? "Mother" : "Father")
   );
 
   const handleSelectPrimaryContact = (contact: "Father" | "Mother" | "Guardian") => {
     setPrimaryContact(contact);
-    if (contact === "Guardian" && hasNoGuardian) {
-      setHasNoGuardian(false);
-      onChange({
-        guardianLastName: "",
-        guardianFirstName: "",
-        guardianMiddleName: "",
-        primaryContactPerson: "Guardian",
-      });
-    } else {
-      onChange({ primaryContactPerson: contact });
-    }
+    onChange({ primaryContactPerson: contact });
   };
 
   // Toggle Father availability
@@ -81,9 +73,13 @@ export default function Step3FamilyBackground({
         fatherMiddleName: "N/A",
         fatherContactNumber: "",
       });
-      // Switch primary contact if Father was selected
-      if (primaryContact === "Father") {
-        setPrimaryContact(isMotherNotAvailable ? "Guardian" : "Mother");
+      // If Mother is also unavailable, automatically switch primary contact to Guardian
+      if (isMotherNotAvailable) {
+        setPrimaryContact("Guardian");
+        onChange({ primaryContactPerson: "Guardian" });
+      } else if (primaryContact === "Father") {
+        setPrimaryContact("Mother");
+        onChange({ primaryContactPerson: "Mother" });
       }
     } else {
       onChange({
@@ -92,6 +88,10 @@ export default function Step3FamilyBackground({
         fatherMiddleName: "",
         fatherContactNumber: "",
       });
+      if (primaryContact === "Guardian" && isMotherNotAvailable) {
+        setPrimaryContact("Father");
+        onChange({ primaryContactPerson: "Father" });
+      }
     }
   };
 
@@ -105,9 +105,13 @@ export default function Step3FamilyBackground({
         motherMiddleName: "N/A",
         motherContactNumber: "",
       });
-      // Switch primary contact if Mother was selected
-      if (primaryContact === "Mother") {
-        setPrimaryContact(isFatherNotAvailable ? "Guardian" : "Father");
+      // If Father is also unavailable, automatically switch primary contact to Guardian
+      if (isFatherNotAvailable) {
+        setPrimaryContact("Guardian");
+        onChange({ primaryContactPerson: "Guardian" });
+      } else if (primaryContact === "Mother") {
+        setPrimaryContact("Father");
+        onChange({ primaryContactPerson: "Father" });
       }
     } else {
       onChange({
@@ -116,35 +120,16 @@ export default function Step3FamilyBackground({
         motherMiddleName: "",
         motherContactNumber: "",
       });
-    }
-  };
-
-  // Toggle Guardian availability
-  const handleGuardianAvailabilityToggle = (noGuardian: boolean) => {
-    setHasNoGuardian(noGuardian);
-    if (noGuardian) {
-      onChange({
-        guardianLastName: "",
-        guardianFirstName: "",
-        guardianMiddleName: "",
-        guardianContactNumber: "",
-        guardianRelationship: "",
-      });
-      if (primaryContact === "Guardian") {
-        setPrimaryContact(!isFatherNotAvailable ? "Father" : "Mother");
+      if (primaryContact === "Guardian" && isFatherNotAvailable) {
+        setPrimaryContact("Mother");
+        onChange({ primaryContactPerson: "Mother" });
       }
     }
   };
 
-  // Validation Logic
+  // Smart Validation Logic
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
-
-    // Check that not all contacts are marked unavailable
-    if (isFatherNotAvailable && isMotherNotAvailable && hasNoGuardian) {
-      newErrors.general =
-        "DepEd Compliance: Learner must have at least one active parent or legal guardian on official school records.";
-    }
 
     // 1. Father Validation
     if (!isFatherNotAvailable) {
@@ -184,42 +169,70 @@ export default function Step3FamilyBackground({
       }
     }
 
-    // 3. Legal Guardian Validation
-    // Guardian is required if: primary contact is Guardian, OR both parents are unavailable, OR user entered guardian details
-    const hasEnteredGuardianData = Boolean(
-      (data.guardianLastName && data.guardianLastName.trim() !== "") ||
-      (data.guardianFirstName && data.guardianFirstName.trim() !== "") ||
-      (data.guardianRelationship && data.guardianRelationship.trim() !== "") ||
-      (data.guardianContactNumber && data.guardianContactNumber.trim() !== "")
-    );
-
-    const isGuardianMandatory =
-      primaryContact === "Guardian" ||
-      (isFatherNotAvailable && isMotherNotAvailable) ||
-      (!hasNoGuardian && hasEnteredGuardianData);
-
-    if (!hasNoGuardian && isGuardianMandatory) {
-      if (!data.guardianLastName || data.guardianLastName.trim() === "") {
-        newErrors.guardianLastName = "Guardian's official last name is required.";
+    // 3. Section C (Legal Guardian) Smart Validation
+    if (isBothParentsUnavailable) {
+      // Both parents are unavailable -> Legal Guardian is MANDATORY!
+      let hasGuardianError = false;
+      if (!data.guardianLastName || data.guardianLastName.trim() === "" || data.guardianLastName === "N/A") {
+        newErrors.guardianLastName = "Guardian's last name is required because both parents are unavailable.";
+        hasGuardianError = true;
       }
-      if (!data.guardianFirstName || data.guardianFirstName.trim() === "") {
-        newErrors.guardianFirstName = "Guardian's official first name is required.";
+      if (!data.guardianFirstName || data.guardianFirstName.trim() === "" || data.guardianFirstName === "N/A") {
+        newErrors.guardianFirstName = "Guardian's first name is required because both parents are unavailable.";
+        hasGuardianError = true;
       }
-      if (!hasNoGuardianMiddleName && (!data.guardianMiddleName || data.guardianMiddleName.trim() === "")) {
+      if (!hasNoGuardianMiddleName && (!data.guardianMiddleName || data.guardianMiddleName.trim() === "" || data.guardianMiddleName === "N/A")) {
         newErrors.guardianMiddleName = "Guardian's middle name is required, or check 'No Middle Name'.";
       }
       if (!data.guardianRelationship || data.guardianRelationship.trim() === "") {
         newErrors.guardianRelationship = "Please select the legal guardian's relationship to the learner.";
+        hasGuardianError = true;
       }
-      if (data.guardianContactNumber && data.guardianContactNumber.trim() !== "") {
+      if (!data.guardianContactNumber || data.guardianContactNumber.trim() === "") {
+        newErrors.guardianContactNumber = "An active 11-digit mobile contact number (09XXXXXXXXX) is required for the guardian.";
+        hasGuardianError = true;
+      } else {
         const cleaned = data.guardianContactNumber.replace(/\D/g, "");
         if (cleaned.length !== 11 || !cleaned.startsWith("09")) {
-          newErrors.guardianContactNumber = "Contact number must be 11 numeric digits starting with 09 (e.g., 09191234567).";
+          newErrors.guardianContactNumber = "Guardian contact number must be 11 numeric digits starting with 09 (e.g., 09191234567).";
+        }
+      }
+
+      if (hasGuardianError) {
+        newErrors.general =
+          "DepEd Compliance: Dahil minarkahang unavailable ang Ama at Ina, kailangan pong punan ang Section C (Legal Guardian) kasama ang kanyang pangalan, relasyon, at 11-digit mobile number.";
+      }
+    } else {
+      // At least one parent is available -> Section C is OPTIONAL!
+      // If user typed anything in guardian fields, validate consistency
+      const hasEnteredGuardianData = Boolean(
+        (data.guardianLastName && data.guardianLastName.trim() !== "" && data.guardianLastName !== "N/A") ||
+        (data.guardianFirstName && data.guardianFirstName.trim() !== "" && data.guardianFirstName !== "N/A") ||
+        (data.guardianRelationship && data.guardianRelationship.trim() !== "") ||
+        (data.guardianContactNumber && data.guardianContactNumber.trim() !== "") ||
+        primaryContact === "Guardian"
+      );
+
+      if (hasEnteredGuardianData) {
+        if (!data.guardianLastName || data.guardianLastName.trim() === "") {
+          newErrors.guardianLastName = "Guardian's last name is required if registering a guardian.";
+        }
+        if (!data.guardianFirstName || data.guardianFirstName.trim() === "") {
+          newErrors.guardianFirstName = "Guardian's first name is required if registering a guardian.";
+        }
+        if (!data.guardianRelationship || data.guardianRelationship.trim() === "") {
+          newErrors.guardianRelationship = "Please select the guardian's relationship to the learner.";
+        }
+        if (data.guardianContactNumber && data.guardianContactNumber.trim() !== "") {
+          const cleaned = data.guardianContactNumber.replace(/\D/g, "");
+          if (cleaned.length !== 11 || !cleaned.startsWith("09")) {
+            newErrors.guardianContactNumber = "Guardian contact number must be 11 numeric digits starting with 09 (e.g., 09191234567).";
+          }
         }
       }
     }
 
-    // 4. Emergency Contact Number Check (At least ONE valid 11-digit number required across all contacts)
+    // 4. Overall Emergency Contact Number Check (At least one active 11-digit mobile number across all active contacts)
     const validFatherContact =
       !isFatherNotAvailable &&
       data.fatherContactNumber &&
@@ -233,7 +246,6 @@ export default function Step3FamilyBackground({
       data.motherContactNumber.replace(/\D/g, "").startsWith("09");
 
     const validGuardianContact =
-      !hasNoGuardian &&
       data.guardianContactNumber &&
       data.guardianContactNumber.replace(/\D/g, "").length === 11 &&
       data.guardianContactNumber.replace(/\D/g, "").startsWith("09");
@@ -267,7 +279,7 @@ export default function Step3FamilyBackground({
           Parent &amp; Legal Guardian Information
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Provide complete parental and legal guardian background in accordance with DepEd Civil Registry verification standards.
+          Provide parental and guardian background in accordance with official DepEd Civil Registry verification standards.
         </p>
       </div>
 
@@ -320,7 +332,7 @@ export default function Step3FamilyBackground({
             <div className="text-xs">
               <div className="font-bold uppercase">Father</div>
               <div className={primaryContact === "Father" && !isFatherNotAvailable ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
-                Primary Emergency Contact
+                {isFatherNotAvailable ? "Unavailable" : "Primary Emergency Contact"}
               </div>
             </div>
           </label>
@@ -346,7 +358,7 @@ export default function Step3FamilyBackground({
             <div className="text-xs">
               <div className="font-bold uppercase">Mother</div>
               <div className={primaryContact === "Mother" && !isMotherNotAvailable ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
-                Primary Emergency Contact
+                {isMotherNotAvailable ? "Unavailable" : "Primary Emergency Contact"}
               </div>
             </div>
           </label>
@@ -369,7 +381,7 @@ export default function Step3FamilyBackground({
             <div className="text-xs">
               <div className="font-bold uppercase">Legal Guardian</div>
               <div className={primaryContact === "Guardian" ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
-                Authorized Custodian
+                {isBothParentsUnavailable ? "Mandatory Custodian" : "Authorized Custodian"}
               </div>
             </div>
           </label>
@@ -384,7 +396,7 @@ export default function Step3FamilyBackground({
               [ Section A: Father&apos;s Legal Information ]
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
-              Official legal name and active mobile number as registered in official documents.
+              Official legal name and active mobile number as registered in official civil documents.
             </p>
           </div>
           <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300">
@@ -400,7 +412,7 @@ export default function Step3FamilyBackground({
 
         {isFatherNotAvailable ? (
           <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic">
-            Father information is designated as Not Available. The school will reference the Mother or Legal Guardian as primary contact.
+            Father information is designated as Not Available. The school will reference the Mother or Legal Guardian.
           </div>
         ) : (
           <div className="space-y-4">
@@ -583,7 +595,7 @@ export default function Step3FamilyBackground({
 
         {isMotherNotAvailable ? (
           <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic">
-            Mother information is designated as Not Available. The school will reference the Father or Legal Guardian as primary contact.
+            Mother information is designated as Not Available. The school will reference the Father or Legal Guardian.
           </div>
         ) : (
           <div className="space-y-4">
@@ -746,242 +758,239 @@ export default function Step3FamilyBackground({
         )}
       </div>
 
-      {/* Section C: Legal Guardian Information */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      {/* Section C: Legal Guardian / Authorized Custodian (SMART OPTIONAL / REQUIRED) */}
+      <div className={`space-y-5 p-6 border-2 transition-colors ${
+        isBothParentsUnavailable ? "bg-red-50/40 border-red-400" : "bg-slate-50 border-slate-300"
+      }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section C: Legal Guardian / Authorized Custodian (Optional) ]
-            </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Fill out ONLY if the learner lives with a relative, grandparent, or guardian (e.g. OFW parents). If living with parents, keep the box checked.
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-bold uppercase tracking-wider block ${
+                isBothParentsUnavailable ? "text-red-900" : "text-[#002060]"
+              }`}>
+                [ Section C: Legal Guardian / Authorized Custodian ]
+              </span>
+              {isBothParentsUnavailable ? (
+                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-700 text-white font-mono">
+                  [ REQUIRED BY DEPED ]
+                </span>
+              ) : (
+                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700 border border-slate-300">
+                  OPTIONAL
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              {isBothParentsUnavailable
+                ? "Dahil minarkahang unavailable ang Ama at Ina, MANDATORY po na maglagay ng Legal Guardian (Lolo/Lola, Kamag-anak, o Foster Parent) at kanyang 11-digit mobile number."
+                : "Optional: Punan lamang kung ang mag-aaral ay may hiwalay na tagapangalaga (hal. Lolo/Lola, Tita/Tito dahil OFW ang magulang). Kung kasama ang magulang, iwanan itong blangko."}
             </p>
           </div>
-          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300">
-            <input
-              type="checkbox"
-              checked={hasNoGuardian}
-              onChange={(e) => handleGuardianAvailabilityToggle(e.target.checked)}
-              className="accent-[#002060]"
-            />
-            <span className="font-bold">No Separate Legal Guardian (Living with Parents)</span>
-          </label>
         </div>
 
-        {hasNoGuardian ? (
-          <div className="p-4 bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 font-medium space-y-1">
-            <div className="font-bold uppercase tracking-wider text-emerald-900">
-              [ LIVING WITH PARENTS &bull; NO GUARDIAN ENTRY REQUIRED ]
-            </div>
-            <p>
-              The learner lives with their parents (Father and/or Mother). A separate legal guardian is not required. (If the student lives with a relative or guardian instead, uncheck the box above or select Legal Guardian as Primary Contact).
-            </p>
+        <div className="space-y-4">
+          {/* Guardian Relationship Selector */}
+          <div>
+            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              Guardian&apos;s Relationship to Learner {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
+            </label>
+            <select
+              value={data.guardianRelationship || ""}
+              onChange={(e) => {
+                onChange({ guardianRelationship: e.target.value });
+                if (errors.guardianRelationship) {
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.guardianRelationship;
+                    return next;
+                  });
+                }
+              }}
+              className={`w-full sm:w-80 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
+                errors.guardianRelationship ? "border-red-600 bg-red-50" : "border-slate-300"
+              }`}
+            >
+              <option value="">-- SELECT RELATIONSHIP --</option>
+              {GUARDIAN_RELATIONSHIPS.map((rel) => (
+                <option key={rel} value={rel}>
+                  {rel}
+                </option>
+              ))}
+            </select>
+            {errors.guardianRelationship && (
+              <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianRelationship}</p>
+            )}
           </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Guardian Relationship Selector */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Guardian Last Name */}
             <div>
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Guardian&apos;s Relationship to Learner <span className="text-red-700">*</span>
+                Guardian&apos;s Last Name {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
               </label>
-              <select
-                value={data.guardianRelationship || ""}
+              <input
+                type="text"
+                value={data.guardianLastName === "N/A" ? "" : (data.guardianLastName || "")}
                 onChange={(e) => {
-                  onChange({ guardianRelationship: e.target.value });
-                  if (errors.guardianRelationship) {
+                  onChange({ guardianLastName: e.target.value.toUpperCase() });
+                  if (errors.guardianLastName) {
                     setErrors((prev) => {
                       const next = { ...prev };
-                      delete next.guardianRelationship;
+                      delete next.guardianLastName;
                       return next;
                     });
                   }
                 }}
-                className={`w-full sm:w-80 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                  errors.guardianRelationship ? "border-red-600 bg-red-50" : "border-slate-300"
+                placeholder="e.g. AGCAOILI"
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                  errors.guardianLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
-              >
-                <option value="">-- SELECT RELATIONSHIP --</option>
-                {GUARDIAN_RELATIONSHIPS.map((rel) => (
-                  <option key={rel} value={rel}>
-                    {rel}
-                  </option>
-                ))}
-              </select>
-              {errors.guardianRelationship && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianRelationship}</p>
+              />
+              {errors.guardianLastName && (
+                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianLastName}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Guardian Last Name */}
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Guardian&apos;s Last Name <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={data.guardianLastName || ""}
-                  onChange={(e) => {
-                    onChange({ guardianLastName: e.target.value.toUpperCase() });
-                    if (errors.guardianLastName) {
-                      setErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.guardianLastName;
-                        return next;
-                      });
-                    }
-                  }}
-                  placeholder="e.g. AGCAOILI"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
-                    errors.guardianLastName ? "border-red-600 bg-red-50" : "border-slate-300"
-                  }`}
-                />
-                {errors.guardianLastName && (
-                  <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianLastName}</p>
-                )}
-              </div>
-
-              {/* Guardian First Name */}
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Guardian&apos;s First Name <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={data.guardianFirstName || ""}
-                  onChange={(e) => {
-                    onChange({ guardianFirstName: e.target.value.toUpperCase() });
-                    if (errors.guardianFirstName) {
-                      setErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.guardianFirstName;
-                        return next;
-                      });
-                    }
-                  }}
-                  placeholder="e.g. EDUARDO"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
-                    errors.guardianFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
-                  }`}
-                />
-                {errors.guardianFirstName && (
-                  <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianFirstName}</p>
-                )}
-              </div>
-
-              {/* Guardian Middle Name */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-900 uppercase">
-                    Guardian&apos;s Middle Name {!hasNoGuardianMiddleName && <span className="text-red-700">*</span>}
-                  </label>
-                  <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={hasNoGuardianMiddleName}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setHasNoGuardianMiddleName(checked);
-                        if (checked) {
-                          onChange({ guardianMiddleName: "N/A" });
-                          if (errors.guardianMiddleName) {
-                            setErrors((prev) => {
-                              const next = { ...prev };
-                              delete next.guardianMiddleName;
-                              return next;
-                            });
-                          }
-                        } else {
-                          onChange({ guardianMiddleName: "" });
-                        }
-                      }}
-                      className="accent-[#002060]"
-                    />
-                    <span>No Middle Name</span>
-                  </label>
-                </div>
-                <input
-                  type="text"
-                  disabled={hasNoGuardianMiddleName}
-                  value={hasNoGuardianMiddleName ? "N/A" : data.guardianMiddleName}
-                  onChange={(e) => {
-                    onChange({ guardianMiddleName: e.target.value.toUpperCase() });
-                    if (errors.guardianMiddleName) {
-                      setErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.guardianMiddleName;
-                        return next;
-                      });
-                    }
-                  }}
-                  placeholder={hasNoGuardianMiddleName ? "N/A" : "e.g. CASTRO"}
-                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none ${
-                    hasNoGuardianMiddleName
-                      ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
-                      : errors.guardianMiddleName
-                      ? "bg-red-50 border-red-600 focus:border-[#002060]"
-                      : "bg-white border-slate-300 focus:border-[#002060]"
-                  }`}
-                />
-                {errors.guardianMiddleName && !hasNoGuardianMiddleName && (
-                  <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianMiddleName}</p>
-                )}
-              </div>
+            {/* Guardian First Name */}
+            <div>
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                Guardian&apos;s First Name {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
+              </label>
+              <input
+                type="text"
+                value={data.guardianFirstName === "N/A" ? "" : (data.guardianFirstName || "")}
+                onChange={(e) => {
+                  onChange({ guardianFirstName: e.target.value.toUpperCase() });
+                  if (errors.guardianFirstName) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.guardianFirstName;
+                      return next;
+                    });
+                  }
+                }}
+                placeholder="e.g. EDUARDO"
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                  errors.guardianFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
+                }`}
+              />
+              {errors.guardianFirstName && (
+                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianFirstName}</p>
+              )}
             </div>
 
-            {/* Guardian Contact Number */}
-            <div className="max-w-md">
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Guardian&apos;s Mobile Contact Number
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  maxLength={11}
-                  value={data.guardianContactNumber || ""}
-                  onChange={(e) => {
-                    const cleaned = e.target.value.replace(/\D/g, "").slice(0, 11);
-                    onChange({ guardianContactNumber: cleaned });
-                    if (errors.guardianContactNumber) {
-                      setErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.guardianContactNumber;
-                        return next;
-                      });
-                    }
-                  }}
-                  placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none ${
-                    errors.guardianContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
-                  }`}
-                />
+            {/* Guardian Middle Name */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-slate-900 uppercase">
+                  Guardian&apos;s Middle Name {isBothParentsUnavailable && !hasNoGuardianMiddleName ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
+                </label>
+                <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={hasNoGuardianMiddleName}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setHasNoGuardianMiddleName(checked);
+                      if (checked) {
+                        onChange({ guardianMiddleName: "N/A" });
+                        if (errors.guardianMiddleName) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next.guardianMiddleName;
+                            return next;
+                          });
+                        }
+                      } else {
+                        onChange({ guardianMiddleName: "" });
+                      }
+                    }}
+                    className="accent-[#002060]"
+                  />
+                  <span>No Middle Name</span>
+                </label>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Standard 11-digit Philippine mobile format (e.g., 09191234567).
-              </p>
-              {errors.guardianContactNumber && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianContactNumber}</p>
+              <input
+                type="text"
+                disabled={hasNoGuardianMiddleName}
+                value={hasNoGuardianMiddleName ? "N/A" : (data.guardianMiddleName || "")}
+                onChange={(e) => {
+                  onChange({ guardianMiddleName: e.target.value.toUpperCase() });
+                  if (errors.guardianMiddleName) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.guardianMiddleName;
+                      return next;
+                    });
+                  }
+                }}
+                placeholder={hasNoGuardianMiddleName ? "N/A" : "e.g. BALAGAT"}
+                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none ${
+                  hasNoGuardianMiddleName
+                    ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
+                    : errors.guardianMiddleName
+                    ? "bg-red-50 border-red-600 focus:border-[#002060]"
+                    : "bg-white border-slate-300 focus:border-[#002060]"
+                }`}
+              />
+              {errors.guardianMiddleName && !hasNoGuardianMiddleName && (
+                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianMiddleName}</p>
               )}
             </div>
           </div>
-        )}
+
+          {/* Guardian Contact Number */}
+          <div className="max-w-md">
+            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              Guardian&apos;s Mobile Contact Number {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                maxLength={11}
+                value={data.guardianContactNumber || ""}
+                onChange={(e) => {
+                  const cleaned = e.target.value.replace(/\D/g, "").slice(0, 11);
+                  onChange({ guardianContactNumber: cleaned });
+                  if (errors.guardianContactNumber) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.guardianContactNumber;
+                      return next;
+                    });
+                  }
+                }}
+                placeholder="09XXXXXXXXX"
+                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none ${
+                  errors.guardianContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
+                }`}
+              />
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1">
+              Standard 11-digit Philippine mobile format (e.g., 09191234567).
+            </p>
+            {errors.guardianContactNumber && (
+              <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianContactNumber}</p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Navigation Footer */}
-      <div className="border-t-2 border-slate-200 pt-6 flex flex-col sm:flex-row justify-between gap-3">
+      {/* Navigation Controls */}
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-slate-200">
         <button
           type="button"
           onClick={onBack}
-          className="btn-secondary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center"
+          className="w-full sm:w-auto px-6 py-3 border-2 border-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 transition-colors"
         >
-          Back to Step 2: Learner Profile
+          &larr; Back to Step 2
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm"
+          className="w-full sm:w-auto px-8 py-3 bg-[#002060] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs"
         >
-          Proceed: Curriculum &amp; Modality (Step 4)
+          Proceed to Step 4 &rarr;
         </button>
       </div>
     </div>
