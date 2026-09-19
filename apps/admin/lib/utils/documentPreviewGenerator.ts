@@ -15,6 +15,14 @@ export interface DocPreviewContext {
   gradeLevel?: number | string;
 }
 
+function toSvgDataUrl(svg: string): string {
+  const cleanSvg = svg
+    .replace(/&bull;/g, "&#8226;")
+    .replace(/–/g, "-")
+    .trim();
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`;
+}
+
 export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext): string {
   const cleanType = (docType || "").toLowerCase();
 
@@ -67,7 +75,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <text x="460" y="275" font-family="sans-serif" font-size="10" fill="#64748b">PLACE OF BIRTH:</text>
       <text x="460" y="298" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0f172a">${(ctx.placeOfBirth || "Dumalneg, Ilocos Norte").toUpperCase()}</text>
       
-      <!-- Section 2: Mother & Father -->
+      <!-- Section 2: Mother &amp; Father -->
       <rect x="40" y="325" width="620" height="26" fill="#002060"/>
       <text x="50" y="343" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff" letter-spacing="1">2. PARENTAGE RECORDS</text>
       
@@ -81,7 +89,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <text x="50" y="417" font-family="sans-serif" font-size="10" fill="#64748b">FATHER'S NAME:</text>
       <text x="50" y="440" font-family="sans-serif" font-size="14" font-weight="bold" fill="#0f172a">${(ctx.fatherName || "LOZANO, JUAN CASTRO").toUpperCase()}</text>
       
-      <!-- Section 3: Official DepEd Watermark & Verification -->
+      <!-- Section 3: Official DepEd Watermark &amp; Verification -->
       <rect x="40" y="465" width="620" height="280" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4"/>
       <text x="350" y="520" font-family="sans-serif" font-size="18" font-weight="bold" fill="#002060" text-anchor="middle" opacity="0.15">AUTHENTICATED PHILIPPINE CIVIL REGISTRY</text>
       <text x="350" y="560" font-family="sans-serif" font-size="13" fill="#334155" text-anchor="middle">Official Copy Issued for Dumalneg National High School Basic Education Enrollment</text>
@@ -122,10 +130,10 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <!-- Official Stamp -->
       <rect x="40" y="900" width="620" height="35" fill="#f1f5f9" stroke="#cbd5e1"/>
       <text x="50" y="922" font-family="monospace" font-size="9" font-weight="bold" fill="#002060">
-        SECURITY PAPER SERIAL: PSA-2025-DM-883921 &bull; VERIFIED CLEAR FOR ENROLLMENT EVALUATION
+        SECURITY PAPER SERIAL: PSA-2025-DM-883921 &#8226; VERIFIED CLEAR FOR ENROLLMENT EVALUATION
       </text>
     </svg>`;
-    return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+    return toSvgDataUrl(svg);
   }
 
   // 2. SF9 / Form 138 (Report Card)
@@ -136,10 +144,10 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <rect x="15" y="15" width="670" height="950" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
       
       <!-- DepEd Header -->
-      <text x="350" y="55" font-family="Times New Roman, serif" font-size="12" text-anchor="middle" fill="#475569">Republic of the Philippines &bull; Department of Education &bull; Region I</text>
+      <text x="350" y="55" font-family="Times New Roman, serif" font-size="12" text-anchor="middle" fill="#475569">Republic of the Philippines &#8226; Department of Education &#8226; Region I</text>
       <text x="350" y="75" font-family="Times New Roman, serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#002060">SCHOOLS DIVISION OF ILOCOS NORTE</text>
       <text x="350" y="95" font-family="Times New Roman, serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#0f172a">${(ctx.schoolAttended || "DUMALNEG ELEMENTARY SCHOOL").toUpperCase()}</text>
-      <text x="350" y="112" font-family="sans-serif" font-size="10" text-anchor="middle" fill="#64748b">School ID: 100050 &bull; Dumalneg, Ilocos Norte</text>
+      <text x="350" y="112" font-family="sans-serif" font-size="10" text-anchor="middle" fill="#64748b">School ID: 100050 &#8226; Dumalneg, Ilocos Norte</text>
       
       <line x1="40" y1="125" x2="660" y2="125" stroke="#002060" stroke-width="2"/>
       
@@ -148,7 +156,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
         LEARNER'S PROGRESS REPORT CARD (SF9)
       </text>
       <text x="350" y="172" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#475569">
-        School Year: 2024–2025 &bull; Grade Level: Grade 6 &bull; Section: Mabini
+        School Year: 2024-2025 &#8226; Grade Level: Grade 6 &#8226; Section: Mabini
       </text>
       
       <!-- Student Info Block -->
@@ -204,7 +212,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <text x="60" y="685" font-family="sans-serif" font-size="11" fill="#334155">Eligible for admission to: <tspan font-weight="bold" fill="#002060">GRADE 7 (Junior High School)</tspan></text>
       <text x="60" y="705" font-family="sans-serif" font-size="11" fill="#334155">Target Institution: <tspan font-weight="bold" fill="#002060">DUMALNEG NATIONAL HIGH SCHOOL</tspan></text>
       <text x="60" y="725" font-family="sans-serif" font-size="11" fill="#334155">Canceled credential / SF9 released on: <tspan font-weight="bold">June 15, 2025</tspan></text>
-      <text x="60" y="745" font-family="sans-serif" font-size="11" fill="#047857" font-weight="bold">[ SF9 STATUS: COMPLETE &bull; NO ACADEMIC DEFICIENCIES ]</text>
+      <text x="60" y="745" font-family="sans-serif" font-size="11" fill="#047857" font-weight="bold">[ SF9 STATUS: COMPLETE &#8226; NO ACADEMIC DEFICIENCIES ]</text>
       
       <!-- Signatures -->
       <line x1="80" y1="870" x2="260" y2="870" stroke="#0f172a" stroke-width="1.5"/>
@@ -215,7 +223,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <text x="530" y="890" font-family="sans-serif" font-size="11" font-weight="bold" fill="#002060" text-anchor="middle">SCHOOL PRINCIPAL</text>
       <text x="530" y="905" font-family="sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Dumalneg Elementary School</text>
     </svg>`;
-    return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+    return toSvgDataUrl(svg);
   }
 
   // 3. 2x2 Official Learner Photo
@@ -237,9 +245,9 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       
       <!-- DepEd Watermark -->
       <rect x="25" y="25" width="350" height="24" fill="#002060"/>
-      <text x="200" y="41" font-family="sans-serif" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">DUMALNEG NATIONAL HIGH SCHOOL &bull; 2X2 ID</text>
+      <text x="200" y="41" font-family="sans-serif" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">DUMALNEG NATIONAL HIGH SCHOOL &#8226; 2X2 ID</text>
     </svg>`;
-    return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+    return toSvgDataUrl(svg);
   }
 
   // 4. Good Moral Character / Barangay Residency Certificate
@@ -249,9 +257,9 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
     <rect x="20" y="20" width="660" height="940" fill="none" stroke="#94a3b8" stroke-width="2"/>
     
     <text x="350" y="70" font-family="Times New Roman, serif" font-size="13" text-anchor="middle" fill="#64748b">Republic of the Philippines</text>
-    <text x="350" y="95" font-family="Times New Roman, serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#002060">DEPARTMENT OF EDUCATION &bull; REGION I</text>
+    <text x="350" y="95" font-family="Times New Roman, serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#002060">DEPARTMENT OF EDUCATION &#8226; REGION I</text>
     <text x="350" y="120" font-family="Times New Roman, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">${(ctx.schoolAttended || "DUMALNEG ELEMENTARY SCHOOL").toUpperCase()}</text>
-    <text x="350" y="140" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#64748b">Municipality of Dumalneg, Province of Ilocos Norte &bull; School ID: 100050</text>
+    <text x="350" y="140" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#64748b">Municipality of Dumalneg, Province of Ilocos Norte &#8226; School ID: 100050</text>
     
     <line x1="80" y1="165" x2="620" y2="165" stroke="#002060" stroke-width="2"/>
     
@@ -276,7 +284,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       This certification is hereby issued upon the request of the interested party for
     </text>
     <text x="350" y="625" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#002060">
-      ADMISSION &amp; ENROLLMENT AT DUMALNEG NATIONAL HIGH SCHOOL (SY 2025–2026).
+      ADMISSION &amp; ENROLLMENT AT DUMALNEG NATIONAL HIGH SCHOOL (SY 2025-2026).
     </text>
     
     <text x="350" y="700" font-family="sans-serif" font-size="12" font-style="italic" text-anchor="middle" fill="#64748b">
@@ -288,5 +296,5 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
     <text x="350" y="865" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#002060">SCHOOL PRINCIPAL</text>
     <text x="350" y="885" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#64748b">${(ctx.schoolAttended || "Dumalneg Elementary School").toUpperCase()}</text>
   </svg>`;
-  return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+  return toSvgDataUrl(svg);
 }
