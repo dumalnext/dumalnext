@@ -373,15 +373,6 @@ function StudentHomeContent() {
                   )}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="btn-secondary text-xs uppercase font-bold py-2 px-3 shrink-0"
-                >
-                  [ Sign Out ]
-                </button>
-              </div>
             </div>
 
             {/* Application Status Card */}
