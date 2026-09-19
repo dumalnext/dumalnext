@@ -194,7 +194,7 @@ export default function EnrollmentStepper({
   }));
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [existingApp, setExistingApp] = useState<any | null>(null);
-  const [isCheckingApp, setIsCheckingApp] = useState<boolean>(true);
+  const [isCheckingApp, setIsCheckingApp] = useState<boolean>(false);
 
   // Auto pre-fill basic account names if student is logged in and sync schoolYear
   useEffect(() => {
@@ -354,20 +354,6 @@ export default function EnrollmentStepper({
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
-
-  // 1. Loading State
-  if (isCheckingApp) {
-    return (
-      <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-3 font-sans shadow-sm">
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          [ CHECKING ENROLLMENT ELIGIBILITY &amp; ADMISSIONS REGISTRY ]
-        </span>
-        <p className="text-sm text-slate-700">
-          Verifying student application status with Dumalneg NHS Registrar...
-        </p>
-      </div>
-    );
-  }
 
   // 1.5. Lockout State: Online Enrollment is Closed
   if (!isEnrollmentOpen) {
