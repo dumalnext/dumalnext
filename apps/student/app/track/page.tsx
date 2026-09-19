@@ -136,7 +136,14 @@ function TrackApplicationContent() {
         snedDetails: [],
         hasPwdId: false,
         preferredModalities: ["Modular (Print)", "Blended"],
-        submittedDocuments: [],
+        submittedDocuments: Array.isArray(suApp.submitted_documents)
+          ? suApp.submitted_documents.map((d: any) => ({
+              type: d.docType || "other",
+              fileName: d.fileName || "document.jpg",
+              fileUrl: d.fileData || "",
+              sizeKb: d.sizeKb || 0,
+            }))
+          : [],
         dataPrivacyAccepted: true,
       },
     };

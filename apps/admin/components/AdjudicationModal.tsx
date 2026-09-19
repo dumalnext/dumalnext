@@ -149,6 +149,12 @@ export default function AdjudicationModal({
     return "Barangay Residency / Other Certificate";
   };
 
+  const idDoc = rawDocs.find((d: any) => {
+    const t = (d.docType || "").toLowerCase();
+    return t.includes("id") || t.includes("picture") || t.includes("photo");
+  });
+  const idPhotoUrl = idDoc?.fileData || null;
+
   // Handle Approve Action
   const handleApprove = async () => {
     setIsSubmitting(true);
@@ -340,36 +346,81 @@ export default function AdjudicationModal({
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-slate-50 p-3 border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">12-Digit LRN</span>
-                  <span className="font-mono font-bold text-sm text-[#002060]">
-                    {st?.student_id || "No LRN Yet (New Learner)"}
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                {/* 2x2 Official Learner Photo Card */}
+                <div className="shrink-0 w-full sm:w-36 bg-white border-2 border-slate-300 p-2 shadow-xs text-center space-y-1.5">
+                  <div className="text-[9px] font-mono font-bold text-[#002060] uppercase pb-1 border-b border-slate-200">
+                    [ 2x2 Photo ]
+                  </div>
+                  <div
+                    onClick={() => {
+                      if (idDoc) {
+                        setInspectingDoc({
+                          docType: "id_picture",
+                          docTitle: "2x2 Official Learner Photo",
+                          fileName: idDoc.fileName || "Learner_ID_Photo.jpg",
+                          fileData: idDoc.fileData || generateDepEdDocPreview("id_picture", previewContext),
+                          sizeKb: idDoc.sizeKb || 25,
+                        });
+                      }
+                    }}
+                    className="w-full h-36 bg-slate-50 border border-slate-300 overflow-hidden cursor-pointer hover:border-[#002060] transition-all flex items-center justify-center relative group p-1"
+                    title="Click to inspect 2x2 Learner Photo"
+                  >
+                    <img
+                      src={idPhotoUrl || generateDepEdDocPreview("id_picture", previewContext)}
+                      alt="2x2 Official Learner Photo"
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        const fallback = generateDepEdDocPreview("id_picture", previewContext);
+                        if ((e.target as HTMLImageElement).src !== fallback) {
+                          (e.target as HTMLImageElement).src = fallback;
+                        }
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-[#002060]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-[10px] font-mono font-bold text-white bg-[#002060] px-2 py-0.5 border border-white/60 uppercase">
+                        Inspect
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-mono text-slate-600 block truncate font-semibold" title={idDoc?.fileName}>
+                    {idDoc?.fileName || "2x2_Learner_ID.jpg"}
                   </span>
                 </div>
-                <div className="bg-slate-50 p-3 border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">PSA Birth Cert No.</span>
-                  <span className="font-mono font-bold text-slate-900">
-                    {st?.psa_birth_cert_no || "1234-5678-9012"}
-                  </span>
-                </div>
-                <div className="bg-slate-50 p-3 border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Sex / Gender</span>
-                  <span className="font-bold text-slate-900 uppercase">{st?.gender || "Male"}</span>
-                </div>
-                <div className="bg-slate-50 p-3 border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Date of Birth &amp; Age</span>
-                  <span className="font-bold text-slate-900">
-                    {st?.date_of_birth || "2012-05-15"} (Age: 12)
-                  </span>
-                </div>
-                <div className="bg-slate-50 p-3 border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Mother Tongue</span>
-                  <span className="font-bold text-slate-900">{st?.mother_tongue || "Ilokano"}</span>
-                </div>
-                <div className="bg-slate-50 p-3 border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Religion</span>
-                  <span className="font-bold text-slate-900">{st?.religion || "Roman Catholic"}</span>
+
+                {/* Demographics Grid */}
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 w-full">
+                  <div className="bg-slate-50 p-3 border border-slate-200">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">12-Digit LRN</span>
+                    <span className="font-mono font-bold text-sm text-[#002060]">
+                      {st?.student_id || "No LRN Yet (New Learner)"}
+                    </span>
+                  </div>
+                  <div className="bg-slate-50 p-3 border border-slate-200">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">PSA Birth Cert No.</span>
+                    <span className="font-mono font-bold text-slate-900">
+                      {st?.psa_birth_cert_no || "1234-5678-9012"}
+                    </span>
+                  </div>
+                  <div className="bg-slate-50 p-3 border border-slate-200">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Sex / Gender</span>
+                    <span className="font-bold text-slate-900 uppercase">{st?.gender || "Male"}</span>
+                  </div>
+                  <div className="bg-slate-50 p-3 border border-slate-200">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Date of Birth &amp; Age</span>
+                    <span className="font-bold text-slate-900">
+                      {st?.date_of_birth || "2012-05-15"} (Age: 12)
+                    </span>
+                  </div>
+                  <div className="bg-slate-50 p-3 border border-slate-200">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Mother Tongue</span>
+                    <span className="font-bold text-slate-900">{st?.mother_tongue || "Ilokano"}</span>
+                  </div>
+                  <div className="bg-slate-50 p-3 border border-slate-200">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Religion</span>
+                    <span className="font-bold text-slate-900">{st?.religion || "Roman Catholic"}</span>
+                  </div>
                 </div>
               </div>
 
@@ -611,13 +662,13 @@ export default function AdjudicationModal({
                         {/* Interactive Picture Thumbnail */}
                         <div
                           onClick={() => setInspectingDoc(docItem)}
-                          className="relative h-36 bg-slate-100 border border-slate-300 overflow-hidden cursor-pointer group-hover:border-[#002060] transition-all flex items-center justify-center"
+                          className="relative h-44 bg-slate-50 border border-slate-300 overflow-hidden cursor-pointer group-hover:border-[#002060] transition-all flex items-center justify-center p-1.5"
                           title="Click to view full image in high resolution"
                         >
                           <img
                             src={previewUrl}
                             alt={title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                             onError={(e) => {
                               const fallback = generateDepEdDocPreview(doc.docType, previewContext);
                               if ((e.target as HTMLImageElement).src !== fallback) {
