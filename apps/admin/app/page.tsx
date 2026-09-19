@@ -89,7 +89,7 @@ export default function AdminHomePage() {
         .select("*")
         .order("grade_level", { ascending: true });
 
-      // 2. Fetch Applications with joined Students & Users
+      // 2. Fetch Applications
       const { data: appData, error: appErr } = await supabase
         .from("enrollment_applications")
         .select(`
@@ -111,42 +111,50 @@ export default function AdminHomePage() {
 
       if (appErr) throw appErr;
 
-      // 3. For each application, fetch student record
       const detailedApps: ApplicationDetail[] = [];
       const sectionCounts: Record<string, number> = {};
 
-      if (appData) {
-        for (const app of appData) {
-          let studentRecord: any = null;
-          let userAccount: any = null;
+      if (appData && appData.length > 0) {
+        // Collect student IDs for high-speed batch fetching
+        const studentIds = Array.from(new Set(appData.map((a: any) => a.student_id).filter(Boolean)));
+        const stDataMap: Record<string, any> = {};
+        const userIds: string[] = [];
 
-          if (app.student_id) {
-            const { data: stData } = await supabase
-              .from("students")
-              .select("*")
-              .eq("id", app.student_id)
-              .limit(1);
+        if (studentIds.length > 0) {
+          const { data: stList } = await supabase
+            .from("students")
+            .select("*")
+            .in("id", studentIds);
 
-            if (stData && stData.length > 0) {
-              studentRecord = stData[0];
-
-              if (studentRecord.current_section_id) {
-                sectionCounts[studentRecord.current_section_id] =
-                  (sectionCounts[studentRecord.current_section_id] || 0) + 1;
-              }
-
-              if (studentRecord.user_id) {
-                const { data: uData } = await supabase
-                  .from("users")
-                  .select("email, user_id")
-                  .eq("id", studentRecord.user_id)
-                  .limit(1);
-                if (uData && uData.length > 0) {
-                  userAccount = uData[0];
-                }
+          if (stList) {
+            for (const s of stList) {
+              stDataMap[s.id] = s;
+              if (s.user_id) userIds.push(s.user_id);
+              if (s.current_section_id) {
+                sectionCounts[s.current_section_id] =
+                  (sectionCounts[s.current_section_id] || 0) + 1;
               }
             }
           }
+        }
+
+        const userDataMap: Record<string, any> = {};
+        if (userIds.length > 0) {
+          const { data: uList } = await supabase
+            .from("users")
+            .select("id, email, user_id")
+            .in("id", Array.from(new Set(userIds)));
+
+          if (uList) {
+            for (const u of uList) {
+              userDataMap[u.id] = u;
+            }
+          }
+        }
+
+        for (const app of appData) {
+          const studentRecord = app.student_id ? stDataMap[app.student_id] || null : null;
+          const userAccount = studentRecord?.user_id ? userDataMap[studentRecord.user_id] || null : null;
 
           detailedApps.push({
             ...app,
@@ -193,18 +201,26 @@ export default function AdminHomePage() {
       fetchData(true);
     };
     window.addEventListener("dumalnext:admin-data-changed", onDataChanged);
+    window.addEventListener("dumalnext:data-changed", onDataChanged);
 
-    // 10-Second Silent Polling
+    // 5-Second Silent Polling to ensure instant freshness
     const heartbeat = setInterval(() => {
       fetchData(true);
-    }, 10000);
+    }, 5000);
 
     // Real-Time Supabase Channel
     const channel = supabase
-      .channel("admin-realtime-applications")
+      .channel("admin-realtime-applications-and-students")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchData(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "students" },
         () => {
           fetchData(true);
         }
@@ -215,34 +231,70 @@ export default function AdminHomePage() {
       window.removeEventListener("focus", onVisibilityChange);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("dumalnext:admin-data-changed", onDataChanged);
+      window.removeEventListener("dumalnext:data-changed", onDataChanged);
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
   }, [user]);
 
-  // Compute Metrics
-  const totalCount = applications.length;
-  const pendingCount = applications.filter((a) => a.status === "Pending").length;
-  const approvedCount = applications.filter((a) => a.status === "Approved").length;
-  const revisionCount = applications.filter((a) => a.status === "Needs Revision").length;
+  // Dynamic Grade-Scoped Metrics (Real-time recalculation based on Grade Filter)
+  const gradeScopedApplications = applications.filter((app) => {
+    if (gradeFilter !== "ALL" && String(app.target_grade_level) !== gradeFilter) return false;
+    return true;
+  });
 
-  // Filtered Applications List
+  const totalCount = gradeScopedApplications.length;
+  const pendingCount = gradeScopedApplications.filter((a) => a.status === "Pending").length;
+  const approvedCount = gradeScopedApplications.filter((a) => a.status === "Approved").length;
+  const revisionCount = gradeScopedApplications.filter((a) => a.status === "Needs Revision").length;
+
+  // Filtered Applications List for Display Table & Credentials Search
   const filteredApplications = applications.filter((app) => {
-    // 1. Status Filter
-    if (statusFilter !== "ALL" && app.status !== statusFilter) return false;
-
-    // 2. Grade Filter
+    // 1. Grade Filter
     if (gradeFilter !== "ALL" && String(app.target_grade_level) !== gradeFilter) return false;
 
-    // 3. Search Query
+    // 2. Status Filter
+    if (statusFilter !== "ALL" && app.status !== statusFilter) return false;
+
+    // 3. Robust Search Query (LRN, Refcode, Full Name, First/Last Name, Email)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      const refMatch = app.application_id?.toLowerCase().includes(q);
-      const lrnMatch = Boolean(app.student?.student_id && /^\d{12}$/.test(app.student.student_id) && app.student.student_id.includes(q));
-      const firstMatch = app.student?.first_name?.toLowerCase().includes(q);
-      const lastMatch = app.student?.last_name?.toLowerCase().includes(q);
-      const emailMatch = app.userAccount?.email?.toLowerCase().includes(q);
-      return refMatch || lrnMatch || firstMatch || lastMatch || emailMatch;
+      const cleanQ = q.replace(/[^a-zA-Z0-9]/g, "");
+      const numericQ = q.replace(/\D/g, "");
+
+      const st = app.student;
+      const firstName = (st?.first_name || "").toLowerCase();
+      const middleName = (st?.middle_name || "").toLowerCase();
+      const lastName = (st?.last_name || "").toLowerCase();
+      const fullNameForward = `${firstName} ${middleName} ${lastName}`.trim();
+      const fullNameReverse = `${lastName}, ${firstName} ${middleName}`.trim();
+
+      const lrn = (st?.student_id || "").toLowerCase();
+      const cleanLrn = lrn.replace(/\D/g, "");
+
+      const appId = (app.application_id || "").toLowerCase();
+      const cleanAppId = appId.replace(/[^a-zA-Z0-9]/g, "");
+
+      const email = (app.userAccount?.email || "").toLowerCase();
+
+      // Refcode Match (e.g., "DNHS-2025-78601", "78601", "2025")
+      const refMatch = appId.includes(q) || (cleanQ.length >= 2 && cleanAppId.includes(cleanQ));
+
+      // LRN Match (12-digit number or any partial digits matching learner's LRN)
+      const lrnMatch = (numericQ.length >= 2 && cleanLrn.includes(numericQ)) || lrn.includes(q);
+
+      // Name Match (supports first name, last name, full name "John Lozano", "Lozano, John")
+      const nameMatch =
+        fullNameForward.includes(q) ||
+        fullNameReverse.includes(q) ||
+        firstName.includes(q) ||
+        lastName.includes(q) ||
+        middleName.includes(q);
+
+      // Email Match
+      const emailMatch = email.includes(q);
+
+      return refMatch || lrnMatch || nameMatch || emailMatch;
     }
 
     return true;
@@ -463,7 +515,7 @@ export default function AdminHomePage() {
         {activeSection === "adjudication" && (
           <div className="space-y-6">
             {/* Title & Real-Time Sync Indicator */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
                   [ MODULE 01: ENROLLMENT ADJUDICATION &bull; REGISTRAR QUEUE ]
@@ -473,29 +525,50 @@ export default function AdminHomePage() {
                 </h2>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-mono font-bold text-slate-600 uppercase">
-                  Supabase Real-Time Live Sync Active
-                </span>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {/* Live Real-time Status Badge */}
+                <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 border border-emerald-300 text-xs font-mono font-bold text-emerald-950">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="uppercase">Real-Time Live Sync</span>
+                </div>
+
+                {/* Grade Level Selector */}
+                <div className="flex items-center gap-1.5 bg-white border-2 border-slate-300 px-2.5 py-1 shadow-2xs">
+                  <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Grade:</span>
+                  <select
+                    value={gradeFilter}
+                    onChange={(e) => setGradeFilter(e.target.value)}
+                    className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer font-mono"
+                  >
+                    <option value="ALL">All Grade Levels</option>
+                    <option value="7">Grade 7</option>
+                    <option value="8">Grade 8</option>
+                    <option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option>
+                    <option value="11">Grade 11 (SHS)</option>
+                    <option value="12">Grade 12 (SHS)</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* Executive KPI Metric Cards */}
+            {/* Executive KPI Metric Cards (Real-Time Dynamic Recalculation) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               {/* Total Applications */}
-              <div className="p-4 bg-white border-2 border-slate-300 shadow-xs">
+              <div className="p-4 bg-white border-2 border-slate-300 shadow-xs transition-all">
                 <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
                   Total Applications
                 </span>
                 <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
                   {totalCount}
                 </div>
-                <span className="text-[10px] text-slate-500">Submitted by learners</span>
+                <span className="text-[10px] text-slate-500 block truncate">
+                  {gradeFilter === "ALL" ? "All Grades • Submitted by learners" : `Grade ${gradeFilter} • Submitted by learners`}
+                </span>
               </div>
 
               {/* Pending (Yellow) */}
-              <div className="p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs">
+              <div className="p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
                   <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
@@ -505,11 +578,13 @@ export default function AdminHomePage() {
                 <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
                   {pendingCount}
                 </div>
-                <span className="text-[10px] text-amber-900">Awaiting registrar decision</span>
+                <span className="text-[10px] text-amber-900 block truncate">
+                  {gradeFilter === "ALL" ? "All Grades • Awaiting registrar decision" : `Grade ${gradeFilter} • Awaiting registrar decision`}
+                </span>
               </div>
 
               {/* Approved (Green) */}
-              <div className="p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs">
+              <div className="p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
                   <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
@@ -519,11 +594,13 @@ export default function AdminHomePage() {
                 <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
                   {approvedCount}
                 </div>
-                <span className="text-[10px] text-emerald-900">Official SY 2025–2026 enrollees</span>
+                <span className="text-[10px] text-emerald-900 block truncate">
+                  {gradeFilter === "ALL" ? "All Grades • Official SY 2025–2026 enrollees" : `Grade ${gradeFilter} • Official enrollees`}
+                </span>
               </div>
 
               {/* Needs Revision (Red) */}
-              <div className="p-4 bg-red-50/70 border-2 border-red-500 shadow-xs">
+              <div className="p-4 bg-red-50/70 border-2 border-red-500 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0" />
                   <span className="text-[10px] font-mono font-bold text-red-950 uppercase block">
@@ -533,7 +610,9 @@ export default function AdminHomePage() {
                 <div className="text-2xl sm:text-3xl font-bold font-mono text-red-950 mt-1">
                   {revisionCount}
                 </div>
-                <span className="text-[10px] text-red-900">Document action required</span>
+                <span className="text-[10px] text-red-900 block truncate">
+                  {gradeFilter === "ALL" ? "All Grades • Document action required" : `Grade ${gradeFilter} • Action required`}
+                </span>
               </div>
             </div>
 
@@ -594,32 +673,158 @@ export default function AdminHomePage() {
                   </button>
                 </div>
 
-                {/* Search & Grade Filter */}
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <select
-                    value={gradeFilter}
-                    onChange={(e) => setGradeFilter(e.target.value)}
-                    className="p-2 bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 outline-none"
-                  >
-                    <option value="ALL">All Grade Levels</option>
-                    <option value="7">Grade 7</option>
-                    <option value="8">Grade 8</option>
-                    <option value="9">Grade 9</option>
-                    <option value="10">Grade 10</option>
-                    <option value="11">Grade 11 (SHS)</option>
-                    <option value="12">Grade 12 (SHS)</option>
-                  </select>
+                {/* Search & Grade Filter Controls */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
+                    <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Grade:</span>
+                    <select
+                      value={gradeFilter}
+                      onChange={(e) => setGradeFilter(e.target.value)}
+                      className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Grade Levels</option>
+                      <option value="7">Grade 7</option>
+                      <option value="8">Grade 8</option>
+                      <option value="9">Grade 9</option>
+                      <option value="10">Grade 10</option>
+                      <option value="11">Grade 11 (SHS)</option>
+                      <option value="12">Grade 12 (SHS)</option>
+                    </select>
+                  </div>
 
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search LRN, Ref Code, or Name..."
-                    className="p-2 bg-white border border-slate-300 text-xs font-mono font-bold w-full sm:w-64 focus:border-[#002060] outline-none"
-                  />
+                  <div className="relative flex-1 sm:w-72">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && filteredApplications.length === 1) {
+                          setSelectedApp(filteredApplications[0]);
+                        }
+                      }}
+                      placeholder="Search LRN, Ref Code, or Name..."
+                      className="w-full pl-3 pr-7 py-1.5 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer"
+                        title="Clear search"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (filteredApplications.length === 1) {
+                        setSelectedApp(filteredApplications[0]);
+                      }
+                    }}
+                    className="px-4 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <span>Search</span>
+                  </button>
                 </div>
               </div>
             </div>
+
+            {/* Matched Learner Credentials Quick Inspection Card */}
+            {searchQuery.trim() && (
+              <div className="p-4 bg-blue-50/80 border-2 border-[#002060] shadow-xs space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-200 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-[#002060] text-white text-[10px] font-mono font-bold uppercase">
+                      CREDENTIALS SEARCH RESULT
+                    </span>
+                    <span className="text-xs font-bold text-[#002060]">
+                      Found {filteredApplications.length} matching learner{filteredApplications.length === 1 ? "" : "s"} for &ldquo;{searchQuery}&rdquo;
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
+                  >
+                    [ Clear Search ]
+                  </button>
+                </div>
+
+                {filteredApplications.length === 0 ? (
+                  <div className="text-xs text-slate-600 p-2">
+                    No learner found with LRN, Reference Code, or Name matching <strong>&ldquo;{searchQuery}&rdquo;</strong>.
+                    Please verify if the 12-digit LRN, Reference code, or spelling is correct.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {filteredApplications.slice(0, 3).map((match) => {
+                      const mSt = match.student;
+                      const mName = mSt
+                        ? `${mSt.last_name}, ${mSt.first_name} ${mSt.middle_name || ""}`.trim()
+                        : "Applicant Learner";
+                      const mLrn = mSt?.student_id && /^\d{12}$/.test(mSt.student_id)
+                        ? mSt.student_id
+                        : "No LRN Yet (Pending LIS)";
+
+                      return (
+                        <div
+                          key={match.id}
+                          className="bg-white p-3.5 border border-blue-300 shadow-2xs space-y-2 hover:border-[#002060] transition-all"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-mono font-bold text-xs text-[#002060]">
+                              {match.application_id}
+                            </span>
+                            <span
+                              className={`px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase ${
+                                match.status === "Approved"
+                                  ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                                  : match.status === "Needs Revision"
+                                  ? "bg-red-100 text-red-900 border border-red-300"
+                                  : "bg-amber-100 text-amber-900 border border-amber-300"
+                              }`}
+                            >
+                              {match.status}
+                            </span>
+                          </div>
+
+                          <div>
+                            <span className="text-[10px] text-slate-500 font-bold uppercase block">Learner Name</span>
+                            <p className="font-bold text-slate-900 text-xs uppercase truncate" title={mName}>
+                              {mName}
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-100">
+                            <div>
+                              <span className="text-[9px] text-slate-500 font-bold uppercase block">12-Digit LRN</span>
+                              <span className="font-mono font-bold text-slate-900">{mLrn}</span>
+                            </div>
+                            <div>
+                              <span className="text-[9px] text-slate-500 font-bold uppercase block">Target Level</span>
+                              <span className="font-bold text-slate-900">
+                                Grade {match.target_grade_level} {match.target_strand ? `(${match.target_strand})` : ""}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setSelectedApp(match)}
+                            className="w-full py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1 mt-1 cursor-pointer"
+                          >
+                            <span>Inspect &amp; Review Credentials &rarr;</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Applications Table */}
             <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto">
