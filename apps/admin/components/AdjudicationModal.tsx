@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import DocumentViewerModal, { DocumentInspectionItem } from "./DocumentViewerModal";
 import { generateDepEdDocPreview } from "@/lib/utils/documentPreviewGenerator";
@@ -96,6 +96,7 @@ export default function AdjudicationModal({
 }: AdjudicationModalProps) {
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<"learner" | "family" | "academic" | "documents">("learner");
+  const [modalSections, setModalSections] = useState<SectionItem[]>(sections);
   const [selectedSectionId, setSelectedSectionId] = useState<string>(
     application.student?.current_section_id || ""
   );
@@ -106,19 +107,54 @@ export default function AdjudicationModal({
   const [actionSuccess, setActionSuccess] = useState<string>("");
   const [inspectingDoc, setInspectingDoc] = useState<DocumentInspectionItem | null>(null);
 
+  // Synchronize modalSections when sections prop changes
+  useEffect(() => {
+    setModalSections(sections);
+  }, [sections]);
+
+  // Live fetch from /api/sections to guarantee deleted sections are completely excluded
+  useEffect(() => {
+    let isMounted = true;
+    const fetchFreshSections = async () => {
+      try {
+        const res = await fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && json.success && Array.isArray(json.sections)) {
+            setModalSections(json.sections);
+          }
+        }
+      } catch {}
+    };
+    fetchFreshSections();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const st = application.student;
   const fullName = st
     ? `${st.last_name}, ${st.first_name} ${st.middle_name || ""}`.trim()
     : "APPLICANT LEARNER";
 
   // Filter sections matching applicant grade level & strand
-  const eligibleSections = sections.filter((s) => {
+  const eligibleSections = modalSections.filter((s) => {
     if (s.grade_level !== Number(application.target_grade_level)) return false;
     if (application.target_strand && s.strand) {
       return s.strand.toUpperCase() === application.target_strand.toUpperCase();
     }
     return true;
   });
+
+  // If the previously selected section is no longer in eligibleSections (e.g. was deleted), clear selection
+  useEffect(() => {
+    if (selectedSectionId && eligibleSections.length > 0) {
+      const exists = eligibleSections.some((s) => s.id === selectedSectionId);
+      if (!exists) {
+        setSelectedSectionId("");
+      }
+    }
+  }, [eligibleSections, selectedSectionId]);
 
   const previewContext = {
     fullName,
@@ -181,7 +217,7 @@ export default function AdjudicationModal({
 
     try {
       // 1. Resolve smart approval remarks if left empty by admin
-      const assignedSection = sections.find((s) => s.id === selectedSectionId);
+      const assignedSection = modalSections.find((s) => s.id === selectedSectionId);
       const sectionName = assignedSection ? assignedSection.section_name : "";
       const isAlreadyApproved = application.status === "Approved";
       const smartApprovalNotice = `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${sectionName ? ` (${sectionName})` : ""}. Welcome to Dumalneg NHS!`;
@@ -788,7 +824,7 @@ export default function AdjudicationModal({
                         </span>
                       </div>
                       <span className="text-xs text-emerald-900 block mt-0.5">
-                        Assigned Section: <strong>{sections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || "Assigned"}</strong>
+                        Assigned Section: <strong>{modalSections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || (selectedSectionId ? "[ Section Removed / Needs Reassignment ]" : "Not Assigned")}</strong>
                       </span>
                     </div>
                     <span className="text-[11px] font-mono text-emerald-800 bg-white px-2 py-1 border border-emerald-300">
@@ -847,7 +883,7 @@ export default function AdjudicationModal({
 
                     {selectedSectionId && (
                       <p className="text-[11px] text-emerald-900 font-bold">
-                        [ Confirmed ]: Learner will be officially enrolled in {sections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
+                        [ Confirmed ]: Learner will be officially enrolled in {modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
                       </p>
                     )}
                   </div>
@@ -879,7 +915,7 @@ export default function AdjudicationModal({
                     SECTION ASSIGNED
                   </span>
                   <span className="text-xs text-emerald-950">
-                    Assigned Section: <strong>{sections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level}).
+                    Assigned Section: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level}).
                   </span>
                 </div>
               )
@@ -927,7 +963,7 @@ export default function AdjudicationModal({
                 <button
                   type="button"
                   onClick={() => {
-                    const assignedSection = sections.find((s) => s.id === selectedSectionId);
+                    const assignedSection = modalSections.find((s) => s.id === selectedSectionId);
                     const sName = assignedSection ? ` (${assignedSection.section_name})` : "";
                     setRemarks(
                       `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${sName}. Welcome to Dumalneg NHS!`

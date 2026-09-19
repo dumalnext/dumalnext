@@ -103,6 +103,34 @@ export default function SectionQuotaConsole() {
         console.warn("Notice querying sections:", secErr.message);
       }
 
+      let deletedIds: string[] = [];
+      let customSections: any[] = [];
+      try {
+        const { data: sysData } = await supabase
+          .from("system_settings")
+          .select("value")
+          .eq("key", "sections_config")
+          .maybeSingle();
+
+        if (sysData?.value) {
+          deletedIds = sysData.value.deletedIds || [];
+          customSections = sysData.value.customSections || [];
+        }
+      } catch {}
+
+      const secMap = new Map<string, any>();
+      (secData || []).forEach((s: any) => {
+        if (!deletedIds.includes(s.id)) {
+          secMap.set(s.id, s);
+        }
+      });
+
+      customSections.forEach((cs: any) => {
+        if (cs.id && !deletedIds.includes(cs.id)) {
+          secMap.set(cs.id, { ...(secMap.get(cs.id) || {}), ...cs });
+        }
+      });
+
       const { data: studentSecData } = await supabase
         .from("students")
         .select("current_section_id")
@@ -120,7 +148,7 @@ export default function SectionQuotaConsole() {
         });
       }
 
-      const enriched: SectionDetail[] = (secData || []).map((s: any) => ({
+      const enriched: SectionDetail[] = Array.from(secMap.values()).map((s: any) => ({
         id: s.id,
         section_name: s.section_name,
         grade_level: Number(s.grade_level),

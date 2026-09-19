@@ -28,11 +28,74 @@ export default function AdjudicationConsole() {
     }
 
     try {
-      // 1. Fetch Sections
-      const { data: secData } = await supabase
-        .from("sections")
-        .select("*")
-        .order("grade_level", { ascending: true });
+      // 1. Fetch Sections from API route (with fallback to Supabase + system_settings filtering)
+      let activeSections: SectionItem[] = [];
+      try {
+        const secRes = await fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" });
+        if (secRes.ok) {
+          const secJson = await secRes.json();
+          if (secJson.success && Array.isArray(secJson.sections)) {
+            activeSections = secJson.sections.map((s: any) => ({
+              id: s.id,
+              section_name: s.section_name,
+              grade_level: Number(s.grade_level),
+              strand: s.strand || undefined,
+              room: s.room || undefined,
+              adviser_name: s.adviser_name || undefined,
+              capacity: Number(s.capacity) || 40,
+              enrolledCount: Number(s.enrolledCount) || 0,
+            }));
+          }
+        }
+      } catch (secApiErr) {
+        console.warn("Notice fetching sections via API:", secApiErr);
+      }
+
+      if (activeSections.length === 0) {
+        const { data: secData } = await supabase
+          .from("sections")
+          .select("*")
+          .order("grade_level", { ascending: true });
+
+        let deletedIds: string[] = [];
+        let customSections: any[] = [];
+        try {
+          const { data: sysData } = await supabase
+            .from("system_settings")
+            .select("value")
+            .eq("key", "sections_config")
+            .maybeSingle();
+
+          if (sysData?.value) {
+            deletedIds = sysData.value.deletedIds || [];
+            customSections = sysData.value.customSections || [];
+          }
+        } catch {}
+
+        const secMap = new Map<string, any>();
+        (secData || []).forEach((s: any) => {
+          if (!deletedIds.includes(s.id)) {
+            secMap.set(s.id, s);
+          }
+        });
+
+        customSections.forEach((cs: any) => {
+          if (cs.id && !deletedIds.includes(cs.id)) {
+            secMap.set(cs.id, { ...(secMap.get(cs.id) || {}), ...cs });
+          }
+        });
+
+        activeSections = Array.from(secMap.values()).map((s: any) => ({
+          id: s.id,
+          section_name: s.section_name,
+          grade_level: Number(s.grade_level),
+          strand: s.strand || undefined,
+          room: s.room || undefined,
+          adviser_name: s.adviser_name || undefined,
+          capacity: Number(s.capacity) || 40,
+          enrolledCount: s.enrolled_count || 0,
+        }));
+      }
 
       // 2. Fetch Applications
       const { data: appData, error: appErr } = await supabase
@@ -98,9 +161,9 @@ export default function AdjudicationConsole() {
         });
       }
 
-      const enrichedSections: SectionItem[] = (secData || []).map((s: any) => ({
+      const enrichedSections: SectionItem[] = activeSections.map((s: any) => ({
         ...s,
-        enrolledCount: sectionCountMap.get(s.id) || s.enrolled_count || 0,
+        enrolledCount: Math.max(s.enrolledCount || 0, sectionCountMap.get(s.id) || 0),
       }));
 
       const enrichedApps: ApplicationDetail[] = (appData || []).map((app: any) => {
@@ -183,6 +246,13 @@ export default function AdjudicationConsole() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "sections" },
+        () => {
+          fetchData(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "system_settings" },
         () => {
           fetchData(true);
         }
