@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "";
+  if (!supabaseUrl || !supabaseKey) return null;
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 function getConfigFilePath(): string {
   const possiblePaths = [
@@ -36,6 +47,27 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET() {
+  // 1. Try Supabase system_settings first (Production / Vercel Serverless)
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from("system_settings")
+        .select("value")
+        .eq("key", "enrollment_controls")
+        .maybeSingle();
+
+      if (data?.value && !error) {
+        return NextResponse.json(data.value, {
+          headers: NO_CACHE_HEADERS,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Supabase system_settings read fallback to local config:", err);
+  }
+
+  // 2. Fallback to local config file
   try {
     const filePath = getConfigFilePath();
     if (fs.existsSync(filePath)) {
@@ -57,17 +89,27 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const filePath = getConfigFilePath();
 
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
+    // Read current settings
     let current = defaultSettings;
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const { data } = await supabase
+          .from("system_settings")
+          .select("value")
+          .eq("key", "enrollment_controls")
+          .maybeSingle();
+        if (data?.value) {
+          current = data.value;
+        }
+      }
+    } catch {}
+
+    const filePath = getConfigFilePath();
     if (fs.existsSync(filePath)) {
       try {
-        current = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+        current = { ...current, ...JSON.parse(fs.readFileSync(filePath, "utf-8")) };
       } catch {}
     }
 
@@ -83,7 +125,31 @@ export async function POST(req: Request) {
       updatedBy: body.updatedBy || "School Administrator (DNHS-ADM-001)",
     };
 
-    fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), "utf-8");
+    // 1. Save to Supabase (Production Vercel Persistence)
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        await supabase.from("system_settings").upsert({
+          key: "enrollment_controls",
+          value: updated,
+          updated_at: new Date().toISOString(),
+        });
+      }
+    } catch (dbErr) {
+      console.warn("Supabase upsert warning:", dbErr);
+    }
+
+    // 2. Save to local config if disk is writable
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), "utf-8");
+    } catch (fsErr) {
+      // In serverless / Vercel read-only filesystem, fs write is ignored
+      console.info("Local filesystem write skipped in serverless environment");
+    }
 
     return NextResponse.json({ success: true, settings: updated }, {
       headers: NO_CACHE_HEADERS,

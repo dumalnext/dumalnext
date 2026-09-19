@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "";
+  if (!supabaseUrl || !supabaseKey) return null;
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 function getConfigFilePath(): string {
   const possiblePaths = [
@@ -36,6 +47,27 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET() {
+  // 1. Try Supabase system_settings first (Production / Vercel Serverless)
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from("system_settings")
+        .select("value")
+        .eq("key", "enrollment_controls")
+        .maybeSingle();
+
+      if (data?.value && !error) {
+        return NextResponse.json(data.value, {
+          headers: NO_CACHE_HEADERS,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Supabase system_settings read fallback to local config:", err);
+  }
+
+  // 2. Fallback to local config file
   try {
     const filePath = getConfigFilePath();
     if (fs.existsSync(filePath)) {
