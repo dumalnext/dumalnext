@@ -32,13 +32,10 @@ function TrackApplicationContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("ref") || searchParams.get("query") || "";
 
-  const [searchTerm, setSearchTerm] = useState<string>(initialQuery);
   const [record, setRecord] = useState<ApplicationRecord | null>(null);
   const [isFetchingRecord, setIsFetchingRecord] = useState<boolean>(true);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
   const [reuploadSuccess, setReuploadSuccess] = useState<boolean>(false);
-  const [showManualSearch, setShowManualSearch] = useState<boolean>(false);
-  const [searchError, setSearchError] = useState<string>("");
   const hasLoadedOnceRef = useRef<boolean>(false);
 
   // Protected Route Check: Unauthenticated visitors redirected to sign in
@@ -157,7 +154,6 @@ function TrackApplicationContent() {
       if (!silent && !hasLoadedOnceRef.current) {
         setIsFetchingRecord(true);
       }
-      setSearchError("");
 
       try {
         // If a specific reference is passed in query, prioritize it
@@ -267,80 +263,6 @@ function TrackApplicationContent() {
       supabase.removeChannel(channel);
     };
   }, [user?.id, user?.lrn, initialQuery]);
-
-  // Manual Search Handler (For looking up other reference numbers if needed)
-  const handleManualSearch = async (term: string) => {
-    const cleanTerm = term.trim().toUpperCase();
-    if (!cleanTerm) {
-      setSearchError("Please enter an Application Reference Number or LRN.");
-      return;
-    }
-
-    setIsFetchingRecord(true);
-    hasLoadedOnceRef.current = false;
-    setSearchError("");
-    setReuploadSuccess(false);
-
-    try {
-      const supabase = createClient();
-      let suApp: any = null;
-      let studentRecord: any = null;
-
-      // 1. Check by application_id
-      const { data: directApp } = await supabase
-        .from("enrollment_applications")
-        .select("*")
-        .eq("application_id", cleanTerm)
-        .limit(1);
-
-      if (directApp && directApp.length > 0) {
-        suApp = directApp[0];
-      } else {
-        // 2. Check by student_id or LRN
-        const { data: stList } = await supabase
-          .from("students")
-          .select("*")
-          .or(`student_id.eq.${cleanTerm}`)
-          .limit(1);
-
-        if (stList && stList.length > 0) {
-          studentRecord = stList[0];
-          const { data: appByStudent } = await supabase
-            .from("enrollment_applications")
-            .select("*")
-            .eq("student_id", studentRecord.id)
-            .order("created_at", { ascending: false })
-            .limit(1);
-
-          if (appByStudent && appByStudent.length > 0) {
-            suApp = appByStudent[0];
-          }
-        }
-      }
-
-      if (suApp) {
-        if (!studentRecord && suApp.student_id) {
-          const { data: stProfile } = await supabase
-            .from("students")
-            .select("*")
-            .eq("id", suApp.student_id)
-            .limit(1);
-          studentRecord = stProfile?.[0];
-        }
-
-        setRecord(mapSupabaseToRecord(suApp, studentRecord));
-      } else {
-        setRecord(null);
-        setSearchError(`No enrollment application found matching "${cleanTerm}".`);
-      }
-    } catch (e) {
-      console.error("Manual search error:", e);
-      setSearchError("An error occurred while connecting to the database.");
-    } finally {
-      hasLoadedOnceRef.current = true;
-      setIsFetchingRecord(false);
-    }
-  };
 
   const handleDownloadApprovedPdf = async () => {
     if (!record) return;
@@ -748,56 +670,6 @@ function TrackApplicationContent() {
           </div>
         </div>
       </section>
-
-      {/* =========================================================================
-         SECONDARY / OPTIONAL LOOKUP FOR OTHER REFERENCE CODES
-         ========================================================================= */}
-      <div className="border border-slate-300 bg-slate-50 p-4 text-xs">
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-slate-700 uppercase">
-            Need to look up a different application reference number?
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowManualSearch(!showManualSearch)}
-            className="text-[#002060] font-bold uppercase underline hover:text-blue-950"
-          >
-            {showManualSearch ? "[ Hide Search ]" : "[ Search Reference Code ]"}
-          </button>
-        </div>
-
-        {showManualSearch && (
-          <div className="mt-4 pt-3 border-t border-slate-200 space-y-3">
-            <p className="text-slate-600 text-xs">
-              Enter another Application Reference Number (e.g. DNHS-2025-XXXXX) or 12-digit LRN to inspect its record:
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleManualSearch(searchTerm);
-              }}
-              className="flex flex-col sm:flex-row gap-2"
-            >
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="e.g. DNHS-2025-13840 or 100050123456"
-                className="flex-1 p-2.5 bg-white border border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shrink-0"
-              >
-                Search
-              </button>
-            </form>
-            {searchError && (
-              <p className="text-xs text-red-700 font-bold">{searchError}</p>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
