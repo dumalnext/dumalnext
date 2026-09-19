@@ -144,18 +144,20 @@ function TrackApplicationContent() {
     };
   };
 
-  // Automatic Loading of Logged-In Student's Personal Application Record
+  // Real-Time Automatic Loading & Sync of Logged-In Student's Application (Zero-Refresh)
   useEffect(() => {
     if (!user) return;
 
     let isMounted = true;
-    (async () => {
-      setIsFetchingRecord(true);
+    const supabase = createClient();
+
+    const fetchRecord = async (silent: boolean = false) => {
+      if (!silent) {
+        setIsFetchingRecord(true);
+      }
       setSearchError("");
 
       try {
-        const supabase = createClient();
-
         // If a specific reference is passed in query, prioritize it
         if (initialQuery.trim()) {
           const cleanRef = initialQuery.trim().toUpperCase();
@@ -213,10 +215,50 @@ function TrackApplicationContent() {
           setIsFetchingRecord(false);
         }
       }
-    })();
+    };
+
+    // 1. Initial fetch
+    fetchRecord(false);
+
+    // 2. Window Focus & Visibility sync
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchRecord(true);
+      }
+    };
+    window.addEventListener("focus", handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // 3. Custom Application/Data Changed event
+    const handleDataChanged = () => {
+      fetchRecord(true);
+    };
+    window.addEventListener("dumalnext:data-changed", handleDataChanged);
+
+    // 4. 3-Second Heartbeat Polling
+    const heartbeat = setInterval(() => {
+      fetchRecord(true);
+    }, 3000);
+
+    // 5. Supabase Realtime Channel: Instant push on enrollment_applications changes
+    const channel = supabase
+      .channel("track-realtime-applications")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchRecord(true);
+        }
+      )
+      .subscribe();
 
     return () => {
       isMounted = false;
+      window.removeEventListener("focus", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("dumalnext:data-changed", handleDataChanged);
+      clearInterval(heartbeat);
+      supabase.removeChannel(channel);
     };
   }, [user, initialQuery]);
 

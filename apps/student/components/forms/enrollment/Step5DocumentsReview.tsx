@@ -283,6 +283,9 @@ export default function Step5DocumentsReview({
 
       setReferenceNumber(generatedRef);
       setIsSubmitted(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);

@@ -31,6 +31,7 @@ interface AuthContextType {
     autoLogin?: boolean
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,44 +68,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const supabase = createClient();
 
-  // Load session from HTTP Cookie and verify live with Supabase Database
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        if (typeof window !== "undefined") {
-          const cachedUser = getSessionCookie();
-          if (cachedUser) {
-            // Live verification with Supabase: Check if this user still exists in public.users
-            const { data: verified, error } = await supabase
-              .from("users")
-              .select("id")
-              .eq("id", cachedUser.id)
-              .limit(1);
-
-            if (isMounted) {
-              if (verified && verified.length > 0) {
-                setUser(cachedUser);
-              } else {
-                // Account was deleted in Supabase! Immediately invalidate stale browser cookie
-                clearSessionCookie();
-                setUser(null);
-              }
-            }
-            return;
-          }
-        }
-      } catch (e) {
-        console.warn("Session verification notice:", e);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+  // Live Session Verification with Supabase Cloud Database
+  const refreshSession = async () => {
+    try {
+      if (typeof window === "undefined") return;
+      const cachedUser = getSessionCookie();
+      if (!cachedUser) {
+        setUser(null);
+        return;
       }
-    })();
+
+      // Query Supabase live to verify account still exists
+      const { data: verified, error } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role")
+        .eq("id", cachedUser.id)
+        .limit(1);
+
+      if (verified && verified.length > 0) {
+        setUser(cachedUser);
+      } else {
+        // Account was deleted or invalid in Supabase! Immediately invalidate stale browser cookie
+        clearSessionCookie();
+        setUser(null);
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
+    } catch (e) {
+      console.warn("Session verification notice:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Automatic Real-Time Synchronization Engine (Zero-Refresh Architecture)
+  useEffect(() => {
+    // 1. Initial verification on mount
+    refreshSession();
+
+    // 2. Window Focus & Visibility: Auto-refresh when student switches tabs or returns to window
+    const handleVisibilitySync = () => {
+      if (document.visibilityState === "visible") {
+        refreshSession();
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
+    };
+    window.addEventListener("focus", handleVisibilitySync);
+    document.addEventListener("visibilitychange", handleVisibilitySync);
+
+    // 3. 3-Second Heartbeat Polling: Guarantees zero stale state even without web socket
+    const heartbeatTimer = setInterval(() => {
+      const cachedUser = getSessionCookie();
+      if (cachedUser) {
+        refreshSession();
+      }
+    }, 3000);
+
+    // 4. Supabase Realtime Channel: Listen to instant INSERT/UPDATE/DELETE on 'users'
+    const authChannel = supabase
+      .channel("realtime-auth-users-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          refreshSession();
+          window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        }
+      )
+      .subscribe();
 
     return () => {
-      isMounted = false;
+      window.removeEventListener("focus", handleVisibilitySync);
+      document.removeEventListener("visibilitychange", handleVisibilitySync);
+      clearInterval(heartbeatTimer);
+      supabase.removeChannel(authChannel);
     };
   }, []);
 
@@ -209,6 +245,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(sessionUser);
       setSessionCookie(sessionUser);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
       return { success: true };
     } catch (e: any) {
       console.error("Supabase authentication error:", e);
@@ -327,6 +366,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSessionCookie(sessionUser);
       }
 
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
+
       return { success: true };
     } catch (e: any) {
       console.error("Supabase registration error:", e);
@@ -337,10 +380,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     clearSessionCookie();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

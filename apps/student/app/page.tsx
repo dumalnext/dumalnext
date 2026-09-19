@@ -55,59 +55,98 @@ function StudentHomeContent() {
   const [userApplication, setUserApplication] = useState<any | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
-  // Check for submitted applications belonging to the logged-in user from Supabase
+  // Real-Time Automatic Synchronization of Logged-In User's Application (Zero-Refresh)
   useEffect(() => {
-    if (user) {
-      let isMounted = true;
-      (async () => {
-        try {
-          const supabase = createClient();
-          // Find student by student_id or user_id in Supabase
-          const { data: stData } = await supabase
-            .from("students")
-            .select("id")
-            .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
+    if (!user) {
+      setUserApplication(null);
+      return;
+    }
+
+    let isMounted = true;
+    const supabase = createClient();
+
+    const fetchApp = async () => {
+      try {
+        const { data: stData } = await supabase
+          .from("students")
+          .select("id")
+          .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
+          .limit(1);
+
+        if (stData && stData.length > 0) {
+          const { data: appData } = await supabase
+            .from("enrollment_applications")
+            .select("*")
+            .eq("student_id", stData[0].id)
+            .order("created_at", { ascending: false })
             .limit(1);
 
-          if (stData && stData.length > 0) {
-            const { data: appData } = await supabase
-              .from("enrollment_applications")
-              .select("*")
-              .eq("student_id", stData[0].id)
-              .order("created_at", { ascending: false })
-              .limit(1);
-
-            if (isMounted && appData && appData.length > 0) {
-              const a = appData[0];
-              setUserApplication({
-                referenceNumber: a.application_id,
-                applicationDate: a.created_at,
-                status: a.status,
-                fullName: `${user.lastName}, ${user.firstName} ${user.middleName || ""}`.trim(),
-                gradeLevel: a.target_grade_level,
-                applicantType: a.applicant_type,
-                targetTrack: a.target_strand ? "Senior High School" : "Junior High School",
-                targetStrand: a.target_strand,
-                remarks: a.admin_feedback,
-              });
-              return;
-            }
+          if (isMounted && appData && appData.length > 0) {
+            const a = appData[0];
+            setUserApplication({
+              referenceNumber: a.application_id,
+              applicationDate: a.created_at,
+              status: a.status,
+              fullName: `${user.lastName}, ${user.firstName} ${user.middleName || ""}`.trim(),
+              gradeLevel: a.target_grade_level,
+              applicantType: a.applicant_type,
+              targetTrack: a.target_strand ? "Senior High School" : "Junior High School",
+              targetStrand: a.target_strand,
+              remarks: a.admin_feedback,
+            });
+            return;
           }
-          if (isMounted) {
-            setUserApplication(null);
-          }
-        } catch (e) {
-          console.error("Error reading Supabase applications:", e);
-          if (isMounted) setUserApplication(null);
         }
-      })();
+        if (isMounted) {
+          setUserApplication(null);
+        }
+      } catch (e) {
+        console.error("Error reading Supabase applications:", e);
+        if (isMounted) setUserApplication(null);
+      }
+    };
 
-      return () => {
-        isMounted = false;
-      };
-    } else {
-      setUserApplication(null);
-    }
+    // 1. Initial fetch
+    fetchApp();
+
+    // 2. Window Focus & Visibility auto-sync
+    const onVisibilitySync = () => {
+      if (document.visibilityState === "visible") {
+        fetchApp();
+      }
+    };
+    window.addEventListener("focus", onVisibilitySync);
+    document.addEventListener("visibilitychange", onVisibilitySync);
+
+    // 3. Custom Application/Auth Event listener
+    const onDataChanged = () => {
+      fetchApp();
+    };
+    window.addEventListener("dumalnext:data-changed", onDataChanged);
+
+    // 4. 3-Second Heartbeat Polling
+    const heartbeat = setInterval(fetchApp, 3000);
+
+    // 5. Supabase Realtime Channel: Instant live update on application changes
+    const channel = supabase
+      .channel("home-realtime-applications")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchApp();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("focus", onVisibilitySync);
+      document.removeEventListener("visibilitychange", onVisibilitySync);
+      window.removeEventListener("dumalnext:data-changed", onDataChanged);
+      clearInterval(heartbeat);
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   // Handle Sign In Submit with System Verification Delay

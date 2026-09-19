@@ -10,51 +10,92 @@ export default function StudentHeaderNav() {
   const [appStatus, setAppStatus] = useState<string | null>(null);
   const [appRef, setAppRef] = useState<string | null>(null);
 
-  // Smart Live Status Tracker: Check submitted application state directly from Supabase
+  // Real-Time Smart Live Status Tracker: Auto-syncs with Supabase without manual refresh
   useEffect(() => {
-    if (user) {
-      let isMounted = true;
-      (async () => {
-        try {
-          const supabase = createClient();
-          const { data: stData } = await supabase
-            .from("students")
-            .select("id")
-            .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
-            .limit(1);
-
-          if (stData && stData.length > 0) {
-            const { data: appData } = await supabase
-              .from("enrollment_applications")
-              .select("application_id, status")
-              .eq("student_id", stData[0].id)
-              .order("created_at", { ascending: false })
-              .limit(1);
-
-            if (isMounted && appData && appData.length > 0) {
-              setAppStatus(appData[0].status);
-              setAppRef(appData[0].application_id);
-              return;
-            }
-          }
-          if (isMounted) {
-            setAppStatus(null);
-            setAppRef(null);
-          }
-        } catch {
-          if (isMounted) {
-            setAppStatus(null);
-            setAppRef(null);
-          }
-        }
-      })();
-      return () => {
-        isMounted = false;
-      };
-    } else {
+    if (!user) {
       setAppStatus(null);
       setAppRef(null);
+      return;
     }
+
+    let isMounted = true;
+    const supabase = createClient();
+
+    const fetchStatus = async () => {
+      try {
+        const { data: stData } = await supabase
+          .from("students")
+          .select("id")
+          .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
+          .limit(1);
+
+        if (stData && stData.length > 0) {
+          const { data: appData } = await supabase
+            .from("enrollment_applications")
+            .select("application_id, status")
+            .eq("student_id", stData[0].id)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          if (isMounted && appData && appData.length > 0) {
+            setAppStatus(appData[0].status);
+            setAppRef(appData[0].application_id);
+            return;
+          }
+        }
+        if (isMounted) {
+          setAppStatus(null);
+          setAppRef(null);
+        }
+      } catch {
+        if (isMounted) {
+          setAppStatus(null);
+          setAppRef(null);
+        }
+      }
+    };
+
+    // 1. Initial fetch
+    fetchStatus();
+
+    // 2. Window Focus & Visibility auto-sync
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchStatus();
+      }
+    };
+    window.addEventListener("focus", onVisibilityChange);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    // 3. Custom Application/Auth Event listener
+    const onDataChanged = () => {
+      fetchStatus();
+    };
+    window.addEventListener("dumalnext:data-changed", onDataChanged);
+
+    // 4. 3-Second Heartbeat Polling
+    const heartbeat = setInterval(fetchStatus, 3000);
+
+    // 5. Supabase Realtime Channel: Instant live push from database
+    const channel = supabase
+      .channel("nav-realtime-applications")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchStatus();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("focus", onVisibilityChange);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("dumalnext:data-changed", onDataChanged);
+      clearInterval(heartbeat);
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   return (
