@@ -102,7 +102,7 @@ export default function EnrollmentControlRoom() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-300 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ MODULE 04: ENROLLMENT CONTROL ROOM &bull; MASTER SYSTEM OPERATIONS ]
+            [ ENROLLMENT CONTROL ROOM &bull; MASTER SYSTEM OPERATIONS ]
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             DepEd Online Enrollment Master Control Room

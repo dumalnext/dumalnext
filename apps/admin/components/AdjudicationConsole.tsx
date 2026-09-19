@@ -224,7 +224,7 @@ export default function AdjudicationConsole() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ MODULE 01: ENROLLMENT ADJUDICATION &bull; REGISTRAR QUEUE ]
+            [ ENROLLMENT ADJUDICATION &bull; REGISTRAR QUEUE ]
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Basic Education Enrollment Applications Queue

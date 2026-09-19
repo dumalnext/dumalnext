@@ -206,28 +206,28 @@ export default function AdminLoginForm() {
             </p>
 
             <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">1. Enrollment Adjudication:</strong>
+              <strong className="text-slate-900 block font-bold uppercase">Enrollment Adjudication:</strong>
               <p className="text-slate-600 text-[11px]">
                 Real-time queue of basic education applications. Approve or request revision on submitted Form 138 report cards and PSA certificates.
               </p>
             </div>
 
             <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">2. Section Quota Enforcement:</strong>
+              <strong className="text-slate-900 block font-bold uppercase">Section Quota Enforcement:</strong>
               <p className="text-slate-600 text-[11px]">
                 Enforces standard DepEd capacity (40 students per section) to eliminate classroom oversubscription.
               </p>
             </div>
 
             <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">3. Conflict-Free Timetable Scheduling:</strong>
+              <strong className="text-slate-900 block font-bold uppercase">Conflict-Free Timetable Scheduling:</strong>
               <p className="text-slate-600 text-[11px]">
                 Evaluates 3D timetable collisions (Teacher loads, Classroom occupancies, and SHS 5-core limits).
               </p>
             </div>
 
             <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">4. Enrollment Control Room:</strong>
+              <strong className="text-slate-900 block font-bold uppercase">Enrollment Control Room:</strong>
               <p className="text-slate-600 text-[11px]">
                 Master switch to toggle online enrollment ON or OFF, configure active School Year, and set institutional advisories.
               </p>

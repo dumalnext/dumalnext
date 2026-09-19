@@ -21,23 +21,19 @@ export default function AdminHeaderNav({
   const isAdjudication =
     activeSection === "adjudication" ||
     pathname === "/adjudication" ||
-    pathname === "/" ||
-    pathname === "/1";
+    pathname === "/";
 
   const isSections =
     activeSection === "sections" ||
-    pathname.startsWith("/sections") ||
-    pathname === "/2";
+    pathname.startsWith("/sections");
 
   const isScheduling =
     activeSection === "scheduling" ||
-    pathname.startsWith("/scheduling") ||
-    pathname === "/3";
+    pathname.startsWith("/scheduling");
 
   const isControl =
     activeSection === "control" ||
-    pathname.startsWith("/control-room") ||
-    pathname === "/4";
+    pathname.startsWith("/control-room");
 
   return (
     <header className="deped-header border-b-4 border-[#002060] bg-white text-slate-900 shadow-sm font-sans">
@@ -108,7 +104,7 @@ export default function AdminHeaderNav({
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              1. Enrollment Adjudication Console
+              Enrollment Adjudication
             </Link>
             <Link
               href="/sections"
@@ -119,7 +115,7 @@ export default function AdminHeaderNav({
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              2. Section Quota &amp; Capacity Control
+              Section Quota &amp; Capacity
             </Link>
             <Link
               href="/scheduling"
@@ -130,7 +126,7 @@ export default function AdminHeaderNav({
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              3. Automated Schedule Deconfliction
+              Schedule Deconfliction
             </Link>
             <Link
               href="/control-room"
@@ -141,7 +137,7 @@ export default function AdminHeaderNav({
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              4. Enrollment Control Room &amp; Operations
+              Enrollment Control Room
             </Link>
           </div>
         </div>

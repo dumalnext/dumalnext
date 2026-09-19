@@ -114,7 +114,7 @@ export default function SectionQuotaConsole() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ MODULE 02: SECTION QUOTA &bull; CLASSROOM CAPACITY CONTROL ]
+            [ SECTION QUOTA &bull; CLASSROOM CAPACITY CONTROL ]
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Class Sections &amp; Quota Limits Management

@@ -64,7 +64,7 @@ export default function ScheduleDeconflictionConsole() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ MODULE 03: AUTOMATED SCHEDULE DECONFLICTION ENGINE ]
+            [ AUTOMATED SCHEDULE DECONFLICTION ENGINE ]
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Timetable Conflict-Free Evaluation Hub
@@ -105,7 +105,7 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-5 bg-white border-2 border-slate-300 space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#002060] uppercase block">
-              1. Teacher Load Conflicts
+              Teacher Load Conflicts
             </span>
             <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300">
               OPTIMAL
@@ -119,7 +119,7 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-5 bg-white border-2 border-slate-300 space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#002060] uppercase block">
-              2. Physical Room Collisions
+              Physical Room Collisions
             </span>
             <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300">
               OPTIMAL
@@ -133,7 +133,7 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-5 bg-white border-2 border-slate-300 space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#002060] uppercase block">
-              3. Student Core Subject Limits
+              Student Core Subject Limits
             </span>
             <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300">
               COMPLIANT
