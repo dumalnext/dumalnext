@@ -311,6 +311,7 @@ export default function Step5DocumentsReview({
               target_strand: data.targetStrand || null,
               status: "Pending", // Reset back to Pending for registrar evaluation
               admin_feedback: null, // Clear revision remarks
+              selected_electives: [data],
               submitted_documents: Object.entries(docs)
                 .filter(([_, v]) => v !== null)
                 .map(([k, v]) => ({
@@ -349,7 +350,7 @@ export default function Step5DocumentsReview({
           // Check if student profile exists in Supabase
           let studentUuid = user?.id;
           const numericLrn = data.lrn && /^\d{12}$/.test(data.lrn) ? data.lrn : null;
-          let studentQuery = supabase.from("students").select("id");
+          let studentQuery = supabase.from("students").select("id, first_name, last_name");
           if (numericLrn && user?.id) {
             studentQuery = studentQuery.or(`student_id.eq.${numericLrn},user_id.eq.${user.id}`);
           } else if (user?.id) {
@@ -361,6 +362,22 @@ export default function Step5DocumentsReview({
 
           if (existingStudent && existingStudent.length > 0) {
             studentUuid = existingStudent[0].id;
+            // Ensure student profile has latest personal information
+            await supabase
+              .from("students")
+              .update({
+                first_name: data.firstName || existingStudent[0].first_name,
+                middle_name: data.middleName || null,
+                last_name: data.lastName || existingStudent[0].last_name,
+                date_of_birth: data.dateOfBirth || null,
+                gender: data.gender || null,
+                contact_number: applicationPayload.contactNumber,
+                barangay: data.currentBarangay || "CABARITAN",
+                grade_level: data.step1.targetGradeLevel,
+                strand: data.targetStrand || null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", studentUuid);
           } else {
             // Insert student profile record
             const assignedStudentId = numericLrn || `100050${Math.floor(100000 + Math.random() * 900000)}`;
@@ -398,6 +415,7 @@ export default function Step5DocumentsReview({
                 target_grade_level: data.step1.targetGradeLevel,
                 target_strand: data.targetStrand || null,
                 status: "Pending",
+                selected_electives: [data],
                 submitted_documents: Object.entries(docs)
                   .filter(([_, v]) => v !== null)
                   .map(([k, v]) => ({

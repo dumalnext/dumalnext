@@ -42,12 +42,14 @@ export default function AdjudicationConsole() {
           application_id,
           student_id,
           applicant_type,
+          school_year,
           target_grade_level,
           target_strand,
-          assigned_section,
           status,
           admin_feedback,
           submitted_documents,
+          selected_electives,
+          submission_date,
           created_at,
           updated_at,
           student:students (
@@ -61,11 +63,9 @@ export default function AdjudicationConsole() {
             date_of_birth,
             contact_number,
             barangay,
-            jhs_program,
-            sps_sport,
-            household_4ps,
-            ip_community,
-            is_sned
+            grade_level,
+            strand,
+            current_section_id
           )
         `)
         .order("created_at", { ascending: false });
@@ -87,34 +87,71 @@ export default function AdjudicationConsole() {
         });
       }
 
-      // Compute section counts based on assigned_section
+      // Compute section counts based on student.current_section_id
       const sectionCountMap = new Map<string, number>();
       if (appData) {
         appData.forEach((app: any) => {
-          if (app.assigned_section) {
-            sectionCountMap.set(
-              app.assigned_section,
-              (sectionCountMap.get(app.assigned_section) || 0) + 1
-            );
+          const secId = app.student?.current_section_id;
+          if (secId) {
+            sectionCountMap.set(secId, (sectionCountMap.get(secId) || 0) + 1);
           }
         });
       }
 
       const enrichedSections: SectionItem[] = (secData || []).map((s: any) => ({
         ...s,
-        enrolledCount: sectionCountMap.get(s.section_name) || s.enrolled_count || 0,
+        enrolledCount: sectionCountMap.get(s.id) || s.enrolled_count || 0,
       }));
 
       const enrichedApps: ApplicationDetail[] = (appData || []).map((app: any) => {
-        const student = app.student;
-        const linkedUser = student?.user_id
-          ? userMap.get(student.user_id)
-          : student?.student_id
-          ? userMap.get(student.student_id)
+        const rawStudent = app.student;
+        const linkedUser = rawStudent?.user_id
+          ? userMap.get(rawStudent.user_id)
+          : rawStudent?.student_id
+          ? userMap.get(rawStudent.student_id)
           : undefined;
+
+        // Extract any extended form data saved in selected_electives
+        const fd = Array.isArray(app.selected_electives) && app.selected_electives.length > 0
+          ? app.selected_electives[0]
+          : {};
+
+        const student = rawStudent ? {
+          ...rawStudent,
+          psa_birth_cert_no: fd.psaBirthCertificateNo || fd.psa_birth_cert_no,
+          place_of_birth: fd.placeOfBirth || fd.place_of_birth,
+          religion: fd.religion,
+          mother_tongue: fd.motherTongue || fd.mother_tongue,
+          is_ip_community: fd.isIpCommunity ?? fd.is_ip_community,
+          ip_community_name: fd.ipCommunityName || fd.ip_community_name,
+          is_4ps_beneficiary: fd.is4psBeneficiary ?? fd.is_4ps_beneficiary,
+          household_id_4ps: fd.household4psId || fd.household_id_4ps,
+          father_last_name: fd.fatherLastName || fd.father_last_name,
+          father_first_name: fd.fatherFirstName || fd.father_first_name,
+          father_middle_name: fd.fatherMiddleName || fd.father_middle_name,
+          father_contact_number: fd.fatherContactNumber || fd.father_contact_number,
+          mother_maiden_last_name: fd.motherMaidenLastName || fd.mother_maiden_last_name,
+          mother_first_name: fd.motherFirstName || fd.mother_first_name,
+          mother_middle_name: fd.motherMiddleName || fd.mother_middle_name,
+          mother_contact_number: fd.motherContactNumber || fd.mother_contact_number,
+          guardian_last_name: fd.guardianLastName || fd.guardian_last_name,
+          guardian_first_name: fd.guardianFirstName || fd.guardian_first_name,
+          guardian_middle_name: fd.guardianMiddleName || fd.guardian_middle_name,
+          guardian_contact_number: fd.guardianContactNumber || fd.guardian_contact_number,
+          guardian_relationship: fd.guardianRelationship || fd.guardian_relationship,
+          primary_contact_person: fd.primaryContactPerson || fd.primary_contact_person,
+          last_grade_completed: fd.lastGradeCompleted || fd.step1?.lastGradeCompleted || fd.last_grade_completed,
+          last_school_year_completed: fd.lastSchoolYearCompleted || fd.step1?.lastSchoolYearCompleted || fd.last_school_year_completed,
+          last_school_attended: fd.lastSchoolAttended || fd.step1?.lastSchoolAttended || fd.last_school_attended,
+          last_school_id: fd.lastSchoolId || fd.step1?.lastSchoolId || fd.last_school_id,
+          preferred_modalities: fd.preferredModalities || fd.preferred_modalities,
+          jhs_program: fd.jhsProgram || fd.step1?.jhsProgram || fd.jhs_program,
+          sps_sport: fd.spsSport || fd.sps_sport,
+        } : undefined;
 
         return {
           ...app,
+          student,
           userAccount: linkedUser,
         };
       });

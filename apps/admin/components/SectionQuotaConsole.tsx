@@ -36,19 +36,19 @@ export default function SectionQuotaConsole() {
         console.warn("Error fetching sections:", secErr.message);
       }
 
-      // 2. Fetch assigned sections count from enrollment_applications
-      const { data: appData } = await supabase
-        .from("enrollment_applications")
-        .select("assigned_section, status")
-        .eq("status", "Approved");
+      // 2. Fetch assigned sections count from students
+      const { data: studentSecData } = await supabase
+        .from("students")
+        .select("current_section_id")
+        .not("current_section_id", "is", null);
 
       const countMap = new Map<string, number>();
-      if (appData) {
-        appData.forEach((a: any) => {
-          if (a.assigned_section) {
+      if (studentSecData) {
+        studentSecData.forEach((st: any) => {
+          if (st.current_section_id) {
             countMap.set(
-              a.assigned_section,
-              (countMap.get(a.assigned_section) || 0) + 1
+              st.current_section_id,
+              (countMap.get(st.current_section_id) || 0) + 1
             );
           }
         });
@@ -62,7 +62,7 @@ export default function SectionQuotaConsole() {
         room: s.room || undefined,
         adviser_name: s.adviser_name || undefined,
         capacity: s.capacity || 40,
-        enrolledCount: countMap.get(s.section_name) || s.enrolled_count || 0,
+        enrolledCount: countMap.get(s.id) || s.enrolled_count || 0,
       }));
 
       setSections(enriched);
