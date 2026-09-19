@@ -183,8 +183,9 @@ export default function AdjudicationModal({
       // 1. Resolve smart approval remarks if left empty by admin
       const assignedSection = sections.find((s) => s.id === selectedSectionId);
       const sectionName = assignedSection ? assignedSection.section_name : "";
-      const smartApprovalNotice = `You're enrolled at Dumalneg National High School for School Year 2025–2026 under Grade ${application.target_grade_level}${sectionName ? ` (${sectionName})` : ""}. Welcome to Dumalneg NHS!`;
-      const finalRemarks = remarks.trim() || smartApprovalNotice;
+      const isAlreadyApproved = application.status === "Approved";
+      const smartApprovalNotice = `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${sectionName ? ` (${sectionName})` : ""}. Welcome to Dumalneg NHS!`;
+      const finalRemarks = remarks.trim() || (isAlreadyApproved ? (application.admin_feedback || smartApprovalNotice) : smartApprovalNotice);
 
       // Update enrollment_applications status in Supabase
       const { error: appErr } = await supabase
@@ -214,7 +215,15 @@ export default function AdjudicationModal({
         }
       }
 
-      setActionSuccess("Application officially APPROVED & ENROLLED with official section assignment. Real-time rosters updated.");
+      setActionSuccess(
+        isAlreadyApproved
+          ? `Section assignment updated to [ ${sectionName || selectedSectionId} ] successfully. Real-time rosters updated.`
+          : "Application officially APPROVED & ENROLLED with official section assignment. Real-time rosters updated."
+      );
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
+      }
       setTimeout(() => {
         onAdjudicationSuccess();
         onClose();
@@ -769,6 +778,25 @@ export default function AdjudicationModal({
                   </span>
                 </div>
 
+                {application.status === "Approved" && (
+                  <div className="p-3 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-950 uppercase font-mono">
+                          [ CURRENTLY ENROLLED &amp; SECTIONED ]
+                        </span>
+                      </div>
+                      <span className="text-xs text-emerald-900 block mt-0.5">
+                        Assigned Section: <strong>{sections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || "Assigned"}</strong>
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-mono text-emerald-800 bg-white px-2 py-1 border border-emerald-300">
+                      ✏️ Section is Editable: Select below to reassign
+                    </span>
+                  </div>
+                )}
+
                 {eligibleSections.length === 0 ? (
                   <div className="p-3 bg-red-100 border border-red-400 text-xs text-red-950 space-y-1">
                     <strong className="block">[ NO ELIGIBLE SECTIONS FOUND IN DATABASE ]</strong>
@@ -902,7 +930,7 @@ export default function AdjudicationModal({
                     const assignedSection = sections.find((s) => s.id === selectedSectionId);
                     const sName = assignedSection ? ` (${assignedSection.section_name})` : "";
                     setRemarks(
-                      `You're enrolled at Dumalneg National High School for School Year 2025–2026 under Grade ${application.target_grade_level}${sName}. Welcome to Dumalneg NHS!`
+                      `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${sName}. Welcome to Dumalneg NHS!`
                     );
                   }}
                   className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-semibold transition-colors cursor-pointer"
@@ -979,12 +1007,22 @@ export default function AdjudicationModal({
                       ? "bg-amber-500 hover:bg-amber-600 text-slate-950 border-2 border-amber-600 font-extrabold"
                       : "bg-[#002060] hover:bg-blue-950 text-white border-2 border-[#002060]"
                   } disabled:opacity-50`}
-                  title={!selectedSectionId ? "Assign a section in Tab 4 first to approve" : "Approve and confirm enrollment"}
+                  title={
+                    !selectedSectionId
+                      ? "Assign a section in Tab 4 first to approve"
+                      : application.status === "Approved"
+                      ? "Update the assigned class section for this student"
+                      : "Approve and confirm enrollment"
+                  }
                 >
                   {isSubmitting
-                    ? "Approving Enrollment..."
+                    ? application.status === "Approved"
+                      ? "Updating Section Assignment..."
+                      : "Approving Enrollment..."
                     : !selectedSectionId
                     ? "[ Assign Section to Approve ]"
+                    : application.status === "Approved"
+                    ? "[ Update Section Assignment ]"
                     : "[ Approve & Confirm Enrollment ]"}
                 </button>
               </div>

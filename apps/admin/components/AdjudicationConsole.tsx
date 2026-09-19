@@ -533,6 +533,11 @@ export default function AdjudicationConsole() {
                           ? `JHS (SPS - ${st?.sps_sport || "Sports"})`
                           : "JHS Regular"}
                       </span>
+                      {st?.current_section_id && (
+                        <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block mt-1">
+                          {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
+                        </span>
+                      )}
                     </td>
                     <td className="p-3 font-mono text-slate-600">
                       {new Date(app.created_at).toLocaleDateString()}
