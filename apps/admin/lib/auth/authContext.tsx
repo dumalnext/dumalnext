@@ -12,12 +12,14 @@ export interface AdminUser {
   lastName: string;
   department: string;
   userRole: "admin";
+  isEmailVerified?: boolean;
 }
 
 interface AdminAuthContextType {
   user: AdminUser | null;
   isLoading: boolean;
-  login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }>;
+  resendVerification: (email: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshSession: () => Promise<void>;
 }
@@ -58,14 +60,56 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const refreshSession = async () => {
     try {
       if (typeof window === "undefined") return;
+
+      // 1. Check Supabase Auth session first
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const authUser = session.user;
+        const { data: suUsers } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role")
+          .eq("email", authUser.email || "")
+          .limit(1);
+
+        const suUser = suUsers?.[0];
+        if (suUser && suUser.user_role === "admin") {
+          const { data: profiles } = await supabase
+            .from("school_administrators")
+            .select("*")
+            .eq("user_id", suUser.id)
+            .limit(1);
+
+          const profile = profiles?.[0];
+          const firstName = profile?.first_name || "OFFICE OF THE";
+          const lastName = profile?.last_name || "REGISTRAR";
+          const department = profile?.department || "Office of the Principal & Registrar";
+
+          const verifiedAdmin: AdminUser = {
+            id: suUser.id,
+            userId: suUser.user_id,
+            email: suUser.email,
+            fullName: `${firstName} ${lastName}`.trim(),
+            firstName,
+            lastName,
+            department,
+            userRole: "admin",
+            isEmailVerified: !!authUser.email_confirmed_at,
+          };
+
+          setUser(verifiedAdmin);
+          setSessionCookie(verifiedAdmin);
+          return;
+        }
+      }
+
+      // 2. Fallback to cached session cookie
       const cachedUser = getSessionCookie();
       if (!cachedUser) {
         setUser(null);
         return;
       }
 
-      // Verify active admin in Supabase
-      const { data: verified, error } = await supabase
+      const { data: verified } = await supabase
         .from("users")
         .select("id, user_id, email, user_role")
         .eq("id", cachedUser.id)
@@ -73,21 +117,10 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         .limit(1);
 
       if (verified && verified.length > 0) {
-        setUser((prev) => {
-          if (
-            prev &&
-            prev.id === cachedUser.id &&
-            prev.userId === cachedUser.userId &&
-            prev.email === cachedUser.email
-          ) {
-            return prev;
-          }
-          return cachedUser;
-        });
+        setUser(cachedUser);
       } else {
         clearSessionCookie();
         setUser(null);
-        window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
       }
     } catch (e) {
       console.warn("Admin session verification notice:", e);
@@ -99,6 +132,19 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refreshSession();
 
+    // Listen to Supabase Auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" || event === "USER_UPDATED" || event === "TOKEN_REFRESHED") {
+        await refreshSession();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
+        }
+      } else if (event === "SIGNED_OUT") {
+        setUser(null);
+        clearSessionCookie();
+      }
+    });
+
     const handleVisibilitySync = () => {
       if (document.visibilityState === "visible") {
         refreshSession();
@@ -108,13 +154,11 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     document.addEventListener("visibilitychange", handleVisibilitySync);
 
     const heartbeatTimer = setInterval(() => {
-      const cachedUser = getSessionCookie();
-      if (cachedUser) {
-        refreshSession();
-      }
+      refreshSession();
     }, 15000);
 
     return () => {
+      subscription.unsubscribe();
       window.removeEventListener("focus", handleVisibilitySync);
       document.removeEventListener("visibilitychange", handleVisibilitySync);
       clearInterval(heartbeatTimer);
@@ -124,7 +168,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (
     identifier: string,
     password: string
-  ): Promise<{ success: boolean; error?: string }> => {
+  ): Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }> => {
     const cleanId = identifier.trim().toLowerCase();
     const cleanPass = password.trim();
 
@@ -133,8 +177,30 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // 1. Check if user exists in Supabase 'users' table
-      let { data: suUsers, error: userErr } = await supabase
+      // 1. If email, attempt Supabase Auth with Gmail verification check
+      if (cleanId.includes("@")) {
+        const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+          email: cleanId,
+          password: cleanPass,
+        });
+
+        if (authErr) {
+          const errMsg = authErr.message.toLowerCase();
+          if (errMsg.includes("email not confirmed") || errMsg.includes("unconfirmed")) {
+            return {
+              success: false,
+              error: "Your administrator Gmail is not yet verified. Please check your inbox (and Spam folder) for the verification link.",
+              unconfirmedEmail: cleanId,
+            };
+          }
+        } else if (authData.user) {
+          await refreshSession();
+          return { success: true };
+        }
+      }
+
+      // 2. Check if user exists in Supabase 'users' table
+      let { data: suUsers } = await supabase
         .from("users")
         .select("*")
         .or(`email.eq.${cleanId},user_id.eq.${cleanId.toUpperCase()}`)
@@ -149,7 +215,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         cleanPass === "admin123";
 
       if ((!suUsers || suUsers.length === 0) && isDefaultAdminCred) {
-        // Auto-seed default Administrator in Supabase
         const newAdminPayload: any = {
           user_id: "DNHS-ADM-001",
           email: cleanId.includes("@") ? cleanId : "admin@dumalneg.deped.gov.ph",
@@ -165,8 +230,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
         if (insertRes.data) {
           suUsers = [insertRes.data];
-
-          // Also insert into school_administrators profile table if available
           await supabase.from("school_administrators").insert({
             user_id: insertRes.data.id,
             first_name: "OFFICE OF THE",
@@ -185,7 +248,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
       const adminUserRecord = suUsers[0];
 
-      // Verify Role: Must be 'admin'
       if (adminUserRecord.user_role !== "admin") {
         return {
           success: false,
@@ -193,7 +255,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Verify Password if column exists
       if (adminUserRecord.password && adminUserRecord.password !== cleanPass) {
         return {
           success: false,
@@ -201,7 +262,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Fetch Profile from school_administrators if exists
       const { data: profiles } = await supabase
         .from("school_administrators")
         .select("*")
@@ -209,10 +269,10 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         .limit(1);
 
       const profile = profiles?.[0];
-      const firstName = profile?.first_name || "SCHOOL";
-      const lastName = profile?.last_name || "ADMINISTRATOR";
+      const firstName = profile?.first_name || "OFFICE OF THE";
+      const lastName = profile?.last_name || "REGISTRAR";
       const department = profile?.department || "Office of the Principal & Registrar";
-      const fullName = `${firstName} ${lastName}`;
+      const fullName = `${firstName} ${lastName}`.trim();
 
       const sessionUser: AdminUser = {
         id: adminUserRecord.id,
@@ -239,7 +299,32 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const resendVerification = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    const cleanEmail = email.trim().toLowerCase();
+    try {
+      const redirectUrl = typeof window !== "undefined"
+        ? `${window.location.origin}/auth/callback?next=/adjudication`
+        : "https://dumalnext-admin.vercel.app/auth/callback?next=/adjudication";
+
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: cleanEmail,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      });
+
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e?.message || "Failed to resend verification email." };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {}
     setUser(null);
     clearSessionCookie();
     if (typeof window !== "undefined") {
@@ -248,7 +333,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, isLoading, login, logout, refreshSession }}>
+    <AdminAuthContext.Provider value={{ user, isLoading, login, resendVerification, logout, refreshSession }}>
       {children}
     </AdminAuthContext.Provider>
   );

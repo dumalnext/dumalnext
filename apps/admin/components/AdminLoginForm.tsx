@@ -4,14 +4,30 @@ import React, { useState } from "react";
 import { useAdminAuth } from "@/lib/auth/authContext";
 
 export default function AdminLoginForm() {
-  const { login } = useAdminAuth();
+  const { login, resendVerification } = useAdminAuth();
 
   const [adminId, setAdminId] = useState<string>("admin@dumalneg.deped.gov.ph");
   const [adminPassword, setAdminPassword] = useState<string>("admin123");
-  const [loginError, setLoginError] = useState<string>("" );
+  const [loginError, setLoginError] = useState<string>("");
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string>("");
+  const [isResending, setIsResending] = useState<boolean>(false);
+  const [resendStatus, setResendStatus] = useState<string>("");
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [loginProgress, setLoginProgress] = useState<number>(0);
   const [loginStatusText, setLoginStatusText] = useState<string>("");
+
+  const handleResend = async () => {
+    if (!unconfirmedEmail) return;
+    setIsResending(true);
+    setResendStatus("");
+    const res = await resendVerification(unconfirmedEmail);
+    if (res.success) {
+      setResendStatus("Verification link resent! Please check your administrator Gmail inbox (and Spam folder).");
+    } else {
+      setResendStatus(res.error || "Failed to resend verification link.");
+    }
+    setIsResending(false);
+  };
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +50,9 @@ export default function AdminLoginForm() {
       const res = await login(adminId, adminPassword);
       if (!res.success) {
         setLoginError(res.error || "Invalid administrator credentials.");
+        if (res.unconfirmedEmail) {
+          setUnconfirmedEmail(res.unconfirmedEmail);
+        }
         setIsLoggingIn(false);
         setLoginProgress(0);
         return;
@@ -101,6 +120,36 @@ export default function AdminLoginForm() {
               <p className="text-xs text-slate-800 font-medium">
                 {loginStatusText || "Authenticating..."}
               </p>
+            </div>
+          )}
+
+          {unconfirmedEmail && (
+            <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+                  [ GMAIL VERIFICATION REQUIRED ]
+                </span>
+              </div>
+              <p className="text-xs text-amber-950 leading-relaxed font-medium">
+                A verification link was sent to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
+                Please open your Gmail, check your <strong>Inbox</strong> (or <strong>Spam</strong> folder), and click the confirmation link to activate your administrator account.
+              </p>
+              <div className="pt-1 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isResending}
+                  onClick={handleResend}
+                  className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
+                >
+                  {isResending ? "Resending Link..." : "[ Resend Verification Link to Gmail ]"}
+                </button>
+                {resendStatus && (
+                  <span className="text-[11px] font-bold text-slate-800 block">
+                    {resendStatus}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 

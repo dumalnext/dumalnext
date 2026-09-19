@@ -13,7 +13,7 @@ function StudentHomeContent() {
   const searchParams = useSearchParams();
   const tabQuery = searchParams.get("tab");
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
-  const { user, login, register, logout } = useAuth();
+  const { user, login, register, resendVerification, logout } = useAuth();
   const { isEnrollmentOpen, schoolYear, closedMessage } = useEnrollmentControl();
 
   // Active Tab for Visitors: "signin" | "register"
@@ -29,6 +29,24 @@ function StudentHomeContent() {
       setActiveTab("signin");
     }
   }, [tabQuery]);
+
+  // Gmail Verification Required State
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState("");
+
+  const handleResendVerification = async () => {
+    if (!unconfirmedEmail) return;
+    setIsResending(true);
+    setResendStatus("");
+    const res = await resendVerification(unconfirmedEmail);
+    if (res.success) {
+      setResendStatus("Verification link successfully resent! Please check your Gmail inbox (and Spam folder).");
+    } else {
+      setResendStatus(res.error || "Failed to resend verification link.");
+    }
+    setIsResending(false);
+  };
 
   // Sign In Form State (Phase 1: Email First)
   const [loginEmail, setLoginEmail] = useState("");
@@ -179,6 +197,9 @@ function StudentHomeContent() {
       const res = await login(loginEmail, loginPassword);
       if (!res.success) {
         setLoginError(res.error || "Invalid email or password. Please try again.");
+        if (res.unconfirmedEmail) {
+          setUnconfirmedEmail(res.unconfirmedEmail);
+        }
         setIsLoggingIn(false);
         setLoginProgress(0);
         return;
@@ -196,6 +217,7 @@ function StudentHomeContent() {
       setLoginPassword("");
       setRegSuccessNotice("");
       setLoginError("");
+      setUnconfirmedEmail("");
 
       if (typeof window !== "undefined") {
         window.history.replaceState(null, "", "/");
@@ -216,7 +238,7 @@ function StudentHomeContent() {
     if (!regForm.lastName.trim()) newErrors.lastName = "Official Last Name is required.";
     if (!regForm.firstName.trim()) newErrors.firstName = "Official First Name is required.";
     if (!regForm.email.trim() || !regForm.email.includes("@")) {
-      newErrors.email = "A valid email address is required.";
+      newErrors.email = "A valid Gmail address is required.";
     }
     if (!regForm.password || regForm.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters.";
@@ -236,7 +258,7 @@ function StudentHomeContent() {
       // Step 1: Pre-save verification delay
       await new Promise((resolve) => setTimeout(resolve, 450));
       setRegProgress(55);
-      setRegStatusText("Saving applicant credentials in DepEd Dumalneg NHS registry...");
+      setRegStatusText("Sending official verification link to your Gmail address...");
 
       const res = await register(
         {
@@ -246,18 +268,21 @@ function StudentHomeContent() {
           email: regForm.email.trim().toLowerCase(),
           password: regForm.password,
         },
-        false // Do not auto-login session so they sign in cleanly from Home
+        false
       );
 
       if (!res.success) {
         setRegErrors({ form: res.error || "Registration failed. Please try again." });
+        if ((res as any).unconfirmedEmail) {
+          setUnconfirmedEmail((res as any).unconfirmedEmail);
+        }
         setIsRegistering(false);
         setRegProgress(0);
         return;
       }
 
       setRegProgress(85);
-      setRegStatusText("Account created successfully! Preparing sign-in console...");
+      setRegStatusText("Verification link sent! Preparing sign-in console...");
       await new Promise((resolve) => setTimeout(resolve, 450));
 
       setRegProgress(100);
@@ -270,8 +295,9 @@ function StudentHomeContent() {
       // Pre-fill email in login form
       setLoginEmail(registeredEmail);
       setLoginPassword("");
+      setUnconfirmedEmail(registeredEmail);
       setRegSuccessNotice(
-        `Account for [ ${applicantFullName} ] created successfully! Please enter your password to sign in.`
+        `Verification Link sent to [ ${registeredEmail} ]! Please open your Gmail, click the confirmation link to activate your account, then sign in below.`
       );
 
       // Clear reg form
@@ -631,11 +657,42 @@ function StudentHomeContent() {
                 {regSuccessNotice && (
                   <div className="p-4 bg-emerald-50 border-2 border-emerald-600 shadow-xs">
                     <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider block mb-1">
-                      [ REGISTRATION SUCCESSFUL &bull; ACCOUNT CREATED ]
+                      [ REGISTRATION SUCCESSFUL &bull; VERIFICATION LINK SENT ]
                     </span>
                     <p className="text-xs text-emerald-900 leading-relaxed font-medium">
                       {regSuccessNotice}
                     </p>
+                  </div>
+                )}
+
+                {/* Gmail Verification Required Notice with Resend Button */}
+                {unconfirmedEmail && (
+                  <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                      <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+                        [ GMAIL VERIFICATION REQUIRED ]
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-950 leading-relaxed font-medium">
+                      A verification link was sent to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
+                      Please open your Gmail, check your <strong>Inbox</strong> (or <strong>Spam</strong> folder), and click the confirmation link to activate your student account.
+                    </p>
+                    <div className="pt-1 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isResending}
+                        onClick={handleResendVerification}
+                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
+                      >
+                        {isResending ? "Resending Link..." : "[ Resend Verification Link to Gmail ]"}
+                      </button>
+                      {resendStatus && (
+                        <span className="text-[11px] font-bold text-slate-800 block">
+                          {resendStatus}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
 
