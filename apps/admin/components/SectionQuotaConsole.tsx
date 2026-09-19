@@ -603,7 +603,7 @@ export default function SectionQuotaConsole() {
             className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-mono font-bold border border-slate-300 uppercase cursor-pointer"
             title="Refresh sections"
           >
-            ⟳ Refresh
+            [ Refresh List ]
           </button>
         </div>
       </div>
@@ -708,9 +708,9 @@ export default function SectionQuotaConsole() {
                   <button
                     type="button"
                     onClick={() => fetchRoster(sec)}
-                    className="w-full py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                    className="w-full py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors shadow-2xs cursor-pointer"
                   >
-                    <span>👥</span> View Class Roster ({count} {count === 1 ? "Student" : "Students"})
+                    [ View Class Roster ({count} {count === 1 ? "Student" : "Students"}) ]
                   </button>
 
                   <div className="flex items-center gap-2">
@@ -720,7 +720,7 @@ export default function SectionQuotaConsole() {
                       className="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider text-center transition-colors cursor-pointer"
                       title="Edit capacity and details"
                     >
-                      ✏️ Edit Capacity
+                      [ Edit Capacity ]
                     </button>
                     <button
                       type="button"
@@ -728,7 +728,7 @@ export default function SectionQuotaConsole() {
                       className="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                       title="Remove section"
                     >
-                      🗑️ Delete
+                      [ Delete ]
                     </button>
                   </div>
                 </div>
@@ -1062,7 +1062,7 @@ export default function SectionQuotaConsole() {
                   className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 text-white text-xs font-mono font-bold border border-blue-400 uppercase cursor-pointer"
                   title="Print official class roster"
                 >
-                  🖨️ Print Roster
+                  [ Print Class Roster ]
                 </button>
                 <button
                   type="button"
@@ -1235,7 +1235,7 @@ export default function SectionQuotaConsole() {
                                   className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                                   title="Transfer student to another section"
                                 >
-                                  ⇄ Reassign
+                                  [ Reassign ]
                                 </button>
                               )}
                             </td>

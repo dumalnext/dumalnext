@@ -392,7 +392,7 @@ export default function EnrollmentControlRoom() {
               }
               className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
             >
-              ⚡ Standard Closed Advisory
+              [ Standard Closed Advisory ]
             </button>
             <button
               type="button"
@@ -404,7 +404,7 @@ export default function EnrollmentControlRoom() {
               }
               className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
             >
-              ⚡ Enrollment Window Concluded
+              [ Enrollment Window Concluded ]
             </button>
             <button
               type="button"
@@ -416,7 +416,7 @@ export default function EnrollmentControlRoom() {
               }
               className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
             >
-              ⚡ Section Quota Paused
+              [ Section Quota Paused ]
             </button>
           </div>
         </div>

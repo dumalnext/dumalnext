@@ -792,7 +792,7 @@ export default function AdjudicationModal({
                       </span>
                     </div>
                     <span className="text-[11px] font-mono text-emerald-800 bg-white px-2 py-1 border border-emerald-300">
-                      ✏️ Section is Editable: Select below to reassign
+                      [ Section is Editable: Select below to reassign ]
                     </span>
                   </div>
                 )}
@@ -910,7 +910,7 @@ export default function AdjudicationModal({
                   className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-900 border border-red-300 font-semibold transition-colors cursor-pointer"
                   title="Insert revision notice"
                 >
-                  ⚡ &ldquo;Double check your requirements...&rdquo;
+                  [ &ldquo;Double check your requirements...&rdquo; ]
                 </button>
                 <button
                   type="button"
@@ -922,7 +922,7 @@ export default function AdjudicationModal({
                   className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-900 border border-red-300 font-semibold transition-colors cursor-pointer"
                   title="Insert document revision notice"
                 >
-                  ⚡ &ldquo;Double check your PSA &amp; SF9...&rdquo;
+                  [ &ldquo;Double check your PSA &amp; SF9...&rdquo; ]
                 </button>
                 <button
                   type="button"
@@ -936,7 +936,7 @@ export default function AdjudicationModal({
                   className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-semibold transition-colors cursor-pointer"
                   title="Insert enrollment approval notice"
                 >
-                  ⚡ &ldquo;You&apos;re enrolled at Dumalneg NHS...&rdquo;
+                  [ &ldquo;You&apos;re enrolled at Dumalneg NHS...&rdquo; ]
                 </button>
                 {remarks && (
                   <button
