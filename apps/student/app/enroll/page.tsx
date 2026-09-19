@@ -18,14 +18,14 @@ export default function StudentEnrollPage() {
     }
   }, [user, isLoading, router]);
 
-  if (isLoading || isControlLoading) {
+  if (isLoading && !user) {
     return (
-      <div className="max-w-4xl mx-auto p-12 bg-white border-2 border-slate-300 text-center font-sans">
+      <div className="max-w-4xl mx-auto p-8 bg-white border-2 border-slate-300 text-center font-sans">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
           [ AUTHENTICATING APPLICANT SESSION ]
         </span>
-        <p className="text-sm font-bold text-slate-800">
-          Verifying authorized student credentials and enrollment system status...
+        <p className="text-xs font-bold text-slate-800">
+          Loading student console...
         </p>
       </div>
     );
