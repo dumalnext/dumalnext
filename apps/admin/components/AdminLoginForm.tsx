@@ -4,11 +4,8 @@ import React, { useState } from "react";
 import { useAdminAuth } from "@/lib/auth/authContext";
 
 export default function AdminLoginForm() {
-  const { login, registerAdmin, resendVerification } = useAdminAuth();
+  const { login, resendVerification } = useAdminAuth();
 
-  const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
-
-  // Sign In State
   const [adminId, setAdminId] = useState<string>("heartistrichford@gmail.com");
   const [adminPassword, setAdminPassword] = useState<string>("");
   const [loginError, setLoginError] = useState<string>("");
@@ -18,16 +15,6 @@ export default function AdminLoginForm() {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [loginProgress, setLoginProgress] = useState<number>(0);
   const [loginStatusText, setLoginStatusText] = useState<string>("");
-
-  // Registration State
-  const [regEmail, setRegEmail] = useState<string>("heartistrichford@gmail.com");
-  const [regPassword, setRegPassword] = useState<string>("");
-  const [regConfirmPassword, setRegConfirmPassword] = useState<string>("");
-  const [regError, setRegError] = useState<string>("");
-  const [regSuccessNotice, setRegSuccessNotice] = useState<string>("");
-  const [isRegistering, setIsRegistering] = useState<boolean>(false);
-  const [regProgress, setRegProgress] = useState<number>(0);
-  const [regStatusText, setRegStatusText] = useState<string>("");
 
   const handleResend = async () => {
     if (!unconfirmedEmail) return;
@@ -47,7 +34,7 @@ export default function AdminLoginForm() {
     setLoginError("");
 
     if (!adminId.trim() || !adminPassword) {
-      setLoginError("Please enter your Administrator ID or Email and password.");
+      setLoginError("Please enter your Administrator Email and security password.");
       return;
     }
 
@@ -85,62 +72,6 @@ export default function AdminLoginForm() {
     }
   };
 
-  const handleAdminRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setRegError("");
-
-    const cleanEmail = regEmail.trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes("@")) {
-      setRegError("A valid administrator Gmail address is required.");
-      return;
-    }
-
-    if (!regPassword || regPassword.length < 6) {
-      setRegError("Security Password must be at least 6 characters.");
-      return;
-    }
-
-    if (regPassword !== regConfirmPassword) {
-      setRegError("Security Passwords do not match.");
-      return;
-    }
-
-    setIsRegistering(true);
-    setRegProgress(25);
-    setRegStatusText("Validating administrative security credentials...");
-
-    try {
-      await new Promise((res) => setTimeout(res, 400));
-      setRegProgress(60);
-      setRegStatusText("Sending official administrator verification link to Gmail...");
-
-      const res = await registerAdmin(cleanEmail, regPassword);
-      if (!res.success) {
-        setRegError(res.error || "Failed to register administrator account.");
-        if (res.unconfirmedEmail) {
-          setUnconfirmedEmail(res.unconfirmedEmail);
-        }
-        return;
-      }
-
-      setRegProgress(100);
-      setRegStatusText("Verification link dispatched! Redirecting to sign in...");
-      await new Promise((res) => setTimeout(res, 350));
-
-      setAdminId(cleanEmail);
-      setAdminPassword("");
-      setUnconfirmedEmail(cleanEmail);
-      setRegSuccessNotice(
-        `Verification Link sent to [ ${cleanEmail} ]! Please open your Gmail, click the confirmation link to activate your administrator privileges, then sign in below.`
-      );
-      setActiveTab("signin");
-    } finally {
-      setIsRegistering(false);
-      setRegProgress(0);
-      setRegStatusText("");
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 space-y-8 font-sans">
       {/* Notice Banner */}
@@ -158,264 +89,117 @@ export default function AdminLoginForm() {
         </p>
       </section>
 
-      {/* Login / Register Box */}
+      {/* Login Box */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border-2 border-[#002060] shadow-sm">
-          {/* Tab Selector */}
-          <div className="grid grid-cols-2 border-b-2 border-slate-200 text-center font-bold text-xs uppercase tracking-wider">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("signin");
-                setLoginError("");
-              }}
-              className={`py-3.5 px-3 text-xs transition-colors ${
-                activeTab === "signin"
-                  ? "bg-[#002060] text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              [ Tab 1: Sign In ]
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("register");
-                setRegError("");
-                setRegSuccessNotice("");
-              }}
-              className={`py-3.5 px-3 text-xs transition-colors ${
-                activeTab === "register"
-                  ? "bg-[#002060] text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              [ Tab 2: Register Admin ]
-            </button>
+        <div className="bg-white p-6 sm:p-8 border-2 border-[#002060] shadow-sm space-y-5">
+          <div className="border-b border-slate-200 pb-3">
+            <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+              [ OFFICIAL ADMINISTRATOR AUTHENTICATION ]
+            </span>
+            <h3 className="text-base font-bold text-slate-900 uppercase">
+              Administrative Personnel Sign-In
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Authorized Account: <strong className="text-slate-900">heartistrichford@gmail.com</strong>
+            </p>
           </div>
 
-          <div className="p-6 sm:p-8 space-y-5">
-            {/* TAB 1: SIGN IN */}
-            {activeTab === "signin" && (
-              <div className="space-y-4">
-                <div className="border-b border-slate-200 pb-3">
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-                    [ OFFICIAL ADMINISTRATOR AUTHENTICATION ]
-                  </span>
-                  <h3 className="text-base font-bold text-slate-900 uppercase">
-                    Administrative Personnel Sign-In
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Authorized Account: <strong className="text-slate-900">heartistrichford@gmail.com</strong>
-                  </p>
-                </div>
-
-                {regSuccessNotice && (
-                  <div className="p-3 bg-emerald-50 border-2 border-emerald-600 shadow-xs text-xs">
-                    <span className="font-bold text-emerald-950 uppercase block mb-1">
-                      [ VERIFICATION LINK DISPATCHED ]
-                    </span>
-                    <p className="text-emerald-900">{regSuccessNotice}</p>
-                  </div>
-                )}
-
-                {/* Progress Bar */}
-                {isLoggingIn && (
-                  <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
-                    <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                      <span>[ VERIFYING CREDENTIALS ]</span>
-                      <span>{loginProgress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
-                      <div
-                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
-                        style={{ width: `${loginProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-800 font-medium">
-                      {loginStatusText || "Authenticating..."}
-                    </p>
-                  </div>
-                )}
-
-                {unconfirmedEmail && (
-                  <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
-                      <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                        [ GMAIL VERIFICATION REQUIRED ]
-                      </span>
-                    </div>
-                    <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                      A verification link was sent to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
-                      Please open your Gmail, check your <strong>Inbox</strong> (or <strong>Spam</strong> folder), and click the confirmation link to activate your administrator account.
-                    </p>
-                    <div className="pt-1 flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        disabled={isResending}
-                        onClick={handleResend}
-                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
-                      >
-                        {isResending ? "Resending Link..." : "[ Resend Verification Link to Gmail ]"}
-                      </button>
-                      {resendStatus && (
-                        <span className="text-[11px] font-bold text-slate-800 block">
-                          {resendStatus}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {loginError && (
-                  <div className="p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-900 leading-normal">
-                    [ AUTHENTICATION ERROR ]: {loginError}
-                  </div>
-                )}
-
-                <form onSubmit={handleAdminLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                      Administrator Email <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={adminId}
-                      onChange={(e) => setAdminId(e.target.value)}
-                      placeholder="heartistrichford@gmail.com"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
-                      disabled={isLoggingIn}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                      Security Password <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      value={adminPassword}
-                      onChange={(e) => setAdminPassword(e.target.value)}
-                      placeholder="Enter administrator password"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
-                      disabled={isLoggingIn}
-                      required
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isLoggingIn}
-                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isLoggingIn ? "[ AUTHENTICATING... PLEASE WAIT ]" : "Sign In to Administration Console"}
-                    </button>
-                  </div>
-                </form>
+          {/* Progress Bar */}
+          {isLoggingIn && (
+            <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
+              <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
+                <span>[ VERIFYING CREDENTIALS ]</span>
+                <span>{loginProgress}%</span>
               </div>
-            )}
-
-            {/* TAB 2: REGISTER ADMINISTRATOR */}
-            {activeTab === "register" && (
-              <div className="space-y-4">
-                <div className="border-b border-slate-200 pb-3">
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-                    [ OFFICIAL ADMINISTRATOR REGISTRATION ]
-                  </span>
-                  <h3 className="text-base font-bold text-slate-900 uppercase">
-                    Register School Administrator
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Enter the authorized administrator Gmail to receive the official activation link.
-                  </p>
-                </div>
-
-                {isRegistering && (
-                  <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
-                    <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                      <span>[ REGISTERING ADMINISTRATOR ]</span>
-                      <span>{regProgress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
-                      <div
-                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
-                        style={{ width: `${regProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-800 font-medium">
-                      {regStatusText || "Processing registration..."}
-                    </p>
-                  </div>
-                )}
-
-                {regError && (
-                  <div className="p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-900 leading-normal">
-                    [ REGISTRATION ERROR ]: {regError}
-                  </div>
-                )}
-
-                <form onSubmit={handleAdminRegister} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                      Administrator Gmail Address <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      placeholder="heartistrichford@gmail.com"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
-                      disabled={isRegistering}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                      Create Security Password <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="Minimum 6 characters"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
-                      disabled={isRegistering}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                      Confirm Security Password <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      value={regConfirmPassword}
-                      onChange={(e) => setRegConfirmPassword(e.target.value)}
-                      placeholder="Re-enter security password"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
-                      disabled={isRegistering}
-                      required
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isRegistering}
-                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isRegistering ? "[ SENDING VERIFICATION LINK... ]" : "Register Administrator & Send Link"}
-                    </button>
-                  </div>
-                </form>
+              <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
+                <div
+                  className="bg-[#002060] h-full transition-all duration-300 ease-out"
+                  style={{ width: `${loginProgress}%` }}
+                />
               </div>
-            )}
-          </div>
+              <p className="text-xs text-slate-800 font-medium">
+                {loginStatusText || "Authenticating..."}
+              </p>
+            </div>
+          )}
+
+          {unconfirmedEmail && (
+            <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+                  [ GMAIL VERIFICATION REQUIRED ]
+                </span>
+              </div>
+              <p className="text-xs text-amber-950 leading-relaxed font-medium">
+                A verification link was sent to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
+                Please open your Gmail, check your <strong>Inbox</strong> (or <strong>Spam</strong> folder), and click the confirmation link to activate your administrator account.
+              </p>
+              <div className="pt-1 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isResending}
+                  onClick={handleResend}
+                  className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
+                >
+                  {isResending ? "Resending Link..." : "[ Resend Verification Link to Gmail ]"}
+                </button>
+                {resendStatus && (
+                  <span className="text-[11px] font-bold text-slate-800 block">
+                    {resendStatus}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {loginError && (
+            <div className="p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-900 leading-normal">
+              [ AUTHENTICATION ERROR ]: {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                Administrator Email <span className="text-red-700">*</span>
+              </label>
+              <input
+                type="email"
+                value={adminId}
+                onChange={(e) => setAdminId(e.target.value)}
+                placeholder="heartistrichford@gmail.com"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
+                disabled={isLoggingIn}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                Security Password <span className="text-red-700">*</span>
+              </label>
+              <input
+                type="password"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                placeholder="Enter administrator password"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
+                disabled={isLoggingIn}
+                required
+              />
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isLoggingIn ? "[ AUTHENTICATING... PLEASE WAIT ]" : "Sign In to Administration Console"}
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Executive Security Clearance Notice */}
