@@ -67,20 +67,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const supabase = createClient();
 
-  // Load session from HTTP Cookie and verify with Supabase Database
+  // Load session from HTTP Cookie and verify live with Supabase Database
   useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        const cachedUser = getSessionCookie();
-        if (cachedUser) {
-          setUser(cachedUser);
+    let isMounted = true;
+    (async () => {
+      try {
+        if (typeof window !== "undefined") {
+          const cachedUser = getSessionCookie();
+          if (cachedUser) {
+            // Live verification with Supabase: Check if this user still exists in public.users
+            const { data: verified, error } = await supabase
+              .from("users")
+              .select("id")
+              .eq("id", cachedUser.id)
+              .limit(1);
+
+            if (isMounted) {
+              if (verified && verified.length > 0) {
+                setUser(cachedUser);
+              } else {
+                // Account was deleted in Supabase! Immediately invalidate stale browser cookie
+                clearSessionCookie();
+                setUser(null);
+              }
+            }
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Session verification notice:", e);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
         }
       }
-    } catch (e) {
-      console.warn("Session retrieval notice:", e);
-    } finally {
-      setIsLoading(false);
-    }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Dual Login via Email OR 12-Digit LRN (100% Supabase PostgreSQL Database)
@@ -256,7 +281,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       let suInsertRes = await supabase.from("users").insert(userPayload).select().single();
 
       // If password column does not exist yet in Supabase schema, gracefully retry without it
-      if (suInsertRes.error && suInsertRes.error.message.includes("password")) {
+      if (suInsertRes.error && (suInsertRes.error.message?.toLowerCase().includes("password") || suInsertRes.error.code === "PGRST204")) {
         delete userPayload.password;
         suInsertRes = await supabase.from("users").insert(userPayload).select().single();
       }
