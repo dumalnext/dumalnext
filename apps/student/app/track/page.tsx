@@ -35,7 +35,6 @@ function TrackApplicationContent() {
   const [record, setRecord] = useState<ApplicationRecord | null>(null);
   const [isFetchingRecord, setIsFetchingRecord] = useState<boolean>(true);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
-  const [reuploadSuccess, setReuploadSuccess] = useState<boolean>(false);
   const hasLoadedOnceRef = useRef<boolean>(false);
 
   // Protected Route Check: Unauthenticated visitors redirected to sign in
@@ -505,29 +504,21 @@ function TrackApplicationContent() {
                 {record.remarks ||
                   "One or more submitted documents require correction or re-submission before your enrollment can be confirmed."}
               </p>
-              <div className="pt-2 border-t border-red-200">
-                <label className="block text-xs font-bold text-red-900 uppercase mb-1">
-                  Re-Upload Corrected Document (SF9 Report Card or PSA Birth Certificate):
-                </label>
-                <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    className="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white border border-red-300 p-1 bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setReuploadSuccess(true)}
-                    className="px-4 py-1.5 bg-red-800 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-900"
-                  >
-                    Submit Re-Upload
-                  </button>
+              <div className="pt-3 border-t border-red-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-xs font-bold text-red-950 uppercase block">
+                    Complete Application Dossier Unlocked
+                  </span>
+                  <span className="text-[11px] text-red-800 block mt-0.5">
+                    Your complete enrollment application is now editable. Proceed to the enrollment form to update your information and documentary requirements.
+                  </span>
                 </div>
-                {reuploadSuccess && (
-                  <p className="text-xs text-emerald-800 font-bold mt-2">
-                    [ RE-UPLOAD SUBMITTED ]: Your updated document has been sent to the registrar for re-evaluation.
-                  </p>
-                )}
+                <Link
+                  href="/enroll"
+                  className="px-5 py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider shadow-xs shrink-0 inline-flex items-center gap-1.5"
+                >
+                  [ Edit &amp; Resubmit Application &rarr; ]
+                </Link>
               </div>
             </div>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { compressImage } from "@/lib/utils/image-compressor";
 import { useAuth } from "@/lib/auth/authContext";
@@ -10,6 +10,7 @@ interface Step5DocumentsReviewProps {
   data: FullEnrollmentFormData;
   onChange: (fields: Partial<FullEnrollmentFormData>) => void;
   onBack: () => void;
+  existingApplication?: any;
 }
 
 interface UploadedDocState {
@@ -24,6 +25,7 @@ export default function Step5DocumentsReview({
   data,
   onChange,
   onBack,
+  existingApplication,
 }: Step5DocumentsReviewProps) {
   const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -40,6 +42,45 @@ export default function Step5DocumentsReview({
     household_4ps: null,
     pwd_id: null,
   });
+
+  // Pre-populate docs if existingApplication has submitted_documents or data has documents
+  useEffect(() => {
+    if (existingApplication && Array.isArray(existingApplication.submitted_documents) && existingApplication.submitted_documents.length > 0) {
+      setDocs((prev) => {
+        const next = { ...prev };
+        existingApplication.submitted_documents.forEach((d: any) => {
+          const key = d.docType;
+          if (key && !next[key] && (d.fileData || d.fileName)) {
+            next[key] = {
+              file: new File([], d.fileName || `${key}.jpg`),
+              previewUrl: d.fileData || "",
+              originalSizeKb: d.sizeKb || 25,
+              compressedSizeKb: d.sizeKb || 25,
+              isCompressing: false,
+            };
+          }
+        });
+        return next;
+      });
+    } else if (data.submittedDocuments && data.submittedDocuments.length > 0) {
+      setDocs((prev) => {
+        const next = { ...prev };
+        data.submittedDocuments.forEach((d: any) => {
+          const key = d.type || d.docType;
+          if (key && !next[key] && (d.fileUrl || d.fileData || d.fileName)) {
+            next[key] = {
+              file: new File([], d.fileName || `${key}.jpg`),
+              previewUrl: d.fileUrl || d.fileData || "",
+              originalSizeKb: d.sizeKb || 25,
+              compressedSizeKb: d.sizeKb || 25,
+              isCompressing: false,
+            };
+          }
+        });
+        return next;
+      });
+    }
+  }, [existingApplication, data.submittedDocuments]);
 
   const isG7 =
     data.step1.applicantType === "Grade 7" ||
@@ -189,9 +230,9 @@ export default function Step5DocumentsReview({
     setIsSubmitting(true);
 
     try {
-      // Generate Official Dumalneg NHS Reference Number
+      // Generate or reuse Official Dumalneg NHS Reference Number
       const randomSuffix = Math.floor(10000 + Math.random() * 90000);
-      const generatedRef = `DNHS-2025-${randomSuffix}`;
+      const generatedRef = existingApplication?.application_id || `DNHS-2025-${randomSuffix}`;
 
       // 1. Cloud Database Synchronization: Save directly to Supabase
       const applicationPayload = {
@@ -223,52 +264,16 @@ export default function Step5DocumentsReview({
       try {
         const supabase = createClient();
 
-        // Check if student profile exists in Supabase
-        let studentUuid = user?.id;
-        const { data: existingStudent } = await supabase
-          .from("students")
-          .select("id")
-          .or(`student_id.eq.${data.lrn || user?.userId},user_id.eq.${user?.id}`)
-          .limit(1);
-
-        if (existingStudent && existingStudent.length > 0) {
-          studentUuid = existingStudent[0].id;
-        } else {
-          // Insert student profile record
-          const { data: createdStudent } = await supabase
-            .from("students")
-            .insert({
-              user_id: user?.id && user.id.length === 36 ? user.id : null,
-              student_id: data.lrn || user?.userId || `STU-${Date.now()}`,
-              first_name: data.firstName,
-              middle_name: data.middleName || null,
-              last_name: data.lastName,
-              date_of_birth: data.dateOfBirth || null,
-              gender: data.gender || null,
-              contact_number: applicationPayload.contactNumber,
-              barangay: data.currentBarangay || "Cabaritan",
-              grade_level: data.step1.targetGradeLevel,
-              strand: data.targetStrand || null,
-            })
-            .select()
-            .single();
-
-          if (createdStudent) {
-            studentUuid = createdStudent.id;
-          }
-        }
-
-        if (studentUuid) {
+        if (existingApplication && existingApplication.id) {
+          // UPDATE existing application row (Resubmission Flow)
           const { error: appErr } = await supabase
             .from("enrollment_applications")
-            .insert({
-              application_id: generatedRef,
-              student_id: studentUuid,
+            .update({
               applicant_type: data.step1.applicantType,
-              school_year: "2025-2026",
               target_grade_level: data.step1.targetGradeLevel,
               target_strand: data.targetStrand || null,
-              status: "Pending",
+              status: "Pending", // Reset back to Pending for registrar evaluation
+              admin_feedback: null, // Clear revision remarks
               submitted_documents: Object.entries(docs)
                 .filter(([_, v]) => v !== null)
                 .map(([k, v]) => ({
@@ -277,10 +282,92 @@ export default function Step5DocumentsReview({
                   sizeKb: v?.compressedSizeKb,
                   fileData: v?.previewUrl || null,
                 })),
-            });
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingApplication.id);
 
           if (appErr) {
-            console.warn("Supabase enrollment_applications insert notice:", appErr.message);
+            console.warn("Supabase enrollment_applications update notice:", appErr.message);
+          }
+
+          // Update student profile record
+          if (existingApplication.student_id) {
+            await supabase
+              .from("students")
+              .update({
+                first_name: data.firstName,
+                middle_name: data.middleName || null,
+                last_name: data.lastName,
+                date_of_birth: data.dateOfBirth || null,
+                gender: data.gender || null,
+                contact_number: applicationPayload.contactNumber,
+                barangay: data.currentBarangay || "CABARITAN",
+                grade_level: data.step1.targetGradeLevel,
+                strand: data.targetStrand || null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", existingApplication.student_id);
+          }
+        } else {
+          // Check if student profile exists in Supabase
+          let studentUuid = user?.id;
+          const { data: existingStudent } = await supabase
+            .from("students")
+            .select("id")
+            .or(`student_id.eq.${data.lrn || user?.userId},user_id.eq.${user?.id}`)
+            .limit(1);
+
+          if (existingStudent && existingStudent.length > 0) {
+            studentUuid = existingStudent[0].id;
+          } else {
+            // Insert student profile record
+            const { data: createdStudent } = await supabase
+              .from("students")
+              .insert({
+                user_id: user?.id && user.id.length === 36 ? user.id : null,
+                student_id: data.lrn || user?.userId || `STU-${Date.now()}`,
+                first_name: data.firstName,
+                middle_name: data.middleName || null,
+                last_name: data.lastName,
+                date_of_birth: data.dateOfBirth || null,
+                gender: data.gender || null,
+                contact_number: applicationPayload.contactNumber,
+                barangay: data.currentBarangay || "CABARITAN",
+                grade_level: data.step1.targetGradeLevel,
+                strand: data.targetStrand || null,
+              })
+              .select()
+              .single();
+
+            if (createdStudent) {
+              studentUuid = createdStudent.id;
+            }
+          }
+
+          if (studentUuid) {
+            const { error: appErr } = await supabase
+              .from("enrollment_applications")
+              .insert({
+                application_id: generatedRef,
+                student_id: studentUuid,
+                applicant_type: data.step1.applicantType,
+                school_year: "2025-2026",
+                target_grade_level: data.step1.targetGradeLevel,
+                target_strand: data.targetStrand || null,
+                status: "Pending",
+                submitted_documents: Object.entries(docs)
+                  .filter(([_, v]) => v !== null)
+                  .map(([k, v]) => ({
+                    docType: k,
+                    fileName: v?.file.name,
+                    sizeKb: v?.compressedSizeKb,
+                    fileData: v?.previewUrl || null,
+                  })),
+              });
+
+            if (appErr) {
+              console.warn("Supabase enrollment_applications insert notice:", appErr.message);
+            }
           }
         }
       } catch (suAppErr) {
@@ -319,7 +406,9 @@ export default function Step5DocumentsReview({
             Dumalneg, Ilocos Norte &bull; DepEd School ID: 300017
           </div>
           <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-mono font-bold px-4 py-1 uppercase tracking-wider">
-            Official Online Enrollment Acknowledgment Slip
+            {existingApplication
+              ? "Official Online Enrollment Resubmission Acknowledgment Slip"
+              : "Official Online Enrollment Acknowledgment Slip"}
           </div>
         </div>
 
@@ -327,15 +416,18 @@ export default function Step5DocumentsReview({
         <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400">
-              [ STATUS: PENDING REGISTRAR VERIFICATION ]
+              {existingApplication
+                ? "[ STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION ]"
+                : "[ STATUS: PENDING REGISTRAR VERIFICATION ]"}
             </span>
             <span className="text-xs font-mono text-amber-900 font-bold">
               DATE: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
             </span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
-            Your online enrollment application has been successfully submitted to the Dumalneg National High School Registrar. 
-            Official documents are currently undergoing evaluation. You will be notified once verified.
+            {existingApplication
+              ? "Your revised enrollment dossier and updated documentary requirements have been successfully resubmitted to the Dumalneg National High School Registrar for re-evaluation. Your reference number remains unchanged."
+              : "Your online enrollment application has been successfully submitted to the Dumalneg National High School Registrar. Official documents are currently undergoing evaluation. You will be notified once verified."}
           </p>
         </div>
 
@@ -1055,7 +1147,11 @@ export default function Step5DocumentsReview({
           disabled={isSubmitting}
           className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? "[ PROCESSING OFFICIAL SUBMISSION... ]" : "[ SUBMIT ENROLLMENT APPLICATION ]"}
+          {isSubmitting
+            ? "[ PROCESSING OFFICIAL SUBMISSION... ]"
+            : existingApplication
+            ? "[ RESUBMIT REVISED ENROLLMENT APPLICATION ]"
+            : "[ SUBMIT ENROLLMENT APPLICATION ]"}
         </button>
       </div>
     </div>
