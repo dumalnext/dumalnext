@@ -22,6 +22,7 @@ interface TeacherAuthContextType {
   resendVerification: (email: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshSession: () => Promise<void>;
+  updateUserName: (firstName: string, middleName: string | undefined, lastName: string) => void;
 }
 
 const TeacherAuthContext = createContext<TeacherAuthContextType | undefined>(undefined);
@@ -287,6 +288,22 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
     }
   };
 
+  const updateUserName = (firstName: string, middleName: string | undefined, lastName: string) => {
+    if (!user) return;
+    const cleanFirst = firstName.trim();
+    const cleanMiddle = middleName ? middleName.trim() : "";
+    const cleanLast = lastName.trim();
+    const fullName = `${cleanFirst} ${cleanMiddle ? cleanMiddle + " " : ""}${cleanLast}`.trim();
+    const updatedUser: TeacherUser = {
+      ...user,
+      firstName: cleanFirst,
+      lastName: cleanLast,
+      fullName,
+    };
+    setUser(updatedUser);
+    setSessionCookie(updatedUser);
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -307,6 +324,7 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         resendVerification,
         logout,
         refreshSession,
+        updateUserName,
       }}
     >
       {children}

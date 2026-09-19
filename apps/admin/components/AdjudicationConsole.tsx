@@ -252,6 +252,13 @@ export default function AdjudicationConsole() {
       )
       .on(
         "postgres_changes",
+        { event: "*", schema: "public", table: "teachers" },
+        () => {
+          fetchData(true);
+        }
+      )
+      .on(
+        "postgres_changes",
         { event: "*", schema: "public", table: "system_settings" },
         () => {
           fetchData(true);

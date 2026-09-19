@@ -23,6 +23,9 @@ interface ApplicationRecord {
   primaryContact?: string;
   contactNumber?: string;
   remarks?: string;
+  sectionName?: string;
+  adviserName?: string;
+  room?: string;
   formData?: FullEnrollmentFormData;
 }
 
@@ -45,7 +48,11 @@ function TrackApplicationContent() {
   }, [user, isAuthLoading, router]);
 
   // Helper to map Supabase database record into ApplicationRecord model
-  const mapSupabaseToRecord = (suApp: any, studentRecord: any): ApplicationRecord => {
+  const mapSupabaseToRecord = (
+    suApp: any,
+    studentRecord: any,
+    sectionInfo?: { sectionName?: string; adviserName?: string; room?: string }
+  ): ApplicationRecord => {
     const fullName = studentRecord
       ? `${studentRecord.last_name}, ${studentRecord.first_name} ${studentRecord.middle_name || ""}`.trim()
       : (user ? `${user.lastName}, ${user.firstName}` : "STUDENT APPLICANT");
@@ -66,6 +73,9 @@ function TrackApplicationContent() {
       targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
       targetStrand: suApp.target_strand || "",
       remarks: suApp.admin_feedback,
+      sectionName: sectionInfo?.sectionName,
+      adviserName: sectionInfo?.adviserName,
+      room: sectionInfo?.room,
       primaryContact: "Parent / Guardian",
       contactNumber: studentRecord?.contact_number || "09181234567",
       formData: {
@@ -170,6 +180,24 @@ function TrackApplicationContent() {
       }
 
       try {
+        // Helper to fetch section info if student has current_section_id
+        const fetchSectionInfo = async (currentSectionId?: string | null) => {
+          if (!currentSectionId) return undefined;
+          const { data: secData } = await supabase
+            .from("sections")
+            .select("section_name, adviser_name, room")
+            .eq("id", currentSectionId)
+            .limit(1);
+          if (secData && secData.length > 0) {
+            return {
+              sectionName: secData[0].section_name,
+              adviserName: secData[0].adviser_name,
+              room: secData[0].room,
+            };
+          }
+          return undefined;
+        };
+
         // If a specific reference is passed in query, prioritize it
         if (initialQuery.trim()) {
           const cleanRef = initialQuery.trim().toUpperCase();
@@ -186,7 +214,10 @@ function TrackApplicationContent() {
               .eq("id", appData[0].student_id)
               .limit(1);
 
-            setRecord(mapSupabaseToRecord(appData[0], stProfile?.[0] || null));
+            const studentObj = stProfile?.[0] || null;
+            const secInfo = await fetchSectionInfo(studentObj?.current_section_id);
+
+            setRecord(mapSupabaseToRecord(appData[0], studentObj, secInfo));
             hasLoadedOnceRef.current = true;
             setIsFetchingRecord(false);
             return;
@@ -202,15 +233,20 @@ function TrackApplicationContent() {
 
         if (stList && stList.length > 0) {
           const studentRecord = stList[0];
-          const { data: appData } = await supabase
-            .from("enrollment_applications")
-            .select("*")
-            .eq("student_id", studentRecord.id)
-            .order("created_at", { ascending: false })
-            .limit(1);
+          const [appRes, secInfo] = await Promise.all([
+            supabase
+              .from("enrollment_applications")
+              .select("*")
+              .eq("student_id", studentRecord.id)
+              .order("created_at", { ascending: false })
+              .limit(1),
+            fetchSectionInfo(studentRecord.current_section_id),
+          ]);
+
+          const appData = appRes.data;
 
           if (isMounted && appData && appData.length > 0) {
-            setRecord(mapSupabaseToRecord(appData[0], studentRecord));
+            setRecord(mapSupabaseToRecord(appData[0], studentRecord, secInfo));
             hasLoadedOnceRef.current = true;
             setIsFetchingRecord(false);
             return;
@@ -250,18 +286,34 @@ function TrackApplicationContent() {
       fetchRecord(true);
     };
     window.addEventListener("dumalnext:data-changed", handleDataChanged);
+    window.addEventListener("dumalnext:teacher-data-changed", handleDataChanged);
+    window.addEventListener("dumalnext:admin-data-changed", handleDataChanged);
 
     // 4. 10-Second Silent Heartbeat Polling
     const heartbeat = setInterval(() => {
       fetchRecord(true);
     }, 10000);
 
-    // 5. Supabase Realtime Channel: Instant push on enrollment_applications changes
+    // 5. Supabase Realtime Channel: Instant push on enrollment_applications, sections, and teachers changes
     const channel = supabase
       .channel("track-realtime-applications")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchRecord(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "sections" },
+        () => {
+          fetchRecord(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "teachers" },
         () => {
           fetchRecord(true);
         }
@@ -273,6 +325,8 @@ function TrackApplicationContent() {
       window.removeEventListener("focus", handleVisibilityChange);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("dumalnext:data-changed", handleDataChanged);
+      window.removeEventListener("dumalnext:teacher-data-changed", handleDataChanged);
+      window.removeEventListener("dumalnext:admin-data-changed", handleDataChanged);
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
@@ -489,6 +543,32 @@ function TrackApplicationContent() {
                 {record.remarks ||
                   "You're enrolled at Dumalneg National High School for School Year 2025–2026. Welcome to your official class section!"}
               </p>
+
+              {/* Assigned Section and Class Adviser Information */}
+              <div className="p-3.5 bg-white border border-emerald-300 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block">
+                    [ ASSIGNED CLASS SECTION ]
+                  </span>
+                  <span className="text-sm font-bold text-slate-900 uppercase">
+                    {record.sectionName || "Section Assignment Pending"}
+                  </span>
+                  {record.room && (
+                    <span className="text-[11px] text-slate-600 block">
+                      Room: {record.room}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block">
+                    [ CLASS ADVISER / TEACHER ]
+                  </span>
+                  <span className="text-sm font-bold text-[#002060] uppercase">
+                    {record.adviserName || "Adviser to be Assigned"}
+                  </span>
+                </div>
+              </div>
+
               <p className="text-xs text-emerald-900 leading-relaxed font-medium">
                 The Dumalneg National High School Registrar has approved your application, verified your credentials, and assigned your official class section. Your official accomplished DepEd enrollment form is ready for download below.
               </p>
@@ -565,6 +645,18 @@ function TrackApplicationContent() {
                     : "Regular Junior High School Curriculum"}
                 </span>
               </div>
+              {record.sectionName && (
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Assigned Section</span>
+                  <span className="font-bold text-slate-900 uppercase">{record.sectionName}</span>
+                </div>
+              )}
+              {record.adviserName && (
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Class Adviser</span>
+                  <span className="font-bold text-[#002060] uppercase">{record.adviserName}</span>
+                </div>
+              )}
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">School Year</span>
                 <span className="font-bold text-slate-900">2025–2026</span>

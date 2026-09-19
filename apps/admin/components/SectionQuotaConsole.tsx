@@ -219,6 +219,11 @@ export default function SectionQuotaConsole() {
       )
       .on(
         "postgres_changes",
+        { event: "*", schema: "public", table: "teachers" },
+        () => fetchSections(true)
+      )
+      .on(
+        "postgres_changes",
         { event: "*", schema: "public", table: "students" },
         () => fetchSections(true)
       )
