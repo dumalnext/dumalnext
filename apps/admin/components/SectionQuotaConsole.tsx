@@ -643,11 +643,8 @@ export default function SectionQuotaConsole() {
 
       {/* Sections Grid */}
       {isLoading ? (
-        <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-2">
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-            [ LOADING SECTION QUOTA RECORDS ]
-          </span>
-          <p className="text-xs text-slate-500">Querying live section allocations from database...</p>
+        <div className="p-8 bg-white border-2 border-slate-200 text-center">
+          <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       ) : filteredSections.length === 0 ? (
         <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-3">
@@ -1158,11 +1155,8 @@ export default function SectionQuotaConsole() {
             {/* Students Table */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {isLoadingRoster ? (
-                <div className="p-12 text-center space-y-2">
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                    [ RETRIEVING CLASS ROSTER FROM DATABASE ]
-                  </span>
-                  <p className="text-xs text-slate-500">Querying enrolled learners in this section...</p>
+                <div className="p-8 text-center">
+                  <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
                 </div>
               ) : filteredRoster.length === 0 ? (
                 <div className="p-12 text-center space-y-2 bg-slate-50 border-2 border-dashed border-slate-300">

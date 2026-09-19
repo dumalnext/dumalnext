@@ -544,11 +544,8 @@ export default function AdjudicationConsole() {
       {/* Applications Table */}
       <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto">
         {isFetchingApps && !hasLoadedAppsOnce.current ? (
-          <div className="p-12 text-center space-y-2">
-            <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-              [ RETRIEVING APPLICATION RECORDS FROM SUPABASE ]
-            </span>
-            <p className="text-xs text-slate-500">Querying live enrollment database...</p>
+          <div className="p-8 text-center">
+            <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
           </div>
         ) : filteredApplications.length === 0 ? (
           <div className="p-12 text-center space-y-2">

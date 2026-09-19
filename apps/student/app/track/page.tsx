@@ -474,14 +474,9 @@ function TrackApplicationContent() {
       </div>
 
       {/* Main Content Area */}
-      {isFetchingRecord ? (
-        <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-3">
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-            [ RETRIEVING ENROLLMENT APPLICATION RECORD ]
-          </span>
-          <p className="text-sm text-slate-700">
-            Querying Dumalneg NHS Supabase Cloud Database...
-          </p>
+      {isFetchingRecord && !record ? (
+        <div className="p-8 bg-white border-2 border-slate-200 text-center">
+          <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       ) : record ? (
         /* =========================================================================
