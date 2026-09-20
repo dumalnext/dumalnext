@@ -13,7 +13,7 @@ function StudentHomeContent() {
   const searchParams = useSearchParams();
   const tabQuery = searchParams.get("tab");
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
-  const { user, login, register, resendVerification, logout } = useAuth();
+  const { user, login, register, verifyEmailOtp, resendVerification, logout } = useAuth();
   const { isEnrollmentOpen, schoolYear, closedMessage } = useEnrollmentControl();
 
   // Active Tab for Visitors: "signin" | "register"
@@ -30,20 +30,40 @@ function StudentHomeContent() {
     }
   }, [tabQuery]);
 
+  // 6-Digit OTP Verification State
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpEmail, setOtpEmail] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState("");
+  const [otpSuccess, setOtpSuccess] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // Countdown timer for resending OTP code
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
   // Gmail Verification Required State
   const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [resendStatus, setResendStatus] = useState("");
 
   const handleResendVerification = async () => {
-    if (!unconfirmedEmail) return;
+    const target = otpEmail || unconfirmedEmail;
+    if (!target) return;
     setIsResending(true);
     setResendStatus("");
-    const res = await resendVerification(unconfirmedEmail);
+    const res = await resendVerification(target);
     if (res.success) {
-      setResendStatus("Verification link successfully resent! Please check your Gmail inbox (and Spam folder).");
+      setResendCooldown(60);
+      setResendStatus("A new 6-digit verification code has been dispatched to your Gmail!");
     } else {
-      setResendStatus(res.error || "Failed to resend verification link.");
+      setResendStatus(res.error || "Failed to resend verification code.");
     }
     setIsResending(false);
   };
@@ -282,23 +302,14 @@ function StudentHomeContent() {
       }
 
       setRegProgress(85);
-      setRegStatusText("Verification link sent! Preparing sign-in console...");
+      setRegStatusText("6-Digit security code dispatched! Opening verification window...");
       await new Promise((resolve) => setTimeout(resolve, 450));
 
       setRegProgress(100);
-      setRegStatusText("Redirecting to Student Login...");
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      setRegStatusText("Ready for verification code entry.");
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       const registeredEmail = regForm.email.trim().toLowerCase();
-      const applicantFullName = `${regForm.firstName.trim().toUpperCase()} ${regForm.lastName.trim().toUpperCase()}`;
-
-      // Pre-fill email in login form
-      setLoginEmail(registeredEmail);
-      setLoginPassword("");
-      setUnconfirmedEmail(registeredEmail);
-      setRegSuccessNotice(
-        `Verification Link sent to [ ${registeredEmail} ]! Please open your Gmail, click the confirmation link to activate your account, then sign in below.`
-      );
 
       // Clear reg form
       setRegForm({
@@ -310,16 +321,65 @@ function StudentHomeContent() {
         confirmPassword: "",
       });
 
-      // Switch to Sign In tab and update URL
-      setActiveTab("signin");
-      if (typeof window !== "undefined") {
-        window.history.replaceState(null, "", "/?tab=signin");
-      }
+      // Launch 6-Digit OTP Verification Screen
+      setOtpEmail(registeredEmail);
+      setOtpCode("");
+      setOtpError("");
+      setOtpSuccess("");
+      setResendCooldown(60);
+      setShowOtpModal(true);
+      setUnconfirmedEmail(registeredEmail);
+      setLoginEmail(registeredEmail);
     } finally {
       setIsRegistering(false);
       setRegProgress(0);
       setRegStatusText("");
     }
+  };
+
+  // Handle 6-Digit OTP Verification Submit
+  const handleVerifyOtpSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = otpCode.replace(/\D/g, "");
+    if (!otpEmail || clean.length !== 6) {
+      setOtpError("Please enter the complete 6-digit numeric verification code.");
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    setOtpError("");
+    setOtpSuccess("");
+
+    try {
+      const res = await verifyEmailOtp(otpEmail, clean);
+      if (res.success) {
+        setOtpSuccess("6-Digit Code verified! Your learner account is activated.");
+        setShowOtpModal(false);
+        setUnconfirmedEmail("");
+        setLoginEmail(otpEmail);
+        router.push("/enroll");
+      } else {
+        setOtpError(res.error || "Invalid or expired 6-digit code. Please check your Gmail or request a new code.");
+      }
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  // Handle OTP Resend from Modal
+  const handleOtpResend = async () => {
+    if (resendCooldown > 0 || !otpEmail) return;
+    setIsResending(true);
+    setOtpError("");
+    setOtpSuccess("");
+    const res = await resendVerification(otpEmail);
+    if (res.success) {
+      setResendCooldown(60);
+      setOtpSuccess("A new 6-digit verification code has been dispatched to your Gmail!");
+    } else {
+      setOtpError(res.error || "Failed to resend verification code. Please try again.");
+    }
+    setIsResending(false);
   };
 
   return (
@@ -656,27 +716,40 @@ function StudentHomeContent() {
                   </div>
                 )}
 
-                {/* Gmail Verification Required Notice with Resend Button */}
+                {/* Gmail Verification Required Notice with 6-Digit Code Entry */}
                 {unconfirmedEmail && (
                   <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
                       <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                        [ GMAIL VERIFICATION REQUIRED ]
+                        [ 6-DIGIT GMAIL VERIFICATION CODE REQUIRED ]
                       </span>
                     </div>
                     <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                      A verification link was sent to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
-                      Please open your Gmail, check your <strong>Inbox</strong> (or <strong>Spam</strong> folder), and click the confirmation link to activate your student account.
+                      A 6-digit confirmation code was dispatched to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
+                      Please enter the 6-digit code to activate your account and access enrollment.
                     </p>
                     <div className="pt-1 flex flex-wrap items-center gap-2">
                       <button
                         type="button"
-                        disabled={isResending}
-                        onClick={handleResendVerification}
-                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
+                        onClick={() => {
+                          setOtpEmail(unconfirmedEmail);
+                          setOtpCode("");
+                          setOtpError("");
+                          setOtpSuccess("");
+                          setShowOtpModal(true);
+                        }}
+                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                       >
-                        {isResending ? "Resending Link..." : "[ Resend Verification Link to Gmail ]"}
+                        [ Enter 6-Digit Code ]
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isResending || resendCooldown > 0}
+                        onClick={handleResendVerification}
+                        className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-400 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer"
+                      >
+                        {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "[ Resend Code ]"}
                       </button>
                       {resendStatus && (
                         <span className="text-[11px] font-bold text-slate-800 block">
@@ -977,6 +1050,118 @@ function StudentHomeContent() {
           </div>
         </div>
       </section>
+
+      {/* ========================================================================= */}
+      {/* MODAL: 6-DIGIT GMAIL SECURITY CODE VERIFICATION */}
+      {/* ========================================================================= */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
+          <div className="bg-white border-4 border-[#002060] w-full max-w-md shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-200 block">
+                  [ SECURITY VERIFICATION &bull; STEP 2 OF 2 ]
+                </span>
+                <h3 className="text-lg font-bold uppercase tracking-tight text-white mt-0.5">
+                  Enter 6-Digit Verification Code
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowOtpModal(false)}
+                className="text-white hover:text-slate-300 font-mono text-2xl font-bold px-2 cursor-pointer"
+                title="Close modal"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 space-y-4">
+              <p className="text-xs text-slate-700 leading-relaxed">
+                An official 6-digit confirmation code has been dispatched to your Gmail address:
+                <strong className="block text-[#002060] font-mono text-sm mt-1 break-all bg-blue-50/60 p-2 border border-blue-200">
+                  {otpEmail}
+                </strong>
+              </p>
+
+              {otpSuccess && (
+                <div className="p-3 bg-emerald-50 border-2 border-emerald-500 text-emerald-950 text-xs font-bold">
+                  {otpSuccess}
+                </div>
+              )}
+
+              {otpError && (
+                <div className="p-3 bg-red-50 border-2 border-red-500 text-red-950 text-xs font-bold">
+                  {otpError}
+                </div>
+              )}
+
+              <form onSubmit={handleVerifyOtpSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase text-center mb-2">
+                    Enter 6-Digit Code
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    autoFocus
+                    value={otpCode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                      setOtpCode(val);
+                      if (otpError) setOtpError("");
+                    }}
+                    placeholder="000000"
+                    className="w-full text-center font-mono font-bold text-3xl tracking-[0.35em] p-3 border-2 border-[#002060] bg-blue-50/40 text-[#002060] outline-none placeholder:text-slate-300"
+                  />
+                  <span className="text-[10px] text-slate-500 text-center block mt-1">
+                    Please check your Gmail Inbox (or Spam folder) for the 6-digit number.
+                  </span>
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  <button
+                    type="submit"
+                    disabled={isVerifyingOtp || otpCode.replace(/\D/g, "").length !== 6}
+                    className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer"
+                  >
+                    {isVerifyingOtp ? "[ Verifying 6-Digit Code... ]" : "[ Verify & Activate Account ]"}
+                  </button>
+
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <button
+                      type="button"
+                      disabled={resendCooldown > 0 || isResending}
+                      onClick={handleOtpResend}
+                      className="text-xs font-mono font-bold text-[#002060] hover:underline disabled:text-slate-400 disabled:no-underline cursor-pointer"
+                    >
+                      {resendCooldown > 0
+                        ? `Resend Code (${resendCooldown}s)`
+                        : isResending
+                        ? "Resending..."
+                        : "[ Resend Code ]"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowOtpModal(false);
+                        setActiveTab("register");
+                      }}
+                      className="text-xs text-slate-600 hover:text-slate-900 cursor-pointer"
+                    >
+                      Change Email / Back
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

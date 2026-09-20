@@ -31,6 +31,7 @@ interface AuthContextType {
     },
     autoLogin?: boolean
   ) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean; email?: string; unconfirmedEmail?: string }>;
+  verifyEmailOtp: (email: string, token: string) => Promise<{ success: boolean; error?: string }>;
   resendVerification: (email: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshSession: () => Promise<void>;
@@ -447,6 +448,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Verify 6-Digit Email OTP Code
+  const verifyEmailOtp = async (email: string, token: string): Promise<{ success: boolean; error?: string }> => {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim();
+
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      return { success: false, error: "Valid email address is required." };
+    }
+    if (!cleanToken || cleanToken.length < 6) {
+      return { success: false, error: "Please enter the complete 6-digit verification code." };
+    }
+
+    try {
+      // 1. Attempt verification with type: 'signup'
+      let { data: verifyData, error: verifyErr } = await supabase.auth.verifyOtp({
+        email: cleanEmail,
+        token: cleanToken,
+        type: "signup",
+      });
+
+      // 2. Fallback to type: 'email' if signup type returns error
+      if (verifyErr) {
+        const fallback = await supabase.auth.verifyOtp({
+          email: cleanEmail,
+          token: cleanToken,
+          type: "email",
+        });
+        if (!fallback.error) {
+          verifyData = fallback.data;
+          verifyErr = null;
+        }
+      }
+
+      if (verifyErr) {
+        return {
+          success: false,
+          error: verifyErr.message || "Invalid or expired 6-digit verification code. Please check your Gmail or request a new code.",
+        };
+      }
+
+      // Session established! Refresh session state immediately
+      await refreshSession();
+      return { success: true };
+    } catch (e: any) {
+      return {
+        success: false,
+        error: e?.message || "An unexpected error occurred while verifying the 6-digit code.",
+      };
+    }
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -459,7 +511,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, resendVerification, logout, refreshSession }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, verifyEmailOtp, resendVerification, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );
