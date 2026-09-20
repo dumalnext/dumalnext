@@ -14,7 +14,37 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, terms: terms || [] });
+    const currentTerms = terms || [];
+
+    // Auto-ensure terms 1, 2, 3 exist for every existing school year
+    const schoolYears = Array.from(new Set(currentTerms.map((t) => t.schoolYear)));
+    const missingToCreate: any[] = [];
+
+    for (const sy of schoolYears) {
+      for (const num of [1, 2, 3]) {
+        const exists = currentTerms.some((t) => t.schoolYear === sy && t.termNumber === num);
+        if (!exists) {
+          missingToCreate.push({
+            schoolYear: sy,
+            termNumber: num,
+            termName: `Trimester ${num}`,
+            isActive: false,
+          });
+        }
+      }
+    }
+
+    if (missingToCreate.length > 0) {
+      await supabase.from("academic_terms").upsert(missingToCreate, { onConflict: "schoolYear,termNumber" });
+      const { data: refreshed } = await supabase
+        .from("academic_terms")
+        .select("*")
+        .order("schoolYear", { ascending: false })
+        .order("termNumber", { ascending: true });
+      return NextResponse.json({ success: true, terms: refreshed || [] });
+    }
+
+    return NextResponse.json({ success: true, terms: currentTerms });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to fetch terms" }, { status: 500 });
   }
@@ -25,6 +55,46 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient();
     const body = await req.json();
 
+    // ACTION: Create new School Year with 3 unconfigured Trimesters (1, 2, 3)
+    if (body.action === "create_school_year" || (body.schoolYear && !body.termNumber)) {
+      const cleanSY = String(body.schoolYear).trim();
+      if (!cleanSY) {
+        return NextResponse.json({ error: "Please enter a valid School Year (e.g. 2027-2028)." }, { status: 400 });
+      }
+
+      const termsToCreate = [1, 2, 3].map((num) => ({
+        schoolYear: cleanSY,
+        termNumber: num,
+        termName: `Trimester ${num}`,
+        totalClassDays: null,
+        startDate: null,
+        endDate: null,
+        openingBlockStart: null,
+        openingBlockEnd: null,
+        instructionalStart: null,
+        instructionalEnd: null,
+        endOfTermStart: null,
+        endOfTermEnd: null,
+        summative1Date: null,
+        summative2Date: null,
+        termExamDates: null,
+        reportCardDate: null,
+        isActive: false,
+      }));
+
+      const { data, error } = await supabase
+        .from("academic_terms")
+        .upsert(termsToCreate, { onConflict: "schoolYear,termNumber" })
+        .select();
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, schoolYear: cleanSY, terms: data });
+    }
+
+    // ACTION: Update an existing Trimester's dates
     const {
       id,
       schoolYear,
@@ -46,9 +116,9 @@ export async function POST(req: NextRequest) {
       isActive,
     } = body;
 
-    if (!schoolYear || !termNumber || !termName) {
+    if (!schoolYear || !termNumber) {
       return NextResponse.json(
-        { error: "School Year, Term Number (1-3), and Term Name are required." },
+        { error: "School Year and Trimester Number are required." },
         { status: 400 }
       );
     }
@@ -56,7 +126,7 @@ export async function POST(req: NextRequest) {
     const payload: Record<string, any> = {
       schoolYear,
       termNumber: Number(termNumber),
-      termName,
+      termName: termName || `Trimester ${termNumber}`,
       totalClassDays: totalClassDays ? Number(totalClassDays) : null,
       startDate: startDate || null,
       endDate: endDate || null,
@@ -110,8 +180,10 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Term ID is required." }, { status: 400 });
     }
 
+    // Deactivate all terms first
     await supabase.from("academic_terms").update({ isActive: false }).neq("id", id);
 
+    // Activate the selected term
     const { data, error } = await supabase
       .from("academic_terms")
       .update({ isActive: true })
