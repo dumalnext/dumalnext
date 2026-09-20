@@ -75,8 +75,20 @@ export default function SectionQuotaConsole() {
   const [editRoom, setEditRoom] = useState<string>("");
   const [editAdviser, setEditAdviser] = useState<string>("");
   const [editStrand, setEditStrand] = useState<string>("");
+  const [autoTransferAdviser, setAutoTransferAdviser] = useState<boolean>(false);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
   const [editError, setEditError] = useState<string>("");
+
+  // Automated Deconfliction Helper: Check if a teacher is already advising another section
+  const getExistingAdvisorySection = (adviserName: string, excludeSectionId?: string): SectionDetail | undefined => {
+    if (!adviserName || !adviserName.trim()) return undefined;
+    const cleanTarget = adviserName.trim().toLowerCase();
+    return sections.find((s) => {
+      if (excludeSectionId && s.id === excludeSectionId) return false;
+      if (!s.adviser_name) return false;
+      return s.adviser_name.trim().toLowerCase() === cleanTarget;
+    });
+  };
 
   // Class Roster Modal State
   const [selectedRosterSection, setSelectedRosterSection] = useState<SectionDetail | null>(null);
@@ -333,6 +345,17 @@ export default function SectionQuotaConsole() {
       return;
     }
 
+    // Automated Deconfliction Guard: Check if the teacher already advises another section
+    if (newAdviser.trim()) {
+      const conflict = getExistingAdvisorySection(newAdviser);
+      if (conflict) {
+        setAddError(
+          `Adviser Conflict Detected: [ ${newAdviser.trim()} ] is already designated as Class Adviser to section [ ${conflict.section_name} ] (Grade ${conflict.grade_level}). Under DepEd staffing rules, a faculty member can only advise ONE section per school year. Please select an available teacher or unassign the previous section first.`
+        );
+        return;
+      }
+    }
+
     setIsSubmittingAdd(true);
 
     try {
@@ -390,6 +413,7 @@ export default function SectionQuotaConsole() {
     setEditAdviser(sec.adviser_name || "");
     setEditStrand(sec.strand || "");
     setEditError("");
+    setAutoTransferAdviser(false);
   };
 
   // Handle Edit Section Submit
@@ -415,9 +439,37 @@ export default function SectionQuotaConsole() {
       return;
     }
 
+    // Automated Deconfliction Guard
+    const conflictSection = editAdviser.trim()
+      ? getExistingAdvisorySection(editAdviser, editingSection.id)
+      : undefined;
+
+    if (conflictSection && !autoTransferAdviser) {
+      setEditError(
+        `Adviser Conflict Detected: [ ${editAdviser.trim()} ] is already designated as Class Adviser to section [ ${conflictSection.section_name} ] (Grade ${conflictSection.grade_level}). Under DepEd staffing policy, a faculty member can only advise ONE section per school year. Please check "1-Click Automated Transfer" below to transfer them automatically, or select an available teacher.`
+      );
+      return;
+    }
+
     setIsSubmittingEdit(true);
 
     try {
+      // Automation: If autoTransferAdviser is enabled, automatically unassign the teacher from the conflicting section first
+      if (conflictSection && autoTransferAdviser) {
+        await fetch("/api/sections", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: conflictSection.id,
+            section_name: conflictSection.section_name,
+            capacity: conflictSection.capacity,
+            room: conflictSection.room || null,
+            adviser_name: null, // Automated unassignment
+            strand: conflictSection.grade_level >= 11 ? conflictSection.strand || null : null,
+          }),
+        });
+      }
+
       const res = await fetch("/api/sections", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -438,7 +490,9 @@ export default function SectionQuotaConsole() {
 
       setStatusNotice({
         type: "success",
-        text: `Section [ ${editSectionName.trim()} ] updated successfully (New Capacity: ${editCapacity} students).`,
+        text: conflictSection && autoTransferAdviser
+          ? `Automated Advisory Transfer Complete: [ ${editAdviser.trim()} ] was unassigned from [ ${conflictSection.section_name} ] and successfully assigned as Class Adviser of [ ${editSectionName.trim()} ].`
+          : `Section [ ${editSectionName.trim()} ] updated successfully (Class Adviser: ${editAdviser.trim() || "Unassigned"}).`,
       });
 
       setEditingSection(null);
@@ -741,9 +795,13 @@ export default function SectionQuotaConsole() {
                       <span className="text-sm font-bold uppercase text-[#002060] block">
                         {sec.section_name}
                       </span>
-                      {sec.adviser_name && (
-                        <span className="text-[11px] text-slate-600 block">
-                          Adviser: {sec.adviser_name}
+                      {sec.adviser_name ? (
+                        <span className="text-[11px] text-slate-700 block">
+                          Adviser: <strong className="text-slate-900 uppercase">{sec.adviser_name}</strong>
+                        </span>
+                      ) : (
+                        <span className="inline-block mt-1 text-[10px] bg-amber-50 text-amber-900 border border-amber-300 font-mono font-bold px-1.5 py-0.5 uppercase">
+                          [ Needs Class Adviser ]
                         </span>
                       )}
                       {sec.room && (
@@ -958,17 +1016,43 @@ export default function SectionQuotaConsole() {
                     className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
                   >
                     <option value="">-- Select Registered Teacher (Optional) --</option>
-                    {teachersList.map((t) => (
-                      <option key={t.id} value={t.fullName}>
-                        {t.fullName} {t.email ? `(${t.email})` : ""}
-                      </option>
-                    ))}
+                    {teachersList.map((t) => {
+                      const alreadyAssignedSec = sections.find(
+                        (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
+                      );
+                      const statusTag = alreadyAssignedSec
+                        ? `[ ALREADY ADVISING: ${alreadyAssignedSec.section_name} ]`
+                        : "[ AVAILABLE ]";
+
+                      return (
+                        <option key={t.id} value={t.fullName}>
+                          {t.fullName} &bull; {statusTag} {t.email ? `(${t.email})` : ""}
+                        </option>
+                      );
+                    })}
                   </select>
                   {teachersList.length === 0 && (
                     <p className="text-[11px] text-amber-700 mt-1">
                       No registered faculty accounts found in database.
                     </p>
                   )}
+                  {(() => {
+                    const conflict = getExistingAdvisorySection(newAdviser);
+                    if (!conflict) return null;
+                    return (
+                      <div className="mt-2 p-2.5 bg-amber-50 border border-amber-400 text-xs text-amber-950 space-y-1">
+                        <span className="font-mono font-bold text-amber-900 uppercase block text-[11px]">
+                          [ DECONFLICTION ALERT: SINGLE-ADVISER RULE ]
+                        </span>
+                        <p>
+                          <strong>{newAdviser}</strong> is already designated as Class Adviser to <strong>{conflict.section_name}</strong> (Grade {conflict.grade_level}).
+                        </p>
+                        <p className="text-[11px] text-amber-800">
+                          A faculty member can only be assigned to one section per school year. Please select an available teacher or reassign the previous section.
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -1108,7 +1192,10 @@ export default function SectionQuotaConsole() {
                   </div>
                   <select
                     value={editAdviser}
-                    onChange={(e) => setEditAdviser(e.target.value)}
+                    onChange={(e) => {
+                      setEditAdviser(e.target.value);
+                      setAutoTransferAdviser(false);
+                    }}
                     className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
                   >
                     <option value="">-- Select Registered Teacher (Unassigned) --</option>
@@ -1118,12 +1205,59 @@ export default function SectionQuotaConsole() {
                         {editAdviser} (Current Adviser)
                       </option>
                     )}
-                    {teachersList.map((t) => (
-                      <option key={t.id} value={t.fullName}>
-                        {t.fullName} {t.email ? `(${t.email})` : ""}
-                      </option>
-                    ))}
+                    {teachersList.map((t) => {
+                      const assignedSec = sections.find(
+                        (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
+                      );
+                      const isCurrent = editingSection && assignedSec && assignedSec.id === editingSection.id;
+                      const statusTag = isCurrent
+                        ? "[ CURRENT ADVISER OF THIS SECTION ]"
+                        : assignedSec
+                        ? `[ ALREADY ADVISING: ${assignedSec.section_name} ]`
+                        : "[ AVAILABLE ]";
+
+                      return (
+                        <option key={t.id} value={t.fullName}>
+                          {t.fullName} &bull; {statusTag} {t.email ? `(${t.email})` : ""}
+                        </option>
+                      );
+                    })}
                   </select>
+                  {(() => {
+                    const conflict = getExistingAdvisorySection(editAdviser, editingSection?.id);
+                    if (!conflict) return null;
+                    return (
+                      <div className="mt-2 p-3 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-bold text-amber-900 uppercase text-[11px]">
+                            [ AUTOMATED DECONFLICTION ALERT ]
+                          </span>
+                          <span className="text-[10px] bg-amber-200 text-amber-950 px-1.5 py-0.5 font-bold uppercase font-mono">
+                            Adviser Conflict
+                          </span>
+                        </div>
+                        <p>
+                          <strong>{editAdviser}</strong> is currently assigned as Class Adviser to <strong>{conflict.section_name}</strong> (Grade {conflict.grade_level}).
+                        </p>
+                        <div className="pt-2 border-t border-amber-200">
+                          <label className="flex items-start gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={autoTransferAdviser}
+                              onChange={(e) => setAutoTransferAdviser(e.target.checked)}
+                              className="mt-0.5 accent-[#002060]"
+                            />
+                            <span className="text-[11px] font-medium leading-tight text-slate-900">
+                              <strong className="text-[#002060] uppercase block">
+                                [ 1-Click Automated Transfer ]
+                              </strong>
+                              Automatically unassign <strong>{editAdviser}</strong> from <u>{conflict.section_name}</u> and designate as Class Adviser for <u>{editSectionName || editingSection?.section_name}</u> upon saving.
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
