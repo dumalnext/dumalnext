@@ -15,6 +15,7 @@ export const viewport: Viewport = {
 
 import StudentProviders from "@/components/providers/StudentProviders";
 import StudentHeaderNav from "@/components/layout/StudentHeaderNav";
+import Link from "next/link";
 
 export default function StudentLayout({
   children,
@@ -28,16 +29,29 @@ export default function StudentLayout({
           {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
           <header className="deped-header px-3 sm:px-6 py-3 sm:py-4 shadow-sm relative z-40">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
-              <div>
-                <p className="text-[10px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase">
-                  Republic of the Philippines | Department of Education | Region I
-                </p>
-                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white mt-0.5 sm:mt-1">
-                  DUMALNEG NATIONAL HIGH SCHOOL
-                </h1>
-                <p className="text-[11px] sm:text-xs text-slate-300 font-medium">
-                  Student Online Portal &amp; Basic Education Enrollment System
-                </p>
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                <Link
+                  href="/"
+                  className="shrink-0 flex items-center group transition-transform active:scale-95"
+                  title="Dumalneg National High School Portal Home"
+                >
+                  <img
+                    src="/dumalneg-logo.png"
+                    alt="Dumalneg National High School Official Seal"
+                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                  />
+                </Link>
+                <div className="min-w-0">
+                  <p className="text-[9px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase truncate">
+                    Republic of the Philippines | Department of Education | Region I
+                  </p>
+                  <h1 className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
+                    DUMALNEG NATIONAL HIGH SCHOOL
+                  </h1>
+                  <p className="text-[10px] sm:text-xs text-slate-300 font-medium truncate">
+                    Student Online Portal &amp; Basic Education Enrollment System
+                  </p>
+                </div>
               </div>
               <StudentHeaderNav />
             </div>

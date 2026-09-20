@@ -221,13 +221,20 @@ export default function StudentHeaderNav() {
             {/* Drawer Top Header */}
             <div>
               <div className="bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
-                <div>
-                  <span className="text-[10px] font-mono text-blue-200 uppercase tracking-wider block">
-                    [ DUMALNEG NHS &bull; PORTAL MENU ]
-                  </span>
-                  <h3 className="text-sm font-bold uppercase tracking-tight mt-0.5">
-                    Navigation &amp; Services
-                  </h3>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/dumalneg-logo.png"
+                    alt="Dumalneg National High School"
+                    className="w-9 h-9 object-contain shrink-0"
+                  />
+                  <div>
+                    <span className="text-[10px] font-mono text-blue-200 uppercase tracking-wider block">
+                      [ DUMALNEG NHS &bull; PORTAL MENU ]
+                    </span>
+                    <h3 className="text-sm font-bold uppercase tracking-tight mt-0.5">
+                      Navigation &amp; Services
+                    </h3>
+                  </div>
                 </div>
 
                 <button
