@@ -138,11 +138,34 @@ export default function Step5DocumentsReview({
         });
       }
 
+      // Upload to Supabase Storage Bucket to get a lightweight public URL (~80 bytes)
+      let finalStoredUrl = finalDataUrl;
+      try {
+        const uploadForm = new FormData();
+        uploadForm.append("file", finalFile);
+        uploadForm.append("docType", docKey);
+        uploadForm.append("identifier", data.lrn || user?.userId || user?.id || "applicant");
+
+        const uploadRes = await fetch("/api/upload-document", {
+          method: "POST",
+          body: uploadForm,
+        });
+
+        if (uploadRes.ok) {
+          const uploadJson = await uploadRes.json();
+          if (uploadJson.success && uploadJson.url) {
+            finalStoredUrl = uploadJson.url;
+          }
+        }
+      } catch (storageErr) {
+        console.warn("Storage upload notice (fallback to client compressed data URL):", storageErr);
+      }
+
       setDocs((prev) => ({
         ...prev,
         [docKey]: {
           file: finalFile,
-          previewUrl: finalDataUrl,
+          previewUrl: finalStoredUrl || finalDataUrl,
           originalSizeKb: originalKb,
           compressedSizeKb: compressedKb,
           isCompressing: false,
@@ -156,7 +179,7 @@ export default function Step5DocumentsReview({
       const newDocEntry = {
         type: docKey,
         fileName: finalFile.name,
-        fileUrl: finalDataUrl,
+        fileUrl: finalStoredUrl || finalDataUrl,
         sizeKb: compressedKb,
       };
 
@@ -319,6 +342,7 @@ export default function Step5DocumentsReview({
                   fileName: v?.file.name,
                   sizeKb: v?.compressedSizeKb,
                   fileData: v?.previewUrl || null,
+                  fileUrl: v?.previewUrl || null,
                 })),
               updated_at: new Date().toISOString(),
             })
@@ -423,6 +447,7 @@ export default function Step5DocumentsReview({
                     fileName: v?.file.name,
                     sizeKb: v?.compressedSizeKb,
                     fileData: v?.previewUrl || null,
+                    fileUrl: v?.previewUrl || null,
                   })),
               });
 
