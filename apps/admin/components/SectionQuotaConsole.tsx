@@ -49,11 +49,22 @@ export interface RegisteredTeacher {
   fullName: string;
 }
 
+export interface RegisteredClassroom {
+  id: string;
+  classroomId: string;
+  classroom_id: string;
+  roomName: string;
+  room_name: string;
+  building: string;
+  capacity: number;
+}
+
 export default function SectionQuotaConsole() {
   const supabase = createClient();
 
   const [sections, setSections] = useState<SectionDetail[]>([]);
   const [teachersList, setTeachersList] = useState<RegisteredTeacher[]>([]);
+  const [classroomsList, setClassroomsList] = useState<RegisteredClassroom[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [gradeFilter, setGradeFilter] = useState<string>("ALL");
 
@@ -266,11 +277,53 @@ export default function SectionQuotaConsole() {
     }
   };
 
+  // Fetch registered classrooms from IT Support facility directory
+  const fetchClassrooms = async () => {
+    try {
+      const res = await fetch(`/api/it-support/classrooms?_t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.classrooms)) {
+          setClassroomsList(data.classrooms);
+          return;
+        }
+      }
+
+      // Fallback directly to Supabase client
+      const { data: dbRooms, error } = await supabase
+        .from("classrooms")
+        .select("id, classroom_id, room_name, building, capacity")
+        .order("building", { ascending: true })
+        .order("classroom_id", { ascending: true });
+
+      if (error) {
+        console.warn("Notice querying classrooms for dropdown:", error.message);
+        return;
+      }
+
+      if (dbRooms) {
+        const mapped: RegisteredClassroom[] = dbRooms.map((r: any) => ({
+          id: r.id,
+          classroomId: r.classroom_id || r.classroomId || "",
+          classroom_id: r.classroom_id || r.classroomId || "",
+          roomName: r.room_name || r.roomName || "",
+          room_name: r.room_name || r.roomName || "",
+          building: r.building || "Main Academic Building",
+          capacity: Number(r.capacity) || 40,
+        }));
+        setClassroomsList(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to fetch classrooms for dropdown:", err);
+    }
+  };
+
   useEffect(() => {
     fetchSections();
     fetchTeachers();
+    fetchClassrooms();
 
-    // Real-time subscription to sections, teachers, students, and enrollment_applications
+    // Real-time subscription to sections, teachers, classrooms, students, and enrollment_applications
     const channel = supabase
       .channel("admin-sections-quota-channel")
       .on(
@@ -288,6 +341,13 @@ export default function SectionQuotaConsole() {
       )
       .on(
         "postgres_changes",
+        { event: "*", schema: "public", table: "classrooms" },
+        () => {
+          fetchClassrooms();
+        }
+      )
+      .on(
+        "postgres_changes",
         { event: "*", schema: "public", table: "students" },
         () => fetchSections(true)
       )
@@ -301,11 +361,13 @@ export default function SectionQuotaConsole() {
     const handleCustomEvent = () => {
       fetchSections(true);
       fetchTeachers();
+      fetchClassrooms();
     };
     if (typeof window !== "undefined") {
       window.addEventListener("dumalnext:data-changed", handleCustomEvent);
       window.addEventListener("dumalnext:teacher-data-changed", handleCustomEvent);
       window.addEventListener("dumalnext:admin-data-changed", handleCustomEvent);
+      window.addEventListener("dumalnext:classrooms-changed", handleCustomEvent);
     }
 
     return () => {
@@ -314,9 +376,71 @@ export default function SectionQuotaConsole() {
         window.removeEventListener("dumalnext:data-changed", handleCustomEvent);
         window.removeEventListener("dumalnext:teacher-data-changed", handleCustomEvent);
         window.removeEventListener("dumalnext:admin-data-changed", handleCustomEvent);
+        window.removeEventListener("dumalnext:classrooms-changed", handleCustomEvent);
       }
     };
   }, []);
+
+  // Helper to normalize room value to match registered facility format
+  const normalizeRoomValue = (val: string) => {
+    if (!val || !val.trim()) return "";
+    const clean = val.trim();
+    const directMatch = classroomsList.find(
+      (r) =>
+        `${r.room_name} (${r.building})`.toLowerCase() === clean.toLowerCase() ||
+        `${r.classroom_id} - ${r.room_name} (${r.building})`.toLowerCase() === clean.toLowerCase()
+    );
+    if (directMatch) return `${directMatch.room_name} (${directMatch.building})`;
+
+    const partialMatch = classroomsList.find(
+      (r) =>
+        r.room_name.toLowerCase() === clean.toLowerCase() ||
+        r.classroom_id.toLowerCase() === clean.toLowerCase()
+    );
+    if (partialMatch) return `${partialMatch.room_name} (${partialMatch.building})`;
+
+    return clean;
+  };
+
+  // Helper to find the registered classroom details object by room string
+  const findClassroomDetails = (roomStr: string) => {
+    if (!roomStr || !roomStr.trim()) return undefined;
+    const clean = roomStr.trim().toLowerCase();
+    return classroomsList.find((r) => {
+      const full = `${r.room_name} (${r.building})`.toLowerCase();
+      const codeFull = `${r.classroom_id} - ${r.room_name} (${r.building})`.toLowerCase();
+      return (
+        full === clean ||
+        codeFull === clean ||
+        r.room_name.toLowerCase() === clean ||
+        r.classroom_id.toLowerCase() === clean
+      );
+    });
+  };
+
+  // Group registered classrooms by building
+  const classroomsByBuilding = classroomsList.reduce((acc, rm) => {
+    const bldg = rm.building ? rm.building.trim() : "Main Academic Building";
+    if (!acc[bldg]) acc[bldg] = [];
+    acc[bldg].push(rm);
+    return acc;
+  }, {} as Record<string, RegisteredClassroom[]>);
+
+  // Helper to find which section is currently occupying a room
+  const getSectionOccupyingRoom = (roomCandidate: string, excludeSectionId?: string): SectionDetail | undefined => {
+    if (!roomCandidate || !roomCandidate.trim()) return undefined;
+    const cleanCand = roomCandidate.trim().toLowerCase();
+    return sections.find((s) => {
+      if (excludeSectionId && s.id === excludeSectionId) return false;
+      if (!s.room || !s.room.trim()) return false;
+      const sRoom = s.room.trim().toLowerCase();
+      return (
+        sRoom === cleanCand ||
+        sRoom.includes(cleanCand) ||
+        cleanCand.includes(sRoom)
+      );
+    });
+  };
 
   // Filter sections by grade
   const filteredSections = sections.filter((sec) => {
@@ -409,7 +533,7 @@ export default function SectionQuotaConsole() {
     setEditingSection(sec);
     setEditSectionName(sec.section_name);
     setEditCapacity(sec.capacity);
-    setEditRoom(sec.room || "");
+    setEditRoom(normalizeRoomValue(sec.room || ""));
     setEditAdviser(sec.adviser_name || "");
     setEditStrand(sec.strand || "");
     setEditError("");
@@ -991,16 +1115,74 @@ export default function SectionQuotaConsole() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Classroom / Room Number
-                  </label>
-                  <input
-                    type="text"
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                      Classroom &amp; Building <span className="text-slate-500 font-normal">(Optional)</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-[#002060] uppercase">
+                      [ IT Facilities: {classroomsList.length} Rooms ]
+                    </span>
+                  </div>
+                  <select
                     value={newRoom}
-                    onChange={(e) => setNewRoom(e.target.value)}
-                    placeholder="e.g. Room 102 / Building B"
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none"
-                  />
+                    onChange={(e) => {
+                      const selectedVal = e.target.value;
+                      setNewRoom(selectedVal);
+                      const matched = findClassroomDetails(selectedVal);
+                      if (matched && (!newCapacity || newCapacity === 40)) {
+                        setNewCapacity(matched.capacity);
+                      }
+                    }}
+                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
+                  >
+                    <option value="">-- Select Classroom / Room (From IT Facilities) --</option>
+                    {Object.entries(classroomsByBuilding).map(([bldg, rooms]) => (
+                      <optgroup key={bldg} label={`[ BUILDING: ${bldg.toUpperCase()} ]`}>
+                        {rooms.map((rm) => {
+                          const optionVal = `${rm.room_name} (${rm.building})`;
+                          const occupyingSec = getSectionOccupyingRoom(optionVal);
+                          const statusTag = occupyingSec
+                            ? `[ OCCUPIED BY: ${occupyingSec.section_name} ]`
+                            : "[ AVAILABLE ]";
+                          return (
+                            <option key={rm.id} value={optionVal}>
+                              {rm.classroom_id ? `[ ${rm.classroom_id} ] ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    ))}
+                  </select>
+                  {classroomsList.length === 0 ? (
+                    <p className="text-[11px] text-amber-700 mt-1">
+                      No classrooms registered in IT Support facilities yet.
+                    </p>
+                  ) : newRoom ? (
+                    (() => {
+                      const rmDetails = findClassroomDetails(newRoom);
+                      if (!rmDetails) return null;
+                      return (
+                        <div className="mt-1.5 p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono font-bold text-[#002060] uppercase">
+                              {rmDetails.classroom_id}: {rmDetails.room_name}
+                            </span>
+                            <span className="font-mono font-bold">
+                              Seating: {rmDetails.capacity} seats
+                            </span>
+                          </div>
+                          <div className="text-slate-600">
+                            Location: <strong>{rmDetails.building}</strong>
+                          </div>
+                          {newCapacity > rmDetails.capacity && (
+                            <p className="text-amber-800 font-bold">
+                              Notice: Section capacity ({newCapacity}) exceeds room seating capacity ({rmDetails.capacity} seats).
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()
+                  ) : null}
                 </div>
 
                 <div>
@@ -1171,16 +1353,91 @@ export default function SectionQuotaConsole() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Classroom / Room Number
-                  </label>
-                  <input
-                    type="text"
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                      Classroom &amp; Building <span className="text-slate-500 font-normal">(Optional)</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-[#002060] uppercase">
+                      [ IT Facilities: {classroomsList.length} Rooms ]
+                    </span>
+                  </div>
+                  <select
                     value={editRoom}
                     onChange={(e) => setEditRoom(e.target.value)}
-                    placeholder="e.g. Room 102"
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none"
-                  />
+                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer font-medium"
+                  >
+                    <option value="">-- Select Classroom / Room (From IT Facilities) --</option>
+                    {/* Preserve custom or legacy room value if not yet in IT Support facilities */}
+                    {editRoom &&
+                      !classroomsList.some((r) => {
+                        const standard = `${r.room_name} (${r.building})`.toLowerCase();
+                        return (
+                          standard === editRoom.toLowerCase() ||
+                          r.room_name.toLowerCase() === editRoom.toLowerCase() ||
+                          r.classroom_id.toLowerCase() === editRoom.toLowerCase()
+                        );
+                      }) && (
+                        <option value={editRoom}>
+                          {editRoom} (Current / Unlisted Room)
+                        </option>
+                      )}
+                    {Object.entries(classroomsByBuilding).map(([bldg, rooms]) => (
+                      <optgroup key={bldg} label={`[ BUILDING: ${bldg.toUpperCase()} ]`}>
+                        {rooms.map((rm) => {
+                          const optionVal = `${rm.room_name} (${rm.building})`;
+                          const occupyingSec = getSectionOccupyingRoom(optionVal, editingSection?.id);
+                          const isCurrent =
+                            editingSection &&
+                            editingSection.room &&
+                            (editingSection.room.toLowerCase() === optionVal.toLowerCase() ||
+                              editingSection.room.toLowerCase() === rm.room_name.toLowerCase() ||
+                              editingSection.room.toLowerCase() === rm.classroom_id.toLowerCase());
+
+                          const statusTag = isCurrent
+                            ? "[ CURRENT ROOM OF THIS SECTION ]"
+                            : occupyingSec
+                            ? `[ ASSIGNED TO: ${occupyingSec.section_name} ]`
+                            : "[ AVAILABLE ]";
+
+                          return (
+                            <option key={rm.id} value={optionVal}>
+                              {rm.classroom_id ? `[ ${rm.classroom_id} ] ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    ))}
+                  </select>
+                  {classroomsList.length === 0 ? (
+                    <p className="text-[11px] text-amber-700 mt-1">
+                      No classrooms registered in IT Support facilities yet.
+                    </p>
+                  ) : editRoom ? (
+                    (() => {
+                      const rmDetails = findClassroomDetails(editRoom);
+                      if (!rmDetails) return null;
+                      return (
+                        <div className="mt-1.5 p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono font-bold text-[#002060] uppercase">
+                              {rmDetails.classroom_id}: {rmDetails.room_name}
+                            </span>
+                            <span className="font-mono font-bold">
+                              Seating: {rmDetails.capacity} seats
+                            </span>
+                          </div>
+                          <div className="text-slate-600">
+                            Location: <strong>{rmDetails.building}</strong>
+                          </div>
+                          {editCapacity > rmDetails.capacity && (
+                            <p className="text-amber-800 font-bold">
+                              Notice: Section capacity ({editCapacity}) exceeds classroom seating capacity ({rmDetails.capacity} seats).
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()
+                  ) : null}
                 </div>
 
                 <div>
