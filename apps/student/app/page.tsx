@@ -337,12 +337,12 @@ function StudentHomeContent() {
     }
   };
 
-  // Handle 6-Digit OTP Verification Submit
+  // Handle OTP Verification Submit (Supports both 6-digit and 8-digit codes)
   const handleVerifyOtpSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const clean = otpCode.replace(/\D/g, "");
-    if (!otpEmail || clean.length !== 6) {
-      setOtpError("Please enter the complete 6-digit numeric verification code.");
+    if (!otpEmail || clean.length < 6 || clean.length > 8) {
+      setOtpError("Please enter the complete verification code (6 to 8 digits).");
       return;
     }
 
@@ -353,13 +353,13 @@ function StudentHomeContent() {
     try {
       const res = await verifyEmailOtp(otpEmail, clean);
       if (res.success) {
-        setOtpSuccess("6-Digit Code verified! Your learner account is activated.");
+        setOtpSuccess("Verification code confirmed! Your learner account is activated.");
         setShowOtpModal(false);
         setUnconfirmedEmail("");
         setLoginEmail(otpEmail);
         router.push("/enroll");
       } else {
-        setOtpError(res.error || "Invalid or expired 6-digit code. Please check your Gmail or request a new code.");
+        setOtpError(res.error || "Invalid or expired verification code. Please check your Gmail or request a new code.");
       }
     } finally {
       setIsVerifyingOtp(false);
@@ -1101,35 +1101,35 @@ function StudentHomeContent() {
               <form onSubmit={handleVerifyOtpSubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-800 uppercase text-center mb-2">
-                    Enter 6-Digit Code
+                    Enter Verification Code (6 to 8 Digits)
                   </label>
                   <input
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    maxLength={6}
+                    maxLength={8}
                     autoFocus
                     value={otpCode}
                     onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 8);
                       setOtpCode(val);
                       if (otpError) setOtpError("");
                     }}
-                    placeholder="000000"
-                    className="w-full text-center font-mono font-bold text-3xl tracking-[0.35em] p-3 border-2 border-[#002060] bg-blue-50/40 text-[#002060] outline-none placeholder:text-slate-300"
+                    placeholder="______"
+                    className="w-full text-center font-mono font-bold text-2xl sm:text-3xl tracking-[0.25em] p-3 border-2 border-[#002060] bg-blue-50/40 text-[#002060] outline-none placeholder:text-slate-300"
                   />
                   <span className="text-[10px] text-slate-500 text-center block mt-1">
-                    Please check your Gmail Inbox (or Spam folder) for the 6-digit number.
+                    Please check your Gmail Inbox (or Spam folder) for the verification code.
                   </span>
                 </div>
 
                 <div className="space-y-2 pt-2">
                   <button
                     type="submit"
-                    disabled={isVerifyingOtp || otpCode.replace(/\D/g, "").length !== 6}
+                    disabled={isVerifyingOtp || otpCode.replace(/\D/g, "").length < 6}
                     className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer"
                   >
-                    {isVerifyingOtp ? "[ Verifying 6-Digit Code... ]" : "[ Verify & Activate Account ]"}
+                    {isVerifyingOtp ? "[ Verifying Code... ]" : "[ Verify & Activate Account ]"}
                   </button>
 
                   <div className="flex items-center justify-between text-xs pt-1">
