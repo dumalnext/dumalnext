@@ -26,8 +26,8 @@ export default function StudentLayout({
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
         <StudentProviders>
           {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
-          <header className="deped-header px-3 sm:px-6 py-3 sm:py-4 shadow-sm">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <header className="deped-header px-3 sm:px-6 py-3 sm:py-4 shadow-sm relative z-40">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
               <div>
                 <p className="text-[10px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase">
                   Republic of the Philippines | Department of Education | Region I
