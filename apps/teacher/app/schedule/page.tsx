@@ -25,6 +25,27 @@ interface ScheduleRecord {
   building?: string;
 }
 
+interface TimeSlotDef {
+  id: string;
+  name: string;
+  start: string;
+  end: string;
+  isBreak?: boolean;
+}
+
+const ACADEMIC_TIME_SLOTS: TimeSlotDef[] = [
+  { id: "P1", name: "Period 1", start: "07:30", end: "08:30" },
+  { id: "P2", name: "Period 2", start: "08:30", end: "09:30" },
+  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "09:45", isBreak: true },
+  { id: "P3", name: "Period 3", start: "09:45", end: "10:45" },
+  { id: "P4", name: "Period 4", start: "10:45", end: "11:45" },
+  { id: "LUNCH", name: "Noon Lunch Break", start: "11:45", end: "13:00", isBreak: true },
+  { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
+  { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
+  { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
+  { id: "P8", name: "Homeroom / Remediation", start: "16:00", end: "17:00" },
+];
+
 const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday"> = [
   "Monday",
   "Tuesday",
@@ -32,6 +53,24 @@ const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Fri
   "Thursday",
   "Friday",
 ];
+
+function toMinutes(t: string): number {
+  if (!t) return 0;
+  const parts = t.split(":");
+  return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || "0", 10);
+}
+
+function timesOverlap(s1: string, e1: string, s2: string, e2: string): boolean {
+  const startA = toMinutes(s1);
+  const endA = toMinutes(e1);
+  const startB = toMinutes(s2);
+  const endB = toMinutes(e2);
+  return Math.max(startA, startB) < Math.min(endA, endB);
+}
+
+function findScheduleInSlot(daySchedules: ScheduleRecord[], slotStart: string, slotEnd: string): ScheduleRecord | undefined {
+  return daySchedules.find((s) => timesOverlap(s.start_time, s.end_time, slotStart, slotEnd));
+}
 
 export default function TeachingSchedulePage() {
   const { user, isLoading } = useTeacherAuth();
@@ -91,15 +130,6 @@ export default function TeachingSchedulePage() {
     return <TeacherLoginForm />;
   }
 
-  // Group schedules by day for the calendar grid
-  const daySchedulesMap = new Map<string, ScheduleRecord[]>();
-  DAYS_OF_WEEK.forEach((d) => daySchedulesMap.set(d, []));
-  schedules.forEach((sc) => {
-    const list = daySchedulesMap.get(sc.day_of_week) || [];
-    list.push(sc);
-    daySchedulesMap.set(sc.day_of_week, list);
-  });
-
   const uniqueSectionsCount = new Set(schedules.map((s) => s.section_id)).size;
 
   return (
@@ -114,7 +144,7 @@ export default function TeachingSchedulePage() {
             Teaching Load &amp; Class Schedule
           </h2>
           <p className="text-xs text-slate-600 mt-1">
-            Official weekly instructional timetable for Faculty Member <strong className="text-slate-900 uppercase">{user.fullName}</strong> ({user.teacherId}).
+            Official weekly instructional timetable matrix for Faculty Member <strong className="text-slate-900 uppercase">{user.fullName}</strong> ({user.teacherId}).
           </p>
         </div>
 
@@ -210,43 +240,84 @@ export default function TeachingSchedulePage() {
             </div>
           </div>
 
-          {/* Weekly 5-Day Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 print:grid-cols-5">
-            {DAYS_OF_WEEK.map((day) => {
-              const dayItems = daySchedulesMap.get(day) || [];
-              return (
-                <div key={day} className="bg-white border-2 border-slate-300 shadow-xs flex flex-col print:border print:shadow-none">
-                  <div className="p-2.5 bg-[#002060] text-white text-center font-bold text-xs uppercase tracking-wider">
-                    {day}
-                  </div>
-                  <div className="p-2.5 flex-1 space-y-2.5 min-h-[220px] bg-slate-50/50">
-                    {dayItems.length === 0 ? (
-                      <div className="h-full flex items-center justify-center text-center p-4 text-slate-400 text-xs italic">
-                        No scheduled class
-                      </div>
-                    ) : (
-                      dayItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="p-2.5 bg-white border border-slate-300 hover:border-[#002060] transition-colors shadow-2xs space-y-1"
-                        >
-                          <span className="text-[10px] font-mono font-bold text-blue-900 bg-blue-50 px-1.5 py-0.5 border border-blue-200 block w-fit">
-                            {item.start_time} – {item.end_time}
-                          </span>
-                          <h4 className="text-xs font-bold text-slate-900 uppercase">
-                            {item.subject_name}
-                          </h4>
-                          <div className="text-[11px] text-slate-600 space-y-0.5">
-                            <div>Class: <strong className="text-[#002060]">{item.section_name}</strong></div>
-                            <div>Facility: <strong className="text-slate-800">{item.classroom_name}</strong></div>
-                          </div>
+          {/* Timetable Matrix with Time Column on the Left */}
+          <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border print:shadow-none">
+            <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
+              <thead>
+                <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
+                  <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
+                    [ Time Period ]
+                  </th>
+                  {DAYS_OF_WEEK.map((day) => (
+                    <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
+                      {day}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {ACADEMIC_TIME_SLOTS.map((slot) => {
+                  if (slot.isBreak) {
+                    return (
+                      <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
+                        <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
+                          <div>{slot.start} – {slot.end}</div>
+                          <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
+                        </td>
+                        <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
+                          [ {slot.start} – {slot.end} &bull; {slot.name} ]
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return (
+                    <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
+                      {/* Left Time Column */}
+                      <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
+                        <div className="font-bold text-[#002060] text-xs">
+                          {slot.start} – {slot.end}
                         </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                        <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
+                          {slot.name}
+                        </div>
+                      </td>
+
+                      {/* 5 Day Cells */}
+                      {DAYS_OF_WEEK.map((day) => {
+                        const daySchedules = schedules.filter((s) => s.day_of_week === day);
+                        const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
+
+                        return (
+                          <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
+                            {matchedItem ? (
+                              <div className="p-2.5 bg-blue-50/70 border border-[#002060]/30 hover:border-[#002060] transition-colors shadow-2xs space-y-1">
+                                <span className="text-[10px] font-mono font-bold text-blue-950 bg-white px-1.5 py-0.5 border border-blue-200 block w-fit">
+                                  {matchedItem.start_time}–{matchedItem.end_time}
+                                </span>
+                                <div className="font-bold text-slate-900 uppercase text-xs">
+                                  {matchedItem.subject_name}
+                                </div>
+                                <div className="text-[11px] text-slate-700">
+                                  Class: <strong className="text-[#002060]">{matchedItem.section_name}</strong>
+                                </div>
+                                <div className="text-[10px] font-mono text-slate-500">
+                                  Room: {matchedItem.classroom_name}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-full h-full min-h-[52px] p-2 text-slate-400 text-[10px] font-mono flex items-center justify-center italic">
+                                Vacant
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
           {/* Masterlist Detail Table */}

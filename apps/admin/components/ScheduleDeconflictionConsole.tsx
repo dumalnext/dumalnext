@@ -60,14 +60,25 @@ export interface SubjectRef {
   trimester?: number;
 }
 
-const STANDARD_PERIODS = [
-  { label: "Period 1 (07:30 – 08:30)", start: "07:30", end: "08:30" },
-  { label: "Period 2 (08:30 – 09:30)", start: "08:30", end: "09:30" },
-  { label: "Period 3 (09:45 – 10:45)", start: "09:45", end: "10:45" },
-  { label: "Period 4 (10:45 – 11:45)", start: "10:45", end: "11:45" },
-  { label: "Period 5 (13:00 – 14:00)", start: "13:00", end: "14:00" },
-  { label: "Period 6 (14:00 – 15:00)", start: "14:00", end: "15:00" },
-  { label: "Period 7 (15:00 – 16:00)", start: "15:00", end: "16:00" },
+interface TimeSlotDef {
+  id: string;
+  name: string;
+  start: string;
+  end: string;
+  isBreak?: boolean;
+}
+
+const ACADEMIC_TIME_SLOTS: TimeSlotDef[] = [
+  { id: "P1", name: "Period 1", start: "07:30", end: "08:30" },
+  { id: "P2", name: "Period 2", start: "08:30", end: "09:30" },
+  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "09:45", isBreak: true },
+  { id: "P3", name: "Period 3", start: "09:45", end: "10:45" },
+  { id: "P4", name: "Period 4", start: "10:45", end: "11:45" },
+  { id: "LUNCH", name: "Noon Lunch Break", start: "11:45", end: "13:00", isBreak: true },
+  { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
+  { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
+  { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
+  { id: "P8", name: "Homeroom / Remediation", start: "16:00", end: "17:00" },
 ];
 
 const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday"> = [
@@ -90,6 +101,10 @@ function timesOverlap(s1: string, e1: string, s2: string, e2: string): boolean {
   const startB = toMinutes(s2);
   const endB = toMinutes(e2);
   return Math.max(startA, startB) < Math.min(endA, endB);
+}
+
+function findScheduleInSlot(daySchedules: ScheduleItem[], slotStart: string, slotEnd: string): ScheduleItem | undefined {
+  return daySchedules.find((s) => timesOverlap(s.start_time, s.end_time, slotStart, slotEnd));
 }
 
 export default function ScheduleDeconflictionConsole() {
@@ -235,6 +250,37 @@ export default function ScheduleDeconflictionConsole() {
     return null;
   }, [schedules, formDayOfWeek, formStartTime, formEndTime, formTeacherId, formClassroomId, formSectionId]);
 
+  // Open modal with pre-filled day & time slot from clicking a grid cell
+  const openAddModalWithDefaults = (day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday", start: string, end: string) => {
+    setAddError("");
+    setFormDayOfWeek(day);
+    setFormStartTime(start);
+    setFormEndTime(end);
+
+    if (viewMode === "bySection" && selectedSectionId) {
+      setFormSectionId(selectedSectionId);
+    } else if (!formSectionId && sections.length > 0) {
+      setFormSectionId(sections[0].id);
+    }
+
+    if (viewMode === "byTeacher" && selectedTeacherId) {
+      setFormTeacherId(selectedTeacherId);
+    } else if (!formTeacherId && teachers.length > 0) {
+      setFormTeacherId(teachers[0].id);
+    }
+
+    if (!formClassroomId && classrooms.length > 0) {
+      setFormClassroomId(classrooms[0].id);
+    }
+
+    if (!formSubjectCode && subjects.length > 0) {
+      setFormSubjectCode(subjects[0].subject_code);
+      setFormCustomSubject(subjects[0].subject_name);
+    }
+
+    setIsAddModalOpen(true);
+  };
+
   // 3. Handle Add Schedule Submit
   const handleAddSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,7 +368,6 @@ export default function ScheduleDeconflictionConsole() {
     setIsScanning(true);
     await new Promise((res) => setTimeout(res, 500));
 
-    // Audit algorithm: Scan all pairwise schedules
     let collisionCount = 0;
     const n = schedules.length;
     for (let i = 0; i < n; i++) {
@@ -393,7 +438,7 @@ export default function ScheduleDeconflictionConsole() {
             Timetable Conflict-Free Evaluation Hub
           </h2>
           <p className="text-xs text-slate-600 mt-1">
-            Real-time algorithm verifying 3-dimensional scheduling collisions across teacher loads, classroom bookings, and section timetables.
+            Structured timetable matrix with standard time axis, preventing scheduling collisions across faculty, facilities, and section programs.
           </p>
         </div>
 
@@ -505,7 +550,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            [ View by Class Section ]
+            [ View by Class Section (Timetable Matrix) ]
           </button>
           <button
             type="button"
@@ -516,7 +561,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            [ View by Teacher Load ]
+            [ View by Teacher Load (Timetable Matrix) ]
           </button>
           <button
             type="button"
@@ -644,7 +689,9 @@ export default function ScheduleDeconflictionConsole() {
         </div>
       ) : (
         <>
-          {/* VIEW 1: BY SECTION WEEKLY GRID */}
+          {/* ===================================================================== */}
+          {/* VIEW 1: BY SECTION TIMETABLE MATRIX (WITH TIME COLUMN ON LEFT) */}
+          {/* ===================================================================== */}
           {viewMode === "bySection" && (
             <div className="space-y-4">
               {currentSection && (
@@ -659,58 +706,110 @@ export default function ScheduleDeconflictionConsole() {
                 </div>
               )}
 
-              {/* Weekly 5-Day Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 print:grid-cols-5">
-                {DAYS_OF_WEEK.map((day) => {
-                  const dayItems = sectionSchedules.filter((s) => s.day_of_week === day);
-                  return (
-                    <div key={day} className="bg-white border-2 border-slate-300 shadow-xs flex flex-col print:border print:shadow-none">
-                      <div className="p-2.5 bg-[#002060] text-white text-center font-bold text-xs uppercase tracking-wider">
-                        {day}
-                      </div>
-                      <div className="p-2.5 flex-1 space-y-2.5 min-h-[220px] bg-slate-50/50">
-                        {dayItems.length === 0 ? (
-                          <div className="h-full flex items-center justify-center text-center p-4 text-slate-400 text-xs italic">
-                            Vacant / No scheduled class
-                          </div>
-                        ) : (
-                          dayItems.map((item) => (
-                            <div
-                              key={item.id}
-                              className="p-2.5 bg-white border border-slate-300 hover:border-[#002060] transition-colors shadow-2xs space-y-1 relative group"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-mono font-bold text-blue-900 bg-blue-50 px-1.5 py-0.5 border border-blue-200">
-                                  {item.start_time} – {item.end_time}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteSchedule(item.id, item.subject_name)}
-                                  className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
-                                  title="Remove this class period"
-                                >
-                                  &times;
-                                </button>
-                              </div>
-                              <h4 className="text-xs font-bold text-slate-900 uppercase">
-                                {item.subject_name}
-                              </h4>
-                              <div className="text-[11px] text-slate-600 space-y-0.5">
-                                <div>Faculty: <strong className="text-slate-800">{item.teacher_name}</strong></div>
-                                <div>Room: <strong className="text-slate-800">{item.classroom_name}</strong></div>
-                              </div>
+              {/* Matrix Table with Time Column on the Left */}
+              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border print:shadow-none">
+                <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
+                  <thead>
+                    <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
+                      <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
+                        [ Time Period ]
+                      </th>
+                      {DAYS_OF_WEEK.map((day) => (
+                        <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
+                          {day}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {ACADEMIC_TIME_SLOTS.map((slot) => {
+                      // Institutional Break Row (Recess / Lunch Break)
+                      if (slot.isBreak) {
+                        return (
+                          <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
+                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
+                              <div>{slot.start} – {slot.end}</div>
+                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
+                            </td>
+                            <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
+                              [ {slot.start} – {slot.end} &bull; {slot.name} ]
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      // Standard Class Period Row
+                      return (
+                        <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
+                          {/* Left Time Column */}
+                          <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
+                            <div className="font-bold text-[#002060] text-xs">
+                              {slot.start} – {slot.end}
                             </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
+                              {slot.name}
+                            </div>
+                          </td>
+
+                          {/* 5 Day Cells (Monday to Friday) */}
+                          {DAYS_OF_WEEK.map((day) => {
+                            const daySchedules = sectionSchedules.filter((s) => s.day_of_week === day);
+                            const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
+
+                            return (
+                              <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
+                                {matchedItem ? (
+                                  <div className="p-2.5 bg-blue-50/70 border border-[#002060]/30 hover:border-[#002060] transition-colors shadow-2xs space-y-1 relative group">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-mono font-bold text-blue-950 bg-white px-1.5 py-0.5 border border-blue-200">
+                                        {matchedItem.start_time}–{matchedItem.end_time}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteSchedule(matchedItem.id, matchedItem.subject_name)}
+                                        className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
+                                        title="Remove this class period"
+                                      >
+                                        &times;
+                                      </button>
+                                    </div>
+                                    <div className="font-bold text-slate-900 uppercase text-xs">
+                                      {matchedItem.subject_name}
+                                    </div>
+                                    <div className="text-[11px] text-slate-700">
+                                      Faculty: <strong className="text-slate-900">{matchedItem.teacher_name}</strong>
+                                    </div>
+                                    <div className="text-[10px] font-mono text-slate-500">
+                                      Room: {matchedItem.classroom_name}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
+                                    className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
+                                    title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
+                                  >
+                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                                      + Assign Slot
+                                    </span>
+                                  </button>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
 
-          {/* VIEW 2: BY TEACHER LOAD GRID */}
+          {/* ===================================================================== */}
+          {/* VIEW 2: BY TEACHER TIMETABLE MATRIX (WITH TIME COLUMN ON LEFT) */}
+          {/* ===================================================================== */}
           {viewMode === "byTeacher" && (
             <div className="space-y-4">
               {currentTeacher && (
@@ -720,63 +819,113 @@ export default function ScheduleDeconflictionConsole() {
                     {currentTeacher.email && <> &bull; Email: <strong>{currentTeacher.email}</strong></>}
                   </div>
                   <div className="text-slate-700">
-                    Teaching Load: <strong>{teacherSchedules.length} Hours / Week</strong> (DepEd Limit: 30 Hours / Week)
+                    Teaching Load: <strong className="text-emerald-800 font-bold">{teacherSchedules.length} Hours / Week</strong> (DepEd Limit: 30 Hours / Week)
                   </div>
                 </div>
               )}
 
-              {/* Weekly 5-Day Grid for Teacher */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 print:grid-cols-5">
-                {DAYS_OF_WEEK.map((day) => {
-                  const dayItems = teacherSchedules.filter((s) => s.day_of_week === day);
-                  return (
-                    <div key={day} className="bg-white border-2 border-slate-300 shadow-xs flex flex-col print:border print:shadow-none">
-                      <div className="p-2.5 bg-[#002060] text-white text-center font-bold text-xs uppercase tracking-wider">
-                        {day}
-                      </div>
-                      <div className="p-2.5 flex-1 space-y-2.5 min-h-[220px] bg-slate-50/50">
-                        {dayItems.length === 0 ? (
-                          <div className="h-full flex items-center justify-center text-center p-4 text-slate-400 text-xs italic">
-                            No teaching load / Vacant
-                          </div>
-                        ) : (
-                          dayItems.map((item) => (
-                            <div
-                              key={item.id}
-                              className="p-2.5 bg-white border border-slate-300 hover:border-[#002060] transition-colors shadow-2xs space-y-1 relative group"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-50 px-1.5 py-0.5 border border-emerald-300">
-                                  {item.start_time} – {item.end_time}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteSchedule(item.id, item.subject_name)}
-                                  className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
-                                  title="Remove this class period"
-                                >
-                                  &times;
-                                </button>
-                              </div>
-                              <h4 className="text-xs font-bold text-slate-900 uppercase">
-                                {item.subject_name}
-                              </h4>
-                              <div className="text-[11px] text-slate-600 space-y-0.5">
-                                <div>Section: <strong className="text-[#002060]">{item.section_name}</strong></div>
-                                <div>Room: <strong className="text-slate-800">{item.classroom_name}</strong></div>
-                              </div>
+              {/* Matrix Table with Time Column on the Left */}
+              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border print:shadow-none">
+                <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
+                  <thead>
+                    <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
+                      <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
+                        [ Time Period ]
+                      </th>
+                      {DAYS_OF_WEEK.map((day) => (
+                        <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
+                          {day}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {ACADEMIC_TIME_SLOTS.map((slot) => {
+                      if (slot.isBreak) {
+                        return (
+                          <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
+                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
+                              <div>{slot.start} – {slot.end}</div>
+                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
+                            </td>
+                            <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
+                              [ {slot.start} – {slot.end} &bull; {slot.name} ]
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      return (
+                        <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
+                          {/* Left Time Column */}
+                          <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
+                            <div className="font-bold text-[#002060] text-xs">
+                              {slot.start} – {slot.end}
                             </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
+                              {slot.name}
+                            </div>
+                          </td>
+
+                          {/* 5 Day Cells */}
+                          {DAYS_OF_WEEK.map((day) => {
+                            const daySchedules = teacherSchedules.filter((s) => s.day_of_week === day);
+                            const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
+
+                            return (
+                              <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
+                                {matchedItem ? (
+                                  <div className="p-2.5 bg-emerald-50/70 border border-emerald-600/30 hover:border-emerald-700 transition-colors shadow-2xs space-y-1 relative group">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-mono font-bold text-emerald-950 bg-white px-1.5 py-0.5 border border-emerald-300">
+                                        {matchedItem.start_time}–{matchedItem.end_time}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteSchedule(matchedItem.id, matchedItem.subject_name)}
+                                        className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
+                                        title="Remove this class period"
+                                      >
+                                        &times;
+                                      </button>
+                                    </div>
+                                    <div className="font-bold text-slate-900 uppercase text-xs">
+                                      {matchedItem.subject_name}
+                                    </div>
+                                    <div className="text-[11px] text-slate-700">
+                                      Class: <strong className="text-[#002060]">{matchedItem.section_name}</strong>
+                                    </div>
+                                    <div className="text-[10px] font-mono text-slate-500">
+                                      Facility: {matchedItem.classroom_name}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
+                                    className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
+                                    title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
+                                  >
+                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                                      + Vacant (Assign)
+                                    </span>
+                                  </button>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
 
+          {/* ===================================================================== */}
           {/* VIEW 3: MASTER TIMETABLE REGISTRY TABLE */}
+          {/* ===================================================================== */}
           {viewMode === "all" && (
             <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border-none print:shadow-none">
               <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">
@@ -1027,8 +1176,7 @@ export default function ScheduleDeconflictionConsole() {
                     onChange={(e) => setFormStartTime(e.target.value)}
                     className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
                     required
-                  >
-                  </input>
+                  />
                 </div>
 
                 <div className="space-y-1">
@@ -1041,8 +1189,7 @@ export default function ScheduleDeconflictionConsole() {
                     onChange={(e) => setFormEndTime(e.target.value)}
                     className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
                     required
-                  >
-                  </input>
+                  />
                 </div>
               </div>
 
@@ -1052,9 +1199,9 @@ export default function ScheduleDeconflictionConsole() {
                   Quick Select DepEd Standard Class Periods:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {STANDARD_PERIODS.map((period) => (
+                  {ACADEMIC_TIME_SLOTS.filter((s) => !s.isBreak).map((period) => (
                     <button
-                      key={period.label}
+                      key={period.id}
                       type="button"
                       onClick={() => {
                         setFormStartTime(period.start);
@@ -1062,7 +1209,7 @@ export default function ScheduleDeconflictionConsole() {
                       }}
                       className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-mono border border-slate-300 uppercase cursor-pointer"
                     >
-                      {period.start}–{period.end}
+                      {period.name} ({period.start}–{period.end})
                     </button>
                   ))}
                 </div>
