@@ -50,6 +50,12 @@ export default function AdminHeaderNav({
             <span className="bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold uppercase tracking-wider">
               SCHOOL ADMINISTRATOR &amp; REGISTRAR
             </span>
+            <Link
+              href="/it-support"
+              className="text-white hover:text-amber-200 underline font-mono text-[10px] ml-2"
+            >
+              [ Switch to IT Support Portal &rarr; ]
+            </Link>
           </div>
         </div>
       </div>
