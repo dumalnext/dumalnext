@@ -104,7 +104,7 @@ export default function TeacherHomePage() {
               </span>
             </div>
             <h3 className="text-base font-bold text-slate-900 uppercase">
-              Section Class Roster
+              Advisory Section Roster
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
               Access certified masterlists of officially enrolled learners in your designated advisory class section, with real-time student LRN search.
@@ -115,7 +115,7 @@ export default function TeacherHomePage() {
             href="/roster"
             className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center block transition-colors shadow-2xs"
           >
-            [ View Advisory Class Roster ]
+            [ View Advisory Section Roster ]
           </Link>
         </div>
 

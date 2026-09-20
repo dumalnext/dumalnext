@@ -274,13 +274,13 @@ export default function ClassSectionRosterPage() {
   return (
     <div className="space-y-6 font-sans">
       {/* Title Bar */}
-      <div className="bg-white p-5 border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white p-5 border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
             [ PORTAL 02: OFFICIAL ADVISORY CLASS MASTERLIST ]
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
-            Section Class Roster
+            Advisory Section Roster
           </h2>
           <p className="text-xs text-slate-600 mt-1">
             Official advisory class masterlist for designated Class Adviser:{" "}
@@ -290,25 +290,38 @@ export default function ClassSectionRosterPage() {
           </p>
         </div>
 
-        {/* Section Selector (Only shown if teacher is assigned to multiple advisory classes) */}
-        {advisorySections.length > 1 && (
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-bold text-slate-800 uppercase shrink-0">
-              Select Advisory Section:
-            </label>
-            <select
-              value={selectedSectionId}
-              onChange={(e) => setSelectedSectionId(e.target.value)}
-              className="p-2 bg-slate-50 border-2 border-slate-400 text-xs font-bold text-slate-900 outline-none focus:border-[#002060] cursor-pointer"
+        {/* Action Controls & Section Selector */}
+        <div className="flex items-center gap-2">
+          {currentSection && (
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="px-3 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold border border-blue-400 uppercase cursor-pointer transition-colors shadow-2xs shrink-0"
+              title="Print official advisory class roster"
             >
-              {advisorySections.map((sec) => (
-                <option key={sec.id} value={sec.id}>
-                  {sec.section_name} (Grade {sec.grade_level})
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+              [ Print Class Roster ]
+            </button>
+          )}
+
+          {advisorySections.length > 1 && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-bold text-slate-800 uppercase shrink-0">
+                Select Advisory Section:
+              </label>
+              <select
+                value={selectedSectionId}
+                onChange={(e) => setSelectedSectionId(e.target.value)}
+                className="p-2 bg-slate-50 border-2 border-slate-400 text-xs font-bold text-slate-900 outline-none focus:border-[#002060] cursor-pointer"
+              >
+                {advisorySections.map((sec) => (
+                  <option key={sec.id} value={sec.id}>
+                    {sec.section_name} (Grade {sec.grade_level})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
       </div>
 
       {isLoadingSections ? (
@@ -345,7 +358,7 @@ export default function ClassSectionRosterPage() {
         <>
           {/* Section Details Summary Bar */}
           {currentSection && (
-            <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono no-print print:hidden">
               <div className="space-y-0.5">
                 <div>
                   Advisory Class: <strong className="text-[#002060] text-sm uppercase">{currentSection.section_name}</strong> &bull; Grade: <strong>Grade {currentSection.grade_level}</strong>
@@ -371,8 +384,39 @@ export default function ClassSectionRosterPage() {
           )}
 
           {/* Search & Student Masterlist */}
-          <div className="bg-white p-5 border-2 border-slate-300 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <div className="bg-white p-5 border-2 border-slate-300 shadow-xs space-y-4 print:p-0 print:border-none print:shadow-none">
+            {/* DepEd Official Letterhead for Printout */}
+            {currentSection && (
+              <div className="hidden print:block p-6 text-center border-b-2 border-slate-900 text-slate-900 mb-4">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-slate-600">
+                  Republic of the Philippines • Department of Education
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Region I • Schools Division of Ilocos Norte
+                </div>
+                <h1 className="text-lg font-bold uppercase tracking-tight text-[#002060] mt-1">
+                  DUMALNEG NATIONAL HIGH SCHOOL
+                </h1>
+                <div className="text-[10px] font-mono text-slate-600">
+                  Dumalneg, Ilocos Norte • School ID: 300017
+                </div>
+                <div className="mt-4 pt-2 border-t border-slate-400 flex items-center justify-between text-xs font-mono">
+                  <div>
+                    <strong>OFFICIAL ADVISORY CLASS ROSTER</strong> • SY 2025–2026
+                  </div>
+                  <div>
+                    Section: <strong>{currentSection.section_name}</strong> (Grade {currentSection.grade_level}{currentSection.strand ? ` • ${currentSection.strand}` : ""})
+                  </div>
+                </div>
+                <div className="mt-1 flex items-center justify-between text-[11px] font-mono text-slate-600">
+                  <div>Room: <strong>{currentSection.room || "Main Building"}</strong></div>
+                  <div>Class Adviser: <strong>{currentSection.adviser_name || user.fullName || "Designated Faculty"}</strong></div>
+                  <div>Total Enrolled: <strong>{rosterStudents.length} / {currentSection.capacity}</strong></div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3 no-print print:hidden">
               <div className="flex items-center gap-2 w-full sm:max-w-md">
                 <input
                   type="text"
@@ -412,7 +456,7 @@ export default function ClassSectionRosterPage() {
                 )}
               </div>
             ) : (
-              <div className="overflow-x-auto border border-slate-200">
+              <div className="overflow-x-auto border border-slate-200 print:border-none">
                 <table className="w-full text-left text-xs font-sans border-collapse">
                   <thead>
                     <tr className="bg-slate-100 border-b border-slate-300 font-bold uppercase text-[11px] text-slate-700">
@@ -441,6 +485,28 @@ export default function ClassSectionRosterPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* DepEd Official Signatory Block for Printout */}
+            {currentSection && (
+              <div className="hidden print:flex justify-between items-end pt-12 mt-6 text-xs font-sans text-slate-900 pb-4 px-2">
+                <div className="text-center w-56">
+                  <div className="border-b border-slate-900 pb-1 font-bold uppercase">
+                    {currentSection.adviser_name || user.fullName || "Class Adviser"}
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-600 uppercase mt-1">
+                    Class Adviser
+                  </div>
+                </div>
+                <div className="text-center w-56">
+                  <div className="border-b border-slate-900 pb-1 font-bold uppercase">
+                    OFFICE OF THE REGISTRAR
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-600 uppercase mt-1">
+                    Certified Correct • DepEd DNHS
+                  </div>
+                </div>
               </div>
             )}
           </div>
