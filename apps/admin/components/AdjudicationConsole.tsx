@@ -18,8 +18,57 @@ export default function AdjudicationConsole() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [gradeFilter, setGradeFilter] = useState<string>("ALL");
 
+  // Academic Terms & Calendar Period State
+  const [academicTerms, setAcademicTerms] = useState<any[]>([]);
+  const [activeTerm, setActiveTerm] = useState<{ schoolYear: string; termName: string; termNumber: number } | null>(null);
+  const [selectedSY, setSelectedSY] = useState<string>("ACTIVE");
+  const [selectedTerm, setSelectedTerm] = useState<string>("ACTIVE");
+
   // Selected Application for Review Modal
   const [selectedApp, setSelectedApp] = useState<ApplicationDetail | null>(null);
+
+  // Fetch Academic Terms from Supabase / API
+  const fetchAcademicTerms = async () => {
+    try {
+      const { data: terms, error } = await supabase
+        .from("academic_terms")
+        .select("*")
+        .order("schoolYear", { ascending: false })
+        .order("termNumber", { ascending: true });
+
+      if (!error && terms && terms.length > 0) {
+        setAcademicTerms(terms);
+        const active = terms.find((t: any) => t.isActive);
+        if (active) {
+          setActiveTerm({
+            schoolYear: active.schoolYear,
+            termName: active.termName || `Trimester ${active.termNumber}`,
+            termNumber: active.termNumber,
+          });
+        }
+        return;
+      }
+
+      // Fallback: API route
+      const res = await fetch(`/api/it-support/terms?_t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.terms)) {
+          setAcademicTerms(json.terms);
+          const active = json.terms.find((t: any) => t.isActive);
+          if (active) {
+            setActiveTerm({
+              schoolYear: active.schoolYear,
+              termName: active.termName || `Trimester ${active.termNumber}`,
+              termNumber: active.termNumber,
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Notice fetching academic terms for adjudication:", err);
+    }
+  };
 
   // Fetch Applications and Sections from Supabase
   const fetchData = async (silent: boolean = false) => {
@@ -212,8 +261,22 @@ export default function AdjudicationConsole() {
           sps_sport: fd.spsSport || fd.sps_sport,
         } : undefined;
 
+        const rawTerm = (
+          fd.semester ||
+          fd.targetSemester ||
+          fd.step1?.targetSemester ||
+          fd.term ||
+          app.semester ||
+          "Trimester 1"
+        ).trim();
+
+        const cleanSchoolYear = (app.school_year || fd.schoolYear || "2026-2027").replace("–", "-").trim();
+
         return {
           ...app,
+          school_year: cleanSchoolYear,
+          semester: rawTerm,
+          term_name: rawTerm,
           student,
           userAccount: linkedUser,
         };
@@ -231,15 +294,24 @@ export default function AdjudicationConsole() {
 
   useEffect(() => {
     // 1. Initial silent/active load
+    fetchAcademicTerms();
     fetchData();
 
-    // 2. Realtime subscription to enrollment_applications and sections
+    // 2. Realtime subscription to enrollment_applications, academic_terms, sections, and system_settings
     const appChannel = supabase
       .channel("admin-realtime-adjudication-apps")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "enrollment_applications" },
         () => {
+          fetchData(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "academic_terms" },
+        () => {
+          fetchAcademicTerms();
           fetchData(true);
         }
       )
@@ -299,8 +371,70 @@ export default function AdjudicationConsole() {
     };
   }, []);
 
-  // Filter Applications by Status, Grade, and Search Query
-  const gradeScopedApplications = applications.filter((app) => {
+  // Helper to test if application term matches target term
+  const matchesTerm = (appTermName: string, targetTermName: string): boolean => {
+    if (targetTermName === "ALL") return true;
+    if (!appTermName) return false;
+
+    const a = appTermName.trim().toLowerCase();
+    const t = targetTermName.trim().toLowerCase();
+    if (a === t) return true;
+
+    const extractNum = (str: string) => {
+      if (str.includes("1") || str.includes("first")) return 1;
+      if (str.includes("2") || str.includes("second")) return 2;
+      if (str.includes("3") || str.includes("third")) return 3;
+      return 0;
+    };
+
+    const numA = extractNum(a);
+    const numT = extractNum(t);
+
+    if (numA !== 0 && numT !== 0) {
+      return numA === numT;
+    }
+
+    return false;
+  };
+
+  // Determine effective School Year and Term/Trimester
+  const effectiveSY = selectedSY === "ACTIVE" ? (activeTerm?.schoolYear || "2026-2027") : selectedSY;
+  const effectiveTerm = selectedTerm === "ACTIVE" ? (activeTerm?.termName || "Trimester 1") : selectedTerm;
+
+  // Available School Years list
+  const availableSchoolYears = Array.from(
+    new Set([
+      ...(activeTerm?.schoolYear ? [activeTerm.schoolYear] : []),
+      ...academicTerms.map((t) => t.schoolYear).filter(Boolean),
+      ...applications.map((a) => (a.school_year || "").replace("–", "-").trim()).filter(Boolean),
+      "2026-2027",
+    ])
+  ).sort().reverse();
+
+  // 1. Filter Applications by Academic Period (School Year & Term/Trimester)
+  // By default, this filters strictly to the Active School Year and Term set by IT Support!
+  const termScopedApplications = applications.filter((app) => {
+    const appSY = (app.school_year || "").replace("–", "-").trim();
+    const appTerm = app.term_name || app.semester || "Trimester 1";
+
+    if (effectiveSY !== "ALL") {
+      const cleanTargetSY = effectiveSY.replace("–", "-").trim();
+      if (appSY !== cleanTargetSY) {
+        return false;
+      }
+    }
+
+    if (effectiveTerm !== "ALL") {
+      if (!matchesTerm(appTerm, effectiveTerm)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  // 2. Filter by Grade Level
+  const gradeScopedApplications = termScopedApplications.filter((app) => {
     if (gradeFilter === "ALL") return true;
     return String(app.target_grade_level) === String(gradeFilter);
   });
@@ -354,6 +488,36 @@ export default function AdjudicationConsole() {
         </div>
       </div>
 
+      {/* Active Academic Period Context Banner */}
+      <div className="p-3.5 bg-white border-2 border-[#002060] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span className="font-mono font-bold text-[#002060] text-xs uppercase tracking-wider">
+            [ ACTIVE ACADEMIC PERIOD QUEUE &bull; S.Y. {activeTerm?.schoolYear || "2026-2027"} &bull; {activeTerm?.termName || "Trimester 1"} ]
+          </span>
+          <span className="text-xs text-slate-600">
+            {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE" ? (
+              <span>Queue is automatically organized to display <strong>enrollees for this active term only</strong>.</span>
+            ) : (
+              <span>Custom filter applied: <strong>S.Y. {effectiveSY} &bull; {effectiveTerm}</strong>.</span>
+            )}
+          </span>
+        </div>
+
+        {(selectedSY !== "ACTIVE" || selectedTerm !== "ACTIVE") && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedSY("ACTIVE");
+              setSelectedTerm("ACTIVE");
+            }}
+            className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-mono font-bold text-[11px] uppercase transition-colors shrink-0 shadow-xs cursor-pointer"
+          >
+            [ Reset to Active Term ]
+          </button>
+        )}
+      </div>
+
       {/* Executive KPI Metric Cards (Real-Time Dynamic Recalculation) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Applications */}
@@ -365,7 +529,9 @@ export default function AdjudicationConsole() {
             {totalCount}
           </div>
           <span className="text-[10px] text-slate-500 block truncate">
-            {gradeFilter === "ALL" ? "All Grades • Submitted by learners" : `Grade ${gradeFilter} • Submitted by learners`}
+            {effectiveSY === "ALL" && effectiveTerm === "ALL"
+              ? (gradeFilter === "ALL" ? "All Terms • All Grades" : `All Terms • Grade ${gradeFilter}`)
+              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
           </span>
         </div>
 
@@ -381,7 +547,9 @@ export default function AdjudicationConsole() {
             {pendingCount}
           </div>
           <span className="text-[10px] text-amber-900 block truncate">
-            {gradeFilter === "ALL" ? "All Grades • Awaiting registrar decision" : `Grade ${gradeFilter} • Awaiting registrar decision`}
+            {effectiveSY === "ALL" && effectiveTerm === "ALL"
+              ? (gradeFilter === "ALL" ? "All Terms • Awaiting decision" : `Grade ${gradeFilter} • Awaiting decision`)
+              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
           </span>
         </div>
 
@@ -397,7 +565,9 @@ export default function AdjudicationConsole() {
             {approvedCount}
           </div>
           <span className="text-[10px] text-emerald-900 block truncate">
-            {gradeFilter === "ALL" ? "All Grades • Official enrollees" : `Grade ${gradeFilter} • Official enrollees`}
+            {effectiveSY === "ALL" && effectiveTerm === "ALL"
+              ? (gradeFilter === "ALL" ? "All Terms • Official enrollees" : `Grade ${gradeFilter} • Official enrollees`)
+              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
           </span>
         </div>
 
@@ -413,7 +583,9 @@ export default function AdjudicationConsole() {
             {revisionCount}
           </div>
           <span className="text-[10px] text-red-900 block truncate">
-            {gradeFilter === "ALL" ? "All Grades • Document action required" : `Grade ${gradeFilter} • Action required`}
+            {effectiveSY === "ALL" && effectiveTerm === "ALL"
+              ? (gradeFilter === "ALL" ? "All Terms • Action required" : `Grade ${gradeFilter} • Action required`)
+              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
           </span>
         </div>
       </div>
@@ -475,8 +647,49 @@ export default function AdjudicationConsole() {
             </button>
           </div>
 
-          {/* Search & Grade Filter Controls */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          {/* Academic Period, Grade & Search Filter Controls */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* School Year Selector */}
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
+              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">SY:</span>
+              <select
+                value={selectedSY}
+                onChange={(e) => setSelectedSY(e.target.value)}
+                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
+              >
+                <option value="ACTIVE">
+                  Active ({activeTerm?.schoolYear || "2026-2027"})
+                </option>
+                {availableSchoolYears
+                  .filter((sy) => sy !== (activeTerm?.schoolYear || "2026-2027"))
+                  .map((sy) => (
+                    <option key={sy} value={sy}>
+                      S.Y. {sy}
+                    </option>
+                  ))}
+                <option value="ALL">All School Years</option>
+              </select>
+            </div>
+
+            {/* Term / Trimester Selector */}
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
+              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Term:</span>
+              <select
+                value={selectedTerm}
+                onChange={(e) => setSelectedTerm(e.target.value)}
+                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
+              >
+                <option value="ACTIVE">
+                  Active ({activeTerm?.termName || "Trimester 1"})
+                </option>
+                <option value="Trimester 1">Trimester 1</option>
+                <option value="Trimester 2">Trimester 2</option>
+                <option value="Trimester 3">Trimester 3</option>
+                <option value="ALL">All Terms</option>
+              </select>
+            </div>
+
+            {/* Grade Selector */}
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
               <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Grade:</span>
               <select
@@ -494,7 +707,8 @@ export default function AdjudicationConsole() {
               </select>
             </div>
 
-            <div className="relative flex-1 sm:w-72">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[180px] sm:w-64">
               <input
                 type="text"
                 value={searchQuery}
@@ -548,13 +762,29 @@ export default function AdjudicationConsole() {
             <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
           </div>
         ) : filteredApplications.length === 0 ? (
-          <div className="p-12 text-center space-y-2">
+          <div className="p-12 text-center space-y-3">
             <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-              [ NO APPLICATIONS FOUND MATCHING CURRENT FILTER ]
+              [ NO APPLICATIONS FOUND FOR S.Y. {effectiveSY} &bull; {effectiveTerm} ]
             </span>
-            <p className="text-xs text-slate-600">
-              No enrollment applications match the selected status or search term.
+            <p className="text-xs text-slate-600 max-w-md mx-auto">
+              {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE"
+                ? `No student enrollment applications have been submitted yet for the current active period (S.Y. ${effectiveSY} • ${effectiveTerm}). As students enroll online, they will appear in this queue automatically.`
+                : `No enrollment applications match the selected academic period (S.Y. ${effectiveSY} • ${effectiveTerm}), grade level, or search query.`}
             </p>
+            {(selectedSY !== "ALL" || selectedTerm !== "ALL") && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSY("ALL");
+                    setSelectedTerm("ALL");
+                  }}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 uppercase tracking-wider transition-colors cursor-pointer"
+                >
+                  [ View Applications Across All Terms ]
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <table className="w-full text-left border-collapse text-xs font-sans">
@@ -607,8 +837,11 @@ export default function AdjudicationConsole() {
                           ? `JHS (SPS - ${st?.sps_sport || "Sports"})`
                           : "JHS Regular"}
                       </span>
+                      <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block mt-1">
+                        S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
+                      </span>
                       {st?.current_section_id && (
-                        <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block mt-1">
+                        <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block mt-1 ml-1">
                           {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
                         </span>
                       )}

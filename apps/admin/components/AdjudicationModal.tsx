@@ -20,6 +20,8 @@ export interface ApplicationDetail {
   admin_feedback?: string;
   submission_date: string;
   created_at: string;
+  semester?: string;
+  term_name?: string;
   // Joined student data
   student?: {
     id: string;
@@ -622,6 +624,12 @@ export default function AdjudicationModal({
                   <span className="text-[10px] font-bold text-[#002060] uppercase block border-b pb-1">
                     Target Academic Program
                   </span>
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">Academic Period:</span>
+                    <strong className="text-slate-900 font-mono">
+                      S.Y. {application.school_year || "2026-2027"} &bull; {application.term_name || application.semester || "Trimester 1"}
+                    </strong>
+                  </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Target Grade Level:</span>
                     <strong className="text-slate-900">Grade {application.target_grade_level}</strong>

@@ -10,7 +10,7 @@ import EnrollmentStepper from "@/components/forms/enrollment/EnrollmentStepper";
 export default function StudentEnrollPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
-  const { isEnrollmentOpen, schoolYear, closedMessage, isLoading: isControlLoading } = useEnrollmentControl();
+  const { isEnrollmentOpen, schoolYear, semester, closedMessage, isLoading: isControlLoading } = useEnrollmentControl();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -150,16 +150,17 @@ export default function StudentEnrollPage() {
             [ Student Home ]
           </Link>
           <span>/</span>
-          <span className="text-slate-800 font-medium">Online Enrollment Form (S.Y. {schoolYear})</span>
+          <span className="text-slate-800 font-medium">Online Enrollment Form (S.Y. {schoolYear} &bull; {semester})</span>
         </div>
         <div className="font-mono text-[11px] text-slate-500">
-          DEPED FORM &bull; S.Y. {schoolYear}
+          DEPED FORM &bull; S.Y. {schoolYear} &bull; {semester}
         </div>
       </div>
 
       {/* Main Enrollment Stepper */}
       <EnrollmentStepper
         schoolYear={schoolYear}
+        semester={semester}
         isEnrollmentOpen={isEnrollmentOpen}
         closedMessage={closedMessage}
       />

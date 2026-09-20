@@ -337,9 +337,10 @@ export default function Step4CurriculumModality({
               <select
                 value={currentSemester}
                 onChange={(e) => {
-                  const val = e.target.value as "1st Semester" | "2nd Semester";
+                  const val = e.target.value;
                   onChange({
                     targetSemester: val,
+                    semester: val,
                     step1: { ...data.step1, targetSemester: val },
                   });
                   if (errors.targetSemester) {
@@ -354,8 +355,15 @@ export default function Step4CurriculumModality({
                   errors.targetSemester ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               >
+                <option value="Trimester 1">Trimester 1 (August - November)</option>
+                <option value="Trimester 2">Trimester 2 (November - March)</option>
+                <option value="Trimester 3">Trimester 3 (March - June)</option>
                 <option value="1st Semester">1st Semester (August - December)</option>
                 <option value="2nd Semester">2nd Semester (January - May)</option>
+                {currentSemester &&
+                  !["Trimester 1", "Trimester 2", "Trimester 3", "1st Semester", "2nd Semester"].includes(currentSemester) && (
+                    <option value={currentSemester}>{currentSemester}</option>
+                  )}
               </select>
               {errors.targetSemester && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetSemester}</p>

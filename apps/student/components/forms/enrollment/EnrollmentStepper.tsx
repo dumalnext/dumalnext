@@ -76,7 +76,7 @@ export interface FullEnrollmentFormData {
   hasPwdId: boolean;
   jhsProgram?: "Regular" | "SPS";
   spsSport?: string;
-  targetSemester: "1st Semester" | "2nd Semester" | "";
+  targetSemester: string;
   targetTrack: string;
   targetStrand: string;
   selectedElectives: string[];
@@ -91,16 +91,18 @@ export interface FullEnrollmentFormData {
   }[];
   dataPrivacyAccepted: boolean;
   schoolYear?: string;
+  semester?: string;
 }
 
 const initialFormData: FullEnrollmentFormData = {
-  schoolYear: "2026–2027",
+  schoolYear: "2026-2027",
+  semester: "Trimester 1",
   step1: {
     isGraded: true,
     applicantType: "",
     targetGradeLevel: "",
     jhsProgram: "Regular",
-    targetSemester: "1st Semester",
+    targetSemester: "Trimester 1",
     targetTrack: "Academic Track",
     targetStrand: "",
     lastGradeCompleted: "",
@@ -178,42 +180,69 @@ const STEP_LABELS = [
 ];
 
 export default function EnrollmentStepper({
-  schoolYear = "2026–2027",
+  schoolYear = "2026-2027",
+  semester = "Trimester 1",
   isEnrollmentOpen = true,
   closedMessage,
 }: {
   schoolYear?: string;
+  semester?: string;
   isEnrollmentOpen?: boolean;
   closedMessage?: string;
 }) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [formData, setFormData] = useState<FullEnrollmentFormData>(() => ({
-    ...initialFormData,
-    schoolYear,
-  }));
+  const [formData, setFormData] = useState<FullEnrollmentFormData>(() => {
+    const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+    const activeSem = semester || "Trimester 1";
+    return {
+      ...initialFormData,
+      schoolYear: cleanSY,
+      semester: activeSem,
+      targetSemester: activeSem,
+      step1: {
+        ...initialFormData.step1,
+        targetSemester: activeSem,
+      },
+    };
+  });
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [existingApp, setExistingApp] = useState<any | null>(null);
   const [isCheckingApp, setIsCheckingApp] = useState<boolean>(false);
 
-  // Auto pre-fill basic account names if student is logged in and sync schoolYear
+  // Auto pre-fill basic account names if student is logged in and sync schoolYear and semester
   useEffect(() => {
+    const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+    const activeSem = semester || "Trimester 1";
+
     if (user) {
       setFormData((prev) => ({
         ...prev,
-        schoolYear: schoolYear || prev.schoolYear || "2026–2027",
+        schoolYear: cleanSY || prev.schoolYear || "2026-2027",
+        semester: activeSem || prev.semester || "Trimester 1",
+        targetSemester: activeSem || prev.targetSemester || "Trimester 1",
+        step1: {
+          ...prev.step1,
+          targetSemester: activeSem || prev.step1?.targetSemester || "Trimester 1",
+        },
         lastName: prev.lastName || user.lastName,
         firstName: prev.firstName || user.firstName,
         middleName: prev.middleName || user.middleName || "",
         lrn: prev.lrn || (user.lrn && /^\d{12}$/.test(user.lrn) ? user.lrn : ""),
       }));
-    } else if (schoolYear) {
+    } else if (schoolYear || semester) {
       setFormData((prev) => ({
         ...prev,
-        schoolYear,
+        schoolYear: cleanSY || prev.schoolYear || "2026-2027",
+        semester: activeSem || prev.semester || "Trimester 1",
+        targetSemester: activeSem || prev.targetSemester || "Trimester 1",
+        step1: {
+          ...prev.step1,
+          targetSemester: activeSem || prev.step1?.targetSemester || "Trimester 1",
+        },
       }));
     }
-  }, [user, schoolYear]);
+  }, [user, schoolYear, semester]);
 
   // Check if student already has an active enrollment application in Supabase
   useEffect(() => {
@@ -556,7 +585,7 @@ export default function EnrollmentStepper({
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#002060]">
-              [ Dumalneg NHS Online Enrollment ]
+              [ Dumalneg NHS Online Enrollment &bull; S.Y. {formData.schoolYear || schoolYear} &bull; {formData.semester || semester} ]
             </span>
             <h1 className="text-lg font-bold text-slate-900">
               Basic Education Enrollment Form

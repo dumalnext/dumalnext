@@ -8,7 +8,7 @@ export interface Step1Data {
   applicantType: ApplicantType | "";
   targetGradeLevel: number | "";
   jhsProgram?: "Regular" | "SPS";
-  targetSemester?: "1st Semester" | "2nd Semester" | "";
+  targetSemester?: string;
   targetTrack?: string;
   targetStrand?: string;
   lastGradeCompleted?: number | "";
@@ -70,7 +70,7 @@ export default function Step1ApplicantType({
         lastGradeCompleted: 6,
         targetTrack: "",
         targetStrand: "",
-        targetSemester: "",
+        targetSemester: data.targetSemester || "Trimester 1",
         lastSchoolAttended: "Dumalneg Elementary School",
         lastSchoolId: "100050",
         lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
@@ -83,7 +83,7 @@ export default function Step1ApplicantType({
         lastGradeCompleted: 10,
         targetTrack: data.targetTrack || "Academic Track",
         targetStrand: data.targetStrand || "STEM",
-        targetSemester: data.targetSemester || "1st Semester",
+        targetSemester: data.targetSemester || "Trimester 1",
         lastSchoolAttended: "Dumalneg National High School",
         lastSchoolId: "300017",
         lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
@@ -99,7 +99,7 @@ export default function Step1ApplicantType({
         lastGradeCompleted: currentTarget === 7 ? 6 : currentTarget - 1,
         targetTrack: isSHS ? (data.targetTrack || "Academic Track") : "",
         targetStrand: isSHS ? (data.targetStrand || "STEM") : "",
-        targetSemester: isSHS ? (data.targetSemester || "1st Semester") : "",
+        targetSemester: data.targetSemester || "Trimester 1",
         lastSchoolAttended: data.lastSchoolAttended || (isG7 ? "Dumalneg Elementary School" : "Dumalneg National High School"),
         lastSchoolId: data.lastSchoolId || (isG7 ? "100050" : "300017"),
         lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",

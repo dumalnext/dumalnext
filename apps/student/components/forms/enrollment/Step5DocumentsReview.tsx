@@ -334,7 +334,13 @@ export default function Step5DocumentsReview({
               target_strand: data.targetStrand || null,
               status: "Pending", // Reset back to Pending for registrar evaluation
               admin_feedback: null, // Clear revision remarks
-              selected_electives: [data],
+              selected_electives: [{
+                ...data,
+                semester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                term: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                targetSemester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                schoolYear: (data.schoolYear || "2026-2027").replace("–", "-"),
+              }],
               submitted_documents: Object.entries(docs)
                 .filter(([_, v]) => v !== null)
                 .map(([k, v]) => ({
@@ -439,7 +445,13 @@ export default function Step5DocumentsReview({
                 target_grade_level: data.step1.targetGradeLevel,
                 target_strand: data.targetStrand || null,
                 status: "Pending",
-                selected_electives: [data],
+                selected_electives: [{
+                  ...data,
+                  semester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                  term: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                  targetSemester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                  schoolYear: (data.schoolYear || "2026-2027").replace("–", "-"),
+                }],
                 submitted_documents: Object.entries(docs)
                   .filter(([_, v]) => v !== null)
                   .map(([k, v]) => ({
