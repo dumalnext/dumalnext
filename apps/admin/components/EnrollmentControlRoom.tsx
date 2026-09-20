@@ -32,21 +32,42 @@ export default function EnrollmentControlRoom() {
   const loadSettings = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/enrollment-control?_t=${Date.now()}`, {
-        cache: "no-store",
-        headers: { "Pragma": "no-cache" },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const [ctrlRes, termsRes] = await Promise.all([
+        fetch(`/api/enrollment-control?_t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { "Pragma": "no-cache" },
+        }),
+        fetch(`/api/it-support/terms?_t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { "Pragma": "no-cache" },
+        }).catch(() => null),
+      ]);
+
+      let itActiveYear = "";
+      let itActiveTermName = "";
+
+      if (termsRes && termsRes.ok) {
+        try {
+          const termsData = await termsRes.json();
+          const active = termsData.terms?.find((t: any) => t.isActive);
+          if (active) {
+            itActiveYear = active.schoolYear;
+            itActiveTermName = active.termName;
+          }
+        } catch {}
+      }
+
+      if (ctrlRes.ok) {
+        const data = await ctrlRes.json();
         setSettings({
           isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
-          schoolYear: data.schoolYear || "2026–2027",
-          semester: data.semester || "1st Semester",
+          schoolYear: itActiveYear || data.schoolYear || "2026-2027",
+          semester: itActiveTermName || data.semester || "Trimester 1",
           enrollmentStartDate: data.enrollmentStartDate || "",
           enrollmentEndDate: data.enrollmentEndDate || "",
           closedMessage:
             data.closedMessage ||
-            "DepEd Official Advisory: Dumalneg National High School Online Enrollment for School Year 2026–2027 is currently closed at this time. Please await further announcements from the Registrar's Office.",
+            "DepEd Official Advisory: Dumalneg National High School Online Enrollment for School Year 2026-2027 is currently closed at this time. Please await further announcements from the Registrar's Office.",
           updatedAt: data.updatedAt,
           updatedBy: data.updatedBy,
         });
@@ -297,65 +318,40 @@ export default function EnrollmentControlRoom() {
       <div className="bg-white border-2 border-slate-300 p-5 sm:p-6 space-y-6 shadow-xs">
         <div className="border-b border-slate-200 pb-2">
           <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-            [ DepEd Academic Year (S.Y.) &amp; Term Parameters ]
+            [ DepEd Academic Year (S.Y.) &amp; Term Parameters &bull; Synchronized from IT Support ]
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Active School Year */}
+          {/* Active School Year (Synced from IT Support) */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-900 uppercase block">
               Official DepEd School Year (S.Y.):
-              <span className="text-red-700 ml-1">*</span>
             </label>
-            <input
-              type="text"
-              value={settings.schoolYear}
-              onChange={(e) => setSettings({ ...settings, schoolYear: e.target.value })}
-              placeholder="e.g. 2026–2027"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-mono font-bold text-[#002060] focus:border-[#002060] outline-none"
-            />
-            <span className="text-[11px] text-slate-500 block leading-normal">
-              This School Year will automatically lock across all student enrollment forms, official registration slips, and DepEd PDF credentials.
-            </span>
-
-            {/* Quick S.Y. Presets */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Presets:</span>
-              {["2026–2027", "2025–2026", "2027–2028"].map((sy) => (
-                <button
-                  key={sy}
-                  type="button"
-                  onClick={() => setSettings({ ...settings, schoolYear: sy })}
-                  className={`px-2 py-0.5 text-[10px] font-mono font-bold border transition-colors cursor-pointer ${
-                    settings.schoolYear === sy
-                      ? "bg-[#002060] text-white border-[#002060]"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-300"
-                  }`}
-                >
-                  {sy}
-                </button>
-              ))}
+            <div className="p-3 bg-slate-100 border-2 border-slate-300 font-mono font-black text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+              <span>{settings.schoolYear}</span>
+              <span className="px-2 py-0.5 bg-green-700 text-white font-mono font-bold text-[10px] uppercase tracking-wider">
+                [ SYNCED FROM IT SUPPORT ]
+              </span>
             </div>
+            <span className="text-[11px] text-slate-500 block leading-normal">
+              This School Year is automatically dictated by IT Support&apos;s active academic calendar. Administrators cannot manually modify this to prevent institutional desynchronization.
+            </span>
           </div>
 
-          {/* Active Semester */}
+          {/* Active Academic Term (Synced from IT Support) */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-900 uppercase block">
-              Academic Semester / Term:
-              <span className="text-red-700 ml-1">*</span>
+              Active Trimester / Term:
             </label>
-            <select
-              value={settings.semester}
-              onChange={(e) => setSettings({ ...settings, semester: e.target.value })}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-bold text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
-            >
-              <option value="1st Semester">1st Semester (SHS) / Full Year (JHS)</option>
-              <option value="2nd Semester">2nd Semester (SHS Only)</option>
-              <option value="Full Academic Year">Full Academic Year (JHS Regular)</option>
-            </select>
+            <div className="p-3 bg-slate-100 border-2 border-slate-300 font-mono font-black text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+              <span>{settings.semester}</span>
+              <span className="px-2 py-0.5 bg-[#002060] text-white font-mono font-bold text-[10px] uppercase tracking-wider">
+                [ ACTIVE TRIMESTER ]
+              </span>
+            </div>
             <span className="text-[11px] text-slate-500 block leading-normal">
-              Senior High School enrolls by semester; Junior High School operates on a full academic year curriculum.
+              Official academic term currently active at Dumalneg National High School, established in the IT Support Console.
             </span>
           </div>
         </div>

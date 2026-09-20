@@ -47,9 +47,29 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET() {
+  const supabase = getSupabaseClient();
+  let activeTerm: { schoolYear: string; termName: string } | null = null;
+
+  if (supabase) {
+    try {
+      const { data: termData } = await supabase
+        .from("academic_terms")
+        .select("schoolYear, termName, isActive")
+        .eq("isActive", true)
+        .maybeSingle();
+      if (termData?.schoolYear) {
+        activeTerm = {
+          schoolYear: termData.schoolYear,
+          termName: termData.termName,
+        };
+      }
+    } catch (tErr) {
+      console.warn("Could not check active academic term in student:", tErr);
+    }
+  }
+
   // 1. Try Supabase system_settings first (Production / Vercel Serverless)
   try {
-    const supabase = getSupabaseClient();
     if (supabase) {
       const { data, error } = await supabase
         .from("system_settings")
@@ -58,7 +78,11 @@ export async function GET() {
         .maybeSingle();
 
       if (data?.value && !error) {
-        return NextResponse.json(data.value, {
+        const val = {
+          ...data.value,
+          ...(activeTerm ? { schoolYear: activeTerm.schoolYear, semester: activeTerm.termName } : {}),
+        };
+        return NextResponse.json(val, {
           headers: NO_CACHE_HEADERS,
         });
       }
@@ -73,7 +97,11 @@ export async function GET() {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, "utf-8");
       const data = JSON.parse(content);
-      return NextResponse.json(data, {
+      const val = {
+        ...data,
+        ...(activeTerm ? { schoolYear: activeTerm.schoolYear, semester: activeTerm.termName } : {}),
+      };
+      return NextResponse.json(val, {
         headers: NO_CACHE_HEADERS,
       });
     }
@@ -81,7 +109,10 @@ export async function GET() {
     console.error("Error reading student enrollment control config:", err);
   }
 
-  return NextResponse.json(defaultSettings, {
-    headers: NO_CACHE_HEADERS,
-  });
+  return NextResponse.json(
+    activeTerm
+      ? { ...defaultSettings, schoolYear: activeTerm.schoolYear, semester: activeTerm.termName }
+      : defaultSettings,
+    { headers: NO_CACHE_HEADERS }
+  );
 }
