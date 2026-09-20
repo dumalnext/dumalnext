@@ -21,6 +21,7 @@ export interface SectionDetail {
   adviser_name?: string;
   capacity: number;
   enrolledCount: number;
+  totalRosterCount?: number;
   school_year?: string;
 }
 
@@ -36,6 +37,49 @@ export interface EnrolledStudent {
   current_section_id?: string | null;
   contact_number?: string | null;
   barangay?: string | null;
+  isEnrolledInActiveTerm?: boolean;
+}
+
+// Helpers for multi-semester enrollment automation
+function extractTermNumber(termStr?: string | null): number {
+  if (!termStr) return 0;
+  const lower = String(termStr).toLowerCase();
+  if (lower.includes("1") || lower.includes("first")) return 1;
+  if (lower.includes("2") || lower.includes("second")) return 2;
+  if (lower.includes("3") || lower.includes("third")) return 3;
+  return 0;
+}
+
+function getApplicationTermNumber(app: any): number {
+  const fd = app.selected_electives?.[0] || {};
+  const rawTerm = (
+    fd.term_name ||
+    fd.termName ||
+    fd.semester ||
+    fd.term ||
+    fd.targetSemester ||
+    app.term_name ||
+    app.semester ||
+    ""
+  );
+  const num = extractTermNumber(rawTerm);
+  return num !== 0 ? num : 1;
+}
+
+function isApplicationInActiveTerm(
+  app: any,
+  activeSchoolYear: string,
+  activeTermNumber: number
+): boolean {
+  const cleanAppSY = (app.school_year || "").replace("–", "-").trim();
+  const cleanActiveSY = (activeSchoolYear || "").replace("–", "-").trim();
+
+  if (cleanActiveSY && cleanAppSY && cleanActiveSY !== cleanAppSY) {
+    return false;
+  }
+
+  const appTermNum = getApplicationTermNumber(app);
+  return appTermNum === activeTermNumber;
 }
 
 export interface RegisteredTeacher {
@@ -174,6 +218,19 @@ export default function SectionQuotaConsole() {
   // Status message for actions (add/edit/delete)
   const [statusNotice, setStatusNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Active academic term tracking state
+  const [activeTerm, setActiveTerm] = useState<{
+    schoolYear: string;
+    termNumber: number;
+    termName: string;
+  }>({
+    schoolYear: "2026-2027",
+    termNumber: 1,
+    termName: "Trimester 1",
+  });
+  const [removingStudentId, setRemovingStudentId] = useState<string | null>(null);
+  const [isRemovingStudent, setIsRemovingStudent] = useState<boolean>(false);
+
   // Fetch all sections
   const fetchSections = async (silent: boolean = false) => {
     try {
@@ -184,6 +241,9 @@ export default function SectionQuotaConsole() {
         const data = await res.json();
         if (data.success && Array.isArray(data.sections)) {
           setSections(data.sections);
+          if (data.activeTerm) {
+            setActiveTerm(data.activeTerm);
+          }
           return;
         }
       }
@@ -227,19 +287,51 @@ export default function SectionQuotaConsole() {
         }
       });
 
+      // 3. Fallback term tracking & enrollment calculations
+      const { data: termsData } = await supabase
+        .from("academic_terms")
+        .select("schoolYear, termNumber, termName, isActive")
+        .order("schoolYear", { ascending: false });
+
+      const active = (termsData || []).find((t: any) => t.isActive);
+      const activeSY = (active?.schoolYear || "2026-2027").replace("–", "-").trim();
+      const activeNum = Number(active?.termNumber) || 1;
+      const activeName = active?.termName || `Trimester ${activeNum}`;
+      setActiveTerm({ schoolYear: activeSY, termNumber: activeNum, termName: activeName });
+
+      const { data: appsData } = await supabase
+        .from("enrollment_applications")
+        .select("id, student_id, school_year, status, selected_electives");
+
+      const enrolledInActiveTermSet = new Set<string>();
+      (appsData || []).forEach((app: any) => {
+        if (app.status === "Approved" && app.student_id) {
+          if (isApplicationInActiveTerm(app, activeSY, activeNum)) {
+            enrolledInActiveTermSet.add(app.student_id);
+          }
+        }
+      });
+
       const { data: studentSecData } = await supabase
         .from("students")
-        .select("current_section_id")
+        .select("id, current_section_id")
         .not("current_section_id", "is", null);
 
       const countMap = new Map<string, number>();
+      const totalRosterMap = new Map<string, number>();
       if (studentSecData) {
         studentSecData.forEach((st: any) => {
           if (st.current_section_id) {
-            countMap.set(
+            totalRosterMap.set(
               st.current_section_id,
-              (countMap.get(st.current_section_id) || 0) + 1
+              (totalRosterMap.get(st.current_section_id) || 0) + 1
             );
+            if (enrolledInActiveTermSet.has(st.id)) {
+              countMap.set(
+                st.current_section_id,
+                (countMap.get(st.current_section_id) || 0) + 1
+              );
+            }
           }
         });
       }
@@ -260,7 +352,9 @@ export default function SectionQuotaConsole() {
           room: s.room || undefined,
           adviser_name: s.adviser_name || undefined,
           capacity,
-          enrolledCount: countMap.get(s.id) || s.enrolled_count || 0,
+          enrolledCount: countMap.get(s.id) || 0,
+          totalRosterCount: totalRosterMap.get(s.id) || 0,
+          school_year: s.school_year || activeSY,
         };
       });
 
@@ -278,6 +372,8 @@ export default function SectionQuotaConsole() {
     setIsLoadingRoster(true);
     setReassignMessage(null);
     setRosterSearch("");
+    setRemovingStudentId(null);
+    setReassigningStudentId(null);
 
     try {
       // 1. Try API route first
@@ -286,12 +382,38 @@ export default function SectionQuotaConsole() {
         const data = await res.json();
         if (data.success && data.section?.students) {
           setRosterStudents(data.section.students);
+          if (data.activeTerm) {
+            setActiveTerm(data.activeTerm);
+          }
           setIsLoadingRoster(false);
           return;
         }
       }
 
       // 2. Fallback directly to Supabase client
+      const { data: termsData } = await supabase
+        .from("academic_terms")
+        .select("schoolYear, termNumber, termName, isActive")
+        .order("schoolYear", { ascending: false });
+
+      const active = (termsData || []).find((t: any) => t.isActive);
+      const activeSY = (active?.schoolYear || activeTerm.schoolYear || "2026-2027").replace("–", "-").trim();
+      const activeNum = Number(active?.termNumber) || activeTerm.termNumber || 1;
+      const activeName = active?.termName || activeTerm.termName || `Trimester ${activeNum}`;
+
+      const { data: appsData } = await supabase
+        .from("enrollment_applications")
+        .select("id, student_id, school_year, status, selected_electives");
+
+      const enrolledInActiveTermSet = new Set<string>();
+      (appsData || []).forEach((app: any) => {
+        if (app.status === "Approved" && app.student_id) {
+          if (isApplicationInActiveTerm(app, activeSY, activeNum)) {
+            enrolledInActiveTermSet.add(app.student_id);
+          }
+        }
+      });
+
       const { data: students, error } = await supabase
         .from("students")
         .select("id, student_id, first_name, middle_name, last_name, gender, grade_level, strand, current_section_id, contact_number, barangay")
@@ -302,7 +424,12 @@ export default function SectionQuotaConsole() {
         console.warn("Notice querying section roster:", error.message);
       }
 
-      setRosterStudents(students || []);
+      const mapped = (students || []).map((st: any) => ({
+        ...st,
+        isEnrolledInActiveTerm: enrolledInActiveTermSet.has(st.id),
+      }));
+
+      setRosterStudents(mapped);
     } catch (err) {
       console.error("Error loading roster:", err);
       setRosterStudents([]);
@@ -425,6 +552,11 @@ export default function SectionQuotaConsole() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "enrollment_applications" },
+        () => fetchSections(true)
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "academic_terms" },
         () => fetchSections(true)
       )
       .subscribe();
@@ -734,6 +866,59 @@ export default function SectionQuotaConsole() {
     }
   };
 
+  // Handle Remove Student from Section Roster (for learners not enrolled in active semester)
+  const handleRemoveStudent = async (studentId: string, studentName: string) => {
+    setIsRemovingStudent(true);
+    setReassignMessage(null);
+
+    try {
+      // 1. Direct Supabase update
+      const { error } = await supabase
+        .from("students")
+        .update({
+          current_section_id: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", studentId);
+
+      if (error) throw error;
+
+      // 2. Also call API route to ensure server cache sync
+      try {
+        await fetch("/api/sections", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ removeStudentId: studentId }),
+        });
+      } catch {}
+
+      setReassignMessage({
+        type: "success",
+        text: `Learner [ ${studentName} ] was removed from this section roster successfully.`,
+      });
+
+      // Refresh current roster and section stats
+      if (selectedRosterSection) {
+        await fetchRoster(selectedRosterSection);
+      }
+      await fetchSections(true);
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
+      }
+
+      setRemovingStudentId(null);
+    } catch (err: any) {
+      setReassignMessage({
+        type: "error",
+        text: `Remove Error: ${err?.message || "Failed to remove student from section roster."}`,
+      });
+    } finally {
+      setIsRemovingStudent(false);
+    }
+  };
+
   // Filter roster students by search query
   const filteredRoster = rosterStudents.filter((st) => {
     if (!rosterSearch.trim()) return true;
@@ -803,6 +988,25 @@ export default function SectionQuotaConsole() {
         </div>
       )}
 
+      {/* Active Academic Term Banner */}
+      <div className="bg-[#002060]/5 border border-[#002060]/20 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase tracking-wider">
+            Active Academic Term
+          </span>
+          <span className="text-xs font-bold text-[#002060]">
+            S.Y. {activeTerm.schoolYear} &bull; {activeTerm.termName}
+          </span>
+        </div>
+        <div className="text-[11px] font-mono text-slate-700">
+          {activeTerm.termNumber === 1 ? (
+            <span>Semester 1: Section counts begin at 0. Assign learners as they enroll.</span>
+          ) : (
+            <span>Semester {activeTerm.termNumber}: Section rosters fixed from Sem 1. Active term enrollment automatically tracked.</span>
+          )}
+        </div>
+      </div>
+
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 bg-white border-2 border-slate-300 shadow-xs">
@@ -831,7 +1035,7 @@ export default function SectionQuotaConsole() {
 
         <div className="p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
-            Officially Enrolled
+            Officially Enrolled ({activeTerm.termName})
           </span>
           <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
             {totalEnrolled}
@@ -956,7 +1160,7 @@ export default function SectionQuotaConsole() {
                   {/* Progress & Capacity */}
                   <div className="space-y-1.5 mt-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-600">Enrolled Capacity:</span>
+                      <span className="text-slate-600">Enrolled ({activeTerm.termName}):</span>
                       <strong className="font-mono text-slate-900">
                         {count} / {sec.capacity} students ({pct}%)
                       </strong>
@@ -993,7 +1197,7 @@ export default function SectionQuotaConsole() {
                     onClick={() => fetchRoster(sec)}
                     className="w-full py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors shadow-2xs cursor-pointer"
                   >
-                    [ View Class Roster ({count} {count === 1 ? "Student" : "Students"}) ]
+                    [ View Class Roster ({count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} in Roster` : ""}) ]
                   </button>
 
                   <div className="flex items-center gap-2">
@@ -1670,19 +1874,22 @@ export default function SectionQuotaConsole() {
             {/* Modal Header (Screen Only) */}
             <div className="no-print print:hidden bg-[#002060] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
                     [ OFFICIAL CLASS ROSTER ]
                   </span>
                   <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold">
                     GRADE {selectedRosterSection.grade_level} {selectedRosterSection.strand ? `• ${selectedRosterSection.strand}` : ""}
                   </span>
+                  <span className="text-[10px] font-mono bg-emerald-950 border border-emerald-400/50 text-emerald-200 px-2 py-0.5 font-bold uppercase">
+                    {activeTerm.termName} &bull; S.Y. {activeTerm.schoolYear}
+                  </span>
                 </div>
                 <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-white mt-1">
                   {selectedRosterSection.section_name}
                 </h2>
                 <p className="text-xs text-blue-200 mt-0.5">
-                  Capacity: {rosterStudents.length} / {selectedRosterSection.capacity} Students Enrolled &bull; {selectedRosterSection.room ? `Room: ${selectedRosterSection.room}` : "Main Building"} &bull; Adviser: {selectedRosterSection.adviser_name || "Unassigned"}
+                  Capacity: {rosterStudents.filter((s) => s.isEnrolledInActiveTerm).length} / {selectedRosterSection.capacity} Students Enrolled &bull; {selectedRosterSection.room ? `Room: ${selectedRosterSection.room}` : "Main Building"} &bull; Adviser: {selectedRosterSection.adviser_name || "Unassigned"}
                 </p>
               </div>
 
@@ -1747,8 +1954,22 @@ export default function SectionQuotaConsole() {
                   )}
                 </div>
 
-                <div className="text-xs text-slate-600 font-mono">
-                  Enrolled Count: <strong>{rosterStudents.length}</strong> / <strong>{selectedRosterSection.capacity}</strong> &bull; Available Slots: <strong>{Math.max(0, selectedRosterSection.capacity - rosterStudents.length)}</strong>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 font-mono">
+                  <span>
+                    Enrolled Count: <strong>{rosterStudents.filter((s) => s.isEnrolledInActiveTerm).length}</strong> / <strong>{selectedRosterSection.capacity}</strong>
+                  </span>
+                  <span>&bull;</span>
+                  <span>
+                    Available Slots: <strong>{Math.max(0, selectedRosterSection.capacity - rosterStudents.filter((s) => s.isEnrolledInActiveTerm).length)}</strong>
+                  </span>
+                  {rosterStudents.length > rosterStudents.filter((s) => s.isEnrolledInActiveTerm).length && (
+                    <>
+                      <span>&bull;</span>
+                      <span className="text-amber-800 font-bold">
+                        Un-enrolled: <strong>{rosterStudents.length - rosterStudents.filter((s) => s.isEnrolledInActiveTerm).length}</strong>
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -1787,6 +2008,8 @@ export default function SectionQuotaConsole() {
                       {filteredRoster.map((st, index) => {
                         const fullName = `${st.last_name}, ${st.first_name} ${st.middle_name || ""}`.trim();
                         const isReassigningThis = reassigningStudentId === st.id;
+                        const isRemovingThis = removingStudentId === st.id;
+                        const isEnrolled = !!st.isEnrolledInActiveTerm;
 
                         // Other eligible sections for this student's grade level
                         const eligibleTargetSections = sections.filter(
@@ -1808,7 +2031,18 @@ export default function SectionQuotaConsole() {
                               )}
                             </td>
                             <td className="p-3 font-bold text-slate-900 uppercase">
-                              {fullName}
+                              <div className="flex items-center gap-2">
+                                <span>{fullName}</span>
+                                {isEnrolled ? (
+                                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase">
+                                    Enrolled
+                                  </span>
+                                ) : (
+                                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 uppercase">
+                                    Not Yet Enrolled
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="p-3">
                               {st.gender || "—"}
@@ -1820,51 +2054,88 @@ export default function SectionQuotaConsole() {
                               )}
                             </td>
                             <td className="p-3 text-right no-print print:hidden">
-                              {isReassigningThis ? (
-                                <div className="inline-flex items-center gap-1.5">
-                                  <select
-                                    value={reassignTargetSectionId}
-                                    onChange={(e) => setReassignTargetSectionId(e.target.value)}
-                                    className="p-1 bg-white border border-slate-400 text-xs font-bold text-[#002060] outline-none"
-                                  >
-                                    <option value="">-- Choose Section --</option>
-                                    {eligibleTargetSections.map((ts) => (
-                                      <option key={ts.id} value={ts.id}>
-                                        {ts.section_name} ({ts.enrolledCount}/{ts.capacity})
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleReassignStudent(st.id, reassignTargetSectionId)}
-                                    disabled={!reassignTargetSectionId}
-                                    className="px-2 py-1 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase disabled:opacity-50 cursor-pointer"
-                                  >
-                                    Move
-                                  </button>
+                              {isEnrolled ? (
+                                isReassigningThis ? (
+                                  <div className="inline-flex items-center gap-1.5">
+                                    <select
+                                      value={reassignTargetSectionId}
+                                      onChange={(e) => setReassignTargetSectionId(e.target.value)}
+                                      className="p-1 bg-white border border-slate-400 text-xs font-bold text-[#002060] outline-none"
+                                    >
+                                      <option value="">-- Choose Section --</option>
+                                      {eligibleTargetSections.map((ts) => (
+                                        <option key={ts.id} value={ts.id}>
+                                          {ts.section_name} ({ts.enrolledCount}/{ts.capacity})
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleReassignStudent(st.id, reassignTargetSectionId)}
+                                      disabled={!reassignTargetSectionId}
+                                      className="px-2 py-1 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase disabled:opacity-50 cursor-pointer"
+                                    >
+                                      Move
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setReassigningStudentId(null);
+                                        setReassignTargetSectionId("");
+                                      }}
+                                      className="px-2 py-1 bg-slate-200 text-slate-700 text-[11px] font-bold uppercase cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      setReassigningStudentId(null);
+                                      setReassigningStudentId(st.id);
                                       setReassignTargetSectionId("");
+                                      setRemovingStudentId(null);
                                     }}
-                                    className="px-2 py-1 bg-slate-200 text-slate-700 text-[11px] font-bold uppercase cursor-pointer"
+                                    className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                                    title="Transfer student to another section"
                                   >
-                                    Cancel
+                                    [ Reassign ]
                                   </button>
-                                </div>
+                                )
                               ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setReassigningStudentId(st.id);
-                                    setReassignTargetSectionId("");
-                                  }}
-                                  className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                                  title="Transfer student to another section"
-                                >
-                                  [ Reassign ]
-                                </button>
+                                isRemovingThis ? (
+                                  <div className="inline-flex items-center gap-1.5">
+                                    <span className="text-[10px] font-mono text-red-700 font-bold">Remove?</span>
+                                    <button
+                                      type="button"
+                                      disabled={isRemovingStudent}
+                                      onClick={() => handleRemoveStudent(st.id, fullName)}
+                                      className="px-2 py-1 bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold uppercase cursor-pointer disabled:opacity-50"
+                                    >
+                                      {isRemovingStudent ? "..." : "Confirm"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={isRemovingStudent}
+                                      onClick={() => setRemovingStudentId(null)}
+                                      className="px-2 py-1 bg-slate-200 text-slate-700 text-[11px] font-bold uppercase cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRemovingStudentId(st.id);
+                                      setReassigningStudentId(null);
+                                    }}
+                                    className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                                    title="Remove learner who is not enrolled in this semester from this section roster"
+                                  >
+                                    [ Remove ]
+                                  </button>
+                                )
                               )}
                             </td>
                           </tr>

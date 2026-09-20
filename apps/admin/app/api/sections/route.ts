@@ -31,6 +31,48 @@ interface SectionPayload {
   school_year?: string;
 }
 
+// Helpers for dynamic multi-semester term tracking
+function extractTermNumber(termStr?: string | null): number {
+  if (!termStr) return 0;
+  const lower = String(termStr).toLowerCase();
+  if (lower.includes("1") || lower.includes("first")) return 1;
+  if (lower.includes("2") || lower.includes("second")) return 2;
+  if (lower.includes("3") || lower.includes("third")) return 3;
+  return 0;
+}
+
+function getApplicationTermNumber(app: any): number {
+  const fd = app.selected_electives?.[0] || {};
+  const rawTerm = (
+    fd.term_name ||
+    fd.termName ||
+    fd.semester ||
+    fd.term ||
+    fd.targetSemester ||
+    app.term_name ||
+    app.semester ||
+    ""
+  );
+  const num = extractTermNumber(rawTerm);
+  return num !== 0 ? num : 1;
+}
+
+function isApplicationInActiveTerm(
+  app: any,
+  activeSchoolYear: string,
+  activeTermNumber: number
+): boolean {
+  const cleanAppSY = (app.school_year || "").replace("–", "-").trim();
+  const cleanActiveSY = (activeSchoolYear || "").replace("–", "-").trim();
+
+  if (cleanActiveSY && cleanAppSY && cleanActiveSY !== cleanAppSY) {
+    return false;
+  }
+
+  const appTermNum = getApplicationTermNumber(app);
+  return appTermNum === activeTermNumber;
+}
+
 // GET /api/sections - List sections with live enrolled counts (and optionally students)
 export async function GET(req: Request) {
   try {
@@ -43,7 +85,32 @@ export async function GET(req: Request) {
     const sectionId = searchParams.get("sectionId");
     const includeStudents = searchParams.get("includeStudents") === "true";
 
-    // 1. Fetch sections from table
+    // 0. Fetch active academic term configured by IT Support
+    const { data: termsData } = await supabase
+      .from("academic_terms")
+      .select("schoolYear, termNumber, termName, isActive")
+      .order("schoolYear", { ascending: false });
+
+    const activeTerm = (termsData || []).find((t: any) => t.isActive);
+    const activeSchoolYear = (activeTerm?.schoolYear || "2026-2027").replace("–", "-").trim();
+    const activeTermNumber = Number(activeTerm?.termNumber) || 1;
+    const activeTermName = activeTerm?.termName || `Trimester ${activeTermNumber}`;
+
+    // 1. Fetch approved enrollment applications for active term tracking
+    const { data: appsData } = await supabase
+      .from("enrollment_applications")
+      .select("id, student_id, school_year, status, selected_electives");
+
+    const enrolledInActiveTermSet = new Set<string>();
+    (appsData || []).forEach((app: any) => {
+      if (app.status === "Approved" && app.student_id) {
+        if (isApplicationInActiveTerm(app, activeSchoolYear, activeTermNumber)) {
+          enrolledInActiveTermSet.add(app.student_id);
+        }
+      }
+    });
+
+    // 2. Fetch sections from table
     const { data: dbSections, error: secErr } = await supabase
       .from("sections")
       .select("*")
@@ -54,7 +121,7 @@ export async function GET(req: Request) {
       console.warn("Notice reading sections table:", secErr.message);
     }
 
-    // 2. Fetch custom section overrides / additions from system_settings
+    // 3. Fetch custom section overrides / additions from system_settings
     let customSections: SectionPayload[] = [];
     let deletedSectionIds: string[] = [];
     try {
@@ -89,7 +156,10 @@ export async function GET(req: Request) {
       }
     });
 
-    // 3. Fetch enrolled students count
+    // 4. Fetch enrolled students
+    // In Sem 1: Sections count only students enrolled for Sem 1.
+    // In Sem 2 & 3: Students from Sem 1 remain assigned to their section ("naka-fixed na"),
+    // but only students enrolled/approved for active term count towards active enrolledCount!
     const { data: studentsData } = await supabase
       .from("students")
       .select("id, student_id, first_name, middle_name, last_name, gender, grade_level, strand, current_section_id, contact_number, barangay")
@@ -101,15 +171,24 @@ export async function GET(req: Request) {
     if (studentsData) {
       studentsData.forEach((st: any) => {
         if (st.current_section_id) {
-          countMap.set(
-            st.current_section_id,
-            (countMap.get(st.current_section_id) || 0) + 1
-          );
+          const isEnrolledInActiveTerm = enrolledInActiveTermSet.has(st.id);
+          const studentWithStatus = {
+            ...st,
+            isEnrolledInActiveTerm,
+          };
+
+          // Only students officially approved for the active term count towards active enrolled quota
+          if (isEnrolledInActiveTerm) {
+            countMap.set(
+              st.current_section_id,
+              (countMap.get(st.current_section_id) || 0) + 1
+            );
+          }
 
           if (!studentListMap.has(st.current_section_id)) {
             studentListMap.set(st.current_section_id, []);
           }
-          studentListMap.get(st.current_section_id)?.push(st);
+          studentListMap.get(st.current_section_id)?.push(studentWithStatus);
         }
       });
     }
@@ -148,8 +227,9 @@ export async function GET(req: Request) {
         room: s.room || undefined,
         adviser_name: s.adviser_name || undefined,
         capacity,
-        school_year: s.school_year || "2026-2027",
+        school_year: s.school_year || activeSchoolYear,
         enrolledCount: countMap.get(s.id) || 0,
+        totalRosterCount: (studentListMap.get(s.id) || []).length,
         students: includeStudents ? (studentListMap.get(s.id) || []) : undefined,
       };
     });
@@ -167,6 +247,11 @@ export async function GET(req: Request) {
       }
       return NextResponse.json({
         success: true,
+        activeTerm: {
+          schoolYear: activeSchoolYear,
+          termNumber: activeTermNumber,
+          termName: activeTermName,
+        },
         section: {
           ...single,
           students: studentListMap.get(sectionId) || [],
@@ -174,7 +259,15 @@ export async function GET(req: Request) {
       }, { headers: NO_CACHE_HEADERS });
     }
 
-    return NextResponse.json({ success: true, sections: sectionsList }, { headers: NO_CACHE_HEADERS });
+    return NextResponse.json({
+      success: true,
+      activeTerm: {
+        schoolYear: activeSchoolYear,
+        termNumber: activeTermNumber,
+        termName: activeTermName,
+      },
+      sections: sectionsList,
+    }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
     console.error("Error in GET /api/sections:", err);
     return NextResponse.json({ success: false, error: err?.message || "Failed to fetch sections" }, { status: 500, headers: NO_CACHE_HEADERS });
@@ -285,6 +378,40 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
+
+    // Check for student removal request from section roster
+    if (body.removeStudentId || (body.action === "remove_student" && body.studentId)) {
+      const studentIdToRemove = body.removeStudentId || body.studentId;
+      const { error: remErr } = await supabase
+        .from("students")
+        .update({
+          current_section_id: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", studentIdToRemove);
+
+      if (remErr) {
+        return NextResponse.json({ success: false, error: remErr.message }, { status: 500, headers: NO_CACHE_HEADERS });
+      }
+      return NextResponse.json({ success: true, removedStudentId: studentIdToRemove }, { headers: NO_CACHE_HEADERS });
+    }
+
+    // Check for student reassignment request
+    if (body.reassignStudentId && body.targetSectionId) {
+      const { error: reassignErr } = await supabase
+        .from("students")
+        .update({
+          current_section_id: body.targetSectionId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", body.reassignStudentId);
+
+      if (reassignErr) {
+        return NextResponse.json({ success: false, error: reassignErr.message }, { status: 500, headers: NO_CACHE_HEADERS });
+      }
+      return NextResponse.json({ success: true, reassignedStudentId: body.reassignStudentId, targetSectionId: body.targetSectionId }, { headers: NO_CACHE_HEADERS });
+    }
+
     const { id, section_name, grade_level, strand, room, adviser_name, capacity } = body;
 
     if (!id) {
