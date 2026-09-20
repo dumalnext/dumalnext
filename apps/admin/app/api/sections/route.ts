@@ -114,18 +114,45 @@ export async function GET(req: Request) {
       });
     }
 
-    const sectionsList = Array.from(sectionMap.values()).map((s) => ({
-      id: s.id,
-      section_name: s.section_name,
-      grade_level: Number(s.grade_level),
-      strand: s.strand || undefined,
-      room: s.room || undefined,
-      adviser_name: s.adviser_name || undefined,
-      capacity: Number(s.capacity) || 40,
-      school_year: s.school_year || "2026-2027",
-      enrolledCount: countMap.get(s.id) || 0,
-      students: includeStudents ? (studentListMap.get(s.id) || []) : undefined,
-    }));
+    // Query classrooms to ensure section capacity is synced with IT Support physical room capacity
+    const { data: classroomsData } = await supabase
+      .from("classrooms")
+      .select("classroom_id, room_name, building, capacity");
+
+    const roomCapacityMap = new Map<string, number>();
+    (classroomsData || []).forEach((c: any) => {
+      const cap = Number(c.capacity) || 40;
+      if (c.classroom_id) roomCapacityMap.set(c.classroom_id.toLowerCase(), cap);
+      if (c.room_name) roomCapacityMap.set(c.room_name.toLowerCase(), cap);
+      if (c.room_name && c.building) {
+        roomCapacityMap.set(`${c.room_name} (${c.building})`.toLowerCase(), cap);
+      }
+    });
+
+    const sectionsList = Array.from(sectionMap.values()).map((s) => {
+      let capacity = Number(s.capacity) || 40;
+      if (s.room) {
+        const cleanRoom = s.room.trim().toLowerCase();
+        for (const [key, cap] of roomCapacityMap.entries()) {
+          if (cleanRoom === key || cleanRoom.includes(key) || key.includes(cleanRoom)) {
+            capacity = cap;
+            break;
+          }
+        }
+      }
+      return {
+        id: s.id,
+        section_name: s.section_name,
+        grade_level: Number(s.grade_level),
+        strand: s.strand || undefined,
+        room: s.room || undefined,
+        adviser_name: s.adviser_name || undefined,
+        capacity,
+        school_year: s.school_year || "2026-2027",
+        enrolledCount: countMap.get(s.id) || 0,
+        students: includeStudents ? (studentListMap.get(s.id) || []) : undefined,
+      };
+    });
 
     // Sort by grade level and section name
     sectionsList.sort((a, b) => {
@@ -173,7 +200,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Valid grade level (7–12) is required." }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
-    const parsedCapacity = Number(capacity) > 0 ? Number(capacity) : 40;
+    let parsedCapacity = Number(capacity) > 0 ? Number(capacity) : 40;
+    if (room) {
+      const { data: rmData } = await supabase
+        .from("classrooms")
+        .select("classroom_id, room_name, building, capacity");
+      if (rmData) {
+        const cleanRoom = room.trim().toLowerCase();
+        const found = rmData.find((c: any) => {
+          const full = `${c.room_name} (${c.building})`.toLowerCase();
+          return full === cleanRoom || c.room_name?.toLowerCase() === cleanRoom || c.classroom_id?.toLowerCase() === cleanRoom;
+        });
+        if (found && found.capacity) {
+          parsedCapacity = Number(found.capacity);
+        }
+      }
+    }
     const cleanSchoolYear = (school_year || "2026-2027").replace("–", "-");
     const newId = crypto.randomUUID();
 
@@ -253,9 +295,26 @@ export async function PUT(req: Request) {
     if (section_name !== undefined) updatePayload.section_name = section_name.trim();
     if (grade_level !== undefined) updatePayload.grade_level = Number(grade_level);
     if (strand !== undefined) updatePayload.strand = strand ? strand.trim() : null;
-    if (room !== undefined) updatePayload.room = room ? room.trim() : null;
     if (adviser_name !== undefined) updatePayload.adviser_name = adviser_name ? adviser_name.trim() : null;
     if (capacity !== undefined) updatePayload.capacity = Number(capacity) > 0 ? Number(capacity) : 40;
+    if (room !== undefined) {
+      updatePayload.room = room ? room.trim() : null;
+      if (room) {
+        const { data: rmData } = await supabase
+          .from("classrooms")
+          .select("classroom_id, room_name, building, capacity");
+        if (rmData) {
+          const cleanRoom = room.trim().toLowerCase();
+          const found = rmData.find((c: any) => {
+            const full = `${c.room_name} (${c.building})`.toLowerCase();
+            return full === cleanRoom || c.room_name?.toLowerCase() === cleanRoom || c.classroom_id?.toLowerCase() === cleanRoom;
+          });
+          if (found && found.capacity) {
+            updatePayload.capacity = Number(found.capacity);
+          }
+        }
+      }
+    }
 
     // 1. Try DB update
     try {

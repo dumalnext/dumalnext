@@ -101,6 +101,67 @@ export default function SectionQuotaConsole() {
     });
   };
 
+  // Helper to normalize room value to match registered facility format
+  const normalizeRoomValue = (val: string) => {
+    if (!val || !val.trim()) return "";
+    const clean = val.trim();
+    const directMatch = classroomsList.find(
+      (r) =>
+        `${r.room_name} (${r.building})`.toLowerCase() === clean.toLowerCase() ||
+        `${r.classroom_id} - ${r.room_name} (${r.building})`.toLowerCase() === clean.toLowerCase()
+    );
+    if (directMatch) return `${directMatch.room_name} (${directMatch.building})`;
+
+    const partialMatch = classroomsList.find(
+      (r) =>
+        r.room_name.toLowerCase() === clean.toLowerCase() ||
+        r.classroom_id.toLowerCase() === clean.toLowerCase()
+    );
+    if (partialMatch) return `${partialMatch.room_name} (${partialMatch.building})`;
+
+    return clean;
+  };
+
+  // Helper to find the registered classroom details object by room string
+  const findClassroomDetails = (roomStr: string) => {
+    if (!roomStr || !roomStr.trim()) return undefined;
+    const clean = roomStr.trim().toLowerCase();
+    return classroomsList.find((r) => {
+      const full = `${r.room_name} (${r.building})`.toLowerCase();
+      const codeFull = `${r.classroom_id} - ${r.room_name} (${r.building})`.toLowerCase();
+      return (
+        full === clean ||
+        codeFull === clean ||
+        r.room_name.toLowerCase() === clean ||
+        r.classroom_id.toLowerCase() === clean
+      );
+    });
+  };
+
+  // Group registered classrooms by building
+  const classroomsByBuilding = classroomsList.reduce((acc, rm) => {
+    const bldg = rm.building ? rm.building.trim() : "Main Academic Building";
+    if (!acc[bldg]) acc[bldg] = [];
+    acc[bldg].push(rm);
+    return acc;
+  }, {} as Record<string, RegisteredClassroom[]>);
+
+  // Helper to find which section is currently occupying a room
+  const getSectionOccupyingRoom = (roomCandidate: string, excludeSectionId?: string): SectionDetail | undefined => {
+    if (!roomCandidate || !roomCandidate.trim()) return undefined;
+    const cleanCand = roomCandidate.trim().toLowerCase();
+    return sections.find((s) => {
+      if (excludeSectionId && s.id === excludeSectionId) return false;
+      if (!s.room || !s.room.trim()) return false;
+      const sRoom = s.room.trim().toLowerCase();
+      return (
+        sRoom === cleanCand ||
+        sRoom.includes(cleanCand) ||
+        cleanCand.includes(sRoom)
+      );
+    });
+  };
+
   // Class Roster Modal State
   const [selectedRosterSection, setSelectedRosterSection] = useState<SectionDetail | null>(null);
   const [rosterStudents, setRosterStudents] = useState<EnrolledStudent[]>([]);
@@ -183,16 +244,25 @@ export default function SectionQuotaConsole() {
         });
       }
 
-      const enriched: SectionDetail[] = Array.from(secMap.values()).map((s: any) => ({
-        id: s.id,
-        section_name: s.section_name,
-        grade_level: Number(s.grade_level),
-        strand: s.strand || undefined,
-        room: s.room || undefined,
-        adviser_name: s.adviser_name || undefined,
-        capacity: Number(s.capacity) || 40,
-        enrolledCount: countMap.get(s.id) || s.enrolled_count || 0,
-      }));
+      const enriched: SectionDetail[] = Array.from(secMap.values()).map((s: any) => {
+        let capacity = Number(s.capacity) || 40;
+        if (s.room) {
+          const matched = findClassroomDetails(s.room);
+          if (matched && matched.capacity) {
+            capacity = matched.capacity;
+          }
+        }
+        return {
+          id: s.id,
+          section_name: s.section_name,
+          grade_level: Number(s.grade_level),
+          strand: s.strand || undefined,
+          room: s.room || undefined,
+          adviser_name: s.adviser_name || undefined,
+          capacity,
+          enrolledCount: countMap.get(s.id) || s.enrolled_count || 0,
+        };
+      });
 
       setSections(enriched);
     } catch (err) {
@@ -344,6 +414,7 @@ export default function SectionQuotaConsole() {
         { event: "*", schema: "public", table: "classrooms" },
         () => {
           fetchClassrooms();
+          fetchSections(true);
         }
       )
       .on(
@@ -380,67 +451,6 @@ export default function SectionQuotaConsole() {
       }
     };
   }, []);
-
-  // Helper to normalize room value to match registered facility format
-  const normalizeRoomValue = (val: string) => {
-    if (!val || !val.trim()) return "";
-    const clean = val.trim();
-    const directMatch = classroomsList.find(
-      (r) =>
-        `${r.room_name} (${r.building})`.toLowerCase() === clean.toLowerCase() ||
-        `${r.classroom_id} - ${r.room_name} (${r.building})`.toLowerCase() === clean.toLowerCase()
-    );
-    if (directMatch) return `${directMatch.room_name} (${directMatch.building})`;
-
-    const partialMatch = classroomsList.find(
-      (r) =>
-        r.room_name.toLowerCase() === clean.toLowerCase() ||
-        r.classroom_id.toLowerCase() === clean.toLowerCase()
-    );
-    if (partialMatch) return `${partialMatch.room_name} (${partialMatch.building})`;
-
-    return clean;
-  };
-
-  // Helper to find the registered classroom details object by room string
-  const findClassroomDetails = (roomStr: string) => {
-    if (!roomStr || !roomStr.trim()) return undefined;
-    const clean = roomStr.trim().toLowerCase();
-    return classroomsList.find((r) => {
-      const full = `${r.room_name} (${r.building})`.toLowerCase();
-      const codeFull = `${r.classroom_id} - ${r.room_name} (${r.building})`.toLowerCase();
-      return (
-        full === clean ||
-        codeFull === clean ||
-        r.room_name.toLowerCase() === clean ||
-        r.classroom_id.toLowerCase() === clean
-      );
-    });
-  };
-
-  // Group registered classrooms by building
-  const classroomsByBuilding = classroomsList.reduce((acc, rm) => {
-    const bldg = rm.building ? rm.building.trim() : "Main Academic Building";
-    if (!acc[bldg]) acc[bldg] = [];
-    acc[bldg].push(rm);
-    return acc;
-  }, {} as Record<string, RegisteredClassroom[]>);
-
-  // Helper to find which section is currently occupying a room
-  const getSectionOccupyingRoom = (roomCandidate: string, excludeSectionId?: string): SectionDetail | undefined => {
-    if (!roomCandidate || !roomCandidate.trim()) return undefined;
-    const cleanCand = roomCandidate.trim().toLowerCase();
-    return sections.find((s) => {
-      if (excludeSectionId && s.id === excludeSectionId) return false;
-      if (!s.room || !s.room.trim()) return false;
-      const sRoom = s.room.trim().toLowerCase();
-      return (
-        sRoom === cleanCand ||
-        sRoom.includes(cleanCand) ||
-        cleanCand.includes(sRoom)
-      );
-    });
-  };
 
   // Filter sections by grade
   const filteredSections = sections.filter((sec) => {
@@ -532,8 +542,11 @@ export default function SectionQuotaConsole() {
   const openEditModal = (sec: SectionDetail) => {
     setEditingSection(sec);
     setEditSectionName(sec.section_name);
-    setEditCapacity(sec.capacity);
-    setEditRoom(normalizeRoomValue(sec.room || ""));
+    const initialRoom = normalizeRoomValue(sec.room || "");
+    setEditRoom(initialRoom);
+    const matchedClassroom = findClassroomDetails(initialRoom);
+    const syncedCapacity = matchedClassroom ? matchedClassroom.capacity : (sec.capacity || 40);
+    setEditCapacity(syncedCapacity);
     setEditAdviser(sec.adviser_name || "");
     setEditStrand(sec.strand || "");
     setEditError("");
@@ -1073,51 +1086,36 @@ export default function SectionQuotaConsole() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Section Capacity (Seats) <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={80}
-                    required
-                    value={newCapacity}
-                    onChange={(e) => setNewCapacity(Number(e.target.value))}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 focus:border-[#002060] outline-none"
-                  />
-                  <span className="text-[10px] text-slate-500 mt-0.5 block">
-                    DepEd standard quota: 40 students
-                  </span>
-                </div>
+                {newGradeLevel >= 11 ? (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      Senior High School Strand
+                    </label>
+                    <select
+                      value={newStrand}
+                      onChange={(e) => setNewStrand(e.target.value)}
+                      className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
+                    >
+                      <option value="">-- Select Strand (Optional / General) --</option>
+                      {SHS_STRANDS.map((s) => (
+                        <option key={s.code} value={s.code}>
+                          {s.code} - {s.name} ({s.track})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-center">
+                    <span>Junior High School (General Academic Curriculum)</span>
+                  </div>
+                )}
               </div>
-
-              {/* Strand selection for SHS (Grades 11 & 12) */}
-              {newGradeLevel >= 11 && (
-                <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Senior High School Strand
-                  </label>
-                  <select
-                    value={newStrand}
-                    onChange={(e) => setNewStrand(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value="">-- Select Strand (Optional / General) --</option>
-                    {SHS_STRANDS.map((s) => (
-                      <option key={s.code} value={s.code}>
-                        {s.code} - {s.name} ({s.track})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-xs font-bold text-slate-900 uppercase">
-                      Classroom &amp; Building <span className="text-slate-500 font-normal">(Optional)</span>
+                      Classroom &amp; Building <span className="text-slate-500 font-normal">(IT Facilities)</span>
                     </label>
                     <span className="text-[10px] font-mono text-[#002060] uppercase">
                       [ IT Facilities: {classroomsList.length} Rooms ]
@@ -1129,7 +1127,7 @@ export default function SectionQuotaConsole() {
                       const selectedVal = e.target.value;
                       setNewRoom(selectedVal);
                       const matched = findClassroomDetails(selectedVal);
-                      if (matched && (!newCapacity || newCapacity === 40)) {
+                      if (matched) {
                         setNewCapacity(matched.capacity);
                       }
                     }}
@@ -1174,11 +1172,6 @@ export default function SectionQuotaConsole() {
                           <div className="text-slate-600">
                             Location: <strong>{rmDetails.building}</strong>
                           </div>
-                          {newCapacity > rmDetails.capacity && (
-                            <p className="text-amber-800 font-bold">
-                              Notice: Section capacity ({newCapacity}) exceeds room seating capacity ({rmDetails.capacity} seats).
-                            </p>
-                          )}
                         </div>
                       );
                     })()
@@ -1239,6 +1232,57 @@ export default function SectionQuotaConsole() {
                   })()}
                 </div>
               </div>
+
+              {/* Section Capacity (Synchronized with IT Support physical room) */}
+              {(() => {
+                const matchedRoom = findClassroomDetails(newRoom);
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-900 uppercase">
+                        Section Capacity (Maximum Allowed Seats) <span className="text-red-600">*</span>
+                      </label>
+                      {matchedRoom ? (
+                        <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300 uppercase">
+                          [ AUTO-SYNCED WITH IT CLASSROOM: {matchedRoom.capacity} SEATS ]
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 border border-slate-300 uppercase">
+                          [ DEFAULT QUOTA ]
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="number"
+                      min={1}
+                      max={80}
+                      required
+                      value={newCapacity}
+                      readOnly={!!matchedRoom}
+                      onChange={(e) => setNewCapacity(Number(e.target.value))}
+                      className={`w-full p-2.5 border text-xs font-mono font-bold outline-none ${
+                        matchedRoom
+                          ? "bg-slate-100 border-slate-300 text-[#002060] cursor-not-allowed"
+                          : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
+                      }`}
+                    />
+                    <div className="mt-1 flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500">
+                        Standard DepEd classroom capacity is 40-45 students.
+                      </span>
+                      {matchedRoom ? (
+                        <span className="font-bold text-[#002060] font-mono">
+                          Physical seating limit locked by IT Support facility registry.
+                        </span>
+                      ) : (
+                        <span className="text-amber-700 font-mono">
+                          Select a classroom above to automatically lock to room capacity.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
                 <button
@@ -1313,24 +1357,6 @@ export default function SectionQuotaConsole() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Section Capacity (Maximum Allowed Seats) <span className="text-red-600">*</span>
-                </label>
-                <input
-                  type="number"
-                  min={editingSection.enrolledCount || 1}
-                  max={80}
-                  required
-                  value={editCapacity}
-                  onChange={(e) => setEditCapacity(Number(e.target.value))}
-                  className="w-full p-2.5 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 focus:border-[#002060] outline-none"
-                />
-                <span className="text-[10px] text-slate-500 mt-0.5 block">
-                  Cannot be lower than currently enrolled students ({editingSection.enrolledCount}).
-                </span>
-              </div>
-
               {editingSection.grade_level >= 11 && (
                 <div>
                   <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
@@ -1355,7 +1381,7 @@ export default function SectionQuotaConsole() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-xs font-bold text-slate-900 uppercase">
-                      Classroom &amp; Building <span className="text-slate-500 font-normal">(Optional)</span>
+                      Classroom &amp; Building <span className="text-slate-500 font-normal">(IT Facilities)</span>
                     </label>
                     <span className="text-[10px] font-mono text-[#002060] uppercase">
                       [ IT Facilities: {classroomsList.length} Rooms ]
@@ -1363,7 +1389,14 @@ export default function SectionQuotaConsole() {
                   </div>
                   <select
                     value={editRoom}
-                    onChange={(e) => setEditRoom(e.target.value)}
+                    onChange={(e) => {
+                      const selectedVal = e.target.value;
+                      setEditRoom(selectedVal);
+                      const matched = findClassroomDetails(selectedVal);
+                      if (matched) {
+                        setEditCapacity(matched.capacity);
+                      }
+                    }}
                     className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer font-medium"
                   >
                     <option value="">-- Select Classroom / Room (From IT Facilities) --</option>
@@ -1429,11 +1462,6 @@ export default function SectionQuotaConsole() {
                           <div className="text-slate-600">
                             Location: <strong>{rmDetails.building}</strong>
                           </div>
-                          {editCapacity > rmDetails.capacity && (
-                            <p className="text-amber-800 font-bold">
-                              Notice: Section capacity ({editCapacity}) exceeds classroom seating capacity ({rmDetails.capacity} seats).
-                            </p>
-                          )}
                         </div>
                       );
                     })()
@@ -1519,6 +1547,57 @@ export default function SectionQuotaConsole() {
                   })()}
                 </div>
               </div>
+
+              {/* Section Capacity (Synchronized with IT Support physical room) */}
+              {(() => {
+                const matchedRoom = findClassroomDetails(editRoom);
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-900 uppercase">
+                        Section Capacity (Maximum Allowed Seats) <span className="text-red-600">*</span>
+                      </label>
+                      {matchedRoom ? (
+                        <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300 uppercase">
+                          [ AUTO-SYNCED WITH IT CLASSROOM: {matchedRoom.capacity} SEATS ]
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 border border-slate-300 uppercase">
+                          [ MANUAL OVERRIDE ]
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="number"
+                      min={editingSection.enrolledCount || 1}
+                      max={80}
+                      required
+                      value={editCapacity}
+                      readOnly={!!matchedRoom}
+                      onChange={(e) => setEditCapacity(Number(e.target.value))}
+                      className={`w-full p-2.5 border text-xs font-mono font-bold outline-none ${
+                        matchedRoom
+                          ? "bg-slate-100 border-slate-300 text-[#002060] cursor-not-allowed"
+                          : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
+                      }`}
+                    />
+                    <div className="mt-1 flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500">
+                        Currently enrolled learners: <strong>{editingSection.enrolledCount}</strong> (Capacity cannot be lower than enrollment).
+                      </span>
+                      {matchedRoom ? (
+                        <span className="font-bold text-[#002060] font-mono">
+                          Physical seating limit locked by IT Support facility registry.
+                        </span>
+                      ) : (
+                        <span className="text-amber-700 font-mono">
+                          Select a classroom above to automatically lock to room capacity.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
                 <button
