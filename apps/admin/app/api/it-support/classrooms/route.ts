@@ -8,13 +8,24 @@ export async function GET() {
     const { data: classrooms, error } = await supabase
       .from("classrooms")
       .select("*")
-      .order("classroomId", { ascending: true });
+      .order("classroom_id", { ascending: true });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, classrooms: classrooms || [] });
+    const formatted = (classrooms || []).map((c: any) => ({
+      id: c.id,
+      classroomId: c.classroom_id || c.classroomId || "",
+      classroom_id: c.classroom_id || c.classroomId || "",
+      roomName: c.room_name || c.roomName || "",
+      room_name: c.room_name || c.roomName || "",
+      building: c.building || "",
+      capacity: Number(c.capacity) || 40,
+      createdAt: c.created_at || c.createdAt || new Date().toISOString(),
+    }));
+
+    return NextResponse.json({ success: true, classrooms: formatted });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to fetch classrooms" }, { status: 500 });
   }
@@ -27,8 +38,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const { id, classroomId, roomName, building, capacity } = body;
+    const roomCode = (classroomId || body.classroom_id || "").trim().toUpperCase();
+    const name = (roomName || body.room_name || "").trim();
+    const bldg = (building || "").trim();
+    const cap = capacity ? Number(capacity) : 40;
 
-    if (!classroomId || !roomName || !building) {
+    if (!roomCode || !name || !bldg) {
       return NextResponse.json(
         { error: "Room Code (e.g. RM-101), Room Name, and Building are required." },
         { status: 400 }
@@ -36,10 +51,10 @@ export async function POST(req: NextRequest) {
     }
 
     const payload: Record<string, any> = {
-      classroomId: classroomId.trim().toUpperCase(),
-      roomName: roomName.trim(),
-      building: building.trim(),
-      capacity: capacity ? Number(capacity) : 40,
+      classroom_id: roomCode,
+      room_name: name,
+      building: bldg,
+      capacity: cap,
     };
 
     if (id) {
@@ -48,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabase
       .from("classrooms")
-      .upsert(payload, { onConflict: "classroomId" })
+      .upsert(payload, { onConflict: "classroom_id" })
       .select()
       .single();
 
@@ -56,7 +71,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, classroom: data });
+    const formatted = {
+      id: data.id,
+      classroomId: data.classroom_id,
+      classroom_id: data.classroom_id,
+      roomName: data.room_name,
+      room_name: data.room_name,
+      building: data.building,
+      capacity: data.capacity,
+    };
+
+    return NextResponse.json({ success: true, classroom: formatted });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to save classroom" }, { status: 500 });
   }
@@ -77,7 +102,7 @@ export async function DELETE(req: NextRequest) {
     const { data: activeSchedules } = await supabase
       .from("class_schedules")
       .select("id")
-      .eq("classroomId", id)
+      .eq("classroom_id", id)
       .limit(1);
 
     if (activeSchedules && activeSchedules.length > 0) {
