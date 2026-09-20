@@ -6,7 +6,7 @@ import { useAdminAuth } from "@/lib/auth/authContext";
 export default function AdminLoginForm() {
   const { login, resendVerification } = useAdminAuth();
 
-  const [adminId, setAdminId] = useState<string>("admin@dumalneg.deped.gov.ph");
+  const [adminId, setAdminId] = useState<string>("heartistrichford@gmail.com");
   const [adminPassword, setAdminPassword] = useState<string>("");
   const [loginError, setLoginError] = useState<string>("");
   const [unconfirmedEmail, setUnconfirmedEmail] = useState<string>("");
@@ -100,7 +100,7 @@ export default function AdminLoginForm() {
               Administrative Personnel Sign-In
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Authorized Account: <strong className="text-slate-900">admin@dumalneg.deped.gov.ph</strong>
+              Authorized Account: <strong className="text-slate-900">heartistrichford@gmail.com</strong>
             </p>
           </div>
 
@@ -168,7 +168,7 @@ export default function AdminLoginForm() {
                 type="email"
                 value={adminId}
                 onChange={(e) => setAdminId(e.target.value)}
-                placeholder="admin@dumalneg.deped.gov.ph"
+                placeholder="heartistrichford@gmail.com"
                 className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
                 disabled={isLoggingIn}
                 required
