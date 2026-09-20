@@ -103,7 +103,7 @@ export default function TeacherHeaderNav() {
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              [ Class Section Rosters ]
+              [ Section Class Roster ]
             </Link>
 
             <Link
