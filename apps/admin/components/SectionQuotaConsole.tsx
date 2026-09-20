@@ -1319,6 +1319,18 @@ export default function SectionQuotaConsole() {
               </div>
             </div>
 
+            {/* Portrait Print Styling for Roster */}
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                @media print {
+                  @page {
+                    size: portrait !important;
+                    margin: 10mm 15mm 15mm 15mm !important;
+                  }
+                }
+              `
+            }} />
+
             {/* Modal Header (Screen Only) */}
             <div className="no-print print:hidden bg-[#002060] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
               <div>

@@ -132,8 +132,34 @@ export default function TeachingSchedulePage() {
 
   const uniqueSectionsCount = new Set(schedules.map((s) => s.section_id)).size;
 
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = `TeachingLoad_${user.fullName.replace(/\s+/g, "_")}_SY2025-2026_DNHS`;
+    window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
+  };
+
   return (
     <div className="space-y-6 font-sans">
+      {/* Dynamic Landscape Print Styling */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @media print {
+            @page {
+              size: landscape !important;
+              margin: 8mm 10mm !important;
+            }
+            body {
+              background-color: #ffffff !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          }
+        `
+      }} />
+
       {/* Title Bar */}
       <div className="p-5 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
         <div>
@@ -153,7 +179,7 @@ export default function TeachingSchedulePage() {
             <>
               <button
                 type="button"
-                onClick={() => window.print()}
+                onClick={handlePrint}
                 className="px-3 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer border border-blue-400 shadow-2xs shrink-0"
                 title="Print certified weekly teaching load timetable"
               >
@@ -171,32 +197,29 @@ export default function TeachingSchedulePage() {
         </div>
       </div>
 
-      {/* Official DepEd Printable Letterhead */}
-      <div className="hidden print:block p-6 text-center border-b-2 border-slate-900 text-slate-900 mb-6">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-slate-600">
-          Republic of the Philippines • Department of Education
+      {/* Official DepEd Printable Letterhead (Landscape 3-Line Compact Format) */}
+      <div className="hidden print:block pb-2 mb-3 text-center border-b-2 border-slate-900 text-slate-900">
+        {/* LINE 1: Government and DepEd Hierarchy */}
+        <div className="text-[10px] font-mono uppercase tracking-widest text-slate-700 leading-tight">
+          Republic of the Philippines • Department of Education • Region I • Schools Division of Ilocos Norte
         </div>
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-800">
-          Region I • Schools Division of Ilocos Norte
-        </div>
-        <h1 className="text-lg font-bold uppercase tracking-tight text-[#002060] mt-1">
+
+        {/* LINE 2: Institution Name */}
+        <h1 className="text-base font-bold uppercase tracking-tight text-[#002060] leading-tight my-0.5">
           DUMALNEG NATIONAL HIGH SCHOOL
         </h1>
-        <div className="text-[10px] font-mono text-slate-600">
-          Dumalneg, Ilocos Norte • School ID: 300017
-        </div>
-        <div className="mt-4 pt-2 border-t border-slate-400 flex items-center justify-between text-xs font-mono">
+
+        {/* LINE 3: School ID, Document Title, and Faculty Target */}
+        <div className="text-[10px] font-mono text-slate-700 flex items-center justify-between border-t border-slate-400 pt-1 mt-1 leading-tight">
           <div>
-            <strong>OFFICIAL TEACHING LOAD &amp; CLASS TIMETABLE</strong> • SY 2025–2026
+            Dumalneg, Ilocos Norte • School ID: 300017
+          </div>
+          <div className="font-bold text-slate-900 uppercase">
+            OFFICIAL TEACHING LOAD &amp; CLASS TIMETABLE • SY 2025–2026
           </div>
           <div>
-            Faculty: <strong>{user.fullName}</strong> ({user.department} &bull; {user.teacherId})
+            Faculty: <strong>{user.fullName}</strong> ({user.department} &bull; {schedules.length} Hours/Wk)
           </div>
-        </div>
-        <div className="mt-1 flex items-center justify-between text-[11px] font-mono text-slate-600">
-          <div>Department: <strong>{user.department}</strong></div>
-          <div>Weekly Instructional Load: <strong>{schedules.length} Hours / Week</strong></div>
-          <div>Prescribed Limit: <strong>30 Hours / Week Maximum</strong></div>
         </div>
       </div>
 
@@ -320,9 +343,9 @@ export default function TeachingSchedulePage() {
             </table>
           </div>
 
-          {/* Masterlist Detail Table */}
-          <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border-none print:shadow-none">
-            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">
+          {/* Masterlist Detail Table (Screen View Only) */}
+          <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto no-print print:hidden">
+            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-slate-700 uppercase">
                 [ COMPLETE INSTRUCTIONAL LOAD MASTERLIST &bull; {schedules.length} PERIODS ]
               </span>
@@ -358,7 +381,7 @@ export default function TeachingSchedulePage() {
           </div>
 
           {/* DepEd Official Signatories for Hard Copy Printout */}
-          <div className="hidden print:flex justify-between items-end pt-12 mt-8 text-xs font-sans text-slate-900 pb-4 px-2">
+          <div className="hidden print:flex justify-between items-end pt-4 mt-3 text-xs font-sans text-slate-900 pb-1 px-4" style={{ pageBreakInside: "avoid" }}>
             <div className="text-center w-56">
               <div className="border-b border-slate-900 pb-1 font-bold uppercase">
                 {user.fullName}

@@ -424,8 +424,39 @@ export default function ScheduleDeconflictionConsole() {
   const uniqueSectionsScheduled = new Set(schedules.map((s) => s.section_id)).size;
   const uniqueTeachersAssigned = new Set(schedules.map((s) => s.teacher_id)).size;
 
+  const handlePrintTimetable = () => {
+    const originalTitle = document.title;
+    if (viewMode === "bySection" && currentSection) {
+      document.title = `Timetable_${currentSection.section_name}_Grade${currentSection.grade_level}_DNHS`;
+    } else if (viewMode === "byTeacher" && currentTeacher) {
+      document.title = `TeachingLoad_${currentTeacher.fullName.replace(/\s+/g, "_")}_DNHS`;
+    } else {
+      document.title = "Master_Timetable_DNHS";
+    }
+    window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
+  };
+
   return (
     <div className="space-y-6 font-sans">
+      {/* Dynamic Landscape Print Styling */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @media print {
+            @page {
+              size: landscape !important;
+              margin: 8mm 10mm !important;
+            }
+            body {
+              background-color: #ffffff !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          }
+        `
+      }} />
       {/* ========================================================================= */}
       {/* TOP HEADER & ACTION CONTROLS */}
       {/* ========================================================================= */}
@@ -640,7 +671,7 @@ export default function ScheduleDeconflictionConsole() {
 
           <button
             type="button"
-            onClick={() => window.print()}
+            onClick={handlePrintTimetable}
             className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider border border-slate-400 cursor-pointer"
             title="Print printable class timetable program"
           >
@@ -650,24 +681,26 @@ export default function ScheduleDeconflictionConsole() {
       </div>
 
       {/* ========================================================================= */}
-      {/* OFFICIAL DEPED LETTERHEAD FOR PRINTOUT */}
+      {/* OFFICIAL DEPED LETTERHEAD FOR PRINTOUT (LANDSCAPE 3-LINE COMPACT FORMAT) */}
       {/* ========================================================================= */}
-      <div className="hidden print:block p-6 text-center border-b-2 border-slate-900 text-slate-900 mb-6">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-slate-600">
-          Republic of the Philippines • Department of Education
+      <div className="hidden print:block pb-2 mb-3 text-center border-b-2 border-slate-900 text-slate-900">
+        {/* LINE 1: Government and DepEd Hierarchy */}
+        <div className="text-[10px] font-mono uppercase tracking-widest text-slate-700 leading-tight">
+          Republic of the Philippines • Department of Education • Region I • Schools Division of Ilocos Norte
         </div>
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-800">
-          Region I • Schools Division of Ilocos Norte
-        </div>
-        <h1 className="text-lg font-bold uppercase tracking-tight text-[#002060] mt-1">
+
+        {/* LINE 2: School Name */}
+        <h1 className="text-base font-bold uppercase tracking-tight text-[#002060] leading-tight my-0.5">
           DUMALNEG NATIONAL HIGH SCHOOL
         </h1>
-        <div className="text-[10px] font-mono text-slate-600">
-          Dumalneg, Ilocos Norte • School ID: 300017
-        </div>
-        <div className="mt-4 pt-2 border-t border-slate-400 flex items-center justify-between text-xs font-mono">
+
+        {/* LINE 3: School ID, Document Title, and Target Section/Faculty */}
+        <div className="text-[10px] font-mono text-slate-700 flex items-center justify-between border-t border-slate-400 pt-1 mt-1 leading-tight">
           <div>
-            <strong>OFFICIAL CLASS PROGRAM &amp; TIMETABLE</strong> • SY 2025–2026
+            Dumalneg, Ilocos Norte • School ID: 300017
+          </div>
+          <div className="font-bold text-slate-900 uppercase">
+            OFFICIAL CLASS PROGRAM &amp; TIMETABLE • SY 2025–2026
           </div>
           <div>
             {viewMode === "bySection" && currentSection
@@ -784,16 +817,21 @@ export default function ScheduleDeconflictionConsole() {
                                     </div>
                                   </div>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                    className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
-                                    title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
-                                  >
-                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-                                      + Assign Slot
-                                    </span>
-                                  </button>
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
+                                      className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
+                                      title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
+                                    >
+                                      <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                                        + Assign Slot
+                                      </span>
+                                    </button>
+                                    <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
+                                      —
+                                    </div>
+                                  </>
                                 )}
                               </td>
                             );
@@ -900,16 +938,21 @@ export default function ScheduleDeconflictionConsole() {
                                     </div>
                                   </div>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                    className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
-                                    title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
-                                  >
-                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-                                      + Vacant (Assign)
-                                    </span>
-                                  </button>
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
+                                      className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
+                                      title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
+                                    >
+                                      <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                                        + Vacant (Assign)
+                                      </span>
+                                    </button>
+                                    <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
+                                      —
+                                    </div>
+                                  </>
                                 )}
                               </td>
                             );
@@ -983,7 +1026,7 @@ export default function ScheduleDeconflictionConsole() {
           )}
 
           {/* DepEd Official Signatories for Printout */}
-          <div className="hidden print:flex justify-between items-end pt-12 mt-8 text-xs font-sans text-slate-900 pb-4 px-2">
+          <div className="hidden print:flex justify-between items-end pt-4 mt-3 text-xs font-sans text-slate-900 pb-1 px-4" style={{ pageBreakInside: "avoid" }}>
             <div className="text-center w-56">
               <div className="border-b border-slate-900 pb-1 font-bold uppercase">
                 {viewMode === "byTeacher" && currentTeacher ? currentTeacher.fullName : "HEAD TEACHER / SCHEDULER"}

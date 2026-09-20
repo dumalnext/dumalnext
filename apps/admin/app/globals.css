@@ -91,7 +91,7 @@ body {
    ========================================================================= */
 @media print {
   @page {
-    size: portrait;
+    size: auto;
     margin: 10mm 15mm 15mm 15mm;
   }
 
