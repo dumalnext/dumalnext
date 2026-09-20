@@ -610,8 +610,9 @@ export default function SectionQuotaConsole() {
   });
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Title & Real-Time Sync Indicator */}
+    <>
+      <div id="admin-sections-dashboard" className="space-y-6 font-sans">
+        {/* Title & Real-Time Sync Indicator */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
@@ -882,6 +883,7 @@ export default function SectionQuotaConsole() {
           })}
         </div>
       )}
+      </div>
 
       {/* ========================================================================= */}
       {/* ADD SECTION MODAL */}
@@ -1286,10 +1288,39 @@ export default function SectionQuotaConsole() {
       {/* CLASS ROSTER / STUDENT LIST MODAL */}
       {/* ========================================================================= */}
       {selectedRosterSection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-[#002060] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+        <div className="roster-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
+          <div className="roster-modal-container bg-white border-4 border-[#002060] w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* DepEd Official Letterhead for Printout */}
+            <div className="hidden print:block p-6 text-center border-b-2 border-slate-900 text-slate-900">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-slate-600">
+                Republic of the Philippines • Department of Education
+              </div>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Region I • Schools Division of Ilocos Norte
+              </div>
+              <h1 className="text-lg font-bold uppercase tracking-tight text-[#002060] mt-1">
+                DUMALNEG NATIONAL HIGH SCHOOL
+              </h1>
+              <div className="text-[10px] font-mono text-slate-600">
+                Dumalneg, Ilocos Norte • School ID: 300017
+              </div>
+              <div className="mt-4 pt-2 border-t border-slate-400 flex items-center justify-between text-xs font-mono">
+                <div>
+                  <strong>OFFICIAL CLASS SECTION ROSTER</strong> • SY 2025–2026
+                </div>
+                <div>
+                  Section: <strong>{selectedRosterSection.section_name}</strong> (Grade {selectedRosterSection.grade_level}{selectedRosterSection.strand ? ` • ${selectedRosterSection.strand}` : ""})
+                </div>
+              </div>
+              <div className="mt-1 flex items-center justify-between text-[11px] font-mono text-slate-600">
+                <div>Room: <strong>{selectedRosterSection.room || "Main Building"}</strong></div>
+                <div>Class Adviser: <strong>{selectedRosterSection.adviser_name || "Unassigned"}</strong></div>
+                <div>Total Enrolled: <strong>{rosterStudents.length} / {selectedRosterSection.capacity}</strong></div>
+              </div>
+            </div>
+
+            {/* Modal Header (Screen Only) */}
+            <div className="no-print print:hidden bg-[#002060] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
@@ -1307,7 +1338,7 @@ export default function SectionQuotaConsole() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 no-print print:hidden">
                 <button
                   type="button"
                   onClick={() => window.print()}
@@ -1327,8 +1358,8 @@ export default function SectionQuotaConsole() {
               </div>
             </div>
 
-            {/* Roster Search & Action Feedback */}
-            <div className="p-4 bg-slate-50 border-b border-slate-300 space-y-3 shrink-0">
+            {/* Roster Search & Action Feedback (Screen Only) */}
+            <div className="no-print print:hidden p-4 bg-slate-50 border-b border-slate-300 space-y-3 shrink-0">
               {reassignMessage && (
                 <div
                   className={`p-2.5 border text-xs font-bold flex items-center justify-between ${
@@ -1375,7 +1406,7 @@ export default function SectionQuotaConsole() {
             </div>
 
             {/* Students Table */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 print:overflow-visible print:p-0 print:m-0">
               {isLoadingRoster ? (
                 <div className="p-8 text-center">
                   <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
@@ -1392,7 +1423,7 @@ export default function SectionQuotaConsole() {
                   </p>
                 </div>
               ) : (
-                <div className="border-2 border-slate-300 overflow-x-auto shadow-xs">
+                <div className="border-2 border-slate-300 overflow-x-auto shadow-xs print:border-none print:shadow-none">
                   <table className="w-full text-left border-collapse text-xs font-sans">
                     <thead>
                       <tr className="bg-slate-100 border-b-2 border-slate-300 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
@@ -1401,7 +1432,7 @@ export default function SectionQuotaConsole() {
                         <th className="p-3">Learner Full Name</th>
                         <th className="p-3">Gender</th>
                         <th className="p-3">Barangay / Contact</th>
-                        <th className="p-3 text-right">Section Action</th>
+                        <th className="p-3 text-right no-print print:hidden">Section Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
@@ -1440,7 +1471,7 @@ export default function SectionQuotaConsole() {
                                 <div className="text-[10px] font-mono text-slate-500">{st.contact_number}</div>
                               )}
                             </td>
-                            <td className="p-3 text-right">
+                            <td className="p-3 text-right no-print print:hidden">
                               {isReassigningThis ? (
                                 <div className="inline-flex items-center gap-1.5">
                                   <select
@@ -1495,10 +1526,30 @@ export default function SectionQuotaConsole() {
                   </table>
                 </div>
               )}
+
+              {/* DepEd Official Signatory Block for Printout */}
+              <div className="hidden print:flex justify-between items-end pt-12 mt-6 text-xs font-sans text-slate-900 pb-4 px-2">
+                <div className="text-center w-56">
+                  <div className="border-b border-slate-900 pb-1 font-bold uppercase">
+                    {selectedRosterSection.adviser_name || "Unassigned"}
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-600 uppercase mt-1">
+                    Class Adviser
+                  </div>
+                </div>
+                <div className="text-center w-56">
+                  <div className="border-b border-slate-900 pb-1 font-bold uppercase">
+                    OFFICE OF THE REGISTRAR
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-600 uppercase mt-1">
+                    Certified Correct • DepEd DNHS
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 bg-slate-100 border-t border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
+            {/* Modal Footer (Screen Only) */}
+            <div className="no-print print:hidden p-4 bg-slate-100 border-t border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
               <span className="text-xs text-slate-600">
                 Official DepEd Class Roster &bull; Dumalneg National High School
               </span>
@@ -1513,6 +1564,6 @@ export default function SectionQuotaConsole() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

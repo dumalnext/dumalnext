@@ -85,3 +85,87 @@ body {
   color: #991b1b;
   border-color: #fecaca;
 }
+
+/* =========================================================================
+   OFFICIAL DEPED PRINT LAYOUT STYLES
+   ========================================================================= */
+@media print {
+  @page {
+    size: portrait;
+    margin: 10mm 15mm 15mm 15mm;
+  }
+
+  /* Completely eliminate background dashboard, navigation, and footers */
+  header,
+  nav,
+  footer,
+  aside,
+  #admin-sections-dashboard,
+  .no-print,
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* Hide background elements when printing roster modal */
+  body:has(.roster-modal-overlay) #admin-sections-dashboard,
+  body:has(.roster-modal-overlay) header,
+  body:has(.roster-modal-overlay) footer {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Convert fixed modal overlay to static document flow */
+  .roster-modal-overlay {
+    position: static !important;
+    inset: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+    z-index: auto !important;
+  }
+
+  .roster-modal-container {
+    position: static !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Clean table styling for paper printout */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+    color: #000000 !important;
+  }
+
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
