@@ -5,10 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
+import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
+import { isApplicationInTerm } from "@/lib/utils/academicTerm";
 
 export default function StudentHeaderNav() {
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  const { schoolYear, semester, termNumber } = useEnrollmentControl();
   const [appStatus, setAppStatus] = useState<string | null>(null);
   const [appRef, setAppRef] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -36,15 +39,20 @@ export default function StudentHeaderNav() {
         if (stData && stData.length > 0) {
           const { data: appData } = await supabase
             .from("enrollment_applications")
-            .select("application_id, status")
+            .select("id, application_id, status, school_year, selected_electives, created_at")
             .eq("student_id", stData[0].id)
-            .order("created_at", { ascending: false })
-            .limit(1);
+            .order("created_at", { ascending: false });
 
-          if (isMounted && appData && appData.length > 0) {
-            setAppStatus(appData[0].status);
-            setAppRef(appData[0].application_id);
-            return;
+          if (isMounted && appData) {
+            const activeApp = appData.find((a: any) =>
+              isApplicationInTerm(a, schoolYear, termNumber || semester)
+            );
+
+            if (activeApp) {
+              setAppStatus(activeApp.status);
+              setAppRef(activeApp.application_id);
+              return;
+            }
           }
         }
         if (isMounted) {
@@ -100,7 +108,7 @@ export default function StudentHeaderNav() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
-  }, [user?.id, user?.lrn]);
+  }, [user?.id, user?.lrn, schoolYear, semester, termNumber]);
 
   // Close menu on Escape key press or outside click
   useEffect(() => {
@@ -148,9 +156,9 @@ export default function StudentHeaderNav() {
       {/* Quick Status Tag on Header for Instant Visibility */}
       {user ? (
         <Link
-          href={trackHref}
+          href={appStatus ? trackHref : "/enroll"}
           className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 text-white font-mono text-xs transition-colors"
-          title="Click to track your enrollment application status"
+          title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
         >
           <span className="font-bold uppercase tracking-tight truncate max-w-[140px] md:max-w-[180px]">
             [ {user.firstName} {user.lastName} ]
@@ -168,8 +176,8 @@ export default function StudentHeaderNav() {
               PENDING
             </span>
           ) : (
-            <span className="text-[10px] text-blue-300 font-sans uppercase">
-              NEW
+            <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider animate-pulse">
+              ENROLL NOW
             </span>
           )}
         </Link>

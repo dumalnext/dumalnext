@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth/authContext";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
+import { isApplicationInTerm } from "@/lib/utils/academicTerm";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -14,7 +15,7 @@ function StudentHomeContent() {
   const tabQuery = searchParams.get("tab");
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
   const { user, login, register, verifyEmailOtp, resendVerification, logout } = useAuth();
-  const { isEnrollmentOpen, schoolYear, closedMessage } = useEnrollmentControl();
+  const { isEnrollmentOpen, schoolYear, semester, termNumber, closedMessage } = useEnrollmentControl();
 
   // Active Tab for Visitors: "signin" | "register"
   const [activeTab, setActiveTab] = useState<"signin" | "register">(
@@ -91,14 +92,16 @@ function StudentHomeContent() {
   const [regStatusText, setRegStatusText] = useState("");
   const [regSuccessNotice, setRegSuccessNotice] = useState("");
 
-  // Authenticated User Submitted Application State
+  // Authenticated User Submitted Application State (Scoped strictly to Active Academic Term)
   const [userApplication, setUserApplication] = useState<any | null>(null);
+  const [pastApplications, setPastApplications] = useState<any[]>([]);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   // Real-Time Automatic Synchronization of Logged-In User's Application (Zero-Refresh)
   useEffect(() => {
     if (!user) {
       setUserApplication(null);
+      setPastApplications([]);
       return;
     }
 
@@ -118,32 +121,81 @@ function StudentHomeContent() {
             .from("enrollment_applications")
             .select("*")
             .eq("student_id", stData[0].id)
-            .order("created_at", { ascending: false })
-            .limit(1);
+            .order("created_at", { ascending: false });
 
-          if (isMounted && appData && appData.length > 0) {
-            const a = appData[0];
-            setUserApplication({
-              referenceNumber: a.application_id,
-              applicationDate: a.created_at,
-              status: a.status,
-              fullName: `${user.lastName}, ${user.firstName} ${user.middleName || ""}`.trim(),
-              gradeLevel: a.target_grade_level,
-              applicantType: a.applicant_type,
-              targetTrack: a.target_strand ? "Senior High School" : "Junior High School",
-              targetStrand: a.target_strand,
-              remarks: a.admin_feedback,
-              schoolYear: a.school_year || schoolYear || "2026-2027",
-            });
+          if (isMounted && appData) {
+            // Find application for CURRENT ACTIVE academic term (School Year & Term/Trimester)
+            const activeApp = appData.find((a: any) =>
+              isApplicationInTerm(a, schoolYear, termNumber || semester)
+            );
+
+            // Filter out past semester/school year applications
+            const otherApps = appData.filter((a: any) => a.id !== activeApp?.id);
+
+            if (activeApp) {
+              const fd = Array.isArray(activeApp.selected_electives) && activeApp.selected_electives.length > 0
+                ? activeApp.selected_electives[0]
+                : (typeof activeApp.selected_electives === "object" && activeApp.selected_electives !== null ? activeApp.selected_electives : {});
+
+              setUserApplication({
+                id: activeApp.id,
+                referenceNumber: activeApp.application_id,
+                applicationDate: activeApp.created_at,
+                status: activeApp.status,
+                fullName: `${user.lastName}, ${user.firstName} ${user.middleName || ""}`.trim(),
+                gradeLevel: activeApp.target_grade_level,
+                applicantType: activeApp.applicant_type,
+                targetTrack: activeApp.target_strand ? "Senior High School" : "Junior High School",
+                targetStrand: activeApp.target_strand,
+                remarks: activeApp.admin_feedback,
+                schoolYear: activeApp.school_year || schoolYear || "2026-2027",
+                semester: fd.term_name || fd.termName || fd.semester || fd.term || semester || "Trimester 1",
+                formData: fd,
+              });
+            } else {
+              setUserApplication(null);
+            }
+
+            setPastApplications(
+              otherApps.map((oa: any) => {
+                const fd = Array.isArray(oa.selected_electives) && oa.selected_electives.length > 0
+                  ? oa.selected_electives[0]
+                  : (typeof oa.selected_electives === "object" && oa.selected_electives !== null ? oa.selected_electives : {});
+                const pastTerm =
+                  fd.term_name ||
+                  fd.termName ||
+                  fd.semester ||
+                  fd.term ||
+                  fd.targetSemester ||
+                  oa.term_name ||
+                  oa.semester ||
+                  "Trimester 1";
+                return {
+                  id: oa.id,
+                  referenceNumber: oa.application_id,
+                  applicationDate: oa.created_at,
+                  status: oa.status,
+                  gradeLevel: oa.target_grade_level,
+                  targetStrand: oa.target_strand,
+                  schoolYear: oa.school_year || "2026-2027",
+                  semester: pastTerm,
+                  remarks: oa.admin_feedback,
+                };
+              })
+            );
             return;
           }
         }
         if (isMounted) {
           setUserApplication(null);
+          setPastApplications([]);
         }
       } catch (e) {
         console.error("Error reading Supabase applications:", e);
-        if (isMounted) setUserApplication(null);
+        if (isMounted) {
+          setUserApplication(null);
+          setPastApplications([]);
+        }
       }
     };
 
@@ -188,7 +240,7 @@ function StudentHomeContent() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
-  }, [user?.id, user?.lrn]);
+  }, [user?.id, user?.lrn, schoolYear, semester, termNumber]);
 
   // Handle Sign In Submit with System Verification Delay
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -441,7 +493,7 @@ function StudentHomeContent() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 uppercase block">
-                      Submitted Enrollment Application
+                      Submitted Enrollment Application (S.Y. {userApplication.schoolYear} &bull; {userApplication.semester})
                     </span>
                     <span className="text-base font-bold font-mono text-[#002060]">
                       {userApplication.referenceNumber}
@@ -504,6 +556,15 @@ function StudentHomeContent() {
                     View / Track Application Details
                   </Link>
 
+                  {userApplication.status === "Needs Revision" && (
+                    <Link
+                      href="/enroll"
+                      className="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider shadow-xs"
+                    >
+                      [ Edit &amp; Resubmit Application ]
+                    </Link>
+                  )}
+
                   {userApplication.status === "Approved" && (
                     <button
                       type="button"
@@ -517,7 +578,7 @@ function StudentHomeContent() {
                                 applicantType: (userApplication.applicantType as any) || "Grade 7",
                                 targetGradeLevel: Number(userApplication.gradeLevel) || 7,
                                 jhsProgram: (userApplication.jhsProgram as any) || "Regular",
-                                targetSemester: "1st Semester",
+                                targetSemester: userApplication.semester || "1st Semester",
                                 targetTrack: userApplication.targetTrack || "Academic Track",
                                 targetStrand: userApplication.targetStrand || "STEM",
                                 lastGradeCompleted: 6,
@@ -576,7 +637,7 @@ function StudentHomeContent() {
                               spsSport: userApplication.spsSport || "",
                               targetTrack: userApplication.targetTrack || "",
                               targetStrand: userApplication.targetStrand || "",
-                              targetSemester: "1st Semester",
+                              targetSemester: userApplication.semester || "1st Semester",
                               isSned: false,
                               snedCategory: "None",
                               hasPwdId: false,
@@ -604,7 +665,7 @@ function StudentHomeContent() {
                 </div>
               </div>
             ) : (
-              /* User has not yet submitted an enrollment application */
+              /* User has not yet submitted an enrollment application for active term */
               <div className={`p-6 border space-y-4 text-center ${
                 !isEnrollmentOpen ? "bg-red-50/60 border-red-300" : "bg-slate-50 border-slate-300"
               }`}>
@@ -615,19 +676,19 @@ function StudentHomeContent() {
                   <span className={`text-xs font-mono font-bold uppercase ${
                     isEnrollmentOpen ? "text-emerald-900" : "text-red-900"
                   }`}>
-                    [ ONLINE ENROLLMENT: {isEnrollmentOpen ? `OPEN FOR S.Y. ${schoolYear}` : `CLOSED FOR S.Y. ${schoolYear}`} ]
+                    [ ONLINE ENROLLMENT: {isEnrollmentOpen ? `OPEN FOR S.Y. ${schoolYear} • ${semester}` : `CLOSED FOR S.Y. ${schoolYear} • ${semester}`} ]
                   </span>
                 </div>
 
                 <h3 className="text-base font-bold text-slate-900">
                   {isEnrollmentOpen
-                    ? `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear}?`
+                    ? `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
                     : `Basic Education Online Enrollment is Currently Closed`}
                 </h3>
 
                 <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
                   {isEnrollmentOpen
-                    ? `Your student account is active. Click below to begin filling out the 5-step official enrollment form for School Year ${schoolYear}. Your registered learner details will be automatically pre-filled.`
+                    ? `Your student account is active. Click below to begin filling out the official enrollment form for School Year ${schoolYear} (${semester}). Your registered learner details will be automatically pre-filled.`
                     : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
                 </p>
 
@@ -641,9 +702,69 @@ function StudentHomeContent() {
                     }`}
                   >
                     {isEnrollmentOpen
-                      ? `Start 5-Step Online Enrollment Form (S.Y. ${schoolYear})`
+                      ? `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
                       : "[ View Official Enrollment Notice & Advisory ]"}
                   </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Previous Academic Term Enrollment Records (Continuing Students) */}
+            {pastApplications.length > 0 && (
+              <div className="p-4 bg-slate-50 border border-slate-300 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span className="text-xs font-mono font-bold text-slate-700 uppercase">
+                    [ Previous Academic Term Records ({pastApplications.length}) ]
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    Archived Term History
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {pastApplications.map((pApp) => (
+                    <div
+                      key={pApp.id}
+                      className="p-3 bg-white border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs"
+                    >
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono font-bold text-[#002060]">
+                            {pApp.referenceNumber}
+                          </span>
+                          <span className="text-slate-600">
+                            &bull; S.Y. {pApp.schoolYear} ({pApp.semester})
+                          </span>
+                          <span className="text-slate-500">
+                            &bull; Grade {pApp.gradeLevel}
+                          </span>
+                        </div>
+                        {pApp.remarks && (
+                          <p className="text-[11px] text-slate-600 mt-1 italic">
+                            Registrar Feedback: {pApp.remarks}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            pApp.status === "Approved"
+                              ? "bg-emerald-50 text-emerald-900 border border-emerald-400"
+                              : pApp.status === "Needs Revision"
+                              ? "bg-red-50 text-red-900 border border-red-400"
+                              : "bg-amber-50 text-amber-900 border border-amber-400"
+                          }`}
+                        >
+                          {pApp.status}
+                        </span>
+                        <Link
+                          href={`/track?ref=${pApp.referenceNumber}`}
+                          className="px-2.5 py-1 text-[11px] font-bold text-[#002060] bg-slate-100 border border-slate-300 hover:bg-slate-200 transition-colors"
+                        >
+                          View Record &rarr;
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

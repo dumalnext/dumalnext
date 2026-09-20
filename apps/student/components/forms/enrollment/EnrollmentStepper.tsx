@@ -10,6 +10,7 @@ import Step5DocumentsReview from "./Step5DocumentsReview";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
+import { isApplicationInTerm } from "@/lib/utils/academicTerm";
 
 export interface FullEnrollmentFormData {
   // Step 1: Classification
@@ -244,10 +245,11 @@ export default function EnrollmentStepper({
     }
   }, [user, schoolYear, semester]);
 
-  // Check if student already has an active enrollment application in Supabase
+  // Check if student already has an active enrollment application in Supabase for the active term
   useEffect(() => {
     if (!user) {
       setIsCheckingApp(false);
+      setExistingApp(null);
       return;
     }
 
@@ -274,11 +276,76 @@ export default function EnrollmentStepper({
             .from("enrollment_applications")
             .select("*")
             .eq("student_id", studentRecord.id)
-            .order("created_at", { ascending: false })
-            .limit(1);
+            .order("created_at", { ascending: false });
 
           if (appRows && appRows.length > 0) {
-            appData = appRows[0];
+            // Find application for CURRENT ACTIVE academic term
+            const activeTermApp = appRows.find((a: any) =>
+              isApplicationInTerm(a, schoolYear, semester)
+            );
+
+            if (activeTermApp) {
+              appData = activeTermApp;
+            } else {
+              // No application for active term: Continuing student fast-path!
+              // Pre-fill profile and parent info from past application and student profile
+              const pastApp = appRows[0];
+              const pastFd = Array.isArray(pastApp.selected_electives) && pastApp.selected_electives.length > 0
+                ? pastApp.selected_electives[0]
+                : (typeof pastApp.selected_electives === "object" && pastApp.selected_electives !== null ? pastApp.selected_electives : {});
+
+              setFormData((prev) => ({
+                ...prev,
+                lrn: (studentRecord?.student_id && /^\d{12}$/.test(studentRecord.student_id))
+                  ? studentRecord.student_id
+                  : (user.lrn && /^\d{12}$/.test(user.lrn))
+                  ? user.lrn
+                  : (prev.lrn || ""),
+                lastName: studentRecord?.last_name || user.lastName || prev.lastName,
+                firstName: studentRecord?.first_name || user.firstName || prev.firstName,
+                middleName: studentRecord?.middle_name || user.middleName || prev.middleName,
+                gender: studentRecord?.gender || pastFd.gender || prev.gender || "Male",
+                dateOfBirth: studentRecord?.date_of_birth || pastFd.dateOfBirth || prev.dateOfBirth || "2012-05-15",
+                contactNumber: studentRecord?.contact_number || pastFd.contactNumber || prev.contactNumber || "09181234567",
+                currentBarangay: studentRecord?.barangay || pastFd.currentBarangay || prev.currentBarangay || "CABARITAN",
+                psaBirthCertNo: pastFd.psaBirthCertNo || prev.psaBirthCertNo || "",
+                placeOfBirth: pastFd.placeOfBirth || prev.placeOfBirth || "Dumalneg, Ilocos Norte",
+                religion: pastFd.religion || prev.religion || "Roman Catholic",
+                motherTongue: pastFd.motherTongue || prev.motherTongue || "Ilokano",
+                isIpCommunity: pastFd.isIpCommunity ?? prev.isIpCommunity ?? true,
+                ipCommunityName: pastFd.ipCommunityName || prev.ipCommunityName || "Isnag",
+                is4psBeneficiary: pastFd.is4psBeneficiary ?? prev.is4psBeneficiary ?? false,
+                householdId4ps: pastFd.householdId4ps || prev.householdId4ps || "",
+                currentHouseNo: pastFd.currentHouseNo || prev.currentHouseNo || "",
+                currentSitio: pastFd.currentSitio || prev.currentSitio || "",
+                currentMunicipality: pastFd.currentMunicipality || prev.currentMunicipality || "DUMALNEG",
+                currentProvince: pastFd.currentProvince || prev.currentProvince || "ILOCOS NORTE",
+                currentCountry: pastFd.currentCountry || prev.currentCountry || "PHILIPPINES",
+                currentZipCode: pastFd.currentZipCode || prev.currentZipCode || "2921",
+                isPermanentSameAsCurrent: pastFd.isPermanentSameAsCurrent ?? prev.isPermanentSameAsCurrent ?? true,
+                permanentHouseNo: pastFd.permanentHouseNo || prev.permanentHouseNo || "",
+                permanentSitio: pastFd.permanentSitio || prev.permanentSitio || "",
+                permanentBarangay: pastFd.permanentBarangay || prev.permanentBarangay || "CABARITAN",
+                permanentMunicipality: pastFd.permanentMunicipality || prev.permanentMunicipality || "DUMALNEG",
+                permanentProvince: pastFd.permanentProvince || prev.permanentProvince || "ILOCOS NORTE",
+                permanentCountry: pastFd.permanentCountry || prev.permanentCountry || "PHILIPPINES",
+                permanentZipCode: pastFd.permanentZipCode || prev.permanentZipCode || "2921",
+                fatherLastName: pastFd.fatherLastName || prev.fatherLastName || "",
+                fatherFirstName: pastFd.fatherFirstName || prev.fatherFirstName || "",
+                fatherMiddleName: pastFd.fatherMiddleName || prev.fatherMiddleName || "",
+                fatherContactNumber: pastFd.fatherContactNumber || prev.fatherContactNumber || "",
+                motherMaidenLastName: pastFd.motherMaidenLastName || prev.motherMaidenLastName || "",
+                motherFirstName: pastFd.motherFirstName || prev.motherFirstName || "",
+                motherMiddleName: pastFd.motherMiddleName || prev.motherMiddleName || "",
+                motherContactNumber: pastFd.motherContactNumber || prev.motherContactNumber || "",
+                guardianLastName: pastFd.guardianLastName || prev.guardianLastName || "",
+                guardianFirstName: pastFd.guardianFirstName || prev.guardianFirstName || "",
+                guardianMiddleName: pastFd.guardianMiddleName || prev.guardianMiddleName || "",
+                guardianContactNumber: pastFd.guardianContactNumber || prev.guardianContactNumber || "",
+                guardianRelationship: pastFd.guardianRelationship || prev.guardianRelationship || "",
+                primaryContactPerson: pastFd.primaryContactPerson || prev.primaryContactPerson || "Father",
+              }));
+            }
           }
         }
 
@@ -325,6 +392,8 @@ export default function EnrollmentStepper({
               dataPrivacyAccepted: true,
             }));
           }
+        } else {
+          setExistingApp(null);
         }
       } catch (err) {
         console.warn("Notice checking existing application:", err);
@@ -349,7 +418,7 @@ export default function EnrollmentStepper({
         window.removeEventListener("dumalnext:data-changed", handleDataChanged);
       }
     };
-  }, [user]);
+  }, [user, schoolYear, semester]);
 
   const handleStep1Change = (fields: Partial<Step1Data>) => {
     setFormData((prev) => ({

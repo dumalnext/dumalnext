@@ -7,6 +7,12 @@ export interface EnrollmentControlSettings {
   isEnrollmentOpen: boolean;
   schoolYear: string;
   semester: string;
+  termNumber?: number;
+  activeTerm?: {
+    schoolYear: string;
+    termName: string;
+    termNumber: number;
+  };
   enrollmentStartDate?: string;
   enrollmentEndDate?: string;
   closedMessage: string;
@@ -18,6 +24,7 @@ const defaultSettings: EnrollmentControlSettings = {
   isEnrollmentOpen: true,
   schoolYear: "2026–2027",
   semester: "1st Semester",
+  termNumber: 1,
   closedMessage:
     "DepEd Official Advisory: Dumalneg National High School Online Enrollment for School Year 2026–2027 is currently closed at this time. Please await further announcements from the Registrar's Office.",
 };
@@ -38,6 +45,8 @@ export function useEnrollmentControl() {
           isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
           schoolYear: data.schoolYear || "2026–2027",
           semester: data.semester || "1st Semester",
+          termNumber: typeof data.termNumber === "number" ? data.termNumber : (data.activeTerm?.termNumber || 1),
+          activeTerm: data.activeTerm || undefined,
           enrollmentStartDate: data.enrollmentStartDate,
           enrollmentEndDate: data.enrollmentEndDate,
           closedMessage:
@@ -72,6 +81,8 @@ export function useEnrollmentControl() {
               isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
               schoolYear: data.schoolYear || "2026–2027",
               semester: data.semester || "1st Semester",
+              termNumber: typeof data.termNumber === "number" ? data.termNumber : (data.activeTerm?.termNumber || 1),
+              activeTerm: data.activeTerm || undefined,
               enrollmentStartDate: data.enrollmentStartDate,
               enrollmentEndDate: data.enrollmentEndDate,
               closedMessage:
@@ -98,6 +109,8 @@ export function useEnrollmentControl() {
               isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
               schoolYear: data.schoolYear || "2026–2027",
               semester: data.semester || "1st Semester",
+              termNumber: typeof data.termNumber === "number" ? data.termNumber : (data.activeTerm?.termNumber || 1),
+              activeTerm: data.activeTerm || undefined,
               enrollmentStartDate: data.enrollmentStartDate,
               enrollmentEndDate: data.enrollmentEndDate,
               closedMessage:

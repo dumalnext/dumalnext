@@ -48,19 +48,20 @@ const NO_CACHE_HEADERS = {
 
 export async function GET() {
   const supabase = getSupabaseClient();
-  let activeTerm: { schoolYear: string; termName: string } | null = null;
+  let activeTerm: { schoolYear: string; termName: string; termNumber: number } | null = null;
 
   if (supabase) {
     try {
       const { data: termData } = await supabase
         .from("academic_terms")
-        .select("schoolYear, termName, isActive")
+        .select("schoolYear, termName, termNumber, isActive")
         .eq("isActive", true)
         .maybeSingle();
       if (termData?.schoolYear) {
         activeTerm = {
           schoolYear: termData.schoolYear,
-          termName: termData.termName,
+          termName: termData.termName || `Trimester ${termData.termNumber || 1}`,
+          termNumber: Number(termData.termNumber) || 1,
         };
       }
     } catch (tErr) {
@@ -80,7 +81,14 @@ export async function GET() {
       if (data?.value && !error) {
         const val = {
           ...data.value,
-          ...(activeTerm ? { schoolYear: activeTerm.schoolYear, semester: activeTerm.termName } : {}),
+          ...(activeTerm
+            ? {
+                schoolYear: activeTerm.schoolYear,
+                semester: activeTerm.termName,
+                termNumber: activeTerm.termNumber,
+                activeTerm,
+              }
+            : {}),
         };
         return NextResponse.json(val, {
           headers: NO_CACHE_HEADERS,
@@ -99,7 +107,14 @@ export async function GET() {
       const data = JSON.parse(content);
       const val = {
         ...data,
-        ...(activeTerm ? { schoolYear: activeTerm.schoolYear, semester: activeTerm.termName } : {}),
+        ...(activeTerm
+          ? {
+              schoolYear: activeTerm.schoolYear,
+              semester: activeTerm.termName,
+              termNumber: activeTerm.termNumber,
+              activeTerm,
+            }
+          : {}),
       };
       return NextResponse.json(val, {
         headers: NO_CACHE_HEADERS,
@@ -111,7 +126,13 @@ export async function GET() {
 
   return NextResponse.json(
     activeTerm
-      ? { ...defaultSettings, schoolYear: activeTerm.schoolYear, semester: activeTerm.termName }
+      ? {
+          ...defaultSettings,
+          schoolYear: activeTerm.schoolYear,
+          semester: activeTerm.termName,
+          termNumber: activeTerm.termNumber,
+          activeTerm,
+        }
       : defaultSettings,
     { headers: NO_CACHE_HEADERS }
   );
@@ -122,18 +143,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     const supabase = getSupabaseClient();
 
-    let activeTerm: { schoolYear: string; termName: string } | null = null;
+    let activeTerm: { schoolYear: string; termName: string; termNumber: number } | null = null;
     if (supabase) {
       try {
         const { data: termData } = await supabase
           .from("academic_terms")
-          .select("schoolYear, termName, isActive")
+          .select("schoolYear, termName, termNumber, isActive")
           .eq("isActive", true)
           .maybeSingle();
         if (termData?.schoolYear) {
           activeTerm = {
             schoolYear: termData.schoolYear,
-            termName: termData.termName,
+            termName: termData.termName || `Trimester ${termData.termNumber || 1}`,
+            termNumber: Number(termData.termNumber) || 1,
           };
         }
       } catch {}

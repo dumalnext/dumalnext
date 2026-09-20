@@ -7,11 +7,17 @@ import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { FullEnrollmentFormData } from "@/components/forms/enrollment/EnrollmentStepper";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/authContext";
+import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
+import { isApplicationInTerm } from "@/lib/utils/academicTerm";
 
 interface ApplicationRecord {
+  id?: string;
   referenceNumber: string;
   applicationDate: string;
   status: "Pending" | "Approved" | "Needs Revision";
+  schoolYear?: string;
+  semester?: string;
+  rawApp?: any;
   lrn: string;
   fullName: string;
   gradeLevel: number | string;
@@ -34,8 +40,10 @@ function TrackApplicationContent() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("ref") || searchParams.get("query") || "";
+  const { isEnrollmentOpen, schoolYear, semester, termNumber } = useEnrollmentControl();
 
   const [record, setRecord] = useState<ApplicationRecord | null>(null);
+  const [allRecords, setAllRecords] = useState<ApplicationRecord[]>([]);
   const [isFetchingRecord, setIsFetchingRecord] = useState<boolean>(true);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
   const hasLoadedOnceRef = useRef<boolean>(false);
@@ -57,10 +65,20 @@ function TrackApplicationContent() {
       ? `${studentRecord.last_name}, ${studentRecord.first_name} ${studentRecord.middle_name || ""}`.trim()
       : (user ? `${user.lastName}, ${user.firstName}` : "STUDENT APPLICANT");
 
+    const fd = Array.isArray(suApp.selected_electives) && suApp.selected_electives.length > 0
+      ? suApp.selected_electives[0]
+      : (typeof suApp.selected_electives === "object" && suApp.selected_electives !== null ? suApp.selected_electives : {});
+    const cleanSY = suApp.school_year || fd.schoolYear || "2026-2027";
+    const appSem = fd.term_name || fd.termName || fd.semester || fd.term || fd.targetSemester || suApp.term_name || suApp.semester || "Trimester 1";
+
     return {
+      id: suApp.id,
       referenceNumber: suApp.application_id,
       applicationDate: suApp.created_at,
       status: suApp.status || "Pending",
+      schoolYear: cleanSY,
+      semester: appSem,
+      rawApp: suApp,
       lrn: (studentRecord?.student_id && /^\d{12}$/.test(studentRecord.student_id))
         ? studentRecord.student_id
         : (user?.lrn && /^\d{12}$/.test(user.lrn))
@@ -84,11 +102,11 @@ function TrackApplicationContent() {
           applicantType: suApp.applicant_type || "Grade 7",
           targetGradeLevel: Number(suApp.target_grade_level) || 7,
           jhsProgram: "Regular",
-          targetSemester: "1st Semester",
+          targetSemester: appSem,
           targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
           targetStrand: suApp.target_strand || "",
           lastGradeCompleted: (Number(suApp.target_grade_level) || 7) - 1,
-          lastSchoolYearCompleted: "2024-2025",
+          lastSchoolYearCompleted: cleanSY,
           lastSchoolAttended: "Dumalneg Elementary School",
           lastSchoolId: "100050",
         },
@@ -238,15 +256,38 @@ function TrackApplicationContent() {
               .from("enrollment_applications")
               .select("*")
               .eq("student_id", studentRecord.id)
-              .order("created_at", { ascending: false })
-              .limit(1),
+              .order("created_at", { ascending: false }),
             fetchSectionInfo(studentRecord.current_section_id),
           ]);
 
           const appData = appRes.data;
 
           if (isMounted && appData && appData.length > 0) {
-            setRecord(mapSupabaseToRecord(appData[0], studentRecord, secInfo));
+            const mappedRecords = appData.map((a: any) =>
+              mapSupabaseToRecord(a, studentRecord, secInfo)
+            );
+            setAllRecords(mappedRecords);
+
+            // Find application for CURRENT ACTIVE academic term
+            const activeTermRecord = mappedRecords.find((r: ApplicationRecord) =>
+              isApplicationInTerm(r.rawApp, schoolYear, termNumber || semester)
+            );
+
+            // If an explicit query parameter was provided, try matching that first
+            if (initialQuery.trim()) {
+              const matchedQuery = mappedRecords.find(
+                (r: ApplicationRecord) =>
+                  r.referenceNumber.toUpperCase() === initialQuery.trim().toUpperCase()
+              );
+              if (matchedQuery) {
+                setRecord(matchedQuery);
+                hasLoadedOnceRef.current = true;
+                setIsFetchingRecord(false);
+                return;
+              }
+            }
+
+            setRecord(activeTermRecord || mappedRecords[0]);
             hasLoadedOnceRef.current = true;
             setIsFetchingRecord(false);
             return;
@@ -256,6 +297,7 @@ function TrackApplicationContent() {
         // No record submitted yet
         if (isMounted) {
           setRecord(null);
+          setAllRecords([]);
           hasLoadedOnceRef.current = true;
           setIsFetchingRecord(false);
         }
@@ -263,6 +305,7 @@ function TrackApplicationContent() {
         console.error("Error auto-fetching application record:", err);
         if (isMounted) {
           setRecord(null);
+          setAllRecords([]);
           hasLoadedOnceRef.current = true;
           setIsFetchingRecord(false);
         }
@@ -330,7 +373,7 @@ function TrackApplicationContent() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
     };
-  }, [user?.id, user?.lrn, initialQuery]);
+  }, [user?.id, user?.lrn, initialQuery, schoolYear, semester, termNumber]);
 
   const handleDownloadApprovedPdf = async () => {
     if (!record) return;
@@ -482,17 +525,64 @@ function TrackApplicationContent() {
         /* =========================================================================
            SCENARIO 1: ENROLLMENT APPLICATION FOUND (AUTOMATIC LIVE TRACKING CARD)
            ========================================================================= */
-        <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 shadow-sm">
-          {/* Header with Reference Number and Status Badge */}
-          <div className="border-b-2 border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <span className="text-[10px] font-mono text-slate-500 uppercase block">
-                Official Application Reference Number
-              </span>
-              <span className="text-2xl font-mono font-bold text-[#002060]">
-                {record.referenceNumber}
-              </span>
+        <div className="space-y-4">
+          {/* Active Academic Term Enrollment Open Advisory */}
+          {!allRecords.some((r) => isApplicationInTerm(r.rawApp, schoolYear, termNumber || semester)) && isEnrollmentOpen && (
+            <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div>
+                <span className="text-xs font-mono font-bold text-emerald-950 uppercase block mb-0.5">
+                  [ NEW ACADEMIC TERM: S.Y. {schoolYear} &bull; {semester} ENROLLMENT IS OPEN ]
+                </span>
+                <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+                  You are currently reviewing your previous term application record. Online Enrollment for School Year {schoolYear} ({semester}) is now officially open!
+                </p>
+              </div>
+              <Link
+                href="/enroll"
+                className="btn-primary text-xs uppercase font-bold py-2.5 px-5 shrink-0 text-center"
+              >
+                Enroll Now for {semester} &rarr;
+              </Link>
             </div>
+          )}
+
+          {/* Multi-Term Application Selector (When learner has records across semesters) */}
+          {allRecords.length > 1 && (
+            <div className="p-3 bg-white border border-slate-300 flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-mono font-bold text-slate-600 uppercase shrink-0">
+                [ Term Records ]:
+              </span>
+              {allRecords.map((rec) => {
+                const isSelected = record?.referenceNumber === rec.referenceNumber;
+                return (
+                  <button
+                    key={rec.referenceNumber}
+                    type="button"
+                    onClick={() => setRecord(rec)}
+                    className={`px-3 py-1.5 font-mono text-xs font-bold border transition-colors cursor-pointer shrink-0 ${
+                      isSelected
+                        ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                        : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
+                    }`}
+                  >
+                    {rec.referenceNumber} &bull; S.Y. {rec.schoolYear} ({rec.semester}) [{rec.status}]
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 shadow-sm">
+            {/* Header with Reference Number and Status Badge */}
+            <div className="border-b-2 border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-mono text-slate-500 uppercase block">
+                  Official Application Reference Number &bull; S.Y. {record.schoolYear} ({record.semester})
+                </span>
+                <span className="text-2xl font-mono font-bold text-[#002060]">
+                  {record.referenceNumber}
+                </span>
+              </div>
 
             {/* Institutional Status Badges (Color-coded, Zero Emojis) */}
             <div>
@@ -653,8 +743,8 @@ function TrackApplicationContent() {
                 </div>
               )}
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">School Year</span>
-                <span className="font-bold text-slate-900">2025–2026</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">School Year &bull; Term</span>
+                <span className="font-bold text-slate-900">{record.schoolYear || "2026-2027"} ({record.semester || "Trimester 1"})</span>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">Submission Date</span>
@@ -669,6 +759,7 @@ function TrackApplicationContent() {
             </div>
           </div>
         </div>
+      </div>
       ) : (
         /* =========================================================================
            SCENARIO 2: NO APPLICATION SUBMITTED YET FOR THIS ACCOUNT
@@ -682,14 +773,14 @@ function TrackApplicationContent() {
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
             Your learner account (<strong className="text-slate-900">{user.email}</strong>) is active and verified. 
-            However, you have not yet completed and submitted the 5-step online basic education enrollment form for School Year 2025–2026.
+            However, you have not yet completed and submitted the online basic education enrollment form for School Year {schoolYear} ({semester}).
           </p>
           <div className="pt-2">
             <Link
               href="/enroll"
               className="inline-block px-8 py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs"
             >
-              Start 5-Step Online Enrollment Form
+              Start Online Enrollment Form ({semester})
             </Link>
           </div>
         </div>
