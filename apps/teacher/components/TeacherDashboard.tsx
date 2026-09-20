@@ -100,16 +100,26 @@ export default function TeacherDashboard() {
     const fetchSchedules = async () => {
       setIsLoadingSchedules(true);
       try {
-        if (user?.id) {
-          const { data, error } = await supabase
-            .from("class_schedules")
-            .select("*")
-            .eq("teacherId", user.id);
+        if (user) {
+          const queryParams = new URLSearchParams();
+          if (user.teacherDbId) queryParams.set("teacherDbId", user.teacherDbId);
+          if (user.teacherId) queryParams.set("teacherId", user.teacherId);
+          if (user.id) queryParams.set("userId", user.id);
+          if (user.email) queryParams.set("email", user.email);
+          if (user.fullName) queryParams.set("name", user.fullName);
 
-          if (!error && data) {
-            setSchedules(data);
+          const res = await fetch(`/api/schedules?${queryParams.toString()}&_t=${Date.now()}`, {
+            cache: "no-store",
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.schedules)) {
+              setSchedules(data.schedules);
+              return;
+            }
           }
         }
+        setSchedules([]);
       } catch {
         setSchedules([]);
       } finally {

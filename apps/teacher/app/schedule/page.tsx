@@ -83,8 +83,11 @@ export default function TeachingSchedulePage() {
     try {
       if (user) {
         const queryParams = new URLSearchParams();
-        if (user.id) queryParams.set("teacherId", user.id);
+        if (user.teacherDbId) queryParams.set("teacherDbId", user.teacherDbId);
+        if (user.teacherId) queryParams.set("teacherId", user.teacherId);
+        if (user.id) queryParams.set("userId", user.id);
         if (user.email) queryParams.set("email", user.email);
+        if (user.fullName) queryParams.set("name", user.fullName);
 
         const res = await fetch(`/api/schedules?${queryParams.toString()}&_t=${Date.now()}`, {
           cache: "no-store",
@@ -111,6 +114,26 @@ export default function TeachingSchedulePage() {
     if (user) {
       fetchSchedules();
     }
+
+    const handleSync = () => {
+      if (user) fetchSchedules();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("dumalnext:teacher-data-changed", handleSync);
+      window.addEventListener("dumalnext:admin-data-changed", handleSync);
+      window.addEventListener("dumalnext:data-changed", handleSync);
+      window.addEventListener("focus", handleSync);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("dumalnext:teacher-data-changed", handleSync);
+        window.removeEventListener("dumalnext:admin-data-changed", handleSync);
+        window.removeEventListener("dumalnext:data-changed", handleSync);
+        window.removeEventListener("focus", handleSync);
+      }
+    };
   }, [user]);
 
   if (isLoading) {
@@ -174,7 +197,16 @@ export default function TeachingSchedulePage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => fetchSchedules()}
+            disabled={isLoadingSchedules}
+            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer border border-slate-300 shadow-2xs shrink-0 disabled:opacity-50"
+            title="Synchronize schedule from official database"
+          >
+            {isLoadingSchedules ? "[ Synchronizing... ]" : "[ Refresh Timetable ]"}
+          </button>
           {schedules.length > 0 ? (
             <>
               <button

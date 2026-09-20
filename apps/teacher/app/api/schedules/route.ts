@@ -31,8 +31,19 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const filterTeacherId = searchParams.get("teacherId");
-    const filterEmail = searchParams.get("email");
+    const filterTeacherDbId = searchParams.get("teacherDbId")?.trim();
+    const filterTeacherId = searchParams.get("teacherId")?.trim();
+    const filterUserId = searchParams.get("userId")?.trim();
+    const filterEmail = searchParams.get("email")?.trim().toLowerCase();
+    const filterName = searchParams.get("name")?.trim().toLowerCase();
+
+    // Security guard: If no teacher identifying parameter is supplied, return empty list
+    if (!filterTeacherDbId && !filterTeacherId && !filterUserId && !filterEmail && !filterName) {
+      return NextResponse.json(
+        { success: true, count: 0, schedules: [] },
+        { headers: NO_CACHE_HEADERS }
+      );
+    }
 
     const [
       { data: sectionsData },
@@ -43,7 +54,7 @@ export async function GET(req: Request) {
       { data: dbSchedulesData },
     ] = await Promise.all([
       supabase.from("sections").select("id, section_name, grade_level, strand"),
-      supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department"),
+      supabase.from("teachers").select("*"),
       supabase.from("classrooms").select("id, classroom_id, room_name, building"),
       supabase.from("course_subjects").select("id, subject_code, subject_name"),
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
@@ -54,10 +65,19 @@ export async function GET(req: Request) {
     (sectionsData || []).forEach((s) => sectionMap.set(s.id, s));
 
     const teacherMap = new Map<string, any>();
-    (teachersData || []).forEach((t) => {
-      const middle = t.middle_name ? ` ${t.middle_name}` : "";
-      const fullName = `${t.first_name}${middle} ${t.last_name}`.trim();
-      teacherMap.set(t.id, { ...t, fullName });
+    (teachersData || []).forEach((t: any) => {
+      const first = (t.first_name || t.firstName || "").trim();
+      const middle = (t.middle_name || t.middleName || "").trim();
+      const last = (t.last_name || t.lastName || "").trim();
+      const midStr = middle ? ` ${middle}` : "";
+      const fullName = `${first}${midStr} ${last}`.trim() || t.email || "Faculty Member";
+      const simpleName = `${first} ${last}`.trim();
+
+      const enriched = { ...t, fullName, simpleName };
+      if (t.id) teacherMap.set(t.id, enriched);
+      if (t.teacher_id) teacherMap.set(t.teacher_id, enriched);
+      if (t.user_id) teacherMap.set(t.user_id, enriched);
+      if (t.email) teacherMap.set(t.email.toLowerCase(), enriched);
     });
 
     const classroomMap = new Map<string, any>();
@@ -65,6 +85,42 @@ export async function GET(req: Request) {
 
     const subjectMap = new Map<string, any>();
     (subjectsData || []).forEach((sub) => subjectMap.set(sub.subject_code, sub));
+
+    // Resolve all possible identifiers for the active logged-in teacher
+    const validTeacherIds = new Set<string>();
+    const validEmails = new Set<string>();
+    const validNames = new Set<string>();
+
+    if (filterTeacherDbId) validTeacherIds.add(filterTeacherDbId);
+    if (filterTeacherId) validTeacherIds.add(filterTeacherId);
+    if (filterUserId) validTeacherIds.add(filterUserId);
+    if (filterEmail) validEmails.add(filterEmail);
+    if (filterName) validNames.add(filterName);
+
+    (teachersData || []).forEach((t: any) => {
+      const first = (t.first_name || t.firstName || "").trim().toLowerCase();
+      const middle = (t.middle_name || t.middleName || "").trim().toLowerCase();
+      const last = (t.last_name || t.lastName || "").trim().toLowerCase();
+      const full = `${first}${middle ? " " + middle : ""} ${last}`.trim();
+      const simple = `${first} ${last}`.trim();
+      const em = (t.email || "").trim().toLowerCase();
+
+      const isMatch =
+        (filterTeacherDbId && t.id === filterTeacherDbId) ||
+        (filterTeacherId && (t.id === filterTeacherId || t.teacher_id === filterTeacherId)) ||
+        (filterUserId && (t.user_id === filterUserId || t.id === filterUserId)) ||
+        (filterEmail && em === filterEmail) ||
+        (filterName && (full === filterName || simple === filterName));
+
+      if (isMatch) {
+        if (t.id) validTeacherIds.add(t.id);
+        if (t.teacher_id) validTeacherIds.add(t.teacher_id);
+        if (t.user_id) validTeacherIds.add(t.user_id);
+        if (em) validEmails.add(em);
+        if (full) validNames.add(full);
+        if (simple) validNames.add(simple);
+      }
+    });
 
     let configSchedules: any[] = [];
     if (sysSettingsData?.value && Array.isArray(sysSettingsData.value.schedules)) {
@@ -92,31 +148,65 @@ export async function GET(req: Request) {
       scheduleMap.set(item.id, { ...item });
     });
 
-    let results = Array.from(scheduleMap.values()).map((sc) => {
+    // Enrich all schedule records
+    const enrichedList = Array.from(scheduleMap.values()).map((sc) => {
       const sec = sectionMap.get(sc.section_id);
       const tch = teacherMap.get(sc.teacher_id);
       const rm = classroomMap.get(sc.classroom_id);
       const sub = subjectMap.get(sc.subject_code);
 
+      const resolvedTeacherName = tch?.fullName || sc.teacher_name || "Faculty Member";
+      const resolvedTeacherEmail = tch?.email || sc.teacher_email;
+
       return {
         ...sc,
-        section_name: sec ? sec.section_name : "General Section",
+        section_name: sec ? sec.section_name : sc.section_name || "General Section",
         grade_level: sec ? sec.grade_level : undefined,
         strand: sec?.strand || null,
-        teacher_name: tch ? tch.fullName : "Faculty Member",
-        teacher_email: tch ? tch.email : undefined,
-        classroom_name: rm ? rm.room_name : "Main Classroom",
+        teacher_name: resolvedTeacherName,
+        teacher_email: resolvedTeacherEmail,
+        classroom_name: rm ? rm.room_name : sc.classroom_name || "Main Classroom",
         building: rm?.building,
         subject_name: sc.subject_name || sub?.subject_name || sc.subject_code,
       };
     });
 
-    if (filterTeacherId) {
-      results = results.filter((r) => r.teacher_id === filterTeacherId);
-    } else if (filterEmail) {
-      const cleanEmail = filterEmail.trim().toLowerCase();
-      results = results.filter((r) => r.teacher_email && r.teacher_email.toLowerCase() === cleanEmail);
-    }
+    // Filter strictly to schedules where the Admin assigned this specific teacher
+    let results = enrichedList.filter((r) => {
+      // 1. Direct ID match
+      if (r.teacher_id && validTeacherIds.has(r.teacher_id)) {
+        return true;
+      }
+
+      // 2. Email match
+      if (r.teacher_email && validEmails.has(r.teacher_email.toLowerCase())) {
+        return true;
+      }
+
+      // 3. Name match
+      if (r.teacher_name) {
+        const schedTeacherName = r.teacher_name.toLowerCase().trim();
+        if (validNames.has(schedTeacherName)) {
+          return true;
+        }
+        // Substring check for name variations
+        for (const vName of validNames) {
+          if (vName && (schedTeacherName.includes(vName) || vName.includes(schedTeacherName))) {
+            return true;
+          }
+        }
+      }
+
+      // 4. Lookup through teacherMap
+      if (r.teacher_id && teacherMap.has(r.teacher_id)) {
+        const tch = teacherMap.get(r.teacher_id);
+        if (tch.email && validEmails.has(tch.email.toLowerCase())) return true;
+        if (tch.fullName && validNames.has(tch.fullName.toLowerCase())) return true;
+        if (tch.simpleName && validNames.has(tch.simpleName.toLowerCase())) return true;
+      }
+
+      return false;
+    });
 
     const dayOrder: Record<string, number> = {
       Monday: 1,

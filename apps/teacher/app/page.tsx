@@ -7,6 +7,55 @@ import TeacherLoginForm from "@/components/TeacherLoginForm";
 
 export default function TeacherHomePage() {
   const { user, isLoading, logout } = useTeacherAuth();
+  const [scheduleCount, setScheduleCount] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (!user) return;
+
+    const fetchLoad = async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (user.teacherDbId) queryParams.set("teacherDbId", user.teacherDbId);
+        if (user.teacherId) queryParams.set("teacherId", user.teacherId);
+        if (user.id) queryParams.set("userId", user.id);
+        if (user.email) queryParams.set("email", user.email);
+        if (user.fullName) queryParams.set("name", user.fullName);
+
+        const res = await fetch(`/api/schedules?${queryParams.toString()}&_t=${Date.now()}`, {
+          cache: "no-store",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.schedules)) {
+            setScheduleCount(data.schedules.length);
+            return;
+          }
+        }
+        setScheduleCount(0);
+      } catch {
+        setScheduleCount(0);
+      }
+    };
+
+    fetchLoad();
+
+    const handleSync = () => fetchLoad();
+    if (typeof window !== "undefined") {
+      window.addEventListener("dumalnext:teacher-data-changed", handleSync);
+      window.addEventListener("dumalnext:admin-data-changed", handleSync);
+      window.addEventListener("dumalnext:data-changed", handleSync);
+      window.addEventListener("focus", handleSync);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("dumalnext:teacher-data-changed", handleSync);
+        window.removeEventListener("dumalnext:admin-data-changed", handleSync);
+        window.removeEventListener("dumalnext:data-changed", handleSync);
+        window.removeEventListener("focus", handleSync);
+      }
+    };
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -72,15 +121,23 @@ export default function TeacherHomePage() {
               <span className="text-xs font-mono font-bold text-[#002060] uppercase">
                 [ MODULE 01 ]
               </span>
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-950 font-mono text-[10px] font-bold uppercase border border-amber-300">
-                PENDING RELEASE
-              </span>
+              {scheduleCount !== null && scheduleCount > 0 ? (
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-[10px] font-bold uppercase border border-emerald-400">
+                  [ {scheduleCount} ACTIVE PERIODS ]
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 bg-amber-100 text-amber-950 font-mono text-[10px] font-bold uppercase border border-amber-300">
+                  [ PENDING RELEASE ]
+                </span>
+              )}
             </div>
             <h3 className="text-base font-bold text-slate-900 uppercase">
               Teaching Load &amp; Schedule
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              View your official weekly instructional timetable, assigned subject periods, and designated classrooms.
+              {scheduleCount !== null && scheduleCount > 0
+                ? `Official instructional timetable active with ${scheduleCount} assigned period(s). View your weekly schedule and classrooms.`
+                : "View your official weekly instructional timetable, assigned subject periods, and designated classrooms."}
             </p>
           </div>
 

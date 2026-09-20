@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export interface TeacherUser {
   id: string;
+  teacherDbId?: string; // Supabase teachers table UUID primary key
   teacherId: string; // e.g. DNHS-TCH-001
   email: string;
   fullName: string;
@@ -93,6 +94,7 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
 
         const activeUser: TeacherUser = {
           id: authUser.id,
+          teacherDbId: teacherRecord?.id,
           teacherId,
           email: cleanEmail,
           fullName,
@@ -239,6 +241,7 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
 
       const sessionUser: TeacherUser = {
         id: authUser.id,
+        teacherDbId: tch?.id,
         teacherId,
         email: targetEmail,
         fullName,
