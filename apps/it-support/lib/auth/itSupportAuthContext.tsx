@@ -24,6 +24,8 @@ interface ITSupportAuthContextType {
 const ITSupportAuthContext = createContext<ITSupportAuthContextType | undefined>(undefined);
 
 const IT_SESSION_COOKIE_NAME = "dumalnext_itsupport_session";
+const AUTHORIZED_IT_EMAIL = "dumalnext@gmail.com";
+const AUTHORIZED_IT_PASS = "dumalNext26.";
 
 function setSessionCookie(user: ITSupportUser) {
   if (typeof document !== "undefined") {
@@ -60,7 +62,7 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
 
       // 1. Check cached session cookie
       const cached = getSessionCookie();
-      if (cached && cached.userRole === "it_support") {
+      if (cached && cached.email?.toLowerCase() === AUTHORIZED_IT_EMAIL.toLowerCase() && cached.userRole === "it_support") {
         setUser(cached);
         setIsLoading(false);
         return;
@@ -68,36 +70,19 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
 
       // 2. Check Supabase auth session
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: suUsers } = await supabase
-          .from("users")
-          .select("id, userId:\"userId\", email, userRole:\"userRole\"")
-          .eq("id", session.user.id)
-          .eq("userRole", "it_support")
-          .limit(1);
-
-        const suUser = suUsers?.[0];
-        if (suUser) {
-          const { data: itProfiles } = await supabase
-            .from("it_supports")
-            .select("*")
-            .eq("userId", suUser.id)
-            .limit(1);
-
-          const itProfile = itProfiles?.[0];
-          const verifiedUser: ITSupportUser = {
-            id: suUser.id,
-            userId: suUser.userId || "DNHS-IT-001",
-            email: suUser.email,
-            fullName: "DNHS IT Operations & Systems Desk",
-            systemRole: itProfile?.systemRole || "System Administrator",
-            userRole: "it_support",
-          };
-          setUser(verifiedUser);
-          setSessionCookie(verifiedUser);
-          setIsLoading(false);
-          return;
-        }
+      if (session?.user && session.user.email?.toLowerCase() === AUTHORIZED_IT_EMAIL.toLowerCase()) {
+        const verifiedUser: ITSupportUser = {
+          id: session.user.id,
+          userId: "DNHS-IT-001",
+          email: AUTHORIZED_IT_EMAIL,
+          fullName: "DNHS IT Operations & Systems Desk",
+          systemRole: "System Administrator",
+          userRole: "it_support",
+        };
+        setUser(verifiedUser);
+        setSessionCookie(verifiedUser);
+        setIsLoading(false);
+        return;
       }
 
       setUser(null);
@@ -117,84 +102,94 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
     identifier: string,
     password: string
   ): Promise<{ success: boolean; error?: string }> => {
-    const cleanId = identifier.trim();
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanPass = password.trim();
+
     if (!cleanId) {
-      return { success: false, error: "Please enter your IT Support Employee ID or Email." };
+      return { success: false, error: "Please enter your authorized IT Support email (dumalnext@gmail.com)." };
     }
-    if (!password) {
+    if (!cleanPass) {
       return { success: false, error: "Please enter your account password." };
     }
 
-    try {
-      // 1. Try querying users table for it_support role
-      const { data: matchingUsers } = await supabase
-        .from("users")
-        .select("id, userId:\"userId\", email, password, userRole:\"userRole\"")
-        .or(`"userId".ilike.${cleanId},email.ilike.${cleanId}`)
-        .eq("userRole", "it_support")
-        .limit(1);
-
-      const foundUser = matchingUsers?.[0];
-
-      if (foundUser) {
-        if (foundUser.password === password || password === "admin123" || password === "password123") {
-          const itUser: ITSupportUser = {
-            id: foundUser.id,
-            userId: foundUser.userId || "DNHS-IT-001",
-            email: foundUser.email,
-            fullName: "DNHS IT Operations & Systems Desk",
-            systemRole: "System Administrator",
-            userRole: "it_support",
-          };
-          setUser(itUser);
-          setSessionCookie(itUser);
-          return { success: true };
-        } else {
-          return { success: false, error: "Invalid password provided for this IT Support account." };
-        }
-      }
-
-      // 2. Demo fallback if user identifier matches standard IT format
-      if (
-        cleanId.toUpperCase() === "DNHS-IT-001" ||
-        cleanId.toLowerCase() === "itsupport@dumalneg.deped.gov.ph" ||
-        cleanId.toLowerCase() === "admin"
-      ) {
-        if (password === "admin123" || password === "password123" || password === "dnhs2026") {
-          const demoUser: ITSupportUser = {
-            id: "00000000-0000-0000-0000-000000000004",
-            userId: "DNHS-IT-001",
-            email: "itsupport@dumalneg.deped.gov.ph",
-            fullName: "DNHS IT Operations & Systems Desk",
-            systemRole: "System Administrator",
-            userRole: "it_support",
-          };
-          setUser(demoUser);
-          setSessionCookie(demoUser);
-          return { success: true };
-        }
-      }
-
+    // STRICT CHECK: Only dumalnext@gmail.com or DNHS-IT-001 allowed
+    if (cleanId !== AUTHORIZED_IT_EMAIL.toLowerCase() && cleanId !== "dnhs-it-001") {
       return {
         success: false,
-        error: "IT Support record not recognized. Use DNHS-IT-001 with your authorized password.",
+        error: "Access Denied: Only the authorized administrator email (dumalnext@gmail.com) is permitted to access the IT Support portal.",
       };
+    }
+
+    // PASSWORD CHECK
+    if (cleanPass !== AUTHORIZED_IT_PASS) {
+      return {
+        success: false,
+        error: "Invalid security password. Please enter the authorized password for dumalnext@gmail.com.",
+      };
+    }
+
+    try {
+      // Ensure user record exists in Supabase PostgreSQL
+      const { data: suUsers } = await supabase
+        .from("users")
+        .select("id, userId:\"userId\", email")
+        .eq("email", AUTHORIZED_IT_EMAIL)
+        .limit(1);
+
+      let userId = "00000000-0000-0000-0000-000000000004";
+      if (suUsers && suUsers.length > 0) {
+        userId = suUsers[0].id;
+        await supabase
+          .from("users")
+          .update({ password: AUTHORIZED_IT_PASS, userRole: "it_support" })
+          .eq("id", userId);
+      } else {
+        const { data: newUser } = await supabase.from("users").insert({
+          userId: "DNHS-IT-001",
+          email: AUTHORIZED_IT_EMAIL,
+          password: AUTHORIZED_IT_PASS,
+          userRole: "it_support",
+        }).select().single();
+        if (newUser) userId = newUser.id;
+      }
+
+      // Upsert into it_supports profile
+      await supabase.from("it_supports").upsert({
+        userId: userId,
+        itsupportID: "DNHS-IT-001",
+        systemRole: "System Administrator",
+      }, { onConflict: "itsupportID" });
+
+      const itUser: ITSupportUser = {
+        id: userId,
+        userId: "DNHS-IT-001",
+        email: AUTHORIZED_IT_EMAIL,
+        fullName: "DNHS IT Operations & Systems Desk",
+        systemRole: "System Administrator",
+        userRole: "it_support",
+      };
+
+      setUser(itUser);
+      setSessionCookie(itUser);
+      return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Failed to authenticate IT Support credentials." };
+      // Even if offline or network lag, session is authenticated via strict credential match
+      const fallbackUser: ITSupportUser = {
+        id: "00000000-0000-0000-0000-000000000004",
+        userId: "DNHS-IT-001",
+        email: AUTHORIZED_IT_EMAIL,
+        fullName: "DNHS IT Operations & Systems Desk",
+        systemRole: "System Administrator",
+        userRole: "it_support",
+      };
+      setUser(fallbackUser);
+      setSessionCookie(fallbackUser);
+      return { success: true };
     }
   };
 
   const demoLogin = async () => {
-    const demoUser: ITSupportUser = {
-      id: "00000000-0000-0000-0000-000000000004",
-      userId: "DNHS-IT-001",
-      email: "itsupport@dumalneg.deped.gov.ph",
-      fullName: "DNHS IT Operations & Systems Desk",
-      systemRole: "System Administrator",
-      userRole: "it_support",
-    };
-    setUser(demoUser);
-    setSessionCookie(demoUser);
+    await login(AUTHORIZED_IT_EMAIL, AUTHORIZED_IT_PASS);
   };
 
   const logout = () => {
