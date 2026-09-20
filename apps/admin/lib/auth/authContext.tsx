@@ -140,7 +140,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       if (verified && verified.length > 0) {
         setUser(cachedUser);
       } else if (
-        cachedUser.email === "heartistrichford@gmail.com" ||
         cachedUser.email === "admin@dumalneg.deped.gov.ph" ||
         cachedUser.userRole === "admin"
       ) {
@@ -236,8 +235,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
       // Self-provisioning: If standard admin credential used and no record exists, provision it in Supabase
       const isDefaultAdminCred =
-        (cleanId === "heartistrichford@gmail.com" ||
-          cleanId === "admin@dumalneg.deped.gov.ph" ||
+        (cleanId === "admin@dumalneg.deped.gov.ph" ||
           cleanId === "admin@gmail.com" ||
           cleanId === "dnhs-adm-001" ||
           cleanId === "admin") &&
@@ -247,7 +245,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         const fallbackAdmin: AdminUser = {
           id: "admin-hr-master-id",
           userId: "DNHS-ADM-HR01",
-          email: cleanId.includes("@") ? cleanId : "heartistrichford@gmail.com",
+          email: cleanId.includes("@") ? cleanId : "admin@dumalneg.deped.gov.ph",
           fullName: "School Administrator (Office of the Registrar)",
           firstName: "OFFICE OF THE",
           lastName: "REGISTRAR",
