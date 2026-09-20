@@ -302,7 +302,7 @@ export default function AcademicCalendarManager() {
             No academic terms configured yet. Click &quot;Configure New Term&quot; to initialize a School Year.
           </div>
         ) : viewMode === "table" ? (
-          /* TABLE VIEW WITH INLINE EXPANDABLE BOX */
+          /* TABLE VIEW WITH INLINE VERTICALLY SCROLLABLE EXPANDED BOX */
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
@@ -401,7 +401,7 @@ export default function AcademicCalendarManager() {
                         </td>
                       </tr>
 
-                      {/* INLINE EXPANDED BOX OF THE SELECTED TRIMESTER */}
+                      {/* INLINE VERTICALLY SCROLLABLE EXPANDED BOX */}
                       {isExpanded && editingTerm && (
                         <tr className="bg-slate-50">
                           <td colSpan={9} className="p-4 border-t-2 border-b-2 border-[#002060]">
@@ -436,165 +436,181 @@ export default function AcademicCalendarManager() {
                                 </button>
                               </div>
 
-                              <p className="text-xs text-slate-600">
-                                Scroll horizontally inside this box to configure every date. Labels appear as subtexts on top, with editable dates positioned directly underneath:
-                              </p>
+                              {/* VERTICALLY SCROLLABLE BOX CONTAINER (SCROLLABLE PABABA) */}
+                              <div className="max-h-[460px] overflow-y-auto pr-2 space-y-4 border-2 border-slate-300 bg-slate-50/70 p-4 shadow-inner">
+                                {/* 1. TOTAL CLASS DAYS */}
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                                    TOTAL CLASS DAYS
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={editingTerm.totalClassDays || ""}
+                                    onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
+                                    placeholder="e.g. 68"
+                                    className="w-full sm:w-60 p-2.5 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                  />
+                                </div>
 
-                              {/* SCROLLABLE HORIZONTAL BOX: Subtext on Top, Date Below */}
-                              <div className="overflow-x-auto pb-4 pt-1 bg-slate-50/80 p-3 border-2 border-slate-300">
-                                <div className="flex items-stretch gap-3 min-w-[1150px]">
-                                  {/* Item 1: Start Date */}
-                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      START DATE
-                                    </span>
-                                    <input
-                                      type="date"
-                                      value={editingTerm.startDate || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.startDate || "---"}
-                                    </span>
+                                {/* 2. TERM DATE */}
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                    TERM DATE
+                                  </span>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
+                                    <div>
+                                      <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                        a. Start:
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={editingTerm.startDate || ""}
+                                        onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
+                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                        b. End:
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={editingTerm.endDate || ""}
+                                        onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
+                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                      />
+                                    </div>
                                   </div>
+                                </div>
 
-                                  {/* Item 2: End Date */}
-                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      END DATE
-                                    </span>
-                                    <input
-                                      type="date"
-                                      value={editingTerm.endDate || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.endDate || "---"}
-                                    </span>
+                                {/* 3. INSTRUCTIONAL PERIOD */}
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                    INSTRUCTIONAL PERIOD
+                                  </span>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
+                                    <div>
+                                      <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                        a. Start:
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={editingTerm.instructionalStart || ""}
+                                        onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
+                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                        b. End:
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={editingTerm.instructionalEnd || ""}
+                                        onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
+                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                      />
+                                    </div>
                                   </div>
+                                </div>
 
-                                  {/* Item 3: Late Cutoff (Summative 2) */}
-                                  <div className="flex-1 min-w-[185px] p-3 bg-red-50/50 border-2 border-red-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-900 block mb-1">
-                                      LATE CUTOFF (SUMMATIVE 2)
-                                    </span>
-                                    <input
-                                      type="date"
-                                      value={editingTerm.summative2Date || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
-                                      className="w-full p-2 border-2 border-red-400 font-mono text-xs font-bold text-red-900 bg-white focus:border-[#002060] outline-none"
-                                    />
-                                    <span className="text-[9px] text-red-800 font-mono mt-1 block">
-                                      Current: {editingTerm.summative2Date || "---"}
-                                    </span>
+                                {/* 4. SUMMATIVE TEST DATE */}
+                                <div className="p-3 bg-red-50/40 border border-red-200 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-red-900 mb-2">
+                                    SUMMATIVE TEST DATE
+                                  </span>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-red-500">
+                                    <div>
+                                      <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                        a. Start (1st Summative):
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={editingTerm.summative1Date || ""}
+                                        onChange={(e) => setEditingTerm({ ...editingTerm, summative1Date: e.target.value })}
+                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-white focus:border-[#002060] outline-none"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[11px] font-mono font-bold text-red-900 mb-1">
+                                        b. End (2nd Summative / Late Cutoff):
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={editingTerm.summative2Date || ""}
+                                        onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
+                                        className="w-full p-2 border-2 border-red-400 font-mono text-xs font-bold text-red-900 bg-white focus:border-[#002060] outline-none"
+                                      />
+                                    </div>
                                   </div>
+                                </div>
 
-                                  {/* Item 4: Term Exams */}
-                                  <div className="flex-1 min-w-[170px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      TERM EXAMS
-                                    </span>
+                                {/* 5. TERM EXAMINATION */}
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                    TERM EXAMINATION
+                                  </span>
+                                  <div className="pl-3 border-l-4 border-[#002060]">
+                                    <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                      Examination Date(s):
+                                    </label>
                                     <input
                                       type="text"
                                       value={editingTerm.termExamDates || ""}
                                       onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
                                       placeholder="e.g. Nov 5-6, 2026"
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                      className="w-full sm:w-80 p-2.5 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
                                     />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.termExamDates || "---"}
-                                    </span>
                                   </div>
+                                </div>
 
-                                  {/* Item 5: Card Day (PTC) */}
-                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      CARD DAY (PTC)
-                                    </span>
+                                {/* 6. REPORT CARD DISTRIBUTION (PTC) */}
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                    REPORT CARD DISTRIBUTION (PTC)
+                                  </span>
+                                  <div className="pl-3 border-l-4 border-[#002060]">
+                                    <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
+                                      Date:
+                                    </label>
                                     <input
                                       type="date"
                                       value={editingTerm.reportCardDate || ""}
                                       onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                      className="w-full sm:w-80 p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
                                     />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.reportCardDate || "---"}
-                                    </span>
                                   </div>
+                                </div>
 
-                                  {/* Item 6: Total Class Days */}
-                                  <div className="flex-1 min-w-[130px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      TOTAL CLASS DAYS
-                                    </span>
-                                    <input
-                                      type="number"
-                                      value={editingTerm.totalClassDays || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
-                                      placeholder="e.g. 68"
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.totalClassDays ? `${editingTerm.totalClassDays} Days` : "---"}
-                                    </span>
-                                  </div>
-
-                                  {/* Item 7: Instructional Start */}
-                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      INSTRUCTIONAL START
-                                    </span>
-                                    <input
-                                      type="date"
-                                      value={editingTerm.instructionalStart || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.instructionalStart || "---"}
-                                    </span>
-                                  </div>
-
-                                  {/* Item 8: Instructional End */}
-                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      INSTRUCTIONAL END
-                                    </span>
-                                    <input
-                                      type="date"
-                                      value={editingTerm.instructionalEnd || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
-                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
-                                      Current: {editingTerm.instructionalEnd || "---"}
-                                    </span>
-                                  </div>
-
-                                  {/* Item 9: Status Column */}
-                                  <div className="flex-1 min-w-[150px] p-3 bg-white border-2 border-slate-300 shadow-2xs flex flex-col justify-between">
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                                      STATUS
-                                    </span>
-                                    <div>
-                                      {editingTerm.isActive ? (
-                                        <span className="w-full py-2 bg-green-700 text-white font-mono font-bold text-xs uppercase tracking-wider block text-center">
-                                          ACTIVE
-                                        </span>
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
-                                          className="w-full py-2 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase tracking-wider transition-colors text-center cursor-pointer"
-                                        >
-                                          [ SET ACTIVE ]
-                                        </button>
-                                      )}
-                                    </div>
-                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block text-center">
-                                      {editingTerm.isActive ? "Current Active Term" : "Click to activate"}
+                                {/* 7. STATUS (CLICKABLE) */}
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                    STATUS (CLICKABLE)
+                                  </span>
+                                  <div className="pl-3 border-l-4 border-[#002060] flex flex-wrap items-center gap-3">
+                                    {editingTerm.isActive ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingTerm({ ...editingTerm, isActive: false })}
+                                        className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+                                        title="Click to deactivate"
+                                      >
+                                        [ ACTIVE OFFICIAL CALENDAR &bull; CLICK TO SET INACTIVE ]
+                                      </button>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
+                                        className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+                                        title="Click to activate"
+                                      >
+                                        [ CLICK TO ACTIVATE THIS TRIMESTER ]
+                                      </button>
+                                    )}
+                                    <span className="text-[11px] text-slate-600 font-mono">
+                                      {editingTerm.isActive
+                                        ? "Currently active for school enrollment and scheduling."
+                                        : "Currently inactive. Click button to activate."}
                                     </span>
                                   </div>
                                 </div>
@@ -602,20 +618,8 @@ export default function AcademicCalendarManager() {
 
                               {/* Action Footer for Expanded Box */}
                               <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    id={`active-toggle-${editingTerm.id}`}
-                                    checked={Boolean(editingTerm.isActive)}
-                                    onChange={(e) => setEditingTerm({ ...editingTerm, isActive: e.target.checked })}
-                                    className="accent-[#002060] cursor-pointer"
-                                  />
-                                  <label
-                                    htmlFor={`active-toggle-${editingTerm.id}`}
-                                    className="text-xs font-bold text-slate-900 uppercase cursor-pointer"
-                                  >
-                                    Activate this trimester as the official school calendar
-                                  </label>
+                                <div className="text-xs text-slate-600 font-mono">
+                                  Scroll up/down inside the box above to verify all dates before saving.
                                 </div>
 
                                 <div className="flex items-center gap-2">
@@ -650,7 +654,7 @@ export default function AcademicCalendarManager() {
             </table>
           </div>
         ) : (
-          /* TRIMESTER BOXES VIEW: Each Trimester rendered as an individual interactive box */
+          /* TRIMESTER BOXES VIEW: Vertically scrollable boxes */
           <div className="p-5 space-y-4 bg-slate-100">
             {terms.map((term) => {
               const isExpanded = expandedTermId === term.id;
@@ -702,166 +706,212 @@ export default function AcademicCalendarManager() {
                     </button>
                   </div>
 
-                  {/* Scrollable Box for Trimester: Subtext on Top, Date on Bottom */}
+                  {/* Vertically Scrollable Content Box */}
                   <div className="p-4">
-                    <span className="text-[10px] font-mono text-slate-500 uppercase block mb-2">
-                      {isExpanded
-                        ? "[ EDITING MODE: Subtext labels indicate each field. Dates are editable below ]"
-                        : "[ DISPLAY MODE: Subtext labels with scheduled dates below. Scroll horizontally if needed ]"}
-                    </span>
+                    <div className="max-h-[440px] overflow-y-auto pr-2 space-y-3 border border-slate-200 bg-slate-50/70 p-4">
+                      {/* 1. Total Class Days */}
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
+                          TOTAL CLASS DAYS
+                        </span>
+                        {isExpanded && editingTerm ? (
+                          <input
+                            type="number"
+                            value={editingTerm.totalClassDays || ""}
+                            onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
+                            placeholder="e.g. 68"
+                            className="w-full sm:w-48 p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                          />
+                        ) : (
+                          <div className="font-mono text-xs font-bold text-slate-900">
+                            {term.totalClassDays ? `${term.totalClassDays} Days` : "---"}
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="overflow-x-auto pb-3 pt-1 border border-slate-200 bg-slate-50/60 p-3">
-                      <div className="flex items-stretch gap-3 min-w-[1100px]">
-                        {/* Start Date */}
-                        <div className="flex-1 min-w-[155px] p-3 bg-white border-2 border-slate-300">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                            START DATE
-                          </span>
-                          {isExpanded && editingTerm ? (
-                            <input
-                              type="date"
-                              value={editingTerm.startDate || ""}
-                              onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
-                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                            />
-                          ) : (
-                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
-                              {term.startDate || "---"}
-                            </div>
-                          )}
+                      {/* 2. Term Date */}
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                          TERM DATE
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
+                          <div>
+                            <span className="block text-[11px] font-mono text-slate-600">a. Start:</span>
+                            {isExpanded && editingTerm ? (
+                              <input
+                                type="date"
+                                value={editingTerm.startDate || ""}
+                                onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
+                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                              />
+                            ) : (
+                              <span className="font-mono text-xs font-bold text-slate-900">{term.startDate || "---"}</span>
+                            )}
+                          </div>
+                          <div>
+                            <span className="block text-[11px] font-mono text-slate-600">b. End:</span>
+                            {isExpanded && editingTerm ? (
+                              <input
+                                type="date"
+                                value={editingTerm.endDate || ""}
+                                onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
+                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                              />
+                            ) : (
+                              <span className="font-mono text-xs font-bold text-slate-900">{term.endDate || "---"}</span>
+                            )}
+                          </div>
                         </div>
+                      </div>
 
-                        {/* End Date */}
-                        <div className="flex-1 min-w-[155px] p-3 bg-white border-2 border-slate-300">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                            END DATE
-                          </span>
-                          {isExpanded && editingTerm ? (
-                            <input
-                              type="date"
-                              value={editingTerm.endDate || ""}
-                              onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
-                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                            />
-                          ) : (
-                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
-                              {term.endDate || "---"}
-                            </div>
-                          )}
+                      {/* 3. Instructional Period */}
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                          INSTRUCTIONAL PERIOD
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
+                          <div>
+                            <span className="block text-[11px] font-mono text-slate-600">a. Start:</span>
+                            {isExpanded && editingTerm ? (
+                              <input
+                                type="date"
+                                value={editingTerm.instructionalStart || ""}
+                                onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
+                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                              />
+                            ) : (
+                              <span className="font-mono text-xs font-bold text-slate-900">{term.instructionalStart || "---"}</span>
+                            )}
+                          </div>
+                          <div>
+                            <span className="block text-[11px] font-mono text-slate-600">b. End:</span>
+                            {isExpanded && editingTerm ? (
+                              <input
+                                type="date"
+                                value={editingTerm.instructionalEnd || ""}
+                                onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
+                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                              />
+                            ) : (
+                              <span className="font-mono text-xs font-bold text-slate-900">{term.instructionalEnd || "---"}</span>
+                            )}
+                          </div>
                         </div>
+                      </div>
 
-                        {/* Late Cutoff */}
-                        <div className="flex-1 min-w-[180px] p-3 bg-red-50/40 border-2 border-red-300">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-900 block mb-1">
-                            LATE CUTOFF (SUMMATIVE 2)
-                          </span>
-                          {isExpanded && editingTerm ? (
-                            <input
-                              type="date"
-                              value={editingTerm.summative2Date || ""}
-                              onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
-                              className="w-full p-2 border-2 border-red-400 font-mono text-xs font-bold text-red-900 bg-white focus:border-[#002060] outline-none"
-                            />
-                          ) : (
-                            <div className="font-mono text-xs font-bold text-red-800 py-1">
-                              {term.summative2Date || "---"}
-                            </div>
-                          )}
+                      {/* 4. Summative Test Date */}
+                      <div className="p-2.5 bg-red-50/40 border border-red-200">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-red-900 mb-1.5">
+                          SUMMATIVE TEST DATE
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-red-500">
+                          <div>
+                            <span className="block text-[11px] font-mono text-slate-600">a. Start (1st Summative):</span>
+                            {isExpanded && editingTerm ? (
+                              <input
+                                type="date"
+                                value={editingTerm.summative1Date || ""}
+                                onChange={(e) => setEditingTerm({ ...editingTerm, summative1Date: e.target.value })}
+                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                              />
+                            ) : (
+                              <span className="font-mono text-xs font-bold text-slate-900">{term.summative1Date || "---"}</span>
+                            )}
+                          </div>
+                          <div>
+                            <span className="block text-[11px] font-mono font-bold text-red-900">b. End (Late Cutoff):</span>
+                            {isExpanded && editingTerm ? (
+                              <input
+                                type="date"
+                                value={editingTerm.summative2Date || ""}
+                                onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
+                                className="w-full p-1.5 border-2 border-red-400 font-mono text-xs font-bold text-red-900"
+                              />
+                            ) : (
+                              <span className="font-mono text-xs font-bold text-red-800">{term.summative2Date || "---"}</span>
+                            )}
+                          </div>
                         </div>
+                      </div>
 
-                        {/* Term Exams */}
-                        <div className="flex-1 min-w-[165px] p-3 bg-white border-2 border-slate-300">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                            TERM EXAMS
-                          </span>
+                      {/* 5. Term Examination */}
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
+                          TERM EXAMINATION
+                        </span>
+                        <div className="pl-2 border-l-2 border-[#002060]">
+                          <span className="block text-[11px] font-mono text-slate-600">Date:</span>
                           {isExpanded && editingTerm ? (
                             <input
                               type="text"
                               value={editingTerm.termExamDates || ""}
                               onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
                               placeholder="e.g. Nov 5-6, 2026"
-                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                              className="w-full sm:w-72 p-1.5 border border-slate-300 font-mono text-xs font-bold"
                             />
                           ) : (
-                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
-                              {term.termExamDates || "---"}
-                            </div>
+                            <span className="font-mono text-xs font-bold text-slate-900">{term.termExamDates || "---"}</span>
                           )}
                         </div>
+                      </div>
 
-                        {/* Card Day (PTC) */}
-                        <div className="flex-1 min-w-[155px] p-3 bg-white border-2 border-slate-300">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                            CARD DAY (PTC)
-                          </span>
+                      {/* 6. Report Card Distribution (PTC) */}
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
+                          REPORT CARD DISTRIBUTION (PTC)
+                        </span>
+                        <div className="pl-2 border-l-2 border-[#002060]">
+                          <span className="block text-[11px] font-mono text-slate-600">Date:</span>
                           {isExpanded && editingTerm ? (
                             <input
                               type="date"
                               value={editingTerm.reportCardDate || ""}
                               onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
-                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                              className="w-full sm:w-72 p-1.5 border border-slate-300 font-mono text-xs font-bold"
                             />
                           ) : (
-                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
-                              {term.reportCardDate || "---"}
-                            </div>
+                            <span className="font-mono text-xs font-bold text-slate-900">{term.reportCardDate || "---"}</span>
                           )}
                         </div>
+                      </div>
 
-                        {/* Total Days */}
-                        <div className="flex-1 min-w-[130px] p-3 bg-white border-2 border-slate-300">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                            TOTAL CLASS DAYS
-                          </span>
+                      {/* 7. Status (Clickable) */}
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                          STATUS (CLICKABLE)
+                        </span>
+                        <div className="pl-2 border-l-2 border-[#002060] flex items-center gap-3">
                           {isExpanded && editingTerm ? (
-                            <input
-                              type="number"
-                              value={editingTerm.totalClassDays || ""}
-                              onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
-                              placeholder="e.g. 68"
-                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                            />
-                          ) : (
-                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
-                              {term.totalClassDays ? `${term.totalClassDays} Days` : "---"}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Status */}
-                        <div className="flex-1 min-w-[140px] p-3 bg-white border-2 border-slate-300 flex flex-col justify-between">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                            STATUS
-                          </span>
-                          <div>
-                            {isExpanded && editingTerm ? (
-                              editingTerm.isActive ? (
-                                <span className="w-full py-1.5 bg-green-700 text-white font-mono font-bold text-xs uppercase block text-center">
-                                  ACTIVE
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
-                                  className="w-full py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase block text-center cursor-pointer transition-colors"
-                                >
-                                  [ SET ACTIVE ]
-                                </button>
-                              )
-                            ) : term.isActive ? (
-                              <span className="w-full py-1.5 bg-green-700 text-white font-mono font-bold text-xs uppercase block text-center">
-                                ACTIVE
-                              </span>
+                            editingTerm.isActive ? (
+                              <button
+                                type="button"
+                                onClick={() => setEditingTerm({ ...editingTerm, isActive: false })}
+                                className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase cursor-pointer"
+                              >
+                                [ ACTIVE &bull; CLICK TO SET INACTIVE ]
+                              </button>
                             ) : (
                               <button
                                 type="button"
-                                onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
-                                className="w-full py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase block text-center cursor-pointer transition-colors"
+                                onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
+                                className="px-3 py-1.5 bg-[#002060] hover:bg-[#001845] text-white font-mono font-bold text-xs uppercase cursor-pointer"
                               >
-                                [ SET ACTIVE ]
+                                [ CLICK TO SET ACTIVE ]
                               </button>
-                            )}
-                          </div>
+                            )
+                          ) : term.isActive ? (
+                            <span className="px-3 py-1 bg-green-700 text-white font-mono font-bold text-xs uppercase">
+                              ACTIVE
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
+                              className="px-3 py-1 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase cursor-pointer"
+                            >
+                              [ SET ACTIVE ]
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
