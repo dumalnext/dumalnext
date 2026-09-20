@@ -28,16 +28,17 @@ export default function AcademicCalendarManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Modal States
-  const [isAddSYModalOpen, setIsAddSYModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // View Mode: "table" or "boxes"
+  const [viewMode, setViewMode] = useState<"table" | "boxes">("table");
 
-  // New School Year Input
+  // School Year Initialization Modal
+  const [isAddSYModalOpen, setIsAddSYModalOpen] = useState(false);
   const [newSchoolYear, setNewSchoolYear] = useState("2027-2028");
 
-  // Selected Term for Editing
+  // Inline Expanded Trimester Editing State
+  const [expandedTermId, setExpandedTermId] = useState<string | null>(null);
   const [editingTerm, setEditingTerm] = useState<AcademicTerm | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchTerms = async () => {
     setIsLoading(true);
@@ -80,6 +81,47 @@ export default function AcademicCalendarManager() {
     }
   };
 
+  // Toggle Inline Box Expansion for Editing
+  const handleToggleEdit = (term: AcademicTerm) => {
+    if (expandedTermId === term.id) {
+      setExpandedTermId(null);
+      setEditingTerm(null);
+    } else {
+      setExpandedTermId(term.id);
+      setEditingTerm({ ...term });
+    }
+  };
+
+  // Save Edited Term Dates from Expanded Box
+  const handleSaveTermDates = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!editingTerm) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/it-support/terms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingTerm),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setStatusMessage({
+          type: "success",
+          text: `Updated dates for ${editingTerm.schoolYear} - ${editingTerm.termName}.`,
+        });
+        setExpandedTermId(null);
+        setEditingTerm(null);
+        fetchTerms();
+      } else {
+        setStatusMessage({ type: "error", text: json.error || "Failed to update term dates." });
+      }
+    } catch (err: any) {
+      setStatusMessage({ type: "error", text: "Error saving trimester dates." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Create New School Year (Generates Trimester 1, 2, 3 with "---")
   const handleCreateSchoolYear = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +140,7 @@ export default function AcademicCalendarManager() {
       if (json.success) {
         setStatusMessage({
           type: "success",
-          text: `School Year ${newSchoolYear} initialized with Trimesters 1, 2, and 3. You can now configure dates using the [ Edit ] buttons.`,
+          text: `School Year ${newSchoolYear} initialized with Trimesters 1, 2, and 3. Click [ EDIT ] on any trimester to expand and configure dates.`,
         });
         setIsAddSYModalOpen(false);
         setNewSchoolYear("");
@@ -113,49 +155,13 @@ export default function AcademicCalendarManager() {
     }
   };
 
-  // Open Edit Modal for a Specific Trimester
-  const handleOpenEdit = (term: AcademicTerm) => {
-    setEditingTerm({ ...term });
-    setIsEditModalOpen(true);
-  };
-
-  // Save Edited Term Dates
-  const handleSaveTermDates = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingTerm) return;
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/it-support/terms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingTerm),
-      });
-      const json = await res.json();
-      if (json.success) {
-        setStatusMessage({
-          type: "success",
-          text: `Updated dates for ${editingTerm.schoolYear} - ${editingTerm.termName}.`,
-        });
-        setIsEditModalOpen(false);
-        setEditingTerm(null);
-        fetchTerms();
-      } else {
-        setStatusMessage({ type: "error", text: json.error || "Failed to update term dates." });
-      }
-    } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Error saving trimester dates." });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const activeTerm = terms.find((t) => t.isActive);
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Top Header Banner */}
+      {/* Top Policy Guideline Banner */}
       <div className="p-4 bg-blue-50 border-2 border-[#002060]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
               [ DEPED POLICY GUIDELINE: DYNAMIC TRISEM CALENDAR CONFIGURATION ]
@@ -164,13 +170,15 @@ export default function AcademicCalendarManager() {
               Zero Hardcoded Dates: School year boundaries, instructional periods, summative deadlines, and report card distribution dates are strictly configured dynamically through this IT Support console.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsAddSYModalOpen(true)}
-            className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
-          >
-            [ + CONFIGURE NEW TERM ]
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsAddSYModalOpen(true)}
+              className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+            >
+              [ + CONFIGURE NEW TERM ]
+            </button>
+          </div>
         </div>
       </div>
 
@@ -246,15 +254,43 @@ export default function AcademicCalendarManager() {
         )}
       </div>
 
-      {/* Main Table: Registered Academic Terms */}
+      {/* Main Section: Registered Academic Terms with Inline Expansion */}
       <div className="bg-white border-2 border-slate-300">
-        <div className="px-5 py-3 border-b-2 border-slate-200 bg-slate-50 flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-            REGISTERED ACADEMIC TERMS • DUMALNEG NATIONAL HIGH SCHOOL
-          </h3>
-          <span className="text-[11px] font-mono font-bold text-slate-600">
-            TOTAL CONFIGURED: {terms.length}
-          </span>
+        <div className="px-5 py-3 border-b-2 border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+              REGISTERED ACADEMIC TERMS • DUMALNEG NATIONAL HIGH SCHOOL
+            </h3>
+            <span className="text-[11px] font-mono font-bold text-slate-600">
+              TOTAL CONFIGURED: {terms.length}
+            </span>
+          </div>
+
+          {/* View Toggle */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setViewMode("table")}
+              className={`px-2.5 py-1 text-[10px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                viewMode === "table"
+                  ? "bg-[#002060] text-white"
+                  : "bg-slate-200 hover:bg-slate-300 text-slate-700"
+              }`}
+            >
+              [ Table View ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("boxes")}
+              className={`px-2.5 py-1 text-[10px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                viewMode === "boxes"
+                  ? "bg-[#002060] text-white"
+                  : "bg-slate-200 hover:bg-slate-300 text-slate-700"
+              }`}
+            >
+              [ Trimester Boxes View ]
+            </button>
+          </div>
         </div>
 
         {isLoading ? (
@@ -265,7 +301,8 @@ export default function AcademicCalendarManager() {
           <div className="p-8 text-center text-xs text-slate-600">
             No academic terms configured yet. Click &quot;Configure New Term&quot; to initialize a School Year.
           </div>
-        ) : (
+        ) : viewMode === "table" ? (
+          /* TABLE VIEW WITH INLINE EXPANDABLE BOX */
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
@@ -282,80 +319,585 @@ export default function AcademicCalendarManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {terms.map((term) => (
-                  <tr key={term.id} className={term.isActive ? "bg-blue-50/40" : "hover:bg-slate-50"}>
-                    {/* Fixed School Year Display */}
-                    <td className="p-3 font-black text-slate-950 font-mono text-xs">
-                      {term.schoolYear}
-                    </td>
+                {terms.map((term) => {
+                  const isExpanded = expandedTermId === term.id;
+                  return (
+                    <React.Fragment key={term.id}>
+                      <tr
+                        className={`transition-colors ${
+                          isExpanded
+                            ? "bg-blue-50/60 border-l-4 border-l-[#002060]"
+                            : term.isActive
+                            ? "bg-blue-50/30 hover:bg-blue-50/50"
+                            : "hover:bg-slate-50"
+                        }`}
+                      >
+                        {/* Fixed School Year */}
+                        <td className="p-3 font-black text-slate-950 font-mono text-xs">
+                          {term.schoolYear}
+                        </td>
 
-                    {/* Trimester (1, 2, 3) */}
-                    <td className="p-3 font-bold text-[#002060]">
-                      {term.termName}
-                    </td>
+                        {/* Trimester Name */}
+                        <td className="p-3 font-bold text-[#002060]">
+                          {term.termName}
+                        </td>
 
-                    {/* Start Date */}
-                    <td className="p-3 font-mono text-slate-800">
-                      {term.startDate || "---"}
-                    </td>
+                        {/* Start Date */}
+                        <td className="p-3 font-mono text-slate-800">
+                          {term.startDate || "---"}
+                        </td>
 
-                    {/* End Date */}
-                    <td className="p-3 font-mono text-slate-800">
-                      {term.endDate || "---"}
-                    </td>
+                        {/* End Date */}
+                        <td className="p-3 font-mono text-slate-800">
+                          {term.endDate || "---"}
+                        </td>
 
-                    {/* Late Cutoff */}
-                    <td className="p-3 font-mono font-bold text-red-800">
-                      {term.summative2Date || "---"}
-                    </td>
+                        {/* Late Cutoff */}
+                        <td className="p-3 font-mono font-bold text-red-800">
+                          {term.summative2Date || "---"}
+                        </td>
 
-                    {/* Term Exams */}
-                    <td className="p-3 text-slate-800">
-                      {term.termExamDates || "---"}
-                    </td>
+                        {/* Term Exams */}
+                        <td className="p-3 text-slate-800">
+                          {term.termExamDates || "---"}
+                        </td>
 
-                    {/* Card Day (PTC) */}
-                    <td className="p-3 font-mono text-slate-800">
-                      {term.reportCardDate || "---"}
-                    </td>
+                        {/* Card Day (PTC) */}
+                        <td className="p-3 font-mono text-slate-800">
+                          {term.reportCardDate || "---"}
+                        </td>
 
-                    {/* Status Column */}
-                    <td className="p-3">
+                        {/* Status */}
+                        <td className="p-3">
+                          {term.isActive ? (
+                            <span className="px-2.5 py-1 bg-green-700 text-white font-mono font-bold text-[10px] uppercase tracking-wider inline-block">
+                              ACTIVE
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
+                              className="px-2.5 py-1 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-700 font-mono font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer"
+                              title="Click to activate this trimester for the school"
+                            >
+                              [ SET ACTIVE ]
+                            </button>
+                          )}
+                        </td>
+
+                        {/* Expand / Edit Action */}
+                        <td className="p-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleEdit(term)}
+                            className={`px-3 py-1 border-2 text-[11px] font-bold uppercase transition-colors cursor-pointer shadow-2xs ${
+                              isExpanded
+                                ? "bg-[#002060] text-white border-[#002060]"
+                                : "bg-white hover:bg-slate-100 text-[#002060] border-[#002060]"
+                            }`}
+                          >
+                            {isExpanded ? "[ CLOSE ▲ ]" : "[ EDIT ]"}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* INLINE EXPANDED BOX OF THE SELECTED TRIMESTER */}
+                      {isExpanded && editingTerm && (
+                        <tr className="bg-slate-50">
+                          <td colSpan={9} className="p-4 border-t-2 border-b-2 border-[#002060]">
+                            <div className="bg-white border-2 border-[#002060] p-4 space-y-4 shadow-md">
+                              {/* Header inside Expanded Box */}
+                              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b-2 border-slate-200">
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <span className="px-2.5 py-1 bg-[#002060] text-white font-mono font-bold text-[10px] uppercase tracking-wider">
+                                    [ EXPANDED TRIMESTER BOX ]
+                                  </span>
+                                  <div className="font-mono text-xs">
+                                    <span className="text-slate-500 uppercase mr-1">SCHOOL YEAR:</span>
+                                    <strong className="text-slate-950 font-black">{editingTerm.schoolYear}</strong>
+                                    <span className="ml-1 text-[10px] text-slate-500 font-bold">(FIXED)</span>
+                                  </div>
+                                  <span className="text-slate-300">|</span>
+                                  <div className="font-mono text-xs">
+                                    <span className="text-slate-500 uppercase mr-1">TRIMESTER:</span>
+                                    <strong className="text-[#002060] font-black">{editingTerm.termName}</strong>
+                                    <span className="ml-1 text-[10px] text-slate-500 font-bold">(FIXED)</span>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setExpandedTermId(null);
+                                    setEditingTerm(null);
+                                  }}
+                                  className="text-xs font-mono font-bold text-slate-600 hover:text-slate-950 cursor-pointer"
+                                >
+                                  [ COLLAPSE BOX ▲ ]
+                                </button>
+                              </div>
+
+                              <p className="text-xs text-slate-600">
+                                Scroll horizontally inside this box to configure every date. Labels appear as subtexts on top, with editable dates positioned directly underneath:
+                              </p>
+
+                              {/* SCROLLABLE HORIZONTAL BOX: Subtext on Top, Date Below */}
+                              <div className="overflow-x-auto pb-4 pt-1 bg-slate-50/80 p-3 border-2 border-slate-300">
+                                <div className="flex items-stretch gap-3 min-w-[1150px]">
+                                  {/* Item 1: Start Date */}
+                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      START DATE
+                                    </span>
+                                    <input
+                                      type="date"
+                                      value={editingTerm.startDate || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.startDate || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 2: End Date */}
+                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      END DATE
+                                    </span>
+                                    <input
+                                      type="date"
+                                      value={editingTerm.endDate || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.endDate || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 3: Late Cutoff (Summative 2) */}
+                                  <div className="flex-1 min-w-[185px] p-3 bg-red-50/50 border-2 border-red-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-900 block mb-1">
+                                      LATE CUTOFF (SUMMATIVE 2)
+                                    </span>
+                                    <input
+                                      type="date"
+                                      value={editingTerm.summative2Date || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
+                                      className="w-full p-2 border-2 border-red-400 font-mono text-xs font-bold text-red-900 bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-red-800 font-mono mt-1 block">
+                                      Current: {editingTerm.summative2Date || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 4: Term Exams */}
+                                  <div className="flex-1 min-w-[170px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      TERM EXAMS
+                                    </span>
+                                    <input
+                                      type="text"
+                                      value={editingTerm.termExamDates || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
+                                      placeholder="e.g. Nov 5-6, 2026"
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.termExamDates || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 5: Card Day (PTC) */}
+                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      CARD DAY (PTC)
+                                    </span>
+                                    <input
+                                      type="date"
+                                      value={editingTerm.reportCardDate || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.reportCardDate || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 6: Total Class Days */}
+                                  <div className="flex-1 min-w-[130px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      TOTAL CLASS DAYS
+                                    </span>
+                                    <input
+                                      type="number"
+                                      value={editingTerm.totalClassDays || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
+                                      placeholder="e.g. 68"
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.totalClassDays ? `${editingTerm.totalClassDays} Days` : "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 7: Instructional Start */}
+                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      INSTRUCTIONAL START
+                                    </span>
+                                    <input
+                                      type="date"
+                                      value={editingTerm.instructionalStart || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.instructionalStart || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 8: Instructional End */}
+                                  <div className="flex-1 min-w-[160px] p-3 bg-white border-2 border-slate-300 shadow-2xs">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      INSTRUCTIONAL END
+                                    </span>
+                                    <input
+                                      type="date"
+                                      value={editingTerm.instructionalEnd || ""}
+                                      onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
+                                      className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    />
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block">
+                                      Current: {editingTerm.instructionalEnd || "---"}
+                                    </span>
+                                  </div>
+
+                                  {/* Item 9: Status Column */}
+                                  <div className="flex-1 min-w-[150px] p-3 bg-white border-2 border-slate-300 shadow-2xs flex flex-col justify-between">
+                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                                      STATUS
+                                    </span>
+                                    <div>
+                                      {editingTerm.isActive ? (
+                                        <span className="w-full py-2 bg-green-700 text-white font-mono font-bold text-xs uppercase tracking-wider block text-center">
+                                          ACTIVE
+                                        </span>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
+                                          className="w-full py-2 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase tracking-wider transition-colors text-center cursor-pointer"
+                                        >
+                                          [ SET ACTIVE ]
+                                        </button>
+                                      )}
+                                    </div>
+                                    <span className="text-[9px] text-slate-500 font-mono mt-1 block text-center">
+                                      {editingTerm.isActive ? "Current Active Term" : "Click to activate"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Footer for Expanded Box */}
+                              <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    id={`active-toggle-${editingTerm.id}`}
+                                    checked={Boolean(editingTerm.isActive)}
+                                    onChange={(e) => setEditingTerm({ ...editingTerm, isActive: e.target.checked })}
+                                    className="accent-[#002060] cursor-pointer"
+                                  />
+                                  <label
+                                    htmlFor={`active-toggle-${editingTerm.id}`}
+                                    className="text-xs font-bold text-slate-900 uppercase cursor-pointer"
+                                  >
+                                    Activate this trimester as the official school calendar
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setExpandedTermId(null);
+                                      setEditingTerm(null);
+                                    }}
+                                    className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                                  >
+                                    [ CANCEL ]
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={isSubmitting}
+                                    onClick={handleSaveTermDates}
+                                    className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
+                                  >
+                                    {isSubmitting ? "[ SAVING TO DATABASE... ]" : `[ SAVE ${editingTerm.termName.toUpperCase()} DATES ]`}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          /* TRIMESTER BOXES VIEW: Each Trimester rendered as an individual interactive box */
+          <div className="p-5 space-y-4 bg-slate-100">
+            {terms.map((term) => {
+              const isExpanded = expandedTermId === term.id;
+              return (
+                <div
+                  key={term.id}
+                  className={`bg-white border-2 transition-shadow ${
+                    isExpanded
+                      ? "border-[#002060] shadow-md ring-2 ring-[#002060]/20"
+                      : term.isActive
+                      ? "border-green-700 shadow-xs"
+                      : "border-slate-300 hover:border-slate-400"
+                  }`}
+                >
+                  {/* Trimester Box Header */}
+                  <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs font-black text-slate-950 bg-slate-200 px-2 py-0.5">
+                        SY {term.schoolYear}
+                      </span>
+                      <h4 className="text-sm font-black text-[#002060] uppercase">
+                        {term.termName}
+                      </h4>
                       {term.isActive ? (
-                        <span className="px-2.5 py-1 bg-green-700 text-white font-mono font-bold text-[10px] uppercase tracking-wider inline-block">
+                        <span className="px-2 py-0.5 bg-green-700 text-white font-mono font-bold text-[10px] uppercase tracking-wider">
                           ACTIVE
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
-                          className="px-2.5 py-1 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-700 font-mono font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer"
-                          title="Click to activate this trimester for the school"
+                          className="px-2 py-0.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-700 font-mono font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer"
                         >
                           [ SET ACTIVE ]
                         </button>
                       )}
-                    </td>
+                    </div>
 
-                    {/* Actions: Edit Term Dates */}
-                    <td className="p-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(term)}
-                        className="px-3 py-1 bg-white hover:bg-slate-100 text-[#002060] border-2 border-[#002060] text-[11px] font-bold uppercase transition-colors cursor-pointer shadow-2xs"
-                      >
-                        [ Edit ]
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleEdit(term)}
+                      className={`px-3 py-1 border-2 text-[11px] font-bold uppercase transition-colors cursor-pointer ${
+                        isExpanded
+                          ? "bg-[#002060] text-white border-[#002060]"
+                          : "bg-white hover:bg-slate-100 text-[#002060] border-[#002060]"
+                      }`}
+                    >
+                      {isExpanded ? "[ CLOSE BOX ▲ ]" : "[ EDIT DATES ]"}
+                    </button>
+                  </div>
+
+                  {/* Scrollable Box for Trimester: Subtext on Top, Date on Bottom */}
+                  <div className="p-4">
+                    <span className="text-[10px] font-mono text-slate-500 uppercase block mb-2">
+                      {isExpanded
+                        ? "[ EDITING MODE: Subtext labels indicate each field. Dates are editable below ]"
+                        : "[ DISPLAY MODE: Subtext labels with scheduled dates below. Scroll horizontally if needed ]"}
+                    </span>
+
+                    <div className="overflow-x-auto pb-3 pt-1 border border-slate-200 bg-slate-50/60 p-3">
+                      <div className="flex items-stretch gap-3 min-w-[1100px]">
+                        {/* Start Date */}
+                        <div className="flex-1 min-w-[155px] p-3 bg-white border-2 border-slate-300">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            START DATE
+                          </span>
+                          {isExpanded && editingTerm ? (
+                            <input
+                              type="date"
+                              value={editingTerm.startDate || ""}
+                              onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
+                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                            />
+                          ) : (
+                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
+                              {term.startDate || "---"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* End Date */}
+                        <div className="flex-1 min-w-[155px] p-3 bg-white border-2 border-slate-300">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            END DATE
+                          </span>
+                          {isExpanded && editingTerm ? (
+                            <input
+                              type="date"
+                              value={editingTerm.endDate || ""}
+                              onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
+                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                            />
+                          ) : (
+                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
+                              {term.endDate || "---"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Late Cutoff */}
+                        <div className="flex-1 min-w-[180px] p-3 bg-red-50/40 border-2 border-red-300">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-900 block mb-1">
+                            LATE CUTOFF (SUMMATIVE 2)
+                          </span>
+                          {isExpanded && editingTerm ? (
+                            <input
+                              type="date"
+                              value={editingTerm.summative2Date || ""}
+                              onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
+                              className="w-full p-2 border-2 border-red-400 font-mono text-xs font-bold text-red-900 bg-white focus:border-[#002060] outline-none"
+                            />
+                          ) : (
+                            <div className="font-mono text-xs font-bold text-red-800 py-1">
+                              {term.summative2Date || "---"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Term Exams */}
+                        <div className="flex-1 min-w-[165px] p-3 bg-white border-2 border-slate-300">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            TERM EXAMS
+                          </span>
+                          {isExpanded && editingTerm ? (
+                            <input
+                              type="text"
+                              value={editingTerm.termExamDates || ""}
+                              onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
+                              placeholder="e.g. Nov 5-6, 2026"
+                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                            />
+                          ) : (
+                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
+                              {term.termExamDates || "---"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Card Day (PTC) */}
+                        <div className="flex-1 min-w-[155px] p-3 bg-white border-2 border-slate-300">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            CARD DAY (PTC)
+                          </span>
+                          {isExpanded && editingTerm ? (
+                            <input
+                              type="date"
+                              value={editingTerm.reportCardDate || ""}
+                              onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
+                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                            />
+                          ) : (
+                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
+                              {term.reportCardDate || "---"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Total Days */}
+                        <div className="flex-1 min-w-[130px] p-3 bg-white border-2 border-slate-300">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            TOTAL CLASS DAYS
+                          </span>
+                          {isExpanded && editingTerm ? (
+                            <input
+                              type="number"
+                              value={editingTerm.totalClassDays || ""}
+                              onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
+                              placeholder="e.g. 68"
+                              className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                            />
+                          ) : (
+                            <div className="font-mono text-xs font-bold text-slate-900 py-1">
+                              {term.totalClassDays ? `${term.totalClassDays} Days` : "---"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Status */}
+                        <div className="flex-1 min-w-[140px] p-3 bg-white border-2 border-slate-300 flex flex-col justify-between">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            STATUS
+                          </span>
+                          <div>
+                            {isExpanded && editingTerm ? (
+                              editingTerm.isActive ? (
+                                <span className="w-full py-1.5 bg-green-700 text-white font-mono font-bold text-xs uppercase block text-center">
+                                  ACTIVE
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
+                                  className="w-full py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase block text-center cursor-pointer transition-colors"
+                                >
+                                  [ SET ACTIVE ]
+                                </button>
+                              )
+                            ) : term.isActive ? (
+                              <span className="w-full py-1.5 bg-green-700 text-white font-mono font-bold text-xs uppercase block text-center">
+                                ACTIVE
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
+                                className="w-full py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase block text-center cursor-pointer transition-colors"
+                              >
+                                [ SET ACTIVE ]
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Save Bar when Box is Expanded */}
+                    {isExpanded && editingTerm && (
+                      <div className="mt-3 pt-3 border-t border-slate-200 flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setExpandedTermId(null);
+                            setEditingTerm(null);
+                          }}
+                          className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                        >
+                          [ CANCEL ]
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isSubmitting}
+                          onClick={handleSaveTermDates}
+                          className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
+                        >
+                          {isSubmitting ? "[ SAVING... ]" : `[ SAVE ${editingTerm.termName.toUpperCase()} DATES ]`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* MODAL 1: ENTER SCHOOL YEAR ONLY (Step 1) */}
+      {/* MODAL: ENTER SCHOOL YEAR ONLY (Step 1 Initialization) */}
       {isAddSYModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white border-4 border-[#002060] max-w-md w-full p-6 space-y-4 shadow-xl">
@@ -378,7 +920,7 @@ export default function AcademicCalendarManager() {
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed">
-              Enter the incoming academic school year. The system will automatically create rows for <strong>Trimester 1, Trimester 2, and Trimester 3</strong> with initial &quot;---&quot; placeholder dates, ready for individual date editing.
+              Enter the incoming academic school year. The system will automatically create rows/boxes for <strong>Trimester 1, Trimester 2, and Trimester 3</strong> with initial &quot;---&quot; placeholder dates, ready for individual date editing.
             </p>
 
             <form onSubmit={handleCreateSchoolYear} className="space-y-4 text-xs">
@@ -413,202 +955,6 @@ export default function AcademicCalendarManager() {
                   className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
                 >
                   {isSubmitting ? "[ Initializing... ]" : "[ Create 3 Trimesters ]"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 2: EDITABLE DATES TABS FOR SPECIFIC TRIMESTER */}
-      {isEditModalOpen && editingTerm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white border-4 border-[#002060] max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                  IT SUPPORT TRIMESTER SCHEDULE EDITOR
-                </span>
-                <h3 className="text-base font-black text-slate-900 uppercase">
-                  Edit Trimester Dates • {editingTerm.termName}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEditModalOpen(false);
-                  setEditingTerm(null);
-                }}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
-              >
-                [ CLOSE X ]
-              </button>
-            </div>
-
-            {/* Fixed Non-Editable School Year and Trimester Indicator */}
-            <div className="p-3 bg-slate-100 border border-slate-300 flex items-center gap-4 text-xs font-mono">
-              <div>
-                <span className="text-[10px] uppercase text-slate-500 block">School Year (Fixed):</span>
-                <strong className="text-slate-900 font-bold text-sm">{editingTerm.schoolYear}</strong>
-              </div>
-              <div className="border-l border-slate-300 pl-4">
-                <span className="text-[10px] uppercase text-slate-500 block">Trimester (Fixed):</span>
-                <strong className="text-[#002060] font-bold text-sm">{editingTerm.termName}</strong>
-              </div>
-            </div>
-
-            <form onSubmit={handleSaveTermDates} className="space-y-4 text-xs">
-              {/* Total Class Days */}
-              <div>
-                <label className="block font-bold uppercase text-slate-800 mb-1">
-                  Total Class Days in Trimester
-                </label>
-                <input
-                  type="number"
-                  value={editingTerm.totalClassDays || ""}
-                  onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
-                  placeholder="e.g. 68"
-                  className="w-full sm:w-48 p-2 border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
-                />
-              </div>
-
-              {/* Start & End Dates */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200">
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    Term Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.startDate || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
-                    className="w-full p-2 border border-slate-300 font-mono focus:border-[#002060] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    Term End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.endDate || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
-                    className="w-full p-2 border border-slate-300 font-mono focus:border-[#002060] outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Instructional Period */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    Instructional Period Start
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.instructionalStart || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
-                    className="w-full p-2 border border-slate-300 font-mono focus:border-[#002060] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    Instructional Period End
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.instructionalEnd || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
-                    className="w-full p-2 border border-slate-300 font-mono focus:border-[#002060] outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Summative 1 & Summative 2 (Late Cutoff) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-red-50/40 border border-red-200">
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    1st Summative Test Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.summative1Date || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, summative1Date: e.target.value })}
-                    className="w-full p-2 border border-slate-300 font-mono focus:border-[#002060] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold uppercase text-red-900 mb-1">
-                    2nd Summative Test Date (Late Enrollment Cutoff)
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.summative2Date || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
-                    className="w-full p-2 border-2 border-red-400 font-mono font-bold focus:border-[#002060] outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Term Exams & Report Card PTC */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    Term Examination Dates
-                  </label>
-                  <input
-                    type="text"
-                    value={editingTerm.termExamDates || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
-                    placeholder="e.g. Nov 5-6, 2026"
-                    className="w-full p-2 border border-slate-300 focus:border-[#002060] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold uppercase text-slate-800 mb-1">
-                    Report Card Distribution (PTC)
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTerm.reportCardDate || ""}
-                    onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
-                    className="w-full p-2 border border-slate-300 font-mono focus:border-[#002060] outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Active Toggle */}
-              <div className="pt-2 border-t border-slate-200 flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="adminEditIsActiveToggle"
-                  checked={Boolean(editingTerm.isActive)}
-                  onChange={(e) => setEditingTerm({ ...editingTerm, isActive: e.target.checked })}
-                  className="accent-[#002060]"
-                />
-                <label htmlFor="adminEditIsActiveToggle" className="font-bold text-slate-900 uppercase cursor-pointer">
-                  Set this trimester as the active school calendar for Dumalneg National High School
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEditModalOpen(false);
-                    setEditingTerm(null);
-                  }}
-                  className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100 cursor-pointer"
-                >
-                  [ Cancel ]
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
-                >
-                  {isSubmitting ? "[ Saving to Database... ]" : "[ Save Trimester Dates ]"}
                 </button>
               </div>
             </form>
