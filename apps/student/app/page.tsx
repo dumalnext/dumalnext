@@ -682,13 +682,17 @@ function StudentHomeContent() {
 
                 <h3 className="text-base font-bold text-slate-900">
                   {isEnrollmentOpen
-                    ? `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
+                    ? pastApplications.some((p) => p.status === "Approved")
+                      ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? [Continuing Learner]`
+                      : `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
                     : `Basic Education Online Enrollment is Currently Closed`}
                 </h3>
 
                 <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
                   {isEnrollmentOpen
-                    ? `Your student account is active. Click below to begin filling out the official enrollment form for School Year ${schoolYear} (${semester}). Your registered learner details will be automatically pre-filled.`
+                    ? pastApplications.some((p) => p.status === "Approved")
+                      ? `Your learner credentials, family background, and official DepEd documents are verified and on file from your previous approved enrollment. Click below to choose your elective subjects and submit enrollment for ${semester}.`
+                      : `Your student account is active. Click below to begin filling out the complete enrollment form for School Year ${schoolYear} (${semester}). Please review and double check all learner credentials and documentary requirements.`
                     : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
                 </p>
 
@@ -702,7 +706,9 @@ function StudentHomeContent() {
                     }`}
                   >
                     {isEnrollmentOpen
-                      ? `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
+                      ? pastApplications.some((p) => p.status === "Approved")
+                        ? `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
+                        : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
                       : "[ View Official Enrollment Notice & Advisory ]"}
                   </Link>
                 </div>

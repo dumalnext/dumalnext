@@ -7,6 +7,7 @@ import Step2LearnerProfile from "./Step2LearnerProfile";
 import Step3FamilyBackground from "./Step3FamilyBackground";
 import Step4CurriculumModality from "./Step4CurriculumModality";
 import Step5DocumentsReview from "./Step5DocumentsReview";
+import ContinuingEnrollmentForm from "./ContinuingEnrollmentForm";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
@@ -209,6 +210,7 @@ export default function EnrollmentStepper({
   });
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [existingApp, setExistingApp] = useState<any | null>(null);
+  const [priorApprovedRecord, setPriorApprovedRecord] = useState<any | null>(null);
   const [isCheckingApp, setIsCheckingApp] = useState<boolean>(false);
 
   // Auto pre-fill basic account names if student is logged in and sync schoolYear and semester
@@ -250,6 +252,7 @@ export default function EnrollmentStepper({
     if (!user) {
       setIsCheckingApp(false);
       setExistingApp(null);
+      setPriorApprovedRecord(null);
       return;
     }
 
@@ -286,10 +289,21 @@ export default function EnrollmentStepper({
 
             if (activeTermApp) {
               appData = activeTermApp;
+              setPriorApprovedRecord(null);
             } else {
-              // No application for active term: Continuing student fast-path!
+              // Check if student has an APPROVED enrollment application from any prior term
+              const pastApproved = appRows.find((a: any) =>
+                a.status === "Approved" && !isApplicationInTerm(a, schoolYear, semester)
+              );
+
+              if (pastApproved) {
+                setPriorApprovedRecord(pastApproved);
+              } else {
+                setPriorApprovedRecord(null);
+              }
+
               // Pre-fill profile and parent info from past application and student profile
-              const pastApp = appRows[0];
+              const pastApp = pastApproved || appRows[0];
               const pastFd = Array.isArray(pastApp.selected_electives) && pastApp.selected_electives.length > 0
                 ? pastApp.selected_electives[0]
                 : (typeof pastApp.selected_electives === "object" && pastApp.selected_electives !== null ? pastApp.selected_electives : {});
@@ -594,7 +608,21 @@ export default function EnrollmentStepper({
     );
   }
 
-  // 4. Active Enrollment Form (New Applicant or Revision Flow)
+  // 4. Active Enrollment Form: If Continuing Student with Approved Prior Record, render streamlined 2-step continuing flow
+  if (!existingApp && priorApprovedRecord) {
+    return (
+      <ContinuingEnrollmentForm
+        priorApprovedApp={priorApprovedRecord}
+        initialData={formData}
+        schoolYear={schoolYear}
+        semester={semester}
+        isEnrollmentOpen={isEnrollmentOpen}
+        closedMessage={closedMessage}
+      />
+    );
+  }
+
+  // 5. Standard Full 5-Step Enrollment Form (New Student, Pending, or Needs Revision Flow)
   return (
     <div className="space-y-6">
       {/* Revision Notice Banner if Admin returned application */}

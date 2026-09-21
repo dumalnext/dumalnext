@@ -9,6 +9,7 @@ import {
   SNED_DIAGNOSES,
   SNED_MANIFESTATIONS,
   DISTANCE_LEARNING_MODALITIES,
+  DEPED_ELECTIVES,
 } from "@/lib/types/enrollment";
 
 interface Step4CurriculumModalityProps {
@@ -40,12 +41,27 @@ export default function Step4CurriculumModality({
   const currentSemester = data.targetSemester || data.step1.targetSemester || "1st Semester";
   const currentTrack = data.targetTrack || data.step1.targetTrack || "Academic Track";
   const currentStrand = data.targetStrand || data.step1.targetStrand || (currentTrack === "Academic Track" ? "STEM" : "TVL-ICT");
+  const currentElectives = data.selectedElectives || [];
+  const relevantElectives = DEPED_ELECTIVES.filter((e) =>
+    isJHS ? e.level === "JHS" || e.level === "All" : e.level === "SHS" || e.level === "All"
+  );
   const currentModalities = data.preferredModalities && data.preferredModalities.length > 0
     ? data.preferredModalities
     : ["Modular (Print)"];
 
   // Filter SHS Strands based on selected track
   const availableStrands = SHS_STRANDS.filter((s) => s.track === currentTrack);
+
+  // Toggle Electives in multi-select array
+  const handleElectiveToggle = (code: string) => {
+    let updated: string[];
+    if (currentElectives.includes(code)) {
+      updated = currentElectives.filter((c) => c !== code);
+    } else {
+      updated = [...currentElectives, code];
+    }
+    onChange({ selectedElectives: updated });
+  };
 
   // Toggle Modality in multi-select array
   const handleModalityToggle = (modality: string) => {
@@ -138,6 +154,7 @@ export default function Step4CurriculumModality({
           targetTrack: "",
           targetStrand: "",
           targetSemester: "",
+          selectedElectives: currentElectives,
           preferredModalities: currentModalities,
           step1: {
             ...data.step1,
@@ -154,6 +171,7 @@ export default function Step4CurriculumModality({
           targetSemester: currentSemester,
           jhsProgram: undefined,
           spsSport: undefined,
+          selectedElectives: currentElectives,
           preferredModalities: currentModalities,
           step1: {
             ...data.step1,
@@ -445,6 +463,61 @@ export default function Step4CurriculumModality({
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* SECTION 7-B: DEPED ELECTIVE SUBJECTS & SPECIALIZED AREAS                 */}
+      {/* ========================================================================= */}
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+        <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+              [ Section 7-B: DepEd Elective Subjects &amp; Specialized Areas ]
+            </span>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Select elective subject preferences for this academic term (cross-strand, applied, and exploratory courses):
+            </p>
+          </div>
+          <span className="text-[11px] font-mono font-bold text-[#002060] bg-white px-2.5 py-1 border border-slate-300 self-start sm:self-auto">
+            SELECTED: {currentElectives.length} SUBJECT(S)
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {relevantElectives.map((elec) => {
+            const isSelected = currentElectives.includes(elec.code);
+            return (
+              <label
+                key={elec.code}
+                className={`p-4 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
+                  isSelected
+                    ? "bg-white border-[#002060] shadow-xs"
+                    : "bg-white border-slate-300 hover:border-slate-400"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => handleElectiveToggle(elec.code)}
+                  className="accent-[#002060] mt-1"
+                />
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`font-bold ${isSelected ? "text-[#002060]" : "text-slate-900"}`}>
+                      {elec.name}
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200">
+                      {elec.category}
+                    </span>
+                  </div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    {elec.description}
+                  </p>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      </div>
 
       {/* ========================================================================= */}
       {/* SECTION C: SPECIAL NEEDS EDUCATION (SNED) / INCLUSIVE LEARNING (SEC. 5)    */}

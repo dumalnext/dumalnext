@@ -206,3 +206,84 @@ export const SPS_SPORTS = [
   'Other Sports Discipline',
 ] as const;
 
+export interface ElectiveSubject {
+  code: string;
+  name: string;
+  category: 'Applied' | 'Specialized' | 'Cross-Strand' | 'TLE / Exploratory';
+  description: string;
+  level: 'SHS' | 'JHS' | 'All';
+}
+
+export const DEPED_ELECTIVES: ElectiveSubject[] = [
+  {
+    code: 'ELECT-PROG',
+    name: 'Computer Programming & Web Technologies',
+    category: 'Applied',
+    description: 'Introductory algorithm design, web interfaces, and modern coding fundamentals.',
+    level: 'SHS',
+  },
+  {
+    code: 'ELECT-JOURN',
+    name: 'Campus Journalism & Media Literacy',
+    category: 'Cross-Strand',
+    description: 'News gathering, editorial broadcasting, and digital student press publishing.',
+    level: 'All',
+  },
+  {
+    code: 'ELECT-CW101',
+    name: 'Creative Writing & Malikhaing Pagsulat',
+    category: 'Cross-Strand',
+    description: 'Fundamentals of creative fiction, poetry, and Philippine literary essays.',
+    level: 'All',
+  },
+  {
+    code: 'ELECT-AGRI',
+    name: 'Agricultural Crop Production & Modern Farming',
+    category: 'Specialized',
+    description: 'Organic farming, horticulture techniques, and localized crop sustainability for Dumalneg.',
+    level: 'All',
+  },
+  {
+    code: 'ELECT-CUL',
+    name: 'Culinary Arts & Food Processing',
+    category: 'Specialized',
+    description: 'Safe food handling, indigenous food preparation, and small-scale catering management.',
+    level: 'All',
+  },
+  {
+    code: 'ELECT-DRAFT',
+    name: 'Technical Drafting & Digital CAD',
+    category: 'Applied',
+    description: 'Architectural drawing principles, orthographic projections, and computer-aided design.',
+    level: 'All',
+  },
+  {
+    code: 'ELECT-ENTREP',
+    name: 'Applied Economics & Youth Entrepreneurship',
+    category: 'Cross-Strand',
+    description: 'Community enterprise development, business planning, and basic financial literacy.',
+    level: 'SHS',
+  },
+  {
+    code: 'ELECT-ROBOT',
+    name: 'Applied Robotics & Environmental Sensors',
+    category: 'Applied',
+    description: 'Microcontroller basics, sensor telemetry, and automation projects.',
+    level: 'SHS',
+  },
+  {
+    code: 'ELECT-FLANG',
+    name: 'Foreign Language / Asian Languages (Introductory)',
+    category: 'Cross-Strand',
+    description: 'Basic conversational linguistic foundations and intercultural communication.',
+    level: 'All',
+  },
+  {
+    code: 'ELECT-ELEC',
+    name: 'Electrical Installation & Smart Maintenance',
+    category: 'TLE / Exploratory',
+    description: 'Basic electrical circuits, residential wiring, and safety standards.',
+    level: 'All',
+  },
+];
+
