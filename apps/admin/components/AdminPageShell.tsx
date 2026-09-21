@@ -7,7 +7,7 @@ import { useAdminAuth } from "@/lib/auth/authContext";
 
 interface AdminPageShellProps {
   children: React.ReactNode;
-  activeSection?: "adjudication" | "sections" | "scheduling" | "control";
+  activeSection?: "adjudication" | "sections" | "scheduling" | "curriculum" | "control";
 }
 
 export default function AdminPageShell({

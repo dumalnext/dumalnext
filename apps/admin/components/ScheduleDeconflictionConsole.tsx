@@ -150,12 +150,12 @@ export default function ScheduleDeconflictionConsole() {
     try {
       if (!silent) setIsLoading(true);
 
-      const [schedRes, secRes, tchRes, rmRes, subRes] = await Promise.all([
+      const [schedRes, secRes, subRes, tchRes, rmRes] = await Promise.all([
         fetch(`/api/schedules?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/subjects?_t=${Date.now()}`, { cache: "no-store" }),
         supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department").order("last_name"),
         supabase.from("classrooms").select("id, classroom_id, room_name, building").order("room_name"),
-        supabase.from("course_subjects").select("id, subject_code, subject_name, grade_level, trimester").order("subject_name"),
       ]);
 
       if (schedRes.ok) {
@@ -182,6 +182,29 @@ export default function ScheduleDeconflictionConsole() {
         }
       }
 
+      if (subRes.ok) {
+        const subData = await subRes.json();
+        if (subData.success && Array.isArray(subData.subjects) && subData.subjects.length > 0) {
+          setSubjects(
+            subData.subjects.map((s: any) => ({
+              id: s.id,
+              subject_code: s.subject_code,
+              subject_name: s.subject_name,
+              grade_level: s.grade_level,
+              trimester: s.trimester,
+            }))
+          );
+        }
+      } else {
+        const { data: directSubs } = await supabase
+          .from("course_subjects")
+          .select("id, subject_code, subject_name, grade_level, trimester")
+          .order("subject_name");
+        if (directSubs && directSubs.length > 0) {
+          setSubjects(directSubs);
+        }
+      }
+
       if (tchRes.data) {
         const mappedTeachers: TeacherRef[] = tchRes.data.map((t: any) => {
           const middle = t.middle_name ? ` ${t.middle_name}` : "";
@@ -205,10 +228,6 @@ export default function ScheduleDeconflictionConsole() {
 
       if (rmRes.data) {
         setClassrooms(rmRes.data);
-      }
-
-      if (subRes.data) {
-        setSubjects(subRes.data);
       }
     } catch (err) {
       console.error("Failed to load scheduling data:", err);

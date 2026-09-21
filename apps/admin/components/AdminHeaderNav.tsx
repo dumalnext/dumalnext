@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { useAdminAuth } from "@/lib/auth/authContext";
 
 interface AdminHeaderNavProps {
-  activeSection?: "adjudication" | "sections" | "scheduling" | "control";
-  onSelectSection?: (section: "adjudication" | "sections" | "scheduling" | "control") => void;
+  activeSection?: "adjudication" | "sections" | "scheduling" | "curriculum" | "control";
+  onSelectSection?: (section: "adjudication" | "sections" | "scheduling" | "curriculum" | "control") => void;
 }
 
 export default function AdminHeaderNav({
@@ -30,6 +30,10 @@ export default function AdminHeaderNav({
   const isScheduling =
     activeSection === "scheduling" ||
     pathname.startsWith("/scheduling");
+
+  const isCurriculum =
+    activeSection === "curriculum" ||
+    pathname.startsWith("/curriculum");
 
   const isControl =
     activeSection === "control" ||
@@ -133,6 +137,17 @@ export default function AdminHeaderNav({
               }`}
             >
               Schedule Deconfliction
+            </Link>
+            <Link
+              href="/curriculum"
+              onClick={() => onSelectSection?.("curriculum")}
+              className={`py-3 px-4 border-b-2 transition-colors ${
+                isCurriculum
+                  ? "border-[#002060] bg-white text-[#002060]"
+                  : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+              }`}
+            >
+              Curriculum &amp; Subjects
             </Link>
             <Link
               href="/control-room"
