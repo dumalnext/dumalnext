@@ -25,6 +25,7 @@ export async function GET() {
       { data: admins },
       { data: itStaff },
       { data: sections },
+      { data: applications },
     ] = await Promise.all([
       supabase.from("users").select("*").order("created_at", { ascending: false }),
       supabase.from("students").select("*"),
@@ -32,6 +33,10 @@ export async function GET() {
       supabase.from("school_administrators").select("*"),
       supabase.from("it_supports").select("*"),
       supabase.from("sections").select("id, section_name, grade_level, strand"),
+      supabase
+        .from("enrollment_applications")
+        .select("student_id, submitted_documents")
+        .order("created_at", { ascending: false }),
     ]);
 
     if (error) {
@@ -58,6 +63,7 @@ export async function GET() {
       );
 
       let fullName = "";
+      let photoUrl: string | null = null;
       let details: Record<string, any> = {};
 
       if (st) {
@@ -66,6 +72,17 @@ export async function GET() {
         );
         fullName = parts.join(" ") || "Student Learner";
         const section = (sections || []).find((sec: any) => sec.id === st.current_section_id);
+
+        const app = (applications || []).find((a: any) => a.student_id === st.id);
+        const docs = app?.submitted_documents || [];
+        const idPic = docs.find((d: any) => {
+          const t = (d.docType || "").toLowerCase();
+          return t.includes("id") || t.includes("picture") || t.includes("photo");
+        });
+        if (idPic?.fileData) {
+          photoUrl = idPic.fileData;
+        }
+
         details = {
           lrn: st.student_id || "Not assigned",
           gradeLevel: st.grade_level ? `Grade ${st.grade_level}` : "Unassigned",
@@ -119,6 +136,7 @@ export async function GET() {
         fullName,
         email: u.email || "",
         userRole,
+        photoUrl,
         createdAt: u.created_at || u.createdAt || new Date().toISOString(),
         details,
       };
