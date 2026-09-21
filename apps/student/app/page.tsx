@@ -554,10 +554,16 @@ function StudentHomeContent() {
                     Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
                   </div>
                 </div>
-                <div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                   <span className="text-[11px] font-mono font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase">
                     Official Class Placement
                   </span>
+                  <Link
+                    href="/section"
+                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs"
+                  >
+                    View Section &bull; [ 04 ] &rarr;
+                  </Link>
                 </div>
               </div>
             ) : (
@@ -579,10 +585,16 @@ function StudentHomeContent() {
                     Awaiting official section placement from the school administrator.
                   </p>
                 </div>
-                <div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                   <span className="text-[11px] font-mono font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase">
                     In Queue for Placement
                   </span>
+                  <Link
+                    href="/section"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs"
+                  >
+                    Check Status &bull; [ 04 ] &rarr;
+                  </Link>
                 </div>
               </div>
             )}

@@ -200,6 +200,7 @@ export default function StudentHeaderNav() {
     : "/?tab=signin&reason=auth_required";
 
   const enrollHref = user ? "/enroll" : "/?tab=signin&reason=auth_required";
+  const sectionHref = user ? "/section" : "/?tab=signin&reason=auth_required";
 
   return (
     <div className="flex items-center gap-3">
@@ -342,16 +343,20 @@ export default function StudentHeaderNav() {
                     </p>
                   </div>
 
-                  {/* Section Assignment Indicator */}
+                  {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
                   {assignedSection ? (
-                    <div className="mt-2.5 p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs space-y-1">
+                    <Link
+                      href={sectionHref}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer"
+                    >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
                           [ SECTION ASSIGNED ]
                         </span>
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 font-mono text-[9px] font-bold uppercase">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
-                          Official Roster
+                          Official Roster &rarr;
                         </span>
                       </div>
                       <div className="text-xs font-bold text-emerald-950 uppercase">
@@ -360,16 +365,20 @@ export default function StudentHeaderNav() {
                       <div className="text-[10px] font-mono text-emerald-800">
                         Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
                       </div>
-                    </div>
+                    </Link>
                   ) : (
-                    <div className="mt-2.5 p-2.5 bg-amber-50 border-2 border-amber-400 text-xs space-y-1">
+                    <Link
+                      href={sectionHref}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer"
+                    >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
                           [ SECTION STATUS ]
                         </span>
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 font-mono text-[9px] font-bold uppercase">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-                          Pending Placement
+                          Pending Placement &rarr;
                         </span>
                       </div>
                       <div className="text-xs font-bold text-amber-950">
@@ -378,7 +387,7 @@ export default function StudentHeaderNav() {
                       <p className="text-[10px] text-amber-800 leading-tight">
                         Awaiting official section placement from the school administrator.
                       </p>
-                    </div>
+                    </Link>
                   )}
                 </div>
               ) : (
@@ -458,6 +467,29 @@ export default function StudentHeaderNav() {
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-normal">
                     Real-time status tracking, registrar review remarks, and Certificate of Enrollment.
+                  </p>
+                </Link>
+
+                {/* 4. Section Placement & Advisory Link */}
+                <Link
+                  href={sectionHref}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`block p-3 border-2 transition-all ${
+                    pathname === "/section"
+                      ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                      : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      [ 04 ] Class Section &amp; Advisory
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                    {assignedSection
+                      ? `Assigned in Section: ${assignedSection.name}`
+                      : "You're not yet assigned to a section. Check official class placement."}
                   </p>
                 </Link>
               </div>
