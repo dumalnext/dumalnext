@@ -19,23 +19,111 @@ function getAdminClient() {
 export async function GET() {
   try {
     const supabase = getAdminClient() || (await createClient());
-    const { data: users, error } = await supabase
-      .from("users")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const [
+      { data: users, error },
+      { data: students },
+      { data: teachers },
+      { data: admins },
+      { data: itStaff },
+      { data: sections },
+    ] = await Promise.all([
+      supabase.from("users").select("*").order("created_at", { ascending: false }),
+      supabase.from("students").select("*"),
+      supabase.from("teachers").select("*"),
+      supabase.from("school_administrators").select("*"),
+      supabase.from("it_supports").select("*"),
+      supabase.from("sections").select("id, section_name, grade_level, strand"),
+    ]);
 
     if (error) {
       console.error("GET /api/it-support/users error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const mappedUsers = (users || []).map((u: any) => ({
-      id: u.id,
-      userId: u.user_id || u.userId || (u.email ? u.email.split("@")[0].toUpperCase() : "DNHS-USER"),
-      email: u.email || "",
-      userRole: (u.user_role || u.userRole || "student").toLowerCase(),
-      createdAt: u.created_at || u.createdAt || new Date().toISOString(),
-    }));
+    const mappedUsers = (users || []).map((u: any) => {
+      const userRole = (u.user_role || u.userRole || "student").toLowerCase();
+      const st = (students || []).find(
+        (s: any) => s.user_id === u.id || (s.student_id && s.student_id === u.user_id)
+      );
+      const tc = (teachers || []).find(
+        (t: any) =>
+          t.user_id === u.id ||
+          (u.email && t.email && t.email.toLowerCase() === u.email.toLowerCase()) ||
+          (t.teacher_id && t.teacher_id === u.user_id)
+      );
+      const ad = (admins || []).find(
+        (a: any) => a.user_id === u.id || (a.admin_id && a.admin_id === u.user_id)
+      );
+      const it = (itStaff || []).find(
+        (i: any) => i.user_id === u.id || (i.itsupport_id && i.itsupport_id === u.user_id)
+      );
+
+      let fullName = "";
+      let details: Record<string, any> = {};
+
+      if (st) {
+        const parts = [st.first_name, st.middle_name, st.last_name].filter(
+          (p) => p && p.trim() && p.toUpperCase() !== "N/A"
+        );
+        fullName = parts.join(" ") || "Student Learner";
+        const section = (sections || []).find((sec: any) => sec.id === st.current_section_id);
+        details = {
+          lrn: st.student_id || "Not assigned",
+          gradeLevel: st.grade_level ? `Grade ${st.grade_level}` : "Unassigned",
+          strand: st.strand || (st.grade_level && st.grade_level >= 11 ? "Senior High Core" : "Junior High School Core"),
+          sectionName: section ? section.section_name : "Unassigned",
+          barangay: st.barangay || "N/A",
+          gender: st.gender || "Not specified",
+          contactNumber: st.contact_number || "None provided",
+          dateOfBirth: st.date_of_birth || "Not specified",
+        };
+      } else if (tc) {
+        const parts = [tc.first_name, tc.middle_name, tc.last_name].filter(
+          (p) => p && p.trim() && p.toUpperCase() !== "N/A"
+        );
+        fullName = parts.join(" ") || "Faculty Member";
+        details = {
+          teacherId: tc.teacher_id || u.user_id,
+          department: tc.department || "Faculty Staff",
+          facultyEmail: tc.email || u.email,
+        };
+      } else if (ad) {
+        const parts = [ad.first_name, ad.last_name].filter(
+          (p) => p && p.trim() && p.toUpperCase() !== "N/A"
+        );
+        fullName = parts.join(" ") || "School Administrator";
+        details = {
+          adminId: ad.admin_id || u.user_id,
+          department: ad.department || "Academic Affairs",
+        };
+      } else if (it || (u.email && u.email.toLowerCase() === "dumalnext@gmail.com")) {
+        fullName = (it && it.system_role) || "System Administrator";
+        details = {
+          itsupportId: (it && it.itsupport_id) || u.user_id || "DNHS-IT-001",
+          systemRole: (it && it.system_role) || "IT Support Desk",
+        };
+      } else {
+        if (u.email) {
+          const localPart = u.email.split("@")[0].replace(/[._]/g, " ");
+          fullName = localPart
+            .split(" ")
+            .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" ");
+        } else {
+          fullName = u.user_id || "DNHS User";
+        }
+      }
+
+      return {
+        id: u.id,
+        userId: u.user_id || u.userId || (u.email ? u.email.split("@")[0].toUpperCase() : "DNHS-USER"),
+        fullName,
+        email: u.email || "",
+        userRole,
+        createdAt: u.created_at || u.createdAt || new Date().toISOString(),
+        details,
+      };
+    });
 
     // Count user roles
     const counts = {
