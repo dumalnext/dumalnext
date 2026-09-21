@@ -22,6 +22,9 @@ export interface ApplicationDetail {
   created_at: string;
   semester?: string;
   term_name?: string;
+  isTransferRequested?: boolean;
+  previousJhsProgram?: string;
+  jhsProgram?: string;
   // Joined student data
   student?: {
     id: string;
@@ -139,6 +142,25 @@ export default function AdjudicationModal({
     ? `${st.last_name}, ${st.first_name} ${st.middle_name || ""}`.trim()
     : "APPLICANT LEARNER";
 
+  const appElectivePayload =
+    Array.isArray(application.selected_electives) && application.selected_electives.length > 0
+      ? application.selected_electives[0]
+      : typeof application.selected_electives === "object" && application.selected_electives !== null
+      ? application.selected_electives
+      : {};
+
+  const isTransferRequested =
+    application.isTransferRequested ??
+    (appElectivePayload.isTransferRequested === true ||
+      (Boolean(appElectivePayload.previousJhsProgram) &&
+        Boolean(appElectivePayload.jhsProgram) &&
+        appElectivePayload.previousJhsProgram !== appElectivePayload.jhsProgram));
+
+  const previousProgram =
+    appElectivePayload.previousJhsProgram || application.previousJhsProgram || "Regular";
+  const targetProgram =
+    appElectivePayload.jhsProgram || application.jhsProgram || st?.jhs_program || "Regular";
+
   // Filter sections matching applicant grade level & strand
   const eligibleSections = modalSections.filter((s) => {
     if (s.grade_level !== Number(application.target_grade_level)) return false;
@@ -237,15 +259,21 @@ export default function AdjudicationModal({
 
       if (appErr) throw appErr;
 
-      // 2. Assign student to selected section and update grade level in Supabase
+      // 2. Assign student to selected section and update grade level & program in Supabase
       if (application.student_id) {
+        const studentUpdates: any = {
+          current_section_id: selectedSectionId,
+          grade_level: application.target_grade_level,
+          updated_at: new Date().toISOString(),
+        };
+
+        if (!application.target_strand && targetProgram) {
+          studentUpdates.strand = targetProgram === "SPS" ? "SPS" : null;
+        }
+
         const { error: stErr } = await supabase
           .from("students")
-          .update({
-            current_section_id: selectedSectionId,
-            grade_level: application.target_grade_level,
-            updated_at: new Date().toISOString(),
-          })
+          .update(studentUpdates)
           .eq("id", application.student_id);
 
         if (stErr) {
@@ -412,6 +440,28 @@ export default function AdjudicationModal({
 
         {/* Scrollable Content Body */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6 text-xs text-slate-800">
+          {/* Continuing JHS Transfer Request High-Visibility Banner */}
+          {isTransferRequested && (
+            <div className="p-4 bg-amber-50 border-2 border-amber-500 space-y-2 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 bg-amber-200/80 px-2.5 py-0.5 border border-amber-400">
+                  [ JHS CURRICULAR PROGRAM TRANSFER REQUEST DETECTED ]
+                </span>
+                <span className="text-[11px] font-mono text-amber-900 font-bold">
+                  ACTION: REQUIRES REGISTRAR REVIEW
+                </span>
+              </div>
+              <p className="text-xs text-amber-950 leading-relaxed font-medium">
+                This continuing Junior High School learner has requested a curricular program change from{" "}
+                <strong>{previousProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> to{" "}
+                <strong className="text-[#002060]">{targetProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> for S.Y. {application.school_year}.
+              </p>
+              <div className="text-[11px] text-amber-900 font-mono">
+                Previous Program: <strong>{previousProgram}</strong> &bull; Requested Program: <strong className="text-[#002060]">{targetProgram}</strong>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: LEARNER PROFILE */}
           {activeTab === "learner" && (
             <div className="space-y-5">
@@ -643,11 +693,23 @@ export default function AdjudicationModal({
                     <strong className="text-slate-900">
                       {application.target_strand
                         ? `Senior High School - ${application.target_strand}`
-                        : st?.jhs_program === "SPS"
-                        ? `Special Program in Sports (SPS - ${st?.sps_sport || "Athletics"})`
+                        : targetProgram === "SPS"
+                        ? "Special Program in Sports (General SPS)"
                         : "Regular Basic Education JHS Curriculum"}
                     </strong>
                   </div>
+                  {isTransferRequested && (
+                    <div className="p-2.5 bg-amber-50 border border-amber-300 mt-2 space-y-1">
+                      <span className="text-[10px] font-bold text-amber-950 uppercase block font-mono">
+                        [ Curricular Transfer Details ]
+                      </span>
+                      <div className="text-[11px] text-amber-900 space-y-0.5">
+                        <div>Previous Program on Record: <strong>{previousProgram}</strong></div>
+                        <div>Enrolling Program Requested: <strong className="text-[#002060]">{targetProgram}</strong></div>
+                        <div>Transfer Status: <strong className="text-amber-800 uppercase font-mono">Pending Registrar Adjudication</strong></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-3.5 bg-slate-50 border border-slate-200 space-y-2">

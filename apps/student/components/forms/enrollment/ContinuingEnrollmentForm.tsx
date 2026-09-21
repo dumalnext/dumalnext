@@ -133,8 +133,38 @@ export default function ContinuingEnrollmentForm({
     formData.step1.targetStrand ||
     priorApprovedApp.target_strand ||
     (currentTrack === "Academic Track" ? "STEM" : "TVL-ICT");
-  const currentJhsProgram =
-    formData.jhsProgram || formData.step1.jhsProgram || "Regular";
+  // Extract previous JHS program on record from prior approved enrollment
+  const pastApprovedFd =
+    Array.isArray(priorApprovedApp?.selected_electives) &&
+    priorApprovedApp.selected_electives.length > 0
+      ? priorApprovedApp.selected_electives[0]
+      : typeof priorApprovedApp?.selected_electives === "object" &&
+        priorApprovedApp.selected_electives !== null
+      ? priorApprovedApp.selected_electives
+      : {};
+
+  const previousJhsProgram: "Regular" | "SPS" = (() => {
+    const rawProg =
+      priorApprovedApp?.jhs_program ||
+      pastApprovedFd.jhsProgram ||
+      pastApprovedFd.step1?.jhsProgram ||
+      priorApprovedApp?.student?.jhs_program ||
+      (priorApprovedApp?.target_strand === "SPS" ? "SPS" : null) ||
+      (priorApprovedApp?.student?.strand === "SPS" ? "SPS" : null);
+
+    if (rawProg === "SPS") return "SPS";
+    return "Regular";
+  })();
+
+  // Curricular Program Transfer Switch State for Continuing JHS
+  const [enableTransfer, setEnableTransfer] = useState<boolean>(false);
+  const [selectedJhsProgram, setSelectedJhsProgram] = useState<"Regular" | "SPS">(previousJhsProgram);
+
+  const currentJhsProgram = isJHS
+    ? enableTransfer
+      ? selectedJhsProgram
+      : previousJhsProgram
+    : formData.jhsProgram || formData.step1.jhsProgram || "Regular";
   const currentSpsSport = formData.spsSport || "";
   const currentElectives = formData.selectedElectives || [];
   const currentModalities =
@@ -225,9 +255,6 @@ export default function ContinuingEnrollmentForm({
       if (!currentStrand) newErrors.targetStrand = "Strand selection is required.";
     } else {
       if (!currentJhsProgram) newErrors.jhsProgram = "Program selection is required.";
-      if (currentJhsProgram === "SPS" && !currentSpsSport) {
-        newErrors.spsSport = "Sports discipline is required for Special Program in Sports.";
-      }
     }
 
     if (!currentModalities || currentModalities.length === 0) {
@@ -389,12 +416,15 @@ export default function ContinuingEnrollmentForm({
       const supabase = createClient();
       let studentUuid = priorApprovedApp.student_id || user?.id;
 
+      const effectiveJhsProgram = enableTransfer ? selectedJhsProgram : previousJhsProgram;
+      const transferRequested = enableTransfer && selectedJhsProgram !== previousJhsProgram;
+
       if (studentUuid) {
         await supabase
           .from("students")
           .update({
             grade_level: targetGrade,
-            strand: null,
+            strand: effectiveJhsProgram === "SPS" ? "SPS" : null,
             updated_at: new Date().toISOString(),
           })
           .eq("id", studentUuid);
@@ -416,9 +446,17 @@ export default function ContinuingEnrollmentForm({
         selectedElectives: [],
         preferredModalities: currentModalities,
         targetTrack: "Junior High School",
-        targetStrand: undefined,
-        jhsProgram: currentJhsProgram,
-        spsSport: currentJhsProgram === "SPS" ? currentSpsSport : undefined,
+        targetStrand: effectiveJhsProgram === "SPS" ? "SPS" : undefined,
+        jhsProgram: effectiveJhsProgram,
+        previousJhsProgram: previousJhsProgram,
+        isTransferRequested: transferRequested,
+        transferDetails: transferRequested
+          ? {
+              from: previousJhsProgram,
+              to: effectiveJhsProgram,
+              requestedAt: new Date().toISOString(),
+            }
+          : null,
         dataPrivacyAccepted: true,
       };
 
@@ -430,7 +468,7 @@ export default function ContinuingEnrollmentForm({
           applicant_type: "Continuing",
           school_year: schoolYear.replace(/[–—]/g, "-"),
           target_grade_level: targetGrade,
-          target_strand: null,
+          target_strand: effectiveJhsProgram === "SPS" ? "SPS" : null,
           status: "Pending",
           selected_electives: [submissionPayload],
           submitted_documents: inheritedDocs,
@@ -493,7 +531,7 @@ export default function ContinuingEnrollmentForm({
         <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400">
-              [ STATUS: PENDING REGISTRAR VERIFICATION ]
+              [ STATUS: PENDING REGISTRAR ADJUDICATION &amp; APPROVAL ]
             </span>
             <span className="text-xs font-mono text-slate-700">
               SUBMITTED: <strong>{new Date().toLocaleDateString()}</strong>
@@ -502,6 +540,16 @@ export default function ContinuingEnrollmentForm({
           <p className="text-xs text-amber-950 leading-relaxed font-medium">
             Your continuing enrollment application {isJHS ? "" : "and elective subject selections"} for {semester}, S.Y. {schoolYear} have been received. Your verified learner credentials and DepEd documents on file from S.Y. {priorApprovedApp.school_year} have been attached automatically.
           </p>
+          {isJHS && enableTransfer && selectedJhsProgram !== previousJhsProgram && (
+            <div className="p-3 bg-amber-100/90 border border-amber-500 mt-2 text-xs font-bold text-amber-950 space-y-0.5">
+              <span className="block font-mono uppercase tracking-wider">
+                [ CURRICULAR TRANSFER REQUEST: {previousJhsProgram} &rarr; {selectedJhsProgram} ]
+              </span>
+              <p className="text-[11px] font-normal text-amber-900 leading-relaxed">
+                Your request to transfer curriculum from {previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} to {selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} has been officially recorded and queued for Registrar and Coordinator adjudication.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Reference Number Box */}
@@ -544,6 +592,11 @@ export default function ContinuingEnrollmentForm({
               <strong className="text-slate-900">
                 Grade {targetGrade} {isJHS ? `(${currentJhsProgram})` : `(${currentStrand})`}
               </strong>
+              {isJHS && enableTransfer && selectedJhsProgram !== previousJhsProgram && (
+                <span className="text-[11px] text-amber-800 font-bold block">
+                  (Transfer Requested from {previousJhsProgram})
+                </span>
+              )}
             </div>
             <div>
               <span className="text-slate-500 block">Selected Electives:</span>
@@ -596,9 +649,12 @@ export default function ContinuingEnrollmentForm({
   }
 
   // =========================================================================
-  // CONTINUING JHS LEARNER (GRADE 7-10): 1-CLICK INSTANT RE-ENROLLMENT
+  // CONTINUING JHS LEARNER (GRADE 7-10): STREAMLINED ENROLLMENT WITH PROGRAM TRANSFER SWITCH
   // =========================================================================
   if (isJHS) {
+    const effectiveProgram = enableTransfer ? selectedJhsProgram : previousJhsProgram;
+    const isTransferRequested = enableTransfer && selectedJhsProgram !== previousJhsProgram;
+
     return (
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans shadow-sm">
         {/* Header */}
@@ -608,14 +664,14 @@ export default function ContinuingEnrollmentForm({
               [ CONTINUING JHS LEARNER AUTOMATION &bull; S.Y. {schoolYear} &bull; {semester} ]
             </span>
             <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 uppercase">
-              1-Click Re-Enrollment Active
+              Continuing Re-Enrollment Active
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight uppercase">
             Junior High School Continuing Enrollment
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-            Dumalneg National High School &bull; DepEd Prescribed Basic Education Core Curriculum
+            Dumalneg National High School &bull; DepEd Prescribed Basic Education Curriculum
           </p>
         </div>
 
@@ -633,7 +689,7 @@ export default function ContinuingEnrollmentForm({
             Your official DepEd learner profile, family background, and documentary requirements (PSA Birth Certificate, SF9 / Form 138, 2x2 Formal ID Photo) are certified and actively on file from your previous approved enrollment in S.Y. {priorApprovedApp.school_year}.
           </p>
           <p className="text-[11px] text-emerald-900 leading-relaxed">
-            Under the DepEd K-12 Basic Education Curriculum, Junior High School (Grades 7 to 10) adheres to prescribed standard core learning areas (Filipino, English, Mathematics, Science, AP, EsP, MAPEH, and TLE). No elective subject selection or document re-submission is required. Click below for instant official continuing re-enrollment.
+            Under the DepEd K-12 Basic Education Curriculum, Junior High School (Grades 7 to 10) adheres to prescribed standard core learning areas. No elective subject selection or document re-submission is required.
           </p>
         </div>
 
@@ -641,7 +697,7 @@ export default function ContinuingEnrollmentForm({
         <div className="border-2 border-slate-300 bg-slate-50 divide-y divide-slate-200 text-xs">
           <div className="p-3 bg-slate-100 font-bold text-slate-800 uppercase tracking-wide flex items-center justify-between">
             <span>Verified Continuing Student Dossier Summary</span>
-            <span className="text-[11px] font-mono text-emerald-800 font-bold">STATUS: READY TO SUBMIT</span>
+            <span className="text-[11px] font-mono text-[#002060] font-bold">READY TO SUBMIT</span>
           </div>
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -655,15 +711,15 @@ export default function ContinuingEnrollmentForm({
               <strong className="text-slate-900 font-mono text-sm">{formData.lrn}</strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Grade Level &amp; Curricular Program:</span>
+              <span className="text-slate-500 block text-[11px]">Previous Program on Record:</span>
               <strong className="text-slate-900">
-                Grade {targetGrade} Junior High School ({currentJhsProgram === "SPS" ? `Special Program in Sports - ${currentSpsSport}` : "Regular Basic Education"})
+                {previousJhsProgram === "SPS" ? "Special Program in Sports (General SPS)" : "Regular Basic Education Curriculum"}
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Academic Period:</span>
+              <span className="text-slate-500 block text-[11px]">Enrolling Grade Level &amp; Period:</span>
               <strong className="text-[#002060]">
-                School Year {schoolYear} &bull; {semester}
+                Grade {targetGrade} &bull; S.Y. {schoolYear} ({semester})
               </strong>
             </div>
             <div>
@@ -679,14 +735,213 @@ export default function ContinuingEnrollmentForm({
           </div>
         </div>
 
-        {/* 1-Click Action Card */}
+        {/* CURRICULAR PROGRAM & TRANSFER SWITCH */}
+        <div className="p-6 bg-slate-50 border-2 border-slate-300 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+            <div>
+              <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
+                [ Curricular Program Transfer Option ]
+              </span>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Toggle to request a transfer between Regular Basic Education and Special Program in Sports (SPS).
+              </p>
+            </div>
+
+            {/* DepEd Standard Interactive Switch */}
+            <div className="flex items-center gap-3 shrink-0">
+              <span className={`text-xs font-bold font-mono uppercase ${!enableTransfer ? "text-slate-900 font-black" : "text-slate-400"}`}>
+                OFF
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={enableTransfer}
+                onClick={() => {
+                  const nextState = !enableTransfer;
+                  setEnableTransfer(nextState);
+                  if (!nextState) {
+                    setSelectedJhsProgram(previousJhsProgram);
+                  }
+                }}
+                className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  enableTransfer ? "bg-[#002060]" : "bg-slate-300"
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                    enableTransfer ? "translate-x-7" : "translate-x-0"
+                  }`}
+                />
+              </button>
+              <span className={`text-xs font-bold font-mono uppercase ${enableTransfer ? "text-[#002060] font-black" : "text-slate-400"}`}>
+                ON
+              </span>
+            </div>
+          </div>
+
+          {/* Switch OFF: Maintaining Program */}
+          {!enableTransfer && (
+            <div className="p-4 bg-white border border-slate-300 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 border border-slate-300">
+                  [ TRANSFER SWITCH: OFF &bull; MAINTAINING CURRENT PROGRAM ]
+                </span>
+              </div>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                You are continuing in your existing curricular program: <strong className="text-slate-900">{previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education Curriculum"}</strong>. No transfer is requested.
+              </p>
+              {previousJhsProgram === "SPS" && (
+                <div className="p-3 bg-blue-50 border border-blue-200 mt-2 space-y-1">
+                  <span className="text-xs font-bold text-[#002060] uppercase block">
+                    [ General Special Program in Sports (SPS) Curriculum ]
+                  </span>
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    The learner continues under the unified SPS curriculum combining secondary academic courses with athletic development. No individual sport selection is required.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Switch ON: Choose Program */}
+          {enableTransfer && (
+            <div className="space-y-4 p-4 bg-white border-2 border-blue-300">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060] bg-blue-100 px-2.5 py-1 border border-blue-300">
+                  [ TRANSFER SWITCH: ON &bull; SELECT PROGRAM ]
+                </span>
+                <span className="text-[11px] text-slate-500 font-mono">
+                  PREVIOUS RECORD: <strong>{previousJhsProgram}</strong>
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-700">
+                Choose the curricular program you wish to enroll into for Grade {targetGrade}, S.Y. {schoolYear}:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Option 1: Regular */}
+                <label
+                  className={`p-4 border-2 cursor-pointer transition-all ${
+                    selectedJhsProgram === "Regular"
+                      ? "border-[#002060] bg-blue-50/70"
+                      : "border-slate-300 bg-slate-50 hover:bg-slate-100"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      name="jhsContinuingProgram"
+                      value="Regular"
+                      checked={selectedJhsProgram === "Regular"}
+                      onChange={() => setSelectedJhsProgram("Regular")}
+                      className="mt-0.5 text-[#002060] focus:ring-[#002060]"
+                    />
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 uppercase">
+                          Regular Basic Education
+                        </span>
+                        {previousJhsProgram === "Regular" && (
+                          <span className="text-[10px] font-mono text-slate-500 font-bold bg-slate-200 px-1.5 py-0.5">
+                            CURRENT
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        Standard DepEd K-12 secondary curriculum covering all core learning areas (Filipino, English, Math, Science, AP, EsP, MAPEH, and TLE).
+                      </p>
+                    </div>
+                  </div>
+                </label>
+
+                {/* Option 2: General SPS */}
+                <label
+                  className={`p-4 border-2 cursor-pointer transition-all ${
+                    selectedJhsProgram === "SPS"
+                      ? "border-[#002060] bg-blue-50/70"
+                      : "border-slate-300 bg-slate-50 hover:bg-slate-100"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      name="jhsContinuingProgram"
+                      value="SPS"
+                      checked={selectedJhsProgram === "SPS"}
+                      onChange={() => setSelectedJhsProgram("SPS")}
+                      className="mt-0.5 text-[#002060] focus:ring-[#002060]"
+                    />
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 uppercase">
+                          Special Program in Sports (SPS)
+                        </span>
+                        {previousJhsProgram === "SPS" && (
+                          <span className="text-[10px] font-mono text-slate-500 font-bold bg-slate-200 px-1.5 py-0.5">
+                            CURRENT
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        Unified secondary athletic curriculum integrating standard academic disciplines with athletic conditioning and sports development.
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              {/* General SPS Notification when SPS selected */}
+              {selectedJhsProgram === "SPS" && (
+                <div className="p-3 bg-blue-50 border border-blue-300 space-y-1">
+                  <span className="text-xs font-bold text-[#002060] uppercase block">
+                    [ General Special Program in Sports (SPS) Curriculum ]
+                  </span>
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    The learner will be enrolled under the unified SPS curriculum. No individual sport selection is required.
+                  </p>
+                </div>
+              )}
+
+              {/* Transfer Alert Notice if different */}
+              {isTransferRequested ? (
+                <div className="p-4 bg-amber-50 border-2 border-amber-400 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-amber-950 uppercase">
+                      [ PROGRAM TRANSFER REQUEST FLAGGED: {previousJhsProgram} &rarr; {selectedJhsProgram} ]
+                    </span>
+                  </div>
+                  <p className="text-xs text-amber-900 leading-relaxed">
+                    You are requesting to transfer from <strong>{previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> to <strong>{selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong>. This application will be marked as a Curricular Transfer Request in the Registrar Adjudication queue for administrative review and approval.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 italic">
+                  You selected the same program as your current record ({previousJhsProgram}). No transfer request will be filed.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* DepEd Review and Approval Note */}
+        <div className="p-4 bg-amber-50/70 border border-amber-300 space-y-1 text-xs text-amber-950">
+          <span className="font-bold uppercase tracking-wider block text-amber-900">
+            Official DepEd Adjudication Policy Notice:
+          </span>
+          <p className="leading-relaxed">
+            All continuing enrollment applications are received and placed under <strong className="font-bold">Pending Registrar Adjudication</strong>. Applications are officially verified and enrolled by the School Registrar upon section assignment and document review.
+          </p>
+        </div>
+
+        {/* Submit Action Card */}
         <div className="p-6 bg-blue-50/70 border-2 border-[#002060] space-y-4">
           <div className="space-y-1">
             <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-              [ 1-CLICK INSTANT CONTINUING ENROLLMENT ]
+              [ SUBMIT CONTINUING ENROLLMENT APPLICATION ]
             </span>
             <p className="text-xs text-slate-700 leading-relaxed">
-              By clicking the button below, you confirm your continuing enrollment for School Year {schoolYear} ({semester}) in accordance with Republic Act 10173 (Data Privacy Act of 2012). Your continuing application will be officially registered with no additional forms required.
+              By clicking the button below, you confirm your continuing enrollment application for Grade {targetGrade} under the <strong>{effectiveProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education Curriculum"}</strong> for School Year {schoolYear} ({semester}) in accordance with Republic Act 10173 (Data Privacy Act of 2012).
             </p>
           </div>
 
@@ -700,12 +955,14 @@ export default function ContinuingEnrollmentForm({
                   ? "bg-slate-400 text-slate-100 cursor-not-allowed"
                   : isSubmitting
                   ? "bg-slate-700 text-white cursor-wait"
-                  : "bg-[#002060] hover:bg-blue-950 text-white active:translate-y-0.5"
+                  : "bg-[#002060] hover:bg-blue-950 text-white active:translate-y-0.5 cursor-pointer"
               }`}
             >
               {isSubmitting
                 ? "Submitting Official Continuing Enrollment..."
-                : `[ 1-CLICK CONFIRM & SUBMIT ENROLLMENT FOR S.Y. ${schoolYear} (${semester}) ]`}
+                : isTransferRequested
+                ? `[ SUBMIT CONTINUING ENROLLMENT WITH TRANSFER REQUEST: ${previousJhsProgram} -> ${selectedJhsProgram} ]`
+                : `[ CONFIRM & SUBMIT CONTINUING ENROLLMENT FOR S.Y. ${schoolYear} (${semester}) ]`}
             </button>
           </div>
         </div>
@@ -953,24 +1210,13 @@ export default function ContinuingEnrollmentForm({
               </div>
 
               {currentJhsProgram === "SPS" && (
-                <div className="p-4 bg-blue-50/70 border border-blue-200 space-y-2">
-                  <label className="block text-xs font-bold text-slate-900 uppercase">
-                    Sports Specialization Discipline <span className="text-red-700">*</span>
-                  </label>
-                  <select
-                    value={currentSpsSport}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, spsSport: e.target.value }))
-                    }
-                    className="w-full sm:w-80 p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value="">-- SELECT SPORT DISCIPLINE --</option>
-                    {SPS_SPORTS.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
+                <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1">
+                  <span className="text-xs font-bold text-[#002060] uppercase block">
+                    [ General Special Program in Sports (SPS) Curriculum ]
+                  </span>
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    The learner is enrolled under the unified Special Program in Sports curriculum combining secondary academic courses with structured athletic training and sports development. No individual sport selection is required.
+                  </p>
                 </div>
               )}
             </div>
@@ -1266,8 +1512,7 @@ export default function ContinuingEnrollmentForm({
               <div>
                 <span className="text-slate-500 block">Curricular Designation:</span>
                 <strong className="text-slate-900">
-                  Grade {targetGrade} &bull; {isJHS ? currentJhsProgram : `${currentTrack} (${currentStrand})`}
-                  {isJHS && currentJhsProgram === "SPS" && ` - Sport: ${currentSpsSport}`}
+                  Grade {targetGrade} &bull; {isJHS ? (currentJhsProgram === "SPS" ? "Special Program in Sports (General SPS)" : "Regular Basic Education") : `${currentTrack} (${currentStrand})`}
                 </strong>
               </div>
               <div>

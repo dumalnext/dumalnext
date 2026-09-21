@@ -272,11 +272,20 @@ export default function AdjudicationConsole() {
 
         const cleanSchoolYear = (app.school_year || fd.schoolYear || "2026-2027").replace("–", "-").trim();
 
+        const isTransferRequested =
+          fd.isTransferRequested === true ||
+          (Boolean(fd.previousJhsProgram) &&
+            Boolean(fd.jhsProgram) &&
+            fd.previousJhsProgram !== fd.jhsProgram);
+
         return {
           ...app,
           school_year: cleanSchoolYear,
           semester: rawTerm,
           term_name: rawTerm,
+          isTransferRequested,
+          previousJhsProgram: fd.previousJhsProgram || null,
+          jhsProgram: fd.jhsProgram || student?.jhs_program || null,
           student,
           userAccount: linkedUser,
         };
@@ -833,10 +842,15 @@ export default function AdjudicationConsole() {
                       <span className="text-[10px] text-slate-600 block">
                         {app.target_strand
                           ? `SHS (${app.target_strand})`
-                          : st?.jhs_program === "SPS"
-                          ? `JHS (SPS - ${st?.sps_sport || "Sports"})`
+                          : (app as any).jhsProgram === "SPS" || st?.jhs_program === "SPS"
+                          ? "JHS (General SPS)"
                           : "JHS Regular"}
                       </span>
+                      {(app as any).isTransferRequested && (
+                        <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-400">
+                          [ TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"} ]
+                        </span>
+                      )}
                       <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block mt-1">
                         S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
                       </span>

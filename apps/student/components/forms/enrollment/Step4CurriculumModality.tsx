@@ -126,9 +126,6 @@ export default function Step4CurriculumModality({
       if (!currentJhsProgram) {
         newErrors.jhsProgram = "Please select a Junior High School curricular program.";
       }
-      if (currentJhsProgram === "SPS" && (!currentSpsSport || currentSpsSport.trim() === "")) {
-        newErrors.spsSport = "Please select a designated sports discipline for the Special Program in Sports.";
-      }
     } else {
       // SHS Validation
       if (!currentSemester) {
@@ -306,43 +303,15 @@ export default function Step4CurriculumModality({
             <p className="text-[11px] font-bold text-red-700">{errors.jhsProgram}</p>
           )}
 
-          {/* Conditional Sport Specialization when SPS is Selected */}
+          {/* General SPS Program Notice */}
           {currentJhsProgram === "SPS" && (
-            <div className="p-5 bg-blue-50/60 border-2 border-blue-200 space-y-3 mt-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Designated Sports Specialization Discipline <span className="text-red-700">*</span>
-                </label>
-                <p className="text-xs text-slate-600 mb-2">
-                  Indicate the primary athletic event or sports discipline the student-athlete specializes in for varsity training and Division Meet representation:
-                </p>
-                <select
-                  value={currentSpsSport}
-                  onChange={(e) => {
-                    onChange({ spsSport: e.target.value });
-                    if (errors.spsSport) {
-                      setErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.spsSport;
-                        return next;
-                      });
-                    }
-                  }}
-                  className={`w-full sm:w-96 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                    errors.spsSport ? "border-red-600 bg-red-50" : "border-slate-300"
-                  }`}
-                >
-                  <option value="">-- SELECT SPORT DISCIPLINE --</option>
-                  {SPS_SPORTS.map((sport) => (
-                    <option key={sport} value={sport}>
-                      {sport}
-                    </option>
-                  ))}
-                </select>
-                {errors.spsSport && (
-                  <p className="text-[11px] font-bold text-red-700 mt-1">{errors.spsSport}</p>
-                )}
-              </div>
+            <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 mt-4">
+              <span className="text-xs font-bold text-[#002060] uppercase block">
+                [ General Special Program in Sports (SPS) Curriculum ]
+              </span>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                The learner is enrolled under the unified Special Program in Sports curriculum combining secondary academic courses with structured athletic training and sports development. No individual sport selection is required.
+              </p>
             </div>
           )}
         </div>
