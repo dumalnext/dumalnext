@@ -225,17 +225,17 @@ export default function CurriculumSubjectsConsole() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-              [ DEPED BASIC EDUCATION &amp; SHS CURRICULUM MANAGEMENT ]
+              [ DEPED COURSE CATALOG &amp; SUBJECT OFFERINGS ]
             </span>
             <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 uppercase">
-              Live Curriculum Roster
+              Live Subject Catalog
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-950 uppercase">
-            Curriculum &amp; Subject Offerings Console
+            Subjects Management Console
           </h2>
           <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-            Manage official learning areas, specialized strands, cross-strand electives, and academic recovery subjects for Junior and Senior High School at Dumalneg National High School.
+            Manage official learning areas and subjects across Junior High School (Grades 7–10) and Senior High School (Grades 11–12) at Dumalneg National High School.
           </p>
         </div>
 
@@ -445,7 +445,7 @@ export default function CurriculumSubjectsConsole() {
           <div className="p-12 text-center">
             <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
             <span className="text-xs font-mono text-slate-600 uppercase block font-bold">
-              Loading Curriculum Subjects Database...
+              Loading Subjects Database...
             </span>
           </div>
         ) : filteredSubjects.length === 0 ? (
@@ -454,7 +454,7 @@ export default function CurriculumSubjectsConsole() {
               [ NO SUBJECTS FOUND MATCHING ACTIVE FILTERS ]
             </span>
             <p className="text-xs text-slate-600 max-w-md mx-auto">
-              No curriculum offerings match the selected grade level, trimester, subject type, or search term. Click the button below to reset filters or create a new subject.
+              No subjects match the selected grade level, trimester, subject type, or search term. Click the button below to reset filters or create a new subject.
             </p>
             <div className="pt-2 flex items-center justify-center gap-2">
               <button
@@ -594,10 +594,10 @@ export default function CurriculumSubjectsConsole() {
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-widest block">
-                  [ DEPED CURRICULUM MANAGEMENT ]
+                  [ DEPED SUBJECT MANAGEMENT ]
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight">
-                  {isEditing ? "Edit Subject Offering" : "Add New Subject Offering"}
+                  {isEditing ? "Edit Subject" : "Add New Subject"}
                 </h3>
               </div>
               <button
@@ -726,10 +726,10 @@ export default function CurriculumSubjectsConsole() {
                 </div>
               </div>
 
-              {/* Curricular Program / Strand Selection */}
+              {/* Program / Strand Selection */}
               <div>
                 <label className="block font-bold text-slate-900 uppercase mb-1">
-                  Curricular Program / Strand Designation
+                  Program / Strand Designation
                 </label>
                 {formGrade <= 10 ? (
                   <select
@@ -737,7 +737,7 @@ export default function CurriculumSubjectsConsole() {
                     onChange={(e) => setFormStrand(e.target.value)}
                     className="w-full p-2 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   >
-                    <option value="Regular">Regular Basic Education Curriculum</option>
+                    <option value="Regular">Regular Basic Education</option>
                     <option value="SPS">Special Program in Sports (General SPS)</option>
                   </select>
                 ) : (
@@ -799,10 +799,10 @@ export default function CurriculumSubjectsConsole() {
           <div className="bg-white border-4 border-red-700 w-full max-w-md shadow-2xl p-6 space-y-4">
             <div className="border-b border-red-200 pb-2">
               <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
-                [ CONFIRM REMOVAL OF CURRICULUM SUBJECT ]
+                [ CONFIRM REMOVAL OF SUBJECT ]
               </span>
               <h3 className="text-base font-bold text-slate-900 uppercase">
-                Remove Subject Offering?
+                Remove Subject?
               </h3>
             </div>
 
@@ -820,7 +820,7 @@ export default function CurriculumSubjectsConsole() {
             </div>
 
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              Note: If this subject is actively assigned in any existing class schedules, removal will be prevented to protect curriculum integrity.
+              Note: If this subject is actively assigned in any existing class schedules, removal will be prevented to protect timetable integrity.
             </p>
 
             <div className="flex items-center justify-end gap-2 pt-2">

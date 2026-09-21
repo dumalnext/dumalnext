@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { useAdminAuth } from "@/lib/auth/authContext";
 
 interface AdminHeaderNavProps {
-  activeSection?: "adjudication" | "sections" | "scheduling" | "curriculum" | "control";
-  onSelectSection?: (section: "adjudication" | "sections" | "scheduling" | "curriculum" | "control") => void;
+  activeSection?: "adjudication" | "sections" | "scheduling" | "subjects" | "curriculum" | "control";
+  onSelectSection?: (section: "adjudication" | "sections" | "scheduling" | "subjects" | "curriculum" | "control") => void;
 }
 
 export default function AdminHeaderNav({
@@ -31,8 +31,10 @@ export default function AdminHeaderNav({
     activeSection === "scheduling" ||
     pathname.startsWith("/scheduling");
 
-  const isCurriculum =
+  const isSubjects =
+    activeSection === "subjects" ||
     activeSection === "curriculum" ||
+    pathname.startsWith("/subjects") ||
     pathname.startsWith("/curriculum");
 
   const isControl =
@@ -139,15 +141,15 @@ export default function AdminHeaderNav({
               Schedule Deconfliction
             </Link>
             <Link
-              href="/curriculum"
-              onClick={() => onSelectSection?.("curriculum")}
+              href="/subjects"
+              onClick={() => onSelectSection?.("subjects")}
               className={`py-3 px-4 border-b-2 transition-colors ${
-                isCurriculum
+                isSubjects
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              Curriculum &amp; Subjects
+              Subjects
             </Link>
             <Link
               href="/control-room"

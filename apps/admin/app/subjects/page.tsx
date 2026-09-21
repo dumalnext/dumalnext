@@ -1,17 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 import AdminPageShell from "@/components/AdminPageShell";
 import CurriculumSubjectsConsole from "@/components/CurriculumSubjectsConsole";
 
-export default function CurriculumPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/subjects");
-  }, [router]);
-
+export default function SubjectsPage() {
   return (
     <AdminPageShell activeSection="subjects">
       <CurriculumSubjectsConsole />
