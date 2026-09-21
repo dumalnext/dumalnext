@@ -703,7 +703,7 @@ function StudentHomeContent() {
                         {isEnrollmentOpen
                           ? priorApproved
                             ? isJhsContinuing
-                              ? `Naka-file at certified na ang iyong mga dokumento at learner credentials mula sa nakaraang approved enrollment. Dahil prescribed core curriculum ang Junior High School (Grade 7-10), walang kinakailangang electives. Pindutin ang button sa ibaba para sa instant 1-click re-enrollment para sa ${semester}.`
+                              ? `Your official learner credentials and documentary requirements are certified on file from your previous approved enrollment. As Junior High School (Grades 7-10) follows a prescribed core curriculum, no electives are required. Click below for instant 1-click re-enrollment for ${semester}.`
                               : `Your learner credentials, family background, and official DepEd documents are verified and on file from your previous approved enrollment. Click below to choose your elective subjects and submit enrollment for ${semester}.`
                             : `Your student account is active. Click below to begin filling out the complete enrollment form for School Year ${schoolYear} (${semester}). Please review and double check all learner credentials and documentary requirements.`
                           : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
@@ -721,7 +721,7 @@ function StudentHomeContent() {
                           {isEnrollmentOpen
                             ? priorApproved
                               ? isJhsContinuing
-                                ? `[ 1-Click Mag-Enroll para sa ${semester} (Grade ${targetContinuingGrade} JHS) ]`
+                                ? `[ 1-Click Re-Enroll for ${semester} (Grade ${targetContinuingGrade} JHS) ]`
                                 : `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
                               : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
                             : "[ View Official Enrollment Notice & Advisory ]"}

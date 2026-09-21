@@ -549,7 +549,7 @@ export default function ContinuingEnrollmentForm({
               <span className="text-slate-500 block">Selected Electives:</span>
               <strong className="text-slate-900">
                 {isJHS
-                  ? "Walang kailangan (DepEd Prescribed JHS Core Curriculum)"
+                  ? "None required (DepEd Prescribed JHS Core Curriculum)"
                   : currentElectives.length > 0
                   ? currentElectives.join(", ")
                   : "None designated"}
@@ -630,10 +630,10 @@ export default function ContinuingEnrollmentForm({
             </span>
           </div>
           <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-            Ang iyong Learner Profile, Family Background, at mga opisyal na dokumento (PSA Birth Certificate, SF9 / Form 138, 2x2 Formal ID Photo) ay certified at aktibong naka-rekord mula sa inyong naunang naaprubahang enrollment noong S.Y. {priorApprovedApp.school_year}.
+            Your official DepEd learner profile, family background, and documentary requirements (PSA Birth Certificate, SF9 / Form 138, 2x2 Formal ID Photo) are certified and actively on file from your previous approved enrollment in S.Y. {priorApprovedApp.school_year}.
           </p>
           <p className="text-[11px] text-emerald-900 leading-relaxed">
-            Alinsunod sa DepEd K-12 Curriculum, ang Junior High School (Grade 7 hanggang Grade 10) ay sumusunod sa standard prescribed core learning areas (Filipino, English, Mathematics, Science, AP, EsP, MAPEH, at TLE). Walang kinakailangang elective subjects o pagpasa muli ng mga dokumento. Isang pindot lamang upang opisyal na makapag-enroll!
+            Under the DepEd K-12 Basic Education Curriculum, Junior High School (Grades 7 to 10) adheres to prescribed standard core learning areas (Filipino, English, Mathematics, Science, AP, EsP, MAPEH, and TLE). No elective subject selection or document re-submission is required. Click below for instant official continuing re-enrollment.
           </p>
         </div>
 
@@ -645,7 +645,7 @@ export default function ContinuingEnrollmentForm({
           </div>
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <span className="text-slate-500 block text-[11px]">Pangalan ng Mag-aaral:</span>
+              <span className="text-slate-500 block text-[11px]">Learner Name:</span>
               <strong className="text-slate-900 text-sm uppercase">
                 {formData.lastName}, {formData.firstName} {formData.middleName || ""}
               </strong>
@@ -655,13 +655,13 @@ export default function ContinuingEnrollmentForm({
               <strong className="text-slate-900 font-mono text-sm">{formData.lrn}</strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Antas at Kurikulum:</span>
+              <span className="text-slate-500 block text-[11px]">Grade Level &amp; Curricular Program:</span>
               <strong className="text-slate-900">
                 Grade {targetGrade} Junior High School ({currentJhsProgram === "SPS" ? `Special Program in Sports - ${currentSpsSport}` : "Regular Basic Education"})
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Akademikong Taon at Termino:</span>
+              <span className="text-slate-500 block text-[11px]">Academic Period:</span>
               <strong className="text-[#002060]">
                 School Year {schoolYear} &bull; {semester}
               </strong>
@@ -686,7 +686,7 @@ export default function ContinuingEnrollmentForm({
               [ 1-CLICK INSTANT CONTINUING ENROLLMENT ]
             </span>
             <p className="text-xs text-slate-700 leading-relaxed">
-              Sa pamamagitan ng pag-click sa button sa ibaba, kinukumpirma mo ang iyong muling pag-enroll para sa School Year {schoolYear} ({semester}) alinsunod sa Republic Act 10173 (Data Privacy Act of 2012). Awtomatikong mairerehistro ang iyong aplikasyon nang walang anumang karagdagang form.
+              By clicking the button below, you confirm your continuing enrollment for School Year {schoolYear} ({semester}) in accordance with Republic Act 10173 (Data Privacy Act of 2012). Your continuing application will be officially registered with no additional forms required.
             </p>
           </div>
 
@@ -704,8 +704,8 @@ export default function ContinuingEnrollmentForm({
               }`}
             >
               {isSubmitting
-                ? "Isinusumite ang Iyong Opisyal na Enrollment..."
-                : `[ 1-CLICK KUMPIRMAHIN AT MAG-ENROLL PARA SA S.Y. ${schoolYear} (${semester}) ]`}
+                ? "Submitting Official Continuing Enrollment..."
+                : `[ 1-CLICK CONFIRM & SUBMIT ENROLLMENT FOR S.Y. ${schoolYear} (${semester}) ]`}
             </button>
           </div>
         </div>
@@ -1051,7 +1051,7 @@ export default function ContinuingEnrollmentForm({
                   [ Section 7-B: Cross-Strand Elective Subjects ]
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
-                  Mag-enroll sa karagdagang elective courses para sa {semester}, S.Y. {schoolYear}:
+                  Enroll in additional elective courses for {semester}, S.Y. {schoolYear}:
                 </p>
               </div>
 
@@ -1101,18 +1101,18 @@ export default function ContinuingEnrollmentForm({
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-slate-400 inline-block shrink-0" />
                   <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                    [ STANDARD STRAND CURRICULUM ACTIVE: WALANG KARAGDAGANG ELECTIVES ]
+                    [ STANDARD STRAND CURRICULUM ACTIVE: NO ADDITIONAL ELECTIVES ]
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Naka-OFF ang elective selection. Ang mag-aaral ay mag-e-enroll lamang sa mga standard at mandatoryong core at specialized subjects para sa Grade {targetGrade} ({isJHS ? currentJhsProgram : currentStrand}). Walang ibang strand subjects na idinagdag.
+                  Elective selection is switched OFF. The learner will only be enrolled in the standard mandatory core and specialized subjects for Grade {targetGrade} ({isJHS ? currentJhsProgram : currentStrand}). No cross-strand subjects added.
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-slate-600">
                   <span className="font-medium">
-                    Mga asignaturang maaaring kunin ngayong {semester} (Na-filter na ang mga nakuha na at mga kailangan sa sariling strand):
+                    Available elective subjects for {semester} (Filtered to exclude previously completed subjects and native strand subjects):
                   </span>
                   <span className="font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-slate-300 w-fit">
                     SELECTED: {currentElectives.length} SUBJECT(S)
@@ -1161,10 +1161,10 @@ export default function ContinuingEnrollmentForm({
                 ) : (
                   <div className="p-4 bg-white border border-slate-300 space-y-1">
                     <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
-                      [ WALANG IBANG ELECTIVES NA MAAARING KUNIN NGAYONG SEMESTER ]
+                      [ NO ADDITIONAL ELECTIVES AVAILABLE FOR THIS TERM ]
                     </span>
                     <p className="text-xs text-slate-500">
-                      Lahat ng cross-strand electives para sa terminong ito ay nakuha na noong mga nakaraang sem o kaya naman ay kasama na sa mga mandatoryong subject ng inyong strand ({currentStrand}).
+                      All cross-strand electives for this term have either been completed in previous terms or are already part of your required strand curriculum ({currentStrand}).
                     </p>
                   </div>
                 )}

@@ -489,7 +489,7 @@ export default function Step4CurriculumModality({
                 [ Section 7-B: Cross-Strand Elective Subjects ]
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
-                Mag-enroll sa karagdagang elective courses para sa {currentSemester}:
+                Enroll in additional elective courses for {currentSemester}:
               </p>
             </div>
 
@@ -539,18 +539,18 @@ export default function Step4CurriculumModality({
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-slate-400 inline-block shrink-0" />
                 <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                  [ STANDARD STRAND CURRICULUM ACTIVE: WALANG KARAGDAGANG ELECTIVES ]
+                  [ STANDARD STRAND CURRICULUM ACTIVE: NO ADDITIONAL ELECTIVES ]
                 </span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Naka-OFF ang elective selection. Ang mag-aaral ay mag-e-enroll lamang sa mga standard at mandatoryong core at specialized subjects para sa Grade {targetGrade} ({isJHS ? currentJhsProgram : currentStrand}). Walang ibang strand subjects na idinagdag.
+                Elective selection is switched OFF. The learner will only be enrolled in the standard mandatory core and specialized subjects for Grade {targetGrade} ({isJHS ? currentJhsProgram : currentStrand}). No cross-strand subjects added.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-slate-600">
                 <span className="font-medium">
-                  Mga asignaturang maaaring kunin ngayong {currentSemester} (Na-filter na ang mga nakuha na at mga kailangan sa sariling strand):
+                  Available elective subjects for {currentSemester} (Filtered to exclude previously completed subjects and native strand subjects):
                 </span>
                 <span className="font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-slate-300 w-fit">
                   SELECTED: {currentElectives.length} SUBJECT(S)
@@ -599,10 +599,10 @@ export default function Step4CurriculumModality({
               ) : (
                 <div className="p-4 bg-white border border-slate-300 space-y-1">
                   <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
-                    [ WALANG IBANG ELECTIVES NA MAAARING KUNIN NGAYONG SEMESTER ]
+                    [ NO ADDITIONAL ELECTIVES AVAILABLE FOR THIS TERM ]
                   </span>
                   <p className="text-xs text-slate-500">
-                    Lahat ng cross-strand electives para sa terminong ito ay nakuha na noong mga nakaraang sem o kaya naman ay kasama na sa mga mandatoryong subject ng inyong strand ({currentStrand}).
+                    All cross-strand electives for this term have either been completed in previous terms or are already part of your required strand curriculum ({currentStrand}).
                   </p>
                 </div>
               )}
