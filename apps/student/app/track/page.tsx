@@ -29,6 +29,7 @@ interface ApplicationRecord {
   primaryContact?: string;
   contactNumber?: string;
   remarks?: string;
+  sectionId?: string;
   sectionName?: string;
   adviserName?: string;
   room?: string;
@@ -48,6 +49,21 @@ function TrackApplicationContent() {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
   const hasLoadedOnceRef = useRef<boolean>(false);
 
+  // Timetable & Prescribed Subjects States
+  const [timetableSchedules, setTimetableSchedules] = useState<any[]>([]);
+  const [enrolledSubjects, setEnrolledSubjects] = useState<any[]>([]);
+  const [isLoadingTimetable, setIsLoadingTimetable] = useState<boolean>(false);
+  const [selectedDayFilter, setSelectedDayFilter] = useState<string>("All");
+
+  const filteredTimetable = React.useMemo(() => {
+    if (selectedDayFilter === "All") {
+      return timetableSchedules;
+    }
+    return timetableSchedules.filter(
+      (s: any) => s.day_of_week?.toLowerCase() === selectedDayFilter.toLowerCase()
+    );
+  }, [timetableSchedules, selectedDayFilter]);
+
   // Protected Route Check: Unauthenticated visitors redirected to sign in
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -59,7 +75,7 @@ function TrackApplicationContent() {
   const mapSupabaseToRecord = (
     suApp: any,
     studentRecord: any,
-    sectionInfo?: { sectionName?: string; adviserName?: string; room?: string }
+    sectionInfo?: { sectionId?: string; sectionName?: string; adviserName?: string; room?: string }
   ): ApplicationRecord => {
     const fullName = studentRecord
       ? `${studentRecord.last_name}, ${studentRecord.first_name} ${studentRecord.middle_name || ""}`.trim()
@@ -70,6 +86,7 @@ function TrackApplicationContent() {
       : (typeof suApp.selected_electives === "object" && suApp.selected_electives !== null ? suApp.selected_electives : {});
     const cleanSY = suApp.school_year || fd.schoolYear || "2026-2027";
     const appSem = fd.term_name || fd.termName || fd.semester || fd.term || fd.targetSemester || suApp.term_name || suApp.semester || "Trimester 1";
+    const jhsProg = fd.jhsProgram || suApp.jhs_program || (suApp.target_strand === "SPS" ? "SPS" : "Regular");
 
     return {
       id: suApp.id,
@@ -87,10 +104,11 @@ function TrackApplicationContent() {
       fullName,
       gradeLevel: suApp.target_grade_level || 7,
       applicantType: suApp.applicant_type || "Grade 7",
-      jhsProgram: "Regular",
+      jhsProgram: jhsProg,
       targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
       targetStrand: suApp.target_strand || "",
       remarks: suApp.admin_feedback,
+      sectionId: sectionInfo?.sectionId,
       sectionName: sectionInfo?.sectionName,
       adviserName: sectionInfo?.adviserName,
       room: sectionInfo?.room,
@@ -101,7 +119,7 @@ function TrackApplicationContent() {
           isGraded: true,
           applicantType: suApp.applicant_type || "Grade 7",
           targetGradeLevel: Number(suApp.target_grade_level) || 7,
-          jhsProgram: "Regular",
+          jhsProgram: jhsProg as any,
           targetSemester: appSem,
           targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
           targetStrand: suApp.target_strand || "",
@@ -203,11 +221,12 @@ function TrackApplicationContent() {
           if (!currentSectionId) return undefined;
           const { data: secData } = await supabase
             .from("sections")
-            .select("section_name, adviser_name, room")
+            .select("id, section_name, adviser_name, room")
             .eq("id", currentSectionId)
             .limit(1);
           if (secData && secData.length > 0) {
             return {
+              sectionId: secData[0].id,
               sectionName: secData[0].section_name,
               adviserName: secData[0].adviser_name,
               room: secData[0].room,
@@ -233,7 +252,8 @@ function TrackApplicationContent() {
               .limit(1);
 
             const studentObj = stProfile?.[0] || null;
-            const secInfo = await fetchSectionInfo(studentObj?.current_section_id);
+            const targetSecId = studentObj?.current_section_id || appData[0]?.section_id || appData[0]?.assigned_section_id;
+            const secInfo = await fetchSectionInfo(targetSecId);
 
             setRecord(mapSupabaseToRecord(appData[0], studentObj, secInfo));
             hasLoadedOnceRef.current = true;
@@ -251,16 +271,15 @@ function TrackApplicationContent() {
 
         if (stList && stList.length > 0) {
           const studentRecord = stList[0];
-          const [appRes, secInfo] = await Promise.all([
-            supabase
-              .from("enrollment_applications")
-              .select("*")
-              .eq("student_id", studentRecord.id)
-              .order("created_at", { ascending: false }),
-            fetchSectionInfo(studentRecord.current_section_id),
-          ]);
+          const appRes = await supabase
+            .from("enrollment_applications")
+            .select("*")
+            .eq("student_id", studentRecord.id)
+            .order("created_at", { ascending: false });
 
           const appData = appRes.data;
+          const targetSecId = studentRecord.current_section_id || (appData?.[0]?.section_id) || (appData?.[0]?.assigned_section_id);
+          const secInfo = await fetchSectionInfo(targetSecId);
 
           if (isMounted && appData && appData.length > 0) {
             const mappedRecords = appData.map((a: any) =>
@@ -374,6 +393,62 @@ function TrackApplicationContent() {
       supabase.removeChannel(channel);
     };
   }, [user?.id, user?.lrn, initialQuery, schoolYear, semester, termNumber]);
+
+  // Fetch Enrolled Subjects & Timetable Schedules for the active record
+  useEffect(() => {
+    if (!record) {
+      setTimetableSchedules([]);
+      setEnrolledSubjects([]);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoadingTimetable(true);
+
+    const loadSubjectsAndTimetable = async () => {
+      try {
+        // 1. Fetch Subjects for Student's Grade Level and Strand/Program
+        const gradeParam = record.gradeLevel || 7;
+        const strandParam = record.targetStrand || (record.jhsProgram === "SPS" ? "SPS" : "Regular");
+        const subjectsUrl = `/api/subjects?gradeLevel=${gradeParam}&strand=${encodeURIComponent(strandParam)}`;
+
+        const subjPromise = fetch(subjectsUrl)
+          .then((res) => res.json())
+          .then((data) => (data.success && Array.isArray(data.subjects) ? data.subjects : []))
+          .catch(() => []);
+
+        // 2. Fetch Timetable Schedules for Student's Assigned Section (or grade level fallback)
+        let schedUrl = `/api/schedules?gradeLevel=${gradeParam}`;
+        if (record.sectionId) {
+          schedUrl = `/api/schedules?sectionId=${record.sectionId}`;
+        }
+
+        const schedPromise = fetch(schedUrl)
+          .then((res) => res.json())
+          .then((data) => (data.success && Array.isArray(data.schedules) ? data.schedules : []))
+          .catch(() => []);
+
+        const [fetchedSubjects, fetchedSchedules] = await Promise.all([subjPromise, schedPromise]);
+
+        if (isMounted) {
+          setEnrolledSubjects(fetchedSubjects);
+          setTimetableSchedules(fetchedSchedules);
+          setIsLoadingTimetable(false);
+        }
+      } catch (err) {
+        console.error("Error loading subjects and timetable:", err);
+        if (isMounted) {
+          setIsLoadingTimetable(false);
+        }
+      }
+    };
+
+    loadSubjectsAndTimetable();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [record?.referenceNumber, record?.sectionId, record?.gradeLevel, record?.targetStrand, record?.jhsProgram]);
 
   const handleDownloadApprovedPdf = async () => {
     if (!record) return;
@@ -757,6 +832,190 @@ function TrackApplicationContent() {
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* =========================================================================
+             SECTION: OFFICIAL ENROLLED SUBJECTS & PRESCRIBED DEPED LEARNING AREAS
+             ========================================================================= */}
+          <div className="border-2 border-slate-300 bg-white p-6 sm:p-8 space-y-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
+              <div>
+                <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                  [ OFFICIAL ENROLLED SUBJECTS &bull; PRESCRIBED DEPED LEARNING AREAS ]
+                </span>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Curricular learning areas designated for Grade {record.gradeLevel}{" "}
+                  {record.targetStrand
+                    ? `(${record.targetStrand})`
+                    : `(${record.jhsProgram === "SPS" ? "Special Program in Sports" : "Regular JHS Curriculum"})`}
+                </p>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1 border border-slate-300">
+                {enrolledSubjects.length} Subject Units Registered
+              </span>
+            </div>
+
+            {isLoadingTimetable && enrolledSubjects.length === 0 ? (
+              <div className="p-8 text-center text-xs font-mono text-slate-500">
+                <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                Loading official enrolled subjects...
+              </div>
+            ) : enrolledSubjects.length === 0 ? (
+              <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center font-mono">
+                [ No prescribed course subjects registered for this grade level ]
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-slate-200">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-mono font-bold text-[11px] uppercase">
+                      <th className="p-2.5">Subject Code</th>
+                      <th className="p-2.5">Learning Area / Course Title</th>
+                      <th className="p-2.5">Classification</th>
+                      <th className="p-2.5">Grade Level</th>
+                      <th className="p-2.5">Curriculum / Program</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {enrolledSubjects.map((subj: any) => (
+                      <tr key={subj.id || subj.subject_code} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-2.5 font-mono font-bold text-[#002060]">
+                          {subj.subject_code}
+                        </td>
+                        <td className="p-2.5 font-bold text-slate-900">
+                          {subj.subject_name}
+                        </td>
+                        <td className="p-2.5">
+                          <span
+                            className={`inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase ${
+                              subj.subject_type === "Core"
+                                ? "bg-blue-50 text-blue-900 border border-blue-300"
+                                : subj.subject_type === "Specialized"
+                                ? "bg-purple-50 text-purple-900 border border-purple-300"
+                                : subj.subject_type === "Applied"
+                                ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
+                                : "bg-amber-50 text-amber-900 border border-amber-300"
+                            }`}
+                          >
+                            {subj.subject_type || "Core"}
+                          </span>
+                        </td>
+                        <td className="p-2.5 text-slate-700 font-medium">
+                          Grade {subj.grade_level}
+                        </td>
+                        <td className="p-2.5 text-slate-600 font-mono text-[11px]">
+                          {subj.strand || "Regular"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* =========================================================================
+             SECTION: OFFICIAL CLASS TIMETABLE & WEEKLY SCHEDULE
+             ========================================================================= */}
+          <div id="timetable" className="border-2 border-slate-300 bg-white p-6 sm:p-8 space-y-5 shadow-sm scroll-mt-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
+              <div>
+                <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                  [ OFFICIAL CLASS TIMETABLE &bull; WEEKLY SCHEDULE ]
+                </span>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Class timetable periods, assigned subject teachers, and classroom locations.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase">
+                  {record.sectionName || "Section Pending"}
+                </span>
+                {record.room && (
+                  <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-800 px-2.5 py-1 border border-slate-300 uppercase">
+                    Room {record.room}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Day of Week Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              {["All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => {
+                const isDayActive = selectedDayFilter.toLowerCase() === day.toLowerCase();
+                const dayCount =
+                  day === "All"
+                    ? timetableSchedules.length
+                    : timetableSchedules.filter((s: any) => s.day_of_week?.toLowerCase() === day.toLowerCase()).length;
+
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => setSelectedDayFilter(day)}
+                    className={`px-3 py-1.5 text-xs font-mono font-bold border transition-colors cursor-pointer ${
+                      isDayActive
+                        ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                        : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
+                    }`}
+                  >
+                    {day.toUpperCase()} ({dayCount})
+                  </button>
+                );
+              })}
+            </div>
+
+            {isLoadingTimetable && timetableSchedules.length === 0 ? (
+              <div className="p-8 text-center text-xs font-mono text-slate-500">
+                <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                Loading section timetable periods...
+              </div>
+            ) : filteredTimetable.length === 0 ? (
+              <div className="p-6 bg-slate-50 border border-slate-300 text-center space-y-2">
+                <span className="text-xs font-mono font-bold text-slate-700 uppercase block">
+                  [ TIMETABLE STATUS: SCHEDULE UNDER PREPARATION &bull; DECONFLICTION GUARD ACTIVE ]
+                </span>
+                <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
+                  The weekly timetable periods for this section are currently being finalized by the school administration and registrar. 
+                  Enrolled subjects and learning areas above are officially registered.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {filteredTimetable.map((item: any) => (
+                  <div
+                    key={item.id}
+                    className="p-3.5 border-2 border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060] transition-colors space-y-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-block px-2.5 py-1 text-[11px] font-mono font-bold bg-[#002060] text-white uppercase tracking-wider">
+                        {item.day_of_week} &bull; {item.start_time} - {item.end_time}
+                      </span>
+                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                        {item.subject_code}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="text-sm font-bold text-slate-900 leading-tight">
+                        {item.subject_name}
+                      </div>
+                      <div className="text-xs text-slate-600 mt-1 flex flex-col gap-0.5">
+                        <span>
+                          <strong className="text-slate-700">Teacher:</strong>{" "}
+                          {item.teacher_name || record.adviserName || "Assigned Faculty"}
+                        </span>
+                        <span>
+                          <strong className="text-slate-700">Classroom:</strong>{" "}
+                          {item.classroom_name || (record.room ? `Room ${record.room}` : "Standard Classroom")}
+                          {item.building ? ` (${item.building})` : ""}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

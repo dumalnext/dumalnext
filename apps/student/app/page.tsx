@@ -556,6 +556,15 @@ function StudentHomeContent() {
                     View / Track Application Details
                   </Link>
 
+                  {userApplication.status === "Approved" && (
+                    <Link
+                      href={`/track?ref=${userApplication.referenceNumber}#timetable`}
+                      className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider shadow-xs inline-flex items-center gap-1"
+                    >
+                      [ View Enrolled Subjects &amp; Timetable &rarr; ]
+                    </Link>
+                  )}
+
                   {userApplication.status === "Needs Revision" && (
                     <Link
                       href="/enroll"

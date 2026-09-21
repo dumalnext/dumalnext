@@ -58,6 +58,8 @@ export interface SubjectRef {
   subject_name: string;
   grade_level: number;
   trimester?: number;
+  strand?: string | null;
+  subject_type?: string | null;
 }
 
 interface TimeSlotDef {
@@ -192,13 +194,15 @@ export default function ScheduleDeconflictionConsole() {
               subject_name: s.subject_name,
               grade_level: s.grade_level,
               trimester: s.trimester,
+              strand: s.strand,
+              subject_type: s.subject_type,
             }))
           );
         }
       } else {
         const { data: directSubs } = await supabase
           .from("course_subjects")
-          .select("id, subject_code, subject_name, grade_level, trimester")
+          .select("id, subject_code, subject_name, grade_level, trimester, strand, subject_type")
           .order("subject_name");
         if (directSubs && directSubs.length > 0) {
           setSubjects(directSubs);
@@ -269,6 +273,74 @@ export default function ScheduleDeconflictionConsole() {
     return null;
   }, [schedules, formDayOfWeek, formStartTime, formEndTime, formTeacherId, formClassroomId, formSectionId]);
 
+  // Selected Section in the Modal Form
+  const selectedFormSection = useMemo(() => {
+    return sections.find((s) => s.id === formSectionId);
+  }, [sections, formSectionId]);
+
+  // Smart Filter: Get valid subjects strictly matching section grade and strand
+  const getValidSubjectsForSection = (sec?: SectionRef) => {
+    if (!sec) return subjects;
+    const secGrade = sec.grade_level;
+    const secStrand = sec.strand ? sec.strand.toUpperCase() : "";
+
+    return subjects.filter((sub) => {
+      // 1. Strict Grade Level Match: A Grade 7 section ONLY gets Grade 7 subjects!
+      if (sub.grade_level !== secGrade) {
+        return false;
+      }
+
+      // 2. Junior High School (Grades 7 - 10)
+      if (secGrade <= 10) {
+        if (secStrand === "SPS") {
+          return sub.strand === "SPS" || !sub.strand || sub.strand === "Regular" || sub.subject_type === "Core";
+        } else {
+          return sub.strand !== "SPS";
+        }
+      }
+
+      // 3. Senior High School (Grades 11 - 12)
+      if (secGrade >= 11) {
+        if (secStrand) {
+          const subStrand = sub.strand ? sub.strand.toUpperCase() : "";
+          return (
+            subStrand === secStrand ||
+            subStrand === "GENERAL" ||
+            !sub.strand ||
+            sub.subject_type === "Core" ||
+            sub.subject_type === "Applied"
+          );
+        }
+      }
+
+      return true;
+    });
+  };
+
+  // Smart Filtered Subjects for currently selected section in the form
+  const filteredFormSubjects = useMemo(() => {
+    return getValidSubjectsForSection(selectedFormSection);
+  }, [selectedFormSection, subjects]);
+
+  // Handle Section Change in Modal with auto-subject selection
+  const handleSectionChange = (newSecId: string) => {
+    setFormSectionId(newSecId);
+    const sec = sections.find((s) => s.id === newSecId);
+    if (sec) {
+      const validSubs = getValidSubjectsForSection(sec);
+      const currentIsValid = validSubs.some((s) => s.subject_code === formSubjectCode);
+      if (!currentIsValid) {
+        if (validSubs.length > 0) {
+          setFormSubjectCode(validSubs[0].subject_code);
+          setFormCustomSubject(validSubs[0].subject_name);
+        } else {
+          setFormSubjectCode("");
+          setFormCustomSubject("");
+        }
+      }
+    }
+  };
+
   // Open modal with pre-filled day & time slot from clicking a grid cell
   const openAddModalWithDefaults = (day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday", start: string, end: string) => {
     setAddError("");
@@ -276,11 +348,12 @@ export default function ScheduleDeconflictionConsole() {
     setFormStartTime(start);
     setFormEndTime(end);
 
-    if (viewMode === "bySection" && selectedSectionId) {
-      setFormSectionId(selectedSectionId);
-    } else if (!formSectionId && sections.length > 0) {
-      setFormSectionId(sections[0].id);
-    }
+    const targetSecId =
+      viewMode === "bySection" && selectedSectionId
+        ? selectedSectionId
+        : formSectionId || (sections.length > 0 ? sections[0].id : "");
+
+    setFormSectionId(targetSecId);
 
     if (viewMode === "byTeacher" && selectedTeacherId) {
       setFormTeacherId(selectedTeacherId);
@@ -292,9 +365,14 @@ export default function ScheduleDeconflictionConsole() {
       setFormClassroomId(classrooms[0].id);
     }
 
-    if (!formSubjectCode && subjects.length > 0) {
-      setFormSubjectCode(subjects[0].subject_code);
-      setFormCustomSubject(subjects[0].subject_name);
+    const sec = sections.find((s) => s.id === targetSecId);
+    const validSubs = getValidSubjectsForSection(sec);
+    if (validSubs.length > 0) {
+      setFormSubjectCode(validSubs[0].subject_code);
+      setFormCustomSubject(validSubs[0].subject_name);
+    } else {
+      setFormSubjectCode("");
+      setFormCustomSubject("");
     }
 
     setIsAddModalOpen(true);
@@ -506,10 +584,33 @@ export default function ScheduleDeconflictionConsole() {
             type="button"
             onClick={() => {
               setAddError("");
-              if (!formSectionId && sections.length > 0) setFormSectionId(sections[0].id);
-              if (!formTeacherId && teachers.length > 0) setFormTeacherId(teachers[0].id);
-              if (!formClassroomId && classrooms.length > 0) setFormClassroomId(classrooms[0].id);
-              if (!formSubjectCode && subjects.length > 0) setFormSubjectCode(subjects[0].subject_code);
+              const targetSecId =
+                viewMode === "bySection" && selectedSectionId
+                  ? selectedSectionId
+                  : formSectionId || (sections.length > 0 ? sections[0].id : "");
+
+              setFormSectionId(targetSecId);
+
+              if (viewMode === "byTeacher" && selectedTeacherId) {
+                setFormTeacherId(selectedTeacherId);
+              } else if (!formTeacherId && teachers.length > 0) {
+                setFormTeacherId(teachers[0].id);
+              }
+
+              if (!formClassroomId && classrooms.length > 0) {
+                setFormClassroomId(classrooms[0].id);
+              }
+
+              const sec = sections.find((s) => s.id === targetSecId);
+              const validSubs = getValidSubjectsForSection(sec);
+              if (validSubs.length > 0) {
+                setFormSubjectCode(validSubs[0].subject_code);
+                setFormCustomSubject(validSubs[0].subject_name);
+              } else {
+                setFormSubjectCode("");
+                setFormCustomSubject("");
+              }
+
               setIsAddModalOpen(true);
             }}
             className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
@@ -1118,7 +1219,7 @@ export default function ScheduleDeconflictionConsole() {
                 </label>
                 <select
                   value={formSectionId}
-                  onChange={(e) => setFormSectionId(e.target.value)}
+                  onChange={(e) => handleSectionChange(e.target.value)}
                   className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
                   required
                 >
@@ -1130,6 +1231,24 @@ export default function ScheduleDeconflictionConsole() {
                   ))}
                 </select>
               </div>
+
+              {/* Smart Automation Status Banner */}
+              {selectedFormSection && (
+                <div className="p-3 bg-blue-50 border-2 border-blue-400 text-xs flex items-center justify-between shadow-2xs">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#002060] shrink-0 animate-pulse" />
+                    <div>
+                      <span className="font-mono text-[#002060] font-bold text-[11px] uppercase block">
+                        [ SMART AUTOMATION ACTIVE ]: Grade {selectedFormSection.grade_level} Filter Enforced
+                      </span>
+                      <span className="text-slate-700 text-[11px] block mt-0.5">
+                        Detected Section: <strong>{selectedFormSection.section_name}</strong> (Grade {selectedFormSection.grade_level}
+                        {selectedFormSection.strand ? ` • ${selectedFormSection.strand}` : ""}). Subject offerings are strictly restricted to Grade {selectedFormSection.grade_level} ({filteredFormSubjects.length} available).
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* 2. Subject Selection */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1146,10 +1265,14 @@ export default function ScheduleDeconflictionConsole() {
                     }}
                     className="w-full p-2 bg-white border border-slate-300 text-xs font-mono text-slate-900 outline-none focus:border-[#002060]"
                   >
-                    <option value="">-- Choose DepEd Subject --</option>
-                    {subjects.map((sub) => (
+                    <option value="">
+                      {selectedFormSection
+                        ? `-- Choose Grade ${selectedFormSection.grade_level} Subject --`
+                        : "-- Choose DepEd Subject --"}
+                    </option>
+                    {filteredFormSubjects.map((sub) => (
                       <option key={sub.id} value={sub.subject_code}>
-                        {sub.subject_name} ({sub.subject_code})
+                        {sub.subject_name} ({sub.subject_code}) {sub.subject_type ? `• ${sub.subject_type}` : ""}
                       </option>
                     ))}
                     <option value="CUSTOM">Custom / Special Subject</option>
