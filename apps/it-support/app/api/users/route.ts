@@ -234,6 +234,22 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: delError.message }, { status: 500 });
     }
 
+    // If Supabase Service Role Key is configured, also purge the credential from Supabase Auth
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (serviceKey && projectUrl) {
+      try {
+        const serviceClient = createSupabaseJsClient(projectUrl, serviceKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+        if (targetUser.id) {
+          await serviceClient.auth.admin.deleteUser(targetUser.id);
+        }
+      } catch (authErr) {
+        console.warn("Could not delete user from Supabase Auth:", authErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: `User ${targetUser.email} (${targetUser.user_id}) deleted successfully.`,
