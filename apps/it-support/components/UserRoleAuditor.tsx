@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export interface SystemUser {
   id: string;
@@ -20,6 +21,10 @@ export default function UserRoleAuditor() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Deletion modal state
+  const [userToDelete, setUserToDelete] = useState<SystemUser | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [formData, setFormData] = useState({
     userId: "",
     fullName: "",
@@ -29,8 +34,8 @@ export default function UserRoleAuditor() {
     department: "CROSS_LEVEL",
   });
 
-  const fetchUsers = async () => {
-    setIsLoading(true);
+  const fetchUsers = async (silent: boolean = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch("/api/users");
       const json = await res.json();
@@ -43,12 +48,48 @@ export default function UserRoleAuditor() {
     } catch (err: any) {
       setStatusMessage({ type: "error", text: "Network error fetching users." });
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   };
 
+  // Real-Time Auto-Sync: Listens to PostgreSQL changes and focus events
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(false);
+
+    const supabase = createClient();
+
+    // 1. Supabase Realtime Channel for instant reflection on INSERT, UPDATE, and DELETE
+    const channel = supabase
+      .channel("it-users-realtime-listener")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          fetchUsers(true);
+        }
+      )
+      .subscribe();
+
+    // 2. Window Focus & Visibility Change: triggers sync when switching back from Supabase dashboard
+    const handleVisibilitySync = () => {
+      if (document.visibilityState === "visible") {
+        fetchUsers(true);
+      }
+    };
+    window.addEventListener("focus", handleVisibilitySync);
+    document.addEventListener("visibilitychange", handleVisibilitySync);
+
+    // 3. 5-Second Silent Heartbeat Polling
+    const heartbeat = setInterval(() => {
+      fetchUsers(true);
+    }, 5000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("focus", handleVisibilitySync);
+      document.removeEventListener("visibilitychange", handleVisibilitySync);
+      clearInterval(heartbeat);
+    };
   }, []);
 
   const handleCreateUser = async (e: React.FormEvent) => {
@@ -62,7 +103,10 @@ export default function UserRoleAuditor() {
       });
       const json = await res.json();
       if (json.success) {
-        setStatusMessage({ type: "success", text: `User ${formData.userId} provisioned successfully with role ${formData.userRole}.` });
+        setStatusMessage({
+          type: "success",
+          text: `User ${formData.userId} provisioned successfully with role ${formData.userRole}.`,
+        });
         setIsModalOpen(false);
         setFormData({
           userId: "",
@@ -72,7 +116,7 @@ export default function UserRoleAuditor() {
           userRole: "teacher",
           department: "CROSS_LEVEL",
         });
-        fetchUsers();
+        fetchUsers(true);
       } else {
         setStatusMessage({ type: "error", text: json.error || "Failed to provision user." });
       }
@@ -80,6 +124,40 @@ export default function UserRoleAuditor() {
       setStatusMessage({ type: "error", text: "Error submitting user provisioning." });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(
+        `/api/users?id=${userToDelete.id}&email=${encodeURIComponent(userToDelete.email)}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const json = await res.json();
+      if (json.success) {
+        setStatusMessage({
+          type: "success",
+          text: `Account ${userToDelete.email} (${userToDelete.userId}) was deleted successfully from Supabase.`,
+        });
+        setUserToDelete(null);
+        await fetchUsers(true);
+      } else {
+        setStatusMessage({
+          type: "error",
+          text: json.error || "Failed to delete account from Supabase.",
+        });
+      }
+    } catch (err: any) {
+      setStatusMessage({
+        type: "error",
+        text: "Network error deleting account.",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -96,11 +174,17 @@ export default function UserRoleAuditor() {
       <div className="p-4 bg-blue-50 border-2 border-[#002060]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ Role-Based Access Control (RBAC) &amp; Credential Directory ]
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                [ Role-Based Access Control (RBAC) &amp; Credential Directory ]
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                Live Cloud Sync Active
+              </span>
+            </div>
             <p className="text-xs text-slate-700 mt-1">
-              Manages the four institutional actor types (Student, Teacher, School Administrator, IT Support). Enforces database-level Row-Level Security (RLS).
+              Manages the four institutional actor types (Student, Teacher, School Administrator, IT Support). Synchronized in real-time with Supabase database.
             </p>
           </div>
           <button
@@ -231,6 +315,7 @@ export default function UserRoleAuditor() {
                   <th className="p-3">Assigned Role</th>
                   <th className="p-3">Access Level</th>
                   <th className="p-3">Registration Date</th>
+                  <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -241,8 +326,10 @@ export default function UserRoleAuditor() {
                   if (user.userRole === "student") badgeClass = "bg-green-100 text-green-900 border-green-300";
                   if (user.userRole === "it_support") badgeClass = "bg-amber-100 text-amber-900 border-amber-300";
 
+                  const isMasterIt = user.email.toLowerCase() === "dumalnext@gmail.com";
+
                   return (
-                    <tr key={user.id} className="hover:bg-slate-50">
+                    <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-3 font-mono font-bold text-[#002060]">{user.userId}</td>
                       <td className="p-3 font-medium text-slate-900">{user.email}</td>
                       <td className="p-3">
@@ -259,6 +346,21 @@ export default function UserRoleAuditor() {
                       <td className="p-3 font-mono text-slate-500">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
+                      <td className="p-3 text-right">
+                        {isMasterIt ? (
+                          <span className="text-[10px] font-mono text-slate-400 font-bold uppercase">
+                            [ MASTER IT ]
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setUserToDelete(user)}
+                            className="px-2.5 py-1 text-[10px] font-mono font-bold uppercase border border-red-300 bg-red-50 text-red-700 hover:bg-red-700 hover:text-white transition-colors cursor-pointer"
+                          >
+                            [ Delete ]
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -268,6 +370,72 @@ export default function UserRoleAuditor() {
         )}
       </div>
 
+      {/* Account Deletion Confirmation Modal */}
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white border-4 border-red-600 max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
+                  SECURITY CONFIRMATION &bull; SUPABASE SYNC
+                </span>
+                <h3 className="text-base font-bold text-slate-900 uppercase">
+                  Confirm Account Deletion
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                disabled={isDeleting}
+                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
+              >
+                [ CLOSE X ]
+              </button>
+            </div>
+
+            <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
+              <p>
+                Are you sure you want to permanently delete the following account from Supabase?
+              </p>
+              <div className="p-3 bg-red-50 border border-red-200 space-y-1">
+                <div>
+                  <strong className="text-slate-900">Email:</strong> {userToDelete.email}
+                </div>
+                <div>
+                  <strong className="text-slate-900">User ID:</strong> {userToDelete.userId}
+                </div>
+                <div>
+                  <strong className="text-slate-900">Role:</strong> {userToDelete.userRole.toUpperCase()}
+                </div>
+              </div>
+              <p className="text-[11px] text-red-800 font-bold">
+                This action will delete their profile from the Supabase database and revoke access.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 border border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors"
+              >
+                [ Cancel ]
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+              >
+                {isDeleting ? "[ Deleting... ]" : "[ Yes, Delete Account ]"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Provision New User Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white border-4 border-[#002060] max-w-md w-full p-6 space-y-4">
@@ -298,46 +466,49 @@ export default function UserRoleAuditor() {
                   value={formData.userRole}
                   onChange={(e) => {
                     const role = e.target.value;
-                    let defaultPrefix = "DNHS-TCH-001";
-                    if (role === "admin") defaultPrefix = "DNHS-ADM-002";
-                    if (role === "it_support") defaultPrefix = "DNHS-IT-002";
-                    if (role === "student") defaultPrefix = "2026-0001";
-                    setFormData({ ...formData, userRole: role, userId: defaultPrefix });
+                    let prefix = "DNHS-TCH";
+                    if (role === "admin") prefix = "DNHS-ADM";
+                    if (role === "student") prefix = "DNHS-STU";
+                    if (role === "it_support") prefix = "DNHS-IT";
+                    setFormData({
+                      ...formData,
+                      userRole: role,
+                      userId: `${prefix}-${Math.floor(100 + Math.random() * 900)}`,
+                    });
                   }}
-                  className="w-full p-2 border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
                 >
-                  <option value="teacher">Faculty Member (Teacher)</option>
-                  <option value="admin">School Administrator (Registrar/Principal)</option>
-                  <option value="it_support">IT Support / System Administrator</option>
-                  <option value="student">Student Learner</option>
+                  <option value="teacher">Teacher (Faculty Member)</option>
+                  <option value="admin">School Administrator (Registrar)</option>
+                  <option value="it_support">IT Support Staff</option>
+                  <option value="student">Student (Learner)</option>
                 </select>
               </div>
 
               <div>
                 <label className="block font-bold uppercase text-slate-800 mb-1">
-                  DNHS Identifier (User ID) <span className="text-red-700">*</span>
+                  DNHS User Identifier <span className="text-red-700">*</span>
                 </label>
                 <input
                   type="text"
+                  required
+                  placeholder="e.g. DNHS-TCH-004"
                   value={formData.userId}
                   onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
-                  required
-                  placeholder="e.g. DNHS-TCH-001"
-                  className="w-full p-2 border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
               <div>
                 <label className="block font-bold uppercase text-slate-800 mb-1">
-                  Full Name <span className="text-red-700">*</span>
+                  Full Name / Personnel Label
                 </label>
                 <input
                   type="text"
+                  placeholder="e.g. Maria Santos"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                  placeholder="e.g. Juan Dela Cruz"
-                  className="w-full p-2 border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
@@ -347,38 +518,56 @@ export default function UserRoleAuditor() {
                 </label>
                 <input
                   type="email"
+                  required
+                  placeholder="e.g. faculty.member@gmail.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  placeholder="e.g. juan.delacruz@deped.gov.ph"
-                  className="w-full p-2 border-2 border-slate-300 focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
               <div>
                 <label className="block font-bold uppercase text-slate-800 mb-1">
-                  Initial Password
+                  Initial Password <span className="text-red-700">*</span>
                 </label>
                 <input
                   type="password"
+                  required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full p-2 border border-slate-300 focus:border-[#002060] outline-none font-mono"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              {formData.userRole === "teacher" && (
+                <div>
+                  <label className="block font-bold uppercase text-slate-800 mb-1">
+                    Faculty Department
+                  </label>
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  >
+                    <option value="CROSS_LEVEL">CROSS_LEVEL (JHS &amp; SHS)</option>
+                    <option value="JHS">Junior High School</option>
+                    <option value="SHS">Senior High School</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100"
+                  className="px-4 py-2 border border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors"
                 >
                   [ Cancel ]
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50"
+                  className="px-5 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
                 >
                   {isSubmitting ? "[ Provisioning... ]" : "[ Save Account ]"}
                 </button>

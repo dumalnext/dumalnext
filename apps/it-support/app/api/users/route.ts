@@ -169,3 +169,78 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message || "Failed to provision user" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const supabase = getAdminClient() || (await createClient());
+    let id: string | null = null;
+    let email: string | null = null;
+    let userId: string | null = null;
+
+    try {
+      const body = await req.json();
+      id = body.id || null;
+      email = body.email || null;
+      userId = body.userId || null;
+    } catch {
+      const { searchParams } = new URL(req.url);
+      id = searchParams.get("id");
+      email = searchParams.get("email");
+      userId = searchParams.get("userId");
+    }
+
+    if (!id && !email && !userId) {
+      return NextResponse.json(
+        { error: "User ID or Email is required for deletion." },
+        { status: 400 }
+      );
+    }
+
+    // Locate the user record in users table
+    let query = supabase.from("users").select("*");
+    if (id) {
+      query = query.eq("id", id);
+    } else if (email) {
+      query = query.eq("email", email.trim().toLowerCase());
+    } else if (userId) {
+      query = query.eq("user_id", userId.trim().toUpperCase());
+    }
+
+    const { data: existing, error: findError } = await query.limit(1);
+    if (findError) {
+      return NextResponse.json({ error: findError.message }, { status: 500 });
+    }
+
+    const targetUser = existing?.[0];
+    if (!targetUser) {
+      return NextResponse.json({ success: true, message: "User not found or already deleted." });
+    }
+
+    // Clean up dependent profile records
+    await Promise.all([
+      supabase.from("teachers").delete().or(`user_id.eq.${targetUser.id},email.eq.${targetUser.email}`),
+      supabase.from("school_administrators").delete().eq("user_id", targetUser.id),
+      supabase.from("it_supports").delete().eq("user_id", targetUser.id),
+      supabase.from("students").delete().eq("user_id", targetUser.id),
+    ]);
+
+    // Delete from public.users table
+    const { error: delError } = await supabase
+      .from("users")
+      .delete()
+      .eq("id", targetUser.id);
+
+    if (delError) {
+      return NextResponse.json({ error: delError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `User ${targetUser.email} (${targetUser.user_id}) deleted successfully.`,
+      deletedId: targetUser.id,
+    });
+  } catch (err: any) {
+    console.error("DELETE /api/users error:", err);
+    return NextResponse.json({ error: err.message || "Failed to delete user" }, { status: 500 });
+  }
+}
