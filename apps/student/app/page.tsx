@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth/authContext";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
-import { isApplicationInTerm } from "@/lib/utils/academicTerm";
+import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -100,6 +100,10 @@ function StudentHomeContent() {
     gradeLevel?: number | string;
     strand?: string | null;
   } | null>(null);
+  const [sectionMode, setSectionMode] = useState<
+    "ASSIGNED" | "NOT_ASSIGNED" | "NOT_ASSIGNED_TRANSFEREE" | "ENROLLMENT_REQUIRED"
+  >("NOT_ASSIGNED");
+  const [activeTermNum, setActiveTermNum] = useState<number>(termNumber || 1);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   // Real-Time Automatic Synchronization of Logged-In User's Application & Section (Zero-Refresh)
@@ -108,6 +112,7 @@ function StudentHomeContent() {
       setUserApplication(null);
       setPastApplications([]);
       setAssignedSection(null);
+      setSectionMode("NOT_ASSIGNED");
       return;
     }
 
@@ -116,60 +121,151 @@ function StudentHomeContent() {
 
     const fetchApp = async () => {
       try {
-        const { data: stData } = await supabase
+        // 0. Resolve active term
+        const { data: termsData } = await supabase
+          .from("academic_terms")
+          .select("schoolYear, termNumber, isActive")
+          .order("schoolYear", { ascending: false });
+
+        const activeTerm = (termsData || []).find((t: any) => t.isActive);
+        const resolvedTermNum = Number(activeTerm?.termNumber) || Number(termNumber) || extractTermNumber(semester) || 1;
+        const resolvedSY = (activeTerm?.schoolYear || schoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+
+        if (isMounted) {
+          setActiveTermNum(resolvedTermNum);
+        }
+
+        // 1. Fetch Student Profile with Comprehensive Fallback Matching
+        let stQuery = supabase
           .from("students")
-          .select("id, current_section_id, grade_level, strand")
-          .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
-          .limit(1);
+          .select("id, user_id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand");
 
-        if (stData && stData.length > 0) {
-          const studentRec = stData[0];
+        const orFilters: string[] = [];
+        if (user.id && user.id.length === 36) orFilters.push(`user_id.eq.${user.id}`);
+        if (user.lrn && /^\d{12}$/.test(user.lrn)) orFilters.push(`student_id.eq.${user.lrn}`);
+        if (user.userId && user.userId !== user.id) orFilters.push(`student_id.eq.${user.userId}`);
+        if (orFilters.length > 0) stQuery = stQuery.or(orFilters.join(","));
 
-          // Fetch Section if assigned
-          if (studentRec.current_section_id) {
-            const { data: secData } = await supabase
-              .from("sections")
-              .select("id, section_name, grade_level, strand")
-              .eq("id", studentRec.current_section_id)
-              .limit(1);
+        const { data: stData } = await stQuery.limit(1);
+        let studentRec = stData && stData.length > 0 ? stData[0] : null;
 
-            if (isMounted) {
-              if (secData && secData.length > 0) {
-                setAssignedSection({
-                  name: secData[0].section_name,
-                  gradeLevel: secData[0].grade_level,
-                  strand: secData[0].strand,
-                });
-              } else {
-                setAssignedSection(null);
+        // Fallback: Check applications if not found directly
+        if (!studentRec) {
+          const { data: allApps } = await supabase
+            .from("enrollment_applications")
+            .select("id, student_id, selected_electives")
+            .order("created_at", { ascending: false })
+            .limit(20);
+
+          if (allApps && allApps.length > 0) {
+            for (const a of allApps) {
+              const fd = Array.isArray(a.selected_electives) && a.selected_electives.length > 0
+                ? a.selected_electives[0]
+                : (typeof a.selected_electives === "object" && a.selected_electives !== null ? a.selected_electives : {});
+
+              const emailInForm = fd.email || fd.learnerEmail;
+              const lrnInForm = fd.lrn || fd.learnerLrn;
+
+              if (
+                (emailInForm && emailInForm.toLowerCase() === user.email.toLowerCase()) ||
+                (lrnInForm && user.lrn && lrnInForm === user.lrn)
+              ) {
+                if (a.student_id) {
+                  const { data: stById } = await supabase
+                    .from("students")
+                    .select("id, user_id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand")
+                    .eq("id", a.student_id)
+                    .limit(1);
+
+                  if (stById && stById.length > 0) {
+                    studentRec = stById[0];
+                    if (!studentRec.user_id && user.id) {
+                      await supabase.from("students").update({ user_id: user.id }).eq("id", studentRec.id);
+                    }
+                    break;
+                  }
+                }
               }
             }
-          } else {
-            if (isMounted) {
-              setAssignedSection(null);
-            }
           }
+        }
 
+        if (studentRec) {
           const { data: appData } = await supabase
             .from("enrollment_applications")
             .select("*")
             .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
-          if (isMounted && appData) {
-            // Find application for CURRENT ACTIVE academic term (School Year & Term/Trimester)
-            const activeApp = appData.find((a: any) =>
-              isApplicationInTerm(a, schoolYear, termNumber || semester)
-            );
+          const userApps = appData || [];
 
-            // Filter out past semester/school year applications
-            const otherApps = appData.filter((a: any) => a.id !== activeApp?.id);
+          // Find application for CURRENT ACTIVE academic term (School Year & Term/Trimester)
+          const activeApp = userApps.find((a: any) =>
+            isApplicationInTerm(a, resolvedSY, resolvedTermNum)
+          );
 
-            if (activeApp) {
-              const fd = Array.isArray(activeApp.selected_electives) && activeApp.selected_electives.length > 0
-                ? activeApp.selected_electives[0]
-                : (typeof activeApp.selected_electives === "object" && activeApp.selected_electives !== null ? activeApp.selected_electives : {});
+          const isEnrolledInActiveTerm = !!activeApp;
 
+          const isTransferee =
+            (activeApp && (activeApp.applicant_type === "Transferee" || activeApp.selected_electives?.[0]?.applicantType === "Transferee")) ||
+            userApps.some((a: any) => a.applicant_type === "Transferee" || a.selected_electives?.[0]?.applicantType === "Transferee");
+
+          // Resolve Section
+          let targetSecId = studentRec.current_section_id;
+          if (resolvedTermNum >= 2 && !isTransferee && isEnrolledInActiveTerm) {
+            if (!targetSecId) {
+              const priorApp = userApps.find((a: any) => a.status === "Approved" && (a.section_id || a.assigned_section_id));
+              if (priorApp) {
+                targetSecId = priorApp.section_id || priorApp.assigned_section_id;
+                await supabase.from("students").update({ current_section_id: targetSecId }).eq("id", studentRec.id);
+              }
+            }
+          }
+
+          let secObj = null;
+          if (targetSecId) {
+            const { data: secData } = await supabase
+              .from("sections")
+              .select("id, section_name, grade_level, strand")
+              .eq("id", targetSecId)
+              .limit(1);
+
+            if (secData && secData.length > 0) {
+              secObj = {
+                name: secData[0].section_name,
+                gradeLevel: secData[0].grade_level,
+                strand: secData[0].strand,
+              };
+              if (isMounted) setAssignedSection(secObj);
+            } else {
+              if (isMounted) setAssignedSection(null);
+            }
+          } else {
+            if (isMounted) setAssignedSection(null);
+          }
+
+          // Determine Section Mode
+          if (resolvedTermNum === 1) {
+            if (isMounted) setSectionMode(secObj ? "ASSIGNED" : "NOT_ASSIGNED");
+          } else {
+            if (isTransferee) {
+              if (isMounted) setSectionMode(secObj ? "ASSIGNED" : "NOT_ASSIGNED_TRANSFEREE");
+            } else {
+              if (!isEnrolledInActiveTerm) {
+                if (isMounted) setSectionMode("ENROLLMENT_REQUIRED");
+              } else {
+                if (isMounted) setSectionMode(secObj ? "ASSIGNED" : "NOT_ASSIGNED");
+              }
+            }
+          }
+
+          // Active Application mapping
+          if (activeApp) {
+            const fd = Array.isArray(activeApp.selected_electives) && activeApp.selected_electives.length > 0
+              ? activeApp.selected_electives[0]
+              : (typeof activeApp.selected_electives === "object" && activeApp.selected_electives !== null ? activeApp.selected_electives : {});
+
+            if (isMounted) {
               setUserApplication({
                 id: activeApp.id,
                 referenceNumber: activeApp.application_id,
@@ -181,14 +277,18 @@ function StudentHomeContent() {
                 targetTrack: activeApp.target_strand ? "Senior High School" : "Junior High School",
                 targetStrand: activeApp.target_strand,
                 remarks: activeApp.admin_feedback,
-                schoolYear: activeApp.school_year || schoolYear || "2026-2027",
+                schoolYear: activeApp.school_year || resolvedSY,
                 semester: fd.term_name || fd.termName || fd.semester || fd.term || semester || "Trimester 1",
                 formData: fd,
               });
-            } else {
-              setUserApplication(null);
             }
+          } else {
+            if (isMounted) setUserApplication(null);
+          }
 
+          // Filter out past semester/school year applications
+          const otherApps = userApps.filter((a: any) => a.id !== activeApp?.id);
+          if (isMounted) {
             setPastApplications(
               otherApps.map((oa: any) => {
                 const fd = Array.isArray(oa.selected_electives) && oa.selected_electives.length > 0
@@ -210,19 +310,21 @@ function StudentHomeContent() {
                   status: oa.status,
                   gradeLevel: oa.target_grade_level,
                   targetStrand: oa.target_strand,
-                  schoolYear: oa.school_year || "2026-2027",
+                  schoolYear: oa.school_year || resolvedSY,
                   semester: pastTerm,
                   remarks: oa.admin_feedback,
                 };
               })
             );
-            return;
           }
+          return;
         }
+
         if (isMounted) {
           setUserApplication(null);
           setPastApplications([]);
           setAssignedSection(null);
+          setSectionMode("NOT_ASSIGNED");
         }
       } catch (e) {
         console.error("Error reading Supabase applications:", e);
@@ -230,6 +332,7 @@ function StudentHomeContent() {
           setUserApplication(null);
           setPastApplications([]);
           setAssignedSection(null);
+          setSectionMode("NOT_ASSIGNED");
         }
       }
     };
@@ -535,7 +638,7 @@ function StudentHomeContent() {
             </div>
 
             {/* Section Assignment Status Card */}
-            {assignedSection ? (
+            {sectionMode === "ASSIGNED" && assignedSection ? (
               <div className="p-3.5 sm:p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -544,7 +647,7 @@ function StudentHomeContent() {
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 font-mono text-[10px] font-bold uppercase">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
-                      Official Roster
+                      {activeTermNum >= 2 ? "Automatic Continuing Roster" : "Official Roster"}
                     </span>
                   </div>
                   <div className="text-sm sm:text-base font-bold text-emerald-950 uppercase">
@@ -563,6 +666,68 @@ function StudentHomeContent() {
                     className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs"
                   >
                     View Section &bull; [ 04 ] &rarr;
+                  </Link>
+                </div>
+              </div>
+            ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
+              <div className="p-3.5 sm:p-4 bg-blue-50 border-2 border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
+                      [ ENROLLMENT REQUIRED ]
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] font-mono text-[10px] font-bold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
+                      Action Needed
+                    </span>
+                  </div>
+                  <div className="text-sm sm:text-base font-bold text-slate-900">
+                    Please enroll to see your section assignment
+                  </div>
+                  <p className="text-xs text-slate-700">
+                    Enrollment for Trimester {activeTermNum} (S.Y. {schoolYear}) is open. Complete continuing enrollment to unlock your section.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-100 border border-blue-300 px-2.5 py-1 inline-block uppercase">
+                    Enrollment Required
+                  </span>
+                  <Link
+                    href="/enroll"
+                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs"
+                  >
+                    Complete Enrollment &bull; [ 02 ] &rarr;
+                  </Link>
+                </div>
+              </div>
+            ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
+              <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
+                      [ SECTION STATUS &bull; TRANSFEREE ]
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 font-mono text-[10px] font-bold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
+                      Transferee Evaluation
+                    </span>
+                  </div>
+                  <div className="text-sm sm:text-base font-bold text-amber-950">
+                    You&apos;re not yet assigned to a section
+                  </div>
+                  <p className="text-xs text-amber-900">
+                    As a transferee learner in Trimester {activeTermNum}, your section placement is pending evaluation by the administrator.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <span className="text-[11px] font-mono font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase">
+                    Pending Admin Evaluation
+                  </span>
+                  <Link
+                    href="/section"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs"
+                  >
+                    Check Status &bull; [ 04 ] &rarr;
                   </Link>
                 </div>
               </div>

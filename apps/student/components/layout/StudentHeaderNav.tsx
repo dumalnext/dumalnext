@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
-import { isApplicationInTerm } from "@/lib/utils/academicTerm";
+import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 
 export default function StudentHeaderNav() {
   const { user, logout } = useAuth();
@@ -19,6 +19,10 @@ export default function StudentHeaderNav() {
     gradeLevel?: number | string;
     strand?: string | null;
   } | null>(null);
+  const [sectionMode, setSectionMode] = useState<
+    "ASSIGNED" | "NOT_ASSIGNED" | "NOT_ASSIGNED_TRANSFEREE" | "ENROLLMENT_REQUIRED"
+  >("NOT_ASSIGNED");
+  const [activeTermNum, setActiveTermNum] = useState<number>(termNumber || 1);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +32,7 @@ export default function StudentHeaderNav() {
       setAppStatus(null);
       setAppRef(null);
       setAssignedSection(null);
+      setSectionMode("NOT_ASSIGNED");
       return;
     }
 
@@ -36,71 +41,164 @@ export default function StudentHeaderNav() {
 
     const fetchStatus = async () => {
       try {
-        const { data: stData } = await supabase
+        // 0. Resolve active term
+        const { data: termsData } = await supabase
+          .from("academic_terms")
+          .select("schoolYear, termNumber, isActive")
+          .order("schoolYear", { ascending: false });
+
+        const activeTerm = (termsData || []).find((t: any) => t.isActive);
+        const resolvedTermNum = Number(activeTerm?.termNumber) || Number(termNumber) || extractTermNumber(semester) || 1;
+        const resolvedSY = (activeTerm?.schoolYear || schoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+
+        if (isMounted) {
+          setActiveTermNum(resolvedTermNum);
+        }
+
+        // 1. Fetch Student Profile with Comprehensive Fallback Matching
+        let stQuery = supabase
           .from("students")
-          .select("id, current_section_id, grade_level, strand")
-          .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
-          .limit(1);
+          .select("id, user_id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand");
 
-        if (stData && stData.length > 0) {
-          const studentRec = stData[0];
+        const orFilters: string[] = [];
+        if (user.id && user.id.length === 36) orFilters.push(`user_id.eq.${user.id}`);
+        if (user.lrn && /^\d{12}$/.test(user.lrn)) orFilters.push(`student_id.eq.${user.lrn}`);
+        if (user.userId && user.userId !== user.id) orFilters.push(`student_id.eq.${user.userId}`);
+        if (orFilters.length > 0) stQuery = stQuery.or(orFilters.join(","));
 
-          // Fetch Section if current_section_id is assigned
-          if (studentRec.current_section_id) {
-            const { data: secData } = await supabase
-              .from("sections")
-              .select("id, section_name, grade_level, strand")
-              .eq("id", studentRec.current_section_id)
-              .limit(1);
+        const { data: stData } = await stQuery.limit(1);
+        let studentRec = stData && stData.length > 0 ? stData[0] : null;
 
-            if (isMounted) {
-              if (secData && secData.length > 0) {
-                setAssignedSection({
-                  name: secData[0].section_name,
-                  gradeLevel: secData[0].grade_level,
-                  strand: secData[0].strand,
-                });
-              } else {
-                setAssignedSection(null);
+        // Fallback: Check applications if not found directly
+        if (!studentRec) {
+          const { data: allApps } = await supabase
+            .from("enrollment_applications")
+            .select("id, student_id, selected_electives")
+            .order("created_at", { ascending: false })
+            .limit(20);
+
+          if (allApps && allApps.length > 0) {
+            for (const a of allApps) {
+              const fd = Array.isArray(a.selected_electives) && a.selected_electives.length > 0
+                ? a.selected_electives[0]
+                : (typeof a.selected_electives === "object" && a.selected_electives !== null ? a.selected_electives : {});
+
+              const emailInForm = fd.email || fd.learnerEmail;
+              const lrnInForm = fd.lrn || fd.learnerLrn;
+
+              if (
+                (emailInForm && emailInForm.toLowerCase() === user.email.toLowerCase()) ||
+                (lrnInForm && user.lrn && lrnInForm === user.lrn)
+              ) {
+                if (a.student_id) {
+                  const { data: stById } = await supabase
+                    .from("students")
+                    .select("id, user_id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand")
+                    .eq("id", a.student_id)
+                    .limit(1);
+
+                  if (stById && stById.length > 0) {
+                    studentRec = stById[0];
+                    if (!studentRec.user_id && user.id) {
+                      await supabase.from("students").update({ user_id: user.id }).eq("id", studentRec.id);
+                    }
+                    break;
+                  }
+                }
               }
             }
-          } else {
-            if (isMounted) {
-              setAssignedSection(null);
-            }
           }
+        }
 
+        if (studentRec) {
           const { data: appData } = await supabase
             .from("enrollment_applications")
-            .select("id, application_id, status, school_year, selected_electives, created_at")
+            .select("id, application_id, applicant_type, status, school_year, selected_electives, created_at")
             .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
-          if (isMounted && appData) {
-            const activeApp = appData.find((a: any) =>
-              isApplicationInTerm(a, schoolYear, termNumber || semester)
-            );
+          const userApps = appData || [];
+          const activeApp = userApps.find((a: any) =>
+            isApplicationInTerm(a, resolvedSY, resolvedTermNum)
+          );
 
+          const isEnrolledInActiveTerm = !!activeApp;
+          if (isMounted) {
             if (activeApp) {
               setAppStatus(activeApp.status);
               setAppRef(activeApp.application_id);
-              return;
+            } else {
+              setAppStatus(null);
+              setAppRef(null);
+            }
+          }
+
+          const isTransferee =
+            (activeApp && (activeApp.applicant_type === "Transferee" || activeApp.selected_electives?.[0]?.applicantType === "Transferee")) ||
+            userApps.some((a: any) => a.applicant_type === "Transferee" || a.selected_electives?.[0]?.applicantType === "Transferee");
+
+          // Resolve Section
+          let targetSecId = studentRec.current_section_id;
+          if (resolvedTermNum >= 2 && !isTransferee && isEnrolledInActiveTerm) {
+            if (!targetSecId) {
+              const priorApp: any = userApps.find((a: any) => a.status === "Approved" && (a.section_id || a.assigned_section_id));
+              if (priorApp) {
+                targetSecId = priorApp.section_id || priorApp.assigned_section_id;
+                await supabase.from("students").update({ current_section_id: targetSecId }).eq("id", studentRec.id);
+              }
+            }
+          }
+
+          let secObj = null;
+          if (targetSecId) {
+            const { data: secData } = await supabase
+              .from("sections")
+              .select("id, section_name, grade_level, strand")
+              .eq("id", targetSecId)
+              .limit(1);
+
+            if (secData && secData.length > 0) {
+              secObj = {
+                name: secData[0].section_name,
+                gradeLevel: secData[0].grade_level,
+                strand: secData[0].strand,
+              };
+              if (isMounted) setAssignedSection(secObj);
+            } else {
+              if (isMounted) setAssignedSection(null);
+            }
+          } else {
+            if (isMounted) setAssignedSection(null);
+          }
+
+          // Determine Section Mode
+          if (resolvedTermNum === 1) {
+            if (isMounted) setSectionMode(secObj ? "ASSIGNED" : "NOT_ASSIGNED");
+          } else {
+            if (isTransferee) {
+              if (isMounted) setSectionMode(secObj ? "ASSIGNED" : "NOT_ASSIGNED_TRANSFEREE");
+            } else {
+              if (!isEnrolledInActiveTerm) {
+                if (isMounted) setSectionMode("ENROLLMENT_REQUIRED");
+              } else {
+                if (isMounted) setSectionMode(secObj ? "ASSIGNED" : "NOT_ASSIGNED");
+              }
             }
           }
         } else {
           if (isMounted) {
             setAssignedSection(null);
+            setAppStatus(null);
+            setAppRef(null);
+            setSectionMode("NOT_ASSIGNED");
           }
-        }
-        if (isMounted) {
-          setAppStatus(null);
-          setAppRef(null);
         }
       } catch {
         if (isMounted) {
           setAppStatus(null);
           setAppRef(null);
           setAssignedSection(null);
+          setSectionMode("NOT_ASSIGNED");
         }
       }
     };
@@ -344,7 +442,7 @@ export default function StudentHeaderNav() {
                   </div>
 
                   {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
-                  {assignedSection ? (
+                  {sectionMode === "ASSIGNED" && assignedSection ? (
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
@@ -365,6 +463,50 @@ export default function StudentHeaderNav() {
                       <div className="text-[10px] font-mono text-emerald-800">
                         Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
                       </div>
+                    </Link>
+                  ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
+                    <Link
+                      href="/enroll"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
+                          [ ENROLLMENT REQUIRED ]
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] font-mono text-[9px] font-bold uppercase">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
+                          Action Needed &rarr;
+                        </span>
+                      </div>
+                      <div className="text-xs font-bold text-slate-900">
+                        Please enroll to see your section
+                      </div>
+                      <p className="text-[10px] text-slate-600 leading-tight">
+                        Enroll in Trimester {activeTermNum} to unlock your continuing section placement.
+                      </p>
+                    </Link>
+                  ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
+                    <Link
+                      href={sectionHref}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
+                          [ SECTION STATUS &bull; TRANSFEREE ]
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 font-mono text-[9px] font-bold uppercase">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
+                          Pending Placement &rarr;
+                        </span>
+                      </div>
+                      <div className="text-xs font-bold text-amber-950">
+                        You&apos;re not yet assigned to a section
+                      </div>
+                      <p className="text-[10px] text-amber-900 leading-tight">
+                        Transferee evaluation in progress by the school administrator.
+                      </p>
                     </Link>
                   ) : (
                     <Link
@@ -487,8 +629,12 @@ export default function StudentHeaderNav() {
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    {assignedSection
+                    {sectionMode === "ASSIGNED" && assignedSection
                       ? `Assigned in Section: ${assignedSection.name}`
+                      : sectionMode === "ENROLLMENT_REQUIRED"
+                      ? `Please enroll for Trimester ${activeTermNum} to see your section assignment.`
+                      : sectionMode === "NOT_ASSIGNED_TRANSFEREE"
+                      ? "You're not yet assigned to a section. Transferee evaluation in progress."
                       : "You're not yet assigned to a section. Check official class placement."}
                   </p>
                 </Link>

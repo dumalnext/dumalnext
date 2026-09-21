@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
+import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 
 interface SectionRecord {
   id: string;
@@ -27,6 +28,12 @@ interface ClassmateRecord {
   gender?: string | null;
 }
 
+type SectionStateMode =
+  | "ASSIGNED"
+  | "NOT_ASSIGNED"
+  | "NOT_ASSIGNED_TRANSFEREE"
+  | "ENROLLMENT_REQUIRED";
+
 function SectionPageContent() {
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -34,6 +41,8 @@ function SectionPageContent() {
 
   const [studentRec, setStudentRec] = useState<any | null>(null);
   const [assignedSection, setAssignedSection] = useState<SectionRecord | null>(null);
+  const [sectionMode, setSectionMode] = useState<SectionStateMode>("NOT_ASSIGNED");
+  const [activeTermNumber, setActiveTermNumber] = useState<number>(termNumber || 1);
   const [classmates, setClassmates] = useState<ClassmateRecord[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [timetableSchedules, setTimetableSchedules] = useState<any[]>([]);
@@ -47,11 +56,12 @@ function SectionPageContent() {
     }
   }, [user, isAuthLoading, router]);
 
-  // Main Data Fetcher with Realtime Auto-sync
+  // Main Data Fetcher with Realtime Auto-sync and Three-Tier Error Trapping Automation
   useEffect(() => {
     if (!user) {
       setStudentRec(null);
       setAssignedSection(null);
+      setSectionMode("NOT_ASSIGNED");
       setClassmates([]);
       setIsLoading(false);
       return;
@@ -62,56 +72,165 @@ function SectionPageContent() {
 
     const fetchSectionData = async () => {
       try {
-        // 1. Fetch Student Profile
-        const { data: stData } = await supabase
-          .from("students")
-          .select("id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand, gender")
-          .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
-          .limit(1);
+        // 0. Resolve active academic term from database (or fall back to hook)
+        const { data: termsData } = await supabase
+          .from("academic_terms")
+          .select("schoolYear, termNumber, termName, isActive")
+          .order("schoolYear", { ascending: false });
 
-        if (!stData || stData.length === 0) {
+        const activeTerm = (termsData || []).find((t: any) => t.isActive);
+        const resolvedTermNum = Number(activeTerm?.termNumber) || Number(termNumber) || extractTermNumber(semester) || 1;
+        const resolvedSY = (activeTerm?.schoolYear || schoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+
+        if (isMounted) {
+          setActiveTermNumber(resolvedTermNum);
+        }
+
+        // 1. Fetch Student Profile with Comprehensive Fallback Matching
+        let stQuery = supabase
+          .from("students")
+          .select("id, user_id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand, gender");
+
+        const orFilters: string[] = [];
+        if (user.id && user.id.length === 36) {
+          orFilters.push(`user_id.eq.${user.id}`);
+        }
+        if (user.lrn && /^\d{12}$/.test(user.lrn)) {
+          orFilters.push(`student_id.eq.${user.lrn}`);
+        }
+        if (user.userId && user.userId !== user.id) {
+          orFilters.push(`student_id.eq.${user.userId}`);
+        }
+
+        if (orFilters.length > 0) {
+          stQuery = stQuery.or(orFilters.join(","));
+        }
+
+        const { data: stData } = await stQuery.limit(1);
+        let student = stData && stData.length > 0 ? stData[0] : null;
+
+        // Fallback: If not found directly, check enrollment_applications to locate student_id
+        if (!student) {
+          const { data: allApps } = await supabase
+            .from("enrollment_applications")
+            .select("id, student_id, selected_electives")
+            .order("created_at", { ascending: false })
+            .limit(20);
+
+          if (allApps && allApps.length > 0) {
+            for (const a of allApps) {
+              const fd = Array.isArray(a.selected_electives) && a.selected_electives.length > 0
+                ? a.selected_electives[0]
+                : (typeof a.selected_electives === "object" && a.selected_electives !== null ? a.selected_electives : {});
+
+              const emailInForm = fd.email || fd.learnerEmail;
+              const lrnInForm = fd.lrn || fd.learnerLrn;
+
+              if (
+                (emailInForm && emailInForm.toLowerCase() === user.email.toLowerCase()) ||
+                (lrnInForm && user.lrn && lrnInForm === user.lrn)
+              ) {
+                if (a.student_id) {
+                  const { data: stById } = await supabase
+                    .from("students")
+                    .select("id, user_id, student_id, first_name, last_name, middle_name, current_section_id, grade_level, strand, gender")
+                    .eq("id", a.student_id)
+                    .limit(1);
+
+                  if (stById && stById.length > 0) {
+                    student = stById[0];
+                    // Auto-heal missing user_id link in students table
+                    if (!student.user_id && user.id) {
+                      await supabase.from("students").update({ user_id: user.id }).eq("id", student.id);
+                    }
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        if (!student) {
           if (isMounted) {
             setStudentRec(null);
             setAssignedSection(null);
+            setSectionMode("NOT_ASSIGNED");
             setClassmates([]);
             setIsLoading(false);
           }
           return;
         }
 
-        const student = stData[0];
         if (isMounted) {
           setStudentRec(student);
         }
 
-        // 2. If student has a current_section_id, query the section
-        if (student.current_section_id) {
+        // 2. Query Student's Enrollment Applications
+        const { data: appsData } = await supabase
+          .from("enrollment_applications")
+          .select("id, application_id, student_id, applicant_type, school_year, status, selected_electives, created_at")
+          .eq("student_id", student.id)
+          .order("created_at", { ascending: false });
+
+        const userApps = appsData || [];
+
+        // Check if student has enrolled for the CURRENT ACTIVE term
+        const activeApp = userApps.find((a: any) =>
+          isApplicationInTerm(a, resolvedSY, resolvedTermNum)
+        );
+
+        const isEnrolledInActiveTerm = !!activeApp;
+
+        // Check if student is a Transferee
+        const isTransferee =
+          (activeApp && (activeApp.applicant_type === "Transferee" || activeApp.selected_electives?.[0]?.applicantType === "Transferee")) ||
+          userApps.some((a: any) => a.applicant_type === "Transferee" || a.selected_electives?.[0]?.applicantType === "Transferee");
+
+        // 3. Resolve Section Placement
+        let targetSectionId = student.current_section_id;
+
+        // AUTOMATION FOR SEM 2 OR 3: Continuing students keep their section automatically!
+        if (resolvedTermNum >= 2 && !isTransferee && isEnrolledInActiveTerm) {
+          if (!targetSectionId) {
+            // Check past approved applications for a section reference
+            const priorApp: any = userApps.find((a: any) => a.status === "Approved" && (a.section_id || a.assigned_section_id));
+            if (priorApp) {
+              targetSectionId = priorApp.section_id || priorApp.assigned_section_id;
+              // Auto-persist back to students table
+              await supabase.from("students").update({ current_section_id: targetSectionId }).eq("id", student.id);
+            }
+          }
+        }
+
+        let sectionRecord: SectionRecord | null = null;
+        if (targetSectionId) {
           const { data: secData } = await supabase
             .from("sections")
             .select("id, section_name, grade_level, strand, room, adviser_name, capacity, school_year")
-            .eq("id", student.current_section_id)
+            .eq("id", targetSectionId)
             .limit(1);
 
           if (secData && secData.length > 0) {
-            const sec = secData[0];
+            sectionRecord = secData[0];
             if (isMounted) {
-              setAssignedSection(sec);
+              setAssignedSection(sectionRecord);
             }
 
-            // 3. Fetch Classmates in the same section
+            // Fetch Classmates in the same section
             const { data: cmData } = await supabase
               .from("students")
               .select("id, student_id, first_name, last_name, middle_name, gender")
-              .eq("current_section_id", student.current_section_id)
+              .eq("current_section_id", targetSectionId)
               .order("last_name", { ascending: true });
 
             if (isMounted && cmData) {
               setClassmates(cmData);
             }
 
-            // 4. Fetch Subjects & Timetable Schedules
-            const gradeParam = sec.grade_level || student.grade_level || 7;
-            const strandParam = sec.strand || student.strand || "Regular";
+            // Fetch Subjects & Schedules
+            const gradeParam = sectionRecord.grade_level || student.grade_level || 7;
+            const strandParam = sectionRecord.strand || student.strand || "Regular";
 
             try {
               const subjRes = await fetch(
@@ -123,14 +242,14 @@ function SectionPageContent() {
               }
 
               const schedRes = await fetch(
-                `/api/schedules?sectionId=${sec.id}&gradeLevel=${gradeParam}`
+                `/api/schedules?sectionId=${sectionRecord.id}&gradeLevel=${gradeParam}`
               ).then((r) => r.json()).catch(() => null);
 
               if (isMounted && schedRes?.success && Array.isArray(schedRes.schedules)) {
                 setTimetableSchedules(schedRes.schedules);
               }
             } catch (err) {
-              console.error("Error loading subjects/schedules:", err);
+              console.error("Notice reading subjects/schedules:", err);
             }
           } else {
             if (isMounted) {
@@ -142,6 +261,39 @@ function SectionPageContent() {
           if (isMounted) {
             setAssignedSection(null);
             setClassmates([]);
+          }
+        }
+
+        // 4. THREE-TIER ERROR TRAPPING & BUSINESS LOGIC
+        if (resolvedTermNum === 1) {
+          // RULE 1: Start of school year / 1st Sem -> If not yet assigned by admin, show "You're not yet assigned"
+          if (sectionRecord) {
+            if (isMounted) setSectionMode("ASSIGNED");
+          } else {
+            if (isMounted) setSectionMode("NOT_ASSIGNED");
+          }
+        } else {
+          // RULE 2 & 3: Semester 2 or 3
+          if (isTransferee) {
+            // RULE 3: Transferee in Sem 2 or 3 -> Shows "You're not yet assigned" until admin manually slots them
+            if (sectionRecord) {
+              if (isMounted) setSectionMode("ASSIGNED");
+            } else {
+              if (isMounted) setSectionMode("NOT_ASSIGNED_TRANSFEREE");
+            }
+          } else {
+            // RULE 2: Continuing / Regular Student in Sem 2 or 3
+            if (!isEnrolledInActiveTerm) {
+              // Not yet enrolled for the active semester
+              if (isMounted) setSectionMode("ENROLLMENT_REQUIRED");
+            } else {
+              // Enrolled -> Automatic section placement carries over!
+              if (sectionRecord) {
+                if (isMounted) setSectionMode("ASSIGNED");
+              } else {
+                if (isMounted) setSectionMode("NOT_ASSIGNED");
+              }
+            }
           }
         }
 
@@ -170,7 +322,7 @@ function SectionPageContent() {
     // 10-Second Heartbeat Polling
     const heartbeat = setInterval(fetchSectionData, 10000);
 
-    // Supabase Realtime Channels: Push updates immediately when admin assigns/changes section
+    // Supabase Realtime Channels: Instant updates on students and sections changes
     const studentChannel = supabase
       .channel("student-section-realtime")
       .on(
@@ -193,6 +345,17 @@ function SectionPageContent() {
       )
       .subscribe();
 
+    const appChannel = supabase
+      .channel("apps-table-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchSectionData();
+        }
+      )
+      .subscribe();
+
     return () => {
       isMounted = false;
       window.removeEventListener("focus", onVisibilityChange);
@@ -200,8 +363,9 @@ function SectionPageContent() {
       clearInterval(heartbeat);
       supabase.removeChannel(studentChannel);
       supabase.removeChannel(sectionChannel);
+      supabase.removeChannel(appChannel);
     };
-  }, [user?.id, user?.lrn]);
+  }, [user?.id, user?.lrn, schoolYear, semester, termNumber]);
 
   if (isAuthLoading || (isLoading && !studentRec)) {
     return (
@@ -242,7 +406,7 @@ function SectionPageContent() {
               Class Section &amp; Advisory Placement
             </h1>
             <p className="text-xs text-slate-600 mt-1">
-              Official section roster, classroom advisory assignment, and prescribed schedule console.
+              Official section roster, classroom advisory assignment, and prescribed schedule console (S.Y. {schoolYear} &bull; Trimester {activeTermNumber}).
             </p>
           </div>
           {user && (
@@ -256,9 +420,9 @@ function SectionPageContent() {
       </section>
 
       {/* =========================================================================
-          STATE A: ASSIGNED TO A SECTION
+          STATE 1: ASSIGNED IN SECTION (CONFIRMED)
           ========================================================================= */}
-      {assignedSection ? (
+      {sectionMode === "ASSIGNED" && assignedSection ? (
         <div className="space-y-6">
           {/* Main Hero Placement Banner */}
           <div className="p-5 sm:p-6 bg-emerald-50 border-2 border-emerald-500 shadow-xs space-y-4">
@@ -270,14 +434,14 @@ function SectionPageContent() {
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/90 text-emerald-950 font-mono text-[10px] font-bold uppercase border border-emerald-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
-                    Official Roster Enrolled
+                    {activeTermNumber >= 2 ? "Automatic Continuing Roster" : "Official Roster Enrolled"}
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-emerald-950 uppercase tracking-tight">
                   Assigned in Section: <span className="underline decoration-emerald-500">{assignedSection.section_name}</span>
                 </h2>
                 <p className="text-xs font-mono text-emerald-800">
-                  Grade {assignedSection.grade_level} &bull; {assignedSection.strand ? `Strand: ${assignedSection.strand}` : "Junior High School"} &bull; S.Y. {assignedSection.school_year || schoolYear || "2026-2027"}
+                  Grade {assignedSection.grade_level} &bull; {assignedSection.strand ? `Strand: ${assignedSection.strand}` : "Junior High School"} &bull; S.Y. {assignedSection.school_year || schoolYear || "2026-2027"} &bull; Trimester {activeTermNumber}
                 </p>
               </div>
 
@@ -516,7 +680,7 @@ function SectionPageContent() {
                               {cm.student_id ? cm.student_id : "LIS Pending"}
                             </td>
                             <td className="py-2.5 px-3 text-slate-700 capitalize">
-                              {cm.gender || "Unspecified"}
+                              {cm.gender || "—"}
                             </td>
                             <td className="py-2.5 px-3 text-right">
                               <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-900 font-mono text-[10px] uppercase font-bold">
@@ -638,9 +802,125 @@ function SectionPageContent() {
             </div>
           )}
         </div>
+      ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
+        /* =========================================================================
+           STATE 2: ENROLLMENT REQUIRED (SEMESTER 2 OR 3 NOT YET ENROLLED)
+           Rule 2: "kung ang sem na ay 2 or 3 po... kung hindi pa naka enroll ang
+           magpapakita sa section niya ay 'please enroll to see your section'"
+           ========================================================================= */
+        <div className="space-y-6">
+          <div className="p-6 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-blue-200 pb-3">
+              <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
+                [ ENROLLMENT REQUIRED ]
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-200 text-[#002060] font-mono text-xs font-bold uppercase border border-blue-400">
+                <span className="w-2 h-2 rounded-full bg-[#002060] animate-pulse" />
+                Enrollment Needed
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
+                Please enroll to see your section assignment
+              </h2>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                Enrollment for <strong>Trimester {activeTermNumber} (S.Y. {schoolYear})</strong> is currently in progress. 
+                Please submit your continuing enrollment application to confirm and view your official class section, advisory teacher, and room placement.
+              </p>
+            </div>
+
+            {/* Explanatory Policy Box */}
+            <div className="p-4 bg-white border border-blue-300 text-xs space-y-2">
+              <span className="font-mono font-bold text-[#002060] uppercase block text-[11px]">
+                [ DepEd Dumalneg NHS Continuing Enrollment Policy ]
+              </span>
+              <p className="text-slate-700 leading-relaxed">
+                As a continuing learner of Dumalneg National High School, your previously assigned class section will be 
+                <strong> automatically retained and unlocked</strong> as soon as your continuing enrollment form is submitted for this semester.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 flex flex-wrap gap-3">
+              <Link
+                href="/enroll"
+                className="btn-primary text-xs uppercase font-bold py-2.5 px-5 inline-flex items-center gap-2"
+              >
+                [ 02 ] Complete Continuing Enrollment Now &rarr;
+              </Link>
+              <Link
+                href="/"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block"
+              >
+                [ 01 ] Return to Home Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
+        /* =========================================================================
+           STATE 3: TRANSFEREE IN SEMESTER 2 OR 3 (AWAITING ADMIN ADJUDICATION)
+           Rule 3: "kung ang isang student ay transferee, tapos nag enroll siya 2 or 3
+           sem ang magpapakita sakanya ay 'You're not yet assigned to a section'
+           kasi nga transferee pa po siya."
+           ========================================================================= */
+        <div className="space-y-6">
+          <div className="p-6 bg-amber-50 border-2 border-amber-500 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-amber-300 pb-3">
+              <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
+                [ SECTION STATUS &bull; TRANSFEREE ]
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400">
+                <span className="w-2 h-2 rounded-full bg-amber-700 animate-pulse" />
+                Transferee Evaluation
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl font-black text-amber-950 uppercase tracking-tight">
+                You&apos;re not yet assigned to a section
+              </h2>
+              <p className="text-xs text-amber-950 leading-relaxed font-medium">
+                As a <strong>transferee learner</strong> enrolling in Trimester {activeTermNumber}, your academic credentials, 
+                SF10 / Form 137, and curriculum credits are currently being verified by the School Administrator and Registrar.
+              </p>
+            </div>
+
+            {/* Explanatory Callout */}
+            <div className="p-4 bg-white border border-amber-300 text-xs space-y-2">
+              <span className="font-mono font-bold text-amber-900 uppercase block text-[11px]">
+                [ Official Transferee Placement Protocol ]
+              </span>
+              <p className="text-slate-800 leading-relaxed">
+                Unlike continuing students, incoming transferee learners require manual evaluation of subject prerequisites 
+                and class advisory slotting by the administration. Your designated section will appear here automatically as soon 
+                as the School Administrator finalizes your class placement.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 flex flex-wrap gap-3">
+              <Link
+                href="/track"
+                className="btn-primary text-xs uppercase font-bold py-2.5 px-4 inline-block"
+              >
+                [ 03 ] Track Transferee Application Status &rarr;
+              </Link>
+              <Link
+                href="/"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block"
+              >
+                [ 01 ] Return to Home Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
       ) : (
         /* =========================================================================
-           STATE B: NOT YET ASSIGNED TO A SECTION
+           STATE 4: GENERAL NOT YET ASSIGNED (START OF SCHOOL YEAR / SEMESTER 1)
+           Rule 1: "kung start ng school year tapos 1 sem palang ang magpapakita
+           sa student talaga ay you're not yet assigned po."
            ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-amber-50 border-2 border-amber-400 shadow-xs space-y-4">
