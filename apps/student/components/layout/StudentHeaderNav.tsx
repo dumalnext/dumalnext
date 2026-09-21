@@ -14,14 +14,20 @@ export default function StudentHeaderNav() {
   const { schoolYear, semester, termNumber } = useEnrollmentControl();
   const [appStatus, setAppStatus] = useState<string | null>(null);
   const [appRef, setAppRef] = useState<string | null>(null);
+  const [assignedSection, setAssignedSection] = useState<{
+    name: string;
+    gradeLevel?: number | string;
+    strand?: string | null;
+  } | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Real-Time Smart Live Status Tracker: Auto-syncs with Supabase without manual refresh
+  // Real-Time Smart Live Status & Section Tracker: Auto-syncs with Supabase without manual refresh
   useEffect(() => {
     if (!user) {
       setAppStatus(null);
       setAppRef(null);
+      setAssignedSection(null);
       return;
     }
 
@@ -32,15 +38,42 @@ export default function StudentHeaderNav() {
       try {
         const { data: stData } = await supabase
           .from("students")
-          .select("id")
+          .select("id, current_section_id, grade_level, strand")
           .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
           .limit(1);
 
         if (stData && stData.length > 0) {
+          const studentRec = stData[0];
+
+          // Fetch Section if current_section_id is assigned
+          if (studentRec.current_section_id) {
+            const { data: secData } = await supabase
+              .from("sections")
+              .select("id, section_name, grade_level, strand")
+              .eq("id", studentRec.current_section_id)
+              .limit(1);
+
+            if (isMounted) {
+              if (secData && secData.length > 0) {
+                setAssignedSection({
+                  name: secData[0].section_name,
+                  gradeLevel: secData[0].grade_level,
+                  strand: secData[0].strand,
+                });
+              } else {
+                setAssignedSection(null);
+              }
+            }
+          } else {
+            if (isMounted) {
+              setAssignedSection(null);
+            }
+          }
+
           const { data: appData } = await supabase
             .from("enrollment_applications")
             .select("id, application_id, status, school_year, selected_electives, created_at")
-            .eq("student_id", stData[0].id)
+            .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
           if (isMounted && appData) {
@@ -54,6 +87,10 @@ export default function StudentHeaderNav() {
               return;
             }
           }
+        } else {
+          if (isMounted) {
+            setAssignedSection(null);
+          }
         }
         if (isMounted) {
           setAppStatus(null);
@@ -63,6 +100,7 @@ export default function StudentHeaderNav() {
         if (isMounted) {
           setAppStatus(null);
           setAppRef(null);
+          setAssignedSection(null);
         }
       }
     };
@@ -88,12 +126,23 @@ export default function StudentHeaderNav() {
     // 4. 10-Second Silent Heartbeat Polling
     const heartbeat = setInterval(fetchStatus, 10000);
 
-    // 5. Supabase Realtime Channel: Instant live push from database
-    const channel = supabase
+    // 5. Supabase Realtime Channels: Instant live push on enrollment applications AND student section changes
+    const appChannel = supabase
       .channel("nav-realtime-applications")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchStatus();
+        }
+      )
+      .subscribe();
+
+    const studentChannel = supabase
+      .channel("nav-realtime-students")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "students" },
         () => {
           fetchStatus();
         }
@@ -106,7 +155,8 @@ export default function StudentHeaderNav() {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("dumalnext:data-changed", onDataChanged);
       clearInterval(heartbeat);
-      supabase.removeChannel(channel);
+      supabase.removeChannel(appChannel);
+      supabase.removeChannel(studentChannel);
     };
   }, [user?.id, user?.lrn, schoolYear, semester, termNumber]);
 
@@ -291,6 +341,45 @@ export default function StudentHeaderNav() {
                       {user.email}
                     </p>
                   </div>
+
+                  {/* Section Assignment Indicator */}
+                  {assignedSection ? (
+                    <div className="mt-2.5 p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
+                          [ SECTION ASSIGNED ]
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 font-mono text-[9px] font-bold uppercase">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
+                          Official Roster
+                        </span>
+                      </div>
+                      <div className="text-xs font-bold text-emerald-950 uppercase">
+                        Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
+                      </div>
+                      <div className="text-[10px] font-mono text-emerald-800">
+                        Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-2.5 p-2.5 bg-amber-50 border-2 border-amber-400 text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
+                          [ SECTION STATUS ]
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 font-mono text-[9px] font-bold uppercase">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                          Pending Placement
+                        </span>
+                      </div>
+                      <div className="text-xs font-bold text-amber-950">
+                        You&apos;re not yet assigned to a section
+                      </div>
+                      <p className="text-[10px] text-amber-800 leading-tight">
+                        Awaiting official section placement from the school administrator.
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="p-4 bg-blue-50/70 border-b border-blue-200">

@@ -95,13 +95,19 @@ function StudentHomeContent() {
   // Authenticated User Submitted Application State (Scoped strictly to Active Academic Term)
   const [userApplication, setUserApplication] = useState<any | null>(null);
   const [pastApplications, setPastApplications] = useState<any[]>([]);
+  const [assignedSection, setAssignedSection] = useState<{
+    name: string;
+    gradeLevel?: number | string;
+    strand?: string | null;
+  } | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
-  // Real-Time Automatic Synchronization of Logged-In User's Application (Zero-Refresh)
+  // Real-Time Automatic Synchronization of Logged-In User's Application & Section (Zero-Refresh)
   useEffect(() => {
     if (!user) {
       setUserApplication(null);
       setPastApplications([]);
+      setAssignedSection(null);
       return;
     }
 
@@ -112,15 +118,42 @@ function StudentHomeContent() {
       try {
         const { data: stData } = await supabase
           .from("students")
-          .select("id")
+          .select("id, current_section_id, grade_level, strand")
           .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
           .limit(1);
 
         if (stData && stData.length > 0) {
+          const studentRec = stData[0];
+
+          // Fetch Section if assigned
+          if (studentRec.current_section_id) {
+            const { data: secData } = await supabase
+              .from("sections")
+              .select("id, section_name, grade_level, strand")
+              .eq("id", studentRec.current_section_id)
+              .limit(1);
+
+            if (isMounted) {
+              if (secData && secData.length > 0) {
+                setAssignedSection({
+                  name: secData[0].section_name,
+                  gradeLevel: secData[0].grade_level,
+                  strand: secData[0].strand,
+                });
+              } else {
+                setAssignedSection(null);
+              }
+            }
+          } else {
+            if (isMounted) {
+              setAssignedSection(null);
+            }
+          }
+
           const { data: appData } = await supabase
             .from("enrollment_applications")
             .select("*")
-            .eq("student_id", stData[0].id)
+            .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
           if (isMounted && appData) {
@@ -189,12 +222,14 @@ function StudentHomeContent() {
         if (isMounted) {
           setUserApplication(null);
           setPastApplications([]);
+          setAssignedSection(null);
         }
       } catch (e) {
         console.error("Error reading Supabase applications:", e);
         if (isMounted) {
           setUserApplication(null);
           setPastApplications([]);
+          setAssignedSection(null);
         }
       }
     };
@@ -220,12 +255,23 @@ function StudentHomeContent() {
     // 4. 10-Second Silent Heartbeat Polling
     const heartbeat = setInterval(fetchApp, 10000);
 
-    // 5. Supabase Realtime Channel: Instant live update on application changes
+    // 5. Supabase Realtime Channels: Instant live update on application AND section assignments
     const channel = supabase
       .channel("home-realtime-applications")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "enrollment_applications" },
+        () => {
+          fetchApp();
+        }
+      )
+      .subscribe();
+
+    const studentChannel = supabase
+      .channel("home-realtime-students")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "students" },
         () => {
           fetchApp();
         }
@@ -239,6 +285,7 @@ function StudentHomeContent() {
       window.removeEventListener("dumalnext:data-changed", onDataChanged);
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
+      supabase.removeChannel(studentChannel);
     };
   }, [user?.id, user?.lrn, schoolYear, semester, termNumber]);
 
@@ -486,6 +533,59 @@ function StudentHomeContent() {
                 </p>
               </div>
             </div>
+
+            {/* Section Assignment Status Card */}
+            {assignedSection ? (
+              <div className="p-3.5 sm:p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
+                      [ SECTION ASSIGNED ]
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 font-mono text-[10px] font-bold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
+                      Official Roster
+                    </span>
+                  </div>
+                  <div className="text-sm sm:text-base font-bold text-emerald-950 uppercase">
+                    Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
+                  </div>
+                  <div className="text-xs font-mono text-emerald-800">
+                    Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[11px] font-mono font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase">
+                    Official Class Placement
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
+                      [ SECTION STATUS ]
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 font-mono text-[10px] font-bold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                      Pending Placement
+                    </span>
+                  </div>
+                  <div className="text-sm sm:text-base font-bold text-amber-950">
+                    You&apos;re not yet assigned to a section
+                  </div>
+                  <p className="text-xs text-amber-800">
+                    Awaiting official section placement from the school administrator.
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-mono font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase">
+                    In Queue for Placement
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Application Status Card */}
             {userApplication ? (
