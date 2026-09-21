@@ -190,6 +190,17 @@ function SectionPageContent() {
         // 3. Resolve Section Placement
         let targetSectionId = student.current_section_id;
 
+        // Fallback: If not on student row, check approved applications
+        if (!targetSectionId) {
+          const appWithSection: any = userApps.find(
+            (a: any) => a.status === "Approved" && (a.section_id || a.assigned_section_id)
+          );
+          if (appWithSection) {
+            targetSectionId = appWithSection.section_id || appWithSection.assigned_section_id;
+            await supabase.from("students").update({ current_section_id: targetSectionId }).eq("id", student.id);
+          }
+        }
+
         // AUTOMATION FOR SEM 2 OR 3: Continuing students keep their section automatically!
         if (resolvedTermNum >= 2 && !isTransferee && isEnrolledInActiveTerm) {
           if (!targetSectionId) {
@@ -205,14 +216,46 @@ function SectionPageContent() {
 
         let sectionRecord: SectionRecord | null = null;
         if (targetSectionId) {
-          const { data: secData } = await supabase
+          const { data: secData, error: secErr } = await supabase
             .from("sections")
-            .select("id, section_name, grade_level, strand, room, adviser_name, capacity, school_year")
+            .select("id, section_name, grade_level, strand, capacity, school_year")
             .eq("id", targetSectionId)
             .limit(1);
 
           if (secData && secData.length > 0) {
-            sectionRecord = secData[0];
+            const rawSec = secData[0];
+            let baseSec: SectionRecord = {
+              id: rawSec.id,
+              section_name: rawSec.section_name,
+              grade_level: rawSec.grade_level,
+              strand: rawSec.strand || null,
+              capacity: rawSec.capacity || 40,
+              school_year: rawSec.school_year || resolvedSY,
+              room: null,
+              adviser_name: null,
+            };
+
+            // Read adviser and room from sections_config in system_settings if present
+            try {
+              const { data: sysData } = await supabase
+                .from("system_settings")
+                .select("value")
+                .eq("key", "sections_config")
+                .maybeSingle();
+
+              if (sysData?.value?.customSections && Array.isArray(sysData.value.customSections)) {
+                const match = sysData.value.customSections.find((c: any) => c.id === targetSectionId);
+                if (match) {
+                  if (match.room) baseSec.room = match.room;
+                  if (match.adviser_name) baseSec.adviser_name = match.adviser_name;
+                  if (match.capacity) baseSec.capacity = match.capacity;
+                }
+              }
+            } catch (cfgErr) {
+              console.warn("Notice reading section config:", cfgErr);
+            }
+
+            sectionRecord = baseSec;
             if (isMounted) {
               setAssignedSection(sectionRecord);
             }

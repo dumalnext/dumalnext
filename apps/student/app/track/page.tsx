@@ -221,15 +221,32 @@ function TrackApplicationContent() {
           if (!currentSectionId) return undefined;
           const { data: secData } = await supabase
             .from("sections")
-            .select("id, section_name, adviser_name, room")
+            .select("id, section_name")
             .eq("id", currentSectionId)
             .limit(1);
           if (secData && secData.length > 0) {
+            let room: string | undefined = undefined;
+            let adviserName: string | undefined = undefined;
+            try {
+              const { data: sysData } = await supabase
+                .from("system_settings")
+                .select("value")
+                .eq("key", "sections_config")
+                .maybeSingle();
+              if (sysData?.value?.customSections && Array.isArray(sysData.value.customSections)) {
+                const match = sysData.value.customSections.find((c: any) => c.id === currentSectionId);
+                if (match) {
+                  room = match.room || undefined;
+                  adviserName = match.adviser_name || undefined;
+                }
+              }
+            } catch {}
+
             return {
               sectionId: secData[0].id,
               sectionName: secData[0].section_name,
-              adviserName: secData[0].adviser_name,
-              room: secData[0].room,
+              adviserName,
+              room,
             };
           }
           return undefined;
