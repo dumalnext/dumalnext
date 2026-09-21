@@ -680,38 +680,56 @@ function StudentHomeContent() {
                   </span>
                 </div>
 
-                <h3 className="text-base font-bold text-slate-900">
-                  {isEnrollmentOpen
-                    ? pastApplications.some((p) => p.status === "Approved")
-                      ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? [Continuing Learner]`
-                      : `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
-                    : `Basic Education Online Enrollment is Currently Closed`}
-                </h3>
+                {(() => {
+                  const priorApproved = pastApplications.find((p) => p.status === "Approved");
+                  const isJhsContinuing = priorApproved
+                    ? Number(priorApproved.gradeLevel) <= 10 || !priorApproved.targetStrand
+                    : false;
+                  const targetContinuingGrade = priorApproved?.gradeLevel || 7;
 
-                <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
-                  {isEnrollmentOpen
-                    ? pastApplications.some((p) => p.status === "Approved")
-                      ? `Your learner credentials, family background, and official DepEd documents are verified and on file from your previous approved enrollment. Click below to choose your elective subjects and submit enrollment for ${semester}.`
-                      : `Your student account is active. Click below to begin filling out the complete enrollment form for School Year ${schoolYear} (${semester}). Please review and double check all learner credentials and documentary requirements.`
-                    : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
-                </p>
+                  return (
+                    <>
+                      <h3 className="text-base font-bold text-slate-900">
+                        {isEnrollmentOpen
+                          ? priorApproved
+                            ? isJhsContinuing
+                              ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? [Continuing JHS Learner]`
+                              : `Ready to Enroll for S.Y. ${schoolYear} (${semester})? [Continuing SHS Learner]`
+                            : `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
+                          : `Basic Education Online Enrollment is Currently Closed`}
+                      </h3>
 
-                <div className="pt-2">
-                  <Link
-                    href="/enroll"
-                    className={`inline-block text-xs uppercase tracking-wider font-bold py-3 px-8 ${
-                      isEnrollmentOpen
-                        ? "btn-primary"
-                        : "bg-red-800 hover:bg-red-900 text-white shadow-xs"
-                    }`}
-                  >
-                    {isEnrollmentOpen
-                      ? pastApplications.some((p) => p.status === "Approved")
-                        ? `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
-                        : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
-                      : "[ View Official Enrollment Notice & Advisory ]"}
-                  </Link>
-                </div>
+                      <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
+                        {isEnrollmentOpen
+                          ? priorApproved
+                            ? isJhsContinuing
+                              ? `Naka-file at certified na ang iyong mga dokumento at learner credentials mula sa nakaraang approved enrollment. Dahil prescribed core curriculum ang Junior High School (Grade 7-10), walang kinakailangang electives. Pindutin ang button sa ibaba para sa instant 1-click re-enrollment para sa ${semester}.`
+                              : `Your learner credentials, family background, and official DepEd documents are verified and on file from your previous approved enrollment. Click below to choose your elective subjects and submit enrollment for ${semester}.`
+                            : `Your student account is active. Click below to begin filling out the complete enrollment form for School Year ${schoolYear} (${semester}). Please review and double check all learner credentials and documentary requirements.`
+                          : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
+                      </p>
+
+                      <div className="pt-2">
+                        <Link
+                          href="/enroll"
+                          className={`inline-block text-xs uppercase tracking-wider font-bold py-3 px-8 ${
+                            isEnrollmentOpen
+                              ? "btn-primary"
+                              : "bg-red-800 hover:bg-red-900 text-white shadow-xs"
+                          }`}
+                        >
+                          {isEnrollmentOpen
+                            ? priorApproved
+                              ? isJhsContinuing
+                                ? `[ 1-Click Mag-Enroll para sa ${semester} (Grade ${targetContinuingGrade} JHS) ]`
+                                : `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
+                              : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
+                            : "[ View Official Enrollment Notice & Advisory ]"}
+                        </Link>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
 

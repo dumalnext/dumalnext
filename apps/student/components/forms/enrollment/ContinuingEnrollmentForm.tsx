@@ -115,11 +115,13 @@ export default function ContinuingEnrollmentForm({
     formData.step1.applicantType === "Grade 7" ||
     (typeof formData.step1.targetGradeLevel === "number" &&
       formData.step1.targetGradeLevel <= 10) ||
-    Number(formData.step1.targetGradeLevel) <= 10;
+    Number(formData.step1.targetGradeLevel) <= 10 ||
+    Number(priorApprovedApp.target_grade_level) <= 10 ||
+    formData.targetTrack === "Junior High School";
 
   const targetGrade =
-    formData.step1.targetGradeLevel ||
-    priorApprovedApp.target_grade_level ||
+    Number(formData.step1.targetGradeLevel) ||
+    Number(priorApprovedApp.target_grade_level) ||
     (isJHS ? 7 : 11);
 
   const currentTrack =
@@ -354,6 +356,105 @@ export default function ContinuingEnrollmentForm({
     }
   };
 
+  const handleOneClickJhsSubmit = async () => {
+    if (!isEnrollmentOpen) {
+      alert(
+        `DepEd Notice: Online enrollment is closed for S.Y. ${schoolYear}. Submissions cannot be processed.`
+      );
+      return;
+    }
+
+    // Live Server Re-verification
+    try {
+      const checkRes = await fetch(`/api/enrollment-control?_t=${Date.now()}`, {
+        cache: "no-store",
+      });
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.isEnrollmentOpen === false) {
+          alert(
+            `DepEd Official Notice:\nOnline basic education enrollment is currently CLOSED for School Year ${checkData.schoolYear || schoolYear}.\n\n${checkData.closedMessage || "Submissions cannot be processed at this time."}`
+          );
+          return;
+        }
+      }
+    } catch {}
+
+    setIsSubmitting(true);
+
+    try {
+      const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+      const generatedRef = `DNHS-2025-${randomSuffix}`;
+
+      const supabase = createClient();
+      let studentUuid = priorApprovedApp.student_id || user?.id;
+
+      if (studentUuid) {
+        await supabase
+          .from("students")
+          .update({
+            grade_level: targetGrade,
+            strand: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", studentUuid);
+      }
+
+      const inheritedDocs = priorDocs.map((d: any) => ({
+        docType: d.docType || d.type || "other",
+        fileName: d.fileName || "certified_document.pdf",
+        sizeKb: d.sizeKb || 30,
+        fileData: d.fileData || d.fileUrl || null,
+        fileUrl: d.fileUrl || d.fileData || null,
+      }));
+
+      const submissionPayload = {
+        ...formData,
+        semester,
+        schoolYear: schoolYear.replace(/[–—]/g, "-"),
+        targetSemester: semester,
+        selectedElectives: [],
+        preferredModalities: currentModalities,
+        targetTrack: "Junior High School",
+        targetStrand: undefined,
+        jhsProgram: currentJhsProgram,
+        spsSport: currentJhsProgram === "SPS" ? currentSpsSport : undefined,
+        dataPrivacyAccepted: true,
+      };
+
+      const { error: insertErr } = await supabase
+        .from("enrollment_applications")
+        .insert({
+          application_id: generatedRef,
+          student_id: studentUuid,
+          applicant_type: "Continuing",
+          school_year: schoolYear.replace(/[–—]/g, "-"),
+          target_grade_level: targetGrade,
+          target_strand: null,
+          status: "Pending",
+          selected_electives: [submissionPayload],
+          submitted_documents: inheritedDocs,
+        });
+
+      if (insertErr) {
+        console.warn("Supabase continuing JHS enrollment insert notice:", insertErr.message);
+      }
+
+      setReferenceNumber(generatedRef);
+      setIsSubmitted(true);
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error("1-click submission exception:", err);
+      alert("Encountered an unexpected error processing continuing JHS enrollment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleDownloadPdf = async () => {
     setIsDownloadingPdf(true);
     try {
@@ -399,7 +500,7 @@ export default function ContinuingEnrollmentForm({
             </span>
           </div>
           <p className="text-xs text-amber-950 leading-relaxed font-medium">
-            Your continuing enrollment application and elective subject selections for {semester}, S.Y. {schoolYear} have been received. Your verified learner credentials and DepEd documents on file from S.Y. {priorApprovedApp.school_year} have been attached automatically.
+            Your continuing enrollment application {isJHS ? "" : "and elective subject selections"} for {semester}, S.Y. {schoolYear} have been received. Your verified learner credentials and DepEd documents on file from S.Y. {priorApprovedApp.school_year} have been attached automatically.
           </p>
         </div>
 
@@ -447,7 +548,9 @@ export default function ContinuingEnrollmentForm({
             <div>
               <span className="text-slate-500 block">Selected Electives:</span>
               <strong className="text-slate-900">
-                {currentElectives.length > 0
+                {isJHS
+                  ? "Walang kailangan (DepEd Prescribed JHS Core Curriculum)"
+                  : currentElectives.length > 0
                   ? currentElectives.join(", ")
                   : "None designated"}
               </strong>
@@ -493,7 +596,125 @@ export default function ContinuingEnrollmentForm({
   }
 
   // =========================================================================
-  // ACTIVE STEPPER: 2-STEP CONTINUING STUDENT FLOW
+  // CONTINUING JHS LEARNER (GRADE 7-10): 1-CLICK INSTANT RE-ENROLLMENT
+  // =========================================================================
+  if (isJHS) {
+    return (
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans shadow-sm">
+        {/* Header */}
+        <div className="border-b-2 border-slate-200 pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
+              [ CONTINUING JHS LEARNER AUTOMATION &bull; S.Y. {schoolYear} &bull; {semester} ]
+            </span>
+            <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 uppercase">
+              1-Click Re-Enrollment Active
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight uppercase">
+            Junior High School Continuing Enrollment
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+            Dumalneg National High School &bull; DepEd Prescribed Basic Education Core Curriculum
+          </p>
+        </div>
+
+        {/* Certified Credentials Banner */}
+        <div className="p-5 bg-emerald-50 border-2 border-emerald-500 text-slate-900 space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
+              [ OFFICIAL DEPED CREDENTIALS &amp; DOCUMENTS VERIFIED ON FILE ]
+            </span>
+            <span className="text-[10px] font-mono bg-emerald-800 text-white px-2 py-0.5 uppercase font-bold w-fit">
+              PREVIOUS REF: {priorApprovedApp.application_id}
+            </span>
+          </div>
+          <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+            Ang iyong Learner Profile, Family Background, at mga opisyal na dokumento (PSA Birth Certificate, SF9 / Form 138, 2x2 Formal ID Photo) ay certified at aktibong naka-rekord mula sa inyong naunang naaprubahang enrollment noong S.Y. {priorApprovedApp.school_year}.
+          </p>
+          <p className="text-[11px] text-emerald-900 leading-relaxed">
+            Alinsunod sa DepEd K-12 Curriculum, ang Junior High School (Grade 7 hanggang Grade 10) ay sumusunod sa standard prescribed core learning areas (Filipino, English, Mathematics, Science, AP, EsP, MAPEH, at TLE). Walang kinakailangang elective subjects o pagpasa muli ng mga dokumento. Isang pindot lamang upang opisyal na makapag-enroll!
+          </p>
+        </div>
+
+        {/* Verified Student Summary Dossier */}
+        <div className="border-2 border-slate-300 bg-slate-50 divide-y divide-slate-200 text-xs">
+          <div className="p-3 bg-slate-100 font-bold text-slate-800 uppercase tracking-wide flex items-center justify-between">
+            <span>Verified Continuing Student Dossier Summary</span>
+            <span className="text-[11px] font-mono text-emerald-800 font-bold">STATUS: READY TO SUBMIT</span>
+          </div>
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <span className="text-slate-500 block text-[11px]">Pangalan ng Mag-aaral:</span>
+              <strong className="text-slate-900 text-sm uppercase">
+                {formData.lastName}, {formData.firstName} {formData.middleName || ""}
+              </strong>
+            </div>
+            <div>
+              <span className="text-slate-500 block text-[11px]">DepEd Learner Reference Number (LRN):</span>
+              <strong className="text-slate-900 font-mono text-sm">{formData.lrn}</strong>
+            </div>
+            <div>
+              <span className="text-slate-500 block text-[11px]">Antas at Kurikulum:</span>
+              <strong className="text-slate-900">
+                Grade {targetGrade} Junior High School ({currentJhsProgram === "SPS" ? `Special Program in Sports - ${currentSpsSport}` : "Regular Basic Education"})
+              </strong>
+            </div>
+            <div>
+              <span className="text-slate-500 block text-[11px]">Akademikong Taon at Termino:</span>
+              <strong className="text-[#002060]">
+                School Year {schoolYear} &bull; {semester}
+              </strong>
+            </div>
+            <div>
+              <span className="text-slate-500 block text-[11px]">Preferred Distance Learning Modality:</span>
+              <strong className="text-slate-900">{currentModalities.join(", ")}</strong>
+            </div>
+            <div>
+              <span className="text-slate-500 block text-[11px]">DepEd Documentary Requirements:</span>
+              <span className="text-emerald-800 font-bold uppercase font-mono text-[11px]">
+                [ 100% INHERITED &amp; CERTIFIED ON FILE ]
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 1-Click Action Card */}
+        <div className="p-6 bg-blue-50/70 border-2 border-[#002060] space-y-4">
+          <div className="space-y-1">
+            <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
+              [ 1-CLICK INSTANT CONTINUING ENROLLMENT ]
+            </span>
+            <p className="text-xs text-slate-700 leading-relaxed">
+              Sa pamamagitan ng pag-click sa button sa ibaba, kinukumpirma mo ang iyong muling pag-enroll para sa School Year {schoolYear} ({semester}) alinsunod sa Republic Act 10173 (Data Privacy Act of 2012). Awtomatikong mairerehistro ang iyong aplikasyon nang walang anumang karagdagang form.
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={handleOneClickJhsSubmit}
+              disabled={isSubmitting || !isEnrollmentOpen}
+              className={`w-full py-4 px-6 text-xs sm:text-sm uppercase tracking-wider font-bold transition-all shadow-md ${
+                !isEnrollmentOpen
+                  ? "bg-slate-400 text-slate-100 cursor-not-allowed"
+                  : isSubmitting
+                  ? "bg-slate-700 text-white cursor-wait"
+                  : "bg-[#002060] hover:bg-blue-950 text-white active:translate-y-0.5"
+              }`}
+            >
+              {isSubmitting
+                ? "Isinusumite ang Iyong Opisyal na Enrollment..."
+                : `[ 1-CLICK KUMPIRMAHIN AT MAG-ENROLL PARA SA S.Y. ${schoolYear} (${semester}) ]`}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // ACTIVE STEPPER: 2-STEP CONTINUING STUDENT FLOW (SHS WITH ELECTIVES)
   // =========================================================================
   return (
     <div className="space-y-6">
