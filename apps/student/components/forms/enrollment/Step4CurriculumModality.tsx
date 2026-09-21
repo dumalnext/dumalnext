@@ -10,7 +10,9 @@ import {
   SNED_MANIFESTATIONS,
   DISTANCE_LEARNING_MODALITIES,
   DEPED_ELECTIVES,
+  getEligibleElectives,
 } from "@/lib/types/enrollment";
+import { extractTermNumber } from "@/lib/utils/academicTerm";
 
 interface Step4CurriculumModalityProps {
   data: FullEnrollmentFormData;
@@ -42,9 +44,21 @@ export default function Step4CurriculumModality({
   const currentTrack = data.targetTrack || data.step1.targetTrack || "Academic Track";
   const currentStrand = data.targetStrand || data.step1.targetStrand || (currentTrack === "Academic Track" ? "STEM" : "TVL-ICT");
   const currentElectives = data.selectedElectives || [];
-  const relevantElectives = DEPED_ELECTIVES.filter((e) =>
-    isJHS ? e.level === "JHS" || e.level === "All" : e.level === "SHS" || e.level === "All"
-  );
+  const activeTermNumber = extractTermNumber(currentSemester || data.semester || data.targetSemester);
+
+  const [enableElectives, setEnableElectives] = useState<boolean>(() => {
+    return Array.isArray(data.selectedElectives) && data.selectedElectives.length > 0;
+  });
+
+  // Smart filtering: excludes native strand subjects, matches term and grade level
+  const eligibleElectives = getEligibleElectives({
+    currentStrand: isJHS ? null : currentStrand,
+    gradeLevel: targetGrade,
+    termNumber: activeTermNumber,
+    previouslyTakenCodes: [],
+    isJHS,
+  });
+
   const currentModalities = data.preferredModalities && data.preferredModalities.length > 0
     ? data.preferredModalities
     : ["Modular (Print)"];
@@ -465,58 +479,134 @@ export default function Step4CurriculumModality({
       )}
 
       {/* ========================================================================= */}
-      {/* SECTION 7-B: DEPED ELECTIVE SUBJECTS & SPECIALIZED AREAS                 */}
+      {/* SECTION 7-B: DEPED ELECTIVE SUBJECTS & SPECIALIZED AREAS (WITH SWITCH)    */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300">
+        <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section 7-B: DepEd Elective Subjects &amp; Specialized Areas ]
+              [ Section 7-B: Cross-Strand Elective Subjects ]
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select elective subject preferences for this academic term (cross-strand, applied, and exploratory courses):
+              Mag-enroll sa karagdagang elective courses para sa {currentSemester}:
             </p>
           </div>
-          <span className="text-[11px] font-mono font-bold text-[#002060] bg-white px-2.5 py-1 border border-slate-300 self-start sm:self-auto">
-            SELECTED: {currentElectives.length} SUBJECT(S)
-          </span>
+
+          {/* Interactive Toggle Switch */}
+          <div className="flex items-center gap-3 bg-white p-2 border border-slate-300 self-start sm:self-auto shadow-xs">
+            <span className="text-xs font-bold uppercase text-slate-700">
+              Select Electives:
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={enableElectives}
+              onClick={() => {
+                const next = !enableElectives;
+                setEnableElectives(next);
+                if (!next) {
+                  onChange({ selectedElectives: [] });
+                }
+              }}
+              className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer transition-colors duration-200 ease-in-out focus:outline-none border-2 ${
+                enableElectives
+                  ? "bg-[#002060] border-[#002060]"
+                  : "bg-slate-200 border-slate-400"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-4 w-4 transform bg-white transition duration-200 ease-in-out mt-0.5 ${
+                  enableElectives ? "translate-x-6" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+            <span
+              className={`text-xs font-mono font-bold uppercase px-2 py-0.5 ${
+                enableElectives
+                  ? "bg-[#002060] text-white"
+                  : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              {enableElectives ? "ON" : "OFF"}
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {relevantElectives.map((elec) => {
-            const isSelected = currentElectives.includes(elec.code);
-            return (
-              <label
-                key={elec.code}
-                className={`p-4 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
-                  isSelected
-                    ? "bg-white border-[#002060] shadow-xs"
-                    : "bg-white border-slate-300 hover:border-slate-400"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => handleElectiveToggle(elec.code)}
-                  className="accent-[#002060] mt-1"
-                />
-                <div className="space-y-1 text-xs">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`font-bold ${isSelected ? "text-[#002060]" : "text-slate-900"}`}>
-                      {elec.name}
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200">
-                      {elec.category}
-                    </span>
-                  </div>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    {elec.description}
-                  </p>
-                </div>
-              </label>
-            );
-          })}
-        </div>
+        {/* CONDITIONAL RENDER BASED ON SWITCH */}
+        {!enableElectives ? (
+          <div className="p-4 bg-white border border-slate-300 space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-slate-400 inline-block shrink-0" />
+              <span className="text-xs font-mono font-bold text-slate-700 uppercase">
+                [ STANDARD STRAND CURRICULUM ACTIVE: WALANG KARAGDAGANG ELECTIVES ]
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Naka-OFF ang elective selection. Ang mag-aaral ay mag-e-enroll lamang sa mga standard at mandatoryong core at specialized subjects para sa Grade {targetGrade} ({isJHS ? currentJhsProgram : currentStrand}). Walang ibang strand subjects na idinagdag.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-slate-600">
+              <span className="font-medium">
+                Mga asignaturang maaaring kunin ngayong {currentSemester} (Na-filter na ang mga nakuha na at mga kailangan sa sariling strand):
+              </span>
+              <span className="font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-slate-300 w-fit">
+                SELECTED: {currentElectives.length} SUBJECT(S)
+              </span>
+            </div>
+
+            {eligibleElectives.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {eligibleElectives.map((elec) => {
+                  const isSelected = currentElectives.includes(elec.code);
+                  return (
+                    <label
+                      key={elec.code}
+                      className={`p-4 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
+                        isSelected
+                          ? "bg-white border-[#002060] shadow-xs"
+                          : "bg-white border-slate-300 hover:border-slate-400"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleElectiveToggle(elec.code)}
+                        className="accent-[#002060] mt-1"
+                      />
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`font-bold ${isSelected ? "text-[#002060]" : "text-slate-900"}`}>
+                            {elec.name}
+                          </span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200">
+                            {elec.category}
+                          </span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-50 text-[#002060] border border-blue-200">
+                            Term {elec.terms?.join(", ") || "All"}
+                          </span>
+                        </div>
+                        <p className="text-slate-600 text-[11px] leading-relaxed">
+                          {elec.description}
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-4 bg-white border border-slate-300 space-y-1">
+                <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
+                  [ WALANG IBANG ELECTIVES NA MAAARING KUNIN NGAYONG SEMESTER ]
+                </span>
+                <p className="text-xs text-slate-500">
+                  Lahat ng cross-strand electives para sa terminong ito ay nakuha na noong mga nakaraang sem o kaya naman ay kasama na sa mga mandatoryong subject ng inyong strand ({currentStrand}).
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ========================================================================= */}

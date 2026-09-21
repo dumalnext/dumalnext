@@ -212,6 +212,9 @@ export interface ElectiveSubject {
   category: 'Applied' | 'Specialized' | 'Cross-Strand' | 'TLE / Exploratory';
   description: string;
   level: 'SHS' | 'JHS' | 'All';
+  nativeStrands: string[];
+  gradeLevels?: number[];
+  terms?: number[];
 }
 
 export const DEPED_ELECTIVES: ElectiveSubject[] = [
@@ -221,6 +224,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Applied',
     description: 'Introductory algorithm design, web interfaces, and modern coding fundamentals.',
     level: 'SHS',
+    nativeStrands: ['TVL-ICT', 'TVL'],
+    gradeLevels: [11, 12],
+    terms: [1, 2],
   },
   {
     code: 'ELECT-JOURN',
@@ -228,6 +234,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Cross-Strand',
     description: 'News gathering, editorial broadcasting, and digital student press publishing.',
     level: 'All',
+    nativeStrands: ['HUMSS'],
+    gradeLevels: [7, 8, 9, 10, 11, 12],
+    terms: [1, 2, 3],
   },
   {
     code: 'ELECT-CW101',
@@ -235,6 +244,19 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Cross-Strand',
     description: 'Fundamentals of creative fiction, poetry, and Philippine literary essays.',
     level: 'All',
+    nativeStrands: ['HUMSS'],
+    gradeLevels: [11, 12],
+    terms: [1, 2],
+  },
+  {
+    code: 'ELECT-PRECALC',
+    name: 'Applied Pre-Calculus & STEM Principles',
+    category: 'Specialized',
+    description: 'Analytic geometry, series, and mathematical foundations for non-STEM students.',
+    level: 'SHS',
+    nativeStrands: ['STEM'],
+    gradeLevels: [11],
+    terms: [1, 2],
   },
   {
     code: 'ELECT-AGRI',
@@ -242,6 +264,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Specialized',
     description: 'Organic farming, horticulture techniques, and localized crop sustainability for Dumalneg.',
     level: 'All',
+    nativeStrands: ['TVL-AFA', 'AFA'],
+    gradeLevels: [7, 8, 9, 10, 11, 12],
+    terms: [1, 2, 3],
   },
   {
     code: 'ELECT-CUL',
@@ -249,6 +274,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Specialized',
     description: 'Safe food handling, indigenous food preparation, and small-scale catering management.',
     level: 'All',
+    nativeStrands: ['TVL-HE', 'HE'],
+    gradeLevels: [7, 8, 9, 10, 11, 12],
+    terms: [1, 2, 3],
   },
   {
     code: 'ELECT-DRAFT',
@@ -256,6 +284,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Applied',
     description: 'Architectural drawing principles, orthographic projections, and computer-aided design.',
     level: 'All',
+    nativeStrands: ['TVL-ICT', 'TVL-IA'],
+    gradeLevels: [7, 8, 9, 10, 11, 12],
+    terms: [1, 2],
   },
   {
     code: 'ELECT-ENTREP',
@@ -263,6 +294,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Cross-Strand',
     description: 'Community enterprise development, business planning, and basic financial literacy.',
     level: 'SHS',
+    nativeStrands: ['ABM'],
+    gradeLevels: [11, 12],
+    terms: [2, 3],
   },
   {
     code: 'ELECT-ROBOT',
@@ -270,6 +304,29 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Applied',
     description: 'Microcontroller basics, sensor telemetry, and automation projects.',
     level: 'SHS',
+    nativeStrands: ['STEM'],
+    gradeLevels: [11, 12],
+    terms: [2, 3],
+  },
+  {
+    code: 'ELECT-BIO',
+    name: 'Applied Environmental Biology & Ecology',
+    category: 'Applied',
+    description: 'Biological diversity, ecological conservation, and field biology applications.',
+    level: 'SHS',
+    nativeStrands: ['STEM'],
+    gradeLevels: [11, 12],
+    terms: [2, 3],
+  },
+  {
+    code: 'ELECT-LEAD',
+    name: 'Youth Governance & Community Development',
+    category: 'Cross-Strand',
+    description: 'Public leadership, community organizing, and local civic participation.',
+    level: 'All',
+    nativeStrands: ['HUMSS'],
+    gradeLevels: [8, 9, 10, 11, 12],
+    terms: [1, 2, 3],
   },
   {
     code: 'ELECT-FLANG',
@@ -277,6 +334,9 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'Cross-Strand',
     description: 'Basic conversational linguistic foundations and intercultural communication.',
     level: 'All',
+    nativeStrands: [],
+    gradeLevels: [7, 8, 9, 10, 11, 12],
+    terms: [1, 2, 3],
   },
   {
     code: 'ELECT-ELEC',
@@ -284,6 +344,69 @@ export const DEPED_ELECTIVES: ElectiveSubject[] = [
     category: 'TLE / Exploratory',
     description: 'Basic electrical circuits, residential wiring, and safety standards.',
     level: 'All',
+    nativeStrands: ['TVL-IA', 'TVL'],
+    gradeLevels: [7, 8, 9, 10, 11, 12],
+    terms: [1, 3],
   },
 ];
+
+/**
+ * Smart filtration function for cross-strand elective subjects.
+ * Strictly excludes:
+ * 1. Subjects the learner already completed or enrolled in during past terms.
+ * 2. Subjects that are native/mandatory to the learner's own strand curriculum.
+ * 3. Subjects not offered in the active semester/trimester or grade level.
+ */
+export function getEligibleElectives({
+  currentStrand,
+  gradeLevel,
+  termNumber,
+  previouslyTakenCodes = [],
+  isJHS = false,
+}: {
+  currentStrand?: string | null;
+  gradeLevel?: number | string | null;
+  termNumber?: number | null;
+  previouslyTakenCodes?: string[];
+  isJHS?: boolean;
+}): ElectiveSubject[] {
+  const normGrade = Number(gradeLevel) || (isJHS ? 7 : 11);
+  const normTerm = Number(termNumber) || 1;
+  const takenSet = new Set(previouslyTakenCodes);
+  const normStrand = (currentStrand || '').toUpperCase().trim();
+
+  return DEPED_ELECTIVES.filter((elec) => {
+    // 1. Exclude subjects already taken in prior terms
+    if (takenSet.has(elec.code)) {
+      return false;
+    }
+
+    // 2. Exclude subjects that are native/mandatory to learner's own strand
+    if (!isJHS && normStrand) {
+      const isNative = elec.nativeStrands.some((ns) => {
+        const upNs = ns.toUpperCase();
+        return normStrand.includes(upNs) || upNs.includes(normStrand);
+      });
+      if (isNative) {
+        return false;
+      }
+    }
+
+    // 3. Filter by Grade Level
+    if (isJHS) {
+      if (elec.level === 'SHS') return false;
+      if (elec.gradeLevels && !elec.gradeLevels.includes(normGrade)) return false;
+    } else {
+      if (elec.level === 'JHS') return false;
+      if (elec.gradeLevels && !elec.gradeLevels.includes(normGrade)) return false;
+    }
+
+    // 4. Filter by Active Term (Trimester / Semester)
+    if (elec.terms && !elec.terms.includes(normTerm)) {
+      return false;
+    }
+
+    return true;
+  });
+}
 
