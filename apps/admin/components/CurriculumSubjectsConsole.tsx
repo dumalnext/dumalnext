@@ -9,9 +9,7 @@ export default function CurriculumSubjectsConsole() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  // Filters
-  const [gradeFilter, setGradeFilter] = useState<string>("ALL");
-  const [trimesterFilter, setTrimesterFilter] = useState<string>("ALL");
+  // Filters (Trimester removed per institutional requirements)
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
   const [strandFilter, setStrandFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -24,7 +22,6 @@ export default function CurriculumSubjectsConsole() {
   const [formName, setFormName] = useState<string>("");
   const [formType, setFormType] = useState<CourseSubjectItem["subject_type"]>("Core");
   const [formGrade, setFormGrade] = useState<number>(7);
-  const [formTrimester, setFormTrimester] = useState<number>(1);
   const [formStrand, setFormStrand] = useState<string>("Regular");
   const [formDescription, setFormDescription] = useState<string>("");
   const [formError, setFormError] = useState<string>("");
@@ -61,10 +58,8 @@ export default function CurriculumSubjectsConsole() {
     fetchSubjects();
   }, []);
 
-  // Filter subjects based on active selections
+  // Filter subjects based on search query, type, and strand
   const filteredSubjects = subjects.filter((s) => {
-    if (gradeFilter !== "ALL" && s.grade_level !== Number(gradeFilter)) return false;
-    if (trimesterFilter !== "ALL" && s.trimester !== Number(trimesterFilter)) return false;
     if (typeFilter !== "ALL" && s.subject_type.toUpperCase() !== typeFilter.toUpperCase()) return false;
     if (strandFilter !== "ALL") {
       if (!s.strand) return false;
@@ -82,33 +77,45 @@ export default function CurriculumSubjectsConsole() {
 
   // Calculate Metrics
   const totalCount = subjects.length;
-  const jhsCount = subjects.filter((s) => s.grade_level <= 10).length;
-  const shsCount = subjects.filter((s) => s.grade_level >= 11).length;
-  const electivesCount = subjects.filter((s) => s.subject_type === "Elective" || s.subject_type === "Specialized").length;
+  const jhsTotal = subjects.filter((s) => s.grade_level <= 10).length;
+  const shsTotal = subjects.filter((s) => s.grade_level >= 11).length;
+  const electivesCount = subjects.filter(
+    (s) => s.subject_type === "Elective" || s.subject_type === "Specialized"
+  ).length;
 
-  // Auto-generate code helper
+  // Auto-generate standard subject code helper (without trimester)
   const handleAutoGenerateCode = () => {
     const isJhs = formGrade <= 10;
     const prefix = isJhs ? "JHS" : "SHS";
+    const strandTag =
+      !isJhs && formStrand && formStrand !== "General"
+        ? `${formStrand.toUpperCase()}-`
+        : "";
     const cleaned = formName
       .toUpperCase()
       .replace(/[^A-Z0-9]/g, "")
-      .slice(0, 6);
+      .slice(0, 7);
     const codeTag = cleaned || "SUBJ";
-    const generated = `${prefix}-${codeTag}${formGrade}-T${formTrimester}`;
+    const generated = `${prefix}-${strandTag}${codeTag}${formGrade}`;
     setFormCode(generated);
   };
 
-  // Open Create Modal
-  const handleOpenCreateModal = () => {
+  // Open Create Modal with optional pre-filled grade and strand
+  const handleOpenCreateModal = (prefillGrade?: number, prefillStrand?: string) => {
     setIsEditing(false);
     setEditingId("");
     setFormCode("");
     setFormName("");
     setFormType("Core");
-    setFormGrade(7);
-    setFormTrimester(1);
-    setFormStrand("Regular");
+    const g = prefillGrade || 7;
+    setFormGrade(g);
+    if (prefillStrand) {
+      setFormStrand(prefillStrand);
+    } else if (g <= 10) {
+      setFormStrand("Regular");
+    } else {
+      setFormStrand("General");
+    }
     setFormDescription("");
     setFormError("");
     setIsModalOpen(true);
@@ -122,7 +129,6 @@ export default function CurriculumSubjectsConsole() {
     setFormName(s.subject_name);
     setFormType(s.subject_type);
     setFormGrade(s.grade_level);
-    setFormTrimester(s.trimester);
     setFormStrand(s.strand || (s.grade_level <= 10 ? "Regular" : "General"));
     setFormDescription(s.description || "");
     setFormError("");
@@ -135,7 +141,7 @@ export default function CurriculumSubjectsConsole() {
     setFormError("");
 
     if (!formCode.trim()) {
-      setFormError("Subject Code is required (e.g., JHS-ENG7-T1).");
+      setFormError("Subject Code is required (e.g., JHS-MATH7, SHS-STEM-PRECAL11).");
       return;
     }
     if (!formName.trim()) {
@@ -153,7 +159,7 @@ export default function CurriculumSubjectsConsole() {
         subject_name: formName.trim(),
         subject_type: formType,
         grade_level: formGrade,
-        trimester: formTrimester,
+        trimester: 1, // Trimester defaulted silently in background
         strand: formStrand || null,
         description: formDescription.trim() || null,
       };
@@ -194,13 +200,18 @@ export default function CurriculumSubjectsConsole() {
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/subjects?subjectCode=${encodeURIComponent(deleteSubjectTarget.subject_code)}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `/api/subjects?subjectCode=${encodeURIComponent(deleteSubjectTarget.subject_code)}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const json = await res.json();
       if (json.success) {
-        setSuccessMessage(`Subject [ ${deleteSubjectTarget.subject_code} ] removed successfully.`);
+        setSuccessMessage(
+          `Subject [ ${deleteSubjectTarget.subject_code} ] removed successfully.`
+        );
         setDeleteSubjectTarget(null);
         fetchSubjects();
         if (typeof window !== "undefined") {
@@ -209,17 +220,197 @@ export default function CurriculumSubjectsConsole() {
         }
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {
-        alert(json.error || "Failed to delete subject.");
+        setErrorMessage(
+          json.error || "Could not remove subject. It may be assigned to an active class timetable."
+        );
+        setDeleteSubjectTarget(null);
       }
     } catch (err: any) {
-      alert(err.message || "Error deleting subject.");
+      setErrorMessage(err.message || "Failed to delete subject.");
+      setDeleteSubjectTarget(null);
     } finally {
       setIsDeleting(false);
     }
   };
 
+  // Groupings for JHS
+  const jhsGrade7 = filteredSubjects.filter((s) => s.grade_level === 7);
+  const jhsGrade8 = filteredSubjects.filter((s) => s.grade_level === 8);
+  const jhsGrade9 = filteredSubjects.filter((s) => s.grade_level === 9);
+  const jhsGrade10 = filteredSubjects.filter((s) => s.grade_level === 10);
+
+  // Groupings for SHS
+  // Grade 11 STEM specifically requested as a sub-heading
+  const shsGrade11Stem = filteredSubjects.filter(
+    (s) => s.grade_level === 11 && s.strand === "STEM"
+  );
+  // Grade 11 Core & Other Tracks
+  const shsGrade11Other = filteredSubjects.filter(
+    (s) => s.grade_level === 11 && s.strand !== "STEM"
+  );
+  // Grade 12 Sub-heading
+  const shsGrade12 = filteredSubjects.filter((s) => s.grade_level === 12);
+
+  // Helper to render subjects table for each sub-heading
+  const renderSubjectTable = (
+    gradeSubjects: CourseSubjectItem[],
+    gradeNum: number,
+    subHeadingTitle: string,
+    defaultStrand: string,
+    addBtnLabel: string
+  ) => {
+    return (
+      <div className="bg-white border-2 border-slate-300 shadow-xs mb-6 overflow-hidden">
+        {/* Sub-Heading Header Bar */}
+        <div className="bg-slate-100 border-b-2 border-slate-300 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-2.5 h-6 bg-[#002060]" />
+            <div>
+              <h4 className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#002060]">
+                {subHeadingTitle}
+              </h4>
+              <span className="text-[10px] font-mono text-slate-500 block uppercase">
+                {gradeSubjects.length}{" "}
+                {gradeSubjects.length === 1 ? "Subject Offering" : "Subject Offerings"}
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleOpenCreateModal(gradeNum, defaultStrand)}
+            className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+          >
+            {addBtnLabel}
+          </button>
+        </div>
+
+        {/* Table Content */}
+        {gradeSubjects.length === 0 ? (
+          <div className="p-8 text-center space-y-2 bg-slate-50/50">
+            <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
+              [ NO SUBJECTS ON RECORD FOR THIS LEVEL ]
+            </span>
+            <p className="text-xs text-slate-600 max-w-md mx-auto">
+              No subjects currently match this level or active filter. Click below to add a new subject.
+            </p>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal(gradeNum, defaultStrand)}
+                className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-[#002060] uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                {addBtnLabel}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse font-sans">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-mono text-slate-700 uppercase">
+                  <th className="p-3 w-40">Subject Code</th>
+                  <th className="p-3 min-w-[240px]">Descriptive Title</th>
+                  <th className="p-3 w-32">Classification</th>
+                  <th className="p-3 min-w-[180px]">Program / Track</th>
+                  <th className="p-3 w-36 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {gradeSubjects.map((sub) => {
+                  const isJhs = sub.grade_level <= 10;
+                  return (
+                    <tr
+                      key={sub.id}
+                      className="hover:bg-blue-50/40 transition-colors"
+                    >
+                      {/* Subject Code */}
+                      <td className="p-3 font-mono font-bold text-[#002060]">
+                        {sub.subject_code}
+                      </td>
+
+                      {/* Subject Title */}
+                      <td className="p-3">
+                        <span className="font-bold text-slate-900 block text-xs sm:text-sm">
+                          {sub.subject_name}
+                        </span>
+                        {sub.description && (
+                          <span className="text-[11px] text-slate-500 block line-clamp-1 mt-0.5">
+                            {sub.description}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Classification Badge */}
+                      <td className="p-3">
+                        {sub.subject_type === "Core" ? (
+                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
+                            CORE
+                          </span>
+                        ) : sub.subject_type === "Elective" ? (
+                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-purple-100 text-purple-900 border border-purple-300">
+                            ELECTIVE
+                          </span>
+                        ) : sub.subject_type === "Specialized" ? (
+                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-amber-100 text-amber-950 border border-amber-400">
+                            SPECIALIZED
+                          </span>
+                        ) : sub.subject_type === "Applied" ? (
+                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400">
+                            APPLIED
+                          </span>
+                        ) : (
+                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-red-100 text-red-950 border border-red-300">
+                            INTERVENTION
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Program / Track */}
+                      <td className="p-3">
+                        <span className="text-[11px] font-mono font-bold text-slate-800 block">
+                          {isJhs
+                            ? sub.strand === "SPS"
+                              ? "Special Program in Sports (General SPS)"
+                              : "Regular Basic Education"
+                            : sub.strand
+                            ? sub.strand === "General"
+                              ? "General (All Tracks)"
+                              : `${sub.strand}`
+                            : "General (All Tracks)"}
+                        </span>
+                      </td>
+
+                      {/* Action Buttons */}
+                      <td className="p-3 text-right space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditModal(sub)}
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          [ Edit ]
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteSubjectTarget(sub)}
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          [ Delete ]
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-8 font-sans pb-12">
       {/* Top Header Card */}
       <div className="bg-white border-2 border-slate-300 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -245,11 +436,11 @@ export default function CurriculumSubjectsConsole() {
             onClick={fetchSubjects}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
-            [ Refresh Roster ]
+            [ Refresh Subjects ]
           </button>
           <button
             type="button"
-            onClick={handleOpenCreateModal}
+            onClick={() => handleOpenCreateModal()}
             className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
           >
             [ + Add New Subject ]
@@ -287,121 +478,50 @@ export default function CurriculumSubjectsConsole() {
 
       {/* Metrics Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-sans">
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1">
+        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
             Total Active Subjects
           </span>
           <div className="text-2xl font-mono font-bold text-[#002060]">{totalCount}</div>
-          <span className="text-[10px] text-slate-500 block">Across all Grade 7-12 offerings</span>
+          <span className="text-[10px] text-slate-500 block">Across all Grade 7-12 levels</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1">
+        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
-            JHS Core &amp; SPS Subjects
+            JHS Subjects (Grades 7–10)
           </span>
-          <div className="text-2xl font-mono font-bold text-emerald-800">{jhsCount}</div>
-          <span className="text-[10px] text-slate-500 block">Grades 7, 8, 9, and 10</span>
+          <div className="text-2xl font-mono font-bold text-emerald-800">{jhsTotal}</div>
+          <span className="text-[10px] text-slate-500 block">Regular &amp; Special Program in Sports</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1">
+        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
-            Senior High School (SHS)
+            SHS Subjects (Grades 11–12)
           </span>
-          <div className="text-2xl font-mono font-bold text-blue-800">{shsCount}</div>
-          <span className="text-[10px] text-slate-500 block">Grades 11 and 12</span>
+          <div className="text-2xl font-mono font-bold text-blue-800">{shsTotal}</div>
+          <span className="text-[10px] text-slate-500 block">STEM, TVL, HUMSS &amp; Core Tracks</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1">
+        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
             Specialized &amp; Electives
           </span>
           <div className="text-2xl font-mono font-bold text-indigo-800">{electivesCount}</div>
-          <span className="text-[10px] text-slate-500 block">Strand &amp; Cross-Strand subjects</span>
+          <span className="text-[10px] text-slate-500 block">Applied, Sports &amp; Track Subjects</span>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="bg-white border-2 border-slate-300 p-4 shadow-xs space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Grade Level Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2.5 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Grade:</span>
-              <select
-                value={gradeFilter}
-                onChange={(e) => setGradeFilter(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ALL">All Grades (7-12)</option>
-                <option value="7">Grade 7</option>
-                <option value="8">Grade 8</option>
-                <option value="9">Grade 9</option>
-                <option value="10">Grade 10</option>
-                <option value="11">Grade 11 (SHS)</option>
-                <option value="12">Grade 12 (SHS)</option>
-              </select>
-            </div>
-
-            {/* Trimester Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2.5 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Trimester:</span>
-              <select
-                value={trimesterFilter}
-                onChange={(e) => setTrimesterFilter(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ALL">All Trimesters</option>
-                <option value="1">Trimester 1</option>
-                <option value="2">Trimester 2</option>
-                <option value="3">Trimester 3</option>
-              </select>
-            </div>
-
-            {/* Subject Type Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2.5 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Type:</span>
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ALL">All Types</option>
-                <option value="Core">Core Subject</option>
-                <option value="Elective">Elective</option>
-                <option value="Applied">Applied</option>
-                <option value="Specialized">Specialized</option>
-                <option value="Intervention">Intervention (ARAL)</option>
-              </select>
-            </div>
-
-            {/* Strand / Program Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2.5 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Program:</span>
-              <select
-                value={strandFilter}
-                onChange={(e) => setStrandFilter(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ALL">All Programs / Strands</option>
-                <option value="Regular">JHS Regular</option>
-                <option value="SPS">JHS SPS (General)</option>
-                <option value="General">SHS General</option>
-                <option value="STEM">SHS STEM</option>
-                <option value="TVL-ICT">SHS TVL-ICT</option>
-                <option value="HUMSS">SHS HUMSS</option>
-                <option value="TVL-Agri-Fishery">SHS TVL-Agri</option>
-              </select>
-            </div>
-          </div>
-
+      {/* Global Filter & Search Bar */}
+      <div className="bg-white border-2 border-slate-300 p-4 space-y-3 shadow-xs">
+        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           {/* Search Box */}
-          <div className="relative min-w-[220px] sm:w-72">
+          <div className="relative flex-1 w-full">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Subject Code or Title..."
-              className="w-full pl-3 pr-7 py-1.5 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+              placeholder="Search by Subject Code, Title, or Track..."
+              className="w-full pl-3 pr-7 py-2 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
             />
             {searchQuery && (
               <button
@@ -414,19 +534,57 @@ export default function CurriculumSubjectsConsole() {
               </button>
             )}
           </div>
+
+          {/* Classification Type Filter */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-[11px] font-mono uppercase text-slate-600 font-bold whitespace-nowrap">
+              Type:
+            </span>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-slate-300 text-xs font-bold focus:border-[#002060] outline-none w-full sm:w-auto"
+            >
+              <option value="ALL">All Classification Types</option>
+              <option value="Core">Core Subjects</option>
+              <option value="Specialized">Specialized Subjects</option>
+              <option value="Applied">Applied Subjects</option>
+              <option value="Elective">Elective Subjects</option>
+              <option value="Intervention">Intervention (ARAL)</option>
+            </select>
+          </div>
+
+          {/* Strand Filter */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-[11px] font-mono uppercase text-slate-600 font-bold whitespace-nowrap">
+              Program:
+            </span>
+            <select
+              value={strandFilter}
+              onChange={(e) => setStrandFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-slate-300 text-xs font-bold focus:border-[#002060] outline-none w-full sm:w-auto"
+            >
+              <option value="ALL">All Programs / Strands</option>
+              <option value="Regular">Regular Basic Education (JHS)</option>
+              <option value="SPS">Special Program in Sports (SPS)</option>
+              <option value="STEM">STEM Track (SHS)</option>
+              <option value="TVL-ICT">TVL-ICT Track (SHS)</option>
+              <option value="HUMSS">HUMSS Track (SHS)</option>
+              <option value="General">General / Core (SHS)</option>
+            </select>
+          </div>
         </div>
 
         {/* Active Filter Indicator */}
-        {(gradeFilter !== "ALL" || trimesterFilter !== "ALL" || typeFilter !== "ALL" || strandFilter !== "ALL" || searchQuery.trim()) && (
+        {(typeFilter !== "ALL" || strandFilter !== "ALL" || searchQuery.trim()) && (
           <div className="p-2.5 bg-blue-50/80 border border-blue-200 flex flex-wrap items-center justify-between gap-2 text-xs">
             <span className="font-mono text-[#002060]">
-              Active Filters: Showing <strong>{filteredSubjects.length}</strong> of <strong>{totalCount}</strong> subjects.
+              Active Filter: Showing <strong>{filteredSubjects.length}</strong> of{" "}
+              <strong>{totalCount}</strong> subjects across all levels.
             </span>
             <button
               type="button"
               onClick={() => {
-                setGradeFilter("ALL");
-                setTrimesterFilter("ALL");
                 setTypeFilter("ALL");
                 setStrandFilter("ALL");
                 setSearchQuery("");
@@ -439,154 +597,169 @@ export default function CurriculumSubjectsConsole() {
         )}
       </div>
 
-      {/* Subjects Table */}
-      <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto">
-        {isLoading ? (
-          <div className="p-12 text-center">
-            <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-            <span className="text-xs font-mono text-slate-600 uppercase block font-bold">
-              Loading Subjects Database...
-            </span>
-          </div>
-        ) : filteredSubjects.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-              [ NO SUBJECTS FOUND MATCHING ACTIVE FILTERS ]
-            </span>
-            <p className="text-xs text-slate-600 max-w-md mx-auto">
-              No subjects match the selected grade level, trimester, subject type, or search term. Click the button below to reset filters or create a new subject.
-            </p>
-            <div className="pt-2 flex items-center justify-center gap-2">
+      {/* LOADING STATE */}
+      {isLoading && (
+        <div className="bg-white border-2 border-slate-300 p-12 text-center shadow-xs">
+          <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <span className="text-xs font-mono text-slate-600 uppercase block font-bold">
+            Loading Subjects Database...
+          </span>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 1. JHS (HEADINGS) SECTION */}
+      {/* ========================================================================= */}
+      {!isLoading && (
+        <section className="border-4 border-[#002060] bg-slate-50 shadow-md">
+          {/* Main JHS Heading Bar */}
+          <div className="bg-[#002060] text-white p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest bg-blue-900 border border-blue-300/40 px-2 py-0.5 font-bold text-blue-200">
+                  DEPED BASIC EDUCATION
+                </span>
+                <span className="text-[10px] font-mono uppercase bg-emerald-900/90 border border-emerald-400/40 px-2 py-0.5 font-bold text-emerald-200">
+                  Grades 7, 8, 9, and 10
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight uppercase text-white">
+                JHS (Headings)
+              </h3>
+              <p className="text-xs text-blue-100 mt-0.5 max-w-xl">
+                Junior High School official learning areas for Regular Basic Education and General Special Program in Sports (SPS).
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 text-white border border-white/20">
+                {jhsTotal} Subjects on Record
+              </span>
               <button
                 type="button"
-                onClick={() => {
-                  setGradeFilter("ALL");
-                  setTrimesterFilter("ALL");
-                  setTypeFilter("ALL");
-                  setStrandFilter("ALL");
-                  setSearchQuery("");
-                }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 uppercase tracking-wider transition-colors cursor-pointer"
+                onClick={() => handleOpenCreateModal(7, "Regular")}
+                className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
               >
-                [ View All Subjects ]
-              </button>
-              <button
-                type="button"
-                onClick={handleOpenCreateModal}
-                className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                [ + Create Subject ]
+                [ + Add JHS Subject ]
               </button>
             </div>
           </div>
-        ) : (
-          <table className="w-full text-left border-collapse text-xs font-sans">
-            <thead>
-              <tr className="bg-slate-100 border-b-2 border-slate-300 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                <th className="p-3">Subject Code</th>
-                <th className="p-3">Official Subject Title</th>
-                <th className="p-3">Classification</th>
-                <th className="p-3">Grade &amp; Program</th>
-                <th className="p-3">Trimester</th>
-                <th className="p-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filteredSubjects.map((sub) => {
-                const isJhs = sub.grade_level <= 10;
-                return (
-                  <tr key={sub.id} className="hover:bg-slate-50 transition-colors">
-                    {/* Subject Code */}
-                    <td className="p-3 font-mono font-bold text-[#002060]">
-                      {sub.subject_code}
-                    </td>
 
-                    {/* Subject Title */}
-                    <td className="p-3">
-                      <span className="font-bold text-slate-900 block">
-                        {sub.subject_name}
-                      </span>
-                      {sub.description && (
-                        <span className="text-[11px] text-slate-500 block line-clamp-1">
-                          {sub.description}
-                        </span>
-                      )}
-                    </td>
+          {/* JHS Sub-Headings Stack */}
+          <div className="p-4 sm:p-6 space-y-2">
+            {/* Grade 7 Sub-Heading */}
+            {renderSubjectTable(
+              jhsGrade7,
+              7,
+              "Grade 7 (Sub Headings)",
+              "Regular",
+              "[ + Add Grade 7 Subject ]"
+            )}
 
-                    {/* Classification Type Badge */}
-                    <td className="p-3">
-                      {sub.subject_type === "Core" ? (
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
-                          CORE
-                        </span>
-                      ) : sub.subject_type === "Elective" ? (
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-purple-100 text-purple-900 border border-purple-300">
-                          ELECTIVE
-                        </span>
-                      ) : sub.subject_type === "Specialized" ? (
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-amber-100 text-amber-950 border border-amber-400">
-                          SPECIALIZED
-                        </span>
-                      ) : sub.subject_type === "Applied" ? (
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400">
-                          APPLIED
-                        </span>
-                      ) : (
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-red-100 text-red-950 border border-red-300">
-                          INTERVENTION
-                        </span>
-                      )}
-                    </td>
+            {/* Grade 8 Sub-Heading */}
+            {renderSubjectTable(
+              jhsGrade8,
+              8,
+              "Grade 8 (Sub Headings)",
+              "Regular",
+              "[ + Add Grade 8 Subject ]"
+            )}
 
-                    {/* Grade Level & Program */}
-                    <td className="p-3">
-                      <span className="font-bold text-slate-900 block">
-                        Grade {sub.grade_level} {isJhs ? "JHS" : "SHS"}
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-600 block">
-                        {isJhs
-                          ? sub.strand === "SPS"
-                            ? "Special Program in Sports (General SPS)"
-                            : "Regular Basic Education"
-                          : sub.strand
-                          ? `Strand: ${sub.strand}`
-                          : "General Academic"}
-                      </span>
-                    </td>
+            {/* Grade 9 Sub-Heading */}
+            {renderSubjectTable(
+              jhsGrade9,
+              9,
+              "Grade 9 (Sub Headings)",
+              "Regular",
+              "[ + Add Grade 9 Subject ]"
+            )}
 
-                    {/* Trimester */}
-                    <td className="p-3">
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold bg-slate-100 text-slate-800 border border-slate-300">
-                        Trimester {sub.trimester}
-                      </span>
-                    </td>
+            {/* Grade 10 Sub-Heading */}
+            {renderSubjectTable(
+              jhsGrade10,
+              10,
+              "Grade 10 (Sub Headings)",
+              "Regular",
+              "[ + Add Grade 10 Subject ]"
+            )}
+          </div>
+        </section>
+      )}
 
-                    {/* Action Buttons */}
-                    <td className="p-3 text-right space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditModal(sub)}
-                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                      >
-                        [ Edit ]
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteSubjectTarget(sub)}
-                        className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                      >
-                        [ Delete ]
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* ========================================================================= */}
+      {/* 2. SHS (HEADINGS) SECTION */}
+      {/* ========================================================================= */}
+      {!isLoading && (
+        <section className="border-4 border-[#0b3c7e] bg-slate-50 shadow-md">
+          {/* Main SHS Heading Bar */}
+          <div className="bg-[#0b3c7e] text-white p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest bg-blue-950 border border-blue-300/40 px-2 py-0.5 font-bold text-blue-200">
+                  DEPED SENIOR HIGH SCHOOL
+                </span>
+                <span className="text-[10px] font-mono uppercase bg-indigo-900/90 border border-indigo-400/40 px-2 py-0.5 font-bold text-indigo-200">
+                  Grades 11 and 12
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight uppercase text-white">
+                SHS (Headings)
+              </h3>
+              <p className="text-xs text-blue-100 mt-0.5 max-w-xl">
+                Senior High School Academic Tracks (STEM, HUMSS, TVL-ICT) and General Core subject offerings.
+              </p>
+            </div>
 
-      {/* CREATE / EDIT SUBJECT MODAL */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 text-white border border-white/20">
+                {shsTotal} Subjects on Record
+              </span>
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal(11, "STEM")}
+                className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
+              >
+                [ + Add SHS Subject ]
+              </button>
+            </div>
+          </div>
+
+          {/* SHS Sub-Headings Stack */}
+          <div className="p-4 sm:p-6 space-y-2">
+            {/* Grade 11 STEM (Sub Headings) - specifically requested */}
+            {renderSubjectTable(
+              shsGrade11Stem,
+              11,
+              "Grade 11 STEM (Sub Headings)",
+              "STEM",
+              "[ + Add Grade 11 STEM Subject ]"
+            )}
+
+            {/* Grade 11 Core & Other Tracks (Sub Headings) */}
+            {shsGrade11Other.length > 0 &&
+              renderSubjectTable(
+                shsGrade11Other,
+                11,
+                "Grade 11 Core & Other Tracks (Sub Headings)",
+                "General",
+                "[ + Add Grade 11 Core Subject ]"
+              )}
+
+            {/* Grade 12 (Sub Headings) */}
+            {renderSubjectTable(
+              shsGrade12,
+              12,
+              "Grade 12 (Sub Headings)",
+              "STEM",
+              "[ + Add Grade 12 Subject ]"
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. CREATE / EDIT SUBJECT MODAL (NO TRIMESTER FIELD) */}
+      {/* ========================================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
           <div className="bg-white border-4 border-[#002060] w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -603,7 +776,7 @@ export default function CurriculumSubjectsConsole() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-white hover:text-slate-300 text-lg font-bold px-2 py-0.5"
+                className="text-white hover:text-slate-300 text-lg font-bold px-2 py-0.5 cursor-pointer"
               >
                 ✕
               </button>
@@ -626,7 +799,7 @@ export default function CurriculumSubjectsConsole() {
                   type="text"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  placeholder="e.g., General Biology 1, Mathematics, Technical Drafting"
+                  placeholder="e.g., Mathematics, Pre-Calculus, General Biology"
                   className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   required
                 />
@@ -641,7 +814,7 @@ export default function CurriculumSubjectsConsole() {
                   <button
                     type="button"
                     onClick={handleAutoGenerateCode}
-                    className="text-[10px] font-mono text-[#002060] hover:underline font-bold"
+                    className="text-[10px] font-mono text-[#002060] hover:underline font-bold cursor-pointer"
                   >
                     [ Auto-Generate Code ]
                   </button>
@@ -650,20 +823,22 @@ export default function CurriculumSubjectsConsole() {
                   type="text"
                   value={formCode}
                   onChange={(e) => setFormCode(e.target.value.toUpperCase())}
-                  placeholder="e.g., JHS-MTH7-T1, SHS-GMATH11-T1"
+                  placeholder="e.g., JHS-MATH7, SHS-STEM-PRECAL11"
                   disabled={isEditing}
                   className={`w-full p-2.5 border-2 text-xs font-mono font-bold outline-none uppercase ${
-                    isEditing ? "bg-slate-100 border-slate-300 text-slate-600 cursor-not-allowed" : "bg-white border-slate-300 focus:border-[#002060]"
+                    isEditing
+                      ? "bg-slate-100 border-slate-300 text-slate-600 cursor-not-allowed"
+                      : "bg-white border-slate-300 focus:border-[#002060]"
                   }`}
                   required
                 />
                 <span className="text-[10px] text-slate-500 block mt-0.5 font-mono">
-                  Standard format: [LEVEL]-[CODE][GRADE]-T[TRIMESTER]
+                  Standard format: [LEVEL]-[STRAND]-[TITLE][GRADE]
                 </span>
               </div>
 
-              {/* Grade Level, Trimester & Classification */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Grade Level & Classification Type */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Grade Level */}
                 <div>
                   <label className="block font-bold text-slate-900 uppercase mb-1">
@@ -677,10 +852,10 @@ export default function CurriculumSubjectsConsole() {
                       if (g <= 10 && formStrand !== "Regular" && formStrand !== "SPS") {
                         setFormStrand("Regular");
                       } else if (g >= 11 && (formStrand === "Regular" || formStrand === "SPS")) {
-                        setFormStrand("General");
+                        setFormStrand("STEM");
                       }
                     }}
-                    className="w-full p-2 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   >
                     <option value={7}>Grade 7 (JHS)</option>
                     <option value={8}>Grade 8 (JHS)</option>
@@ -688,22 +863,6 @@ export default function CurriculumSubjectsConsole() {
                     <option value={10}>Grade 10 (JHS)</option>
                     <option value={11}>Grade 11 (SHS)</option>
                     <option value={12}>Grade 12 (SHS)</option>
-                  </select>
-                </div>
-
-                {/* Trimester */}
-                <div>
-                  <label className="block font-bold text-slate-900 uppercase mb-1">
-                    Trimester <span className="text-red-700">*</span>
-                  </label>
-                  <select
-                    value={formTrimester}
-                    onChange={(e) => setFormTrimester(Number(e.target.value))}
-                    className="w-full p-2 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value={1}>Trimester 1</option>
-                    <option value={2}>Trimester 2</option>
-                    <option value={3}>Trimester 3</option>
                   </select>
                 </div>
 
@@ -715,12 +874,12 @@ export default function CurriculumSubjectsConsole() {
                   <select
                     value={formType}
                     onChange={(e) => setFormType(e.target.value as any)}
-                    className="w-full p-2 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   >
                     <option value="Core">Core Subject</option>
+                    <option value="Specialized">Specialized Subject</option>
+                    <option value="Applied">Applied Subject</option>
                     <option value="Elective">Elective</option>
-                    <option value="Specialized">Specialized</option>
-                    <option value="Applied">Applied</option>
                     <option value="Intervention">Intervention (ARAL)</option>
                   </select>
                 </div>
@@ -735,7 +894,7 @@ export default function CurriculumSubjectsConsole() {
                   <select
                     value={formStrand}
                     onChange={(e) => setFormStrand(e.target.value)}
-                    className="w-full p-2 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   >
                     <option value="Regular">Regular Basic Education</option>
                     <option value="SPS">Special Program in Sports (General SPS)</option>
@@ -744,38 +903,39 @@ export default function CurriculumSubjectsConsole() {
                   <select
                     value={formStrand}
                     onChange={(e) => setFormStrand(e.target.value)}
-                    className="w-full p-2 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   >
-                    <option value="General">General (All SHS Tracks)</option>
                     <option value="STEM">Science, Technology, Engineering &amp; Math (STEM)</option>
-                    <option value="TVL-ICT">TVL - Information &amp; Communications Technology</option>
-                    <option value="HUMSS">Humanities and Social Sciences (HUMSS)</option>
-                    <option value="TVL-Agri-Fishery">TVL - Agri-Fishery Arts</option>
-                    <option value="TVL-HE">TVL - Home Economics</option>
+                    <option value="General">General (All SHS Tracks / Core)</option>
+                    <option value="TVL-ICT">TVL - Information &amp; Communications Tech (ICT)</option>
+                    <option value="HUMSS">Humanities &amp; Social Sciences (HUMSS)</option>
                     <option value="GAS">General Academic Strand (GAS)</option>
+                    <option value="ABM">Accountancy, Business &amp; Management (ABM)</option>
+                    <option value="TVL-Agri-Fishery">TVL - Agri-Fishery Arts</option>
                   </select>
                 )}
               </div>
 
-              {/* Description / Course Notes */}
+              {/* Description / Notes */}
               <div>
                 <label className="block font-bold text-slate-900 uppercase mb-1">
-                  Course Description / Curriculum Notes (Optional)
+                  Description / Prerequisites (Optional)
                 </label>
                 <textarea
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  rows={3}
-                  placeholder="Additional syllabus notes, prerequisites, or DepEd learning competencies..."
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium focus:border-[#002060] outline-none"
+                  rows={2}
+                  placeholder="Notes, course objectives, or learning area scope..."
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none font-sans"
                 />
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+              {/* Modal Actions */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
+                  disabled={isSaving}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
                   [ Cancel ]
@@ -783,9 +943,13 @@ export default function CurriculumSubjectsConsole() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer disabled:bg-slate-400"
+                  className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:bg-slate-400"
                 >
-                  {isSaving ? "Saving..." : isEditing ? "[ Update Subject ]" : "[ Save Subject Offering ]"}
+                  {isSaving
+                    ? "Saving..."
+                    : isEditing
+                    ? "[ Update Subject ]"
+                    : "[ Save Subject ]"}
                 </button>
               </div>
             </form>
@@ -793,7 +957,9 @@ export default function CurriculumSubjectsConsole() {
         </div>
       )}
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* ========================================================================= */}
+      {/* 4. CONFIRM DELETE MODAL */}
+      {/* ========================================================================= */}
       {deleteSubjectTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
           <div className="bg-white border-4 border-red-700 w-full max-w-md shadow-2xl p-6 space-y-4">
@@ -815,7 +981,8 @@ export default function CurriculumSubjectsConsole() {
                 {deleteSubjectTarget.subject_name}
               </div>
               <div className="text-[11px] text-slate-600">
-                Grade {deleteSubjectTarget.grade_level} &bull; Trimester {deleteSubjectTarget.trimester}
+                Grade {deleteSubjectTarget.grade_level}{" "}
+                {deleteSubjectTarget.strand ? `• ${deleteSubjectTarget.strand}` : ""}
               </div>
             </div>
 

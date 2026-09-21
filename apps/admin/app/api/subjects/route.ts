@@ -35,68 +35,68 @@ export interface CourseSubjectItem {
 // Standard fallback subjects in case database table is empty
 const DEFAULT_FALLBACK_SUBJECTS: CourseSubjectItem[] = [
   // Grade 7 JHS Core
-  { id: "sub-jhs-7-01", subject_code: "JHS-VAL7-T1", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-02", subject_code: "JHS-FIL7-T1", subject_name: "Filipino", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-03", subject_code: "JHS-ENG7-T1", subject_name: "English", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-04", subject_code: "JHS-SCI7-T1", subject_name: "Science", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-05", subject_code: "JHS-MTH7-T1", subject_name: "Mathematics", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-06", subject_code: "JHS-AP7-T1", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-07", subject_code: "JHS-TLE7-T1", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-08", subject_code: "JHS-MAP7-T1", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-09", subject_code: "JHS-SPS7-T1", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 7, trimester: 1, strand: "SPS" },
-  { id: "sub-jhs-7-10", subject_code: "JHS-ARAL7-T1", subject_name: "ARAL Program (Academic Recovery)", subject_type: "Intervention", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-01", subject_code: "JHS-VAL7", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-02", subject_code: "JHS-FIL7", subject_name: "Filipino", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-03", subject_code: "JHS-ENG7", subject_name: "English", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-04", subject_code: "JHS-SCI7", subject_name: "Science", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-05", subject_code: "JHS-MTH7", subject_name: "Mathematics", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-06", subject_code: "JHS-AP7", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-07", subject_code: "JHS-TLE7", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-08", subject_code: "JHS-MAP7", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-7-09", subject_code: "JHS-SPS7", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 7, trimester: 1, strand: "SPS" },
+  { id: "sub-jhs-7-10", subject_code: "JHS-ARAL7", subject_name: "ARAL Program (Academic Recovery)", subject_type: "Intervention", grade_level: 7, trimester: 1, strand: "Regular" },
 
   // Grade 8 JHS Core
-  { id: "sub-jhs-8-01", subject_code: "JHS-VAL8-T1", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-02", subject_code: "JHS-FIL8-T1", subject_name: "Filipino", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-03", subject_code: "JHS-ENG8-T1", subject_name: "English", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-04", subject_code: "JHS-SCI8-T1", subject_name: "Science", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-05", subject_code: "JHS-MTH8-T1", subject_name: "Mathematics", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-06", subject_code: "JHS-AP8-T1", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-07", subject_code: "JHS-TLE8-T1", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-08", subject_code: "JHS-MAP8-T1", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-09", subject_code: "JHS-SPS8-T1", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 8, trimester: 1, strand: "SPS" },
+  { id: "sub-jhs-8-01", subject_code: "JHS-VAL8", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-02", subject_code: "JHS-FIL8", subject_name: "Filipino", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-03", subject_code: "JHS-ENG8", subject_name: "English", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-04", subject_code: "JHS-SCI8", subject_name: "Science", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-05", subject_code: "JHS-MTH8", subject_name: "Mathematics", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-06", subject_code: "JHS-AP8", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-07", subject_code: "JHS-TLE8", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-08", subject_code: "JHS-MAP8", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-8-09", subject_code: "JHS-SPS8", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 8, trimester: 1, strand: "SPS" },
 
   // Grade 9 JHS Core
-  { id: "sub-jhs-9-01", subject_code: "JHS-VAL9-T1", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-02", subject_code: "JHS-FIL9-T1", subject_name: "Filipino", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-03", subject_code: "JHS-ENG9-T1", subject_name: "English", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-04", subject_code: "JHS-SCI9-T1", subject_name: "Science", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-05", subject_code: "JHS-MTH9-T1", subject_name: "Mathematics", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-06", subject_code: "JHS-AP9-T1", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-07", subject_code: "JHS-TLE9-T1", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-08", subject_code: "JHS-MAP9-T1", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-09", subject_code: "JHS-SPS9-T1", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 9, trimester: 1, strand: "SPS" },
+  { id: "sub-jhs-9-01", subject_code: "JHS-VAL9", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-02", subject_code: "JHS-FIL9", subject_name: "Filipino", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-03", subject_code: "JHS-ENG9", subject_name: "English", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-04", subject_code: "JHS-SCI9", subject_name: "Science", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-05", subject_code: "JHS-MTH9", subject_name: "Mathematics", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-06", subject_code: "JHS-AP9", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-07", subject_code: "JHS-TLE9", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-08", subject_code: "JHS-MAP9", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-9-09", subject_code: "JHS-SPS9", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 9, trimester: 1, strand: "SPS" },
 
   // Grade 10 JHS Core
-  { id: "sub-jhs-10-01", subject_code: "JHS-VAL10-T1", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-02", subject_code: "JHS-FIL10-T1", subject_name: "Filipino", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-03", subject_code: "JHS-ENG10-T1", subject_name: "English", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-04", subject_code: "JHS-SCI10-T1", subject_name: "Science", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-05", subject_code: "JHS-MTH10-T1", subject_name: "Mathematics", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-06", subject_code: "JHS-AP10-T1", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-07", subject_code: "JHS-TLE10-T1", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-08", subject_code: "JHS-MAP10-T1", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-09", subject_code: "JHS-SPS10-T1", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 10, trimester: 1, strand: "SPS" },
+  { id: "sub-jhs-10-01", subject_code: "JHS-VAL10", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-02", subject_code: "JHS-FIL10", subject_name: "Filipino", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-03", subject_code: "JHS-ENG10", subject_name: "English", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-04", subject_code: "JHS-SCI10", subject_name: "Science", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-05", subject_code: "JHS-MTH10", subject_name: "Mathematics", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-06", subject_code: "JHS-AP10", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-07", subject_code: "JHS-TLE10", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-08", subject_code: "JHS-MAP10", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
+  { id: "sub-jhs-10-09", subject_code: "JHS-SPS10", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 10, trimester: 1, strand: "SPS" },
 
   // Senior High School (Grades 11 & 12)
-  { id: "sub-shs-11-01", subject_code: "SHS-GMATH11-T1", subject_name: "General Mathematics", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
-  { id: "sub-shs-11-02", subject_code: "SHS-GSCI11-T1", subject_name: "General Science / Earth & Life", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
-  { id: "sub-shs-11-03", subject_code: "SHS-EFFCOM11-T1", subject_name: "Effective Communication", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
-  { id: "sub-shs-11-04", subject_code: "SHS-KASAY11-T1", subject_name: "Pag-aaral ng Kasaysayan at Lipunang Pilipino", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
-  { id: "sub-shs-11-05", subject_code: "SHS-LCSKILLS11-T1", subject_name: "Life & Career Skills", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
-  { id: "sub-shs-11-06", subject_code: "SHS-PRECALC11-T1", subject_name: "Pre-Calculus & STEM Principles", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "STEM" },
-  { id: "sub-shs-11-07", subject_code: "SHS-PROG11-T1", subject_name: "Introduction to Programming & Computing", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "TVL-ICT" },
-  { id: "sub-shs-11-08", subject_code: "SHS-JOURN11-T1", subject_name: "Creative Writing & Journalism", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "HUMSS" },
-  { id: "sub-shs-11-09", subject_code: "SHS-HUMMOV11-T1", subject_name: "Human Movement & Fitness 1", subject_type: "Elective", grade_level: 11, trimester: 1, strand: "General" },
-  { id: "sub-shs-11-10", subject_code: "SHS-AGRI11-T1", subject_name: "Agricultural Crop Production", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "TVL-Agri-Fishery" },
+  { id: "sub-shs-11-01", subject_code: "SHS-GMATH11", subject_name: "General Mathematics", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
+  { id: "sub-shs-11-02", subject_code: "SHS-GSCI11", subject_name: "General Science / Earth & Life", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
+  { id: "sub-shs-11-03", subject_code: "SHS-EFFCOM11", subject_name: "Effective Communication", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
+  { id: "sub-shs-11-04", subject_code: "SHS-KASAY11", subject_name: "Pag-aaral ng Kasaysayan at Lipunang Pilipino", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
+  { id: "sub-shs-11-05", subject_code: "SHS-LCSKILLS11", subject_name: "Life & Career Skills", subject_type: "Core", grade_level: 11, trimester: 1, strand: "General" },
+  { id: "sub-shs-11-06", subject_code: "SHS-STEM-PRECAL11", subject_name: "Pre-Calculus & STEM Principles", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "STEM" },
+  { id: "sub-shs-11-07", subject_code: "SHS-PROG11", subject_name: "Introduction to Programming & Computing", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "TVL-ICT" },
+  { id: "sub-shs-11-08", subject_code: "SHS-JOURN11", subject_name: "Creative Writing & Journalism", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "HUMSS" },
+  { id: "sub-shs-11-09", subject_code: "SHS-HUMMOV11", subject_name: "Human Movement & Fitness 1", subject_type: "Elective", grade_level: 11, trimester: 1, strand: "General" },
+  { id: "sub-shs-11-10", subject_code: "SHS-AGRI11", subject_name: "Agricultural Crop Production", subject_type: "Specialized", grade_level: 11, trimester: 1, strand: "TVL-Agri-Fishery" },
 
-  { id: "sub-shs-12-01", subject_code: "SHS-PRACRES12-T1", subject_name: "Practical Research 2", subject_type: "Applied", grade_level: 12, trimester: 1, strand: "General" },
-  { id: "sub-shs-12-02", subject_code: "SHS-BASICALC12-T1", subject_name: "Basic Calculus", subject_type: "Specialized", grade_level: 12, trimester: 1, strand: "STEM" },
-  { id: "sub-shs-12-03", subject_code: "SHS-WEBDEV12-T1", subject_name: "Advanced Web Technologies & Systems", subject_type: "Specialized", grade_level: 12, trimester: 1, strand: "TVL-ICT" },
-  { id: "sub-shs-12-04", subject_code: "SHS-POLITICS12-T1", subject_name: "Philippine Politics & Governance", subject_type: "Specialized", grade_level: 12, trimester: 1, strand: "HUMSS" },
-  { id: "sub-shs-12-05", subject_code: "SHS-ENTREP12-T1", subject_name: "Entrepreneurship", subject_type: "Applied", grade_level: 12, trimester: 1, strand: "General" },
-  { id: "sub-shs-12-06", subject_code: "SHS-ROBOT12-T1", subject_name: "Applied Robotics & Embedded Systems", subject_type: "Elective", grade_level: 12, trimester: 1, strand: "STEM" },
+  { id: "sub-shs-12-01", subject_code: "SHS-PRACRES12", subject_name: "Practical Research 2", subject_type: "Applied", grade_level: 12, trimester: 1, strand: "General" },
+  { id: "sub-shs-12-02", subject_code: "SHS-STEM-CALC12", subject_name: "Basic Calculus", subject_type: "Specialized", grade_level: 12, trimester: 1, strand: "STEM" },
+  { id: "sub-shs-12-03", subject_code: "SHS-WEBDEV12", subject_name: "Advanced Web Technologies & Systems", subject_type: "Specialized", grade_level: 12, trimester: 1, strand: "TVL-ICT" },
+  { id: "sub-shs-12-04", subject_code: "SHS-POLITICS12", subject_name: "Philippine Politics & Governance", subject_type: "Specialized", grade_level: 12, trimester: 1, strand: "HUMSS" },
+  { id: "sub-shs-12-05", subject_code: "SHS-ENTREP12", subject_name: "Entrepreneurship", subject_type: "Applied", grade_level: 12, trimester: 1, strand: "General" },
+  { id: "sub-shs-12-06", subject_code: "SHS-STEM-ROBOT12", subject_name: "Applied Robotics & Embedded Systems", subject_type: "Elective", grade_level: 12, trimester: 1, strand: "STEM" },
 ];
 
 function normalizeSubject(row: any): CourseSubjectItem {
@@ -234,17 +234,17 @@ export async function POST(req: Request) {
       description,
     } = body;
 
-    if (!subject_code || !subject_name || !subject_type || !grade_level || !trimester) {
+    if (!subject_code || !subject_name || !subject_type || !grade_level) {
       return NextResponse.json({
         success: false,
-        error: "Missing required fields: subject_code, subject_name, subject_type, grade_level, trimester",
+        error: "Missing required fields: subject_code, subject_name, subject_type, grade_level",
       }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
     const cleanCode = String(subject_code).trim().toUpperCase();
     const cleanName = String(subject_name).trim();
     const numGrade = Number(grade_level);
-    const numTri = Number(trimester);
+    const numTri = trimester ? Number(trimester) : 1;
 
     if (numGrade < 7 || numGrade > 12) {
       return NextResponse.json({
@@ -368,7 +368,7 @@ export async function PUT(req: Request) {
     const cleanCode = String(subject_code).trim().toUpperCase();
     const cleanName = String(subject_name).trim();
     const numGrade = Number(grade_level);
-    const numTri = Number(trimester);
+    const numTri = trimester !== undefined && trimester !== null ? Number(trimester) : 1;
 
     const updatedSubject: CourseSubjectItem = {
       id: id || `subj-${cleanCode}`,
