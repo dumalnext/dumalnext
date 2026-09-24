@@ -823,6 +823,8 @@ export default function EnrollmentStepper({
         {currentStep === 4 && (
           <Step4CurriculumModality
             data={formData}
+            schoolYear={schoolYear}
+            semester={semester}
             onChange={handleFormDataChange}
             onNext={nextStep}
             onBack={prevStep}

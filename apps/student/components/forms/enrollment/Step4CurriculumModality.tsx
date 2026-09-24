@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
+import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import {
   JHS_PROGRAMS,
   SPS_SPORTS,
@@ -26,6 +27,8 @@ interface Step4CurriculumModalityProps {
   onChange: (fields: Partial<FullEnrollmentFormData>) => void;
   onNext: () => void;
   onBack: () => void;
+  schoolYear?: string;
+  semester?: string;
 }
 
 export default function Step4CurriculumModality({
@@ -33,8 +36,45 @@ export default function Step4CurriculumModality({
   onChange,
   onNext,
   onBack,
+  schoolYear,
+  semester,
 }: Step4CurriculumModalityProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Real-time synchronization with IT-Support Registered Academic Terms
+  const { semester: controlSemester, schoolYear: controlSchoolYear, activeTerm } = useEnrollmentControl();
+
+  const activeSemester =
+    semester ||
+    controlSemester ||
+    activeTerm?.termName ||
+    data.targetSemester ||
+    data.semester ||
+    data.step1.targetSemester ||
+    "Trimester 1";
+
+  const activeSchoolYear =
+    schoolYear ||
+    controlSchoolYear ||
+    activeTerm?.schoolYear ||
+    data.schoolYear ||
+    "2026–2027";
+
+  const currentSemester = activeSemester;
+
+  // Auto-sync form state to active semester managed by IT-support
+  useEffect(() => {
+    if (activeSemester && (data.targetSemester !== activeSemester || data.step1?.targetSemester !== activeSemester)) {
+      onChange({
+        targetSemester: activeSemester,
+        semester: activeSemester,
+        step1: {
+          ...data.step1,
+          targetSemester: activeSemester,
+        },
+      });
+    }
+  }, [activeSemester]);
 
   // Detection: Check if learner belongs to Junior High School (Grade 7 - 10) or Senior High School (Grade 11 - 12)
   const isJHS =
@@ -47,7 +87,6 @@ export default function Step4CurriculumModality({
   // Current values with fallbacks
   const currentJhsProgram = data.jhsProgram || data.step1.jhsProgram || "Regular";
   const currentSpsSport = data.spsSport || "";
-  const currentSemester = data.targetSemester || data.step1.targetSemester || "Trimester 1";
 
   // Track normalization
   const rawTrack = data.targetTrack || data.step1.targetTrack || "Academic Track";
@@ -410,45 +449,28 @@ export default function Step4CurriculumModality({
               </span>
             </div>
 
-            {/* Semester Selector */}
+            {/* Auto-Synced Official Academic Term from IT-Support */}
             <div className="max-w-md">
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Semester / Trimester of Enrollment <span className="text-red-700">*</span>
+                Semester / Trimester of Enrollment
               </label>
-              <select
-                value={currentSemester}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  onChange({
-                    targetSemester: val,
-                    semester: val,
-                    step1: { ...data.step1, targetSemester: val },
-                  });
-                  if (errors.targetSemester) {
-                    setErrors((prev) => {
-                      const next = { ...prev };
-                      delete next.targetSemester;
-                      return next;
-                    });
-                  }
-                }}
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                  errors.targetSemester ? "border-red-600 bg-red-50" : "border-slate-300"
-                }`}
-              >
-                <option value="Trimester 1">Trimester 1 (August - November)</option>
-                <option value="Trimester 2">Trimester 2 (November - March)</option>
-                <option value="Trimester 3">Trimester 3 (March - June)</option>
-                <option value="1st Semester">1st Semester (August - December)</option>
-                <option value="2nd Semester">2nd Semester (January - May)</option>
-                {currentSemester &&
-                  !["Trimester 1", "Trimester 2", "Trimester 3", "1st Semester", "2nd Semester"].includes(currentSemester) && (
-                    <option value={currentSemester}>{currentSemester}</option>
-                  )}
-              </select>
-              {errors.targetSemester && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetSemester}</p>
-              )}
+              <div className="p-3.5 bg-white border-2 border-[#002060] flex items-center justify-between shadow-xs">
+                <div className="space-y-0.5">
+                  <div className="text-sm font-mono font-bold text-[#002060] uppercase">
+                    {activeSemester}
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-600">
+                    School Year {activeSchoolYear}
+                    {activeTerm?.startDate && activeTerm?.endDate ? ` (${activeTerm.startDate} to ${activeTerm.endDate})` : ""}
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 border border-emerald-400 px-2.5 py-1 uppercase tracking-wider shrink-0">
+                  AUTO-SYNCED (ACTIVE)
+                </span>
+              </div>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                [ Centrally managed and synchronized with IT-Support Registered Academic Terms ]
+              </p>
             </div>
 
             {/* 2-Track Selection Cards */}

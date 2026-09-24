@@ -12,6 +12,8 @@ export interface EnrollmentControlSettings {
     schoolYear: string;
     termName: string;
     termNumber: number;
+    startDate?: string | null;
+    endDate?: string | null;
   };
   enrollmentStartDate?: string;
   enrollmentEndDate?: string;

@@ -48,13 +48,13 @@ const NO_CACHE_HEADERS = {
 
 export async function GET() {
   const supabase = getSupabaseClient();
-  let activeTerm: { schoolYear: string; termName: string; termNumber: number } | null = null;
+  let activeTerm: { schoolYear: string; termName: string; termNumber: number; startDate?: string | null; endDate?: string | null } | null = null;
 
   if (supabase) {
     try {
       const { data: termData } = await supabase
         .from("academic_terms")
-        .select("schoolYear, termName, termNumber, isActive")
+        .select("schoolYear, termName, termNumber, isActive, startDate, endDate")
         .eq("isActive", true)
         .maybeSingle();
       if (termData?.schoolYear) {
@@ -62,6 +62,8 @@ export async function GET() {
           schoolYear: termData.schoolYear,
           termName: termData.termName || `Trimester ${termData.termNumber || 1}`,
           termNumber: Number(termData.termNumber) || 1,
+          startDate: termData.startDate || null,
+          endDate: termData.endDate || null,
         };
       }
     } catch (tErr) {
