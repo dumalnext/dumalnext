@@ -81,6 +81,9 @@ export interface FullEnrollmentFormData {
   targetSemester: string;
   targetTrack: string;
   targetStrand: string;
+  careerPathway?: string;
+  primaryCluster?: string;
+  doorwayElectives?: string[];
   selectedElectives: string[];
   preferredModalities: string[];
 
@@ -99,6 +102,9 @@ export interface FullEnrollmentFormData {
 const initialFormData: FullEnrollmentFormData = {
   schoolYear: "2026-2027",
   semester: "Trimester 1",
+  careerPathway: "",
+  primaryCluster: "",
+  doorwayElectives: [],
   step1: {
     isGraded: true,
     applicantType: "",

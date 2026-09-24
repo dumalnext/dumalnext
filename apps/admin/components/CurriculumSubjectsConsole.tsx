@@ -564,12 +564,14 @@ export default function CurriculumSubjectsConsole() {
               onChange={(e) => setStrandFilter(e.target.value)}
               className="px-3 py-2 bg-white border border-slate-300 text-xs font-bold focus:border-[#002060] outline-none w-full sm:w-auto"
             >
-              <option value="ALL">All Programs / Strands</option>
+              <option value="ALL">All Programs / Tracks</option>
+              <option value="Academic">Academic Track (Strengthened SHS)</option>
+              <option value="TechPro">Technical-Professional (TechPro) Track</option>
               <option value="Regular">Regular Basic Education (JHS)</option>
               <option value="SPS">Special Program in Sports (SPS)</option>
-              <option value="STEM">STEM Track (SHS)</option>
-              <option value="TVL-ICT">TVL-ICT Track (SHS)</option>
-              <option value="HUMSS">HUMSS Track (SHS)</option>
+              <option value="STEM">STEM Track (Legacy SHS)</option>
+              <option value="TVL-ICT">TVL-ICT Track (Legacy SHS)</option>
+              <option value="HUMSS">HUMSS Track (Legacy SHS)</option>
               <option value="General">General / Core (SHS)</option>
             </select>
           </div>
@@ -905,8 +907,10 @@ export default function CurriculumSubjectsConsole() {
                     onChange={(e) => setFormStrand(e.target.value)}
                     className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   >
-                    <option value="STEM">Science, Technology, Engineering &amp; Math (STEM)</option>
+                    <option value="Academic">Academic Track (Strengthened SHS)</option>
+                    <option value="TechPro">Technical-Professional Track (TechPro)</option>
                     <option value="General">General (All SHS Tracks / Core)</option>
+                    <option value="STEM">Science, Technology, Engineering &amp; Math (STEM)</option>
                     <option value="TVL-ICT">TVL - Information &amp; Communications Tech (ICT)</option>
                     <option value="HUMSS">Humanities &amp; Social Sciences (HUMSS)</option>
                     <option value="GAS">General Academic Strand (GAS)</option>

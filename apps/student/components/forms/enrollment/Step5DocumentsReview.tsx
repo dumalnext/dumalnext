@@ -1136,6 +1136,18 @@ export default function Step5DocumentsReview({
                     : `${data.targetTrack} - ${data.targetStrand} (${data.targetSemester})`}
                 </span>
               </div>
+              {data.careerPathway && (
+                <div className="col-span-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Career Pathway Specialization</span>
+                  <span className="font-bold text-slate-900">{data.careerPathway}</span>
+                </div>
+              )}
+              {data.doorwayElectives && data.doorwayElectives.length > 0 && (
+                <div className="col-span-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Doorway Cross-Track Electives</span>
+                  <span className="font-bold text-blue-900">{data.doorwayElectives.join(", ")}</span>
+                </div>
+              )}
               <div className="col-span-2">
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">Last School Attended</span>
                 <span className="font-bold text-slate-900 uppercase">
