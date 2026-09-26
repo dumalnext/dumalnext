@@ -237,7 +237,7 @@ export default function EnrollmentStepper({
         lastName: prev.lastName || user.lastName,
         firstName: prev.firstName || user.firstName,
         middleName: prev.middleName || user.middleName || "",
-        lrn: prev.lrn || (user.lrn && /^\d{12}$/.test(user.lrn) ? user.lrn : ""),
+        lrn: prev.lrn || "",
       }));
     } else if (schoolYear || semester) {
       setFormData((prev) => ({
@@ -316,11 +316,7 @@ export default function EnrollmentStepper({
 
               setFormData((prev) => ({
                 ...prev,
-                lrn: (studentRecord?.student_id && /^\d{12}$/.test(studentRecord.student_id))
-                  ? studentRecord.student_id
-                  : (user.lrn && /^\d{12}$/.test(user.lrn))
-                  ? user.lrn
-                  : (prev.lrn || ""),
+                lrn: prev.lrn || "",
                 lastName: studentRecord?.last_name || user.lastName || prev.lastName,
                 firstName: studentRecord?.first_name || user.firstName || prev.firstName,
                 middleName: studentRecord?.middle_name || user.middleName || prev.middleName,
