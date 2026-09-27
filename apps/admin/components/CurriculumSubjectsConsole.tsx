@@ -29,6 +29,7 @@ export default function CurriculumSubjectsConsole() {
   const [modalLockedTrack, setModalLockedTrack] = useState<{
     track: "Academic" | "TechPro";
     category: "Core" | "Elective";
+    grade?: number;
   } | null>(null);
 
   // Delete State
@@ -125,7 +126,8 @@ export default function CurriculumSubjectsConsole() {
       .replace(/[^A-Z0-9]/g, "")
       .slice(0, 7);
     const codeTag = cleaned || "SUBJ";
-    const generated = `${prefix}-${strandTag}${codeTag}${formGrade}`;
+    const targetGrade = modalLockedTrack?.grade || formGrade;
+    const generated = `${prefix}-${strandTag}${codeTag}${targetGrade}`;
     setFormCode(generated);
   };
 
@@ -134,7 +136,7 @@ export default function CurriculumSubjectsConsole() {
     prefillGrade?: number,
     prefillStrand?: string,
     prefillType?: CourseSubjectItem["subject_type"],
-    lockedTrack?: { track: "Academic" | "TechPro"; category: "Core" | "Elective" } | null
+    lockedTrack?: { track: "Academic" | "TechPro"; category: "Core" | "Elective"; grade?: number } | null
   ) => {
     setIsEditing(false);
     setEditingId("");
@@ -144,7 +146,9 @@ export default function CurriculumSubjectsConsole() {
     setFormGrade(g);
 
     if (lockedTrack) {
-      setModalLockedTrack(lockedTrack);
+      const targetGrade = lockedTrack.grade || g;
+      setModalLockedTrack({ ...lockedTrack, grade: targetGrade });
+      setFormGrade(targetGrade);
       setFormType(
         lockedTrack.category === "Core"
           ? "Core"
@@ -209,7 +213,7 @@ export default function CurriculumSubjectsConsole() {
     try {
       const endpoint = "/api/subjects";
       const method = isEditing ? "PUT" : "POST";
-      const finalGrade = modalLockedTrack ? 11 : formGrade;
+      const finalGrade = modalLockedTrack ? (modalLockedTrack.grade || formGrade) : formGrade;
       const finalType = modalLockedTrack
         ? modalLockedTrack.category === "Core"
           ? "Core"
@@ -336,8 +340,23 @@ export default function CurriculumSubjectsConsole() {
     (s) => s.grade_level === 11 && s.subject_type !== "Core" && isTechProSubject(s)
   );
 
-  // Grade 12 Sub-heading
-  const shsGrade12 = filteredSubjects.filter((s) => s.grade_level === 12);
+  // Groupings for SHS Grade 12 (Separated into Academic & TechPro, each with Core and Elective)
+  const shsGrade12AcademicCore = filteredSubjects.filter(
+    (s) => s.grade_level === 12 && s.subject_type === "Core" && !isTechProSubject(s)
+  );
+  const shsGrade12AcademicElectives = filteredSubjects.filter(
+    (s) => s.grade_level === 12 && s.subject_type !== "Core" && !isTechProSubject(s)
+  );
+
+  const shsGrade12TechproCore = filteredSubjects.filter(
+    (s) =>
+      s.grade_level === 12 &&
+      s.subject_type === "Core" &&
+      (isTechProSubject(s) || s.strand === "General" || !s.strand)
+  );
+  const shsGrade12TechproElectives = filteredSubjects.filter(
+    (s) => s.grade_level === 12 && s.subject_type !== "Core" && isTechProSubject(s)
+  );
 
   // Helper to render the actual HTML table of subjects
   const renderSubjectRowsTable = (
@@ -518,12 +537,13 @@ export default function CurriculumSubjectsConsole() {
     );
   };
 
-  // Helper to render Grade 11 with 2 separated sections in one single box: Core Subjects and Elective Part
+  // Helper to render Grade 11 / Grade 12 with 2 separated sections in one single box: Core Subjects and Elective Part
   const renderSeparatedTrackBox = (
     subHeadingTitle: string,
     coreSubjects: CourseSubjectItem[],
     electiveSubjects: CourseSubjectItem[],
-    trackStrand: "Academic" | "TechPro"
+    trackStrand: "Academic" | "TechPro",
+    gradeLevel: number = 11
   ) => {
     const totalCount = coreSubjects.length + electiveSubjects.length;
     const defaultElectiveType = trackStrand === "TechPro" ? "Specialized" : "Elective";
@@ -548,9 +568,10 @@ export default function CurriculumSubjectsConsole() {
             <button
               type="button"
               onClick={() =>
-                handleOpenCreateModal(11, trackStrand, "Core", {
+                handleOpenCreateModal(gradeLevel, trackStrand, "Core", {
                   track: trackStrand,
                   category: "Core",
+                  grade: gradeLevel,
                 })
               }
               className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
@@ -560,9 +581,10 @@ export default function CurriculumSubjectsConsole() {
             <button
               type="button"
               onClick={() =>
-                handleOpenCreateModal(11, trackStrand, defaultElectiveType, {
+                handleOpenCreateModal(gradeLevel, trackStrand, defaultElectiveType, {
                   track: trackStrand,
                   category: "Elective",
+                  grade: gradeLevel,
                 })
               }
               className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
@@ -586,9 +608,10 @@ export default function CurriculumSubjectsConsole() {
             <button
               type="button"
               onClick={() =>
-                handleOpenCreateModal(11, trackStrand, "Core", {
+                handleOpenCreateModal(gradeLevel, trackStrand, "Core", {
                   track: trackStrand,
                   category: "Core",
+                  grade: gradeLevel,
                 })
               }
               className="text-[11px] font-mono font-bold text-[#002060] hover:underline uppercase cursor-pointer"
@@ -599,11 +622,12 @@ export default function CurriculumSubjectsConsole() {
 
           {renderSubjectRowsTable(
             coreSubjects,
-            `NO CORE SUBJECTS ON RECORD FOR GRADE 11 ${trackStrand.toUpperCase()}`,
+            `NO CORE SUBJECTS ON RECORD FOR GRADE ${gradeLevel} ${trackStrand.toUpperCase()}`,
             () =>
-              handleOpenCreateModal(11, trackStrand, "Core", {
+              handleOpenCreateModal(gradeLevel, trackStrand, "Core", {
                 track: trackStrand,
                 category: "Core",
+                grade: gradeLevel,
               }),
             "[ + Add Core Subject ]"
           )}
@@ -623,9 +647,10 @@ export default function CurriculumSubjectsConsole() {
             <button
               type="button"
               onClick={() =>
-                handleOpenCreateModal(11, trackStrand, defaultElectiveType, {
+                handleOpenCreateModal(gradeLevel, trackStrand, defaultElectiveType, {
                   track: trackStrand,
                   category: "Elective",
+                  grade: gradeLevel,
                 })
               }
               className="text-[11px] font-mono font-bold text-purple-900 hover:underline uppercase cursor-pointer"
@@ -636,11 +661,12 @@ export default function CurriculumSubjectsConsole() {
 
           {renderSubjectRowsTable(
             electiveSubjects,
-            `NO ELECTIVE / SPECIALIZED SUBJECTS ON RECORD FOR GRADE 11 ${trackStrand.toUpperCase()}`,
+            `NO ELECTIVE / SPECIALIZED SUBJECTS ON RECORD FOR GRADE ${gradeLevel} ${trackStrand.toUpperCase()}`,
             () =>
-              handleOpenCreateModal(11, trackStrand, defaultElectiveType, {
+              handleOpenCreateModal(gradeLevel, trackStrand, defaultElectiveType, {
                 track: trackStrand,
                 category: "Elective",
+                grade: gradeLevel,
               }),
             "[ + Add Elective Subject ]"
           )}
@@ -967,13 +993,14 @@ export default function CurriculumSubjectsConsole() {
           </div>
 
           {/* SHS Sub-Headings Stack */}
-          <div className="p-4 sm:p-6 space-y-2">
+          <div className="p-4 sm:p-6 space-y-4">
             {/* Grade 11 Academic (Sub Headings) */}
             {renderSeparatedTrackBox(
               "Grade 11 Academic (Sub Headings)",
               shsGrade11AcademicCore,
               shsGrade11AcademicElectives,
-              "Academic"
+              "Academic",
+              11
             )}
 
             {/* Grade 11 Techpro (Sub Headings) */}
@@ -981,16 +1008,26 @@ export default function CurriculumSubjectsConsole() {
               "Grade 11 Techpro (Sub Headings)",
               shsGrade11TechproCore,
               shsGrade11TechproElectives,
-              "TechPro"
+              "TechPro",
+              11
             )}
 
-            {/* Grade 12 (Sub Headings) */}
-            {renderSubjectTable(
-              shsGrade12,
-              12,
-              "Grade 12 (Sub Headings)",
+            {/* Grade 12 Academic (Sub Headings) */}
+            {renderSeparatedTrackBox(
+              "Grade 12 Academic (Sub Headings)",
+              shsGrade12AcademicCore,
+              shsGrade12AcademicElectives,
               "Academic",
-              "[ + Add Grade 12 Subject ]"
+              12
+            )}
+
+            {/* Grade 12 Techpro (Sub Headings) */}
+            {renderSeparatedTrackBox(
+              "Grade 12 Techpro (Sub Headings)",
+              shsGrade12TechproCore,
+              shsGrade12TechproElectives,
+              "TechPro",
+              12
             )}
           </div>
         </section>
@@ -1012,7 +1049,7 @@ export default function CurriculumSubjectsConsole() {
                   {isEditing
                     ? "Edit Subject"
                     : modalLockedTrack
-                    ? `Add Grade 11 ${modalLockedTrack.track} ${
+                    ? `Add Grade ${modalLockedTrack.grade || formGrade} ${modalLockedTrack.track} ${
                         modalLockedTrack.category === "Core" ? "Core Subject" : "Elective Subject"
                       }`
                     : "Add New Subject"}
@@ -1032,7 +1069,7 @@ export default function CurriculumSubjectsConsole() {
               <div className="bg-blue-50 border-b-2 border-blue-200 px-6 py-2.5 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-[#002060] uppercase">
-                    [ Track Mode: Grade 11 {modalLockedTrack.track.toUpperCase()} ]
+                    [ Track Mode: Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track.toUpperCase()} ]
                   </span>
                   <span className="text-slate-600 font-bold uppercase">
                     • {modalLockedTrack.category === "Core" ? "Core Subject" : "Elective / Specialized"}
@@ -1066,7 +1103,7 @@ export default function CurriculumSubjectsConsole() {
                       ? "e.g., General Mathematics, Effective Communication, General Science"
                       : modalLockedTrack?.track === "Academic"
                       ? "e.g., Introduction to Philosophy, Creative Writing, Philippine Politics"
-                      : "e.g., Computer Systems Servicing, Electrical Installation Maintenance"
+                      : "e.g., Computer Systems Servicing, Work Immersion, Electrical Installation Maintenance"
                   }
                   className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   required
@@ -1095,11 +1132,11 @@ export default function CurriculumSubjectsConsole() {
                     modalLockedTrack
                       ? modalLockedTrack.track === "Academic"
                         ? modalLockedTrack.category === "Core"
-                          ? "e.g., SHS-ACAD-CORE-MATH11"
-                          : "e.g., SHS-ACAD-ELEC-PHIL11"
+                          ? `e.g., SHS-ACAD-CORE-MATH${modalLockedTrack.grade || formGrade}`
+                          : `e.g., SHS-ACAD-ELEC-PHIL${modalLockedTrack.grade || formGrade}`
                         : modalLockedTrack.category === "Core"
-                        ? "e.g., SHS-TECH-CORE-MATH11"
-                        : "e.g., SHS-TECH-ELEC-CSS11"
+                        ? `e.g., SHS-TECH-CORE-MATH${modalLockedTrack.grade || formGrade}`
+                        : `e.g., SHS-TECH-ELEC-CSS${modalLockedTrack.grade || formGrade}`
                       : "e.g., JHS-MATH7, SHS-STEM-PRECAL11"
                   }
                   disabled={isEditing}
@@ -1124,7 +1161,9 @@ export default function CurriculumSubjectsConsole() {
                   </label>
                   {modalLockedTrack ? (
                     <div className="w-full p-2.5 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-800 flex items-center justify-between">
-                      <span className="font-mono text-slate-900">Grade 11 (SHS)</span>
+                      <span className="font-mono text-slate-900">
+                        Grade {modalLockedTrack.grade || formGrade} (SHS)
+                      </span>
                       <span className="text-[10px] font-mono uppercase bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-300 font-bold">
                         [ Locked ]
                       </span>
@@ -1211,7 +1250,7 @@ export default function CurriculumSubjectsConsole() {
                           : "Technical-Professional Track (TechPro)"}
                       </span>
                       <span className="text-[10px] font-mono text-slate-600 font-normal block mt-0.5">
-                        Automatic designation for Grade 11 {modalLockedTrack.track}
+                        Automatic designation for Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track}
                       </span>
                     </div>
                     <span className="text-[10px] font-mono uppercase bg-amber-400 text-slate-950 px-2 py-0.5 font-bold border border-amber-600">
