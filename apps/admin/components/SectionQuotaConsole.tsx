@@ -3,14 +3,60 @@
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const SHS_STRANDS = [
-  { code: "STEM", name: "Science, Technology, Engineering, and Mathematics", track: "Academic Track" },
-  { code: "HUMSS", name: "Humanities and Social Sciences", track: "Academic Track" },
-  { code: "ABM", name: "Accountancy, Business, and Management", track: "Academic Track" },
-  { code: "TVL-ICT", name: "Information and Communications Technology", track: "TVL Track" },
-  { code: "TVL-HE", name: "Home Economics", track: "TVL Track" },
-  { code: "TVL-AFA", name: "Agri-Fishery Arts", track: "TVL Track" },
+export const SHS_TRACKS = [
+  { code: "Academic", name: "Academic Track" },
+  { code: "TechPro", name: "Technical-Professional Track (TechPro)" },
 ];
+
+export function extractBaseSectionName(rawName: string, gradeLevel: number, strandOrTrack?: string | null): string {
+  if (!rawName) return "";
+  let base = rawName.trim();
+
+  // Strip prefixes like "Grade 7 - ", "Grade 11 Academic - ", "GRADE 11 - HUMSS ", "Grade 11 - "
+  base = base.replace(/^(Grade|Gr\.?)\s*\d+\s*(Academic|TechPro|TVL|STEM|HUMSS|ABM|GAS)?\s*[-–:]*\s*/i, "");
+
+  // Strip old strand codes if present at start
+  base = base.replace(/^(Academic|TechPro|TVL-ICT|TVL-HE|TVL-AFA|TVL|STEM|HUMSS|ABM|GAS)\s*[-–:]*\s*/i, "");
+
+  if (strandOrTrack) {
+    const trackPattern = new RegExp(`^${strandOrTrack}\\s*[-–:]*\\s*`, "i");
+    base = base.replace(trackPattern, "");
+  }
+
+  return base.trim();
+}
+
+export function formatSectionFullName(grade: number, rawInput: string, track?: string | null): string {
+  if (!rawInput || !rawInput.trim()) return "";
+  const trimmed = rawInput.trim();
+
+  let base = trimmed;
+  // If user entered Grade prefix, clean it out so we have the pure base name
+  if (/^(Grade|Gr\.?)\s*\d+/i.test(trimmed)) {
+    base = extractBaseSectionName(trimmed, grade, track);
+    if (!base) {
+      base = trimmed.replace(/^(Grade|Gr\.?)\s*\d+\s*[-–:]*\s*/i, "").trim();
+    }
+  } else if (track) {
+    const trackPattern = new RegExp(`^${track}\\s*[-–:]*\\s*`, "i");
+    base = base.replace(trackPattern, "").trim();
+  }
+
+  // Proper title casing if all lowercase (e.g. "rizal" -> "Rizal")
+  if (base && base === base.toLowerCase()) {
+    base = base
+      .split(" ")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  if (grade >= 11) {
+    const cleanTrack = track === "TechPro" ? "TechPro" : "Academic";
+    return base ? `Grade ${grade} ${cleanTrack} - ${base}` : `Grade ${grade} ${cleanTrack}`;
+  }
+
+  return base ? `Grade ${grade} - ${base}` : `Grade ${grade}`;
+}
 
 export interface SectionDetail {
   id: string;
@@ -116,7 +162,7 @@ export default function SectionQuotaConsole() {
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [newSectionName, setNewSectionName] = useState<string>("");
   const [newGradeLevel, setNewGradeLevel] = useState<number>(7);
-  const [newStrand, setNewStrand] = useState<string>("");
+  const [newStrand, setNewStrand] = useState<string>("Academic");
   const [newCapacity, setNewCapacity] = useState<number>(40);
   const [newRoom, setNewRoom] = useState<string>("");
   const [newAdviser, setNewAdviser] = useState<string>("");
@@ -126,10 +172,11 @@ export default function SectionQuotaConsole() {
   // Edit Section Modal State
   const [editingSection, setEditingSection] = useState<SectionDetail | null>(null);
   const [editSectionName, setEditSectionName] = useState<string>("");
+  const [editGradeLevel, setEditGradeLevel] = useState<number>(7);
   const [editCapacity, setEditCapacity] = useState<number>(40);
   const [editRoom, setEditRoom] = useState<string>("");
   const [editAdviser, setEditAdviser] = useState<string>("");
-  const [editStrand, setEditStrand] = useState<string>("");
+  const [editStrand, setEditStrand] = useState<string>("Academic");
   const [autoTransferAdviser, setAutoTransferAdviser] = useState<boolean>(false);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
   const [editError, setEditError] = useState<string>("");
@@ -596,18 +643,38 @@ export default function SectionQuotaConsole() {
   const totalAvailable = Math.max(0, totalCapacity - totalEnrolled);
   const overallPct = totalCapacity > 0 ? Math.round((totalEnrolled / totalCapacity) * 100) : 0;
 
-  // Handle Add Section
+
+  // Open Add Section Modal
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
+    setAddError("");
+    const initialGrade = gradeFilter !== "ALL" ? Number(gradeFilter) : 7;
+    setNewGradeLevel(initialGrade);
+    setNewStrand(initialGrade >= 11 ? "Academic" : "Academic");
+    setNewSectionName("");
+    setNewCapacity(40);
+    setNewRoom("");
+    setNewAdviser("");
+  };
+
+  // Handle Add Section Submit
   const handleAddSection = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError("");
 
-    if (!newSectionName.trim()) {
-      setAddError("Please enter a valid Section Name (e.g. Grade 7 - Bonifacio).");
+    const fullSectionName = formatSectionFullName(
+      newGradeLevel,
+      newSectionName,
+      newGradeLevel >= 11 ? (newStrand || "Academic") : null
+    );
+
+    if (!fullSectionName.trim()) {
+      setAddError("Section name cannot be empty. Please enter a section name (e.g. Rizal, A).");
       return;
     }
 
     if (newCapacity <= 0 || isNaN(newCapacity)) {
-      setAddError("Please enter a valid maximum capacity (e.g. 40).");
+      setAddError("Please enter a valid section capacity (minimum 1 seat).");
       return;
     }
 
@@ -629,9 +696,9 @@ export default function SectionQuotaConsole() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          section_name: newSectionName.trim(),
+          section_name: fullSectionName,
           grade_level: newGradeLevel,
-          strand: newGradeLevel >= 11 ? newStrand || null : null,
+          strand: newGradeLevel >= 11 ? (newStrand || "Academic") : null,
           capacity: newCapacity,
           room: newRoom.trim() || null,
           adviser_name: newAdviser.trim() || null,
@@ -646,13 +713,13 @@ export default function SectionQuotaConsole() {
 
       setStatusNotice({
         type: "success",
-        text: `Section [ ${newSectionName.trim()} ] has been successfully created with a capacity of ${newCapacity} students.`,
+        text: `Section [ ${fullSectionName} ] has been successfully created with a capacity of ${newCapacity} students.`,
       });
 
       // Reset form
       setNewSectionName("");
       setNewGradeLevel(7);
-      setNewStrand("");
+      setNewStrand("Academic");
       setNewCapacity(40);
       setNewRoom("");
       setNewAdviser("");
@@ -673,14 +740,29 @@ export default function SectionQuotaConsole() {
   // Open Edit Section Modal
   const openEditModal = (sec: SectionDetail) => {
     setEditingSection(sec);
-    setEditSectionName(sec.section_name);
+    const initialGrade = sec.grade_level || 7;
+    setEditGradeLevel(initialGrade);
+
+    let initialTrack = "Academic";
+    if (sec.strand) {
+      const upper = sec.strand.toUpperCase();
+      if (upper.includes("TECH") || upper.includes("TVL")) {
+        initialTrack = "TechPro";
+      } else {
+        initialTrack = "Academic";
+      }
+    }
+    setEditStrand(initialTrack);
+
+    const extracted = extractBaseSectionName(sec.section_name, initialGrade, sec.strand);
+    setEditSectionName(extracted || sec.section_name);
+
     const initialRoom = normalizeRoomValue(sec.room || "");
     setEditRoom(initialRoom);
     const matchedClassroom = findClassroomDetails(initialRoom);
     const syncedCapacity = matchedClassroom ? matchedClassroom.capacity : (sec.capacity || 40);
     setEditCapacity(syncedCapacity);
     setEditAdviser(sec.adviser_name || "");
-    setEditStrand(sec.strand || "");
     setEditError("");
     setAutoTransferAdviser(false);
   };
@@ -691,8 +773,14 @@ export default function SectionQuotaConsole() {
     if (!editingSection) return;
     setEditError("");
 
-    if (!editSectionName.trim()) {
-      setEditError("Section name cannot be empty.");
+    const fullSectionName = formatSectionFullName(
+      editGradeLevel,
+      editSectionName,
+      editGradeLevel >= 11 ? (editStrand || "Academic") : null
+    );
+
+    if (!fullSectionName.trim()) {
+      setEditError("Section name cannot be empty. Please enter a section name (e.g. Rizal, A).");
       return;
     }
 
@@ -731,6 +819,7 @@ export default function SectionQuotaConsole() {
           body: JSON.stringify({
             id: conflictSection.id,
             section_name: conflictSection.section_name,
+            grade_level: conflictSection.grade_level,
             capacity: conflictSection.capacity,
             room: conflictSection.room || null,
             adviser_name: null, // Automated unassignment
@@ -744,11 +833,12 @@ export default function SectionQuotaConsole() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingSection.id,
-          section_name: editSectionName.trim(),
+          section_name: fullSectionName,
+          grade_level: editGradeLevel,
           capacity: editCapacity,
           room: editRoom.trim() || null,
           adviser_name: editAdviser.trim() || null,
-          strand: editingSection.grade_level >= 11 ? editStrand || null : null,
+          strand: editGradeLevel >= 11 ? (editStrand || "Academic") : null,
         }),
       });
 
@@ -760,8 +850,8 @@ export default function SectionQuotaConsole() {
       setStatusNotice({
         type: "success",
         text: conflictSection && autoTransferAdviser
-          ? `Automated Advisory Transfer Complete: [ ${editAdviser.trim()} ] was unassigned from [ ${conflictSection.section_name} ] and successfully assigned as Class Adviser of [ ${editSectionName.trim()} ].`
-          : `Section [ ${editSectionName.trim()} ] updated successfully (Class Adviser: ${editAdviser.trim() || "Unassigned"}).`,
+          ? `Automated Advisory Transfer Complete: [ ${editAdviser.trim()} ] was unassigned from [ ${conflictSection.section_name} ] and successfully assigned as Class Adviser of [ ${fullSectionName} ].`
+          : `Section [ ${fullSectionName} ] updated successfully (Class Adviser: ${editAdviser.trim() || "Unassigned"}).`,
       });
 
       setEditingSection(null);
@@ -770,7 +860,7 @@ export default function SectionQuotaConsole() {
         window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
       }
     } catch (err: any) {
-      setEditError(err?.message || "Failed to update section.");
+      setEditError(err?.message || "Failed to update section. Please check database connection.");
     } finally {
       setIsSubmittingEdit(false);
     }
@@ -952,10 +1042,7 @@ export default function SectionQuotaConsole() {
           {/* Add Section Button */}
           <button
             type="button"
-            onClick={() => {
-              setIsAddModalOpen(true);
-              setAddError("");
-            }}
+            onClick={openAddModal}
             className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
           >
             <span>+</span> Add New Class Section
@@ -1107,13 +1194,8 @@ export default function SectionQuotaConsole() {
           <p className="text-xs text-slate-600">No sections exist for the selected grade filter.</p>
           <button
             type="button"
-            onClick={() => {
-              setIsAddModalOpen(true);
-              if (gradeFilter !== "ALL") {
-                setNewGradeLevel(Number(gradeFilter));
-              }
-            }}
-            className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase tracking-wider"
+            onClick={openAddModal}
+            className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase tracking-wider cursor-pointer"
           >
             + Add Section for {gradeFilter === "ALL" ? "All Grades" : `Grade ${gradeFilter}`}
           </button>
@@ -1134,7 +1216,7 @@ export default function SectionQuotaConsole() {
                   {/* Card Header */}
                   <div className="flex items-start justify-between gap-2 border-b border-slate-200 pb-3">
                     <div>
-                      <span className="text-sm font-bold uppercase text-[#002060] block">
+                      <span className="text-sm font-bold text-[#002060] block">
                         {sec.section_name}
                       </span>
                       {sec.adviser_name ? (
@@ -1153,7 +1235,7 @@ export default function SectionQuotaConsole() {
                       )}
                     </div>
                     <span className="text-[10px] font-mono bg-slate-100 px-2.5 py-1 border border-slate-300 font-bold shrink-0">
-                      Grade {sec.grade_level} {sec.strand ? `(${sec.strand})` : ""}
+                      Grade {sec.grade_level} {sec.grade_level >= 11 && sec.strand ? `(${sec.strand === "TechPro" || sec.strand.toUpperCase().includes("TVL") ? "TechPro" : "Academic"})` : ""}
                     </span>
                   </div>
 
@@ -1257,20 +1339,7 @@ export default function SectionQuotaConsole() {
                 </div>
               )}
 
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Section Name <span className="text-red-600">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newSectionName}
-                  onChange={(e) => setNewSectionName(e.target.value)}
-                  placeholder="e.g. Grade 7 - Bonifacio / Grade 11 - STEM B"
-                  className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-slate-900 focus:border-[#002060] outline-none uppercase"
-                />
-              </div>
-
+              {/* 1. Grade Level & Track Selector */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
@@ -1278,41 +1347,79 @@ export default function SectionQuotaConsole() {
                   </label>
                   <select
                     value={newGradeLevel}
-                    onChange={(e) => setNewGradeLevel(Number(e.target.value))}
+                    onChange={(e) => {
+                      const g = Number(e.target.value);
+                      setNewGradeLevel(g);
+                      if (g >= 11 && !newStrand) {
+                        setNewStrand("Academic");
+                      }
+                    }}
                     className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
                   >
-                    <option value={7}>Grade 7 (JHS)</option>
-                    <option value={8}>Grade 8 (JHS)</option>
-                    <option value={9}>Grade 9 (JHS)</option>
-                    <option value={10}>Grade 10 (JHS)</option>
-                    <option value={11}>Grade 11 (SHS)</option>
-                    <option value={12}>Grade 12 (SHS)</option>
+                    <option value={7}>Grade 7 (Junior High School)</option>
+                    <option value={8}>Grade 8 (Junior High School)</option>
+                    <option value={9}>Grade 9 (Junior High School)</option>
+                    <option value={10}>Grade 10 (Junior High School)</option>
+                    <option value={11}>Grade 11 (Senior High School)</option>
+                    <option value={12}>Grade 12 (Senior High School)</option>
                   </select>
                 </div>
 
                 {newGradeLevel >= 11 ? (
                   <div>
                     <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                      Senior High School Strand
+                      Senior High School Track <span className="text-red-600">*</span>
                     </label>
                     <select
-                      value={newStrand}
+                      value={newStrand || "Academic"}
                       onChange={(e) => setNewStrand(e.target.value)}
                       className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
                     >
-                      <option value="">-- Select Strand (Optional / General) --</option>
-                      {SHS_STRANDS.map((s) => (
-                        <option key={s.code} value={s.code}>
-                          {s.code} - {s.name} ({s.track})
+                      {SHS_TRACKS.map((t) => (
+                        <option key={t.code} value={t.code}>
+                          {t.name}
                         </option>
                       ))}
                     </select>
                   </div>
                 ) : (
-                  <div className="p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-center">
-                    <span>Junior High School (General Academic Curriculum)</span>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex flex-col justify-center">
+                    <span className="font-bold text-slate-700">Junior High School</span>
+                    <span className="text-slate-500">General Standard Curriculum (No Specialized Strand)</span>
                   </div>
                 )}
+              </div>
+
+              {/* 2. Section Name Input with Live Computed Preview */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-900 uppercase">
+                    Section Name <span className="text-red-600">*</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-slate-500">
+                    (e.g. Rizal, Bonifacio, Luna, A)
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={newSectionName}
+                  onChange={(e) => setNewSectionName(e.target.value)}
+                  placeholder={newGradeLevel >= 11 ? "e.g. A, B, Rizal, or Bonifacio" : "e.g. Rizal, Bonifacio, or Aguinaldo"}
+                  className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-slate-900 focus:border-[#002060] outline-none"
+                />
+                <div className="mt-1.5 p-2 bg-blue-50/60 border border-blue-200 flex items-center justify-between text-xs">
+                  <span className="text-slate-600 font-mono text-[11px] uppercase">
+                    Saved Section Name:
+                  </span>
+                  <strong className="font-mono font-bold text-[#002060] text-xs">
+                    {formatSectionFullName(
+                      newGradeLevel,
+                      newSectionName,
+                      newGradeLevel >= 11 ? (newStrand || "Academic") : null
+                    ) || "[ Enter section name above ]"}
+                  </strong>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1548,38 +1655,88 @@ export default function SectionQuotaConsole() {
                 </strong>
               </div>
 
+              {/* 1. Grade Level & Track Selector */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                    Grade Level <span className="text-red-600">*</span>
+                  </label>
+                  <select
+                    value={editGradeLevel}
+                    onChange={(e) => {
+                      const g = Number(e.target.value);
+                      setEditGradeLevel(g);
+                      if (g >= 11 && !editStrand) {
+                        setEditStrand("Academic");
+                      }
+                    }}
+                    className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
+                  >
+                    <option value={7}>Grade 7 (Junior High School)</option>
+                    <option value={8}>Grade 8 (Junior High School)</option>
+                    <option value={9}>Grade 9 (Junior High School)</option>
+                    <option value={10}>Grade 10 (Junior High School)</option>
+                    <option value={11}>Grade 11 (Senior High School)</option>
+                    <option value={12}>Grade 12 (Senior High School)</option>
+                  </select>
+                </div>
+
+                {editGradeLevel >= 11 ? (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      Senior High School Track <span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      value={editStrand || "Academic"}
+                      onChange={(e) => setEditStrand(e.target.value)}
+                      className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
+                    >
+                      {SHS_TRACKS.map((t) => (
+                        <option key={t.code} value={t.code}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex flex-col justify-center">
+                    <span className="font-bold text-slate-700">Junior High School</span>
+                    <span className="text-slate-500">General Standard Curriculum (No Specialized Strand)</span>
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Section Name Input with Live Computed Preview */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Section Name <span className="text-red-600">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-900 uppercase">
+                    Section Name <span className="text-red-600">*</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-slate-500">
+                    (e.g. Rizal, Bonifacio, Luna, A)
+                  </span>
+                </div>
                 <input
                   type="text"
                   required
                   value={editSectionName}
                   onChange={(e) => setEditSectionName(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-slate-900 focus:border-[#002060] outline-none uppercase"
+                  placeholder={editGradeLevel >= 11 ? "e.g. A, B, Rizal, or Bonifacio" : "e.g. Rizal, Bonifacio, or Aguinaldo"}
+                  className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-slate-900 focus:border-[#002060] outline-none"
                 />
-              </div>
-
-              {editingSection.grade_level >= 11 && (
-                <div>
-                  <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                    Specialized Strand
-                  </label>
-                  <select
-                    value={editStrand}
-                    onChange={(e) => setEditStrand(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value="">-- None / General --</option>
-                    {SHS_STRANDS.map((s) => (
-                      <option key={s.code} value={s.code}>
-                        {s.code} - {s.name}
-                      </option>
-                    ))}
-                  </select>
+                <div className="mt-1.5 p-2 bg-blue-50/60 border border-blue-200 flex items-center justify-between text-xs">
+                  <span className="text-slate-600 font-mono text-[11px] uppercase">
+                    Saved Section Name:
+                  </span>
+                  <strong className="font-mono font-bold text-[#002060] text-xs">
+                    {formatSectionFullName(
+                      editGradeLevel,
+                      editSectionName,
+                      editGradeLevel >= 11 ? (editStrand || "Academic") : null
+                    ) || "[ Enter section name above ]"}
+                  </strong>
                 </div>
-              )}
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -1849,7 +2006,7 @@ export default function SectionQuotaConsole() {
                   <strong>OFFICIAL CLASS SECTION ROSTER</strong> • SY 2025–2026
                 </div>
                 <div>
-                  Section: <strong>{selectedRosterSection.section_name}</strong> (Grade {selectedRosterSection.grade_level}{selectedRosterSection.strand ? ` • ${selectedRosterSection.strand}` : ""})
+                  Section: <strong>{selectedRosterSection.section_name}</strong> (Grade {selectedRosterSection.grade_level}{selectedRosterSection.grade_level >= 11 && selectedRosterSection.strand ? ` • ${selectedRosterSection.strand === "TechPro" || selectedRosterSection.strand.toUpperCase().includes("TVL") ? "TechPro" : "Academic"}` : ""})
                 </div>
               </div>
               <div className="mt-1 flex items-center justify-between text-[11px] font-mono text-slate-600">
@@ -1879,13 +2036,13 @@ export default function SectionQuotaConsole() {
                     [ OFFICIAL CLASS ROSTER ]
                   </span>
                   <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold">
-                    GRADE {selectedRosterSection.grade_level} {selectedRosterSection.strand ? `• ${selectedRosterSection.strand}` : ""}
+                    GRADE {selectedRosterSection.grade_level} {selectedRosterSection.grade_level >= 11 && selectedRosterSection.strand ? `• ${selectedRosterSection.strand === "TechPro" || selectedRosterSection.strand.toUpperCase().includes("TVL") ? "TechPro" : "Academic"}` : ""}
                   </span>
                   <span className="text-[10px] font-mono bg-emerald-950 border border-emerald-400/50 text-emerald-200 px-2 py-0.5 font-bold uppercase">
                     {activeTerm.termName} &bull; S.Y. {activeTerm.schoolYear}
                   </span>
                 </div>
-                <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-white mt-1">
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white mt-1">
                   {selectedRosterSection.section_name}
                 </h2>
                 <p className="text-xs text-blue-200 mt-0.5">
