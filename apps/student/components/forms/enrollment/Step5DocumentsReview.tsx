@@ -1148,6 +1148,16 @@ export default function Step5DocumentsReview({
                   <span className="font-bold text-blue-900">{data.doorwayElectives.join(", ")}</span>
                 </div>
               )}
+              {data.selectedElectives && data.selectedElectives.length > 0 && (
+                <div className="col-span-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                    Elective / Prescribed Course Offerings
+                  </span>
+                  <span className="font-mono font-bold text-[#002060]">
+                    {data.selectedElectives.join(", ")}
+                  </span>
+                </div>
+              )}
               <div className="col-span-2">
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">Last School Attended</span>
                 <span className="font-bold text-slate-900 uppercase">
