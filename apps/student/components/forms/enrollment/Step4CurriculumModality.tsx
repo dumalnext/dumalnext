@@ -164,14 +164,16 @@ export default function Step4CurriculumModality({
     ? data.preferredModalities
     : ["Modular (Print)"];
 
-  // Toggle Elective in multi-select array
+  // Single-select Elective (Maximum of 1 allowed per semester)
   const handleElectiveToggle = (subjectCode: string) => {
     const current = data.selectedElectives || [];
     let updated: string[];
     if (current.includes(subjectCode)) {
-      updated = current.filter((c) => c !== subjectCode);
+      // Deselect if already selected
+      updated = [];
     } else {
-      updated = [...current, subjectCode];
+      // Select the clicked elective as the single chosen subject
+      updated = [subjectCode];
     }
     onChange({ selectedElectives: updated });
     if (errors.selectedElectives) {
@@ -241,7 +243,9 @@ export default function Step4CurriculumModality({
       }
       if (currentTrack === "Academic Track" && academicElectiveSubjects.length > 0) {
         if (!data.selectedElectives || data.selectedElectives.length === 0) {
-          newErrors.selectedElectives = `Please select at least one elective subject for your Grade ${targetGrade} Academic Track curriculum.`;
+          newErrors.selectedElectives = `Please select one (1) elective subject for your Grade ${targetGrade} Academic Track curriculum.`;
+        } else if (data.selectedElectives.length > 1) {
+          newErrors.selectedElectives = "DepEd Policy: A maximum of one (1) elective subject is allowed per semester.";
         }
       }
     }
@@ -599,18 +603,18 @@ export default function Step4CurriculumModality({
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                    [ Section 7-B: Grade {targetGrade} Academic Track - Elective Part ]
+                    [ Section 7-B: Grade {targetGrade} Academic Track - Elective Part (Maximum 1 Subject) ]
                   </span>
                   <p className="text-xs text-slate-600 mt-0.5">
-                    Choose your elective subject(s) for Grade {targetGrade}. These offerings are synchronized directly from the subjects configured by school administration:
+                    Choose one (1) elective subject for this semester. Under DepEd curriculum guidelines, learners may enroll in a maximum of one (1) elective offering per semester:
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase">
-                    {(data.selectedElectives || []).length} SELECTED
+                    {(data.selectedElectives || []).length} / 1 SELECTED
                   </span>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-blue-100 text-[#002060] border border-blue-300 uppercase">
-                    ADMIN SYNCED
+                    MAX 1 PER SEMESTER
                   </span>
                 </div>
               </div>
@@ -637,10 +641,10 @@ export default function Step4CurriculumModality({
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="block text-xs font-bold text-slate-900 uppercase">
-                      Select Elective Subject(s) <span className="text-red-700">*</span>
+                      Select Elective Subject (Choose Maximum 1) <span className="text-red-700">*</span>
                     </label>
                     <span className="text-[11px] font-mono text-slate-500">
-                      Click any card to select or deselect
+                      Click any card to select or switch your elective
                     </span>
                   </div>
 
@@ -661,7 +665,9 @@ export default function Step4CurriculumModality({
                             <div className="flex items-start justify-between gap-2 mb-1.5">
                               <div className="flex items-center gap-2">
                                 <input
-                                  type="checkbox"
+                                  type="radio"
+                                  name="academicElectiveRadio"
+                                  value={sub.subject_code}
                                   checked={isSelected}
                                   onChange={() => {}}
                                   className="accent-[#002060] pointer-events-none"
