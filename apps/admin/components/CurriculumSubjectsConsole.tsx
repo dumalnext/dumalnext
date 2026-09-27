@@ -26,6 +26,10 @@ export default function CurriculumSubjectsConsole() {
   const [formDescription, setFormDescription] = useState<string>("");
   const [formError, setFormError] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [modalLockedTrack, setModalLockedTrack] = useState<{
+    track: "Academic" | "TechPro";
+    category: "Core" | "Elective";
+  } | null>(null);
 
   // Delete State
   const [deleteSubjectTarget, setDeleteSubjectTarget] = useState<CourseSubjectItem | null>(null);
@@ -62,8 +66,26 @@ export default function CurriculumSubjectsConsole() {
   const filteredSubjects = subjects.filter((s) => {
     if (typeFilter !== "ALL" && s.subject_type.toUpperCase() !== typeFilter.toUpperCase()) return false;
     if (strandFilter !== "ALL") {
-      if (!s.strand) return false;
-      if (s.strand.toUpperCase() !== strandFilter.toUpperCase()) return false;
+      const strandUpper = (s.strand || "").toUpperCase();
+      const filterUpper = strandFilter.toUpperCase();
+      // Universal core subjects for SHS (strand General or empty/null) apply to all SHS tracks
+      if (s.grade_level >= 11 && s.subject_type === "Core" && (strandUpper === "GENERAL" || !s.strand)) {
+        // Retained for universal core coverage
+      } else if (filterUpper === "ACADEMIC") {
+        const isAcademic =
+          strandUpper === "ACADEMIC" ||
+          strandUpper === "STEM" ||
+          strandUpper === "HUMSS" ||
+          strandUpper === "GAS" ||
+          strandUpper === "ABM";
+        if (!isAcademic) return false;
+      } else if (filterUpper === "TECHPRO") {
+        const isTechPro = strandUpper === "TECHPRO" || strandUpper.startsWith("TVL");
+        if (!isTechPro) return false;
+      } else {
+        if (!s.strand) return false;
+        if (strandUpper !== filterUpper) return false;
+      }
     }
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
@@ -87,10 +109,17 @@ export default function CurriculumSubjectsConsole() {
   const handleAutoGenerateCode = () => {
     const isJhs = formGrade <= 10;
     const prefix = isJhs ? "JHS" : "SHS";
-    const strandTag =
-      !isJhs && formStrand && formStrand !== "General"
-        ? `${formStrand.toUpperCase()}-`
-        : "";
+    let strandTag = "";
+    if (modalLockedTrack) {
+      const trackCode = modalLockedTrack.track === "Academic" ? "ACAD" : "TECH";
+      const catCode = modalLockedTrack.category === "Core" ? "CORE" : "ELEC";
+      strandTag = `${trackCode}-${catCode}-`;
+    } else if (!isJhs && formStrand && formStrand !== "General") {
+      let strandCode = formStrand.toUpperCase();
+      if (strandCode === "ACADEMIC") strandCode = "ACAD";
+      if (strandCode === "TECHPRO") strandCode = "TECH";
+      strandTag = `${strandCode}-`;
+    }
     const cleaned = formName
       .toUpperCase()
       .replace(/[^A-Z0-9]/g, "")
@@ -100,26 +129,42 @@ export default function CurriculumSubjectsConsole() {
     setFormCode(generated);
   };
 
-  // Open Create Modal with optional pre-filled grade, strand, and classification type
+  // Open Create Modal with optional pre-filled grade, strand, classification type, and locked track
   const handleOpenCreateModal = (
     prefillGrade?: number,
     prefillStrand?: string,
-    prefillType?: CourseSubjectItem["subject_type"]
+    prefillType?: CourseSubjectItem["subject_type"],
+    lockedTrack?: { track: "Academic" | "TechPro"; category: "Core" | "Elective" } | null
   ) => {
     setIsEditing(false);
     setEditingId("");
     setFormCode("");
     setFormName("");
-    setFormType(prefillType || "Core");
     const g = prefillGrade || 7;
     setFormGrade(g);
-    if (prefillStrand) {
-      setFormStrand(prefillStrand);
-    } else if (g <= 10) {
-      setFormStrand("Regular");
+
+    if (lockedTrack) {
+      setModalLockedTrack(lockedTrack);
+      setFormType(
+        lockedTrack.category === "Core"
+          ? "Core"
+          : lockedTrack.track === "TechPro"
+          ? "Specialized"
+          : "Elective"
+      );
+      setFormStrand(lockedTrack.track);
     } else {
-      setFormStrand("General");
+      setModalLockedTrack(null);
+      setFormType(prefillType || "Core");
+      if (prefillStrand) {
+        setFormStrand(prefillStrand);
+      } else if (g <= 10) {
+        setFormStrand("Regular");
+      } else {
+        setFormStrand("General");
+      }
     }
+
     setFormDescription("");
     setFormError("");
     setIsModalOpen(true);
@@ -136,7 +181,14 @@ export default function CurriculumSubjectsConsole() {
     setFormStrand(s.strand || (s.grade_level <= 10 ? "Regular" : "General"));
     setFormDescription(s.description || "");
     setFormError("");
+    setModalLockedTrack(null);
     setIsModalOpen(true);
+  };
+
+  // Close Modal and clear locked track state
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalLockedTrack(null);
   };
 
   // Save Subject (Create or Edit)
@@ -157,14 +209,24 @@ export default function CurriculumSubjectsConsole() {
     try {
       const endpoint = "/api/subjects";
       const method = isEditing ? "PUT" : "POST";
+      const finalGrade = modalLockedTrack ? 11 : formGrade;
+      const finalType = modalLockedTrack
+        ? modalLockedTrack.category === "Core"
+          ? "Core"
+          : modalLockedTrack.track === "TechPro"
+          ? "Specialized"
+          : "Elective"
+        : formType;
+      const finalStrand = modalLockedTrack ? modalLockedTrack.track : (formStrand || null);
+
       const payload = {
         id: editingId || undefined,
         subject_code: formCode.trim().toUpperCase(),
         subject_name: formName.trim(),
-        subject_type: formType,
-        grade_level: formGrade,
+        subject_type: finalType,
+        grade_level: finalGrade,
         trimester: 1, // Trimester defaulted silently in background
-        strand: formStrand || null,
+        strand: finalStrand,
         description: formDescription.trim() || null,
       };
 
@@ -177,6 +239,7 @@ export default function CurriculumSubjectsConsole() {
       const json = await res.json();
       if (json.success) {
         setIsModalOpen(false);
+        setModalLockedTrack(null);
         setSuccessMessage(
           isEditing
             ? `Subject [ ${formCode.toUpperCase()} ] updated successfully.`
@@ -484,14 +547,24 @@ export default function CurriculumSubjectsConsole() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => handleOpenCreateModal(11, trackStrand, "Core")}
+              onClick={() =>
+                handleOpenCreateModal(11, trackStrand, "Core", {
+                  track: trackStrand,
+                  category: "Core",
+                })
+              }
               className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
             >
               [ + Add Core Subject ]
             </button>
             <button
               type="button"
-              onClick={() => handleOpenCreateModal(11, trackStrand, defaultElectiveType)}
+              onClick={() =>
+                handleOpenCreateModal(11, trackStrand, defaultElectiveType, {
+                  track: trackStrand,
+                  category: "Elective",
+                })
+              }
               className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
             >
               [ + Add Elective Subject ]
@@ -512,7 +585,12 @@ export default function CurriculumSubjectsConsole() {
             </div>
             <button
               type="button"
-              onClick={() => handleOpenCreateModal(11, trackStrand, "Core")}
+              onClick={() =>
+                handleOpenCreateModal(11, trackStrand, "Core", {
+                  track: trackStrand,
+                  category: "Core",
+                })
+              }
               className="text-[11px] font-mono font-bold text-[#002060] hover:underline uppercase cursor-pointer"
             >
               [ + Add Core ]
@@ -522,7 +600,11 @@ export default function CurriculumSubjectsConsole() {
           {renderSubjectRowsTable(
             coreSubjects,
             `NO CORE SUBJECTS ON RECORD FOR GRADE 11 ${trackStrand.toUpperCase()}`,
-            () => handleOpenCreateModal(11, trackStrand, "Core"),
+            () =>
+              handleOpenCreateModal(11, trackStrand, "Core", {
+                track: trackStrand,
+                category: "Core",
+              }),
             "[ + Add Core Subject ]"
           )}
         </div>
@@ -540,7 +622,12 @@ export default function CurriculumSubjectsConsole() {
             </div>
             <button
               type="button"
-              onClick={() => handleOpenCreateModal(11, trackStrand, defaultElectiveType)}
+              onClick={() =>
+                handleOpenCreateModal(11, trackStrand, defaultElectiveType, {
+                  track: trackStrand,
+                  category: "Elective",
+                })
+              }
               className="text-[11px] font-mono font-bold text-purple-900 hover:underline uppercase cursor-pointer"
             >
               [ + Add Elective ]
@@ -550,7 +637,11 @@ export default function CurriculumSubjectsConsole() {
           {renderSubjectRowsTable(
             electiveSubjects,
             `NO ELECTIVE / SPECIALIZED SUBJECTS ON RECORD FOR GRADE 11 ${trackStrand.toUpperCase()}`,
-            () => handleOpenCreateModal(11, trackStrand, defaultElectiveType),
+            () =>
+              handleOpenCreateModal(11, trackStrand, defaultElectiveType, {
+                track: trackStrand,
+                category: "Elective",
+              }),
             "[ + Add Elective Subject ]"
           )}
         </div>
@@ -918,17 +1009,40 @@ export default function CurriculumSubjectsConsole() {
                   [ DEPED SUBJECT MANAGEMENT ]
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight">
-                  {isEditing ? "Edit Subject" : "Add New Subject"}
+                  {isEditing
+                    ? "Edit Subject"
+                    : modalLockedTrack
+                    ? `Add Grade 11 ${modalLockedTrack.track} ${
+                        modalLockedTrack.category === "Core" ? "Core Subject" : "Elective Subject"
+                      }`
+                    : "Add New Subject"}
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleCloseModal}
                 className="text-white hover:text-slate-300 text-lg font-bold px-2 py-0.5 cursor-pointer"
               >
                 ✕
               </button>
             </div>
+
+            {/* Locked Track Banner */}
+            {modalLockedTrack && (
+              <div className="bg-blue-50 border-b-2 border-blue-200 px-6 py-2.5 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-[#002060] uppercase">
+                    [ Track Mode: Grade 11 {modalLockedTrack.track.toUpperCase()} ]
+                  </span>
+                  <span className="text-slate-600 font-bold uppercase">
+                    • {modalLockedTrack.category === "Core" ? "Core Subject" : "Elective / Specialized"}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono font-bold uppercase bg-[#002060] text-white px-2 py-0.5">
+                  Locked
+                </span>
+              </div>
+            )}
 
             {/* Modal Form Body */}
             <form onSubmit={handleSaveSubject} className="p-6 space-y-4 overflow-y-auto text-xs">
@@ -947,7 +1061,13 @@ export default function CurriculumSubjectsConsole() {
                   type="text"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  placeholder="e.g., Mathematics, Pre-Calculus, General Biology"
+                  placeholder={
+                    modalLockedTrack?.category === "Core"
+                      ? "e.g., General Mathematics, Effective Communication, General Science"
+                      : modalLockedTrack?.track === "Academic"
+                      ? "e.g., Introduction to Philosophy, Creative Writing, Philippine Politics"
+                      : "e.g., Computer Systems Servicing, Electrical Installation Maintenance"
+                  }
                   className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
                   required
                 />
@@ -971,7 +1091,17 @@ export default function CurriculumSubjectsConsole() {
                   type="text"
                   value={formCode}
                   onChange={(e) => setFormCode(e.target.value.toUpperCase())}
-                  placeholder="e.g., JHS-MATH7, SHS-STEM-PRECAL11"
+                  placeholder={
+                    modalLockedTrack
+                      ? modalLockedTrack.track === "Academic"
+                        ? modalLockedTrack.category === "Core"
+                          ? "e.g., SHS-ACAD-CORE-MATH11"
+                          : "e.g., SHS-ACAD-ELEC-PHIL11"
+                        : modalLockedTrack.category === "Core"
+                        ? "e.g., SHS-TECH-CORE-MATH11"
+                        : "e.g., SHS-TECH-ELEC-CSS11"
+                      : "e.g., JHS-MATH7, SHS-STEM-PRECAL11"
+                  }
                   disabled={isEditing}
                   className={`w-full p-2.5 border-2 text-xs font-mono font-bold outline-none uppercase ${
                     isEditing
@@ -992,26 +1122,35 @@ export default function CurriculumSubjectsConsole() {
                   <label className="block font-bold text-slate-900 uppercase mb-1">
                     Grade Level <span className="text-red-700">*</span>
                   </label>
-                  <select
-                    value={formGrade}
-                    onChange={(e) => {
-                      const g = Number(e.target.value);
-                      setFormGrade(g);
-                      if (g <= 10 && formStrand !== "Regular" && formStrand !== "SPS") {
-                        setFormStrand("Regular");
-                      } else if (g >= 11 && (formStrand === "Regular" || formStrand === "SPS")) {
-                        setFormStrand("STEM");
-                      }
-                    }}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value={7}>Grade 7 (JHS)</option>
-                    <option value={8}>Grade 8 (JHS)</option>
-                    <option value={9}>Grade 9 (JHS)</option>
-                    <option value={10}>Grade 10 (JHS)</option>
-                    <option value={11}>Grade 11 (SHS)</option>
-                    <option value={12}>Grade 12 (SHS)</option>
-                  </select>
+                  {modalLockedTrack ? (
+                    <div className="w-full p-2.5 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-800 flex items-center justify-between">
+                      <span className="font-mono text-slate-900">Grade 11 (SHS)</span>
+                      <span className="text-[10px] font-mono uppercase bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-300 font-bold">
+                        [ Locked ]
+                      </span>
+                    </div>
+                  ) : (
+                    <select
+                      value={formGrade}
+                      onChange={(e) => {
+                        const g = Number(e.target.value);
+                        setFormGrade(g);
+                        if (g <= 10 && formStrand !== "Regular" && formStrand !== "SPS") {
+                          setFormStrand("Regular");
+                        } else if (g >= 11 && (formStrand === "Regular" || formStrand === "SPS")) {
+                          setFormStrand("Academic");
+                        }
+                      }}
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    >
+                      <option value={7}>Grade 7 (JHS)</option>
+                      <option value={8}>Grade 8 (JHS)</option>
+                      <option value={9}>Grade 9 (JHS)</option>
+                      <option value={10}>Grade 10 (JHS)</option>
+                      <option value={11}>Grade 11 (SHS)</option>
+                      <option value={12}>Grade 12 (SHS)</option>
+                    </select>
+                  )}
                 </div>
 
                 {/* Classification Type */}
@@ -1019,26 +1158,67 @@ export default function CurriculumSubjectsConsole() {
                   <label className="block font-bold text-slate-900 uppercase mb-1">
                     Classification <span className="text-red-700">*</span>
                   </label>
-                  <select
-                    value={formType}
-                    onChange={(e) => setFormType(e.target.value as any)}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value="Core">Core Subject</option>
-                    <option value="Specialized">Specialized Subject</option>
-                    <option value="Applied">Applied Subject</option>
-                    <option value="Elective">Elective</option>
-                    <option value="Intervention">Intervention (ARAL)</option>
-                  </select>
+                  {modalLockedTrack ? (
+                    <div
+                      className={`w-full p-2.5 border-2 text-xs font-bold flex items-center justify-between ${
+                        modalLockedTrack.category === "Core"
+                          ? "bg-blue-50 border-[#002060] text-[#002060]"
+                          : "bg-purple-50 border-purple-800 text-purple-900"
+                      }`}
+                    >
+                      <span>
+                        {modalLockedTrack.category === "Core"
+                          ? "Core Subject"
+                          : modalLockedTrack.track === "TechPro"
+                          ? "Specialized / Elective Subject"
+                          : "Elective Subject"}
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono uppercase px-2 py-0.5 text-white font-bold ${
+                          modalLockedTrack.category === "Core" ? "bg-[#002060]" : "bg-purple-800"
+                        }`}
+                      >
+                        [ Locked ]
+                      </span>
+                    </div>
+                  ) : (
+                    <select
+                      value={formType}
+                      onChange={(e) => setFormType(e.target.value as any)}
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    >
+                      <option value="Core">Core Subject</option>
+                      <option value="Specialized">Specialized Subject</option>
+                      <option value="Applied">Applied Subject</option>
+                      <option value="Elective">Elective</option>
+                      <option value="Intervention">Intervention (ARAL)</option>
+                    </select>
+                  )}
                 </div>
               </div>
 
               {/* Program / Strand Selection */}
               <div>
                 <label className="block font-bold text-slate-900 uppercase mb-1">
-                  Program / Strand Designation
+                  Program / Strand Designation <span className="text-red-700">*</span>
                 </label>
-                {formGrade <= 10 ? (
+                {modalLockedTrack ? (
+                  <div className="w-full p-2.5 bg-amber-50 border-2 border-amber-500 text-xs font-bold text-slate-950 flex items-center justify-between">
+                    <div>
+                      <span className="block text-slate-900 font-bold">
+                        {modalLockedTrack.track === "Academic"
+                          ? "Academic Track (Strengthened SHS)"
+                          : "Technical-Professional Track (TechPro)"}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-600 font-normal block mt-0.5">
+                        Automatic designation for Grade 11 {modalLockedTrack.track}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono uppercase bg-amber-400 text-slate-950 px-2 py-0.5 font-bold border border-amber-600">
+                      [ Auto-Assigned ]
+                    </span>
+                  </div>
+                ) : formGrade <= 10 ? (
                   <select
                     value={formStrand}
                     onChange={(e) => setFormStrand(e.target.value)}
@@ -1084,7 +1264,7 @@ export default function CurriculumSubjectsConsole() {
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={handleCloseModal}
                   disabled={isSaving}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >

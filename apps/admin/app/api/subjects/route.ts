@@ -251,9 +251,27 @@ export async function GET(req: Request) {
       list = list.filter((s) => s.subject_type.toUpperCase() === subjectType.toUpperCase());
     }
     if (strand && strand !== "ALL") {
+      const strandUpper = strand.toUpperCase();
       list = list.filter((s) => {
+        const sStrandUpper = (s.strand || "").toUpperCase();
+        // Universal core subjects for SHS (strand General or empty/null) apply to all SHS tracks
+        if (s.grade_level >= 11 && s.subject_type === "Core" && (sStrandUpper === "GENERAL" || !s.strand)) {
+          return true;
+        }
+        if (strandUpper === "ACADEMIC") {
+          return (
+            sStrandUpper === "ACADEMIC" ||
+            sStrandUpper === "STEM" ||
+            sStrandUpper === "HUMSS" ||
+            sStrandUpper === "GAS" ||
+            sStrandUpper === "ABM"
+          );
+        }
+        if (strandUpper === "TECHPRO") {
+          return sStrandUpper === "TECHPRO" || sStrandUpper.startsWith("TVL");
+        }
         if (!s.strand) return false;
-        return s.strand.toUpperCase() === strand.toUpperCase();
+        return sStrandUpper === strandUpper;
       });
     }
 
