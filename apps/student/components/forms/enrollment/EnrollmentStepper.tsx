@@ -187,6 +187,9 @@ const STEP_LABELS = [
   { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
+const STEP_STORAGE_KEY = "dumalnext_student_enrollment_step";
+const DRAFT_STORAGE_KEY = "dumalnext_student_enrollment_draft";
+
 export default function EnrollmentStepper({
   schoolYear = "2026-2027",
   semester = "Trimester 1",
@@ -200,6 +203,7 @@ export default function EnrollmentStepper({
 }) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
   const [formData, setFormData] = useState<FullEnrollmentFormData>(() => {
     const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
     const activeSem = semester || "Trimester 1";
@@ -218,6 +222,81 @@ export default function EnrollmentStepper({
   const [existingApp, setExistingApp] = useState<any | null>(null);
   const [priorApprovedRecord, setPriorApprovedRecord] = useState<any | null>(null);
   const [isCheckingApp, setIsCheckingApp] = useState<boolean>(false);
+
+  // Restore step and form draft on mount
+  useEffect(() => {
+    const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+    const activeSem = semester || "Trimester 1";
+
+    try {
+      const savedStep = localStorage.getItem(STEP_STORAGE_KEY);
+      if (savedStep) {
+        const parsed = parseInt(savedStep, 10);
+        if (parsed >= 1 && parsed <= 5) {
+          setCurrentStep(parsed);
+        }
+      }
+
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        setFormData((prev) => ({
+          ...prev,
+          ...parsed,
+          schoolYear: cleanSY,
+          semester: activeSem,
+          targetSemester: activeSem,
+          step1: {
+            ...prev.step1,
+            ...(parsed.step1 || {}),
+            targetSemester: activeSem,
+          },
+        }));
+      }
+    } catch {}
+    setIsHydrated(true);
+  }, [schoolYear, semester]);
+
+  // Persist current step to localStorage upon change
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(STEP_STORAGE_KEY, String(currentStep));
+    } catch {}
+  }, [currentStep, isHydrated]);
+
+  // Persist form data draft to localStorage (excluding heavy document files)
+  useEffect(() => {
+    if (!isHydrated || !formData) return;
+    try {
+      const { submittedDocuments, ...draftToSave } = formData;
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftToSave));
+    } catch {}
+  }, [formData, isHydrated]);
+
+  // Reset draft and start over from Step 1
+  const handleResetDraft = () => {
+    if (confirm("Are you sure you want to reset your enrollment progress and start over from Step 1?")) {
+      try {
+        localStorage.removeItem(STEP_STORAGE_KEY);
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {}
+      setCurrentStep(1);
+      const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+      const activeSem = semester || "Trimester 1";
+      setFormData({
+        ...initialFormData,
+        schoolYear: cleanSY,
+        semester: activeSem,
+        targetSemester: activeSem,
+        step1: {
+          ...initialFormData.step1,
+          targetSemester: activeSem,
+        },
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   // Auto pre-fill basic account names if student is logged in and sync schoolYear and semester
   useEffect(() => {
@@ -296,6 +375,12 @@ export default function EnrollmentStepper({
             if (activeTermApp) {
               appData = activeTermApp;
               setPriorApprovedRecord(null);
+              if (activeTermApp.status !== "Needs Revision") {
+                try {
+                  localStorage.removeItem(STEP_STORAGE_KEY);
+                  localStorage.removeItem(DRAFT_STORAGE_KEY);
+                } catch {}
+              }
             } else {
               // Check if student has an APPROVED enrollment application from any prior term
               const pastApproved = appRows.find((a: any) =>
@@ -690,13 +775,25 @@ export default function EnrollmentStepper({
               Basic Education Enrollment Form
             </h1>
           </div>
-          <div className="text-right">
-            <span className="text-xs font-mono font-bold text-slate-600 block">
-              Step {currentStep} of 5
-            </span>
-            <span className="text-[10px] text-[#002060] font-bold uppercase tracking-wider">
-              {Math.round((currentStep / 5) * 100)}% Complete
-            </span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {currentStep > 1 && (
+              <button
+                type="button"
+                onClick={handleResetDraft}
+                className="text-[10px] font-mono font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 uppercase tracking-wider transition-colors cursor-pointer"
+                title="Reset enrollment progress and start over from Step 1"
+              >
+                [ Reset / Start Over ]
+              </button>
+            )}
+            <div className="text-right">
+              <span className="text-xs font-mono font-bold text-slate-600 block">
+                Step {currentStep} of 5
+              </span>
+              <span className="text-[10px] text-[#002060] font-bold uppercase tracking-wider">
+                {Math.round((currentStep / 5) * 100)}% Complete
+              </span>
+            </div>
           </div>
         </div>
 

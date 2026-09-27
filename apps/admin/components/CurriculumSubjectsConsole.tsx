@@ -2,12 +2,46 @@
 
 import React, { useState, useEffect } from "react";
 import { CourseSubjectItem } from "@/app/api/subjects/route";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CurriculumSubjectsConsole() {
   const [subjects, setSubjects] = useState<CourseSubjectItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  // Broadcast curriculum mutations in real-time across tabs and devices
+  const broadcastCurriculumChanged = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
+      window.dispatchEvent(new CustomEvent("dumalnext:subjects-changed"));
+
+      try {
+        const bc = new BroadcastChannel("dumalnext-subjects-sync");
+        bc.postMessage({ type: "SUBJECTS_CHANGED", timestamp: Date.now() });
+        bc.close();
+      } catch {}
+
+      try {
+        localStorage.setItem("dumalnext:subjects-timestamp", String(Date.now()));
+      } catch {}
+    }
+
+    try {
+      const supabase = createClient();
+      const channel = supabase.channel("dumalnext-subjects-sync");
+      channel.subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          channel.send({
+            type: "broadcast",
+            event: "subjects-updated",
+            payload: { timestamp: Date.now() },
+          });
+        }
+      });
+    } catch {}
+  };
 
   // Filters (Trimester removed per institutional requirements)
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
@@ -250,10 +284,7 @@ export default function CurriculumSubjectsConsole() {
             : `New subject [ ${formCode.toUpperCase()} ] created successfully.`
         );
         fetchSubjects();
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
-          window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
-        }
+        broadcastCurriculumChanged();
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {
         setFormError(json.error || "Failed to save subject record.");
@@ -285,10 +316,7 @@ export default function CurriculumSubjectsConsole() {
         );
         setDeleteSubjectTarget(null);
         fetchSubjects();
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
-          window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
-        }
+        broadcastCurriculumChanged();
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {
         setErrorMessage(

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
+import { createClient } from "@/lib/supabase/client";
 import {
   JHS_PROGRAMS,
   SHS_TRACKS,
@@ -108,37 +109,128 @@ export default function Step4CurriculumModality({
       ? "Technical-Professional Track"
       : rawTrack;
 
+  const dataRef = useRef(data);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   // Live subjects synchronized from Admin catalog
   const [subjectsList, setSubjectsList] = useState<CourseSubjectItem[]>([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState<boolean>(!isJHS);
 
+  // Fetch live subjects (silent mode avoids flickering skeleton)
+  const fetchLiveSubjects = useCallback(async (showLoading: boolean = false) => {
+    if (isJHS) return;
+    if (showLoading) setIsLoadingSubjects(true);
+
+    try {
+      const res = await fetch(`/api/subjects?gradeLevel=${gradeNum}&_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      if (!res.ok) throw new Error("Failed to fetch subjects");
+      const json = await res.json();
+      if (json.success && Array.isArray(json.subjects)) {
+        setSubjectsList(json.subjects);
+
+        // Real-time synchronization check: if student had selected an elective that admin just deleted, clean it up
+        const currentData = dataRef.current;
+        if (currentTrack === "Academic Track" && currentData.selectedElectives && currentData.selectedElectives.length > 0) {
+          const validCodes = new Set(
+            json.subjects
+              .filter((s: CourseSubjectItem) => s.grade_level === gradeNum && s.subject_type !== "Core" && !isTechProSubject(s))
+              .map((s: CourseSubjectItem) => s.subject_code)
+          );
+          const filtered = currentData.selectedElectives.filter((c: string) => validCodes.has(c));
+          if (filtered.length !== currentData.selectedElectives.length) {
+            onChangeRef.current({ selectedElectives: filtered });
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Could not load live subjects:", err);
+    } finally {
+      if (showLoading) setIsLoadingSubjects(false);
+    }
+  }, [isJHS, gradeNum, currentTrack]);
+
+  // Real-time multi-channel listener: Supabase WebSocket + BroadcastChannel + Window Events + 3s Polling
   useEffect(() => {
     if (isJHS) return;
 
-    let isMounted = true;
-    setIsLoadingSubjects(true);
+    // 1. Initial immediate fetch with loading skeleton
+    fetchLiveSubjects(true);
 
-    const fetchLiveSubjects = async () => {
-      try {
-        const res = await fetch(`/api/subjects?gradeLevel=${gradeNum}&_t=${Date.now()}`);
-        if (!res.ok) throw new Error("Failed to fetch subjects");
-        const json = await res.json();
-        if (isMounted && json.success && Array.isArray(json.subjects)) {
-          setSubjectsList(json.subjects);
+    // 2. Supabase Realtime WebSocket Push (0-millisecond sync across any port or device)
+    const supabase = createClient();
+    const realtimeChannel = supabase
+      .channel("dumalnext-subjects-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "course_subjects" },
+        () => {
+          fetchLiveSubjects(false);
         }
-      } catch (err) {
-        console.warn("Could not load live subjects:", err);
-      } finally {
-        if (isMounted) setIsLoadingSubjects(false);
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "system_settings" },
+        (payload: any) => {
+          if (payload?.new?.key === "subjects_config" || payload?.eventType === "DELETE") {
+            fetchLiveSubjects(false);
+          }
+        }
+      )
+      .on("broadcast", { event: "subjects-updated" }, () => {
+        fetchLiveSubjects(false);
+      })
+      .subscribe();
+
+    // 3. Browser BroadcastChannel for instant local cross-tab communication
+    let bc: BroadcastChannel | null = null;
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        bc = new BroadcastChannel("dumalnext-subjects-sync");
+        bc.onmessage = () => {
+          fetchLiveSubjects(false);
+        };
+      } catch {}
+    }
+
+    // 4. Window events and storage listener (cross-origin / tab focus)
+    const handleUpdate = () => fetchLiveSubjects(false);
+    window.addEventListener("dumalnext:data-changed", handleUpdate);
+    window.addEventListener("dumalnext:admin-data-changed", handleUpdate);
+    window.addEventListener("dumalnext:subjects-changed", handleUpdate);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "dumalnext:subjects-timestamp") {
+        fetchLiveSubjects(false);
       }
     };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("focus", handleUpdate);
 
-    fetchLiveSubjects();
+    // 5. Silent 3-second background polling fallback to guarantee synchronization
+    const pollInterval = setInterval(() => {
+      fetchLiveSubjects(false);
+    }, 3000);
 
     return () => {
-      isMounted = false;
+      clearInterval(pollInterval);
+      if (bc) bc.close();
+      supabase.removeChannel(realtimeChannel);
+      window.removeEventListener("dumalnext:data-changed", handleUpdate);
+      window.removeEventListener("dumalnext:admin-data-changed", handleUpdate);
+      window.removeEventListener("dumalnext:subjects-changed", handleUpdate);
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("focus", handleUpdate);
     };
-  }, [isJHS, gradeNum]);
+  }, [isJHS, gradeNum, fetchLiveSubjects]);
 
   // Categorized subjects for the current Grade level
   const academicCoreSubjects = subjectsList.filter(

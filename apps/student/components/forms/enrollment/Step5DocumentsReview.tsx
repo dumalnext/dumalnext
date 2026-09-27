@@ -478,6 +478,10 @@ export default function Step5DocumentsReview({
       setReferenceNumber(generatedRef);
       setIsSubmitted(true);
       if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("dumalnext_student_enrollment_step");
+          localStorage.removeItem("dumalnext_student_enrollment_draft");
+        } catch {}
         window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
