@@ -5,22 +5,14 @@ import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import {
   JHS_PROGRAMS,
-  SPS_SPORTS,
-  SHS_STRANDS,
   SHS_TRACKS,
   SHS_ACADEMIC_CLUSTERS,
   SHS_TECHPRO_CLUSTERS,
-  CAREER_PATHWAYS,
   STRENGTHENED_SHS_CORE_SUBJECTS,
-  STRENGTHENED_SHS_ELECTIVES,
-  getStrengthenedElectives,
   SNED_DIAGNOSES,
   SNED_MANIFESTATIONS,
   DISTANCE_LEARNING_MODALITIES,
-  DEPED_ELECTIVES,
-  getEligibleElectives,
 } from "@/lib/types/enrollment";
-import { extractTermNumber } from "@/lib/utils/academicTerm";
 
 interface Step4CurriculumModalityProps {
   data: FullEnrollmentFormData;
@@ -95,94 +87,17 @@ export default function Step4CurriculumModality({
       ? "Technical-Professional Track"
       : rawTrack;
 
-  const currentPathway = data.careerPathway || "";
   const currentCluster =
     data.primaryCluster ||
     (currentTrack === "Academic Track"
       ? "Science, Technology, Engineering, and Mathematics"
       : "ICT Support and Computer Programming Technologies");
 
-  const currentElectives = data.selectedElectives || [];
-  const currentDoorwayElectives = data.doorwayElectives || [];
-
-  const [enableElectives, setEnableElectives] = useState<boolean>(() => {
-    return Array.isArray(data.selectedElectives) && data.selectedElectives.length > 0;
-  });
-
-  const [enableDoorway, setEnableDoorway] = useState<boolean>(() => {
-    return Array.isArray(data.doorwayElectives) && data.doorwayElectives.length > 0;
-  });
-
-  const [selectedClusterFilter, setSelectedClusterFilter] = useState<string>("ALL");
   const [showCoreDetails, setShowCoreDetails] = useState<boolean>(false);
-
-  // Strengthened SHS Electives for current track
-  const trackElectives = getStrengthenedElectives({
-    targetTrack: currentTrack,
-    cluster: selectedClusterFilter === "ALL" ? undefined : selectedClusterFilter,
-    gradeLevel: targetGrade,
-    isDoorway: false,
-  });
-
-  // Cross-track Doorway electives (from the other track)
-  const doorwayOptions = getStrengthenedElectives({
-    targetTrack: currentTrack,
-    gradeLevel: targetGrade,
-    isDoorway: true,
-  });
 
   const currentModalities = data.preferredModalities && data.preferredModalities.length > 0
     ? data.preferredModalities
     : ["Modular (Print)"];
-
-  // Toggle Electives in multi-select array
-  const handleElectiveToggle = (code: string) => {
-    let updated: string[];
-    if (currentElectives.includes(code)) {
-      updated = currentElectives.filter((c) => c !== code);
-    } else {
-      updated = [...currentElectives, code];
-    }
-    onChange({ selectedElectives: updated });
-  };
-
-  // Toggle Doorway Electives (Maximum 2 allowed per DepEd guidelines)
-  const handleDoorwayToggle = (code: string) => {
-    let updated: string[];
-    if (currentDoorwayElectives.includes(code)) {
-      updated = currentDoorwayElectives.filter((c) => c !== code);
-    } else {
-      if (currentDoorwayElectives.length >= 2) {
-        alert("DepEd Reform Policy: Learners may select a maximum of two (2) Doorway cross-track electives.");
-        return;
-      }
-      updated = [...currentDoorwayElectives, code];
-    }
-    onChange({ doorwayElectives: updated });
-  };
-
-  // Pathway selection change
-  const handlePathwayChange = (pathwayId: string) => {
-    if (!pathwayId) {
-      onChange({ careerPathway: "" });
-      return;
-    }
-    const pathway = CAREER_PATHWAYS.find((p) => p.id === pathwayId);
-    if (pathway) {
-      onChange({
-        careerPathway: pathway.name,
-        targetTrack: pathway.track,
-        primaryCluster: pathway.primaryCluster,
-        targetStrand: pathway.primaryCluster,
-        step1: {
-          ...data.step1,
-          targetTrack: pathway.track,
-          targetStrand: pathway.primaryCluster,
-        },
-      });
-      setSelectedClusterFilter(pathway.primaryCluster);
-    }
-  };
 
   // Toggle Modality in multi-select array
   const handleModalityToggle = (modality: string) => {
@@ -287,19 +202,19 @@ export default function Step4CurriculumModality({
       } else {
         onChange({
           targetTrack: currentTrack,
-          targetStrand: currentCluster || currentPathway || currentTrack,
+          targetStrand: currentCluster || currentTrack,
           targetSemester: currentSemester,
-          careerPathway: currentPathway,
+          careerPathway: "",
           primaryCluster: currentCluster,
-          doorwayElectives: enableDoorway ? currentDoorwayElectives : [],
-          selectedElectives: currentElectives,
+          doorwayElectives: [],
+          selectedElectives: [],
           jhsProgram: undefined,
           spsSport: undefined,
           preferredModalities: currentModalities,
           step1: {
             ...data.step1,
             targetTrack: currentTrack,
-            targetStrand: currentCluster || currentPathway || currentTrack,
+            targetStrand: currentCluster || currentTrack,
             targetSemester: currentSemester,
           },
         });
@@ -515,7 +430,6 @@ export default function Step4CurriculumModality({
                                     targetStrand: newCluster,
                                   },
                                 });
-                                setSelectedClusterFilter("ALL");
                                 if (errors.targetTrack) {
                                   setErrors((prev) => {
                                     const next = { ...prev };
@@ -577,78 +491,11 @@ export default function Step4CurriculumModality({
             </div>
           </div>
 
-          {/* SECTION 7-B: CAREER PATHWAYS (DEPED ANNEX B) */}
+          {/* SECTION 7-B: PRIMARY THEMATIC ELECTIVE CLUSTER */}
           <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
             <div className="border-b-2 border-slate-200 pb-3">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                [ Section 7-B: Career Pathway Specialization (Annex B) ]
-              </span>
-              <p className="text-xs text-slate-600 mt-0.5">
-                Optional: Select a designated career pathway to automatically configure recommended elective courses and primary clusters, or choose custom exploration:
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Designated Career Pathway
-              </label>
-              <select
-                value={CAREER_PATHWAYS.find((p) => p.name === currentPathway)?.id || ""}
-                onChange={(e) => handlePathwayChange(e.target.value)}
-                className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-              >
-                <option value="">-- Custom / Exploratory Cluster Selection --</option>
-                {CAREER_PATHWAYS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    [{p.track === "Academic Track" ? "ACAD" : "TECHPRO"}] {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Pathway Info Card */}
-            {currentPathway && (
-              <div className="p-4 bg-white border-2 border-blue-200 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold text-[#002060] uppercase">
-                    Active Pathway: {currentPathway}
-                  </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 font-bold uppercase">
-                    {currentTrack}
-                  </span>
-                </div>
-                {CAREER_PATHWAYS.find((p) => p.name === currentPathway)?.description && (
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    {CAREER_PATHWAYS.find((p) => p.name === currentPathway)?.description}
-                  </p>
-                )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
-                  <div>
-                    <span className="font-bold text-slate-800 block text-[11px] uppercase">
-                      Recommended Academic Electives:
-                    </span>
-                    <span className="text-slate-600 text-[11px]">
-                      {CAREER_PATHWAYS.find((p) => p.name === currentPathway)?.recommendedAcademicElectives.join(", ") || "None specified"}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-slate-800 block text-[11px] uppercase">
-                      Recommended TechPro Electives:
-                    </span>
-                    <span className="text-slate-600 text-[11px]">
-                      {CAREER_PATHWAYS.find((p) => p.name === currentPathway)?.recommendedTechProElectives.join(", ") || "None specified"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* SECTION 7-C: PRIMARY THEMATIC ELECTIVE CLUSTER */}
-          <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
-            <div className="border-b-2 border-slate-200 pb-3">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                [ Section 7-C: Primary Thematic Elective Cluster ]
+                [ Section 7-B: Primary Thematic Elective Cluster ]
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
                 Under the strengthened program, rigid strands are replaced by flexible thematic clusters. Select your primary area of focus:
@@ -703,12 +550,12 @@ export default function Step4CurriculumModality({
             </div>
           </div>
 
-          {/* SECTION 7-D: MANDATORY GRADE 11 UNIFIED CORE FOUNDATION */}
+          {/* SECTION 7-C: MANDATORY GRADE 11 UNIFIED CORE FOUNDATION */}
           <div className="space-y-4 p-6 bg-white border-2 border-slate-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
               <div>
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                  [ Section 7-D: Grade 11 Mandatory Unified Core Subjects ]
+                  [ Section 7-C: Grade 11 Mandatory Unified Core Subjects ]
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Five (5) mandatory unified foundation subjects (160 credit hours each, total 800 hours across Grade 11):
@@ -758,271 +605,7 @@ export default function Step4CurriculumModality({
             </p>
           </div>
 
-          {/* SECTION 7-E: TRACK SPECIALIZED ELECTIVES */}
-          <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300">
-            <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                  [ Section 7-E: Track Specialized Elective Courses ]
-                </span>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Select specialized elective subjects aligned with your track and career goals:
-                </p>
-              </div>
-
-              {/* Interactive Toggle Switch */}
-              <div className="flex items-center gap-3 bg-white p-2 border border-slate-300 self-start sm:self-auto shadow-xs">
-                <span className="text-xs font-bold uppercase text-slate-700">
-                  Select Electives:
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={enableElectives}
-                  onClick={() => {
-                    const next = !enableElectives;
-                    setEnableElectives(next);
-                    if (!next) {
-                      onChange({ selectedElectives: [] });
-                    }
-                  }}
-                  className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer transition-colors duration-200 ease-in-out focus:outline-none border-2 ${
-                    enableElectives
-                      ? "bg-[#002060] border-[#002060]"
-                      : "bg-slate-200 border-slate-400"
-                  }`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-4 w-4 transform bg-white transition duration-200 ease-in-out mt-0.5 ${
-                      enableElectives ? "translate-x-6" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-                <span
-                  className={`text-xs font-mono font-bold uppercase px-2 py-0.5 ${
-                    enableElectives
-                      ? "bg-[#002060] text-white"
-                      : "bg-slate-100 text-slate-500"
-                  }`}
-                >
-                  {enableElectives ? "ON" : "OFF"}
-                </span>
-              </div>
-            </div>
-
-            {enableElectives ? (
-              <div className="space-y-4">
-                {/* Cluster Filter inside Track */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-700 uppercase">Filter Cluster:</span>
-                    <select
-                      value={selectedClusterFilter}
-                      onChange={(e) => setSelectedClusterFilter(e.target.value)}
-                      className="p-1.5 bg-white border border-slate-300 text-xs font-bold outline-none"
-                    >
-                      <option value="ALL">All Clusters in {currentTrack}</option>
-                      {(currentTrack === "Academic Track" ? SHS_ACADEMIC_CLUSTERS : SHS_TECHPRO_CLUSTERS).map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <span className="font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-slate-300 w-fit">
-                    SELECTED: {currentElectives.length} SUBJECT(S)
-                  </span>
-                </div>
-
-                {trackElectives.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {trackElectives.map((elec) => {
-                      const isSelected = currentElectives.includes(elec.code);
-                      return (
-                        <label
-                          key={elec.code}
-                          className={`p-4 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
-                            isSelected
-                              ? "bg-white border-[#002060] shadow-xs"
-                              : "bg-white border-slate-300 hover:border-slate-400"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => handleElectiveToggle(elec.code)}
-                            className="accent-[#002060] mt-1"
-                          />
-                          <div className="space-y-1 text-xs">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className={`font-bold ${isSelected ? "text-[#002060]" : "text-slate-900"}`}>
-                                {elec.name}
-                              </span>
-                              {elec.ncLevel && (
-                                <span className="text-[10px] font-mono px-1.5 py-0.5 bg-amber-100 text-amber-950 border border-amber-300 font-bold">
-                                  {elec.ncLevel}
-                                </span>
-                              )}
-                              {elec.hours && (
-                                <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-50 text-[#002060] border border-blue-200">
-                                  {elec.hours} HRS
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-[10px] font-mono text-slate-500 uppercase">
-                              Cluster: {elec.cluster}
-                            </div>
-                            <p className="text-slate-600 text-[11px] leading-relaxed">
-                              {elec.description}
-                            </p>
-                            {elec.prerequisites && elec.prerequisites !== "none" && (
-                              <div className="text-[10px] text-slate-500 font-mono">
-                                Prereq: {elec.prerequisites}
-                              </div>
-                            )}
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="p-4 bg-white border border-slate-300 text-xs text-slate-600">
-                    No specialized electives matching the current filter.
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-4 bg-white border border-slate-300 space-y-1">
-                <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                  [ STANDARD PROGRAM ACTIVE: NO OPTIONAL ELECTIVES SELECTED ]
-                </span>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Switch the selector to ON if you wish to enroll in specialized cluster electives for this school term.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* SECTION 7-F: DOORWAY OPTION (CROSS-TRACK ELECTIVES) */}
-          <div className="space-y-4 p-5 bg-blue-50/50 border-2 border-blue-300">
-            <div className="border-b border-blue-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                    [ Section 7-F: Doorway Option (Cross-Track Exploration) ]
-                  </span>
-                  <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase">
-                    DEPED REFORM EXCLUSIVE
-                  </span>
-                </div>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Under the Strengthened Senior High School Program, learners are allowed to select <strong>1 to 2 electives from the other track</strong> without track shifting, enabling cross-disciplinary discovery.
-                </p>
-              </div>
-
-              {/* Doorway Toggle Switch */}
-              <div className="flex items-center gap-3 bg-white p-2 border border-slate-300 self-start sm:self-auto shadow-xs">
-                <span className="text-xs font-bold uppercase text-slate-700">
-                  Doorway Mode:
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={enableDoorway}
-                  onClick={() => {
-                    const next = !enableDoorway;
-                    setEnableDoorway(next);
-                    if (!next) {
-                      onChange({ doorwayElectives: [] });
-                    }
-                  }}
-                  className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer transition-colors duration-200 ease-in-out focus:outline-none border-2 ${
-                    enableDoorway
-                      ? "bg-[#002060] border-[#002060]"
-                      : "bg-slate-200 border-slate-400"
-                  }`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-4 w-4 transform bg-white transition duration-200 ease-in-out mt-0.5 ${
-                      enableDoorway ? "translate-x-6" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-                <span
-                  className={`text-xs font-mono font-bold uppercase px-2 py-0.5 ${
-                    enableDoorway
-                      ? "bg-[#002060] text-white"
-                      : "bg-slate-100 text-slate-500"
-                  }`}
-                >
-                  {enableDoorway ? "ON" : "OFF"}
-                </span>
-              </div>
-            </div>
-
-            {enableDoorway ? (
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-slate-700">
-                  <span className="font-semibold">
-                    Offering cross-track courses from{" "}
-                    <strong>
-                      {currentTrack === "Academic Track" ? "Technical-Professional Track" : "Academic Track"}
-                    </strong>:
-                  </span>
-                  <span className="font-mono font-bold text-[#002060] bg-white px-2.5 py-0.5 border border-blue-300 w-fit">
-                    DOORWAY ELECTIVES: {currentDoorwayElectives.length} / 2 MAXIMUM
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {doorwayOptions.slice(0, 12).map((elec) => {
-                    const isSelected = currentDoorwayElectives.includes(elec.code);
-                    return (
-                      <label
-                        key={elec.code}
-                        className={`p-3.5 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
-                          isSelected
-                            ? "bg-white border-[#002060] shadow-xs"
-                            : "bg-white border-slate-300 hover:border-slate-400"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => handleDoorwayToggle(elec.code)}
-                          className="accent-[#002060] mt-1"
-                        />
-                        <div className="space-y-1 text-xs">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`font-bold ${isSelected ? "text-[#002060]" : "text-slate-900"}`}>
-                              {elec.name}
-                            </span>
-                            {elec.ncLevel && (
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 bg-amber-100 text-amber-950 border border-amber-300 font-bold">
-                                {elec.ncLevel}
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-[10px] font-mono text-slate-500 uppercase">
-                            Source Track: {elec.track}
-                          </div>
-                          <p className="text-slate-600 text-[11px] leading-relaxed">
-                            {elec.description}
-                          </p>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="p-3 bg-white border border-slate-300 text-xs text-slate-600">
-                Doorway Option is currently OFF. Turn ON to select 1 to 2 electives from the alternate track.
-              </div>
-            )}
-          </div>
-
-          {/* SECTION 7-G: WORK IMMERSION & FIELD EXPERIENCE NOTICE */}
+          {/* SECTION 7-D: WORK IMMERSION & FIELD EXPERIENCE NOTICE */}
           <div className="p-4 bg-slate-100 border border-slate-300 text-xs space-y-1">
             <span className="font-bold text-slate-900 uppercase block">
               [ DepEd Work Immersion & Field Experience Requirement ]
