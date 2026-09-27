@@ -100,13 +100,17 @@ export default function CurriculumSubjectsConsole() {
     setFormCode(generated);
   };
 
-  // Open Create Modal with optional pre-filled grade and strand
-  const handleOpenCreateModal = (prefillGrade?: number, prefillStrand?: string) => {
+  // Open Create Modal with optional pre-filled grade, strand, and classification type
+  const handleOpenCreateModal = (
+    prefillGrade?: number,
+    prefillStrand?: string,
+    prefillType?: CourseSubjectItem["subject_type"]
+  ) => {
     setIsEditing(false);
     setEditingId("");
     setFormCode("");
     setFormName("");
-    setFormType("Core");
+    setFormType(prefillType || "Core");
     const g = prefillGrade || 7;
     setFormGrade(g);
     if (prefillStrand) {
@@ -233,25 +237,180 @@ export default function CurriculumSubjectsConsole() {
     }
   };
 
+  // Helper predicates for SHS tracks
+  const isTechProSubject = (s: CourseSubjectItem) => {
+    const strand = (s.strand || "").toUpperCase();
+    const code = (s.subject_code || "").toUpperCase();
+    return (
+      strand === "TECHPRO" ||
+      strand.startsWith("TVL") ||
+      code.startsWith("TECH-") ||
+      code.startsWith("TVL-")
+    );
+  };
+
   // Groupings for JHS
   const jhsGrade7 = filteredSubjects.filter((s) => s.grade_level === 7);
   const jhsGrade8 = filteredSubjects.filter((s) => s.grade_level === 8);
   const jhsGrade9 = filteredSubjects.filter((s) => s.grade_level === 9);
   const jhsGrade10 = filteredSubjects.filter((s) => s.grade_level === 10);
 
-  // Groupings for SHS
-  // Grade 11 STEM specifically requested as a sub-heading
-  const shsGrade11Stem = filteredSubjects.filter(
-    (s) => s.grade_level === 11 && s.strand === "STEM"
+  // Groupings for SHS Grade 11 (Separated into Academic & TechPro, each with Core and Elective)
+  const shsGrade11AcademicCore = filteredSubjects.filter(
+    (s) => s.grade_level === 11 && s.subject_type === "Core" && !isTechProSubject(s)
   );
-  // Grade 11 Core & Other Tracks
-  const shsGrade11Other = filteredSubjects.filter(
-    (s) => s.grade_level === 11 && s.strand !== "STEM"
+  const shsGrade11AcademicElectives = filteredSubjects.filter(
+    (s) => s.grade_level === 11 && s.subject_type !== "Core" && !isTechProSubject(s)
   );
+
+  const shsGrade11TechproCore = filteredSubjects.filter(
+    (s) =>
+      s.grade_level === 11 &&
+      s.subject_type === "Core" &&
+      (isTechProSubject(s) || s.strand === "General" || !s.strand)
+  );
+  const shsGrade11TechproElectives = filteredSubjects.filter(
+    (s) => s.grade_level === 11 && s.subject_type !== "Core" && isTechProSubject(s)
+  );
+
   // Grade 12 Sub-heading
   const shsGrade12 = filteredSubjects.filter((s) => s.grade_level === 12);
 
-  // Helper to render subjects table for each sub-heading
+  // Helper to render the actual HTML table of subjects
+  const renderSubjectRowsTable = (
+    list: CourseSubjectItem[],
+    emptyMessage: string,
+    onAddClick?: () => void,
+    addLabel?: string
+  ) => {
+    if (list.length === 0) {
+      return (
+        <div className="p-6 text-center space-y-2 bg-slate-50/50">
+          <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
+            [ {emptyMessage} ]
+          </span>
+          <p className="text-xs text-slate-600 max-w-md mx-auto">
+            No subjects currently match this category or active filter. Click below to add a new subject.
+          </p>
+          {onAddClick && (
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={onAddClick}
+                className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-[#002060] uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                {addLabel || "[ + Add Subject ]"}
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-xs border-collapse font-sans">
+          <thead>
+            <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-mono text-slate-700 uppercase">
+              <th className="p-3 w-40">Subject Code</th>
+              <th className="p-3 min-w-[240px]">Descriptive Title</th>
+              <th className="p-3 w-32">Classification</th>
+              <th className="p-3 min-w-[180px]">Program / Track</th>
+              <th className="p-3 w-36 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200">
+            {list.map((sub) => {
+              const isJhs = sub.grade_level <= 10;
+              return (
+                <tr
+                  key={sub.id}
+                  className="hover:bg-blue-50/40 transition-colors"
+                >
+                  {/* Subject Code */}
+                  <td className="p-3 font-mono font-bold text-[#002060]">
+                    {sub.subject_code}
+                  </td>
+
+                  {/* Subject Title */}
+                  <td className="p-3">
+                    <span className="font-bold text-slate-900 block text-xs sm:text-sm">
+                      {sub.subject_name}
+                    </span>
+                    {sub.description && (
+                      <span className="text-[11px] text-slate-500 block line-clamp-1 mt-0.5">
+                        {sub.description}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Classification Badge */}
+                  <td className="p-3">
+                    {sub.subject_type === "Core" ? (
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
+                        CORE
+                      </span>
+                    ) : sub.subject_type === "Elective" ? (
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-purple-100 text-purple-900 border border-purple-300">
+                        ELECTIVE
+                      </span>
+                    ) : sub.subject_type === "Specialized" ? (
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-amber-100 text-amber-950 border border-amber-400">
+                        SPECIALIZED
+                      </span>
+                    ) : sub.subject_type === "Applied" ? (
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400">
+                        APPLIED
+                      </span>
+                    ) : (
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-red-100 text-red-950 border border-red-300">
+                        INTERVENTION
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Program / Track */}
+                  <td className="p-3">
+                    <span className="text-[11px] font-mono font-bold text-slate-800 block">
+                      {isJhs
+                        ? sub.strand === "SPS"
+                          ? "Special Program in Sports (General SPS)"
+                          : "Regular Basic Education"
+                        : sub.strand
+                        ? sub.strand === "General"
+                          ? "General (All Tracks)"
+                          : `${sub.strand}`
+                        : "General (All Tracks)"}
+                    </span>
+                  </td>
+
+                  {/* Action Buttons */}
+                  <td className="p-3 text-right space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(sub)}
+                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      [ Edit ]
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteSubjectTarget(sub)}
+                      className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      [ Delete ]
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Helper to render subjects table for single-list sub-headings (e.g., JHS Grade 7-10, Grade 12)
   const renderSubjectTable = (
     gradeSubjects: CourseSubjectItem[],
     gradeNum: number,
@@ -286,125 +445,115 @@ export default function CurriculumSubjectsConsole() {
         </div>
 
         {/* Table Content */}
-        {gradeSubjects.length === 0 ? (
-          <div className="p-8 text-center space-y-2 bg-slate-50/50">
-            <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-              [ NO SUBJECTS ON RECORD FOR THIS LEVEL ]
-            </span>
-            <p className="text-xs text-slate-600 max-w-md mx-auto">
-              No subjects currently match this level or active filter. Click below to add a new subject.
-            </p>
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => handleOpenCreateModal(gradeNum, defaultStrand)}
-                className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-[#002060] uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                {addBtnLabel}
-              </button>
+        {renderSubjectRowsTable(
+          gradeSubjects,
+          "NO SUBJECTS ON RECORD FOR THIS LEVEL",
+          () => handleOpenCreateModal(gradeNum, defaultStrand),
+          addBtnLabel
+        )}
+      </div>
+    );
+  };
+
+  // Helper to render Grade 11 with 2 separated sections in one single box: Core Subjects and Elective Part
+  const renderSeparatedTrackBox = (
+    subHeadingTitle: string,
+    coreSubjects: CourseSubjectItem[],
+    electiveSubjects: CourseSubjectItem[],
+    trackStrand: "Academic" | "TechPro"
+  ) => {
+    const totalCount = coreSubjects.length + electiveSubjects.length;
+    const defaultElectiveType = trackStrand === "TechPro" ? "Specialized" : "Elective";
+
+    return (
+      <div className="bg-white border-2 border-slate-300 shadow-xs mb-6 overflow-hidden">
+        {/* Main Subheading Header Bar */}
+        <div className="bg-slate-100 border-b-2 border-slate-300 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-2.5 h-6 bg-[#002060]" />
+            <div>
+              <h4 className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#002060]">
+                {subHeadingTitle}
+              </h4>
+              <span className="text-[10px] font-mono text-slate-500 block uppercase">
+                {totalCount} Total Subject Offerings ({coreSubjects.length} Core • {electiveSubjects.length} Elective / Specialized)
+              </span>
             </div>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse font-sans">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-mono text-slate-700 uppercase">
-                  <th className="p-3 w-40">Subject Code</th>
-                  <th className="p-3 min-w-[240px]">Descriptive Title</th>
-                  <th className="p-3 w-32">Classification</th>
-                  <th className="p-3 min-w-[180px]">Program / Track</th>
-                  <th className="p-3 w-36 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {gradeSubjects.map((sub) => {
-                  const isJhs = sub.grade_level <= 10;
-                  return (
-                    <tr
-                      key={sub.id}
-                      className="hover:bg-blue-50/40 transition-colors"
-                    >
-                      {/* Subject Code */}
-                      <td className="p-3 font-mono font-bold text-[#002060]">
-                        {sub.subject_code}
-                      </td>
 
-                      {/* Subject Title */}
-                      <td className="p-3">
-                        <span className="font-bold text-slate-900 block text-xs sm:text-sm">
-                          {sub.subject_name}
-                        </span>
-                        {sub.description && (
-                          <span className="text-[11px] text-slate-500 block line-clamp-1 mt-0.5">
-                            {sub.description}
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Classification Badge */}
-                      <td className="p-3">
-                        {sub.subject_type === "Core" ? (
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
-                            CORE
-                          </span>
-                        ) : sub.subject_type === "Elective" ? (
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-purple-100 text-purple-900 border border-purple-300">
-                            ELECTIVE
-                          </span>
-                        ) : sub.subject_type === "Specialized" ? (
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-amber-100 text-amber-950 border border-amber-400">
-                            SPECIALIZED
-                          </span>
-                        ) : sub.subject_type === "Applied" ? (
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400">
-                            APPLIED
-                          </span>
-                        ) : (
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-red-100 text-red-950 border border-red-300">
-                            INTERVENTION
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Program / Track */}
-                      <td className="p-3">
-                        <span className="text-[11px] font-mono font-bold text-slate-800 block">
-                          {isJhs
-                            ? sub.strand === "SPS"
-                              ? "Special Program in Sports (General SPS)"
-                              : "Regular Basic Education"
-                            : sub.strand
-                            ? sub.strand === "General"
-                              ? "General (All Tracks)"
-                              : `${sub.strand}`
-                            : "General (All Tracks)"}
-                        </span>
-                      </td>
-
-                      {/* Action Buttons */}
-                      <td className="p-3 text-right space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditModal(sub)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                        >
-                          [ Edit ]
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteSubjectTarget(sub)}
-                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                        >
-                          [ Delete ]
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleOpenCreateModal(11, trackStrand, "Core")}
+              className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+            >
+              [ + Add Core Subject ]
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOpenCreateModal(11, trackStrand, defaultElectiveType)}
+              className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+            >
+              [ + Add Elective Subject ]
+            </button>
           </div>
-        )}
+        </div>
+
+        {/* SUBSECTION 1: CORE SUBJECTS */}
+        <div className="border-b-4 border-slate-300">
+          <div className="bg-blue-50/70 border-b border-blue-200 px-4 sm:px-6 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider">
+                [ Core Subjects ]
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-100 text-[#002060] font-bold border border-blue-300">
+                {coreSubjects.length} {coreSubjects.length === 1 ? "COURSE" : "COURSES"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenCreateModal(11, trackStrand, "Core")}
+              className="text-[11px] font-mono font-bold text-[#002060] hover:underline uppercase cursor-pointer"
+            >
+              [ + Add Core ]
+            </button>
+          </div>
+
+          {renderSubjectRowsTable(
+            coreSubjects,
+            `NO CORE SUBJECTS ON RECORD FOR GRADE 11 ${trackStrand.toUpperCase()}`,
+            () => handleOpenCreateModal(11, trackStrand, "Core"),
+            "[ + Add Core Subject ]"
+          )}
+        </div>
+
+        {/* SUBSECTION 2: ELECTIVE PART */}
+        <div>
+          <div className="bg-purple-50/60 border-b border-purple-200 px-4 sm:px-6 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-purple-950 uppercase tracking-wider">
+                [ Elective Part ]
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 bg-purple-100 text-purple-950 font-bold border border-purple-300">
+                {electiveSubjects.length} {electiveSubjects.length === 1 ? "COURSE" : "COURSES"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenCreateModal(11, trackStrand, defaultElectiveType)}
+              className="text-[11px] font-mono font-bold text-purple-900 hover:underline uppercase cursor-pointer"
+            >
+              [ + Add Elective ]
+            </button>
+          </div>
+
+          {renderSubjectRowsTable(
+            electiveSubjects,
+            `NO ELECTIVE / SPECIALIZED SUBJECTS ON RECORD FOR GRADE 11 ${trackStrand.toUpperCase()}`,
+            () => handleOpenCreateModal(11, trackStrand, defaultElectiveType),
+            "[ + Add Elective Subject ]"
+          )}
+        </div>
       </div>
     );
   };
@@ -718,7 +867,7 @@ export default function CurriculumSubjectsConsole() {
               </span>
               <button
                 type="button"
-                onClick={() => handleOpenCreateModal(11, "STEM")}
+                onClick={() => handleOpenCreateModal(11, "Academic")}
                 className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
               >
                 [ + Add SHS Subject ]
@@ -728,31 +877,28 @@ export default function CurriculumSubjectsConsole() {
 
           {/* SHS Sub-Headings Stack */}
           <div className="p-4 sm:p-6 space-y-2">
-            {/* Grade 11 STEM (Sub Headings) - specifically requested */}
-            {renderSubjectTable(
-              shsGrade11Stem,
-              11,
-              "Grade 11 STEM (Sub Headings)",
-              "STEM",
-              "[ + Add Grade 11 STEM Subject ]"
+            {/* Grade 11 Academic (Sub Headings) */}
+            {renderSeparatedTrackBox(
+              "Grade 11 Academic (Sub Headings)",
+              shsGrade11AcademicCore,
+              shsGrade11AcademicElectives,
+              "Academic"
             )}
 
-            {/* Grade 11 Core & Other Tracks (Sub Headings) */}
-            {shsGrade11Other.length > 0 &&
-              renderSubjectTable(
-                shsGrade11Other,
-                11,
-                "Grade 11 Core & Other Tracks (Sub Headings)",
-                "General",
-                "[ + Add Grade 11 Core Subject ]"
-              )}
+            {/* Grade 11 Techpro (Sub Headings) */}
+            {renderSeparatedTrackBox(
+              "Grade 11 Techpro (Sub Headings)",
+              shsGrade11TechproCore,
+              shsGrade11TechproElectives,
+              "TechPro"
+            )}
 
             {/* Grade 12 (Sub Headings) */}
             {renderSubjectTable(
               shsGrade12,
               12,
               "Grade 12 (Sub Headings)",
-              "STEM",
+              "Academic",
               "[ + Add Grade 12 Subject ]"
             )}
           </div>
