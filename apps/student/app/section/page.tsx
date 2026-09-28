@@ -348,7 +348,48 @@ function SectionPageContent() {
               }
 
               if (chosenElectiveRaw) {
-                let resolvedName = SHS_ELECTIVES_MAP[chosenElectiveRaw.toUpperCase()];
+                let resolvedName = "";
+
+                // 1. Try matching with configured subjects from system_settings or course_subjects
+                try {
+                  const { data: sysSubj } = await supabase
+                    .from("system_settings")
+                    .select("value")
+                    .eq("key", "subjects_config")
+                    .maybeSingle();
+                  const configured: any[] = sysSubj?.value?.subjects || [];
+                  const foundSubj = configured.find((s: any) => {
+                    const c = (s.subject_code || s.subjectCode || "").trim().toUpperCase();
+                    const n = (s.subject_name || s.subjectName || "").trim().toUpperCase();
+                    const raw = chosenElectiveRaw.trim().toUpperCase();
+                    return c === raw || n === raw || n.includes(raw) || raw.includes(n);
+                  });
+                  if (foundSubj) {
+                    resolvedName = foundSubj.subject_name || foundSubj.subjectName;
+                  }
+                } catch {}
+
+                if (!resolvedName) {
+                  try {
+                    const { data: dbSubjs } = await supabase
+                      .from("course_subjects")
+                      .select("subject_code, subject_name");
+                    const foundSubj = (dbSubjs || []).find((s: any) => {
+                      const c = (s.subject_code || "").trim().toUpperCase();
+                      const n = (s.subject_name || "").trim().toUpperCase();
+                      const raw = chosenElectiveRaw.trim().toUpperCase();
+                      return c === raw || n === raw || n.includes(raw) || raw.includes(n);
+                    });
+                    if (foundSubj) {
+                      resolvedName = foundSubj.subject_name;
+                    }
+                  } catch {}
+                }
+
+                // 2. Fallback to static catalog and raw code
+                if (!resolvedName) {
+                  resolvedName = SHS_ELECTIVES_MAP[chosenElectiveRaw.toUpperCase()];
+                }
                 if (!resolvedName) {
                   for (const [code, name] of Object.entries(SHS_ELECTIVES_MAP)) {
                     if (

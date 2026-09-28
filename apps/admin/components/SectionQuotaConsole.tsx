@@ -651,15 +651,9 @@ export default function SectionQuotaConsole() {
     };
   }, []);
 
-  // Merge custom elective sections from `sections` with `electiveSections`
+  // Strictly use elective sections derived dynamically from Subject Management
   const allElectivesMerged: SectionDetail[] = [...electiveSections];
-  sections.forEach((sec) => {
-    if (sec.strand === "Elective" || sec.isElective) {
-      if (!allElectivesMerged.some((e) => e.id === sec.id)) {
-        allElectivesMerged.push(sec);
-      }
-    }
-  });
+
 
   // Base regular sections
   const regularSections = sections.filter((sec) => sec.strand !== "Elective" && !sec.isElective);
