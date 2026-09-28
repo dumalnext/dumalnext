@@ -161,11 +161,61 @@ export default function AdjudicationModal({
   const targetProgram =
     appElectivePayload.jhsProgram || application.jhsProgram || st?.jhs_program || "Regular";
 
-  // Filter sections matching applicant grade level & strand
+  // SHS 2-Track and Electives Resolution
+  const isSHS = Number(application.target_grade_level) >= 11;
+  const rawShsStrand = (
+    appElectivePayload.targetTrack ||
+    appElectivePayload.targetStrand ||
+    application.target_track ||
+    application.target_strand ||
+    st?.strand ||
+    ""
+  ).toLowerCase();
+
+  const isTechPro = rawShsStrand.includes("tech") || rawShsStrand.includes("tvl") || rawShsStrand.includes("pro");
+  const shsTrackTitle = isTechPro ? "Technical-Professional (Tech-Pro) Track" : "Academic Track";
+
+  let rawElectives: string[] = [];
+  if (Array.isArray(appElectivePayload.selectedElectives) && appElectivePayload.selectedElectives.length > 0) {
+    rawElectives = appElectivePayload.selectedElectives;
+  } else if (Array.isArray(application.selected_electives) && application.selected_electives.length > 0) {
+    const first = application.selected_electives[0];
+    if (typeof first === "string") {
+      rawElectives = application.selected_electives;
+    } else if (typeof first === "object" && first !== null && Array.isArray(first.selectedElectives)) {
+      rawElectives = first.selectedElectives;
+    }
+  }
+
+  const [allSubjects, setAllSubjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch(`/api/subjects?_t=${Date.now()}`, { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data?.subjects && Array.isArray(data.subjects)) {
+          setAllSubjects(data.subjects);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Filter sections matching applicant grade level & track/strand
   const eligibleSections = modalSections.filter((s) => {
     if (s.grade_level !== Number(application.target_grade_level)) return false;
-    if (application.target_strand && s.strand) {
-      return s.strand.toUpperCase() === application.target_strand.toUpperCase();
+    if (isSHS) {
+      if (s.strand) {
+        const secIsTechPro =
+          s.strand.toLowerCase().includes("tech") ||
+          s.strand.toLowerCase().includes("tvl") ||
+          s.strand.toLowerCase().includes("pro");
+        return isTechPro ? secIsTechPro : !secIsTechPro;
+      }
+      return true;
     }
     return true;
   });
@@ -267,7 +317,9 @@ export default function AdjudicationModal({
           updated_at: new Date().toISOString(),
         };
 
-        if (!application.target_strand && targetProgram) {
+        if (isSHS) {
+          studentUpdates.strand = isTechPro ? "Tech-Pro" : "Academic";
+        } else if (!application.target_strand && targetProgram) {
           studentUpdates.strand = targetProgram === "SPS" ? "SPS" : null;
         }
 
@@ -356,7 +408,7 @@ export default function AdjudicationModal({
               {fullName}
             </h2>
             <p className="text-xs text-blue-200">
-              Account: {application.userAccount?.email || "N/A"} &bull; Target: Grade {application.target_grade_level} {application.target_strand ? `(${application.target_strand})` : ""}
+              Account: {application.userAccount?.email || "N/A"} &bull; Target: Grade {application.target_grade_level} {isSHS ? `(${shsTrackTitle})` : application.target_strand ? `(${application.target_strand})` : ""}
             </p>
           </div>
 
@@ -691,13 +743,59 @@ export default function AdjudicationModal({
                   <div>
                     <span className="text-slate-500 block text-[10px]">Curricular Program:</span>
                     <strong className="text-slate-900">
-                      {application.target_strand
-                        ? `Senior High School - ${application.target_strand}`
+                      {isSHS
+                        ? `Senior High School - ${shsTrackTitle}`
                         : targetProgram === "SPS"
                         ? "Special Program in Sports (General SPS)"
                         : "Regular Basic Education JHS Curriculum"}
                     </strong>
                   </div>
+
+                  {/* SHS Selected Elective Subject Display */}
+                  {isSHS && (
+                    <div className="pt-2 border-t border-slate-200 mt-2 space-y-1">
+                      <span className="text-slate-500 block text-[10px]">
+                        {isTechPro ? "Curriculum Track Structure:" : "Selected Elective Subject:"}
+                      </span>
+                      {isTechPro ? (
+                        <div>
+                          <span className="px-2 py-0.5 bg-slate-200 border border-slate-300 text-slate-800 text-[11px] font-mono font-bold uppercase inline-block">
+                            Fixed Tech-Pro Curriculum (No Elective Required)
+                          </span>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            All specialized technical-professional subjects are prescribed and fixed per DepEd MATATAG curriculum.
+                          </p>
+                        </div>
+                      ) : rawElectives.length > 0 ? (
+                        <div className="space-y-1">
+                          {rawElectives.map((code) => {
+                            const foundSub = allSubjects.find(
+                              (s) =>
+                                s.subject_code?.toLowerCase() === code.toLowerCase() ||
+                                s.subject_name?.toLowerCase() === code.toLowerCase()
+                            );
+                            const displayName = foundSub
+                              ? `${foundSub.subject_code} - ${foundSub.subject_name}`
+                              : code;
+                            return (
+                              <div
+                                key={code}
+                                className="px-2.5 py-1 bg-blue-100 border border-blue-300 text-[#002060] font-mono font-bold text-[11px] inline-block"
+                              >
+                                [ ELECTIVE ]: {displayName}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div>
+                          <span className="px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-900 text-[11px] font-mono font-bold uppercase inline-block">
+                            [ None Selected / Pending Enrollment Selection ]
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {isTransferRequested && (
                     <div className="p-2.5 bg-amber-50 border border-amber-300 mt-2 space-y-1">
                       <span className="text-[10px] font-bold text-amber-950 uppercase block font-mono">
@@ -907,8 +1005,7 @@ export default function AdjudicationModal({
                   <div className="p-3 bg-red-100 border border-red-400 text-xs text-red-950 space-y-1">
                     <strong className="block">[ NO ELIGIBLE SECTIONS FOUND IN DATABASE ]</strong>
                     <p className="text-[11px]">
-                      There are currently no active sections configured for Grade {application.target_grade_level}
-                      {application.target_strand ? ` (${application.target_strand})` : ""}.
+                      There are currently no active sections configured for Grade {application.target_grade_level} ({isSHS ? shsTrackTitle : application.target_strand || "General"}).
                       Please create or activate sections in the Sections console before approving this student.
                     </p>
                   </div>

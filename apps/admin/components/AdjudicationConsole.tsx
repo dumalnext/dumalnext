@@ -27,6 +27,27 @@ export default function AdjudicationConsole() {
   // Selected Application for Review Modal
   const [selectedApp, setSelectedApp] = useState<ApplicationDetail | null>(null);
 
+  // Subjects directory map (subject_code -> subject_name)
+  const [subjectsMap, setSubjectsMap] = useState<Map<string, string>>(new Map());
+
+  const fetchSubjects = async () => {
+    try {
+      const res = await fetch(`/api/subjects?_t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.subjects && Array.isArray(json.subjects)) {
+          const sm = new Map<string, string>();
+          json.subjects.forEach((s: any) => {
+            if (s.subject_code) sm.set(s.subject_code.toLowerCase(), s.subject_name);
+          });
+          setSubjectsMap(sm);
+        }
+      }
+    } catch (err) {
+      console.warn("Notice fetching subjects for adjudication:", err);
+    }
+  };
+
   // Fetch Academic Terms from Supabase / API
   const fetchAcademicTerms = async () => {
     try {
@@ -305,6 +326,7 @@ export default function AdjudicationConsole() {
     // 1. Initial silent/active load
     fetchAcademicTerms();
     fetchData();
+    fetchSubjects();
 
     // 2. Realtime subscription to enrollment_applications, academic_terms, sections, and system_settings
     const appChannel = supabase
@@ -474,6 +496,201 @@ export default function AdjudicationConsole() {
 
     return true;
   });
+
+  const jhsGrades = [7, 8, 9, 10];
+  const shsGrades = [11, 12];
+
+  const activeJhsGrades =
+    gradeFilter === "ALL"
+      ? jhsGrades
+      : jhsGrades.filter((g) => g.toString() === gradeFilter);
+
+  const activeShsGrades =
+    gradeFilter === "ALL"
+      ? shsGrades
+      : shsGrades.filter((g) => g.toString() === gradeFilter);
+
+  const jhsTotalCount = filteredApplications.filter((a) =>
+    jhsGrades.includes(Number(a.target_grade_level))
+  ).length;
+
+  const shsTotalCount = filteredApplications.filter((a) =>
+    shsGrades.includes(Number(a.target_grade_level))
+  ).length;
+
+  const getShsInfo = (app: ApplicationDetail) => {
+    const isSHS = Number(app.target_grade_level) >= 11;
+    if (!isSHS) return null;
+
+    const fd =
+      Array.isArray(app.selected_electives) && app.selected_electives.length > 0
+        ? app.selected_electives[0]
+        : typeof app.selected_electives === "object" && app.selected_electives !== null
+        ? app.selected_electives
+        : {};
+
+    const rawStrand = (
+      fd.targetTrack ||
+      fd.targetStrand ||
+      app.target_track ||
+      app.target_strand ||
+      app.student?.strand ||
+      ""
+    ).toLowerCase();
+
+    const isTechPro =
+      rawStrand.includes("tech") ||
+      rawStrand.includes("tvl") ||
+      rawStrand.includes("pro");
+    const trackTitle = isTechPro
+      ? "Technical-Professional (Tech-Pro) Track"
+      : "Academic Track";
+
+    let rawElectives: string[] = [];
+    if (Array.isArray(fd.selectedElectives) && fd.selectedElectives.length > 0) {
+      rawElectives = fd.selectedElectives;
+    } else if (
+      Array.isArray(app.selected_electives) &&
+      app.selected_electives.length > 0
+    ) {
+      const first = app.selected_electives[0];
+      if (typeof first === "string") {
+        rawElectives = app.selected_electives;
+      } else if (
+        typeof first === "object" &&
+        first !== null &&
+        Array.isArray(first.selectedElectives)
+      ) {
+        rawElectives = first.selectedElectives;
+      }
+    }
+
+    return {
+      isTechPro,
+      trackTitle,
+      electives: rawElectives,
+    };
+  };
+
+  const renderApplicationRow = (app: ApplicationDetail) => {
+    const st = app.student;
+    const studentName = st
+      ? `${st.last_name}, ${st.first_name} ${st.middle_name || ""}`.trim()
+      : "APPLICANT LEARNER";
+
+    const isSHS = Number(app.target_grade_level) >= 11;
+    const shsInfo = isSHS ? getShsInfo(app) : null;
+
+    return (
+      <tr key={app.id} className="hover:bg-slate-50 transition-colors">
+        <td className="p-3 font-mono font-bold text-[#002060]">
+          {app.application_id}
+        </td>
+        <td className="p-3 font-bold text-slate-900 uppercase">
+          {studentName}
+          {app.userAccount?.email && (
+            <span className="text-[10px] text-slate-500 font-normal block lowercase font-sans">
+              {app.userAccount.email}
+            </span>
+          )}
+        </td>
+        <td className="p-3 font-mono">
+          {st?.student_id && /^\d{12}$/.test(st.student_id) ? (
+            <span className="font-bold text-slate-900">{st.student_id}</span>
+          ) : (
+            <span className="text-slate-400 italic font-sans text-[11px]">No LRN (Pending LIS)</span>
+          )}
+        </td>
+        <td className="p-3">
+          <span className="font-bold text-slate-900 block">
+            Grade {app.target_grade_level}
+          </span>
+          {isSHS && shsInfo ? (
+            <div className="space-y-0.5 mt-0.5">
+              <span className="text-[11px] font-bold text-[#002060] block">
+                {shsInfo.trackTitle}
+              </span>
+              {shsInfo.isTechPro ? (
+                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 border border-slate-200 inline-block">
+                  Fixed Tech-Pro Curriculum
+                </span>
+              ) : shsInfo.electives.length > 0 ? (
+                <div className="flex flex-wrap gap-1 mt-0.5">
+                  {shsInfo.electives.map((el) => {
+                    const name = subjectsMap.get(el.toLowerCase());
+                    return (
+                      <span
+                        key={el}
+                        className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block"
+                        title={name || el}
+                      >
+                        [ Elective ]: {name ? `${el} (${name})` : el}
+                      </span>
+                    );
+                  })}
+                </div>
+              ) : (
+                <span className="text-[10px] font-mono text-amber-800 bg-amber-50 px-1.5 py-0.5 border border-amber-200 inline-block">
+                  [ Pending Elective Selection ]
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className="text-[10px] text-slate-600 block">
+              {(app as any).jhsProgram === "SPS" || st?.jhs_program === "SPS"
+                ? "JHS (General SPS)"
+                : "JHS Regular Curriculum"}
+            </span>
+          )}
+          {(app as any).isTransferRequested && (
+            <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-400">
+              [ TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"} ]
+            </span>
+          )}
+          <div className="mt-1">
+            <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block">
+              S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
+            </span>
+            {st?.current_section_id && (
+              <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block ml-1">
+                {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
+              </span>
+            )}
+          </div>
+        </td>
+        <td className="p-3 font-mono text-slate-600">
+          {new Date(app.created_at).toLocaleDateString()}
+        </td>
+        <td className="p-3">
+          {app.status === "Approved" ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border border-emerald-500">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
+              APPROVED
+            </span>
+          ) : app.status === "Needs Revision" ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border border-red-500">
+              <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
+              REVISION
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border border-amber-400">
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              PENDING
+            </span>
+          )}
+        </td>
+        <td className="p-3 text-right">
+          <button
+            type="button"
+            onClick={() => setSelectedApp(app)}
+            className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+          >
+            [ Review Dossier ]
+          </button>
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -764,139 +981,175 @@ export default function AdjudicationConsole() {
         )}
       </div>
 
-      {/* Applications Table */}
-      <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto">
-        {isFetchingApps && !hasLoadedAppsOnce.current ? (
-          <div className="p-8 text-center">
-            <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-          </div>
-        ) : filteredApplications.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-              [ NO APPLICATIONS FOUND FOR S.Y. {effectiveSY} &bull; {effectiveTerm} ]
-            </span>
-            <p className="text-xs text-slate-600 max-w-md mx-auto">
-              {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE"
-                ? `No student enrollment applications have been submitted yet for the current active period (S.Y. ${effectiveSY} • ${effectiveTerm}). As students enroll online, they will appear in this queue automatically.`
-                : `No enrollment applications match the selected academic period (S.Y. ${effectiveSY} • ${effectiveTerm}), grade level, or search query.`}
-            </p>
-            {(selectedSY !== "ALL" || selectedTerm !== "ALL") && (
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedSY("ALL");
-                    setSelectedTerm("ALL");
-                  }}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 uppercase tracking-wider transition-colors cursor-pointer"
-                >
-                  [ View Applications Across All Terms ]
-                </button>
+      {/* Applications Directory Grouped by JHS and SHS */}
+      {isFetchingApps && !hasLoadedAppsOnce.current ? (
+        <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center">
+          <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <span className="text-xs font-mono uppercase text-slate-500">[ Loading Adjudication Queue... ]</span>
+        </div>
+      ) : filteredApplications.length === 0 ? (
+        <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center space-y-3">
+          <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
+            [ NO APPLICATIONS FOUND FOR S.Y. {effectiveSY} &bull; {effectiveTerm} ]
+          </span>
+          <p className="text-xs text-slate-600 max-w-md mx-auto">
+            {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE"
+              ? `No student enrollment applications have been submitted yet for the current active period (S.Y. ${effectiveSY} • ${effectiveTerm}). As students enroll online, they will appear in this queue automatically.`
+              : `No enrollment applications match the selected academic period (S.Y. ${effectiveSY} • ${effectiveTerm}), grade level, or search query.`}
+          </p>
+          {(selectedSY !== "ALL" || selectedTerm !== "ALL") && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedSY("ALL");
+                  setSelectedTerm("ALL");
+                }}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                [ View Applications Across All Terms ]
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* 1. JUNIOR HIGH SCHOOL (JHS) SECTION */}
+          {activeJhsGrades.length > 0 && (
+            <div className="bg-white border-2 border-[#002060] shadow-xs overflow-hidden">
+              {/* JHS HEADING */}
+              <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold uppercase tracking-wider text-xs sm:text-sm">
+                    [ JUNIOR HIGH SCHOOL (JHS) ENROLLEES ]
+                  </span>
+                  <span className="text-[11px] text-blue-200 hidden sm:inline">&bull; Grades 7, 8, 9, &amp; 10</span>
+                </div>
+                <span className="font-mono font-bold text-xs bg-white/20 px-2.5 py-1 rounded text-white self-start sm:self-auto">
+                  {jhsTotalCount} Enrollee{jhsTotalCount === 1 ? "" : "s"}
+                </span>
               </div>
-            )}
-          </div>
-        ) : (
-          <table className="w-full text-left border-collapse text-xs font-sans">
-            <thead>
-              <tr className="bg-slate-100 border-b-2 border-slate-300 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                <th className="p-3">Reference No.</th>
-                <th className="p-3">Learner Full Name</th>
-                <th className="p-3">12-Digit LRN</th>
-                <th className="p-3">Grade &amp; Curriculum</th>
-                <th className="p-3">Date Submitted</th>
-                <th className="p-3">Status</th>
-                <th className="p-3 text-right">Adjudication Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filteredApplications.map((app) => {
-                const st = app.student;
-                const studentName = st
-                  ? `${st.last_name}, ${st.first_name} ${st.middle_name || ""}`.trim()
-                  : "APPLICANT LEARNER";
 
-                return (
-                  <tr key={app.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3 font-mono font-bold text-[#002060]">
-                      {app.application_id}
-                    </td>
-                    <td className="p-3 font-bold text-slate-900 uppercase">
-                      {studentName}
-                      {app.userAccount?.email && (
-                        <span className="text-[10px] text-slate-500 font-normal block lowercase">
-                          {app.userAccount.email}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-3 font-mono">
-                      {st?.student_id && /^\d{12}$/.test(st.student_id) ? (
-                        <span className="font-bold text-slate-900">{st.student_id}</span>
+              {/* JHS SUB-HEADINGS */}
+              <div className="divide-y-2 divide-slate-200">
+                {activeJhsGrades.map((grade) => {
+                  const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
+                  return (
+                    <div key={grade} className="bg-white">
+                      {/* SUB-HEADING */}
+                      <div className="bg-slate-100 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
+                            Grade {grade}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-600 font-bold">
+                            [{gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"}]
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content: Table or Empty state */}
+                      {gradeApps.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/40">
+                          No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
+                        </div>
                       ) : (
-                        <span className="text-slate-400 italic font-sans text-[11px]">No LRN (Pending LIS)</span>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse text-xs font-sans">
+                            <thead>
+                              <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                <th className="p-2.5">Reference No.</th>
+                                <th className="p-2.5">Learner Full Name</th>
+                                <th className="p-2.5">12-Digit LRN</th>
+                                <th className="p-2.5">Curriculum / Program</th>
+                                <th className="p-2.5">Date Submitted</th>
+                                <th className="p-2.5">Status</th>
+                                <th className="p-2.5 text-right">Adjudication Action</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {gradeApps.map((app) => renderApplicationRow(app))}
+                            </tbody>
+                          </table>
+                        </div>
                       )}
-                    </td>
-                    <td className="p-3">
-                      <span className="font-bold text-slate-900 block">
-                        Grade {app.target_grade_level}
-                      </span>
-                      <span className="text-[10px] text-slate-600 block">
-                        {app.target_strand
-                          ? `SHS (${app.target_strand})`
-                          : (app as any).jhsProgram === "SPS" || st?.jhs_program === "SPS"
-                          ? "JHS (General SPS)"
-                          : "JHS Regular"}
-                      </span>
-                      {(app as any).isTransferRequested && (
-                        <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-400">
-                          [ TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"} ]
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 2. SENIOR HIGH SCHOOL (SHS) SECTION */}
+          {activeShsGrades.length > 0 && (
+            <div className="bg-white border-2 border-[#002060] shadow-xs overflow-hidden">
+              {/* SHS HEADING */}
+              <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold uppercase tracking-wider text-xs sm:text-sm">
+                    [ SENIOR HIGH SCHOOL (SHS) ENROLLEES ]
+                  </span>
+                  <span className="text-[11px] text-blue-200 hidden sm:inline">&bull; Grades 11 &amp; 12 &bull; Academic &amp; Tech-Pro</span>
+                </div>
+                <span className="font-mono font-bold text-xs bg-white/20 px-2.5 py-1 rounded text-white self-start sm:self-auto">
+                  {shsTotalCount} Enrollee{shsTotalCount === 1 ? "" : "s"}
+                </span>
+              </div>
+
+              {/* SHS SUB-HEADINGS */}
+              <div className="divide-y-2 divide-slate-200">
+                {activeShsGrades.map((grade) => {
+                  const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
+                  return (
+                    <div key={grade} className="bg-white">
+                      {/* SUB-HEADING */}
+                      <div className="bg-slate-100 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
+                            Grade {grade}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-600 font-bold">
+                            [{gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"}]
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-500 uppercase">
+                          Academic &amp; Tech-Pro Tracks
                         </span>
-                      )}
-                      <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block mt-1">
-                        S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
-                      </span>
-                      {st?.current_section_id && (
-                        <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block mt-1 ml-1">
-                          {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-3 font-mono text-slate-600">
-                      {new Date(app.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-3">
-                      {app.status === "Approved" ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border border-emerald-500">
-                          <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
-                          APPROVED
-                        </span>
-                      ) : app.status === "Needs Revision" ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border border-red-500">
-                          <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
-                          REVISION
-                        </span>
+                      </div>
+
+                      {/* Content: Table or Empty state */}
+                      {gradeApps.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/40">
+                          No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
+                        </div>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border border-amber-400">
-                          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-                          PENDING
-                        </span>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse text-xs font-sans">
+                            <thead>
+                              <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                <th className="p-2.5">Reference No.</th>
+                                <th className="p-2.5">Learner Full Name</th>
+                                <th className="p-2.5">12-Digit LRN</th>
+                                <th className="p-2.5">SHS Track &amp; Elective</th>
+                                <th className="p-2.5">Date Submitted</th>
+                                <th className="p-2.5">Status</th>
+                                <th className="p-2.5 text-right">Adjudication Action</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {gradeApps.map((app) => renderApplicationRow(app))}
+                            </tbody>
+                          </table>
+                        </div>
                       )}
-                    </td>
-                    <td className="p-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedApp(app)}
-                        className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs"
-                      >
-                        [ Review Dossier ]
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Adjudication Inspection Modal */}
       {selectedApp && (
