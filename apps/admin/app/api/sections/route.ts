@@ -329,6 +329,8 @@ export async function GET(req: Request) {
         if (fd.firstElective) rawElectives.push(fd.firstElective);
         if (fd.secondElective) rawElectives.push(fd.secondElective);
         if (fd.electiveSubject) rawElectives.push(fd.electiveSubject);
+        if (fd.assigned_elective_code) rawElectives.push(fd.assigned_elective_code);
+        if (fd.assigned_elective_name) rawElectives.push(fd.assigned_elective_name);
 
         const enrichedStudentItem = {
           ...studentObj,

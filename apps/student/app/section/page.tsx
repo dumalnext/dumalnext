@@ -327,8 +327,9 @@ function SectionPageContent() {
             if (effectiveGrade >= 11) {
               const targetApp = activeApp || userApps[0];
               let chosenElectiveRaw = "";
+              let fd: any = {};
               if (targetApp && targetApp.selected_electives) {
-                const fd = Array.isArray(targetApp.selected_electives) && targetApp.selected_electives.length > 0
+                fd = Array.isArray(targetApp.selected_electives) && targetApp.selected_electives.length > 0
                   ? targetApp.selected_electives[0]
                   : typeof targetApp.selected_electives === "object" && targetApp.selected_electives !== null
                   ? targetApp.selected_electives
@@ -343,7 +344,14 @@ function SectionPageContent() {
                   else if (first?.name) chosenElectiveRaw = first.name;
                 }
                 if (!chosenElectiveRaw) {
-                  chosenElectiveRaw = fd.elective || fd.firstElective || fd.secondElective || fd.electiveSubject || "";
+                  chosenElectiveRaw =
+                    fd.assigned_elective_name ||
+                    fd.assigned_elective_code ||
+                    fd.elective ||
+                    fd.firstElective ||
+                    fd.secondElective ||
+                    fd.electiveSubject ||
+                    "";
                 }
               }
 
@@ -404,7 +412,9 @@ function SectionPageContent() {
                 }
                 if (!resolvedName) resolvedName = chosenElectiveRaw;
 
-                const electiveSecName = `Grade ${effectiveGrade} Elective - ${resolvedName}`;
+                const electiveSecName =
+                  fd.assigned_elective_section_name ||
+                  `Grade ${effectiveGrade} Elective - ${resolvedName}`;
 
                 if (isMounted) {
                   setElectiveInfo({

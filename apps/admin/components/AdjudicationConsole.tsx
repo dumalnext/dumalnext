@@ -10,6 +10,7 @@ export default function AdjudicationConsole() {
   // Adjudication Console Data State
   const [applications, setApplications] = useState<ApplicationDetail[]>([]);
   const [sections, setSections] = useState<SectionItem[]>([]);
+  const [electiveSections, setElectiveSections] = useState<any[]>([]);
   const [isFetchingApps, setIsFetchingApps] = useState<boolean>(true);
   const hasLoadedAppsOnce = useRef<boolean>(false);
 
@@ -115,6 +116,9 @@ export default function AdjudicationConsole() {
               capacity: Number(s.capacity) || 40,
               enrolledCount: Number(s.enrolledCount) || 0,
             }));
+          }
+          if (secJson.success && Array.isArray(secJson.electiveSections)) {
+            setElectiveSections(secJson.electiveSections);
           }
         }
       } catch (secApiErr) {
@@ -656,6 +660,11 @@ export default function AdjudicationConsole() {
                 {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
               </span>
             )}
+            {app.target_grade_level >= 11 && ((app as any).selected_electives?.[0]?.assigned_elective_section_name || ((app as any).selected_electives?.[0]?.assigned_elective_name ? `Elective - ${(app as any).selected_electives[0].assigned_elective_name}` : null)) && (
+              <span className="text-[10px] font-mono font-bold text-purple-900 bg-purple-100 px-1.5 py-0.5 border border-purple-300 inline-block ml-1">
+                {(app as any).selected_electives[0].assigned_elective_section_name || `Elective - ${(app as any).selected_electives[0].assigned_elective_name}`}
+              </span>
+            )}
           </div>
         </td>
         <td className="p-3 font-mono text-slate-600">
@@ -1156,6 +1165,7 @@ export default function AdjudicationConsole() {
         <AdjudicationModal
           application={selectedApp}
           sections={sections}
+          electiveSections={electiveSections}
           onClose={() => setSelectedApp(null)}
           onAdjudicationSuccess={() => fetchData(true)}
         />

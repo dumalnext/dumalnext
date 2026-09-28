@@ -89,6 +89,7 @@ export interface SectionItem {
 interface AdjudicationModalProps {
   application: ApplicationDetail;
   sections: SectionItem[];
+  electiveSections?: any[];
   onClose: () => void;
   onAdjudicationSuccess: () => void;
 }
@@ -96,26 +97,37 @@ interface AdjudicationModalProps {
 export default function AdjudicationModal({
   application,
   sections,
+  electiveSections,
   onClose,
   onAdjudicationSuccess,
 }: AdjudicationModalProps) {
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<"learner" | "family" | "academic" | "documents">("learner");
   const [modalSections, setModalSections] = useState<SectionItem[]>(sections);
+  const [modalElectiveSections, setModalElectiveSections] = useState<any[]>(electiveSections || []);
   const [selectedSectionId, setSelectedSectionId] = useState<string>(
     application.student?.current_section_id || ""
   );
+  const [selectedElectiveSectionId, setSelectedElectiveSectionId] = useState<string>("");
   const [sectionError, setSectionError] = useState<boolean>(false);
+  const [electiveSectionError, setElectiveSectionError] = useState<boolean>(false);
+  const [showAllElectives, setShowAllElectives] = useState<boolean>(false);
   const [remarks, setRemarks] = useState<string>(application.admin_feedback || "");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionError, setActionError] = useState<string>("");
   const [actionSuccess, setActionSuccess] = useState<string>("");
   const [inspectingDoc, setInspectingDoc] = useState<DocumentInspectionItem | null>(null);
 
-  // Synchronize modalSections when sections prop changes
+  // Synchronize modalSections and modalElectiveSections when props change
   useEffect(() => {
     setModalSections(sections);
   }, [sections]);
+
+  useEffect(() => {
+    if (electiveSections && Array.isArray(electiveSections)) {
+      setModalElectiveSections(electiveSections);
+    }
+  }, [electiveSections]);
 
   // Live fetch from /api/sections to guarantee deleted sections are completely excluded
   useEffect(() => {
@@ -125,8 +137,13 @@ export default function AdjudicationModal({
         const res = await fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" });
         if (res.ok) {
           const json = await res.json();
-          if (isMounted && json.success && Array.isArray(json.sections)) {
-            setModalSections(json.sections);
+          if (isMounted && json.success) {
+            if (Array.isArray(json.sections)) {
+              setModalSections(json.sections);
+            }
+            if (Array.isArray(json.electiveSections)) {
+              setModalElectiveSections(json.electiveSections);
+            }
           }
         }
       } catch {}
@@ -186,6 +203,14 @@ export default function AdjudicationModal({
       rawElectives = first.selectedElectives;
     }
   }
+  if (appElectivePayload.assigned_elective_code) rawElectives.push(appElectivePayload.assigned_elective_code);
+  if (appElectivePayload.assigned_elective_name) rawElectives.push(appElectivePayload.assigned_elective_name);
+  if (appElectivePayload.elective) rawElectives.push(appElectivePayload.elective);
+  if (appElectivePayload.electiveSubject) rawElectives.push(appElectivePayload.electiveSubject);
+  if (appElectivePayload.firstElective) rawElectives.push(appElectivePayload.firstElective);
+  if (appElectivePayload.secondElective) rawElectives.push(appElectivePayload.secondElective);
+
+  const cleanRawElectives = Array.from(new Set(rawElectives.map((e) => String(e).trim()).filter(Boolean)));
 
   const [allSubjects, setAllSubjects] = useState<any[]>([]);
 
@@ -204,7 +229,41 @@ export default function AdjudicationModal({
     };
   }, []);
 
-  // Filter sections matching applicant grade level & track/strand
+  // Filter elective sections matching applicant grade level
+  const eligibleElectiveSections = modalElectiveSections.filter(
+    (s) => Number(s.grade_level) === Number(application.target_grade_level)
+  );
+
+  // Smart match elective section based on student's chosen elective
+  const matchedElectiveSection = eligibleElectiveSections.find((e) => {
+    const eCode = (e.electiveCode || "").trim().toUpperCase();
+    const eName = (e.electiveName || "").trim().toUpperCase();
+    const sName = (e.section_name || "").trim().toUpperCase();
+
+    return cleanRawElectives.some((re) => {
+      const clean = re.trim().toUpperCase();
+      return (
+        clean === eCode ||
+        clean === eName ||
+        eName.includes(clean) ||
+        clean.includes(eName) ||
+        sName.includes(clean) ||
+        (clean.length > 3 && eCode.includes(clean))
+      );
+    });
+  });
+
+  const chosenElectiveName = matchedElectiveSection
+    ? matchedElectiveSection.electiveName
+    : cleanRawElectives.length > 0
+    ? cleanRawElectives[0]
+    : null;
+
+  const chosenElectiveCode = matchedElectiveSection
+    ? matchedElectiveSection.electiveCode
+    : null;
+
+  // Filter track sections matching applicant grade level & track/strand
   const eligibleSections = modalSections.filter((s) => {
     if (s.grade_level !== Number(application.target_grade_level)) return false;
     if (isSHS) {
@@ -220,15 +279,46 @@ export default function AdjudicationModal({
     return true;
   });
 
-  // If the previously selected section is no longer in eligibleSections (e.g. was deleted), clear selection
+  // Displayed elective sections: By default, shows ONLY the student's chosen elective section!
+  const displayedElectiveSections =
+    matchedElectiveSection && !showAllElectives
+      ? [matchedElectiveSection]
+      : eligibleElectiveSections;
+
+  // Smart Automation 1: Auto-select or initialize Track section
   useEffect(() => {
     if (selectedSectionId && eligibleSections.length > 0) {
       const exists = eligibleSections.some((s) => s.id === selectedSectionId);
       if (!exists) {
-        setSelectedSectionId("");
+        const best = eligibleSections.find((s) => (s.enrolledCount || 0) < s.capacity) || eligibleSections[0];
+        setSelectedSectionId(best ? best.id : "");
+      }
+    } else if (!selectedSectionId && eligibleSections.length > 0) {
+      const best = eligibleSections.find((s) => (s.enrolledCount || 0) < s.capacity) || eligibleSections[0];
+      if (best) {
+        setSelectedSectionId(best.id);
       }
     }
   }, [eligibleSections, selectedSectionId]);
+
+  // Smart Automation 2: Auto-select or initialize Elective section for SHS
+  useEffect(() => {
+    if (isSHS) {
+      const priorId = appElectivePayload.assigned_elective_section_id || "";
+      if (priorId && eligibleElectiveSections.some((s) => s.id === priorId)) {
+        if (!selectedElectiveSectionId) {
+          setSelectedElectiveSectionId(priorId);
+        }
+      } else if (matchedElectiveSection) {
+        if (!selectedElectiveSectionId || !eligibleElectiveSections.some((s) => s.id === selectedElectiveSectionId)) {
+          setSelectedElectiveSectionId(matchedElectiveSection.id);
+        }
+      } else if (!selectedElectiveSectionId && eligibleElectiveSections.length > 0) {
+        const bestElec = eligibleElectiveSections.find((s) => (s.enrolledCount || 0) < s.capacity) || eligibleElectiveSections[0];
+        if (bestElec) setSelectedElectiveSectionId(bestElec.id);
+      }
+    }
+  }, [isSHS, matchedElectiveSection, eligibleElectiveSections, selectedElectiveSectionId, appElectivePayload.assigned_elective_section_id]);
 
   const previewContext = {
     fullName,
@@ -273,10 +363,27 @@ export default function AdjudicationModal({
       setActiveTab("documents");
       setSectionError(true);
       setActionError(
-        "DepEd Quota Control Requirement: You cannot approve this application without assigning an Official Section / Class Group. Please select an eligible section below."
+        isSHS
+          ? "DepEd Quota Control: You must assign an Official Track Section before approval."
+          : "DepEd Quota Control: You must assign an Official Class Section before approval."
       );
       setTimeout(() => {
         const secElem = document.getElementById("section-assignment-box");
+        if (secElem) {
+          secElem.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+      return;
+    }
+
+    if (isSHS && !selectedElectiveSectionId) {
+      setActiveTab("documents");
+      setElectiveSectionError(true);
+      setActionError(
+        "DepEd Quota Control: You must assign an Official Elective Section for this Senior High School learner before approval."
+      );
+      setTimeout(() => {
+        const secElem = document.getElementById("elective-section-assignment-box");
         if (secElem) {
           secElem.scrollIntoView({ behavior: "smooth", block: "center" });
         }
@@ -288,28 +395,59 @@ export default function AdjudicationModal({
     setActionError("");
     setActionSuccess("");
     setSectionError(false);
+    setElectiveSectionError(false);
 
     try {
-      // 1. Resolve smart approval remarks if left empty by admin
-      const assignedSection = modalSections.find((s) => s.id === selectedSectionId);
-      const sectionName = assignedSection ? assignedSection.section_name : "";
+      const assignedTrackSec = modalSections.find((s) => s.id === selectedSectionId);
+      const trackSectionName = assignedTrackSec ? assignedTrackSec.section_name : "";
+
+      const assignedElecSec = modalElectiveSections.find((s) => s.id === selectedElectiveSectionId) || matchedElectiveSection;
+      const elecSectionName = assignedElecSec ? assignedElecSec.section_name : "";
+      const finalElecCode = assignedElecSec?.electiveCode || matchedElectiveSection?.electiveCode || chosenElectiveCode || "";
+      const finalElecName = assignedElecSec?.electiveName || matchedElectiveSection?.electiveName || chosenElectiveName || "";
+
       const isAlreadyApproved = application.status === "Approved";
-      const smartApprovalNotice = `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${sectionName ? ` (${sectionName})` : ""}. Welcome to Dumalneg NHS!`;
+      const smartApprovalNotice = isSHS
+        ? `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level} (${shsTrackTitle}). Track Section: ${trackSectionName || selectedSectionId} | Elective Section: ${elecSectionName || selectedElectiveSectionId}. Welcome to Dumalneg NHS!`
+        : `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${trackSectionName ? ` (${trackSectionName})` : ""}. Welcome to Dumalneg NHS!`;
+
       const finalRemarks = remarks.trim() || (isAlreadyApproved ? (application.admin_feedback || smartApprovalNotice) : smartApprovalNotice);
 
-      // Update enrollment_applications status in Supabase
+      // Build updated selected_electives payload
+      const currentSelectedElectives = Array.isArray(application.selected_electives)
+        ? [...application.selected_electives]
+        : typeof application.selected_electives === "object" && application.selected_electives !== null
+        ? [{ ...(application.selected_electives as Record<string, any>) }]
+        : [{}];
+
+      const baseFd = currentSelectedElectives[0] || {};
+      const updatedElectivesPayload = [
+        {
+          ...baseFd,
+          assigned_track_section_id: selectedSectionId,
+          assigned_track_section_name: trackSectionName,
+          assigned_elective_section_id: isSHS ? selectedElectiveSectionId : null,
+          assigned_elective_section_name: isSHS ? elecSectionName : null,
+          assigned_elective_code: isSHS ? finalElecCode : null,
+          assigned_elective_name: isSHS ? finalElecName : null,
+          selectedElectives: isSHS && finalElecCode ? [finalElecCode] : baseFd.selectedElectives || [],
+        },
+      ];
+
+      // 1. Update enrollment_applications status in Supabase
       const { error: appErr } = await supabase
         .from("enrollment_applications")
         .update({
           status: "Approved",
           admin_feedback: finalRemarks,
+          selected_electives: updatedElectivesPayload,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id);
 
       if (appErr) throw appErr;
 
-      // 2. Assign student to selected section and update grade level & program in Supabase
+      // 2. Assign student to selected track section and update grade level & program in Supabase
       if (application.student_id) {
         const studentUpdates: any = {
           current_section_id: selectedSectionId,
@@ -335,8 +473,8 @@ export default function AdjudicationModal({
 
       setActionSuccess(
         isAlreadyApproved
-          ? `Section assignment updated to [ ${sectionName || selectedSectionId} ] successfully. Real-time rosters updated.`
-          : "Application officially APPROVED & ENROLLED with official section assignment. Real-time rosters updated."
+          ? `Section assignments updated successfully: [ ${trackSectionName || selectedSectionId} ]${isSHS ? ` & [ ${elecSectionName || selectedElectiveSectionId} ]` : ""}. Real-time rosters updated.`
+          : `Application officially APPROVED & ENROLLED with official section assignments: [ ${trackSectionName || selectedSectionId} ]${isSHS ? ` & [ ${elecSectionName || selectedElectiveSectionId} ]` : ""}. Real-time rosters updated.`
       );
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
@@ -751,24 +889,15 @@ export default function AdjudicationModal({
                     </strong>
                   </div>
 
-                  {/* SHS Selected Elective Subject Display */}
+                  {/* SHS Selected Elective / Specialized Subject Display */}
                   {isSHS && (
                     <div className="pt-2 border-t border-slate-200 mt-2 space-y-1">
                       <span className="text-slate-500 block text-[10px]">
-                        {isTechPro ? "Curriculum Track Structure:" : "Selected Elective Subject:"}
+                        Selected Elective / Specialized Subject:
                       </span>
-                      {isTechPro ? (
-                        <div>
-                          <span className="px-2 py-0.5 bg-slate-200 border border-slate-300 text-slate-800 text-[11px] font-mono font-bold uppercase inline-block">
-                            Fixed Tech-Pro Curriculum (No Elective Required)
-                          </span>
-                          <p className="text-[10px] text-slate-500 mt-0.5">
-                            All specialized technical-professional subjects are prescribed and fixed per DepEd MATATAG curriculum.
-                          </p>
-                        </div>
-                      ) : rawElectives.length > 0 ? (
+                      {cleanRawElectives.length > 0 ? (
                         <div className="space-y-1">
-                          {rawElectives.map((code) => {
+                          {cleanRawElectives.map((code) => {
                             const foundSub = allSubjects.find(
                               (s) =>
                                 s.subject_code?.toLowerCase() === code.toLowerCase() ||
@@ -776,13 +905,16 @@ export default function AdjudicationModal({
                             );
                             const displayName = foundSub
                               ? `${foundSub.subject_code} - ${foundSub.subject_name}`
+                              : matchedElectiveSection
+                              ? `${matchedElectiveSection.electiveCode} - ${matchedElectiveSection.electiveName}`
                               : code;
                             return (
                               <div
                                 key={code}
-                                className="px-2.5 py-1 bg-blue-100 border border-blue-300 text-[#002060] font-mono font-bold text-[11px] inline-block"
+                                className="px-2.5 py-1 bg-purple-100 border border-purple-300 text-purple-950 font-mono font-bold text-[11px] inline-flex items-center gap-1.5"
                               >
-                                [ ELECTIVE ]: {displayName}
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-700" />
+                                <span>[ ELECTIVE / SPECIALIZED ]: {displayName}</span>
                               </div>
                             );
                           })}
@@ -957,109 +1089,339 @@ export default function AdjudicationModal({
                 </div>
               </div>
 
-              {/* Section Assignment with Smart Capacity Quota Counter */}
-              <div
-                id="section-assignment-box"
-                className={`p-4 border-2 transition-all space-y-3 ${
-                  sectionError
-                    ? "bg-red-50 border-red-500 shadow-md ring-2 ring-red-400"
-                    : selectedSectionId
-                    ? "bg-emerald-50/60 border-emerald-600"
-                    : "bg-blue-50/60 border-[#002060]"
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs font-bold text-[#002060] uppercase block">
-                      Assign Official Section / Class Group (Quota Control): <span className="text-red-600">*</span>
-                    </label>
-                    <span className="text-[10px] font-mono font-bold text-red-700 uppercase bg-red-100 px-1.5 py-0.5 border border-red-300">
-                      MANDATORY FOR APPROVAL
+              {/* Section Assignment Block (Dual-Sectioning for SHS, Single for JHS) */}
+              {isSHS ? (
+                <div className="space-y-4">
+                  {/* SHS Dual-Sectioning Advisory Header */}
+                  <div className="p-3 bg-blue-50/80 border-2 border-blue-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                        [ SENIOR HIGH SCHOOL DUAL-SECTIONING &bull; DEPED MATATAG ]
+                      </span>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 uppercase">
+                        Dual Cohort Assignment: Track Section &amp; Elective Class Section
+                      </h4>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Senior High School enrollees are assigned two distinct cohorts: a <strong>Track Section</strong> for universal core subjects and an <strong>Elective Section</strong> for their chosen specialized subject.
+                      </p>
+                    </div>
+                    <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 self-start sm:self-auto shrink-0 shadow-2xs">
+                      Grade {application.target_grade_level} &bull; {shsTrackTitle}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-600">
-                    DepEd Standard Capacity: 40 Students/Section
-                  </span>
-                </div>
 
-                {application.status === "Approved" && (
-                  <div className="p-3 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-                        <span className="text-xs font-bold text-emerald-950 uppercase font-mono">
-                          [ CURRENTLY ENROLLED &amp; SECTIONED ]
+                  {/* Existing Enrollment Status if Approved */}
+                  {application.status === "Approved" && (
+                    <div className="p-3 bg-emerald-50 border-2 border-emerald-500 space-y-2">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                          <span className="text-xs font-bold text-emerald-950 uppercase font-mono">
+                            [ CURRENTLY ENROLLED &bull; DUAL-SECTION CONFIRMED ]
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-emerald-800 bg-white px-2 py-0.5 border border-emerald-300">
+                          [ Sections are Editable: Reassign below ]
                         </span>
                       </div>
-                      <span className="text-xs text-emerald-900 block mt-0.5">
-                        Assigned Section: <strong>{modalSections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || (selectedSectionId ? "[ Section Removed / Needs Reassignment ]" : "Not Assigned")}</strong>
-                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-emerald-950">
+                        <div className="p-2 bg-white border border-emerald-200">
+                          <span className="text-[10px] font-mono text-emerald-700 uppercase block">1. Assigned Track Section:</span>
+                          <strong>{modalSections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || selectedSectionId || "Not Assigned"}</strong>
+                        </div>
+                        <div className="p-2 bg-white border border-emerald-200">
+                          <span className="text-[10px] font-mono text-emerald-700 uppercase block">2. Assigned Elective Section:</span>
+                          <strong>{modalElectiveSections.find((s) => s.id === selectedElectiveSectionId)?.section_name || appElectivePayload.assigned_elective_section_name || matchedElectiveSection?.section_name || "Not Assigned"}</strong>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-[11px] font-mono text-emerald-800 bg-white px-2 py-1 border border-emerald-300">
-                      [ Section is Editable: Select below to reassign ]
-                    </span>
-                  </div>
-                )}
+                  )}
 
-                {eligibleSections.length === 0 ? (
-                  <div className="p-3 bg-red-100 border border-red-400 text-xs text-red-950 space-y-1">
-                    <strong className="block">[ NO ELIGIBLE SECTIONS FOUND IN DATABASE ]</strong>
-                    <p className="text-[11px]">
-                      There are currently no active sections configured for Grade {application.target_grade_level} ({isSHS ? shsTrackTitle : application.target_strand || "General"}).
-                      Please create or activate sections in the Sections console before approving this student.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    <select
-                      value={selectedSectionId}
-                      onChange={(e) => {
-                        setSelectedSectionId(e.target.value);
-                        if (e.target.value) {
-                          setSectionError(false);
-                          if (actionError.includes("Official Section")) {
-                            setActionError("");
-                          }
-                        }
-                      }}
-                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
+                  {/* Dual Section Assignment Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* CARD 1: TRACK SECTION */}
+                    <div
+                      id="section-assignment-box"
+                      className={`p-4 border-2 transition-all space-y-3 ${
                         sectionError
-                          ? "border-red-600 bg-red-50/20"
+                          ? "bg-red-50 border-red-500 shadow-md ring-2 ring-red-400"
                           : selectedSectionId
-                          ? "border-emerald-600"
-                          : "border-slate-400 focus:border-[#002060]"
+                          ? "bg-white border-blue-600 shadow-xs"
+                          : "bg-blue-50/60 border-slate-400"
                       }`}
                     >
-                      <option value="">-- Select Section Assignment (Required for Official Approval) --</option>
-                      {eligibleSections.map((sec) => {
-                        const isFull = (sec.enrolledCount || 0) >= sec.capacity;
-                        return (
-                          <option key={sec.id} value={sec.id}>
-                            {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
-                            {isFull ? " [AT FULL CAPACITY]" : ""}
-                          </option>
-                        );
-                      })}
-                    </select>
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                        <div>
+                          <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
+                            [ SECTION 1: HOMEROOM TRACK ]
+                          </span>
+                          <label className="text-xs font-bold text-slate-900 uppercase block">
+                            {isTechPro ? "Tech-Pro Track Section" : "Academic Track Section"} <span className="text-red-600">*</span>
+                          </label>
+                        </div>
+                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-blue-100 text-blue-900 border border-blue-300 uppercase">
+                          {isTechPro ? "Tech-Pro Cohort" : "Academic Cohort"}
+                        </span>
+                      </div>
 
-                    {sectionError && (
-                      <p className="text-[11px] font-bold text-red-700">
-                        [ Section Required ]: You must select an official class section before you can approve this application.
+                      <p className="text-[11px] text-slate-600">
+                        Classmates in this section share homeroom and universal core curriculum subjects.
                       </p>
-                    )}
 
-                    {selectedSectionId && (
-                      <p className="text-[11px] text-emerald-900 font-bold">
-                        [ Confirmed ]: Learner will be officially enrolled in {modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
-                      </p>
-                    )}
+                      {eligibleSections.length === 0 ? (
+                        <div className="p-3 bg-red-50 border border-red-300 text-xs text-red-900 space-y-1">
+                          <strong>No {isTechPro ? "Tech-Pro" : "Academic"} sections available.</strong>
+                          <p className="text-[10px]">Please create a Grade {application.target_grade_level} {isTechPro ? "Tech-Pro" : "Academic"} section in the Section Console.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <select
+                            value={selectedSectionId}
+                            onChange={(e) => {
+                              setSelectedSectionId(e.target.value);
+                              if (e.target.value) {
+                                setSectionError(false);
+                                if (actionError.includes("Track Section")) setActionError("");
+                              }
+                            }}
+                            className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
+                              sectionError ? "border-red-600 bg-red-50/20" : selectedSectionId ? "border-blue-600" : "border-slate-400"
+                            }`}
+                          >
+                            <option value="">-- Select Official Track Section (Required) --</option>
+                            {eligibleSections.map((sec) => {
+                              const isFull = (sec.enrolledCount || 0) >= sec.capacity;
+                              return (
+                                <option key={sec.id} value={sec.id}>
+                                  {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
+                                  {isFull ? " [AT FULL CAPACITY]" : ""}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          {selectedSectionId && (
+                            <div className="text-[10px] font-mono text-blue-900 bg-blue-50 p-1.5 border border-blue-200">
+                              [ Track Confirmed ]: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong>
+                            </div>
+                          )}
+                          {sectionError && (
+                            <p className="text-[11px] font-bold text-red-700">
+                              [ Track Section Required ]: Please select an official track section.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CARD 2: ELECTIVE SECTION */}
+                    <div
+                      id="elective-section-assignment-box"
+                      className={`p-4 border-2 transition-all space-y-3 ${
+                        electiveSectionError
+                          ? "bg-red-50 border-red-500 shadow-md ring-2 ring-red-400"
+                          : selectedElectiveSectionId
+                          ? "bg-white border-purple-600 shadow-xs"
+                          : "bg-purple-50/60 border-slate-400"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                        <div>
+                          <span className="text-[10px] font-mono font-bold text-purple-900 uppercase block">
+                            [ SECTION 2: SPECIALIZED ELECTIVE ]
+                          </span>
+                          <label className="text-xs font-bold text-slate-900 uppercase block">
+                            Elective Subject Section <span className="text-red-600">*</span>
+                          </label>
+                        </div>
+                        {matchedElectiveSection && !showAllElectives ? (
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-400 uppercase">
+                            Smart Auto-Matched
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-purple-100 text-purple-900 border border-purple-300 uppercase">
+                            Elective Class
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Chosen Elective Badge */}
+                      <div className="p-2.5 bg-purple-50 border border-purple-200 text-xs text-purple-950 space-y-1">
+                        <span className="text-[10px] font-mono uppercase text-purple-800 block">Enrollee's Chosen Elective:</span>
+                        <div className="font-bold flex items-center justify-between gap-1 flex-wrap">
+                          <span>
+                            {chosenElectiveName
+                              ? `${chosenElectiveName}${chosenElectiveCode ? ` (${chosenElectiveCode})` : ""}`
+                              : "[ Pending Elective Choice ]"}
+                          </span>
+                          {matchedElectiveSection && (
+                            <span className="text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
+                              AUTO-MATCHED
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {displayedElectiveSections.length === 0 ? (
+                        <div className="p-3 bg-amber-50 border border-amber-300 text-xs text-amber-950 space-y-1">
+                          <strong>No elective class section configured yet for this subject.</strong>
+                          <p className="text-[10px]">Active Grade {application.target_grade_level} elective sections will appear once configured in Subject Management.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <select
+                            value={selectedElectiveSectionId}
+                            onChange={(e) => {
+                              setSelectedElectiveSectionId(e.target.value);
+                              if (e.target.value) {
+                                setElectiveSectionError(false);
+                                if (actionError.includes("Elective Section")) setActionError("");
+                              }
+                            }}
+                            className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
+                              electiveSectionError ? "border-red-600 bg-red-50/20" : selectedElectiveSectionId ? "border-purple-600" : "border-slate-400"
+                            }`}
+                          >
+                            <option value="">-- Select Elective Section (Required) --</option>
+                            {displayedElectiveSections.map((sec) => (
+                              <option key={sec.id} value={sec.id}>
+                                {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* Toggle to show other electives if needed */}
+                          {matchedElectiveSection && (
+                            <div className="flex items-center justify-between pt-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setShowAllElectives((prev) => !prev)}
+                                className="text-[10px] font-mono text-[#002060] hover:underline cursor-pointer"
+                              >
+                                {showAllElectives ? "[ Show Only Matched Elective ]" : `[ Change / View All Grade ${application.target_grade_level} Elective Classes ]`}
+                              </button>
+                            </div>
+                          )}
+
+                          {selectedElectiveSectionId && (
+                            <div className="text-[10px] font-mono text-purple-900 bg-purple-50 p-1.5 border border-purple-200">
+                              [ Elective Confirmed ]: <strong>{modalElectiveSections.find((s) => s.id === selectedElectiveSectionId)?.section_name || selectedElectiveSectionId}</strong>
+                            </div>
+                          )}
+                          {electiveSectionError && (
+                            <p className="text-[11px] font-bold text-red-700">
+                              [ Elective Section Required ]: Please assign the student's elective section.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
+              ) : (
+                /* JUNIOR HIGH SCHOOL SINGLE SECTION BLOCK */
+                <div
+                  id="section-assignment-box"
+                  className={`p-4 border-2 transition-all space-y-3 ${
+                    sectionError
+                      ? "bg-red-50 border-red-500 shadow-md ring-2 ring-red-400"
+                      : selectedSectionId
+                      ? "bg-emerald-50/60 border-emerald-600"
+                      : "bg-blue-50/60 border-[#002060]"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-bold text-[#002060] uppercase block">
+                        Assign Official Section / Class Group (Quota Control): <span className="text-red-600">*</span>
+                      </label>
+                      <span className="text-[10px] font-mono font-bold text-red-700 uppercase bg-red-100 px-1.5 py-0.5 border border-red-300">
+                        MANDATORY FOR APPROVAL
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-600">
+                      DepEd Standard Capacity: 40 Students/Section
+                    </span>
+                  </div>
 
-                <p className="text-[10px] text-slate-600 leading-normal">
-                  Under DepEd Quota Control rules, an applicant cannot be admitted without an official section assignment to prevent class overcrowding.
-                </p>
-              </div>
+                  {application.status === "Approved" && (
+                    <div className="p-3 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                          <span className="text-xs font-bold text-emerald-950 uppercase font-mono">
+                            [ CURRENTLY ENROLLED &amp; SECTIONED ]
+                          </span>
+                        </div>
+                        <span className="text-xs text-emerald-900 block mt-0.5">
+                          Assigned Section: <strong>{modalSections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || (selectedSectionId ? "[ Section Removed / Needs Reassignment ]" : "Not Assigned")}</strong>
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-mono text-emerald-800 bg-white px-2 py-1 border border-emerald-300">
+                        [ Section is Editable: Select below to reassign ]
+                      </span>
+                    </div>
+                  )}
+
+                  {eligibleSections.length === 0 ? (
+                    <div className="p-3 bg-red-100 border border-red-400 text-xs text-red-950 space-y-1">
+                      <strong className="block">[ NO ELIGIBLE SECTIONS FOUND IN DATABASE ]</strong>
+                      <p className="text-[11px]">
+                        There are currently no active sections configured for Grade {application.target_grade_level} ({application.target_strand || "General"}).
+                        Please create or activate sections in the Sections console before approving this student.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <select
+                        value={selectedSectionId}
+                        onChange={(e) => {
+                          setSelectedSectionId(e.target.value);
+                          if (e.target.value) {
+                            setSectionError(false);
+                            if (actionError.includes("Official Section")) {
+                              setActionError("");
+                            }
+                          }
+                        }}
+                        className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
+                          sectionError
+                            ? "border-red-600 bg-red-50/20"
+                            : selectedSectionId
+                            ? "border-emerald-600"
+                            : "border-slate-400 focus:border-[#002060]"
+                        }`}
+                      >
+                        <option value="">-- Select Section Assignment (Required for Official Approval) --</option>
+                        {eligibleSections.map((sec) => {
+                          const isFull = (sec.enrolledCount || 0) >= sec.capacity;
+                          return (
+                            <option key={sec.id} value={sec.id}>
+                              {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
+                              {isFull ? " [AT FULL CAPACITY]" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+
+                      {sectionError && (
+                        <p className="text-[11px] font-bold text-red-700">
+                          [ Section Required ]: You must select an official class section before you can approve this application.
+                        </p>
+                      )}
+
+                      {selectedSectionId && (
+                        <p className="text-[11px] text-emerald-900 font-bold">
+                          [ Confirmed ]: Learner will be officially enrolled in {modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="text-[10px] text-slate-600 leading-normal">
+                    Under DepEd Quota Control rules, an applicant cannot be admitted without an official section assignment to prevent class overcrowding.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -1067,24 +1429,55 @@ export default function AdjudicationModal({
           <div className="pt-3 border-t-2 border-slate-300 space-y-3">
             {/* Section Assignment Status (Visible only on Tab 4: Requirements & Sectioning) */}
             {activeTab === "documents" && (
-              !selectedSectionId ? (
-                <div className="p-2.5 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-amber-200 border border-amber-400 text-[10px] font-mono font-bold uppercase text-amber-950 shrink-0">
-                    SECTION REQUIRED
-                  </span>
-                  <span className="text-xs text-amber-950">
-                    Official Section has <strong>not yet been assigned</strong>. DepEd Quota Control requires assigning an official section before approval.
-                  </span>
-                </div>
+              isSHS ? (
+                !selectedSectionId || !selectedElectiveSectionId ? (
+                  <div className="p-2.5 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-amber-200 border border-amber-400 text-[10px] font-mono font-bold uppercase text-amber-950 shrink-0">
+                      DUAL SECTIONING REQUIRED
+                    </span>
+                    <span className="text-xs text-amber-950">
+                      {!selectedSectionId && !selectedElectiveSectionId
+                        ? "Both Official Track Section and Elective Section must be assigned before approval."
+                        : !selectedSectionId
+                        ? "Official Track Section has not yet been assigned. Please select a Track Section."
+                        : "Official Elective Section has not yet been assigned. Please select an Elective Section."}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 text-[10px] font-mono font-bold uppercase text-emerald-900 shrink-0">
+                        DUAL SECTIONS ASSIGNED
+                      </span>
+                      <span className="text-xs text-emerald-950">
+                        Track: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> &bull; Elective: <strong>{modalElectiveSections.find((s) => s.id === selectedElectiveSectionId)?.section_name || selectedElectiveSectionId}</strong>
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-800 bg-white px-1.5 py-0.5 border border-emerald-300">
+                      [ DepEd MATATAG Dual-Section Quota Verified ]
+                    </span>
+                  </div>
+                )
               ) : (
-                <div className="p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 text-[10px] font-mono font-bold uppercase text-emerald-900 shrink-0">
-                    SECTION ASSIGNED
-                  </span>
-                  <span className="text-xs text-emerald-950">
-                    Assigned Section: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level}).
-                  </span>
-                </div>
+                !selectedSectionId ? (
+                  <div className="p-2.5 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-amber-200 border border-amber-400 text-[10px] font-mono font-bold uppercase text-amber-950 shrink-0">
+                      SECTION REQUIRED
+                    </span>
+                    <span className="text-xs text-amber-950">
+                      Official Section has <strong>not yet been assigned</strong>. DepEd Quota Control requires assigning an official section before approval.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 text-[10px] font-mono font-bold uppercase text-emerald-900 shrink-0">
+                      SECTION ASSIGNED
+                    </span>
+                    <span className="text-xs text-emerald-950">
+                      Assigned Section: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong> (Grade {application.target_grade_level}).
+                    </span>
+                  </div>
+                )
               )
             )}
 
@@ -1131,9 +1524,13 @@ export default function AdjudicationModal({
                   type="button"
                   onClick={() => {
                     const assignedSection = modalSections.find((s) => s.id === selectedSectionId);
-                    const sName = assignedSection ? ` (${assignedSection.section_name})` : "";
+                    const trackSName = assignedSection ? assignedSection.section_name : "";
+                    const assignedElec = modalElectiveSections.find((s) => s.id === selectedElectiveSectionId) || matchedElectiveSection;
+                    const elecSName = assignedElec ? assignedElec.section_name : "";
                     setRemarks(
-                      `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${sName}. Welcome to Dumalneg NHS!`
+                      isSHS
+                        ? `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level} (${shsTrackTitle}). Track Section: ${trackSName || selectedSectionId} | Elective Section: ${elecSName || selectedElectiveSectionId}. Welcome to Dumalneg NHS!`
+                        : `You're enrolled at Dumalneg National High School for School Year 2026–2027 under Grade ${application.target_grade_level}${trackSName ? ` (${trackSName})` : ""}. Welcome to Dumalneg NHS!`
                     );
                   }}
                   className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-semibold transition-colors cursor-pointer"
@@ -1186,7 +1583,7 @@ export default function AdjudicationModal({
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold uppercase tracking-wider"
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold uppercase tracking-wider cursor-pointer"
               >
                 Close Inspection
               </button>
@@ -1196,7 +1593,7 @@ export default function AdjudicationModal({
                   type="button"
                   onClick={handleNeedsRevision}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                  className="px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? "Updating..." : "[ Request Revision ]"}
                 </button>
@@ -1206,13 +1603,15 @@ export default function AdjudicationModal({
                   onClick={handleApprove}
                   disabled={isSubmitting}
                   className={`px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs ${
-                    !selectedSectionId
-                      ? "bg-amber-500 hover:bg-amber-600 text-slate-950 border-2 border-amber-600 font-extrabold"
-                      : "bg-[#002060] hover:bg-blue-950 text-white border-2 border-[#002060]"
+                    (isSHS ? (!selectedSectionId || !selectedElectiveSectionId) : !selectedSectionId)
+                      ? "bg-amber-500 hover:bg-amber-600 text-slate-950 border-2 border-amber-600 font-extrabold cursor-pointer"
+                      : "bg-[#002060] hover:bg-blue-950 text-white border-2 border-[#002060] cursor-pointer"
                   } disabled:opacity-50`}
                   title={
-                    !selectedSectionId
-                      ? "Assign a section in Tab 4 first to approve"
+                    (isSHS ? (!selectedSectionId || !selectedElectiveSectionId) : !selectedSectionId)
+                      ? isSHS
+                        ? "Assign both Track and Elective sections in Tab 4 first to approve"
+                        : "Assign a section in Tab 4 first to approve"
                       : application.status === "Approved"
                       ? "Update the assigned class section for this student"
                       : "Approve and confirm enrollment"
@@ -1220,12 +1619,14 @@ export default function AdjudicationModal({
                 >
                   {isSubmitting
                     ? application.status === "Approved"
-                      ? "Updating Section Assignment..."
+                      ? "Updating Section Assignments..."
                       : "Approving Enrollment..."
-                    : !selectedSectionId
-                    ? "[ Assign Section to Approve ]"
+                    : (isSHS ? (!selectedSectionId || !selectedElectiveSectionId) : !selectedSectionId)
+                    ? isSHS
+                      ? "[ Assign Track & Elective Sections to Approve ]"
+                      : "[ Assign Section to Approve ]"
                     : application.status === "Approved"
-                    ? "[ Update Section Assignment ]"
+                    ? "[ Update Section Assignments ]"
                     : "[ Approve & Confirm Enrollment ]"}
                 </button>
               </div>
