@@ -26,7 +26,55 @@ interface ClassmateRecord {
   last_name: string;
   middle_name?: string | null;
   gender?: string | null;
+  baseSectionName?: string;
 }
+
+interface ElectiveInfoRecord {
+  code: string;
+  name: string;
+  sectionName: string;
+  room?: string;
+  adviser_name?: string;
+}
+
+const SHS_ELECTIVES_MAP: Record<string, string> = {
+  "ACAD-BIO1": "Biology 1 (General Biology)",
+  "ACAD-CHEM1": "Chemistry 1",
+  "ACAD-PHYS1": "Physics 1",
+  "ACAD-ESS1": "Earth and Space Science 1",
+  "ACAD-ARTS1": "Arts 1 (Visual, Literary, Media)",
+  "ACAD-ARTS2": "Arts 2 (Music, Dance, and Theater)",
+  "ACAD-CITIZEN": "Citizenship and Civic Engagement",
+  "ACAD-CONLIT1": "Contemporary Literature 1",
+  "ACAD-FIL1": "Filipino 1 (Wika at Komunikasyon)",
+  "ACAD-PHILOS": "Introduction to Philosophy",
+  "ACAD-MALIKPAG": "Malikhaing Pagsulat",
+  "ACAD-GOV": "Philippine Governance (Politics and Governance)",
+  "ACAD-SOCSCI": "Social Sciences (Theory and Practice)",
+  "ACAD-BACC1": "Business 1 (Basic Accounting)",
+  "ACAD-ORGMGT": "Organization and Management",
+  "ACAD-MKTG": "Contemporary Marketing",
+  "ACAD-HMOV1": "Human Movement 1 (Basic Anatomy)",
+  "ACAD-HMOV2": "Human Movement 2 (Motor Skills)",
+  "ACAD-EMPTECH": "Empowerment Technologies",
+  "TECH-CROPS": "Agricultural Crops Production",
+  "TECH-ORGANIC": "Organic Agriculture Production",
+  "ACAD-PRECAL1": "Pre-calculus 1 & Engineering Principles",
+  "ACAD-ADVMATH1": "Advanced Mathematics 1 / Calculus",
+  "ACAD-DATA": "Fundamentals in Data Analytics",
+  "ACAD-DBMGT": "Database Management",
+  "ACAD-BIO2": "Biology 2",
+  "ACAD-CHEM2": "Chemistry 2",
+  "ACAD-PHYS2": "Physics 2",
+  "ACAD-ESS2": "Earth and Space Science 2",
+  "ACAD-BFIN2": "Business 2 (Business Finance & Taxation)",
+  "ACAD-BECON3": "Business 3 (Business Economics)",
+  "ACAD-ENTREP": "Entrepreneurship",
+  "ACAD-FIRSTAID": "Safety and First Aid",
+  "ACAD-RESMETH": "Research Methods",
+  "ACAD-DESINNOV": "Design and Innovation",
+  "ACAD-FIELDEXP": "Field Exposure (Professional Immersion)",
+};
 
 type SectionStateMode =
   | "ASSIGNED"
@@ -44,6 +92,9 @@ function SectionPageContent() {
   const [sectionMode, setSectionMode] = useState<SectionStateMode>("NOT_ASSIGNED");
   const [activeTermNumber, setActiveTermNumber] = useState<number>(termNumber || 1);
   const [classmates, setClassmates] = useState<ClassmateRecord[]>([]);
+  const [electiveInfo, setElectiveInfo] = useState<ElectiveInfoRecord | null>(null);
+  const [electiveClassmates, setElectiveClassmates] = useState<ClassmateRecord[]>([]);
+  const [classmatesViewType, setClassmatesViewType] = useState<"track" | "elective">("track");
   const [subjects, setSubjects] = useState<any[]>([]);
   const [timetableSchedules, setTimetableSchedules] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -269,6 +320,119 @@ function SectionPageContent() {
 
             if (isMounted && cmData) {
               setClassmates(cmData);
+            }
+
+            // SHS Dual Sectioning: Resolve Specialized Elective & Elective Classmates
+            const effectiveGrade = sectionRecord.grade_level || student.grade_level || 7;
+            if (effectiveGrade >= 11) {
+              const targetApp = activeApp || userApps[0];
+              let chosenElectiveRaw = "";
+              if (targetApp && targetApp.selected_electives) {
+                const fd = Array.isArray(targetApp.selected_electives) && targetApp.selected_electives.length > 0
+                  ? targetApp.selected_electives[0]
+                  : typeof targetApp.selected_electives === "object" && targetApp.selected_electives !== null
+                  ? targetApp.selected_electives
+                  : {};
+
+                if (Array.isArray(fd.selectedElectives) && fd.selectedElectives.length > 0) {
+                  chosenElectiveRaw = fd.selectedElectives[0];
+                } else if (Array.isArray(targetApp.selected_electives) && targetApp.selected_electives.length > 0) {
+                  const first = targetApp.selected_electives[0];
+                  if (typeof first === "string") chosenElectiveRaw = first;
+                  else if (first?.code) chosenElectiveRaw = first.code;
+                  else if (first?.name) chosenElectiveRaw = first.name;
+                }
+                if (!chosenElectiveRaw) {
+                  chosenElectiveRaw = fd.elective || fd.firstElective || fd.secondElective || fd.electiveSubject || "";
+                }
+              }
+
+              if (chosenElectiveRaw) {
+                let resolvedName = SHS_ELECTIVES_MAP[chosenElectiveRaw.toUpperCase()];
+                if (!resolvedName) {
+                  for (const [code, name] of Object.entries(SHS_ELECTIVES_MAP)) {
+                    if (
+                      code.toLowerCase() === chosenElectiveRaw.toLowerCase() ||
+                      name.toLowerCase().includes(chosenElectiveRaw.toLowerCase()) ||
+                      chosenElectiveRaw.toLowerCase().includes(name.toLowerCase())
+                    ) {
+                      resolvedName = name;
+                      break;
+                    }
+                  }
+                }
+                if (!resolvedName) resolvedName = chosenElectiveRaw;
+
+                const electiveSecName = `Grade ${effectiveGrade} Elective - ${resolvedName}`;
+
+                if (isMounted) {
+                  setElectiveInfo({
+                    code: chosenElectiveRaw,
+                    name: resolvedName,
+                    sectionName: electiveSecName,
+                  });
+                }
+
+                // Query approved applications in this grade level taking the same elective
+                try {
+                  const { data: allPeerApps } = await supabase
+                    .from("enrollment_applications")
+                    .select("student_id, selected_electives, target_grade_level")
+                    .eq("status", "Approved");
+
+                  const { data: allSecs } = await supabase.from("sections").select("id, section_name");
+                  const secNameMap = new Map<string, string>();
+                  (allSecs || []).forEach((s: any) => secNameMap.set(s.id, s.section_name));
+
+                  const matchedStudentIds: string[] = [];
+                  (allPeerApps || []).forEach((app: any) => {
+                    if (app.student_id) {
+                      const rawVal = JSON.stringify(app.selected_electives || "").toLowerCase();
+                      const cleanSearch = chosenElectiveRaw.toLowerCase();
+                      if (rawVal.includes(cleanSearch) || (resolvedName && rawVal.includes(resolvedName.toLowerCase()))) {
+                        matchedStudentIds.push(app.student_id);
+                      }
+                    }
+                  });
+
+                  if (student.id && !matchedStudentIds.includes(student.id)) {
+                    matchedStudentIds.push(student.id);
+                  }
+
+                  if (matchedStudentIds.length > 0) {
+                    const { data: peerStudents } = await supabase
+                      .from("students")
+                      .select("id, student_id, first_name, last_name, middle_name, gender, current_section_id")
+                      .in("id", matchedStudentIds)
+                      .order("last_name", { ascending: true });
+
+                    if (isMounted && peerStudents) {
+                      const mapped = peerStudents.map((st: any) => ({
+                        id: st.id,
+                        student_id: st.student_id,
+                        first_name: st.first_name,
+                        last_name: st.last_name,
+                        middle_name: st.middle_name,
+                        gender: st.gender,
+                        baseSectionName: st.current_section_id ? secNameMap.get(st.current_section_id) || "Academic" : "Academic",
+                      }));
+                      setElectiveClassmates(mapped);
+                    }
+                  }
+                } catch (peerErr) {
+                  console.warn("Notice querying elective peers:", peerErr);
+                }
+              } else {
+                if (isMounted) {
+                  setElectiveInfo(null);
+                  setElectiveClassmates([]);
+                }
+              }
+            } else {
+              if (isMounted) {
+                setElectiveInfo(null);
+                setElectiveClassmates([]);
+              }
             }
 
             // Fetch Subjects & Schedules
@@ -529,6 +693,48 @@ function SectionPageContent() {
                 <span className="text-[10px] text-emerald-700 block">Active Section Roster</span>
               </div>
             </div>
+
+            {/* SHS Dual-Section Placement Card */}
+            {assignedSection.grade_level >= 11 && (
+              <div className="p-4 bg-white border-2 border-blue-900/30 shadow-xs space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-200 pb-2">
+                  <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                    [ SHS Dual Cohort Sectioning &bull; DepEd MATATAG ]
+                  </span>
+                  <span className="text-[10px] font-mono font-bold bg-blue-100 text-[#002060] px-2 py-0.5 border border-blue-300 self-start sm:self-auto uppercase">
+                    Dual Active Section Assignments
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600">
+                  In Senior High School, you are assigned to <strong>2 distinct class cohorts</strong>: your Track Section with peers taking core/common subjects, and your Specialized Elective Section with peers who selected the same elective.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 bg-blue-50/70 border border-blue-300 space-y-1">
+                    <span className="text-[10px] font-mono font-bold text-blue-950 uppercase block">
+                      1. Primary Track Section (Core / Common Subjects)
+                    </span>
+                    <strong className="text-sm font-bold text-[#002060] block">
+                      {assignedSection.section_name}
+                    </strong>
+                    <span className="text-[11px] text-slate-600 block">
+                      Track: <strong>{assignedSection.strand?.toUpperCase().includes("TECH") || assignedSection.strand?.toUpperCase().includes("TVL") ? "TechPro Track" : "Academic Track"}</strong> &bull; {classmates.length} Classmates
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-purple-50/70 border border-purple-300 space-y-1">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 uppercase block">
+                      2. Specialized Elective Section (Elective Period)
+                    </span>
+                    <strong className="text-sm font-bold text-purple-950 block">
+                      {electiveInfo ? electiveInfo.sectionName : `Grade ${assignedSection.grade_level} Elective Class`}
+                    </strong>
+                    <span className="text-[11px] text-purple-900 block">
+                      Elective: <strong>{electiveInfo?.name || "General Elective"}</strong> &bull; {electiveClassmates.length} Classmates
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Tab Navigation */}
@@ -553,7 +759,7 @@ function SectionPageContent() {
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              [ 02 ] Section Classmates ({classmates.length})
+              [ 02 ] Section Classmates ({assignedSection.grade_level >= 11 && electiveInfo ? `${classmates.length} Track / ${electiveClassmates.length} Elective` : `${classmates.length}`})
             </button>
             <button
               type="button"
@@ -631,6 +837,37 @@ function SectionPageContent() {
                     </div>
                   </div>
                 </div>
+
+                {assignedSection.grade_level >= 11 && electiveInfo && (
+                  <div className="p-4 bg-purple-50/70 border border-purple-200 space-y-3 md:col-span-2">
+                    <h4 className="font-bold text-purple-950 uppercase font-mono text-[11px] border-b border-purple-200 pb-1 flex items-center justify-between">
+                      <span>Specialized Elective Section Details</span>
+                      <span className="text-[10px] bg-purple-200/80 px-2 py-0.5 font-bold">[ Elective Cohort ]</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Elective Section Name:</span>
+                          <strong className="text-purple-950 font-mono">{electiveInfo.sectionName}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Selected Elective:</span>
+                          <strong className="text-purple-950">{electiveInfo.name}</strong>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Total Enrollees in Elective:</span>
+                          <strong className="font-mono text-purple-950">{electiveClassmates.length} Learners</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Grouping Mechanism:</span>
+                          <span className="text-purple-900 font-semibold">Shared period across all Grade {assignedSection.grade_level} sections</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Navigation Action Buttons */}
@@ -660,82 +897,201 @@ function SectionPageContent() {
 
           {/* TAB 2: CLASSMATES ROSTER */}
           {activeTab === "classmates" && (
-            <div className="bg-white border-2 border-slate-300 p-6 space-y-4">
+            <div className="bg-white border-2 border-slate-300 p-6 space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
                   <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
                     [ Official Classmates Directory ]
                   </span>
                   <h3 className="text-base font-bold text-slate-900 uppercase">
-                    Classmates in {assignedSection.section_name}
+                    {assignedSection.grade_level >= 11 && electiveInfo
+                      ? classmatesViewType === "track"
+                        ? `Track Classmates • ${assignedSection.section_name}`
+                        : `Elective Classmates • ${electiveInfo.sectionName}`
+                      : `Classmates in ${assignedSection.section_name}`}
                   </h3>
                 </div>
                 <div className="text-xs font-mono text-slate-600 bg-slate-100 px-3 py-1 border border-slate-200">
-                  Total Enrolled: <strong className="text-slate-900">{classmates.length} Learners</strong>
+                  Total Enrolled:{" "}
+                  <strong className="text-slate-900">
+                    {classmatesViewType === "track" ? classmates.length : electiveClassmates.length} Learners
+                  </strong>
                 </div>
               </div>
 
-              {classmates.length === 0 ? (
-                <div className="p-8 text-center bg-slate-50 border border-slate-200">
-                  <p className="text-xs text-slate-600 font-mono">
-                    No other learners currently slotted in this section yet.
-                  </p>
+              {/* SHS Dual Cohort Toggle Switcher */}
+              {assignedSection.grade_level >= 11 && electiveInfo && (
+                <div className="p-3 bg-slate-50 border border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-mono font-bold text-slate-600 uppercase block">
+                      Select Cohort Directory:
+                    </span>
+                    <p className="text-xs text-slate-700">
+                      {classmatesViewType === "track"
+                        ? `Viewing students in your primary Track Section (${assignedSection.section_name}) for core/common subjects.`
+                        : `Viewing students in your Elective Class (${electiveInfo.name}) during elective periods.`}
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setClassmatesViewType("track")}
+                      className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition-colors cursor-pointer border ${
+                        classmatesViewType === "track"
+                          ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+                      }`}
+                    >
+                      [ Track Cohort ({classmates.length}) ]
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setClassmatesViewType("elective")}
+                      className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition-colors cursor-pointer border ${
+                        classmatesViewType === "elective"
+                          ? "bg-purple-900 text-white border-purple-900 shadow-xs"
+                          : "bg-white text-purple-950 border-purple-300 hover:bg-purple-50"
+                      }`}
+                    >
+                      [ Elective Cohort ({electiveClassmates.length}) ]
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <div className="overflow-x-auto border border-slate-200">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono uppercase text-slate-700">
-                        <th className="py-2.5 px-3 w-12 text-center">#</th>
-                        <th className="py-2.5 px-3">Learner Name</th>
-                        <th className="py-2.5 px-3 font-mono">Learner Reference No.</th>
-                        <th className="py-2.5 px-3">Gender</th>
-                        <th className="py-2.5 px-3 text-right">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 font-sans">
-                      {classmates.map((cm, idx) => {
-                        const isCurrentLearner =
-                          (user && (cm.student_id === user.lrn || cm.student_id === user.userId)) ||
-                          (studentRec && cm.id === studentRec.id);
+              )}
 
-                        return (
-                          <tr
-                            key={cm.id}
-                            className={`hover:bg-blue-50/50 transition-colors ${
-                              isCurrentLearner ? "bg-emerald-50/80 font-bold" : ""
-                            }`}
-                          >
-                            <td className="py-2.5 px-3 font-mono text-center text-slate-500">
-                              {String(idx + 1).padStart(2, "0")}
-                            </td>
-                            <td className="py-2.5 px-3">
-                              <span className="text-slate-900 uppercase">
-                                {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
-                              </span>
-                              {isCurrentLearner && (
-                                <span className="ml-2 inline-block px-1.5 py-0.2 bg-emerald-200 text-emerald-950 font-mono text-[9px] uppercase font-bold border border-emerald-400">
-                                  You
+              {/* Table rendering */}
+              {classmatesViewType === "track" ? (
+                classmates.length === 0 ? (
+                  <div className="p-8 text-center bg-slate-50 border border-slate-200">
+                    <p className="text-xs text-slate-600 font-mono">
+                      No other learners currently slotted in this section yet.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto border border-slate-200">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono uppercase text-slate-700">
+                          <th className="py-2.5 px-3 w-12 text-center">#</th>
+                          <th className="py-2.5 px-3">Learner Name</th>
+                          <th className="py-2.5 px-3 font-mono">Learner Reference No.</th>
+                          <th className="py-2.5 px-3">Gender</th>
+                          <th className="py-2.5 px-3 text-right">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 font-sans">
+                        {classmates.map((cm, idx) => {
+                          const isCurrentLearner =
+                            (user && (cm.student_id === user.lrn || cm.student_id === user.userId)) ||
+                            (studentRec && cm.id === studentRec.id);
+
+                          return (
+                            <tr
+                              key={cm.id}
+                              className={`hover:bg-blue-50/50 transition-colors ${
+                                isCurrentLearner ? "bg-emerald-50/80 font-bold" : ""
+                              }`}
+                            >
+                              <td className="py-2.5 px-3 font-mono text-center text-slate-500">
+                                {String(idx + 1).padStart(2, "0")}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span className="text-slate-900 uppercase">
+                                  {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
                                 </span>
-                              )}
-                            </td>
-                            <td className="py-2.5 px-3 font-mono text-slate-600">
-                              {cm.student_id ? cm.student_id : "LIS Pending"}
-                            </td>
-                            <td className="py-2.5 px-3 text-slate-700 capitalize">
-                              {cm.gender || "—"}
-                            </td>
-                            <td className="py-2.5 px-3 text-right">
-                              <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-900 font-mono text-[10px] uppercase font-bold">
-                                Enrolled
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                                {isCurrentLearner && (
+                                  <span className="ml-2 inline-block px-1.5 py-0.2 bg-emerald-200 text-emerald-950 font-mono text-[9px] uppercase font-bold border border-emerald-400">
+                                    You
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 font-mono text-slate-600">
+                                {cm.student_id ? cm.student_id : "LIS Pending"}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-700 capitalize">
+                                {cm.gender || "—"}
+                              </td>
+                              <td className="py-2.5 px-3 text-right">
+                                <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-900 font-mono text-[10px] uppercase font-bold">
+                                  Enrolled
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              ) : (
+                electiveClassmates.length === 0 ? (
+                  <div className="p-8 text-center bg-purple-50/40 border border-purple-200">
+                    <p className="text-xs text-purple-900 font-mono">
+                      No other learners currently enrolled in this elective class yet.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto border border-purple-200">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-purple-100/60 border-b border-purple-300 text-[10px] font-mono uppercase text-purple-950">
+                          <th className="py-2.5 px-3 w-12 text-center">#</th>
+                          <th className="py-2.5 px-3">Learner Name</th>
+                          <th className="py-2.5 px-3 font-mono">Learner Reference No.</th>
+                          <th className="py-2.5 px-3">Base / Academic Section</th>
+                          <th className="py-2.5 px-3">Gender</th>
+                          <th className="py-2.5 px-3 text-right">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-purple-100 font-sans">
+                        {electiveClassmates.map((cm, idx) => {
+                          const isCurrentLearner =
+                            (user && (cm.student_id === user.lrn || cm.student_id === user.userId)) ||
+                            (studentRec && cm.id === studentRec.id);
+
+                          return (
+                            <tr
+                              key={cm.id}
+                              className={`hover:bg-purple-50/60 transition-colors ${
+                                isCurrentLearner ? "bg-purple-50 font-bold" : ""
+                              }`}
+                            >
+                              <td className="py-2.5 px-3 font-mono text-center text-purple-800">
+                                {String(idx + 1).padStart(2, "0")}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span className="text-slate-900 uppercase">
+                                  {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
+                                </span>
+                                {isCurrentLearner && (
+                                  <span className="ml-2 inline-block px-1.5 py-0.2 bg-purple-200 text-purple-950 font-mono text-[9px] uppercase font-bold border border-purple-400">
+                                    You
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 font-mono text-slate-600">
+                                {cm.student_id ? cm.student_id : "LIS Pending"}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span className="inline-block px-2 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 font-mono font-bold text-[11px]">
+                                  {cm.baseSectionName || "Academic Track"}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-700 capitalize">
+                                {cm.gender || "—"}
+                              </td>
+                              <td className="py-2.5 px-3 text-right">
+                                <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-900 font-mono text-[10px] uppercase font-bold">
+                                  Elective Enrolled
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )
               )}
             </div>
           )}

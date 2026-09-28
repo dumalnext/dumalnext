@@ -99,7 +99,7 @@ export async function GET(req: Request) {
     // 1. Fetch approved enrollment applications for active term tracking
     const { data: appsData } = await supabase
       .from("enrollment_applications")
-      .select("id, student_id, school_year, status, selected_electives");
+      .select("id, student_id, school_year, status, selected_electives, target_grade_level, target_strand");
 
     const enrolledInActiveTermSet = new Set<string>();
     (appsData || []).forEach((app: any) => {
@@ -157,19 +157,17 @@ export async function GET(req: Request) {
     });
 
     // 4. Fetch enrolled students
-    // In Sem 1: Sections count only students enrolled for Sem 1.
-    // In Sem 2 & 3: Students from Sem 1 remain assigned to their section ("naka-fixed na"),
-    // but only students enrolled/approved for active term count towards active enrolledCount!
     const { data: studentsData } = await supabase
       .from("students")
-      .select("id, student_id, first_name, middle_name, last_name, gender, grade_level, strand, current_section_id, contact_number, barangay")
-      .not("current_section_id", "is", null);
+      .select("id, student_id, first_name, middle_name, last_name, gender, grade_level, strand, current_section_id, contact_number, barangay");
 
     const countMap = new Map<string, number>();
     const studentListMap = new Map<string, any[]>();
+    const studentByIdMap = new Map<string, any>();
 
     if (studentsData) {
       studentsData.forEach((st: any) => {
+        studentByIdMap.set(st.id, st);
         if (st.current_section_id) {
           const isEnrolledInActiveTerm = enrolledInActiveTermSet.has(st.id);
           const studentWithStatus = {
@@ -177,7 +175,6 @@ export async function GET(req: Request) {
             isEnrolledInActiveTerm,
           };
 
-          // Only students officially approved for the active term count towards active enrolled quota
           if (isEnrolledInActiveTerm) {
             countMap.set(
               st.current_section_id,
@@ -240,8 +237,182 @@ export async function GET(req: Request) {
       return a.section_name.localeCompare(b.section_name);
     });
 
+    // 5. Build SHS Elective Sections (Grade 11 & 12)
+    // Pre-defined catalog of electives per DepEd MATATAG curriculum
+    const SHS_CATALOG: { code: string; name: string; grade_level: number }[] = [
+      // Grade 11 Electives
+      { code: "ACAD-BIO1", name: "Biology 1 (General Biology)", grade_level: 11 },
+      { code: "ACAD-CHEM1", name: "Chemistry 1", grade_level: 11 },
+      { code: "ACAD-PHYS1", name: "Physics 1", grade_level: 11 },
+      { code: "ACAD-ESS1", name: "Earth and Space Science 1", grade_level: 11 },
+      { code: "ACAD-ARTS1", name: "Arts 1 (Visual, Literary, Media)", grade_level: 11 },
+      { code: "ACAD-ARTS2", name: "Arts 2 (Music, Dance, and Theater)", grade_level: 11 },
+      { code: "ACAD-CITIZEN", name: "Citizenship and Civic Engagement", grade_level: 11 },
+      { code: "ACAD-CONLIT1", name: "Contemporary Literature 1", grade_level: 11 },
+      { code: "ACAD-FIL1", name: "Filipino 1 (Wika at Komunikasyon)", grade_level: 11 },
+      { code: "ACAD-PHILOS", name: "Introduction to Philosophy", grade_level: 11 },
+      { code: "ACAD-MALIKPAG", name: "Malikhaing Pagsulat", grade_level: 11 },
+      { code: "ACAD-GOV", name: "Philippine Governance (Politics and Governance)", grade_level: 11 },
+      { code: "ACAD-SOCSCI", name: "Social Sciences (Theory and Practice)", grade_level: 11 },
+      { code: "ACAD-BACC1", name: "Business 1 (Basic Accounting)", grade_level: 11 },
+      { code: "ACAD-ORGMGT", name: "Organization and Management", grade_level: 11 },
+      { code: "ACAD-MKTG", name: "Contemporary Marketing", grade_level: 11 },
+      { code: "ACAD-HMOV1", name: "Human Movement 1 (Basic Anatomy)", grade_level: 11 },
+      { code: "ACAD-HMOV2", name: "Human Movement 2 (Motor Skills)", grade_level: 11 },
+      { code: "ACAD-EMPTECH", name: "Empowerment Technologies", grade_level: 11 },
+      { code: "TECH-CROPS", name: "Agricultural Crops Production", grade_level: 11 },
+      { code: "TECH-ORGANIC", name: "Organic Agriculture Production", grade_level: 11 },
+
+      // Grade 12 Electives
+      { code: "ACAD-PRECAL1", name: "Pre-calculus 1 & Engineering Principles", grade_level: 12 },
+      { code: "ACAD-ADVMATH1", name: "Advanced Mathematics 1 / Calculus", grade_level: 12 },
+      { code: "ACAD-DATA", name: "Fundamentals in Data Analytics", grade_level: 12 },
+      { code: "ACAD-DBMGT", name: "Database Management", grade_level: 12 },
+      { code: "ACAD-BIO2", name: "Biology 2", grade_level: 12 },
+      { code: "ACAD-CHEM2", name: "Chemistry 2", grade_level: 12 },
+      { code: "ACAD-PHYS2", name: "Physics 2", grade_level: 12 },
+      { code: "ACAD-ESS2", name: "Earth and Space Science 2", grade_level: 12 },
+      { code: "ACAD-BFIN2", name: "Business 2 (Business Finance & Taxation)", grade_level: 12 },
+      { code: "ACAD-BECON3", name: "Business 3 (Business Economics)", grade_level: 12 },
+      { code: "ACAD-ENTREP", name: "Entrepreneurship", grade_level: 12 },
+      { code: "ACAD-FIRSTAID", name: "Safety and First Aid", grade_level: 12 },
+      { code: "ACAD-RESMETH", name: "Research Methods", grade_level: 12 },
+      { code: "ACAD-DESINNOV", name: "Design and Innovation", grade_level: 12 },
+      { code: "ACAD-FIELDEXP", name: "Field Exposure (Professional Immersion)", grade_level: 12 },
+    ];
+
+    // Map of electiveKey -> Array of students taking that elective
+    const electiveStudentMap = new Map<string, any[]>();
+
+    (appsData || []).forEach((app: any) => {
+      const gLevel = Number(app.target_grade_level);
+      if (gLevel >= 11 && app.student_id) {
+        const studentObj = studentByIdMap.get(app.student_id);
+        if (!studentObj) return;
+
+        const baseSection = studentObj.current_section_id ? sectionMap.get(studentObj.current_section_id) : null;
+        const baseSectionName = baseSection ? baseSection.section_name : "Not Yet Assigned";
+
+        const fd = Array.isArray(app.selected_electives) && app.selected_electives.length > 0
+          ? app.selected_electives[0]
+          : typeof app.selected_electives === "object" && app.selected_electives !== null
+          ? app.selected_electives
+          : {};
+
+        let rawElectives: string[] = [];
+        if (Array.isArray(fd.selectedElectives) && fd.selectedElectives.length > 0) {
+          rawElectives = fd.selectedElectives;
+        } else if (Array.isArray(app.selected_electives) && app.selected_electives.length > 0) {
+          const first = app.selected_electives[0];
+          if (typeof first === "string") rawElectives = app.selected_electives;
+          else if (first && Array.isArray(first.selectedElectives)) rawElectives = first.selectedElectives;
+        }
+
+        const enrichedStudentItem = {
+          ...studentObj,
+          base_section_id: studentObj.current_section_id,
+          base_section_name: baseSectionName,
+          isEnrolledInActiveTerm: enrolledInActiveTermSet.has(studentObj.id),
+        };
+
+        rawElectives.forEach((elec) => {
+          if (!elec || !elec.trim()) return;
+          const clean = elec.trim();
+          // Find matching catalog code or key
+          const matched = SHS_CATALOG.find(
+            (c) =>
+              c.code.toLowerCase() === clean.toLowerCase() ||
+              c.name.toLowerCase() === clean.toLowerCase() ||
+              c.name.toLowerCase().includes(clean.toLowerCase()) ||
+              clean.toLowerCase().includes(c.code.toLowerCase())
+          );
+          const key = matched ? `${matched.grade_level}-${matched.code}` : `${gLevel}-${clean}`;
+          if (!electiveStudentMap.has(key)) {
+            electiveStudentMap.set(key, []);
+          }
+          const list = electiveStudentMap.get(key)!;
+          if (!list.some((s) => s.id === enrichedStudentItem.id)) {
+            list.push(enrichedStudentItem);
+          }
+        });
+      }
+    });
+
+    // Build the elective sections list from catalog and active enrollments
+    const electiveSectionsList: any[] = [];
+    const processedKeys = new Set<string>();
+
+    SHS_CATALOG.forEach((cat) => {
+      const key = `${cat.grade_level}-${cat.code}`;
+      processedKeys.add(key);
+
+      const enrolledStudents = electiveStudentMap.get(key) || [];
+      const customConfig = customSections.find(
+        (cs) =>
+          cs.id === `elec-${cat.grade_level}-${cat.code}` ||
+          (cs.strand === "Elective" && cs.grade_level === cat.grade_level && cs.section_name.toLowerCase().includes(cat.name.toLowerCase()))
+      );
+
+      let capacity = customConfig?.capacity || 40;
+      let room = customConfig?.room || undefined;
+      let adviser_name = customConfig?.adviser_name || undefined;
+
+      if (room) {
+        const cleanRoom = room.trim().toLowerCase();
+        for (const [k, cap] of roomCapacityMap.entries()) {
+          if (cleanRoom === k || cleanRoom.includes(k) || k.includes(cleanRoom)) {
+            capacity = cap;
+            break;
+          }
+        }
+      }
+
+      electiveSectionsList.push({
+        id: customConfig?.id || `elec-${cat.grade_level}-${cat.code}`,
+        section_name: customConfig?.section_name || `Grade ${cat.grade_level} Elective - ${cat.name}`,
+        grade_level: cat.grade_level,
+        strand: "Elective",
+        isElective: true,
+        electiveCode: cat.code,
+        electiveName: cat.name,
+        room,
+        adviser_name,
+        capacity,
+        school_year: customConfig?.school_year || activeSchoolYear,
+        enrolledCount: enrolledStudents.length,
+        totalRosterCount: enrolledStudents.length,
+        students: enrolledStudents,
+      });
+    });
+
+    // Check for any remaining custom elective keys from student applications
+    for (const [key, students] of electiveStudentMap.entries()) {
+      if (!processedKeys.has(key)) {
+        const [gStr, ...rest] = key.split("-");
+        const gNum = Number(gStr) || 11;
+        const namePart = rest.join("-");
+        electiveSectionsList.push({
+          id: `elec-${key}`,
+          section_name: `Grade ${gNum} Elective - ${namePart}`,
+          grade_level: gNum,
+          strand: "Elective",
+          isElective: true,
+          electiveCode: namePart,
+          electiveName: namePart,
+          capacity: 40,
+          school_year: activeSchoolYear,
+          enrolledCount: students.length,
+          totalRosterCount: students.length,
+          students: students,
+        });
+      }
+    }
+
     if (sectionId) {
-      const single = sectionsList.find((s) => s.id === sectionId);
+      const single =
+        sectionsList.find((s) => s.id === sectionId) ||
+        electiveSectionsList.find((s) => s.id === sectionId);
+
       if (!single) {
         return NextResponse.json({ success: false, error: "Section not found" }, { status: 404, headers: NO_CACHE_HEADERS });
       }
@@ -254,7 +425,7 @@ export async function GET(req: Request) {
         },
         section: {
           ...single,
-          students: studentListMap.get(sectionId) || [],
+          students: single.isElective ? (single.students || []) : (studentListMap.get(sectionId) || []),
         },
       }, { headers: NO_CACHE_HEADERS });
     }
@@ -267,6 +438,7 @@ export async function GET(req: Request) {
         termName: activeTermName,
       },
       sections: sectionsList,
+      electiveSections: electiveSectionsList,
     }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
     console.error("Error in GET /api/sections:", err);

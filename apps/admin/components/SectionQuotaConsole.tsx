@@ -6,17 +6,18 @@ import { createClient } from "@/lib/supabase/client";
 export const SHS_TRACKS = [
   { code: "Academic", name: "Academic Track" },
   { code: "TechPro", name: "Technical-Professional Track (TechPro)" },
+  { code: "Elective", name: "Academic Elective Class / Section" },
 ];
 
 export function extractBaseSectionName(rawName: string, gradeLevel: number, strandOrTrack?: string | null): string {
   if (!rawName) return "";
   let base = rawName.trim();
 
-  // Strip prefixes like "Grade 7 - ", "Grade 11 Academic - ", "GRADE 11 - HUMSS ", "Grade 11 - "
-  base = base.replace(/^(Grade|Gr\.?)\s*\d+\s*(Academic|TechPro|TVL|STEM|HUMSS|ABM|GAS)?\s*[-–:]*\s*/i, "");
+  // Strip prefixes like "Grade 7 - ", "Grade 11 Academic - ", "Grade 11 Elective - ", "GRADE 11 - HUMSS ", "Grade 11 - "
+  base = base.replace(/^(Grade|Gr\.?)\s*\d+\s*(Academic|TechPro|Elective|TVL|STEM|HUMSS|ABM|GAS)?\s*[-–:]*\s*/i, "");
 
   // Strip old strand codes if present at start
-  base = base.replace(/^(Academic|TechPro|TVL-ICT|TVL-HE|TVL-AFA|TVL|STEM|HUMSS|ABM|GAS)\s*[-–:]*\s*/i, "");
+  base = base.replace(/^(Academic|TechPro|Elective|TVL-ICT|TVL-HE|TVL-AFA|TVL|STEM|HUMSS|ABM|GAS)\s*[-–:]*\s*/i, "");
 
   if (strandOrTrack) {
     const trackPattern = new RegExp(`^${strandOrTrack}\\s*[-–:]*\\s*`, "i");
@@ -51,6 +52,9 @@ export function formatSectionFullName(grade: number, rawInput: string, track?: s
   }
 
   if (grade >= 11) {
+    if (track === "Elective") {
+      return base ? `Grade ${grade} Elective - ${base}` : `Grade ${grade} Elective`;
+    }
     const cleanTrack = track === "TechPro" ? "TechPro" : "Academic";
     return base ? `Grade ${grade} ${cleanTrack} - ${base}` : `Grade ${grade} ${cleanTrack}`;
   }
@@ -69,6 +73,10 @@ export interface SectionDetail {
   enrolledCount: number;
   totalRosterCount?: number;
   school_year?: string;
+  isElective?: boolean;
+  electiveCode?: string;
+  electiveName?: string;
+  students?: any[];
 }
 
 export interface EnrolledStudent {
@@ -84,6 +92,8 @@ export interface EnrolledStudent {
   contact_number?: string | null;
   barangay?: string | null;
   isEnrolledInActiveTerm?: boolean;
+  base_section_name?: string | null;
+  base_section_id?: string | null;
 }
 
 // Helpers for multi-semester enrollment automation
@@ -153,6 +163,7 @@ export default function SectionQuotaConsole() {
   const supabase = createClient();
 
   const [sections, setSections] = useState<SectionDetail[]>([]);
+  const [electiveSections, setElectiveSections] = useState<SectionDetail[]>([]);
   const [teachersList, setTeachersList] = useState<RegisteredTeacher[]>([]);
   const [classroomsList, setClassroomsList] = useState<RegisteredClassroom[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -288,6 +299,9 @@ export default function SectionQuotaConsole() {
         const data = await res.json();
         if (data.success && Array.isArray(data.sections)) {
           setSections(data.sections);
+          if (Array.isArray(data.electiveSections)) {
+            setElectiveSections(data.electiveSections);
+          }
           if (data.activeTerm) {
             setActiveTerm(data.activeTerm);
           }
@@ -423,8 +437,14 @@ export default function SectionQuotaConsole() {
     setReassigningStudentId(null);
 
     try {
+      if (section.isElective && Array.isArray(section.students) && section.students.length > 0) {
+        setRosterStudents(section.students);
+        setIsLoadingRoster(false);
+        return;
+      }
+
       // 1. Try API route first
-      const res = await fetch(`/api/sections?sectionId=${section.id}&includeStudents=true&_t=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch(`/api/sections?sectionId=${encodeURIComponent(section.id)}&includeStudents=true&_t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.section?.students) {
@@ -631,13 +651,48 @@ export default function SectionQuotaConsole() {
     };
   }, []);
 
-  // Filter sections by grade
-  const filteredSections = sections.filter((sec) => {
+  // Merge custom elective sections from `sections` with `electiveSections`
+  const allElectivesMerged: SectionDetail[] = [...electiveSections];
+  sections.forEach((sec) => {
+    if (sec.strand === "Elective" || sec.isElective) {
+      if (!allElectivesMerged.some((e) => e.id === sec.id)) {
+        allElectivesMerged.push(sec);
+      }
+    }
+  });
+
+  // Base regular sections
+  const regularSections = sections.filter((sec) => sec.strand !== "Elective" && !sec.isElective);
+
+  // Filter regular sections by grade
+  const filteredSections = regularSections.filter((sec) => {
     if (gradeFilter === "ALL") return true;
     return String(sec.grade_level) === String(gradeFilter);
   });
 
-  const totalSections = filteredSections.length;
+  // JHS Sections (Grades 7 to 10)
+  const jhsSections = regularSections.filter((s) => s.grade_level >= 7 && s.grade_level <= 10);
+  const g7Sections = jhsSections.filter((s) => s.grade_level === 7);
+  const g8Sections = jhsSections.filter((s) => s.grade_level === 8);
+  const g9Sections = jhsSections.filter((s) => s.grade_level === 9);
+  const g10Sections = jhsSections.filter((s) => s.grade_level === 10);
+
+  // SHS Track Sections (Grades 11 and 12)
+  const shsTrackSections = regularSections.filter((s) => s.grade_level >= 11);
+  const g11TrackSections = shsTrackSections.filter((s) => s.grade_level === 11);
+  const g12TrackSections = shsTrackSections.filter((s) => s.grade_level === 12);
+
+  // SHS Elective Sections
+  const g11ElectiveSections = allElectivesMerged.filter((s) => s.grade_level === 11);
+  const g12ElectiveSections = allElectivesMerged.filter((s) => s.grade_level === 12);
+
+  // Visibility filters
+  const shouldShowJhs = gradeFilter === "ALL" || ["7", "8", "9", "10"].includes(gradeFilter);
+  const shouldShowShs = gradeFilter === "ALL" || ["11", "12"].includes(gradeFilter);
+  const shouldShowGrade = (g: number) => gradeFilter === "ALL" || String(g) === String(gradeFilter);
+
+  // Total summary
+  const totalSections = filteredSections.length + (gradeFilter === "ALL" ? allElectivesMerged.length : allElectivesMerged.filter(e => String(e.grade_level) === String(gradeFilter)).length);
   const totalCapacity = filteredSections.reduce((sum, s) => sum + s.capacity, 0);
   const totalEnrolled = filteredSections.reduce((sum, s) => sum + s.enrolledCount, 0);
   const totalAvailable = Math.max(0, totalCapacity - totalEnrolled);
@@ -1022,6 +1077,141 @@ export default function SectionQuotaConsole() {
     return lrnMatch || firstNameMatch || lastNameMatch || fullNameMatch || brgyMatch;
   });
 
+  const renderSectionCard = (sec: SectionDetail, isElectiveView?: boolean) => {
+    const count = sec.enrolledCount || 0;
+    const capacity = sec.capacity || 40;
+    const pct = Math.min(100, Math.round((count / capacity) * 100));
+    const isFull = count >= capacity;
+
+    return (
+      <div
+        key={sec.id}
+        className={`p-5 bg-white border-2 shadow-xs space-y-4 transition-colors flex flex-col justify-between ${
+          isElectiveView ? "border-purple-300 hover:border-purple-600" : "border-slate-300 hover:border-[#002060]"
+        }`}
+      >
+        <div>
+          {/* Card Header */}
+          <div
+            className={`flex items-start justify-between gap-2 border-b pb-3 ${
+              isElectiveView ? "border-purple-100" : "border-slate-200"
+            }`}
+          >
+            <div>
+              {isElectiveView && (
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-900 border border-purple-300 px-1.5 py-0.2 uppercase">
+                    [ ELECTIVE: {sec.electiveCode || "SHS-ELEC"} ]
+                  </span>
+                </div>
+              )}
+              <span className={`text-sm font-bold block ${isElectiveView ? "text-purple-950" : "text-[#002060]"}`}>
+                {sec.section_name}
+              </span>
+              {sec.adviser_name ? (
+                <span className="text-[11px] text-slate-700 block mt-0.5">
+                  {isElectiveView ? "Instructor:" : "Adviser:"}{" "}
+                  <strong className="text-slate-900 uppercase">{sec.adviser_name}</strong>
+                </span>
+              ) : (
+                <span className="inline-block mt-1 text-[10px] bg-amber-50 text-amber-900 border border-amber-300 font-mono font-bold px-1.5 py-0.5 uppercase">
+                  [ Needs Faculty Assignment ]
+                </span>
+              )}
+              {sec.room && (
+                <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
+                  {isElectiveView ? "Facility:" : "Room:"} {sec.room}
+                </span>
+              )}
+            </div>
+            <span
+              className={`text-[10px] font-mono px-2.5 py-1 border font-bold shrink-0 ${
+                isElectiveView
+                  ? "bg-purple-50 text-purple-900 border-purple-200"
+                  : "bg-slate-100 text-slate-800 border-slate-300"
+              }`}
+            >
+              Grade {sec.grade_level}{" "}
+              {sec.grade_level >= 11
+                ? isElectiveView
+                  ? "(Elective)"
+                  : sec.strand?.toUpperCase().includes("TECH") || sec.strand?.toUpperCase().includes("TVL")
+                  ? "(TechPro)"
+                  : "(Academic)"
+                : ""}
+            </span>
+          </div>
+
+          {/* Progress & Capacity */}
+          <div className="space-y-1.5 mt-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-600">
+                {isElectiveView ? "Enrolled in Elective:" : `Enrolled (${activeTerm.termName}):`}
+              </span>
+              <strong className="font-mono text-slate-900">
+                {count} / {capacity} students ({pct}%)
+              </strong>
+            </div>
+            <div className="w-full bg-slate-200 h-2.5 overflow-hidden border border-slate-300">
+              <div
+                className={`h-full transition-all duration-300 ${
+                  isFull ? "bg-red-600" : isElectiveView ? "bg-purple-700" : pct > 75 ? "bg-amber-500" : "bg-[#002060]"
+                }`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Slots Remaining */}
+          <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs mt-3">
+            <span className="text-slate-500">Available Slots:</span>
+            <span
+              className={`font-bold font-mono px-2 py-0.5 border ${
+                isFull
+                  ? "bg-red-50 text-red-700 border-red-300"
+                  : "bg-emerald-50 text-emerald-900 border-emerald-300"
+              }`}
+            >
+              {isFull ? "FULL (0 SLOTS)" : `${capacity - count} SLOTS REMAINING`}
+            </span>
+          </div>
+        </div>
+
+        {/* Card Action Buttons */}
+        <div className="pt-3 border-t border-slate-200 space-y-2">
+          <button
+            type="button"
+            onClick={() => fetchRoster(sec)}
+            className={`w-full py-2 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors shadow-2xs cursor-pointer ${
+              isElectiveView ? "bg-purple-900 hover:bg-purple-950" : "bg-[#002060] hover:bg-blue-950"
+            }`}
+          >
+            [ View {isElectiveView ? "Elective" : "Class"} Roster ({count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} in Roster` : ""}) ]
+          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => openEditModal(sec)}
+              className="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider text-center transition-colors cursor-pointer"
+              title={isElectiveView ? "Assign room or instructor" : "Edit capacity and details"}
+            >
+              [ {isElectiveView ? "Assign Facility" : "Edit Capacity"} ]
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDeleteSection(sec)}
+              className="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              title="Remove section"
+            >
+              [ Delete ]
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div id="admin-sections-dashboard" className="space-y-6 font-sans">
@@ -1187,7 +1377,7 @@ export default function SectionQuotaConsole() {
         <div className="p-8 bg-white border-2 border-slate-200 text-center">
           <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
-      ) : filteredSections.length === 0 ? (
+      ) : filteredSections.length === 0 && allElectivesMerged.length === 0 ? (
         <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-3">
           <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
             [ NO SECTIONS FOUND ]
@@ -1202,109 +1392,266 @@ export default function SectionQuotaConsole() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredSections.map((sec) => {
-            const count = sec.enrolledCount || 0;
-            const pct = Math.min(100, Math.round((count / sec.capacity) * 100));
-            const isFull = count >= sec.capacity;
-
-            return (
-              <div
-                key={sec.id}
-                className="p-5 bg-white border-2 border-slate-300 shadow-xs space-y-4 hover:border-[#002060] transition-colors flex flex-col justify-between"
-              >
+        <div className="space-y-10">
+          {/* ========================================================================= */}
+          {/* JUNIOR HIGH SCHOOL (JHS) SECTION BLOCK */}
+          {/* ========================================================================= */}
+          {shouldShowJhs && (
+            <div className="space-y-6">
+              <div className="border-b-2 border-[#002060] pb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  {/* Card Header */}
-                  <div className="flex items-start justify-between gap-2 border-b border-slate-200 pb-3">
-                    <div>
-                      <span className="text-sm font-bold text-[#002060] block">
-                        {sec.section_name}
-                      </span>
-                      {sec.adviser_name ? (
-                        <span className="text-[11px] text-slate-700 block">
-                          Adviser: <strong className="text-slate-900 uppercase">{sec.adviser_name}</strong>
-                        </span>
-                      ) : (
-                        <span className="inline-block mt-1 text-[10px] bg-amber-50 text-amber-900 border border-amber-300 font-mono font-bold px-1.5 py-0.5 uppercase">
-                          [ Needs Class Adviser ]
-                        </span>
-                      )}
-                      {sec.room && (
-                        <span className="text-[10px] text-slate-500 font-mono block">
-                          Room: {sec.room}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] font-mono bg-slate-100 px-2.5 py-1 border border-slate-300 font-bold shrink-0">
-                      Grade {sec.grade_level} {sec.grade_level >= 11 && sec.strand ? `(${sec.strand === "TechPro" || sec.strand.toUpperCase().includes("TVL") ? "TechPro" : "Academic"})` : ""}
-                    </span>
-                  </div>
-
-                  {/* Progress & Capacity */}
-                  <div className="space-y-1.5 mt-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-600">Enrolled ({activeTerm.termName}):</span>
-                      <strong className="font-mono text-slate-900">
-                        {count} / {sec.capacity} students ({pct}%)
-                      </strong>
-                    </div>
-                    <div className="w-full bg-slate-200 h-2.5 overflow-hidden border border-slate-300">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          isFull ? "bg-red-600" : pct > 75 ? "bg-amber-500" : "bg-[#002060]"
-                        }`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Slots Remaining */}
-                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs mt-3">
-                    <span className="text-slate-500">Available Slots:</span>
-                    <span
-                      className={`font-bold font-mono px-2 py-0.5 border ${
-                        isFull
-                          ? "bg-red-50 text-red-700 border-red-300"
-                          : "bg-emerald-50 text-emerald-900 border-emerald-300"
-                      }`}
-                    >
-                      {isFull ? "FULL (0 SLOTS)" : `${sec.capacity - count} SLOTS REMAINING`}
-                    </span>
-                  </div>
+                  <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                    [ SECONDARY EDUCATION - JHS ]
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-bold uppercase text-slate-900">
+                    Junior High School (JHS)
+                  </h3>
                 </div>
-
-                {/* Card Action Buttons */}
-                <div className="pt-3 border-t border-slate-200 space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => fetchRoster(sec)}
-                    className="w-full py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors shadow-2xs cursor-pointer"
-                  >
-                    [ View Class Roster ({count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} in Roster` : ""}) ]
-                  </button>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(sec)}
-                      className="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider text-center transition-colors cursor-pointer"
-                      title="Edit capacity and details"
-                    >
-                      [ Edit Capacity ]
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteSection(sec)}
-                      className="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                      title="Remove section"
-                    >
-                      [ Delete ]
-                    </button>
-                  </div>
-                </div>
+                <span className="text-xs font-mono font-bold bg-[#002060] text-white px-3 py-1 self-start sm:self-auto">
+                  Grades 7 - 10 Core Curricula
+                </span>
               </div>
-            );
-          })}
+
+              {/* Grade 7 Sub-block */}
+              {shouldShowGrade(7) && (
+                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
+                      Grade 7 Sections
+                    </h4>
+                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                      {g7Sections.length} {g7Sections.length === 1 ? "Section" : "Sections"}
+                    </span>
+                  </div>
+                  {g7Sections.length === 0 ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                      No Grade 7 sections created yet. Click "+ Add New Class Section" to register one.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {g7Sections.map((sec) => renderSectionCard(sec))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Grade 8 Sub-block */}
+              {shouldShowGrade(8) && (
+                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
+                      Grade 8 Sections
+                    </h4>
+                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                      {g8Sections.length} {g8Sections.length === 1 ? "Section" : "Sections"}
+                    </span>
+                  </div>
+                  {g8Sections.length === 0 ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                      No Grade 8 sections created yet. Click "+ Add New Class Section" to register one.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {g8Sections.map((sec) => renderSectionCard(sec))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Grade 9 Sub-block */}
+              {shouldShowGrade(9) && (
+                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
+                      Grade 9 Sections
+                    </h4>
+                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                      {g9Sections.length} {g9Sections.length === 1 ? "Section" : "Sections"}
+                    </span>
+                  </div>
+                  {g9Sections.length === 0 ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                      No Grade 9 sections created yet. Click "+ Add New Class Section" to register one.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {g9Sections.map((sec) => renderSectionCard(sec))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Grade 10 Sub-block */}
+              {shouldShowGrade(10) && (
+                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
+                      Grade 10 Sections
+                    </h4>
+                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                      {g10Sections.length} {g10Sections.length === 1 ? "Section" : "Sections"}
+                    </span>
+                  </div>
+                  {g10Sections.length === 0 ? (
+                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                      No Grade 10 sections created yet. Click "+ Add New Class Section" to register one.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {g10Sections.map((sec) => renderSectionCard(sec))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* SENIOR HIGH SCHOOL (SHS) SECTION BLOCK */}
+          {/* ========================================================================= */}
+          {shouldShowShs && (
+            <div className="space-y-8">
+              <div className="border-b-2 border-blue-900 pb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-[10px] font-mono font-bold text-blue-900 uppercase tracking-wider block">
+                    [ POST-SECONDARY EDUCATION - SHS ]
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-bold uppercase text-slate-900">
+                    Senior High School (SHS)
+                  </h3>
+                </div>
+                <span className="text-xs font-mono font-bold bg-blue-900 text-white px-3 py-1 self-start sm:self-auto">
+                  Grades 11 - 12 Academic &amp; Tech-Pro
+                </span>
+              </div>
+
+              {/* Grade 11 Block */}
+              {shouldShowGrade(11) && (
+                <div className="space-y-6 pl-2 sm:pl-4 border-l-2 border-blue-400">
+                  {/* Grade 11 Track Sections (Academic at Tech-Pro) */}
+                  <div className="space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-blue-50/70 p-3 border border-blue-200">
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-bold text-[#002060] uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
+                          Grade 11 Academic at Tech-Pro (Track Sections)
+                        </h4>
+                        <p className="text-[11px] text-slate-600">
+                          Primary homeroom cohorts for core curriculum. Students in the same track are classmates here.
+                        </p>
+                      </div>
+                      <span className="text-xs font-mono font-bold text-blue-900 bg-white px-2.5 py-0.5 border border-blue-300 self-start sm:self-auto">
+                        {g11TrackSections.length} {g11TrackSections.length === 1 ? "Track Section" : "Track Sections"}
+                      </span>
+                    </div>
+
+                    {g11TrackSections.length === 0 ? (
+                      <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                        No Grade 11 track sections found. Click "+ Add New Class Section" to add Academic or TechPro sections.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {g11TrackSections.map((sec) => renderSectionCard(sec))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Electives Subheading -> Grade 11 mga section ulit */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-purple-50/80 p-3 border border-purple-200">
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-bold text-purple-950 uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 bg-purple-700 inline-block" />
+                          Electives — Grade 11 Elective Sections
+                        </h4>
+                        <p className="text-[11px] text-purple-900">
+                          Specialized subject sections. Students taking the same elective are classmates during elective periods.
+                        </p>
+                      </div>
+                      <span className="text-xs font-mono font-bold text-purple-900 bg-white px-2.5 py-0.5 border border-purple-300 self-start sm:self-auto">
+                        {g11ElectiveSections.length} {g11ElectiveSections.length === 1 ? "Elective Class" : "Elective Classes"}
+                      </span>
+                    </div>
+
+                    {g11ElectiveSections.length === 0 ? (
+                      <div className="p-4 bg-purple-50/40 border border-purple-200 text-xs text-purple-800 font-mono">
+                        No Grade 11 elective classes currently populated. As SHS students select electives during enrollment, sections appear here automatically.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {g11ElectiveSections.map((sec) => renderSectionCard(sec, true))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Grade 12 Block */}
+              {shouldShowGrade(12) && (
+                <div className="space-y-6 pl-2 sm:pl-4 border-l-2 border-blue-400">
+                  {/* Grade 12 Track Sections (Academic at Tech-Pro) */}
+                  <div className="space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-blue-50/70 p-3 border border-blue-200">
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-bold text-[#002060] uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
+                          Grade 12 Academic at Tech-Pro (Track Sections)
+                        </h4>
+                        <p className="text-[11px] text-slate-600">
+                          Primary homeroom cohorts for core curriculum. Students in the same track are classmates here.
+                        </p>
+                      </div>
+                      <span className="text-xs font-mono font-bold text-blue-900 bg-white px-2.5 py-0.5 border border-blue-300 self-start sm:self-auto">
+                        {g12TrackSections.length} {g12TrackSections.length === 1 ? "Track Section" : "Track Sections"}
+                      </span>
+                    </div>
+
+                    {g12TrackSections.length === 0 ? (
+                      <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                        No Grade 12 track sections found. Click "+ Add New Class Section" to add Academic or TechPro sections.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {g12TrackSections.map((sec) => renderSectionCard(sec))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Electives Subheading -> Grade 12 mga section ulit */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-purple-50/80 p-3 border border-purple-200">
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-bold text-purple-950 uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 bg-purple-700 inline-block" />
+                          Electives — Grade 12 Elective Sections
+                        </h4>
+                        <p className="text-[11px] text-purple-900">
+                          Specialized subject sections. Students taking the same elective are classmates during elective periods.
+                        </p>
+                      </div>
+                      <span className="text-xs font-mono font-bold text-purple-900 bg-white px-2.5 py-0.5 border border-purple-300 self-start sm:self-auto">
+                        {g12ElectiveSections.length} {g12ElectiveSections.length === 1 ? "Elective Class" : "Elective Classes"}
+                      </span>
+                    </div>
+
+                    {g12ElectiveSections.length === 0 ? (
+                      <div className="p-4 bg-purple-50/40 border border-purple-200 text-xs text-purple-800 font-mono">
+                        No Grade 12 elective classes currently populated. As SHS students select electives during enrollment, sections appear here automatically.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {g12ElectiveSections.map((sec) => renderSectionCard(sec, true))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
       </div>
@@ -2150,6 +2497,9 @@ export default function SectionQuotaConsole() {
                         <th className="p-3 w-12 text-center">#</th>
                         <th className="p-3">12-Digit LRN</th>
                         <th className="p-3">Learner Full Name</th>
+                        {selectedRosterSection.isElective && (
+                          <th className="p-3">Base / Academic Section</th>
+                        )}
                         <th className="p-3">Gender</th>
                         <th className="p-3">Barangay / Contact</th>
                         <th className="p-3 text-right no-print print:hidden">Section Action</th>
@@ -2195,6 +2545,13 @@ export default function SectionQuotaConsole() {
                                 )}
                               </div>
                             </td>
+                            {selectedRosterSection.isElective && (
+                              <td className="p-3">
+                                <span className="inline-block px-2 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 font-mono font-bold text-[11px]">
+                                  {st.base_section_name || "Academic"}
+                                </span>
+                              </td>
+                            )}
                             <td className="p-3">
                               {st.gender || "—"}
                             </td>
@@ -2205,7 +2562,11 @@ export default function SectionQuotaConsole() {
                               )}
                             </td>
                             <td className="p-3 text-right no-print print:hidden">
-                              {isEnrolled ? (
+                              {selectedRosterSection.isElective ? (
+                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-50 text-purple-900 border border-purple-200 uppercase">
+                                  [ Elective Cohort ]
+                                </span>
+                              ) : isEnrolled ? (
                                 isReassigningThis ? (
                                   <div className="inline-flex items-center gap-1.5">
                                     <select
