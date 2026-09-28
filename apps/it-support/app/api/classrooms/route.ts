@@ -48,16 +48,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (id) {
+      const { data, error } = await supabase
+        .from("classrooms")
+        .update({
+          classroom_id: roomCode,
+          room_name: name,
+          building: bldg,
+          capacity: cap,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
+      const formatted = {
+        id: data.id,
+        classroomId: data.classroom_id,
+        classroom_id: data.classroom_id,
+        roomName: data.room_name,
+        room_name: data.room_name,
+        building: data.building,
+        capacity: data.capacity,
+      };
+
+      return NextResponse.json({ success: true, classroom: formatted });
+    }
+
     const payload: Record<string, any> = {
       classroom_id: roomCode,
       room_name: name,
       building: bldg,
       capacity: cap,
     };
-
-    if (id) {
-      payload.id = id;
-    }
 
     const { data, error } = await supabase
       .from("classrooms")
@@ -83,6 +109,11 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to save classroom" }, { status: 500 });
   }
+}
+
+// PUT: Update an existing classroom
+export async function PUT(req: NextRequest) {
+  return POST(req);
 }
 
 export async function DELETE(req: NextRequest) {
