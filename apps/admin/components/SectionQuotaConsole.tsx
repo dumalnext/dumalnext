@@ -689,6 +689,9 @@ export default function SectionQuotaConsole() {
       }
     }
 
+    const matchedRoom = findClassroomDetails(newRoom);
+    const finalCapacity = matchedRoom ? matchedRoom.capacity : 40;
+
     setIsSubmittingAdd(true);
 
     try {
@@ -699,7 +702,7 @@ export default function SectionQuotaConsole() {
           section_name: fullSectionName,
           grade_level: newGradeLevel,
           strand: newGradeLevel >= 11 ? (newStrand || "Academic") : null,
-          capacity: newCapacity,
+          capacity: finalCapacity,
           room: newRoom.trim() || null,
           adviser_name: newAdviser.trim() || null,
           school_year: "2026-2027",
@@ -713,7 +716,7 @@ export default function SectionQuotaConsole() {
 
       setStatusNotice({
         type: "success",
-        text: `Section [ ${fullSectionName} ] has been successfully created with a capacity of ${newCapacity} students.`,
+        text: `Section [ ${fullSectionName} ] has been successfully created with a fixed capacity of ${finalCapacity} students (governed by IT Facilities).`,
       });
 
       // Reset form
@@ -784,14 +787,12 @@ export default function SectionQuotaConsole() {
       return;
     }
 
-    if (editCapacity <= 0 || isNaN(editCapacity)) {
-      setEditError("Please enter a valid section capacity.");
-      return;
-    }
+    const matchedRoom = findClassroomDetails(editRoom);
+    const finalCapacity = matchedRoom ? matchedRoom.capacity : (editingSection.capacity || 40);
 
-    if (editCapacity < editingSection.enrolledCount) {
+    if (finalCapacity < editingSection.enrolledCount) {
       setEditError(
-        `Capacity cannot be set lower than currently enrolled students (${editingSection.enrolledCount} students). Please reassign students first.`
+        `Classroom Capacity Conflict: The selected room capacity (${finalCapacity} seats) is lower than currently enrolled students (${editingSection.enrolledCount} students). Please reassign students or select a classroom with adequate seating.`
       );
       return;
     }
@@ -835,7 +836,7 @@ export default function SectionQuotaConsole() {
           id: editingSection.id,
           section_name: fullSectionName,
           grade_level: editGradeLevel,
-          capacity: editCapacity,
+          capacity: finalCapacity,
           room: editRoom.trim() || null,
           adviser_name: editAdviser.trim() || null,
           strand: editGradeLevel >= 11 ? (editStrand || "Academic") : null,
@@ -1544,52 +1545,47 @@ export default function SectionQuotaConsole() {
                 </div>
               </div>
 
-              {/* Section Capacity (Synchronized with IT Support physical room) */}
+              {/* Section Capacity (Fixed & Governed by IT Support physical room) */}
               {(() => {
                 const matchedRoom = findClassroomDetails(newRoom);
+                const effectiveCapacity = matchedRoom ? matchedRoom.capacity : 40;
                 return (
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-900 uppercase">
-                        Section Capacity (Maximum Allowed Seats) <span className="text-red-600">*</span>
-                      </label>
-                      {matchedRoom ? (
-                        <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300 uppercase">
-                          [ AUTO-SYNCED WITH IT CLASSROOM: {matchedRoom.capacity} SEATS ]
+                  <div className="p-3.5 bg-slate-50 border-2 border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 uppercase">
+                          Section Capacity (Allowed Seats)
                         </span>
-                      ) : (
-                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 border border-slate-300 uppercase">
-                          [ DEFAULT QUOTA ]
-                        </span>
-                      )}
+                        {matchedRoom ? (
+                          <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 px-2 py-0.5 border border-emerald-400 uppercase">
+                            [ FIXED BY IT FACILITY: {matchedRoom.classroom_id || matchedRoom.room_name} ]
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-300 uppercase">
+                            [ STANDARD QUOTA: UNASSIGNED ROOM ]
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-600 mt-1">
+                        {matchedRoom ? (
+                          <span>
+                            Classroom seating limit is <strong>automatically locked and fixed</strong> by the IT Support Facility Registry to ensure zero student overcrowding.
+                          </span>
+                        ) : (
+                          <span>
+                            Standard DepEd default quota is 40 seats. Select a registered classroom above to lock to its physical IT room capacity.
+                          </span>
+                        )}
+                      </p>
                     </div>
-                    <input
-                      type="number"
-                      min={1}
-                      max={80}
-                      required
-                      value={newCapacity}
-                      readOnly={!!matchedRoom}
-                      onChange={(e) => setNewCapacity(Number(e.target.value))}
-                      className={`w-full p-2.5 border text-xs font-mono font-bold outline-none ${
-                        matchedRoom
-                          ? "bg-slate-100 border-slate-300 text-[#002060] cursor-not-allowed"
-                          : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
-                      }`}
-                    />
-                    <div className="mt-1 flex items-center justify-between text-[10px]">
-                      <span className="text-slate-500">
-                        Standard DepEd classroom capacity is 40-45 students.
+
+                    <div className="shrink-0 text-left sm:text-right bg-white p-2.5 sm:px-4 border border-slate-300 min-w-[120px]">
+                      <span className="text-2xl sm:text-3xl font-mono font-bold text-[#002060] block leading-tight">
+                        {effectiveCapacity}
                       </span>
-                      {matchedRoom ? (
-                        <span className="font-bold text-[#002060] font-mono">
-                          Physical seating limit locked by IT Support facility registry.
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 font-mono">
-                          Select a classroom above to automatically lock to room capacity.
-                        </span>
-                      )}
+                      <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+                        Maximum Seats
+                      </span>
                     </div>
                   </div>
                 );
@@ -1909,52 +1905,50 @@ export default function SectionQuotaConsole() {
                 </div>
               </div>
 
-              {/* Section Capacity (Synchronized with IT Support physical room) */}
+              {/* Section Capacity (Fixed & Governed by IT Support physical room) */}
               {(() => {
                 const matchedRoom = findClassroomDetails(editRoom);
+                const effectiveCapacity = matchedRoom ? matchedRoom.capacity : (editingSection.capacity || 40);
                 return (
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-900 uppercase">
-                        Section Capacity (Maximum Allowed Seats) <span className="text-red-600">*</span>
-                      </label>
-                      {matchedRoom ? (
-                        <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300 uppercase">
-                          [ AUTO-SYNCED WITH IT CLASSROOM: {matchedRoom.capacity} SEATS ]
+                  <div className="p-3.5 bg-slate-50 border-2 border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 uppercase">
+                          Section Capacity (Allowed Seats)
                         </span>
-                      ) : (
-                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 border border-slate-300 uppercase">
-                          [ MANUAL OVERRIDE ]
-                        </span>
-                      )}
+                        {matchedRoom ? (
+                          <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 px-2 py-0.5 border border-emerald-400 uppercase">
+                            [ FIXED BY IT FACILITY: {matchedRoom.classroom_id || matchedRoom.room_name} ]
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-300 uppercase">
+                            [ STANDARD QUOTA: UNASSIGNED ROOM ]
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-600 mt-1">
+                        {matchedRoom ? (
+                          <span>
+                            Classroom seating limit is <strong>automatically locked and fixed</strong> by the IT Support Facility Registry ({matchedRoom.room_name}, {matchedRoom.building}).
+                          </span>
+                        ) : (
+                          <span>
+                            Standard DepEd default quota. Select a registered classroom above to lock to its physical IT room capacity.
+                          </span>
+                        )}
+                      </p>
+                      <div className="mt-1 text-[11px] font-mono text-slate-500">
+                        Currently enrolled learners: <strong className="text-slate-900">{editingSection.enrolledCount}</strong> students.
+                      </div>
                     </div>
-                    <input
-                      type="number"
-                      min={editingSection.enrolledCount || 1}
-                      max={80}
-                      required
-                      value={editCapacity}
-                      readOnly={!!matchedRoom}
-                      onChange={(e) => setEditCapacity(Number(e.target.value))}
-                      className={`w-full p-2.5 border text-xs font-mono font-bold outline-none ${
-                        matchedRoom
-                          ? "bg-slate-100 border-slate-300 text-[#002060] cursor-not-allowed"
-                          : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
-                      }`}
-                    />
-                    <div className="mt-1 flex items-center justify-between text-[10px]">
-                      <span className="text-slate-500">
-                        Currently enrolled learners: <strong>{editingSection.enrolledCount}</strong> (Capacity cannot be lower than enrollment).
+
+                    <div className="shrink-0 text-left sm:text-right bg-white p-2.5 sm:px-4 border border-slate-300 min-w-[120px]">
+                      <span className="text-2xl sm:text-3xl font-mono font-bold text-[#002060] block leading-tight">
+                        {effectiveCapacity}
                       </span>
-                      {matchedRoom ? (
-                        <span className="font-bold text-[#002060] font-mono">
-                          Physical seating limit locked by IT Support facility registry.
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 font-mono">
-                          Select a classroom above to automatically lock to room capacity.
-                        </span>
-                      )}
+                      <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+                        Maximum Seats
+                      </span>
                     </div>
                   </div>
                 );
