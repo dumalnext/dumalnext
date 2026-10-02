@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       {/* Error Alert Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border-2 border-red-400">
+        <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
           <p className="text-xs font-bold text-red-900 leading-normal">
             [ AUTHENTICATION ERROR ]: {error}
           </p>
@@ -70,7 +70,7 @@ export default function LoginPage() {
       )}
 
       {/* Sign In Card */}
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-lg shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Identifier: Email First */}
           <div>
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="e.g. student@example.com"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md"
               required
             />
             <p className="text-[10px] text-slate-500 mt-1">
@@ -106,7 +106,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="Enter your account password"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none rounded-md"
               required
             />
           </div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400"
+              className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
             >
               {isSubmitting ? "[ AUTHENTICATING ACCOUNT... ]" : "[ SIGN IN TO STUDENT PORTAL ]"}
             </button>
@@ -124,7 +124,7 @@ export default function LoginPage() {
         </form>
 
         {/* Capstone Defense Testing Quick Buttons */}
-        <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px]">
+        <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] rounded-md">
           <span className="font-bold text-slate-600 block uppercase text-[10px]">
             [ Capstone Defense Demo Shortcuts ]:
           </span>
@@ -135,7 +135,7 @@ export default function LoginPage() {
                 setIdentifier("100050123456");
                 setPassword("password123");
               }}
-              className="text-left text-[#002060] font-mono hover:underline truncate"
+              className="text-left text-[#002060] font-mono hover:underline truncate cursor-pointer"
             >
               &bull; Login as Mark Agcaoili (LRN: 100050123456)
             </button>
@@ -145,7 +145,7 @@ export default function LoginPage() {
                 setIdentifier("john.lozano@example.com");
                 setPassword("password123");
               }}
-              className="text-left text-[#002060] font-mono hover:underline truncate"
+              className="text-left text-[#002060] font-mono hover:underline truncate cursor-pointer"
             >
               &bull; Login as John Lozano (Email: john.lozano@example.com)
             </button>

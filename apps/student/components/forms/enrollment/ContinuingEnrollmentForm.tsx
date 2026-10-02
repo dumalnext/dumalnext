@@ -528,9 +528,9 @@ export default function ContinuingEnrollmentForm({
         </div>
 
         {/* Status Banner */}
-        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2">
+        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-md">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-xs">
               [ STATUS: PENDING REGISTRAR ADJUDICATION &amp; APPROVAL ]
             </span>
             <span className="text-xs font-mono text-slate-700">
@@ -541,7 +541,7 @@ export default function ContinuingEnrollmentForm({
             Your continuing enrollment application {isJHS ? "" : "and elective subject selections"} for {semester}, S.Y. {schoolYear} have been received. Your verified learner credentials and DepEd documents on file from S.Y. {priorApprovedApp.school_year} have been attached automatically.
           </p>
           {isJHS && enableTransfer && selectedJhsProgram !== previousJhsProgram && (
-            <div className="p-3 bg-amber-100/90 border border-amber-500 mt-2 text-xs font-bold text-amber-950 space-y-0.5">
+            <div className="p-3 bg-amber-100/90 border border-amber-500 mt-2 text-xs font-bold text-amber-950 space-y-0.5 rounded-md">
               <span className="block font-mono uppercase tracking-wider">
                 [ CURRICULAR TRANSFER REQUEST: {previousJhsProgram} &rarr; {selectedJhsProgram} ]
               </span>
@@ -553,7 +553,7 @@ export default function ContinuingEnrollmentForm({
         </div>
 
         {/* Reference Number Box */}
-        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2">
+        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-md">
           <span className="text-xs font-mono uppercase tracking-widest text-slate-600 font-bold block">
             Official DepEd Tracking Reference Number
           </span>
@@ -566,7 +566,7 @@ export default function ContinuingEnrollmentForm({
         </div>
 
         {/* Summary Details */}
-        <div className="border border-slate-200 divide-y divide-slate-200 text-xs">
+        <div className="border border-slate-200 divide-y divide-slate-200 text-xs rounded-md overflow-hidden">
           <div className="p-3 bg-slate-100 font-bold text-slate-800 uppercase tracking-wide">
             Continuing Enrollment Dossier Summary
           </div>
@@ -623,7 +623,7 @@ export default function ContinuingEnrollmentForm({
             type="button"
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
-            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs"
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs rounded-md"
           >
             {isDownloadingPdf
               ? "Generating Official PDF..."
@@ -632,13 +632,13 @@ export default function ContinuingEnrollmentForm({
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Link
               href={`/track?ref=${referenceNumber}`}
-              className="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white text-center font-bold text-xs uppercase tracking-wider transition-colors"
+              className="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white text-center font-bold text-xs uppercase tracking-wider transition-colors rounded-md"
             >
               [ View / Track Application Details ]
             </Link>
             <Link
               href="/"
-              className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-center font-bold text-xs uppercase tracking-wider transition-colors"
+              className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-center font-bold text-xs uppercase tracking-wider transition-colors rounded-md"
             >
               Return to Student Home
             </Link>
@@ -736,7 +736,7 @@ export default function ContinuingEnrollmentForm({
         </div>
 
         {/* CURRICULAR PROGRAM & TRANSFER SWITCH */}
-        <div className="p-6 bg-slate-50 border-2 border-slate-300 space-y-4">
+        <div className="p-6 bg-slate-50 border-2 border-slate-300 space-y-4 rounded-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
             <div>
               <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
@@ -781,9 +781,9 @@ export default function ContinuingEnrollmentForm({
 
           {/* Switch OFF: Maintaining Program */}
           {!enableTransfer && (
-            <div className="p-4 bg-white border border-slate-300 space-y-2">
+            <div className="p-4 bg-white border border-slate-300 space-y-2 rounded-md">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 border border-slate-300">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 border border-slate-300 rounded">
                   [ TRANSFER SWITCH: OFF &bull; MAINTAINING CURRENT PROGRAM ]
                 </span>
               </div>
@@ -791,7 +791,7 @@ export default function ContinuingEnrollmentForm({
                 You are continuing in your existing curricular program: <strong className="text-slate-900">{previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education Curriculum"}</strong>. No transfer is requested.
               </p>
               {previousJhsProgram === "SPS" && (
-                <div className="p-3 bg-blue-50 border border-blue-200 mt-2 space-y-1">
+                <div className="p-3 bg-blue-50 border border-blue-200 mt-2 space-y-1 rounded-md">
                   <span className="text-xs font-bold text-[#002060] uppercase block">
                     [ General Special Program in Sports (SPS) Curriculum ]
                   </span>
@@ -805,9 +805,9 @@ export default function ContinuingEnrollmentForm({
 
           {/* Switch ON: Choose Program */}
           {enableTransfer && (
-            <div className="space-y-4 p-4 bg-white border-2 border-blue-300">
+            <div className="space-y-4 p-4 bg-white border-2 border-blue-300 rounded-md">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060] bg-blue-100 px-2.5 py-1 border border-blue-300">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060] bg-blue-100 px-2.5 py-1 border border-blue-300 rounded">
                   [ TRANSFER SWITCH: ON &bull; SELECT PROGRAM ]
                 </span>
                 <span className="text-[11px] text-slate-500 font-mono">
@@ -822,7 +822,7 @@ export default function ContinuingEnrollmentForm({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Option 1: Regular */}
                 <label
-                  className={`p-4 border-2 cursor-pointer transition-all ${
+                  className={`p-4 border-2 cursor-pointer transition-all rounded-md ${
                     selectedJhsProgram === "Regular"
                       ? "border-[#002060] bg-blue-50/70"
                       : "border-slate-300 bg-slate-50 hover:bg-slate-100"
@@ -843,7 +843,7 @@ export default function ContinuingEnrollmentForm({
                           Regular Basic Education
                         </span>
                         {previousJhsProgram === "Regular" && (
-                          <span className="text-[10px] font-mono text-slate-500 font-bold bg-slate-200 px-1.5 py-0.5">
+                          <span className="text-[10px] font-mono text-slate-500 font-bold bg-slate-200 px-1.5 py-0.5 rounded">
                             CURRENT
                           </span>
                         )}
@@ -857,7 +857,7 @@ export default function ContinuingEnrollmentForm({
 
                 {/* Option 2: General SPS */}
                 <label
-                  className={`p-4 border-2 cursor-pointer transition-all ${
+                  className={`p-4 border-2 cursor-pointer transition-all rounded-md ${
                     selectedJhsProgram === "SPS"
                       ? "border-[#002060] bg-blue-50/70"
                       : "border-slate-300 bg-slate-50 hover:bg-slate-100"
@@ -878,7 +878,7 @@ export default function ContinuingEnrollmentForm({
                           Special Program in Sports (SPS)
                         </span>
                         {previousJhsProgram === "SPS" && (
-                          <span className="text-[10px] font-mono text-slate-500 font-bold bg-slate-200 px-1.5 py-0.5">
+                          <span className="text-[10px] font-mono text-slate-500 font-bold bg-slate-200 px-1.5 py-0.5 rounded">
                             CURRENT
                           </span>
                         )}
@@ -893,7 +893,7 @@ export default function ContinuingEnrollmentForm({
 
               {/* General SPS Notification when SPS selected */}
               {selectedJhsProgram === "SPS" && (
-                <div className="p-3 bg-blue-50 border border-blue-300 space-y-1">
+                <div className="p-3 bg-blue-50 border border-blue-300 space-y-1 rounded-md">
                   <span className="text-xs font-bold text-[#002060] uppercase block">
                     [ General Special Program in Sports (SPS) Curriculum ]
                   </span>
@@ -905,7 +905,7 @@ export default function ContinuingEnrollmentForm({
 
               {/* Transfer Alert Notice if different */}
               {isTransferRequested ? (
-                <div className="p-4 bg-amber-50 border-2 border-amber-400 space-y-1">
+                <div className="p-4 bg-amber-50 border-2 border-amber-400 space-y-1 rounded-md">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono font-bold text-amber-950 uppercase">
                       [ PROGRAM TRANSFER REQUEST FLAGGED: {previousJhsProgram} &rarr; {selectedJhsProgram} ]
@@ -925,7 +925,7 @@ export default function ContinuingEnrollmentForm({
         </div>
 
         {/* DepEd Review and Approval Note */}
-        <div className="p-4 bg-amber-50/70 border border-amber-300 space-y-1 text-xs text-amber-950">
+        <div className="p-4 bg-amber-50/70 border border-amber-300 space-y-1 text-xs text-amber-950 rounded-md">
           <span className="font-bold uppercase tracking-wider block text-amber-900">
             Official DepEd Adjudication Policy Notice:
           </span>
@@ -935,7 +935,7 @@ export default function ContinuingEnrollmentForm({
         </div>
 
         {/* Submit Action Card */}
-        <div className="p-6 bg-blue-50/70 border-2 border-[#002060] space-y-4">
+        <div className="p-6 bg-blue-50/70 border-2 border-[#002060] space-y-4 rounded-md">
           <div className="space-y-1">
             <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
               [ SUBMIT CONTINUING ENROLLMENT APPLICATION ]
@@ -950,7 +950,7 @@ export default function ContinuingEnrollmentForm({
               type="button"
               onClick={handleOneClickJhsSubmit}
               disabled={isSubmitting || !isEnrollmentOpen}
-              className={`w-full py-4 px-6 text-xs sm:text-sm uppercase tracking-wider font-bold transition-all shadow-md ${
+              className={`w-full py-4 px-6 text-xs sm:text-sm uppercase tracking-wider font-bold transition-all shadow-md rounded-md ${
                 !isEnrollmentOpen
                   ? "bg-slate-400 text-slate-100 cursor-not-allowed"
                   : isSubmitting
@@ -1061,7 +1061,7 @@ export default function ContinuingEnrollmentForm({
               <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
                 [ OFFICIAL DEPED CREDENTIALS VERIFIED &amp; ON FILE ]
               </span>
-              <span className="text-[10px] font-mono bg-emerald-800 text-white px-2 py-0.5 uppercase font-bold w-fit">
+              <span className="text-[10px] font-mono bg-emerald-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded">
                 PRIOR REF: {priorApprovedApp.application_id}
               </span>
             </div>
@@ -1074,12 +1074,12 @@ export default function ContinuingEnrollmentForm({
           </div>
 
           {/* Read-Only Verified Learner Summary Card */}
-          <div className="border border-slate-300 bg-slate-50 p-4 space-y-3">
+          <div className="border border-slate-300 bg-slate-50 p-4 space-y-3 rounded-md">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
                 [ Verified Learner Profile on Record ]
               </span>
-              <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 border border-emerald-300">
+              <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 border border-emerald-300 rounded">
                 VERIFIED STATUS: ACTIVE
               </span>
             </div>
@@ -1126,16 +1126,16 @@ export default function ContinuingEnrollmentForm({
                 Certified Official Documents on File:
               </span>
               <div className="flex flex-wrap gap-2 text-[11px]">
-                <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold">
+                <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
                   [OK] PSA Birth Certificate
                 </span>
-                <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold">
+                <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
                   [OK] SF9 / Form 138 Report Card
                 </span>
-                <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold">
+                <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
                   [OK] Formal 2x2 ID Photo
                 </span>
-                <span className="px-2.5 py-1 bg-white border border-slate-300 text-slate-600 font-mono">
+                <span className="px-2.5 py-1 bg-white border border-slate-300 text-slate-600 font-mono rounded">
                   [OK] DepEd Learner Permanent Record
                 </span>
               </div>
@@ -1144,14 +1144,14 @@ export default function ContinuingEnrollmentForm({
 
           {/* Validation Notice */}
           {Object.keys(errors).length > 0 && (
-            <div className="p-3 bg-red-50 border-2 border-red-300 text-xs font-bold text-red-800">
+            <div className="p-3 bg-red-50 border-2 border-red-300 text-xs font-bold text-red-800 rounded-md">
               [ Action Required ]: Please complete all required fields below before proceeding.
             </div>
           )}
 
           {/* Curriculum Placement Confirmation */}
           {isJHS ? (
-            <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300">
+            <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-2">
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
                   [ Junior High School Program Selection ]
@@ -1167,7 +1167,7 @@ export default function ContinuingEnrollmentForm({
                   return (
                     <label
                       key={prog.code}
-                      className={`p-4 border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                      className={`p-4 border-2 cursor-pointer transition-all flex flex-col justify-between rounded-md ${
                         isSelected
                           ? "bg-white border-[#002060] shadow-xs"
                           : "bg-white border-slate-300 hover:border-slate-400"
@@ -1195,7 +1195,7 @@ export default function ContinuingEnrollmentForm({
                             </span>
                           </div>
                           {isSelected && (
-                            <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5">
+                            <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 rounded">
                               SELECTED
                             </span>
                           )}
@@ -1210,7 +1210,7 @@ export default function ContinuingEnrollmentForm({
               </div>
 
               {currentJhsProgram === "SPS" && (
-                <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1">
+                <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 rounded-md">
                   <span className="text-xs font-bold text-[#002060] uppercase block">
                     [ General Special Program in Sports (SPS) Curriculum ]
                   </span>
@@ -1221,7 +1221,7 @@ export default function ContinuingEnrollmentForm({
               )}
             </div>
           ) : (
-            <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300">
+            <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-2">
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
                   [ Senior High School Track &amp; Strand Confirmation ]
@@ -1253,7 +1253,7 @@ export default function ContinuingEnrollmentForm({
                         },
                       }));
                     }}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none rounded-md"
                   >
                     <option value="Academic Track">Academic Track</option>
                     <option value="Technical-Vocational-Livelihood Track">
@@ -1276,7 +1276,7 @@ export default function ContinuingEnrollmentForm({
                         step1: { ...prev.step1, targetStrand: newStrand },
                       }));
                     }}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none rounded-md"
                   >
                     {availableStrands.map((s) => (
                       <option key={s.code} value={s.code}>
@@ -1290,7 +1290,7 @@ export default function ContinuingEnrollmentForm({
           )}
 
           {/* Section 7-B: Electives Selection with Toggle Switch */}
-          <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300">
+          <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
             <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -1302,7 +1302,7 @@ export default function ContinuingEnrollmentForm({
               </div>
 
               {/* Interactive Toggle Switch (DepEd Navy Blue #002060) */}
-              <div className="flex items-center gap-3 bg-white p-2 border border-slate-300 self-start sm:self-auto shadow-xs">
+              <div className="flex items-center gap-3 bg-white p-2 border border-slate-300 self-start sm:self-auto shadow-xs rounded-md">
                 <span className="text-xs font-bold uppercase text-slate-700">
                   Select Electives:
                 </span>
@@ -1317,20 +1317,20 @@ export default function ContinuingEnrollmentForm({
                       setFormData((prev) => ({ ...prev, selectedElectives: [] }));
                     }
                   }}
-                  className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer transition-colors duration-200 ease-in-out focus:outline-none border-2 ${
+                  className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer transition-colors duration-200 ease-in-out focus:outline-none border-2 rounded-full ${
                     enableElectives
                       ? "bg-[#002060] border-[#002060]"
                       : "bg-slate-200 border-slate-400"
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-4 w-4 transform bg-white transition duration-200 ease-in-out mt-0.5 ${
+                    className={`pointer-events-none inline-block h-4 w-4 transform bg-white transition duration-200 ease-in-out mt-0.5 rounded-full ${
                       enableElectives ? "translate-x-6" : "translate-x-0.5"
                     }`}
                   />
                 </button>
                 <span
-                  className={`text-xs font-mono font-bold uppercase px-2 py-0.5 ${
+                  className={`text-xs font-mono font-bold uppercase px-2 py-0.5 rounded ${
                     enableElectives
                       ? "bg-[#002060] text-white"
                       : "bg-slate-100 text-slate-500"
@@ -1343,7 +1343,7 @@ export default function ContinuingEnrollmentForm({
 
             {/* CONDITIONAL CONTENT BASED ON SWITCH */}
             {!enableElectives ? (
-              <div className="p-4 bg-white border border-slate-300 space-y-1">
+              <div className="p-4 bg-white border border-slate-300 space-y-1 rounded-md">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-slate-400 inline-block shrink-0" />
                   <span className="text-xs font-mono font-bold text-slate-700 uppercase">
@@ -1360,7 +1360,7 @@ export default function ContinuingEnrollmentForm({
                   <span className="font-medium">
                     Available elective subjects for {semester} (Filtered to exclude previously completed subjects and native strand subjects):
                   </span>
-                  <span className="font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-slate-300 w-fit">
+                  <span className="font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-slate-300 w-fit rounded">
                     SELECTED: {currentElectives.length} SUBJECT(S)
                   </span>
                 </div>
@@ -1372,7 +1372,7 @@ export default function ContinuingEnrollmentForm({
                       return (
                         <label
                           key={elec.code}
-                          className={`p-4 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
+                          className={`p-4 border-2 flex items-start gap-3 cursor-pointer transition-colors rounded-md ${
                             isSelected
                               ? "bg-white border-[#002060] shadow-xs"
                               : "bg-white border-slate-300 hover:border-slate-400"
@@ -1389,10 +1389,10 @@ export default function ContinuingEnrollmentForm({
                               <span className={`font-bold ${isSelected ? "text-[#002060]" : "text-slate-900"}`}>
                                 {elec.name}
                               </span>
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200">
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200 rounded">
                                 {elec.category}
                               </span>
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-50 text-[#002060] border border-blue-200">
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 rounded">
                                 Term {elec.terms?.join(", ") || "All"}
                               </span>
                             </div>
@@ -1405,7 +1405,7 @@ export default function ContinuingEnrollmentForm({
                     })}
                   </div>
                 ) : (
-                  <div className="p-4 bg-white border border-slate-300 space-y-1">
+                  <div className="p-4 bg-white border border-slate-300 space-y-1 rounded-md">
                     <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
                       [ NO ADDITIONAL ELECTIVES AVAILABLE FOR THIS TERM ]
                     </span>
@@ -1419,7 +1419,7 @@ export default function ContinuingEnrollmentForm({
           </div>
 
           {/* Section 8: Distance Learning Modalities */}
-          <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300">
+          <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
             <div className="border-b-2 border-slate-200 pb-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
                 [ Section 8: Preferred Distance Learning Modalities ]
@@ -1435,7 +1435,7 @@ export default function ContinuingEnrollmentForm({
                 return (
                   <label
                     key={modality}
-                    className={`p-3 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
+                    className={`p-3 border-2 flex items-start gap-3 cursor-pointer transition-colors rounded-md ${
                       isChecked
                         ? "bg-white border-[#002060] shadow-xs"
                         : "bg-white border-slate-300 hover:border-slate-400"
@@ -1466,7 +1466,7 @@ export default function ContinuingEnrollmentForm({
             <button
               type="button"
               onClick={handleProceedToStep2}
-              className="w-full sm:w-auto px-8 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs rounded"
+              className="w-full sm:w-auto px-8 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs rounded-md"
             >
               Proceed to Review &amp; Confirmation (Step 2) &rarr;
             </button>
@@ -1535,12 +1535,12 @@ export default function ContinuingEnrollmentForm({
                     return (
                       <div
                         key={code}
-                        className="p-2.5 bg-white border border-slate-300 flex items-center justify-between"
+                        className="p-2.5 bg-white border border-slate-300 flex items-center justify-between rounded-md"
                       >
                         <span className="font-bold text-slate-900 text-xs">
                           {elec?.name || code}
                         </span>
-                        <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-1.5 py-0.5">
+                        <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-1.5 py-0.5 rounded">
                           {elec?.category || "Elective"}
                         </span>
                       </div>
@@ -1561,13 +1561,13 @@ export default function ContinuingEnrollmentForm({
                 Under DepEd continuing enrollment policy, official documents submitted during your approved enrollment (Ref: {priorApprovedApp.application_id}) are active and automatically attached:
               </p>
               <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
-                <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold">
+                <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
                   [ATTACHED] PSA Birth Certificate
                 </span>
-                <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold">
+                <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
                   [ATTACHED] SF9 / Form 138 Progress Report Card
                 </span>
-                <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold">
+                <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
                   [ATTACHED] Formal 2x2 ID Photo
                 </span>
               </div>
@@ -1599,7 +1599,7 @@ export default function ContinuingEnrollmentForm({
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
-              className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded"
+              className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
             >
               &larr; Back to Electives Selection (Step 1)
             </button>
@@ -1607,7 +1607,7 @@ export default function ContinuingEnrollmentForm({
               type="button"
               onClick={handleSubmitEnrollment}
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-8 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs disabled:opacity-50 rounded"
+              className="w-full sm:w-auto px-8 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs disabled:opacity-50 rounded-md"
             >
               {isSubmitting
                 ? "Submitting Term Enrollment..."

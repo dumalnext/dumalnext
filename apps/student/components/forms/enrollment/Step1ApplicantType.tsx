@@ -236,14 +236,14 @@ export default function Step1ApplicantType({
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-lg">
       {/* Step Header */}
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-mono text-xs font-bold text-[#002060] uppercase tracking-wider">
             [ Step 1 of 5 &bull; Academic Classification ]
           </span>
-          <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold uppercase tracking-wider shadow-xs">
+          <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold uppercase tracking-wider shadow-xs rounded-xs">
             School Year: {schoolYear}
           </span>
         </div>
@@ -459,7 +459,7 @@ export default function Step1ApplicantType({
 
       {/* Part 3: Target Grade Level Selector (for Transferee / Returning) */}
       {isTransfereeOrReturning && (
-        <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
+        <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
           <div className="border-l-4 border-[#002060] pl-3">
             <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
               3. Target Grade Level at Dumalneg NHS (Grades 7 to 12)
@@ -479,7 +479,7 @@ export default function Step1ApplicantType({
                   key={lvl}
                   type="button"
                   onClick={() => handleTargetGradeChange(lvl)}
-                  className={`p-3.5 border-2 text-center font-bold transition-all relative ${
+                  className={`p-3.5 border-2 text-center font-bold transition-all relative rounded-md ${
                     isSelected
                       ? "bg-[#002060] text-white border-[#002060] shadow-sm"
                       : "bg-white text-slate-800 border-slate-300 hover:border-[#002060] hover:bg-slate-100"
@@ -509,13 +509,13 @@ export default function Step1ApplicantType({
 
       {/* Part 4: DepEd Section 6: Previous School & Academic Prerequisite Background */}
       {data.applicantType && (
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
           <div className="border-b-2 border-slate-200 pb-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
                 [ DepEd Section 6: Previous School Attended &amp; Academic History ]
               </span>
-              <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold">
+              <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded-xs">
                 [ SMART PREREQUISITE VALIDATION ACTIVE ]
               </span>
             </div>
@@ -548,7 +548,7 @@ export default function Step1ApplicantType({
                     lastGradeCompleted: e.target.value ? Number(e.target.value) : "",
                   })
                 }
-                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-md"
               >
                 <option value="">-- Select Completed Grade Level --</option>
                 {availableCompletedGrades.map((opt) => (
@@ -577,7 +577,7 @@ export default function Step1ApplicantType({
                 value={data.lastSchoolYearCompleted || ""}
                 onChange={(e) => onChange({ lastSchoolYearCompleted: e.target.value })}
                 placeholder="e.g. 2024-2025"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-md"
               />
               <span className="text-[11px] text-slate-500 mt-1 block">
                 Format: 4-digit start year - 4-digit end year (e.g., 2024-2025).
@@ -624,7 +624,7 @@ export default function Step1ApplicantType({
                       });
                     }
                   }}
-                  className={`p-4 border-2 text-left transition-all ${
+                  className={`p-4 border-2 text-left transition-all rounded-md ${
                     isDefaultSchool
                       ? "border-[#002060] bg-blue-50/70 shadow-sm ring-1 ring-[#002060]"
                       : "border-slate-300 bg-white hover:border-slate-400"
@@ -632,7 +632,7 @@ export default function Step1ApplicantType({
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs ${
                         isDefaultSchool
                           ? "bg-[#002060] text-white"
                           : "bg-slate-200 text-slate-700"
@@ -663,7 +663,7 @@ export default function Step1ApplicantType({
                       });
                     }
                   }}
-                  className={`p-4 border-2 text-left transition-all ${
+                  className={`p-4 border-2 text-left transition-all rounded-md ${
                     !isDefaultSchool
                       ? "border-[#002060] bg-blue-50/70 shadow-sm ring-1 ring-[#002060]"
                       : "border-slate-300 bg-white hover:border-slate-400"
@@ -671,7 +671,7 @@ export default function Step1ApplicantType({
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs ${
                         !isDefaultSchool
                           ? "bg-[#002060] text-white"
                           : "bg-slate-200 text-slate-700"
@@ -694,7 +694,7 @@ export default function Step1ApplicantType({
 
               {/* Verified Feeder Confirmation Banner */}
               {isDefaultSchool && (
-                <div className="p-3.5 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div className="p-3.5 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs rounded-md">
                   <div>
                     <span className="font-bold text-emerald-950 uppercase block">
                       Automatic Feeder Applied: {defaultFeederSchoolName}
@@ -703,7 +703,7 @@ export default function Step1ApplicantType({
                       DepEd School ID: <strong>{defaultFeederSchoolId}</strong> (Division of Ilocos Norte). Ready for verification.
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto">
+                  <span className="font-mono text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto rounded-xs">
                     [ AUTO-PRESET VERIFIED ]
                   </span>
                 </div>
@@ -711,7 +711,7 @@ export default function Step1ApplicantType({
 
               {/* Manual Entry Inputs when "Others (Specify)" is selected */}
               {!isDefaultSchool && (
-                <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner">
+                <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner rounded-md">
                   <div className="border-b border-slate-200 pb-2">
                     <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
                       [ Manual School Specification ]
@@ -743,7 +743,7 @@ export default function Step1ApplicantType({
                           ? "e.g. CABARITAN ELEMENTARY SCHOOL / BANGUI CENTRAL SCHOOL"
                           : "e.g. PAGUDPUD NATIONAL HIGH SCHOOL / ADAMS NATIONAL HIGH SCHOOL"
                       }
-                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                         errors.lastSchoolAttended ? "border-red-600 bg-red-50" : "border-slate-300"
                       }`}
                     />
@@ -773,7 +773,7 @@ export default function Step1ApplicantType({
                           }
                         }}
                         placeholder="100XXX"
-                        className={`w-40 p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-widest text-center focus:border-[#002060] outline-none ${
+                        className={`w-40 p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-widest text-center focus:border-[#002060] outline-none rounded-md ${
                           errors.lastSchoolId ? "border-red-600 bg-red-50" : "border-slate-300"
                         }`}
                       />
@@ -794,7 +794,7 @@ export default function Step1ApplicantType({
 
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
-        <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs">
+        <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-md">
           <div className="font-bold text-[#002060] uppercase tracking-wider flex items-center justify-between">
             <span>[ ENROLLMENT CLASSIFICATION SUMMARY ]</span>
             <span className="font-mono text-[11px] text-blue-900">VERIFIED</span>
@@ -823,7 +823,7 @@ export default function Step1ApplicantType({
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm"
+          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-md"
         >
           Proceed: Learner&apos;s Personal Information (Step 2)
         </button>

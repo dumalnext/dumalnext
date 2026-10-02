@@ -268,7 +268,7 @@ export default function Step3FamilyBackground({
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded-xs">
+          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded">
             STEP 03 OF 05
           </span>
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -285,7 +285,7 @@ export default function Step3FamilyBackground({
 
       {/* Global Error Banner */}
       {(errors.general || errors.emergencyContact) && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-md">
           {errors.general && (
             <p className="text-xs font-bold text-red-800 leading-normal">
               [ Validation Notice ]: {errors.general}
@@ -300,7 +300,7 @@ export default function Step3FamilyBackground({
       )}
 
       {/* Primary Emergency Contact Dispatcher */}
-      <div className="p-5 bg-blue-50/50 border-2 border-blue-200 space-y-3">
+      <div className="p-5 bg-blue-50/50 border-2 border-blue-200 space-y-3 rounded-md">
         <div>
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
             [ Primary School Contact / Designated Custodian ]
@@ -312,7 +312,7 @@ export default function Step3FamilyBackground({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
           <label
-            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
+            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-md ${
               primaryContact === "Father" && !isFatherNotAvailable
                 ? "bg-[#002060] text-white border-[#002060]"
                 : isFatherNotAvailable
@@ -338,7 +338,7 @@ export default function Step3FamilyBackground({
           </label>
 
           <label
-            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
+            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-md ${
               primaryContact === "Mother" && !isMotherNotAvailable
                 ? "bg-[#002060] text-white border-[#002060]"
                 : isMotherNotAvailable
@@ -364,7 +364,7 @@ export default function Step3FamilyBackground({
           </label>
 
           <label
-            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
+            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-md ${
               primaryContact === "Guardian"
                 ? "bg-[#002060] text-white border-[#002060]"
                 : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
@@ -389,7 +389,7 @@ export default function Step3FamilyBackground({
       </div>
 
       {/* Section A: Father's Information */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -399,7 +399,7 @@ export default function Step3FamilyBackground({
               Official legal name and active mobile number as registered in official civil documents.
             </p>
           </div>
-          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300">
+          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded">
             <input
               type="checkbox"
               checked={isFatherNotAvailable}
@@ -411,7 +411,7 @@ export default function Step3FamilyBackground({
         </div>
 
         {isFatherNotAvailable ? (
-          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic">
+          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic rounded-md">
             Father information is designated as Not Available. The school will reference the Mother or Legal Guardian.
           </div>
         ) : (
@@ -436,7 +436,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. DELA CRUZ"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                     errors.fatherLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -464,7 +464,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. JUAN"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                     errors.fatherFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -519,7 +519,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder={hasNoFatherMiddleName ? "N/A" : "e.g. RAMOS"}
-                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none ${
+                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-md ${
                     hasNoFatherMiddleName
                       ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
                       : errors.fatherMiddleName
@@ -555,7 +555,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                     errors.fatherContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -572,7 +572,7 @@ export default function Step3FamilyBackground({
       </div>
 
       {/* Section B: Mother's Maiden Information */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -582,7 +582,7 @@ export default function Step3FamilyBackground({
               Important: Enter your mother&apos;s legal <strong>Maiden Name</strong> (her surname at birth, before marriage).
             </p>
           </div>
-          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300">
+          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded">
             <input
               type="checkbox"
               checked={isMotherNotAvailable}
@@ -594,12 +594,12 @@ export default function Step3FamilyBackground({
         </div>
 
         {isMotherNotAvailable ? (
-          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic">
+          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic rounded-md">
             Mother information is designated as Not Available. The school will reference the Father or Legal Guardian.
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-normal">
+            <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-normal rounded-md">
               <strong>DepEd Civil Verification Note:</strong> DepEd Basic Education records strictly require the mother&apos;s <strong>Maiden Last Name</strong> (apelyido sa pagkadalaga) to verify civil registry records in the PSA Birth Certificate.
             </div>
 
@@ -623,7 +623,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. SANTOS"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                     errors.motherMaidenLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -651,7 +651,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. MARIA"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                     errors.motherFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -706,7 +706,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder={hasNoMotherMiddleName ? "N/A" : "e.g. GARCIA"}
-                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none ${
+                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-md ${
                     hasNoMotherMiddleName
                       ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
                       : errors.motherMiddleName
@@ -742,7 +742,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                     errors.motherContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -759,7 +759,7 @@ export default function Step3FamilyBackground({
       </div>
 
       {/* Section C: Legal Guardian / Authorized Custodian (SMART OPTIONAL / REQUIRED) */}
-      <div className={`space-y-5 p-6 border-2 transition-colors ${
+      <div className={`space-y-5 p-6 border-2 transition-colors rounded-md ${
         isBothParentsUnavailable ? "bg-red-50/40 border-red-400" : "bg-slate-50 border-slate-300"
       }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
@@ -771,11 +771,11 @@ export default function Step3FamilyBackground({
                 [ Section C: Legal Guardian / Authorized Custodian ]
               </span>
               {isBothParentsUnavailable ? (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-700 text-white font-mono">
+                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-700 text-white font-mono rounded">
                   [ REQUIRED BY DEPED ]
                 </span>
               ) : (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700 border border-slate-300">
+                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700 border border-slate-300 rounded">
                   OPTIONAL
                 </span>
               )}
@@ -806,7 +806,7 @@ export default function Step3FamilyBackground({
                   });
                 }
               }}
-              className={`w-full sm:w-80 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
+              className={`w-full sm:w-80 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-md ${
                 errors.guardianRelationship ? "border-red-600 bg-red-50" : "border-slate-300"
               }`}
             >
@@ -842,7 +842,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="e.g. AGCAOILI"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                   errors.guardianLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -870,7 +870,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="e.g. EDUARDO"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                   errors.guardianFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -925,7 +925,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder={hasNoGuardianMiddleName ? "N/A" : "e.g. BALAGAT"}
-                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none ${
+                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-md ${
                   hasNoGuardianMiddleName
                     ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
                     : errors.guardianMiddleName
@@ -961,7 +961,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="09XXXXXXXXX"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                   errors.guardianContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -981,14 +981,14 @@ export default function Step3FamilyBackground({
         <button
           type="button"
           onClick={onBack}
-          className="w-full sm:w-auto px-6 py-3 border-2 border-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 transition-colors"
+          className="w-full sm:w-auto px-6 py-3 border-2 border-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
         >
           &larr; Back to Step 2
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="w-full sm:w-auto px-8 py-3 bg-[#002060] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs"
+          className="w-full sm:w-auto px-8 py-3 bg-[#002060] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded-md"
         >
           Proceed to Step 4 &rarr;
         </button>

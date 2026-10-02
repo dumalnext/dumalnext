@@ -397,7 +397,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       >
         <div
           ref={menuRef}
-          className={`w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] rounded-r-xl flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >

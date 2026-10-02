@@ -93,7 +93,7 @@ export default function RegisterPage() {
 
       {/* Global Error Notice */}
       {errors.form && (
-        <div className="p-4 bg-red-50 border-2 border-red-400">
+        <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
           <p className="text-xs font-bold text-red-900 leading-normal">
             [ REGISTRATION NOTICE ]: {errors.form}
           </p>
@@ -101,7 +101,7 @@ export default function RegisterPage() {
       )}
 
       {/* Registration Form Card */}
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-lg shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
@@ -123,7 +123,7 @@ export default function RegisterPage() {
                   if (errors.lastName) setErrors({ ...errors, lastName: "" });
                 }}
                 placeholder="e.g. AGCAOILI"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                   errors.lastName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -145,7 +145,7 @@ export default function RegisterPage() {
                   if (errors.firstName) setErrors({ ...errors, firstName: "" });
                 }}
                 placeholder="e.g. MARK ANTHONY"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md ${
                   errors.firstName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -168,7 +168,7 @@ export default function RegisterPage() {
                   setFormData({ ...formData, middleName: e.target.value.toUpperCase() })
                 }
                 placeholder="e.g. DELA CRUZ"
-                className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md"
               />
             </div>
 
@@ -187,7 +187,7 @@ export default function RegisterPage() {
                   if (errors.lrn) setErrors({ ...errors, lrn: "" });
                 }}
                 placeholder="e.g. 100050123456"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                   errors.lrn ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -218,7 +218,7 @@ export default function RegisterPage() {
                 if (errors.email) setErrors({ ...errors, email: "" });
               }}
               placeholder="e.g. student.name@gmail.com"
-              className={`w-full p-2.5 bg-white border-2 text-xs font-mono focus:border-[#002060] outline-none ${
+              className={`w-full p-2.5 bg-white border-2 text-xs font-mono focus:border-[#002060] outline-none rounded-md ${
                 errors.email ? "border-red-600 bg-red-50" : "border-slate-300"
               }`}
             />
@@ -244,7 +244,7 @@ export default function RegisterPage() {
                   if (errors.password) setErrors({ ...errors, password: "" });
                 }}
                 placeholder="Minimum 6 characters"
-                className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none rounded-md ${
                   errors.password ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -266,7 +266,7 @@ export default function RegisterPage() {
                   if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: "" });
                 }}
                 placeholder="Re-type password"
-                className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none ${
+                className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none rounded-md ${
                   errors.confirmPassword ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -281,7 +281,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400"
+              className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
             >
               {isSubmitting ? "[ CREATING OFFICIAL ACCOUNT... ]" : "[ REGISTER ACCOUNT & PROCEED TO ENROLLMENT ]"}
             </button>

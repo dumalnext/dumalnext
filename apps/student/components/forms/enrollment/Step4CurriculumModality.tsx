@@ -436,7 +436,7 @@ export default function Step4CurriculumModality({
 
       {/* Global Error Notice */}
       {Object.keys(errors).length > 0 && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-md">
           <p className="text-xs font-bold text-red-800 leading-normal">
             [ Validation Required ]: Please address the highlighted required fields before advancing to Step 5.
           </p>
@@ -447,7 +447,7 @@ export default function Step4CurriculumModality({
       {/* CONDITIONAL SECTION A: JUNIOR HIGH SCHOOL CURRICULAR PROGRAM (GRADES 7-10) */}
       {/* ========================================================================= */}
       {isJHS ? (
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
           <div className="border-b-2 border-slate-200 pb-3">
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
               [ Section 4-B: Junior High School Curricular Program ]
@@ -463,7 +463,7 @@ export default function Step4CurriculumModality({
               return (
                 <label
                   key={program.code}
-                  className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                  className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between rounded-md ${
                     isSelected
                       ? "bg-white border-[#002060] shadow-xs"
                       : "bg-white border-slate-300 hover:border-slate-400"
@@ -497,7 +497,7 @@ export default function Step4CurriculumModality({
                         </span>
                       </div>
                       {isSelected && (
-                        <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase">
+                        <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded">
                           SELECTED
                         </span>
                       )}
@@ -519,7 +519,7 @@ export default function Step4CurriculumModality({
 
           {/* General SPS Program Notice */}
           {currentJhsProgram === "SPS" && (
-            <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 mt-4">
+            <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 mt-4 rounded-md">
               <span className="text-xs font-bold text-[#002060] uppercase block">
                 [ General Special Program in Sports (SPS) Curriculum ]
               </span>
@@ -536,7 +536,7 @@ export default function Step4CurriculumModality({
         /* ========================================================================= */
         <div className="space-y-6">
           {/* SECTION 7-A: ACADEMIC TRACK & SEMESTER SELECTION */}
-          <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+          <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
             <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -546,7 +546,7 @@ export default function Step4CurriculumModality({
                   The Strengthened Senior High School Program offers two (2) distinct tracks with unified core foundations and specialized elective clusters:
                 </p>
               </div>
-              <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider w-fit">
+              <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider w-fit rounded">
                 DEPED REFORM STANDARD
               </span>
             </div>
@@ -556,7 +556,7 @@ export default function Step4CurriculumModality({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Semester / Trimester of Enrollment
               </label>
-              <div className="p-3.5 bg-white border-2 border-[#002060] flex items-center justify-between shadow-xs">
+              <div className="p-3.5 bg-white border-2 border-[#002060] flex items-center justify-between shadow-xs rounded-md">
                 <div className="space-y-0.5">
                   <div className="text-sm font-mono font-bold text-[#002060] uppercase">
                     {activeSemester}
@@ -566,7 +566,7 @@ export default function Step4CurriculumModality({
                     {activeTerm?.startDate && activeTerm?.endDate ? ` (${activeTerm.startDate} to ${activeTerm.endDate})` : ""}
                   </div>
                 </div>
-                <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 border border-emerald-400 px-2.5 py-1 uppercase tracking-wider shrink-0">
+                <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 border border-emerald-400 px-2.5 py-1 uppercase tracking-wider shrink-0 rounded">
                   AUTO-SYNCED (ACTIVE)
                 </span>
               </div>
@@ -586,7 +586,7 @@ export default function Step4CurriculumModality({
                   return (
                     <label
                       key={t.code}
-                      className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                      className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between rounded-md ${
                         isSelected
                           ? "bg-white border-[#002060] shadow-xs"
                           : "bg-white border-slate-300 hover:border-slate-400"
@@ -639,7 +639,7 @@ export default function Step4CurriculumModality({
                             </span>
                           </div>
                           {isSelected && (
-                            <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase">
+                            <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded">
                               SELECTED
                             </span>
                           )}
@@ -660,18 +660,18 @@ export default function Step4CurriculumModality({
                         <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200 text-[10px] font-mono text-slate-600">
                           {t.code === "Academic Track" ? (
                             <>
-                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200">STEM</span>
-                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200">Humanities &amp; Social Sciences</span>
-                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200">Business &amp; Management</span>
-                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200">Arts &amp; Design</span>
-                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200">Sports &amp; Health</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded">STEM</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded">Humanities &amp; Social Sciences</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded">Business &amp; Management</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded">Arts &amp; Design</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded">Sports &amp; Health</span>
                             </>
                           ) : (
                             <>
-                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950">Fixed Curriculum</span>
-                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950">TESDA NC II / III</span>
-                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950">Work Immersion</span>
-                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950">Industry Direct</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded">Fixed Curriculum</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded">TESDA NC II / III</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded">Work Immersion</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded">Industry Direct</span>
                             </>
                           )}
                         </div>
@@ -691,7 +691,7 @@ export default function Step4CurriculumModality({
           {/* ========================================================================= */}
           {currentTrack === "Academic Track" ? (
             /* ACADEMIC TRACK: ELECTIVE SUBJECT SELECTION */
-            <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
+            <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -702,17 +702,17 @@ export default function Step4CurriculumModality({
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase rounded">
                     {(data.selectedElectives || []).length} / 1 SELECTED
                   </span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-blue-100 text-[#002060] border border-blue-300 uppercase">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-blue-100 text-[#002060] border border-blue-300 uppercase rounded">
                     MAX 1 PER SEMESTER
                   </span>
                 </div>
               </div>
 
               {isLoadingSubjects ? (
-                <div className="p-8 text-center bg-white border border-slate-200 space-y-2">
+                <div className="p-8 text-center bg-white border border-slate-200 space-y-2 rounded-md">
                   <div className="text-xs font-mono font-bold text-[#002060] animate-pulse">
                     [ Synchronizing elective subject offerings with Administrator catalog... ]
                   </div>
@@ -721,7 +721,7 @@ export default function Step4CurriculumModality({
                   </p>
                 </div>
               ) : academicElectiveSubjects.length === 0 ? (
-                <div className="p-6 text-center bg-white border border-slate-200 space-y-2">
+                <div className="p-6 text-center bg-white border border-slate-200 space-y-2 rounded-md">
                   <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
                     [ No Elective Subjects On Record For Grade {targetGrade} Academic Track ]
                   </span>
@@ -747,7 +747,7 @@ export default function Step4CurriculumModality({
                         <div
                           key={sub.id || sub.subject_code}
                           onClick={() => handleElectiveToggle(sub.subject_code)}
-                          className={`p-4 border-2 cursor-pointer transition-all flex flex-col justify-between select-none ${
+                          className={`p-4 border-2 cursor-pointer transition-all flex flex-col justify-between select-none rounded-md ${
                             isSelected
                               ? "bg-blue-50/60 border-[#002060] shadow-xs"
                               : "bg-white border-slate-300 hover:border-slate-400"
@@ -769,7 +769,7 @@ export default function Step4CurriculumModality({
                                 </span>
                               </div>
                               <span
-                                className={`text-[9px] font-mono font-bold px-2 py-0.5 uppercase border ${
+                                className={`text-[9px] font-mono font-bold px-2 py-0.5 uppercase border rounded ${
                                   isSelected
                                     ? "bg-[#002060] text-white border-[#002060]"
                                     : "bg-purple-100 text-purple-950 border-purple-300"
@@ -802,7 +802,7 @@ export default function Step4CurriculumModality({
             </div>
           ) : (
             /* TECHPRO TRACK: PRESCRIBED STANDARDIZED CURRICULUM (NO ELECTIVES) */
-            <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
+            <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -812,13 +812,13 @@ export default function Step4CurriculumModality({
                     Standardized TechPro Curriculum: All specialized industry subjects configured by administration are fixed and automatically assigned for the full academic year.
                   </p>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase shrink-0">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase shrink-0 rounded">
                   FIXED CURRICULUM (NO ELECTIVES)
                 </span>
               </div>
 
               {isLoadingSubjects ? (
-                <div className="p-8 text-center bg-white border border-slate-200 space-y-2">
+                <div className="p-8 text-center bg-white border border-slate-200 space-y-2 rounded-md">
                   <div className="text-xs font-mono font-bold text-[#002060] animate-pulse">
                     [ Synchronizing TechPro specialized courses with Administrator catalog... ]
                   </div>
@@ -827,7 +827,7 @@ export default function Step4CurriculumModality({
                   </p>
                 </div>
               ) : techproSpecializedSubjects.length === 0 ? (
-                <div className="p-6 text-center bg-white border border-slate-200 space-y-2">
+                <div className="p-6 text-center bg-white border border-slate-200 space-y-2 rounded-md">
                   <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
                     [ No Specialized TechPro Subjects On Record For Grade {targetGrade} ]
                   </span>
@@ -850,13 +850,13 @@ export default function Step4CurriculumModality({
                     {techproSpecializedSubjects.map((sub) => (
                       <div
                         key={sub.id || sub.subject_code}
-                        className="p-4 bg-white border-2 border-amber-300 space-y-1.5 shadow-2xs"
+                        className="p-4 bg-white border-2 border-amber-300 space-y-1.5 shadow-2xs rounded-md"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <span className="text-xs font-mono font-bold text-[#002060]">
                             {sub.subject_code}
                           </span>
-                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase">
+                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase rounded">
                             PRESCRIBED / SPECIALIZED
                           </span>
                         </div>
@@ -872,7 +872,7 @@ export default function Step4CurriculumModality({
                     ))}
                   </div>
 
-                  <div className="p-3 bg-amber-50/80 border border-amber-300 text-xs text-amber-950">
+                  <div className="p-3 bg-amber-50/80 border border-amber-300 text-xs text-amber-950 rounded-md">
                     <strong className="uppercase block text-[11px] mb-0.5">[ Automatic Enrollment Policy ]:</strong>
                     Under DepEd Technical-Professional track guidelines, learners undergo a standardized, unified industry syllabus without elective branching. All courses above will be studied throughout the entire academic year as configured by the school administration.
                   </div>
@@ -902,7 +902,7 @@ export default function Step4CurriculumModality({
                 : [];
 
             return (
-              <div className="space-y-4 p-6 bg-white border-2 border-slate-300">
+              <div className="space-y-4 p-6 bg-white border-2 border-slate-300 rounded-md">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
                   <div>
                     <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -913,7 +913,7 @@ export default function Step4CurriculumModality({
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase rounded">
                       AUTOMATICALLY ENROLLED
                     </span>
                     <button
@@ -939,13 +939,13 @@ export default function Step4CurriculumModality({
                     {displayCoreSubjects.map((sub, idx) => (
                       <div
                         key={sub.id || sub.subject_code}
-                        className="p-3 bg-slate-50 border border-slate-200 space-y-1"
+                        className="p-3 bg-slate-50 border border-slate-200 space-y-1 rounded-md"
                       >
                         <div className="flex items-center justify-between gap-1">
                           <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
                             {sub.subject_code || `Core 0${idx + 1}`}
                           </span>
-                          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-blue-100 text-[#002060] font-bold">
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-blue-100 text-[#002060] font-bold rounded">
                             CORE
                           </span>
                         </div>
@@ -969,7 +969,7 @@ export default function Step4CurriculumModality({
           })()}
 
           {/* SECTION 7-D: WORK IMMERSION & FIELD EXPERIENCE NOTICE */}
-          <div className="p-4 bg-slate-100 border border-slate-300 text-xs space-y-1">
+          <div className="p-4 bg-slate-100 border border-slate-300 text-xs space-y-1 rounded-md">
             <span className="font-bold text-slate-900 uppercase block">
               [ DepEd Work Immersion & Field Experience Requirement ]
             </span>
@@ -985,7 +985,7 @@ export default function Step4CurriculumModality({
       {/* ========================================================================= */}
       {/* SECTION C: SPECIAL NEEDS EDUCATION (SNED) / INCLUSIVE LEARNING (SEC. 5)    */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
             [ Section 5: Special Needs Education (SNEd) &amp; Inclusive Support ]
@@ -1002,7 +1002,7 @@ export default function Step4CurriculumModality({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
             <label
-              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
+              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-md ${
                 !data.isSned
                   ? "bg-[#002060] text-white border-[#002060]"
                   : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
@@ -1034,7 +1034,7 @@ export default function Step4CurriculumModality({
             </label>
 
             <label
-              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
+              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-md ${
                 data.isSned
                   ? "bg-[#002060] text-white border-[#002060]"
                   : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
@@ -1061,7 +1061,7 @@ export default function Step4CurriculumModality({
 
         {/* Expanded SNEd Fields */}
         {data.isSned && (
-          <div className="p-5 bg-white border-2 border-blue-200 space-y-4">
+          <div className="p-5 bg-white border-2 border-blue-200 space-y-4 rounded-md">
             <div>
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Classification Assessment Basis <span className="text-red-700">*</span>
@@ -1104,14 +1104,14 @@ export default function Step4CurriculumModality({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
                 Specific Learning Need / Condition (DepEd Official Form Checklist) <span className="text-red-700">*</span>
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-3 border border-slate-300 bg-slate-50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-3 border border-slate-300 bg-slate-50 rounded-md">
                 {(data.snedCategory === "Manifestations" ? SNED_MANIFESTATIONS : SNED_DIAGNOSES).map(
                   (item) => {
                     const isChecked = (data.snedDetails || []).includes(item);
                     return (
                       <label
                         key={item}
-                        className="flex items-start gap-2 p-1.5 hover:bg-white text-xs text-slate-800 cursor-pointer"
+                        className="flex items-start gap-2 p-1.5 hover:bg-white text-xs text-slate-800 cursor-pointer rounded"
                       >
                         <input
                           type="checkbox"
@@ -1149,7 +1149,7 @@ export default function Step4CurriculumModality({
       {/* ========================================================================= */}
       {/* SECTION D: DISTANCE LEARNING MODALITIES (DEPED SECTION 8)                  */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
             [ Section 8: Preferred Distance Learning Modalities ]
@@ -1165,7 +1165,7 @@ export default function Step4CurriculumModality({
             return (
               <label
                 key={modality}
-                className={`p-3.5 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
+                className={`p-3.5 border-2 flex items-start gap-3 cursor-pointer transition-colors rounded-md ${
                   isChecked
                     ? "bg-white border-[#002060] shadow-xs"
                     : "bg-white border-slate-300 hover:border-slate-400"
@@ -1211,14 +1211,14 @@ export default function Step4CurriculumModality({
         <button
           type="button"
           onClick={onBack}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
+          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
         >
           &larr; Back to Family Background (Step 3)
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="w-full sm:w-auto px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs"
+          className="w-full sm:w-auto px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded-md"
         >
           Proceed to Document Upload (Step 5) &rarr;
         </button>
