@@ -184,7 +184,6 @@ export default function AdjudicationConsole() {
           target_strand,
           status,
           admin_feedback,
-          submitted_documents,
           selected_electives,
           submission_date,
           created_at,

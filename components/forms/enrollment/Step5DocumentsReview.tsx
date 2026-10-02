@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { compressImage } from "@/lib/utils/image-compressor";
 import { useAuth } from "@/lib/auth/authContext";
+import { createClient } from "@/lib/supabase/client";
 
 interface Step5DocumentsReviewProps {
   data: FullEnrollmentFormData;
@@ -91,11 +92,42 @@ export default function Step5DocumentsReview({
         finalDataUrl = URL.createObjectURL(file);
       }
 
+      // Upload to Supabase Storage Bucket to get a lightweight public URL (~80 bytes)
+      let finalStoredUrl = "";
+      try {
+        const supabase = createClient();
+        const cleanId = (data.lrn || user?.userId || user?.id || "applicant").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const cleanDoc = docKey.replace(/[^a-zA-Z0-9_-]/g, "_");
+        const originalExt = finalFile.name.includes(".")
+          ? finalFile.name.split(".").pop()?.toLowerCase() || "jpg"
+          : "jpg";
+        const cleanExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(originalExt) ? originalExt : "jpg";
+        const storagePath = `${cleanId}/${cleanDoc}_${Date.now()}.${cleanExt}`;
+
+        const { error: uploadErr } = await supabase.storage
+          .from("student-documents")
+          .upload(storagePath, finalFile, {
+            contentType: finalFile.type || (cleanExt === "pdf" ? "application/pdf" : "image/jpeg"),
+            upsert: true,
+          });
+
+        if (!uploadErr) {
+          const { data: pubData } = supabase.storage
+            .from("student-documents")
+            .getPublicUrl(storagePath);
+          if (pubData?.publicUrl) {
+            finalStoredUrl = pubData.publicUrl;
+          }
+        }
+      } catch (storageErr) {
+        console.warn("Storage upload notice (fallback to preview):", storageErr);
+      }
+
       setDocs((prev) => ({
         ...prev,
         [docKey]: {
           file: finalFile,
-          previewUrl: finalDataUrl,
+          previewUrl: finalStoredUrl || finalDataUrl,
           originalSizeKb: originalKb,
           compressedSizeKb: compressedKb,
           isCompressing: false,
@@ -107,7 +139,7 @@ export default function Step5DocumentsReview({
       const newDocEntry = {
         type: docType,
         fileName: finalFile.name,
-        fileUrl: finalDataUrl,
+        fileUrl: finalStoredUrl || finalDataUrl,
         sizeKb: compressedKb,
       };
 

@@ -117,6 +117,36 @@ export default function AdjudicationModal({
   const [actionError, setActionError] = useState<string>("");
   const [actionSuccess, setActionSuccess] = useState<string>("");
   const [inspectingDoc, setInspectingDoc] = useState<DocumentInspectionItem | null>(null);
+  const [documents, setDocuments] = useState<any[]>(
+    Array.isArray(application.submitted_documents) ? application.submitted_documents : []
+  );
+
+  // Lazy fetch documents on-demand only for this specific student when modal is opened
+  useEffect(() => {
+    if (Array.isArray(application.submitted_documents) && application.submitted_documents.length > 0) {
+      setDocuments(application.submitted_documents);
+      return;
+    }
+    let isMounted = true;
+    const fetchDocs = async () => {
+      try {
+        const { data } = await supabase
+          .from("enrollment_applications")
+          .select("submitted_documents")
+          .eq("id", application.id)
+          .single();
+        if (isMounted && data?.submitted_documents && Array.isArray(data.submitted_documents)) {
+          setDocuments(data.submitted_documents);
+        }
+      } catch (err) {
+        console.warn("Lazy documents fetch notice:", err);
+      }
+    };
+    fetchDocs();
+    return () => {
+      isMounted = false;
+    };
+  }, [application.id, application.submitted_documents, supabase]);
 
   // Synchronize modalSections and modalElectiveSections when props change
   useEffect(() => {
@@ -332,8 +362,8 @@ export default function AdjudicationModal({
     gradeLevel: application.target_grade_level,
   };
 
-  const rawDocs = Array.isArray(application.submitted_documents) && application.submitted_documents.length > 0
-    ? application.submitted_documents
+  const rawDocs = Array.isArray(documents) && documents.length > 0
+    ? documents
     : [
         { docType: "birth_certificate", fileName: "PSA_Birth_Certificate.jpg", sizeKb: 28 },
         { docType: "form_138", fileName: "SF9_Report_Card.jpg", sizeKb: 34 },

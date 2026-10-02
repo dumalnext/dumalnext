@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* DepEd Official Brand Colors (Preserved) */
   --deped-navy: #002060;
   --deped-navy-dark: #001744;
   --deped-navy-light: #0d3882;
@@ -9,6 +10,24 @@
   --deped-border: #cbd5e1;
   --deped-text-main: #0f172a;
   --deped-text-muted: #475569;
+
+  /* Global Geometry & Border Radius Tokens */
+  --radius-xs: 0.125rem; /* 2px */
+  --radius-sm: 0.25rem;  /* 4px - standard DepEd institutional control radius */
+  --radius-md: 0.375rem; /* 6px - buttons & cards */
+  --radius-lg: 0.5rem;   /* 8px - containers & modals */
+  --radius-xl: 0.75rem;  /* 12px - elevated panels */
+  --radius-full: 9999px; /* pill badges */
+
+  /* Layered Elevation & Shadow Tokens (Tinted with Navy depth) */
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px 0 rgba(0, 32, 96, 0.06), 0 1px 2px -1px rgba(0, 32, 96, 0.04);
+  --shadow-raised: 0 4px 6px -1px rgba(0, 32, 96, 0.08), 0 2px 4px -2px rgba(0, 32, 96, 0.06);
+  --shadow-overlay: 0 10px 15px -3px rgba(0, 16, 48, 0.15), 0 4px 6px -4px rgba(0, 16, 48, 0.10);
+
+  /* Micro-Interaction Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -26,46 +45,153 @@ body {
   border-bottom: 3px solid var(--deped-navy-dark);
 }
 
+/* Base Button Foundation & Tokens */
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-danger,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  font-size: 0.875rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  box-shadow: var(--shadow-subtle);
+}
+
+.btn-primary:active:not(:disabled),
+.btn-secondary:active:not(:disabled),
+.btn-outline:active:not(:disabled),
+.btn-danger:active:not(:disabled),
+.btn-ghost:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-outline:focus-visible,
+.btn-ghost:focus-visible {
+  outline: 2px solid var(--deped-navy);
+  outline-offset: 2px;
+}
+
+.btn-danger:focus-visible {
+  outline: 2px solid #b91c1c;
+  outline-offset: 2px;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-outline:disabled,
+.btn-danger:disabled,
+.btn-ghost:disabled,
+[disabled].btn-primary,
+[disabled].btn-secondary {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+/* Button Variants */
 .btn-primary {
   background-color: var(--deped-navy);
   color: var(--deped-white);
   border: 1px solid var(--deped-navy-dark);
-  font-weight: 600;
-  padding: 0.6rem 1.25rem;
-  transition: background-color 0.15s ease-in-out;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: var(--deped-navy-light);
+  border-color: var(--deped-navy);
 }
 
 .btn-secondary {
   background-color: var(--deped-white);
   color: var(--deped-navy);
   border: 1px solid var(--deped-navy);
-  font-weight: 600;
-  padding: 0.6rem 1.25rem;
-  transition: all 0.15s ease-in-out;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background-color: #f1f5f9;
+  color: var(--deped-navy-dark);
 }
 
+.btn-outline {
+  background-color: transparent;
+  color: var(--deped-navy);
+  border: 1px solid var(--deped-border);
+  box-shadow: none;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #f8fafc;
+  border-color: var(--deped-navy);
+}
+
+.btn-danger {
+  background-color: #b91c1c;
+  color: #ffffff;
+  border: 1px solid #991b1b;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #991b1b;
+  border-color: #7f1d1d;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--deped-text-main);
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  color: var(--deped-navy);
+}
+
+/* Button Sizing Utilities */
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: var(--radius-xs);
+}
+
+.btn-md {
+  padding: 0.55rem 1.15rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+}
+
+/* Status Badges */
 .badge-status {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 700;
   border: 1px solid;
+  border-radius: var(--radius-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  line-height: 1;
 }
 
 .badge-pending {
@@ -84,6 +210,34 @@ body {
   background-color: #fef2f2;
   color: #991b1b;
   border-color: #fecaca;
+}
+
+.badge-neutral {
+  background-color: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+/* Form Controls */
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--deped-border);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.875rem;
+  color: var(--deped-text-main);
+  background-color: var(--deped-white);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--deped-navy);
+  box-shadow: 0 0 0 3px rgba(0, 32, 96, 0.15);
 }
 
 /* =========================================================================

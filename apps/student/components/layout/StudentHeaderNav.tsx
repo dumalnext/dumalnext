@@ -8,7 +8,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 
-export default function StudentHeaderNav() {
+interface StudentHeaderNavProps {
+  children?: React.ReactNode;
+}
+
+export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {}) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const { schoolYear, semester, termNumber } = useEnrollmentControl();
@@ -301,79 +305,86 @@ export default function StudentHeaderNav() {
   const sectionHref = user ? "/section" : "/?tab=signin&reason=auth_required";
 
   return (
-    <div className="flex items-center gap-3">
-      {/* Quick Status Tag on Header for Instant Visibility */}
-      {user ? (
-        <Link
-          href={appStatus ? trackHref : "/enroll"}
-          className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 text-white font-mono text-xs transition-colors"
-          title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
+    <div className="max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 w-full">
+      {/* Upper-Left: 3-Line Hamburger Menu Button + School Branding */}
+      <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+        {/* 3-Line Hamburger Menu Button (Upper-Left positioned for natural human eye-flow) */}
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm rounded active:scale-95 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+          aria-label="Toggle Portal Navigation Menu"
+          aria-expanded={isMenuOpen}
         >
-          <span className="font-bold uppercase tracking-tight truncate max-w-[140px] md:max-w-[180px]">
-            [ {user.firstName} {user.lastName} ]
-          </span>
-          {appStatus === "Approved" ? (
-            <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider">
-              APPROVED
-            </span>
-          ) : appStatus === "Needs Revision" ? (
-            <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider">
-              REVISION
-            </span>
-          ) : appStatus === "Pending" ? (
-            <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider">
-              PENDING
-            </span>
-          ) : (
-            <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider animate-pulse">
-              ENROLL NOW
-            </span>
-          )}
-        </Link>
-      ) : (
-        <Link
-          href="/?tab=signin"
-          className="hidden sm:inline-block bg-white text-[#002060] font-bold uppercase tracking-wider py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs"
-        >
-          Login
-        </Link>
-      )}
+          {/* 3 Horizontal Lines (Hamburger Icon) */}
+          <div className="w-4 h-3.5 sm:w-5 sm:h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
+            <span
+              className={`w-full h-0.5 bg-white transition-all duration-200 origin-center ${
+                isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
+              }`}
+            />
+            <span
+              className={`w-full h-0.5 bg-white transition-all duration-200 ${
+                isMenuOpen ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`w-full h-0.5 bg-white transition-all duration-200 origin-center ${
+                isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
+              }`}
+            />
+          </div>
+          <span className="hidden xs:inline sm:inline">{isMenuOpen ? "[ Close ]" : "[ Menu ]"}</span>
+        </button>
 
-      {/* 3-Line Hamburger Menu Button */}
-      <button
-        type="button"
-        onClick={() => setIsMenuOpen((prev) => !prev)}
-        className="flex items-center gap-2.5 px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border-2 border-blue-400/60 hover:border-white text-white font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
-        aria-label="Toggle Portal Navigation Menu"
-        aria-expanded={isMenuOpen}
-      >
-        {/* 3 Horizontal Lines (Hamburger Icon) */}
-        <div className="w-5 h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
-          <span
-            className={`w-full h-0.5 bg-white transition-all duration-200 origin-center ${
-              isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
-            }`}
-          />
-          <span
-            className={`w-full h-0.5 bg-white transition-all duration-200 ${
-              isMenuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`w-full h-0.5 bg-white transition-all duration-200 origin-center ${
-              isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
-            }`}
-          />
-        </div>
-        <span>{isMenuOpen ? "[ Close ]" : "[ Menu ]"}</span>
-      </button>
+        {children}
+      </div>
 
-      {/* Slide-over Drawer / Collapsible Menu Overlay */}
+      {/* Upper-Right: Quick Status Tag / User Info / Login */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {user ? (
+          <Link
+            href={appStatus ? trackHref : "/enroll"}
+            className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white font-mono text-xs transition-colors rounded shadow-xs"
+            title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
+          >
+            <span className="font-bold uppercase tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
+              [ {user.firstName} {user.lastName} ]
+            </span>
+            {appStatus === "Approved" ? (
+              <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider rounded-xs">
+                APPROVED
+              </span>
+            ) : appStatus === "Needs Revision" ? (
+              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider rounded-xs">
+                REVISION
+              </span>
+            ) : appStatus === "Pending" ? (
+              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider rounded-xs">
+                PENDING
+              </span>
+            ) : (
+              <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider animate-pulse rounded-xs">
+                ENROLL NOW
+              </span>
+            )}
+          </Link>
+        ) : (
+          <Link
+            href="/?tab=signin"
+            className="inline-block bg-white text-[#002060] font-bold uppercase tracking-wider py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs rounded active:scale-95"
+          >
+            Login
+          </Link>
+        )}
+      </div>
+
+      {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-slate-950/70 z-50 backdrop-blur-xs flex justify-end animate-in fade-in duration-150">
+        <div className="fixed inset-0 bg-slate-950/70 z-50 backdrop-blur-xs flex justify-start animate-in fade-in duration-150">
           <div
             ref={menuRef}
-            className="w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-l-4 border-[#002060] flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-200"
+            className="w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-200"
           >
             {/* Drawer Top Header */}
             <div>

@@ -139,26 +139,55 @@ export default function Step5DocumentsReview({
       }
 
       // Upload to Supabase Storage Bucket to get a lightweight public URL (~80 bytes)
-      let finalStoredUrl = finalDataUrl;
+      let finalStoredUrl = "";
       try {
-        const uploadForm = new FormData();
-        uploadForm.append("file", finalFile);
-        uploadForm.append("docType", docKey);
-        uploadForm.append("identifier", data.lrn || user?.userId || user?.id || "applicant");
+        const supabase = createClient();
+        const cleanId = (data.lrn || user?.userId || user?.id || "applicant").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const cleanDoc = docKey.replace(/[^a-zA-Z0-9_-]/g, "_");
+        const originalExt = finalFile.name.includes(".")
+          ? finalFile.name.split(".").pop()?.toLowerCase() || "jpg"
+          : "jpg";
+        const cleanExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(originalExt) ? originalExt : "jpg";
+        const storagePath = `${cleanId}/${cleanDoc}_${Date.now()}.${cleanExt}`;
 
-        const uploadRes = await fetch("/api/upload-document", {
-          method: "POST",
-          body: uploadForm,
-        });
+        // 1. Direct upload from browser to Supabase storage bucket
+        const { error: directUploadErr } = await supabase.storage
+          .from("student-documents")
+          .upload(storagePath, finalFile, {
+            contentType: finalFile.type || (cleanExt === "pdf" ? "application/pdf" : "image/jpeg"),
+            upsert: true,
+          });
 
-        if (uploadRes.ok) {
-          const uploadJson = await uploadRes.json();
-          if (uploadJson.success && uploadJson.url) {
-            finalStoredUrl = uploadJson.url;
+        if (!directUploadErr) {
+          const { data: pubData } = supabase.storage
+            .from("student-documents")
+            .getPublicUrl(storagePath);
+          if (pubData?.publicUrl) {
+            finalStoredUrl = pubData.publicUrl;
+          }
+        }
+
+        // 2. Fallback to API route if direct upload failed
+        if (!finalStoredUrl) {
+          const uploadForm = new FormData();
+          uploadForm.append("file", finalFile);
+          uploadForm.append("docType", docKey);
+          uploadForm.append("identifier", data.lrn || user?.userId || user?.id || "applicant");
+
+          const uploadRes = await fetch("/api/upload-document", {
+            method: "POST",
+            body: uploadForm,
+          });
+
+          if (uploadRes.ok) {
+            const uploadJson = await uploadRes.json();
+            if (uploadJson.success && uploadJson.url) {
+              finalStoredUrl = uploadJson.url;
+            }
           }
         }
       } catch (storageErr) {
-        console.warn("Storage upload notice (fallback to client compressed data URL):", storageErr);
+        console.warn("Storage upload notice (fallback to client preview):", storageErr);
       }
 
       setDocs((prev) => ({

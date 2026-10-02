@@ -27,9 +27,9 @@ export default function StudentLayout({
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
         <StudentProviders>
           {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
-          <header className="deped-header px-3 sm:px-6 py-3 sm:py-4 shadow-sm relative z-40">
-            <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <header className="deped-header px-3 sm:px-6 py-2.5 sm:py-3.5 shadow-md relative z-40">
+            <StudentHeaderNav>
+              <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                 <Link
                   href="/"
                   className="shrink-0 flex items-center group transition-transform active:scale-95"
@@ -38,14 +38,14 @@ export default function StudentLayout({
                   <img
                     src="/dumalneg-logo.png"
                     alt="Dumalneg National High School Official Seal"
-                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
                   />
                 </Link>
                 <div className="min-w-0">
                   <p className="text-[9px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase truncate">
                     Republic of the Philippines | Department of Education | Region I
                   </p>
-                  <h1 className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
+                  <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
                     DUMALNEG NATIONAL HIGH SCHOOL
                   </h1>
                   <p className="text-[10px] sm:text-xs text-slate-300 font-medium truncate">
@@ -53,8 +53,7 @@ export default function StudentLayout({
                   </p>
                 </div>
               </div>
-              <StudentHeaderNav />
-            </div>
+            </StudentHeaderNav>
           </header>
 
           {/* Main Content Area with Adaptive Mobile & Tablet Padding */}
