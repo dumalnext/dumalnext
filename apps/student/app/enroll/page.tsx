@@ -22,7 +22,7 @@ export default function StudentEnrollPage() {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-white border-2 border-slate-300 text-center font-sans rounded-lg shadow-sm">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-          [ AUTHENTICATING APPLICANT SESSION ]
+          AUTHENTICATING APPLICANT SESSION
         </span>
         <p className="text-xs font-bold text-slate-800">
           Loading student console...
@@ -35,7 +35,7 @@ export default function StudentEnrollPage() {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-amber-50 border-2 border-amber-400 text-center font-sans space-y-3 rounded-lg shadow-sm">
         <span className="text-xs font-bold text-amber-900 uppercase block">
-          [ ACCESS RESTRICTED: AUTHENTICATION REQUIRED ]
+          ACCESS RESTRICTED: AUTHENTICATION REQUIRED
         </span>
         <p className="text-xs text-amber-800">
           You must create an account or sign in before filling out the official online enrollment form. Redirecting...
@@ -54,7 +54,7 @@ export default function StudentEnrollPage() {
         <div className="flex items-center justify-between text-xs text-slate-600 bg-white p-3 border border-slate-300 rounded-md">
           <div className="flex items-center space-x-2">
             <Link href="/" className="font-bold text-[#002060] hover:underline">
-              [ Student Home ]
+              Student Home
             </Link>
             <span>/</span>
             <span className="text-slate-800 font-medium">Online Enrollment Notice</span>
@@ -69,7 +69,7 @@ export default function StudentEnrollPage() {
           <div className="border-b-2 border-red-200 pb-4 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-2.5 py-1 bg-red-100 text-red-900 border border-red-400 text-xs font-mono font-bold uppercase rounded-xs">
-                [ DEPED OFFICIAL ADVISORY: ONLINE ENROLLMENT IS CURRENTLY CLOSED ]
+                DEPED OFFICIAL ADVISORY: ONLINE ENROLLMENT IS CURRENTLY CLOSED
               </span>
               <span className="text-xs font-mono font-bold text-slate-600">
                 School Year: <strong>{schoolYear}</strong>
@@ -124,13 +124,13 @@ export default function StudentEnrollPage() {
               href="/"
               className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs rounded"
             >
-              [ Return to Student Dashboard ]
+              Return to Student Dashboard
             </Link>
             <Link
               href="/track"
               className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold uppercase border border-slate-300 transition-colors rounded"
             >
-              [ Track Application ]
+              Track Application
             </Link>
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function StudentEnrollPage() {
       <div className="flex items-center justify-between text-xs text-slate-600 bg-white p-3 border border-slate-300 rounded-md">
         <div className="flex items-center space-x-2">
           <Link href="/" className="font-bold text-[#002060] hover:underline">
-            [ Student Home ]
+            Student Home
           </Link>
           <span>/</span>
           <span className="text-slate-800 font-medium">Online Enrollment Form (S.Y. {schoolYear} &bull; {semester})</span>

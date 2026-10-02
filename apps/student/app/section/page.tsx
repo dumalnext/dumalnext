@@ -649,7 +649,7 @@ function SectionPageContent() {
         <span className="text-slate-400 uppercase">Portal Modules</span>
         <span>/</span>
         <span className="font-bold text-[#002060] uppercase">
-          [ 04 ] Class Section &amp; Advisory
+          04 Class Section &amp; Advisory
         </span>
       </nav>
 
@@ -658,7 +658,7 @@ function SectionPageContent() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
-              [ DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS ]
+              DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS
             </span>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               Class Section &amp; Advisory Placement
@@ -688,7 +688,7 @@ function SectionPageContent() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-widest">
-                    [ SECTION ASSIGNED ]
+                    SECTION ASSIGNED
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/90 text-emerald-950 font-mono text-[10px] font-bold uppercase border border-emerald-400 rounded-xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
@@ -750,7 +750,7 @@ function SectionPageContent() {
               <div className="p-4 bg-white border-2 border-blue-900/30 shadow-xs space-y-3 rounded-md">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-200 pb-2">
                   <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                    [ SHS Dual Cohort Sectioning &bull; DepEd MATATAG ]
+                    SHS Dual Cohort Sectioning &bull; DepEd MATATAG
                   </span>
                   <span className="text-[10px] font-mono font-bold bg-blue-100 text-[#002060] px-2 py-0.5 border border-blue-300 self-start sm:self-auto uppercase rounded-xs">
                     Dual Active Section Assignments
@@ -799,7 +799,7 @@ function SectionPageContent() {
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              [ 01 ] Section Overview &amp; Advisory
+              01 Section Overview &amp; Advisory
             </button>
             <button
               type="button"
@@ -810,7 +810,7 @@ function SectionPageContent() {
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              [ 02 ] Section Classmates ({assignedSection.grade_level >= 11 && electiveInfo ? `${classmates.length} Track / ${electiveClassmates.length} Elective` : `${classmates.length}`})
+              02 Section Classmates ({assignedSection.grade_level >= 11 && electiveInfo ? `${classmates.length} Track / ${electiveClassmates.length} Elective` : `${classmates.length}`})
             </button>
             <button
               type="button"
@@ -821,7 +821,7 @@ function SectionPageContent() {
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              [ 03 ] Prescribed Schedule &amp; Subjects
+              03 Prescribed Schedule &amp; Subjects
             </button>
           </div>
 
@@ -830,7 +830,7 @@ function SectionPageContent() {
             <div className="bg-white border-2 border-slate-300 p-6 space-y-6 rounded-lg shadow-sm">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-                  [ Official Advisory Information ]
+                  Official Advisory Information
                 </span>
                 <h3 className="text-base font-bold text-slate-900 uppercase">
                   Class Profile &bull; {assignedSection.section_name}
@@ -893,7 +893,7 @@ function SectionPageContent() {
                   <div className="p-4 bg-purple-50/70 border border-purple-200 space-y-3 md:col-span-2 rounded-md">
                     <h4 className="font-bold text-purple-950 uppercase font-mono text-[11px] border-b border-purple-200 pb-1 flex items-center justify-between">
                       <span>Specialized Elective Section Details</span>
-                      <span className="text-[10px] bg-purple-200/80 px-2 py-0.5 font-bold rounded-xs">[ Elective Cohort ]</span>
+                      <span className="text-[10px] bg-purple-200/80 px-2 py-0.5 font-bold rounded-xs">Elective Cohort</span>
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
@@ -934,13 +934,13 @@ function SectionPageContent() {
                   href="/track"
                   className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
                 >
-                  [ 03 ] Track Full Application
+                  03 Track Full Application
                 </Link>
                 <Link
                   href="/"
                   className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
                 >
-                  [ 01 ] Return to Home Dashboard
+                  01 Return to Home Dashboard
                 </Link>
               </div>
             </div>
@@ -952,7 +952,7 @@ function SectionPageContent() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
                   <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                    [ Official Classmates Directory ]
+                    Official Classmates Directory
                   </span>
                   <h3 className="text-base font-bold text-slate-900 uppercase">
                     {assignedSection.grade_level >= 11 && electiveInfo
@@ -993,7 +993,7 @@ function SectionPageContent() {
                           : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
                       }`}
                     >
-                      [ Track Cohort ({classmates.length}) ]
+                      Track Cohort ({classmates.length})
                     </button>
                     <button
                       type="button"
@@ -1004,7 +1004,7 @@ function SectionPageContent() {
                           : "bg-white text-purple-950 border-purple-300 hover:bg-purple-50"
                       }`}
                     >
-                      [ Elective Cohort ({electiveClassmates.length}) ]
+                      Elective Cohort ({electiveClassmates.length})
                     </button>
                   </div>
                 </div>
@@ -1152,7 +1152,7 @@ function SectionPageContent() {
             <div className="bg-white border-2 border-slate-300 p-6 space-y-6 rounded-lg shadow-sm">
               <div className="border-b border-slate-200 pb-3">
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                  [ Prescribed Class Curriculum ]
+                  Prescribed Class Curriculum
                 </span>
                 <h3 className="text-base font-bold text-slate-900 uppercase">
                   Subjects &amp; Timetable &bull; Grade {assignedSection.grade_level}
@@ -1262,7 +1262,7 @@ function SectionPageContent() {
           <div className="p-6 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-4 rounded-lg">
             <div className="flex items-center justify-between border-b border-blue-200 pb-3">
               <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                [ ENROLLMENT REQUIRED ]
+                ENROLLMENT REQUIRED
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-200 text-[#002060] font-mono text-xs font-bold uppercase border border-blue-400 rounded-xs">
                 <span className="w-2 h-2 rounded-full bg-[#002060] animate-pulse" />
@@ -1283,7 +1283,7 @@ function SectionPageContent() {
             {/* Explanatory Policy Box */}
             <div className="p-4 bg-white border border-blue-300 text-xs space-y-2 rounded-md">
               <span className="font-mono font-bold text-[#002060] uppercase block text-[11px]">
-                [ DepEd Dumalneg NHS Continuing Enrollment Policy ]
+                DepEd Dumalneg NHS Continuing Enrollment Policy
               </span>
               <p className="text-slate-700 leading-relaxed">
                 As a continuing learner of Dumalneg National High School, your previously assigned class section will be 
@@ -1297,13 +1297,13 @@ function SectionPageContent() {
                 href="/enroll"
                 className="btn-primary text-xs uppercase font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-md"
               >
-                [ 02 ] Complete Continuing Enrollment Now &rarr;
+                02 Complete Continuing Enrollment Now &rarr;
               </Link>
               <Link
                 href="/"
                 className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
               >
-                [ 01 ] Return to Home Dashboard
+                01 Return to Home Dashboard
               </Link>
             </div>
           </div>
@@ -1319,7 +1319,7 @@ function SectionPageContent() {
           <div className="p-6 bg-amber-50 border-2 border-amber-500 shadow-xs space-y-4 rounded-lg">
             <div className="flex items-center justify-between border-b border-amber-300 pb-3">
               <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
-                [ SECTION STATUS &bull; TRANSFEREE ]
+                SECTION STATUS &bull; TRANSFEREE
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400 rounded-xs">
                 <span className="w-2 h-2 rounded-full bg-amber-700 animate-pulse" />
@@ -1340,7 +1340,7 @@ function SectionPageContent() {
             {/* Explanatory Callout */}
             <div className="p-4 bg-white border border-amber-300 text-xs space-y-2 rounded-md">
               <span className="font-mono font-bold text-amber-900 uppercase block text-[11px]">
-                [ Official Transferee Placement Protocol ]
+                Official Transferee Placement Protocol
               </span>
               <p className="text-slate-800 leading-relaxed">
                 Unlike continuing students, incoming transferee learners require manual evaluation of subject prerequisites 
@@ -1355,13 +1355,13 @@ function SectionPageContent() {
                 href="/track"
                 className="btn-primary text-xs uppercase font-bold py-2.5 px-4 inline-block rounded-md"
               >
-                [ 03 ] Track Transferee Application Status &rarr;
+                03 Track Transferee Application Status &rarr;
               </Link>
               <Link
                 href="/"
                 className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
               >
-                [ 01 ] Return to Home Dashboard
+                01 Return to Home Dashboard
               </Link>
             </div>
           </div>
@@ -1376,7 +1376,7 @@ function SectionPageContent() {
           <div className="p-6 bg-amber-50 border-2 border-amber-400 shadow-xs space-y-4 rounded-lg">
             <div className="flex items-center justify-between border-b border-amber-200 pb-3">
               <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
-                [ SECTION STATUS ]
+                SECTION STATUS
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400 rounded-xs">
                 <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
@@ -1388,7 +1388,7 @@ function SectionPageContent() {
               <h2 className="text-xl sm:text-2xl font-black text-amber-950 uppercase tracking-tight">
                 You&apos;re not yet assigned to a section
               </h2>
-              <p className="text-xs text-amber-900 leading-relaxed font-medium">
+              <p className="text-xs text-amber-950 leading-relaxed font-medium">
                 Your student profile is currently awaiting official section placement from the school administrator and registrar.
               </p>
             </div>
@@ -1428,13 +1428,13 @@ function SectionPageContent() {
                 href="/track"
                 className="btn-primary text-xs uppercase font-bold py-2.5 px-4 inline-block rounded-md"
               >
-                [ 03 ] Track Application Status
+                03 Track Application Status
               </Link>
               <Link
                 href="/"
                 className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
               >
-                [ 01 ] Return to Home Dashboard
+                01 Return to Home Dashboard
               </Link>
             </div>
           </div>

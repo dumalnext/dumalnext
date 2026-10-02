@@ -559,7 +559,7 @@ function TrackApplicationContent() {
     return (
       <div className="max-w-4xl mx-auto p-12 bg-white border-2 border-slate-300 text-center font-sans">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-          [ AUTHENTICATING APPLICANT SESSION ]
+          AUTHENTICATING APPLICANT SESSION
         </span>
         <p className="text-sm font-bold text-slate-800">
           Verifying authorized student credentials...
@@ -572,7 +572,7 @@ function TrackApplicationContent() {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-amber-50 border-2 border-amber-400 text-center font-sans space-y-3 rounded-lg shadow-sm">
         <span className="text-xs font-bold text-amber-900 uppercase block">
-          [ ACCESS RESTRICTED: AUTHENTICATION REQUIRED ]
+          ACCESS RESTRICTED: AUTHENTICATION REQUIRED
         </span>
         <p className="text-xs text-amber-800">
           You must create an account or sign in before tracking your enrollment status. Redirecting to sign in...
@@ -623,7 +623,7 @@ function TrackApplicationContent() {
             <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-md">
               <div>
                 <span className="text-xs font-mono font-bold text-emerald-950 uppercase block mb-0.5">
-                  [ NEW ACADEMIC TERM: S.Y. {schoolYear} &bull; {semester} ENROLLMENT IS OPEN ]
+                  NEW ACADEMIC TERM: S.Y. {schoolYear} &bull; {semester} ENROLLMENT IS OPEN
                 </span>
                 <p className="text-xs text-emerald-900 leading-relaxed font-medium">
                   You are currently reviewing your previous term application record. Online Enrollment for School Year {schoolYear} ({semester}) is now officially open!
@@ -642,7 +642,7 @@ function TrackApplicationContent() {
           {allRecords.length > 1 && (
             <div className="p-3 bg-white border border-slate-300 flex flex-wrap items-center gap-2 text-xs rounded-md">
               <span className="font-mono font-bold text-slate-600 uppercase shrink-0">
-                [ Term Records ]:
+                Term Records:
               </span>
               {allRecords.map((rec) => {
                 const isSelected = record?.referenceNumber === rec.referenceNumber;
@@ -657,7 +657,7 @@ function TrackApplicationContent() {
                         : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
                     }`}
                   >
-                    {rec.referenceNumber} &bull; S.Y. {rec.schoolYear} ({rec.semester}) [{rec.status}]
+                    {rec.referenceNumber} &bull; S.Y. {rec.schoolYear} ({rec.semester}) ({rec.status})
                   </button>
                 );
               })}
@@ -681,19 +681,19 @@ function TrackApplicationContent() {
               {record.status === "Pending" && (
                 <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-xs">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border border-amber-600 inline-block shrink-0" />
-                  [ STATUS: PENDING REGISTRAR VERIFICATION ]
+                  STATUS: PENDING REGISTRAR VERIFICATION
                 </span>
               )}
               {record.status === "Approved" && (
                 <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-xs">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 border border-emerald-700 inline-block shrink-0" />
-                  [ STATUS: APPROVED &amp; OFFICIALLY ENROLLED ]
+                  STATUS: APPROVED &amp; OFFICIALLY ENROLLED
                 </span>
               )}
               {record.status === "Needs Revision" && (
                 <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-xs">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-600 border border-red-700 inline-block shrink-0" />
-                  [ STATUS: NEEDS REVISION / ACTION REQUIRED ]
+                  STATUS: NEEDS REVISION / ACTION REQUIRED
                 </span>
               )}
             </div>
@@ -725,7 +725,7 @@ function TrackApplicationContent() {
               <div className="p-3.5 bg-white border border-emerald-300 grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-md">
                 <div>
                   <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block">
-                    [ ASSIGNED CLASS SECTION ]
+                    ASSIGNED CLASS SECTION
                   </span>
                   <span className="text-sm font-bold text-slate-900 uppercase">
                     {record.sectionName || "Section Assignment Pending"}
@@ -738,7 +738,7 @@ function TrackApplicationContent() {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block">
-                    [ CLASS ADVISER / TEACHER ]
+                    CLASS ADVISER / TEACHER
                   </span>
                   <span className="text-sm font-bold text-[#002060] uppercase">
                     {record.adviserName || "Adviser to be Assigned"}
@@ -757,8 +757,8 @@ function TrackApplicationContent() {
                   className="px-6 py-3 bg-[#002060] text-white text-xs font-bold uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded"
                 >
                   {isDownloadingPdf
-                    ? "[ GENERATING OFFICIAL DEPED PDF... ]"
-                    : "[ DOWNLOAD ACCOMPLISHED DEPED FORM (PDF) ]"}
+                    ? "GENERATING OFFICIAL DEPED PDF..."
+                    : "DOWNLOAD ACCOMPLISHED DEPED FORM (PDF)"}
                 </button>
               </div>
             </div>
@@ -786,7 +786,7 @@ function TrackApplicationContent() {
                   href="/enroll"
                   className="px-5 py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider shadow-xs shrink-0 inline-flex items-center gap-1.5 rounded"
                 >
-                  [ Edit &amp; Resubmit Application &rarr; ]
+                  Edit &amp; Resubmit Application &rarr;
                 </Link>
               </div>
             </div>
@@ -795,7 +795,7 @@ function TrackApplicationContent() {
           {/* Official Applicant Details Summary Table */}
           <div className="border-2 border-slate-200 p-5 space-y-4 rounded-md">
             <div className="text-xs font-bold text-[#002060] uppercase tracking-wider border-b border-slate-200 pb-2">
-              [ Official Enrollment Application Details ]
+              Official Enrollment Application Details
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
               <div>
@@ -858,7 +858,7 @@ function TrackApplicationContent() {
             <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                  [ OFFICIAL ENROLLED SUBJECTS &bull; PRESCRIBED DEPED LEARNING AREAS ]
+                  OFFICIAL ENROLLED SUBJECTS &bull; PRESCRIBED DEPED LEARNING AREAS
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Curricular learning areas designated for Grade {record.gradeLevel}{" "}
@@ -879,7 +879,7 @@ function TrackApplicationContent() {
               </div>
             ) : enrolledSubjects.length === 0 ? (
               <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center font-mono rounded-md">
-                [ No prescribed course subjects registered for this grade level ]
+                No prescribed course subjects registered for this grade level
               </div>
             ) : (
               <div className="overflow-x-auto border border-slate-200 rounded-md">
@@ -938,7 +938,7 @@ function TrackApplicationContent() {
             <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                  [ OFFICIAL CLASS TIMETABLE &bull; WEEKLY SCHEDULE ]
+                  OFFICIAL CLASS TIMETABLE &bull; WEEKLY SCHEDULE
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Class timetable periods, assigned subject teachers, and classroom locations.
@@ -990,7 +990,7 @@ function TrackApplicationContent() {
             ) : filteredTimetable.length === 0 ? (
               <div className="p-6 bg-slate-50 border border-slate-300 text-center space-y-2 rounded-md">
                 <span className="text-xs font-mono font-bold text-slate-700 uppercase block">
-                  [ TIMETABLE STATUS: SCHEDULE UNDER PREPARATION &bull; DECONFLICTION GUARD ACTIVE ]
+                  TIMETABLE STATUS: SCHEDULE UNDER PREPARATION &bull; DECONFLICTION GUARD ACTIVE
                 </span>
                 <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
                   The weekly timetable periods for this section are currently being finalized by the school administration and registrar. 
@@ -1042,7 +1042,7 @@ function TrackApplicationContent() {
            ========================================================================= */
         <div className="p-8 bg-white border-2 border-slate-300 text-center space-y-4 shadow-sm rounded-lg">
           <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-            [ APPLICATION STATUS: NOT YET SUBMITTED ]
+            APPLICATION STATUS: NOT YET SUBMITTED
           </span>
           <h2 className="text-lg font-bold text-slate-900">
             No Submitted Enrollment Application Found
@@ -1069,7 +1069,7 @@ function TrackApplicationContent() {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ STATUS LEGEND &bull; GABAY SA MGA KULAY NG KATAYUAN ]
+              STATUS LEGEND &bull; GABAY SA MGA KULAY NG KATAYUAN
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
               Opisyal na panuntunan ng DepEd Dumalneg NHS Registrar para sa pagsusuri ng enrollment:
@@ -1086,7 +1086,7 @@ function TrackApplicationContent() {
             <div className="flex items-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 shrink-0 border border-emerald-700 shadow-xs" />
               <span className="text-xs font-mono font-bold text-emerald-950 uppercase tracking-wider">
-                [ Green: Approved ]
+                Green: Approved
               </span>
             </div>
             <div className="space-y-1">
@@ -1104,7 +1104,7 @@ function TrackApplicationContent() {
             <div className="flex items-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full bg-amber-500 shrink-0 border border-amber-600 shadow-xs" />
               <span className="text-xs font-mono font-bold text-amber-950 uppercase tracking-wider">
-                [ Yellow: Pending ]
+                Yellow: Pending
               </span>
             </div>
             <div className="space-y-1">
@@ -1122,7 +1122,7 @@ function TrackApplicationContent() {
             <div className="flex items-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full bg-red-600 shrink-0 border border-red-700 shadow-xs" />
               <span className="text-xs font-mono font-bold text-red-950 uppercase tracking-wider">
-                [ Red: Needs Revision ]
+                Red: Needs Revision
               </span>
             </div>
             <div className="space-y-1">

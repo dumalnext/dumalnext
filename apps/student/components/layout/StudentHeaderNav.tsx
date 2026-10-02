@@ -340,7 +340,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               }`}
             />
           </div>
-          <span className="hidden xs:inline sm:inline transition-colors duration-200">{isMenuOpen ? "[ Close ]" : "[ Menu ]"}</span>
+          <span className="hidden xs:inline sm:inline transition-colors duration-200">{isMenuOpen ? "Close" : "Menu"}</span>
         </button>
 
         {children}
@@ -355,7 +355,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
           >
             <span className="font-bold uppercase tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
-              [ {user.firstName} {user.lastName} ]
+              {user.firstName} {user.lastName}
             </span>
             {appStatus === "Approved" ? (
               <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-sans font-bold uppercase tracking-wider rounded-xs">
@@ -412,7 +412,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 />
                 <div>
                   <span className="text-[10px] font-mono text-blue-200 uppercase tracking-wider block">
-                    [ DUMALNEG NHS &bull; PORTAL MENU ]
+                    DUMALNEG NHS &bull; PORTAL MENU
                   </span>
                   <h3 className="text-sm font-bold uppercase tracking-tight mt-0.5">
                     Navigation &amp; Services
@@ -425,7 +425,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 onClick={() => setIsMenuOpen(false)}
                 className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 ease-in-out cursor-pointer rounded active:scale-95"
               >
-                [ X Close ]
+                Close
               </button>
             </div>
 
@@ -434,7 +434,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
-                      [ ACTIVE LEARNER SESSION ]
+                      ACTIVE LEARNER SESSION
                     </span>
                     {appStatus === "Approved" ? (
                       <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-mono font-bold uppercase rounded-sm">
@@ -476,7 +476,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
-                          [ SECTION ASSIGNED ]
+                          SECTION ASSIGNED
                         </span>
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
@@ -498,7 +498,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                          [ ENROLLMENT REQUIRED ]
+                          ENROLLMENT REQUIRED
                         </span>
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
@@ -520,7 +520,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
-                          [ SECTION STATUS &bull; TRANSFEREE ]
+                          SECTION STATUS &bull; TRANSFEREE
                         </span>
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
@@ -542,7 +542,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
-                          [ SECTION STATUS ]
+                          SECTION STATUS
                         </span>
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
@@ -561,7 +561,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               ) : (
                 <div className="p-4 bg-blue-50/70 border-b border-blue-200">
                   <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-                    [ GUEST VISITOR ]
+                    GUEST VISITOR
                   </span>
                   <p className="text-xs text-slate-700 mt-1">
                     Sign in with your verified email to access online basic education enrollment or track your application status.
@@ -572,7 +572,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               {/* Menu Navigation Links */}
               <div className="p-4 space-y-2">
                 <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block px-1">
-                  [ PORTAL MODULES ]
+                  PORTAL MODULES
                 </span>
 
                 {/* 1. Home Link */}
@@ -587,7 +587,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider">
-                      [ 01 ] Home Dashboard
+                      01 &bull; Home Dashboard
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -608,7 +608,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider">
-                      [ 02 ] Basic Education Enrollment
+                      02 &bull; Basic Education Enrollment
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -629,7 +629,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider">
-                      [ 03 ] Track Application Status
+                      03 &bull; Track Application Status
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -650,7 +650,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider">
-                      [ 04 ] Class Section &amp; Advisory
+                      04 &bull; Class Section &amp; Advisory
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -678,7 +678,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }}
                   className="w-full py-2.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border-2 border-red-300 hover:border-red-500 font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded active:scale-[0.99]"
                 >
-                  [ Sign Out Account ]
+                  Sign Out Account
                 </button>
               ) : (
                 <Link
@@ -686,7 +686,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   onClick={() => setIsMenuOpen(false)}
                   className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded active:scale-[0.99]"
                 >
-                  [ Sign In / Register Account ]
+                  Sign In / Register Account
                 </Link>
               )}
 

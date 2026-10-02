@@ -307,7 +307,7 @@ export default function Step2LearnerProfile({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part A: Official DepEd Identifiers ]
+            Part A: Official DepEd Identifiers
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
             Learner Reference Number (LRN) registered in DepEd LIS and Philippine Statistics Authority (PSA) Certificate.

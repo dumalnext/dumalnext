@@ -95,7 +95,7 @@ export default function RegisterPage() {
       {errors.form && (
         <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
           <p className="text-xs font-bold text-red-900 leading-normal">
-            [ REGISTRATION NOTICE ]: {errors.form}
+            REGISTRATION NOTICE: {errors.form}
           </p>
         </div>
       )}
@@ -105,7 +105,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-              [ 1. Official Learner Identification ]
+              1. Official Learner Identification
             </span>
           </div>
 
@@ -201,7 +201,7 @@ export default function RegisterPage() {
 
           <div className="border-b border-slate-200 pt-2 pb-2">
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-              [ 2. Account Access Credentials ]
+              2. Account Access Credentials
             </span>
           </div>
 
@@ -283,7 +283,7 @@ export default function RegisterPage() {
               disabled={isSubmitting}
               className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
             >
-              {isSubmitting ? "[ CREATING OFFICIAL ACCOUNT... ]" : "[ REGISTER ACCOUNT & PROCEED TO ENROLLMENT ]"}
+              {isSubmitting ? "Creating Official Account..." : "Register Account & Proceed to Enrollment"}
             </button>
           </div>
         </form>

@@ -241,7 +241,7 @@ export default function Step1ApplicantType({
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-mono text-xs font-bold text-[#002060] uppercase tracking-wider">
-            [ Step 1 of 5 &bull; Academic Classification ]
+            Step 1 of 5 &bull; Academic Classification
           </span>
           <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold uppercase tracking-wider shadow-xs rounded-xs">
             School Year: {schoolYear}
@@ -285,7 +285,7 @@ export default function Step1ApplicantType({
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.isGraded ? "SELECTED" : "CLICK TO SELECT"} ]
+                {data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
               </span>
               <span className="text-[11px] font-bold text-slate-400 font-mono">CODE: GRADED</span>
             </div>
@@ -313,7 +313,7 @@ export default function Step1ApplicantType({
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {!data.isGraded ? "SELECTED" : "CLICK TO SELECT"} ]
+                {!data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
               </span>
               <span className="text-[11px] font-bold text-slate-400 font-mono">CODE: SNED-ONLY</span>
             </div>
@@ -338,7 +338,7 @@ export default function Step1ApplicantType({
 
         {errors.applicantType && (
           <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs rounded-sm">
-            [ Validation Required ]: {errors.applicantType}
+            Validation Required: {errors.applicantType}
           </div>
         )}
 
@@ -361,7 +361,7 @@ export default function Step1ApplicantType({
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} ] CATEGORY 01
+                {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 01
               </span>
               <span className="text-xs font-bold text-[#002060]">Target: Grade 7</span>
             </div>
@@ -389,7 +389,7 @@ export default function Step1ApplicantType({
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} ] CATEGORY 02
+                {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 02
               </span>
               <span className="text-xs font-bold text-[#002060]">Target: Grade 11</span>
             </div>
@@ -417,7 +417,7 @@ export default function Step1ApplicantType({
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Transferee" ? "ACTIVE" : "SELECT"} ] CATEGORY 03
+                {data.applicantType === "Transferee" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 03
               </span>
               <span className="text-xs font-bold text-amber-800">Grades 7–12</span>
             </div>
@@ -445,7 +445,7 @@ export default function Step1ApplicantType({
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} ] CATEGORY 04
+                {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 04
               </span>
               <span className="text-xs font-bold text-indigo-800">Balik-Aral (Grades 7–12)</span>
             </div>
@@ -491,7 +491,7 @@ export default function Step1ApplicantType({
                   <div className="text-base sm:text-lg font-bold">Grade {lvl}</div>
                   {isSelected && (
                     <span className="block text-[10px] font-mono uppercase text-blue-200 mt-0.5">
-                      [ TARGET ]
+                      TARGET
                     </span>
                   )}
                 </button>
@@ -501,7 +501,7 @@ export default function Step1ApplicantType({
 
           {errors.targetGradeLevel && (
             <span className="text-xs text-red-700 font-semibold block">
-              [ Validation Required ]: {errors.targetGradeLevel}
+              Validation Required: {errors.targetGradeLevel}
             </span>
           )}
         </div>
@@ -513,10 +513,10 @@ export default function Step1ApplicantType({
           <div className="border-b-2 border-slate-200 pb-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                [ DepEd Section 6: Previous School Attended &amp; Academic History ]
+                DepEd Section 6: Previous School Attended &amp; Academic History
               </span>
               <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded-xs">
-                [ SMART PREREQUISITE VALIDATION ACTIVE ]
+                SMART PREREQUISITE VALIDATION ACTIVE
               </span>
             </div>
             <p className="text-xs text-slate-600 mt-1">
@@ -638,7 +638,7 @@ export default function Step1ApplicantType({
                           : "bg-slate-200 text-slate-700"
                       }`}
                     >
-                      [ {isDefaultSchool ? "SELECTED" : "SELECT"} ]
+                      {isDefaultSchool ? "SELECTED" : "SELECT"}
                     </span>
                     <span className="text-[11px] font-mono font-bold text-[#002060]">
                       ID: {defaultFeederSchoolId}
@@ -677,7 +677,7 @@ export default function Step1ApplicantType({
                           : "bg-slate-200 text-slate-700"
                       }`}
                     >
-                      [ {!isDefaultSchool ? "SELECTED" : "SELECT"} ]
+                      {!isDefaultSchool ? "SELECTED" : "SELECT"}
                     </span>
                     <span className="text-[10px] font-mono text-slate-500 uppercase font-bold">
                       MANUAL ENTRY
@@ -704,7 +704,7 @@ export default function Step1ApplicantType({
                     </span>
                   </div>
                   <span className="font-mono text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto rounded-xs">
-                    [ AUTO-PRESET VERIFIED ]
+                    AUTO-PRESET VERIFIED
                   </span>
                 </div>
               )}
@@ -714,7 +714,7 @@ export default function Step1ApplicantType({
                 <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner rounded-md">
                   <div className="border-b border-slate-200 pb-2">
                     <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                      [ Manual School Specification ]
+                      Manual School Specification
                     </span>
                     <p className="text-[11px] text-slate-600 mt-0.5">
                       Enter the registered name and 6-digit DepEd School ID found on the learner&apos;s Form 138 / SF9 Report Card.
@@ -796,7 +796,7 @@ export default function Step1ApplicantType({
       {data.applicantType && data.targetGradeLevel && (
         <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-md">
           <div className="font-bold text-[#002060] uppercase tracking-wider flex items-center justify-between">
-            <span>[ ENROLLMENT CLASSIFICATION SUMMARY ]</span>
+            <span>ENROLLMENT CLASSIFICATION SUMMARY</span>
             <span className="font-mono text-[11px] text-blue-900">VERIFIED</span>
           </div>
           <p className="text-slate-900 leading-relaxed">

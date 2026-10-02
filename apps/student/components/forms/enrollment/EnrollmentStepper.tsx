@@ -574,7 +574,7 @@ export default function EnrollmentStepper({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block shrink-0" />
             <span className="text-xs font-mono font-bold text-red-950 uppercase">
-              [ DEPED OFFICIAL NOTICE: SUBMISSION SYSTEM TEMPORARILY LOCKED ]
+              DEPED OFFICIAL NOTICE: SUBMISSION SYSTEM TEMPORARILY LOCKED
             </span>
           </div>
           <p className="text-xs text-red-900 leading-relaxed whitespace-pre-line">
@@ -620,7 +620,7 @@ export default function EnrollmentStepper({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shrink-0" />
             <span className="text-xs font-mono font-bold text-amber-950 uppercase">
-              [ SUBMISSION LOCKED: PENDING REGISTRAR VERIFICATION ]
+              SUBMISSION LOCKED: PENDING REGISTRAR VERIFICATION
             </span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed">
@@ -636,7 +636,7 @@ export default function EnrollmentStepper({
             href={`/track?ref=${existingApp.application_id}`}
             className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider shadow-xs rounded-md"
           >
-            [ Track Application Status &rarr; ]
+            Track Application Status &rarr;
           </Link>
           <Link
             href="/"
@@ -669,7 +669,7 @@ export default function EnrollmentStepper({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shrink-0" />
             <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-              [ STATUS: APPROVED &amp; OFFICIALLY ENROLLED ]
+              STATUS: APPROVED &amp; OFFICIALLY ENROLLED
             </span>
           </div>
           <p className="text-xs text-emerald-900 leading-relaxed">
@@ -682,7 +682,7 @@ export default function EnrollmentStepper({
             href={`/track?ref=${existingApp.application_id}`}
             className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider shadow-xs rounded-md"
           >
-            [ View Enrollment Slip &amp; Section Assignment &rarr; ]
+            View Enrollment Slip &amp; Section Assignment &rarr;
           </Link>
           <Link
             href="/"
@@ -717,7 +717,7 @@ export default function EnrollmentStepper({
         <div className="p-4 bg-red-50 border-2 border-red-500 text-slate-900 space-y-2 shadow-xs rounded-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
             <span className="text-xs font-mono font-bold text-red-950 uppercase">
-              [ REGISTRAR NOTICE: APPLICATION DOSSIER RETURNED FOR REVISION ]
+              REGISTRAR NOTICE: APPLICATION DOSSIER RETURNED FOR REVISION
             </span>
             <span className="text-[10px] font-mono bg-red-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded-xs">
               REF: {existingApp.application_id}
@@ -769,7 +769,7 @@ export default function EnrollmentStepper({
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#002060]">
-              [ Dumalneg NHS Online Enrollment &bull; S.Y. {formData.schoolYear || schoolYear} &bull; {formData.semester || semester} ]
+              Dumalneg NHS Online Enrollment &bull; S.Y. {formData.schoolYear || schoolYear} &bull; {formData.semester || semester}
             </span>
             <h1 className="text-lg font-bold text-slate-900">
               Basic Education Enrollment Form
@@ -783,7 +783,7 @@ export default function EnrollmentStepper({
                 className="text-[10px] font-mono font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 uppercase tracking-wider transition-colors cursor-pointer rounded active:scale-95"
                 title="Reset enrollment progress and start over from Step 1"
               >
-                [ Reset / Start Over ]
+                Reset / Start Over
               </button>
             )}
             <div className="text-right">
@@ -868,7 +868,7 @@ export default function EnrollmentStepper({
                 }`}
               >
                 <div className="font-mono font-bold text-[10px] uppercase">
-                  [ {isDone ? "OK" : `0${item.step}`} ]
+                  {isDone ? "OK" : `0${item.step}`}
                 </div>
                 <div className="font-bold truncate mt-0.5">{item.label}</div>
                 <div

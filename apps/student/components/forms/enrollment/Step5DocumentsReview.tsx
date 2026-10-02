@@ -548,8 +548,8 @@ export default function Step5DocumentsReview({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded">
               {existingApplication
-                ? "[ STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION ]"
-                : "[ STATUS: PENDING REGISTRAR VERIFICATION ]"}
+                ? "STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION"
+                : "STATUS: PENDING REGISTRAR VERIFICATION"}
             </span>
             <span className="text-xs font-mono text-amber-900 font-bold">
               DATE: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
@@ -578,7 +578,7 @@ export default function Step5DocumentsReview({
         {/* Learner & Enrollment Summary */}
         <div className="border-2 border-slate-300 p-5 space-y-4 rounded-md shadow-xs">
           <div className="text-xs font-bold text-[#002060] uppercase tracking-wider border-b border-slate-200 pb-2">
-            [ Official Application Summary ]
+            Official Application Summary
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
             <div>
@@ -637,7 +637,7 @@ export default function Step5DocumentsReview({
         {/* Next Steps for Student / Parent */}
         <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3 rounded-md shadow-xs">
           <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-            [ Instructions &amp; Next Steps for Dumalneg NHS Enrollees ]
+            Instructions &amp; Next Steps for Dumalneg NHS Enrollees
           </div>
           <ol className="list-decimal list-inside text-xs text-slate-700 space-y-2 leading-relaxed">
             <li>
@@ -647,7 +647,7 @@ export default function Step5DocumentsReview({
               <strong>Track Your Application Status</strong>: Visit the <strong>Track Application Status</strong> page on the portal anytime using your Application Tracking Number or 12-digit LRN.
             </li>
             <li>
-              <strong>Official DepEd PDF Release</strong>: Once your application is marked as <strong>[ APPROVED &amp; OFFICIALLY ENROLLED ]</strong> by the school administrator, your official accomplished DepEd Enrollment Form (PDF) and Certificate of Enrollment will be immediately unlocked for download.
+              <strong>Official DepEd PDF Release</strong>: Once your application is marked as <strong>APPROVED &amp; OFFICIALLY ENROLLED</strong> by the school administrator, your official accomplished DepEd Enrollment Form (PDF) and Certificate of Enrollment will be immediately unlocked for download.
             </li>
             <li>
               <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Registrar&apos;s Office during the first week of classes for physical civil registry validation.
@@ -702,7 +702,7 @@ export default function Step5DocumentsReview({
       {Object.keys(errors).length > 0 && (
         <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-md">
           <p className="text-xs font-bold text-red-800 leading-normal">
-            [ Submission Requirement Notice ]: Please resolve the highlighted required items below before submitting your application.
+            Submission Requirement Notice: Please resolve the highlighted required items below before submitting your application.
           </p>
         </div>
       )}
@@ -713,7 +713,7 @@ export default function Step5DocumentsReview({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Section 9: Official Document Upload (Automated Compressor &lt; 350KB) ]
+            Section 9: Official Document Upload (Automated Compressor &lt; 350KB)
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
             Photos taken from smartphones will be automatically compressed by your browser to ensure fast uploads even on spotty mobile data connections in Dumalneg:
@@ -1079,7 +1079,7 @@ export default function Step5DocumentsReview({
         <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Online Application Review Card ]
+              Online Application Review Card
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
               Review all encoded applicant information below. Ensure every entry matches your civil registry and academic records before submitting:
@@ -1320,7 +1320,7 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-md">
         <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-          [ DepEd Sworn Certification &amp; Republic Act No. 10173 (Data Privacy Act of 2012) ]
+          DepEd Sworn Certification &amp; Republic Act No. 10173 (Data Privacy Act of 2012)
         </div>
         <p className="text-xs text-slate-700 leading-relaxed">
           I hereby certify that all information supplied herein is true, complete, and accurate to the best of my knowledge and belief. 
@@ -1379,10 +1379,10 @@ export default function Step5DocumentsReview({
           className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded-md"
         >
           {isSubmitting
-            ? "[ PROCESSING OFFICIAL SUBMISSION... ]"
+            ? "PROCESSING OFFICIAL SUBMISSION..."
             : existingApplication
-            ? "[ RESUBMIT REVISED ENROLLMENT APPLICATION ]"
-            : "[ SUBMIT ENROLLMENT APPLICATION ]"}
+            ? "RESUBMIT REVISED ENROLLMENT APPLICATION"
+            : "SUBMIT ENROLLMENT APPLICATION"}
         </button>
       </div>
     </div>

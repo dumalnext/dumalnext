@@ -64,7 +64,7 @@ export default function LoginPage() {
       {error && (
         <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
           <p className="text-xs font-bold text-red-900 leading-normal">
-            [ AUTHENTICATION ERROR ]: {error}
+            AUTHENTICATION ERROR: {error}
           </p>
         </div>
       )}
@@ -118,7 +118,7 @@ export default function LoginPage() {
               disabled={isSubmitting}
               className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
             >
-              {isSubmitting ? "[ AUTHENTICATING ACCOUNT... ]" : "[ SIGN IN TO STUDENT PORTAL ]"}
+              {isSubmitting ? "Authenticating Account..." : "Sign In to Student Portal"}
             </button>
           </div>
         </form>
@@ -126,7 +126,7 @@ export default function LoginPage() {
         {/* Capstone Defense Testing Quick Buttons */}
         <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] rounded-md">
           <span className="font-bold text-slate-600 block uppercase text-[10px]">
-            [ Capstone Defense Demo Shortcuts ]:
+            Capstone Defense Demo Shortcuts:
           </span>
           <div className="flex flex-col gap-1">
             <button

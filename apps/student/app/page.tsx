@@ -589,7 +589,7 @@ function StudentHomeContent() {
       {/* DepEd & DNHS Institutional Banner */}
       <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200 rounded-lg">
         <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
-          [ DepEd Region I &bull; Schools Division of Ilocos Norte &bull; Dumalneg NHS ]
+          DepEd Region I &bull; Schools Division of Ilocos Norte &bull; Dumalneg NHS
         </span>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Basic Education Online Enrollment &amp; Admission Portal
@@ -604,7 +604,7 @@ function StudentHomeContent() {
       {noticeQuery === "auth_required" && (
         <div className="p-4 bg-amber-50 border-2 border-amber-500 shadow-xs rounded-md">
           <span className="text-xs font-bold text-amber-900 uppercase tracking-wider block mb-1">
-            [ ACCESS RESTRICTED: AUTHENTICATION REQUIRED ]
+            ACCESS RESTRICTED: AUTHENTICATION REQUIRED
           </span>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
             You must <strong>Sign In</strong> to your student account or <strong>Create a New Account</strong> below 
@@ -623,7 +623,7 @@ function StudentHomeContent() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-0.5">
-                  [ Authenticated Applicant Account ]
+                  Authenticated Applicant Account
                 </span>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                   Welcome back, {user.firstName} {user.lastName}
@@ -643,7 +643,7 @@ function StudentHomeContent() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
-                      [ SECTION ASSIGNED ]
+                      SECTION ASSIGNED
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 font-mono text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
@@ -665,7 +665,7 @@ function StudentHomeContent() {
                     href="/section"
                     className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
-                    View Section &bull; [ 04 ] &rarr;
+                    View Section &rarr;
                   </Link>
                 </div>
               </div>
@@ -674,7 +674,7 @@ function StudentHomeContent() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                      [ ENROLLMENT REQUIRED ]
+                      ENROLLMENT REQUIRED
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] font-mono text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
@@ -696,7 +696,7 @@ function StudentHomeContent() {
                     href="/enroll"
                     className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
-                    Complete Enrollment &bull; [ 02 ] &rarr;
+                    Complete Enrollment &rarr;
                   </Link>
                 </div>
               </div>
@@ -705,7 +705,7 @@ function StudentHomeContent() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
-                      [ SECTION STATUS &bull; TRANSFEREE ]
+                      SECTION STATUS &bull; TRANSFEREE
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 font-mono text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
@@ -727,7 +727,7 @@ function StudentHomeContent() {
                     href="/section"
                     className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
-                    Check Status &bull; [ 04 ] &rarr;
+                    Check Status &rarr;
                   </Link>
                 </div>
               </div>
@@ -736,7 +736,7 @@ function StudentHomeContent() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
-                      [ SECTION STATUS ]
+                      SECTION STATUS
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 font-mono text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
@@ -758,7 +758,7 @@ function StudentHomeContent() {
                     href="/section"
                     className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
-                    Check Status &bull; [ 04 ] &rarr;
+                    Check Status &rarr;
                   </Link>
                 </div>
               </div>
@@ -780,17 +780,17 @@ function StudentHomeContent() {
                     {userApplication.status === "Approved" ? (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-600 border border-emerald-700 shrink-0" />
-                        [ STATUS: APPROVED &amp; OFFICIALLY ENROLLED ]
+                        STATUS: APPROVED &amp; OFFICIALLY ENROLLED
                       </span>
                     ) : userApplication.status === "Needs Revision" ? (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-xs">
                         <span className="w-2 h-2 rounded-full bg-red-600 border border-red-700 shrink-0" />
-                        [ STATUS: NEEDS REVISION / ACTION REQUIRED ]
+                        STATUS: NEEDS REVISION / ACTION REQUIRED
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-xs">
                         <span className="w-2 h-2 rounded-full bg-amber-500 border border-amber-600 shrink-0" />
-                        [ STATUS: PENDING REGISTRAR VERIFICATION ]
+                        STATUS: PENDING REGISTRAR VERIFICATION
                       </span>
                     )}
                   </div>
@@ -838,7 +838,7 @@ function StudentHomeContent() {
                       href={`/track?ref=${userApplication.referenceNumber}#timetable`}
                       className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider shadow-xs inline-flex items-center gap-1 rounded"
                     >
-                      [ View Enrolled Subjects &amp; Timetable &rarr; ]
+                      View Enrolled Subjects &amp; Timetable &rarr;
                     </Link>
                   )}
 
@@ -847,7 +847,7 @@ function StudentHomeContent() {
                       href="/enroll"
                       className="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider shadow-xs rounded"
                     >
-                      [ Edit &amp; Resubmit Application ]
+                      Edit &amp; Resubmit Application
                     </Link>
                   )}
 
@@ -979,8 +979,8 @@ function StudentHomeContent() {
                         {isEnrollmentOpen
                           ? priorApproved
                             ? isJhsContinuing
-                              ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? [Continuing JHS Learner]`
-                              : `Ready to Enroll for S.Y. ${schoolYear} (${semester})? [Continuing SHS Learner]`
+                              ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? (Continuing JHS Learner)`
+                              : `Ready to Enroll for S.Y. ${schoolYear} (${semester})? (Continuing SHS Learner)`
                             : `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
                           : `Basic Education Online Enrollment is Currently Closed`}
                       </h3>
@@ -1007,10 +1007,10 @@ function StudentHomeContent() {
                           {isEnrollmentOpen
                             ? priorApproved
                               ? isJhsContinuing
-                                ? `[ 1-Click Re-Enroll for ${semester} (Grade ${targetContinuingGrade} JHS) ]`
+                                ? `1-Click Re-Enroll for ${semester} (Grade ${targetContinuingGrade} JHS)`
                                 : `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
                               : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
-                            : "[ View Official Enrollment Notice & Advisory ]"}
+                            : "View Official Enrollment Notice & Advisory"}
                         </Link>
                       </div>
                     </>
@@ -1024,7 +1024,7 @@ function StudentHomeContent() {
               <div className="p-4 bg-slate-50 border border-slate-300 space-y-3 rounded-lg shadow-xs">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                    [ Previous Academic Term Records ({pastApplications.length}) ]
+                    Previous Academic Term Records ({pastApplications.length})
                   </span>
                   <span className="text-[11px] text-slate-500 font-medium">
                     Archived Term History
@@ -1099,7 +1099,7 @@ function StudentHomeContent() {
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              [ Tab 1: Sign In ]
+              Tab 1: Sign In
             </button>
             <button
               type="button"
@@ -1114,7 +1114,7 @@ function StudentHomeContent() {
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              [ Tab 2: Create Account ]
+              Tab 2: Create Account
             </button>
           </div>
 
@@ -1126,7 +1126,7 @@ function StudentHomeContent() {
               <div className="max-w-md mx-auto space-y-6">
                 <div className="border-b border-slate-200 pb-3 text-center">
                   <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-                    [ Phase 1: Student Account Authentication ]
+                    Phase 1: Student Account Authentication
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
                     Sign In to Student Portal
@@ -1139,7 +1139,7 @@ function StudentHomeContent() {
                 {regSuccessNotice && (
                   <div className="p-4 bg-emerald-50 border-2 border-emerald-600 shadow-xs rounded-md">
                     <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider block mb-1">
-                      [ REGISTRATION SUCCESSFUL &bull; VERIFICATION LINK SENT ]
+                      REGISTRATION SUCCESSFUL &bull; VERIFICATION LINK SENT
                     </span>
                     <p className="text-xs text-emerald-900 leading-relaxed font-medium">
                       {regSuccessNotice}
@@ -1153,7 +1153,7 @@ function StudentHomeContent() {
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
                       <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                        [ 6-DIGIT GMAIL VERIFICATION CODE REQUIRED ]
+                        6-DIGIT GMAIL VERIFICATION CODE REQUIRED
                       </span>
                     </div>
                     <p className="text-xs text-amber-950 leading-relaxed font-medium">
@@ -1172,7 +1172,7 @@ function StudentHomeContent() {
                         }}
                         className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs rounded"
                       >
-                        [ Enter 6-Digit Code ]
+                        Enter 6-Digit Code
                       </button>
                       <button
                         type="button"
@@ -1180,7 +1180,7 @@ function StudentHomeContent() {
                         onClick={handleResendVerification}
                         className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-400 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer rounded"
                       >
-                        {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "[ Resend Code ]"}
+                        {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "Resend Code"}
                       </button>
                       {resendStatus && (
                         <span className="text-[11px] font-bold text-slate-800 block">
@@ -1195,7 +1195,7 @@ function StudentHomeContent() {
                 {isLoggingIn && (
                   <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-md">
                     <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                      <span>[ SYSTEM AUTHENTICATING ]</span>
+                      <span>SYSTEM AUTHENTICATING</span>
                       <span>{loginProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden rounded-full">
@@ -1213,7 +1213,7 @@ function StudentHomeContent() {
                 {loginError && (
                   <div className="p-3 bg-red-50 border-2 border-red-400 rounded-md">
                     <p className="text-xs font-bold text-red-900 leading-normal">
-                      [ AUTHENTICATION ERROR ]: {loginError}
+                      AUTHENTICATION ERROR: {loginError}
                     </p>
                   </div>
                 )}
@@ -1264,7 +1264,7 @@ function StudentHomeContent() {
                       disabled={isLoggingIn}
                       className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-md"
                     >
-                      {isLoggingIn ? "[ AUTHENTICATING... PLEASE WAIT ]" : "Sign In & Proceed to Student Portal"}
+                      {isLoggingIn ? "Authenticating... Please Wait" : "Sign In & Proceed to Student Portal"}
                     </button>
                   </div>
                 </form>
@@ -1278,7 +1278,7 @@ function StudentHomeContent() {
               <div className="max-w-xl mx-auto space-y-6">
                 <div className="border-b border-slate-200 pb-3 text-center">
                   <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-                    [ Phase 1: New Learner Registration ]
+                    Phase 1: New Learner Registration
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
                     Create Student Applicant Account
@@ -1293,7 +1293,7 @@ function StudentHomeContent() {
                 {isRegistering && (
                   <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-md">
                     <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                      <span>[ SYSTEM REGISTERING APPLICANT ]</span>
+                      <span>SYSTEM REGISTERING APPLICANT</span>
                       <span>{regProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden rounded-full">
@@ -1311,7 +1311,7 @@ function StudentHomeContent() {
                 {regErrors.form && (
                   <div className="p-3 bg-red-50 border-2 border-red-400 rounded-md">
                     <p className="text-xs font-bold text-red-900 leading-normal">
-                      [ REGISTRATION NOTICE ]: {regErrors.form}
+                      REGISTRATION NOTICE: {regErrors.form}
                     </p>
                   </div>
                 )}
@@ -1433,7 +1433,7 @@ function StudentHomeContent() {
 
                   <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 rounded-md">
                     <strong className="text-slate-800 block mb-0.5 uppercase tracking-wide">
-                      [ DepEd Enrollment Notice ]:
+                      DepEd Enrollment Notice:
                     </strong>
                     Your 12-digit Learner Reference Number (LRN), Dumalneg Elementary School background, and document attachments 
                     (PSA Birth Certificate, Form 138 / SF9 Report Card) will be encoded inside the 5-step enrollment form after registration.
@@ -1445,7 +1445,7 @@ function StudentHomeContent() {
                       disabled={isRegistering}
                       className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-md"
                     >
-                      {isRegistering ? "[ CREATING ACCOUNT... PLEASE WAIT ]" : "Create Account & Register"}
+                      {isRegistering ? "Creating Account... Please Wait" : "Create Account & Register"}
                     </button>
                   </div>
                 </form>
@@ -1458,7 +1458,7 @@ function StudentHomeContent() {
       {/* Institutional Services Reference Section */}
       <section className="bg-slate-100 p-6 border border-slate-200 rounded-lg">
         <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase mb-3">
-          [ Dumalneg National High School Enrollment Services ]
+          Dumalneg National High School Enrollment Services
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           <div className="bg-white p-4 border border-slate-300 rounded-md shadow-xs">
@@ -1470,7 +1470,7 @@ function StudentHomeContent() {
           <div className="bg-white p-4 border border-slate-300 rounded-md shadow-xs">
             <strong className="text-slate-900 block mb-1">2. Live Application Tracking:</strong>
             <p className="text-slate-600">
-              Real-time colored status badges ([ Pending ], [ Approved ], [ Needs Revision ]) with registrar feedback and document re-upload.
+              Real-time colored status badges (Pending, Approved, Needs Revision) with registrar feedback and document re-upload.
             </p>
           </div>
           <div className="bg-white p-4 border border-slate-300 rounded-md shadow-xs">
@@ -1492,7 +1492,7 @@ function StudentHomeContent() {
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-200 block">
-                  [ SECURITY VERIFICATION &bull; STEP 2 OF 2 ]
+                  SECURITY VERIFICATION &bull; STEP 2 OF 2
                 </span>
                 <h3 className="text-lg font-bold uppercase tracking-tight text-white mt-0.5">
                   Enter 6-Digit Verification Code
@@ -1560,7 +1560,7 @@ function StudentHomeContent() {
                     disabled={isVerifyingOtp || otpCode.replace(/\D/g, "").length < 6}
                     className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer rounded-md"
                   >
-                    {isVerifyingOtp ? "[ Verifying Code... ]" : "[ Verify & Activate Account ]"}
+                    {isVerifyingOtp ? "Verifying Code..." : "Verify & Activate Account"}
                   </button>
 
                   <div className="flex items-center justify-between text-xs pt-1">
@@ -1574,7 +1574,7 @@ function StudentHomeContent() {
                         ? `Resend Code (${resendCooldown}s)`
                         : isResending
                         ? "Resending..."
-                        : "[ Resend Code ]"}
+                        : "Resend Code"}
                     </button>
                     <button
                       type="button"

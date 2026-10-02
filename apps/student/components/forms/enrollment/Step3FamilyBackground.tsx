@@ -288,12 +288,12 @@ export default function Step3FamilyBackground({
         <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-md">
           {errors.general && (
             <p className="text-xs font-bold text-red-800 leading-normal">
-              [ Validation Notice ]: {errors.general}
+              Validation Notice: {errors.general}
             </p>
           )}
           {errors.emergencyContact && (
             <p className="text-xs font-bold text-red-800 leading-normal">
-              [ Emergency Requirement ]: {errors.emergencyContact}
+              Emergency Requirement: {errors.emergencyContact}
             </p>
           )}
         </div>
@@ -303,7 +303,7 @@ export default function Step3FamilyBackground({
       <div className="p-5 bg-blue-50/50 border-2 border-blue-200 space-y-3 rounded-md">
         <div>
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Primary School Contact / Designated Custodian ]
+            Primary School Contact / Designated Custodian
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
             Select who the Dumalneg NHS administration and faculty should prioritize for urgent student notifications, emergency situations, and report card releases:
@@ -393,7 +393,7 @@ export default function Step3FamilyBackground({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section A: Father&apos;s Legal Information ]
+              Section A: Father&apos;s Legal Information
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
               Official legal name and active mobile number as registered in official civil documents.
@@ -576,7 +576,7 @@ export default function Step3FamilyBackground({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section B: Mother&apos;s Maiden Legal Information ]
+              Section B: Mother&apos;s Maiden Legal Information
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
               Important: Enter your mother&apos;s legal <strong>Maiden Name</strong> (her surname at birth, before marriage).
@@ -768,11 +768,11 @@ export default function Step3FamilyBackground({
               <span className={`text-xs font-bold uppercase tracking-wider block ${
                 isBothParentsUnavailable ? "text-red-900" : "text-[#002060]"
               }`}>
-                [ Section C: Legal Guardian / Authorized Custodian ]
+                Section C: Legal Guardian / Authorized Custodian
               </span>
               {isBothParentsUnavailable ? (
                 <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-700 text-white font-mono rounded">
-                  [ REQUIRED BY DEPED ]
+                  REQUIRED BY DEPED
                 </span>
               ) : (
                 <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700 border border-slate-300 rounded">

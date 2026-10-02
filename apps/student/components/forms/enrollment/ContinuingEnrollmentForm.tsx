@@ -627,14 +627,14 @@ export default function ContinuingEnrollmentForm({
           >
             {isDownloadingPdf
               ? "Generating Official PDF..."
-              : "[ Download Official DepEd Form (PDF) ]"}
+              : "Download Official DepEd Form (PDF)"}
           </button>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Link
               href={`/track?ref=${referenceNumber}`}
               className="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white text-center font-bold text-xs uppercase tracking-wider transition-colors rounded-md"
             >
-              [ View / Track Application Details ]
+              View / Track Application Details
             </Link>
             <Link
               href="/"
@@ -740,7 +740,7 @@ export default function ContinuingEnrollmentForm({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
             <div>
               <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                [ Curricular Program Transfer Option ]
+                Curricular Program Transfer Option
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
                 Toggle to request a transfer between Regular Basic Education and Special Program in Sports (SPS).
@@ -784,7 +784,7 @@ export default function ContinuingEnrollmentForm({
             <div className="p-4 bg-white border border-slate-300 space-y-2 rounded-md">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 border border-slate-300 rounded">
-                  [ TRANSFER SWITCH: OFF &bull; MAINTAINING CURRENT PROGRAM ]
+                  TRANSFER SWITCH: OFF &bull; MAINTAINING CURRENT PROGRAM
                 </span>
               </div>
               <p className="text-xs text-slate-700 leading-relaxed">
@@ -793,7 +793,7 @@ export default function ContinuingEnrollmentForm({
               {previousJhsProgram === "SPS" && (
                 <div className="p-3 bg-blue-50 border border-blue-200 mt-2 space-y-1 rounded-md">
                   <span className="text-xs font-bold text-[#002060] uppercase block">
-                    [ General Special Program in Sports (SPS) Curriculum ]
+                    General Special Program in Sports (SPS) Curriculum
                   </span>
                   <p className="text-xs text-slate-700 leading-relaxed">
                     The learner continues under the unified SPS curriculum combining secondary academic courses with athletic development. No individual sport selection is required.
@@ -808,7 +808,7 @@ export default function ContinuingEnrollmentForm({
             <div className="space-y-4 p-4 bg-white border-2 border-blue-300 rounded-md">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060] bg-blue-100 px-2.5 py-1 border border-blue-300 rounded">
-                  [ TRANSFER SWITCH: ON &bull; SELECT PROGRAM ]
+                  TRANSFER SWITCH: ON &bull; SELECT PROGRAM
                 </span>
                 <span className="text-[11px] text-slate-500 font-mono">
                   PREVIOUS RECORD: <strong>{previousJhsProgram}</strong>
@@ -895,7 +895,7 @@ export default function ContinuingEnrollmentForm({
               {selectedJhsProgram === "SPS" && (
                 <div className="p-3 bg-blue-50 border border-blue-300 space-y-1 rounded-md">
                   <span className="text-xs font-bold text-[#002060] uppercase block">
-                    [ General Special Program in Sports (SPS) Curriculum ]
+                    General Special Program in Sports (SPS) Curriculum
                   </span>
                   <p className="text-xs text-slate-700 leading-relaxed">
                     The learner will be enrolled under the unified SPS curriculum. No individual sport selection is required.
@@ -908,7 +908,7 @@ export default function ContinuingEnrollmentForm({
                 <div className="p-4 bg-amber-50 border-2 border-amber-400 space-y-1 rounded-md">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono font-bold text-amber-950 uppercase">
-                      [ PROGRAM TRANSFER REQUEST FLAGGED: {previousJhsProgram} &rarr; {selectedJhsProgram} ]
+                      PROGRAM TRANSFER REQUEST FLAGGED: {previousJhsProgram} &rarr; {selectedJhsProgram}
                     </span>
                   </div>
                   <p className="text-xs text-amber-900 leading-relaxed">
@@ -938,7 +938,7 @@ export default function ContinuingEnrollmentForm({
         <div className="p-6 bg-blue-50/70 border-2 border-[#002060] space-y-4 rounded-md">
           <div className="space-y-1">
             <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-              [ SUBMIT CONTINUING ENROLLMENT APPLICATION ]
+              SUBMIT CONTINUING ENROLLMENT APPLICATION
             </span>
             <p className="text-xs text-slate-700 leading-relaxed">
               By clicking the button below, you confirm your continuing enrollment application for Grade {targetGrade} under the <strong>{effectiveProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education Curriculum"}</strong> for School Year {schoolYear} ({semester}) in accordance with Republic Act 10173 (Data Privacy Act of 2012).
@@ -1077,7 +1077,7 @@ export default function ContinuingEnrollmentForm({
           <div className="border border-slate-300 bg-slate-50 p-4 space-y-3 rounded-md">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-                [ Verified Learner Profile on Record ]
+                Verified Learner Profile on Record
               </span>
               <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 border border-emerald-300 rounded">
                 VERIFIED STATUS: ACTIVE
@@ -1127,16 +1127,16 @@ export default function ContinuingEnrollmentForm({
               </span>
               <div className="flex flex-wrap gap-2 text-[11px]">
                 <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
-                  [OK] PSA Birth Certificate
+                  ON FILE: PSA Birth Certificate
                 </span>
                 <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
-                  [OK] SF9 / Form 138 Report Card
+                  ON FILE: SF9 / Form 138 Report Card
                 </span>
                 <span className="px-2.5 py-1 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
-                  [OK] Formal 2x2 ID Photo
+                  ON FILE: Formal 2x2 ID Photo
                 </span>
                 <span className="px-2.5 py-1 bg-white border border-slate-300 text-slate-600 font-mono rounded">
-                  [OK] DepEd Learner Permanent Record
+                  ON FILE: DepEd Learner Permanent Record
                 </span>
               </div>
             </div>
@@ -1145,7 +1145,7 @@ export default function ContinuingEnrollmentForm({
           {/* Validation Notice */}
           {Object.keys(errors).length > 0 && (
             <div className="p-3 bg-red-50 border-2 border-red-300 text-xs font-bold text-red-800 rounded-md">
-              [ Action Required ]: Please complete all required fields below before proceeding.
+              Action Required: Please complete all required fields below before proceeding.
             </div>
           )}
 
@@ -1154,7 +1154,7 @@ export default function ContinuingEnrollmentForm({
             <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-2">
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                  [ Junior High School Program Selection ]
+                  Junior High School Program Selection
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Confirm curricular program for Grade {targetGrade} at Dumalneg National High School:
@@ -1212,7 +1212,7 @@ export default function ContinuingEnrollmentForm({
               {currentJhsProgram === "SPS" && (
                 <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 rounded-md">
                   <span className="text-xs font-bold text-[#002060] uppercase block">
-                    [ General Special Program in Sports (SPS) Curriculum ]
+                    General Special Program in Sports (SPS) Curriculum
                   </span>
                   <p className="text-xs text-slate-700 leading-relaxed">
                     The learner is enrolled under the unified Special Program in Sports curriculum combining secondary academic courses with structured athletic training and sports development. No individual sport selection is required.
@@ -1224,7 +1224,7 @@ export default function ContinuingEnrollmentForm({
             <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-2">
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                  [ Senior High School Track &amp; Strand Confirmation ]
+                  Senior High School Track &amp; Strand Confirmation
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Confirm Senior High School academic track and specialized strand for Grade {targetGrade}:
@@ -1280,7 +1280,7 @@ export default function ContinuingEnrollmentForm({
                   >
                     {availableStrands.map((s) => (
                       <option key={s.code} value={s.code}>
-                        [{s.code}] {s.name}
+                        {s.code} - {s.name}
                       </option>
                     ))}
                   </select>
@@ -1294,7 +1294,7 @@ export default function ContinuingEnrollmentForm({
             <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                  [ Section 7-B: Cross-Strand Elective Subjects ]
+                  Section 7-B: Cross-Strand Elective Subjects
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Enroll in additional elective courses for {semester}, S.Y. {schoolYear}:
@@ -1347,7 +1347,7 @@ export default function ContinuingEnrollmentForm({
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-slate-400 inline-block shrink-0" />
                   <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                    [ STANDARD STRAND CURRICULUM ACTIVE: NO ADDITIONAL ELECTIVES ]
+                    STANDARD STRAND CURRICULUM ACTIVE: NO ADDITIONAL ELECTIVES
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
@@ -1407,7 +1407,7 @@ export default function ContinuingEnrollmentForm({
                 ) : (
                   <div className="p-4 bg-white border border-slate-300 space-y-1 rounded-md">
                     <span className="text-xs font-mono font-bold text-slate-600 uppercase block">
-                      [ NO ADDITIONAL ELECTIVES AVAILABLE FOR THIS TERM ]
+                      NO ADDITIONAL ELECTIVES AVAILABLE FOR THIS TERM
                     </span>
                     <p className="text-xs text-slate-500">
                       All cross-strand electives for this term have either been completed in previous terms or are already part of your required strand curriculum ({currentStrand}).
@@ -1422,7 +1422,7 @@ export default function ContinuingEnrollmentForm({
           <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-md">
             <div className="border-b-2 border-slate-200 pb-2">
               <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                [ Section 8: Preferred Distance Learning Modalities ]
+                Section 8: Preferred Distance Learning Modalities
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
                 DepEd Contingency Standard: Select alternative learning delivery modes during severe weather or class suspensions:
@@ -1562,13 +1562,13 @@ export default function ContinuingEnrollmentForm({
               </p>
               <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
                 <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
-                  [ATTACHED] PSA Birth Certificate
+                  ATTACHED: PSA Birth Certificate
                 </span>
                 <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
-                  [ATTACHED] SF9 / Form 138 Progress Report Card
+                  ATTACHED: SF9 / Form 138 Progress Report Card
                 </span>
                 <span className="px-2.5 py-0.5 bg-white border border-emerald-400 text-emerald-900 font-mono font-bold rounded">
-                  [ATTACHED] Formal 2x2 ID Photo
+                  ATTACHED: Formal 2x2 ID Photo
                 </span>
               </div>
             </div>
@@ -1611,7 +1611,7 @@ export default function ContinuingEnrollmentForm({
             >
               {isSubmitting
                 ? "Submitting Term Enrollment..."
-                : `[ Submit Term Enrollment for ${semester} ]`}
+                : `Submit Term Enrollment for ${semester}`}
             </button>
           </div>
         </div>
