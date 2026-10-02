@@ -29,6 +29,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
   const [activeTermNum, setActiveTermNum] = useState<number>(termNumber || 1);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Real-Time Smart Live Status & Section Tracker: Auto-syncs with Supabase without manual refresh
   useEffect(() => {
@@ -271,7 +272,11 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
     };
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        !buttonRef.current?.contains(e.target as Node)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -310,31 +315,32 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
         {/* 3-Line Hamburger Menu Button (Upper-Left positioned for natural human eye-flow) */}
         <button
+          ref={buttonRef}
           type="button"
           onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm rounded active:scale-95 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer shadow-sm rounded active:scale-90 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           aria-label="Toggle Portal Navigation Menu"
           aria-expanded={isMenuOpen}
         >
           {/* 3 Horizontal Lines (Hamburger Icon) */}
           <div className="w-4 h-3.5 sm:w-5 sm:h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
             <span
-              className={`w-full h-0.5 bg-white transition-all duration-200 origin-center ${
+              className={`w-full h-0.5 bg-white transition-all duration-300 ease-in-out origin-center ${
                 isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
               }`}
             />
             <span
-              className={`w-full h-0.5 bg-white transition-all duration-200 ${
-                isMenuOpen ? "opacity-0" : ""
+              className={`w-full h-0.5 bg-white transition-all duration-300 ease-in-out ${
+                isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
               }`}
             />
             <span
-              className={`w-full h-0.5 bg-white transition-all duration-200 origin-center ${
+              className={`w-full h-0.5 bg-white transition-all duration-300 ease-in-out origin-center ${
                 isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
               }`}
             />
           </div>
-          <span className="hidden xs:inline sm:inline">{isMenuOpen ? "[ Close ]" : "[ Menu ]"}</span>
+          <span className="hidden xs:inline sm:inline transition-colors duration-200">{isMenuOpen ? "[ Close ]" : "[ Menu ]"}</span>
         </button>
 
         {children}
@@ -380,39 +386,48 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       </div>
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 bg-slate-950/70 z-50 backdrop-blur-xs flex justify-start animate-in fade-in duration-150">
-          <div
-            ref={menuRef}
-            className="w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-200"
-          >
-            {/* Drawer Top Header */}
-            <div>
-              <div className="bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
-                <div className="flex items-center gap-2.5">
-                  <img
-                    src="/dumalneg-logo.png"
-                    alt="Dumalneg National High School"
-                    className="w-9 h-9 object-contain shrink-0"
-                  />
-                  <div>
-                    <span className="text-[10px] font-mono text-blue-200 uppercase tracking-wider block">
-                      [ DUMALNEG NHS &bull; PORTAL MENU ]
-                    </span>
-                    <h3 className="text-sm font-bold uppercase tracking-tight mt-0.5">
-                      Navigation &amp; Services
-                    </h3>
-                  </div>
+      <div
+        className={`fixed inset-0 bg-slate-950/70 z-50 backdrop-blur-xs flex justify-start transition-opacity duration-300 ease-in-out ${
+          isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden={!isMenuOpen}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setIsMenuOpen(false);
+        }}
+      >
+        <div
+          ref={menuRef}
+          className={`w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out will-change-transform ${
+            isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          {/* Drawer Top Header */}
+          <div>
+            <div className="bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="/dumalneg-logo.png"
+                  alt="Dumalneg National High School"
+                  className="w-9 h-9 object-contain shrink-0"
+                />
+                <div>
+                  <span className="text-[10px] font-mono text-blue-200 uppercase tracking-wider block">
+                    [ DUMALNEG NHS &bull; PORTAL MENU ]
+                  </span>
+                  <h3 className="text-sm font-bold uppercase tracking-tight mt-0.5">
+                    Navigation &amp; Services
+                  </h3>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer rounded"
-                >
-                  [ X Close ]
-                </button>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(false)}
+                className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 ease-in-out cursor-pointer rounded active:scale-95"
+              >
+                [ X Close ]
+              </button>
+            </div>
 
               {/* Student Identity Section (If Authenticated) */}
               {user ? (
@@ -678,10 +693,9 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <div className="text-center text-[10px] font-mono text-slate-500">
                 Dumalneg National High School &bull; School ID: 300017
               </div>
-            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
