@@ -354,7 +354,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white font-mono text-xs transition-colors rounded shadow-xs"
             title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
           >
-            <span className="font-bold uppercase tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
+            <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
               {user.firstName} {user.lastName}
             </span>
             {appStatus === "Approved" ? (
@@ -378,7 +378,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         ) : (
           <Link
             href="/?tab=signin"
-            className="inline-block bg-white text-[#002060] font-bold uppercase tracking-wider py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs rounded active:scale-95"
+            className="inline-block bg-white text-[#002060] font-bold py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs rounded active:scale-95"
           >
             Login
           </Link>
@@ -414,7 +414,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <span className="text-[10px] font-mono text-blue-200 uppercase tracking-wider block">
                     DUMALNEG NHS &bull; PORTAL MENU
                   </span>
-                  <h3 className="text-sm font-bold uppercase tracking-tight mt-0.5">
+                  <h3 className="text-sm font-bold tracking-tight mt-0.5">
                     Navigation &amp; Services
                   </h3>
                 </div>
@@ -456,7 +456,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   </div>
 
                   <div className="space-y-0.5">
-                    <h4 className="text-base font-bold text-slate-900 uppercase">
+                    <h4 className="text-base font-bold text-slate-900">
                       {user.firstName} {user.lastName}
                     </h4>
                     <p className="text-xs font-mono text-slate-600">
@@ -483,7 +483,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                           Official Roster &rarr;
                         </span>
                       </div>
-                      <div className="text-xs font-bold text-emerald-950 uppercase">
+                      <div className="text-xs font-bold text-emerald-950">
                         Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
                       </div>
                       <div className="text-[10px] font-mono text-emerald-800">
@@ -586,7 +586,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-900">
                       01 &bull; Home Dashboard
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
@@ -607,7 +607,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-900">
                       02 &bull; Basic Education Enrollment
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
@@ -628,7 +628,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-900">
                       03 &bull; Track Application Status
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>
@@ -649,7 +649,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-900">
                       04 &bull; Class Section &amp; Advisory
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">&rarr;</span>

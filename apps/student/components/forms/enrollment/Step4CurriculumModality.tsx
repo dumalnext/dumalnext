@@ -417,10 +417,10 @@ export default function Step4CurriculumModality({
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-            STEP 04 OF 05
+          <span className="text-xs font-bold tracking-wider text-[#002060]">
+            Step 04 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-medium text-slate-500">
             DepEd Form Sections 5, 7, &amp; 8
           </span>
         </div>
@@ -449,7 +449,7 @@ export default function Step4CurriculumModality({
       {isJHS ? (
         <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
           <div className="border-b-2 border-slate-200 pb-3">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+            <span className="text-xs font-bold text-[#002060] block">
               Section 4-B: Junior High School Curricular Program
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
@@ -492,7 +492,7 @@ export default function Step4CurriculumModality({
                           }}
                           className="accent-[#002060] mt-0.5"
                         />
-                        <span className="text-xs font-bold text-slate-900 uppercase tracking-tight">
+                        <span className="text-xs font-bold text-slate-900">
                           {program.title}
                         </span>
                       </div>
@@ -502,7 +502,7 @@ export default function Step4CurriculumModality({
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] font-semibold text-[#002060] uppercase mb-1">
+                    <div className="text-[11px] font-semibold text-[#002060] mb-1">
                       {program.subtitle}
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">
@@ -520,7 +520,7 @@ export default function Step4CurriculumModality({
           {/* General SPS Program Notice */}
           {currentJhsProgram === "SPS" && (
             <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 mt-4 rounded-md">
-              <span className="text-xs font-bold text-[#002060] uppercase block">
+              <span className="text-xs font-bold text-[#002060] block">
                 General Special Program in Sports (SPS) Curriculum
               </span>
               <p className="text-xs text-slate-700 leading-relaxed">
@@ -539,7 +539,7 @@ export default function Step4CurriculumModality({
           <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
             <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                <span className="text-xs font-bold text-[#002060] block">
                   Section 7-A: Senior High School Track Selection
                 </span>
                 <p className="text-xs text-slate-600 mt-0.5">
@@ -553,12 +553,12 @@ export default function Step4CurriculumModality({
 
             {/* Auto-Synced Official Academic Term from IT-Support */}
             <div className="max-w-md">
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Semester / Trimester of Enrollment
               </label>
               <div className="p-3.5 bg-white border-2 border-[#002060] flex items-center justify-between shadow-xs rounded-md">
                 <div className="space-y-0.5">
-                  <div className="text-sm font-mono font-bold text-[#002060] uppercase">
+                  <div className="text-sm font-bold text-[#002060]">
                     {activeSemester}
                   </div>
                   <div className="text-[11px] font-mono text-slate-600">
@@ -577,7 +577,7 @@ export default function Step4CurriculumModality({
 
             {/* 2-Track Selection Cards */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
+              <label className="block text-xs font-bold text-slate-900 mb-2">
                 Select Track <span className="text-red-700">*</span>
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -634,7 +634,7 @@ export default function Step4CurriculumModality({
                               }}
                               className="accent-[#002060] mt-0.5"
                             />
-                            <span className="text-sm font-bold text-slate-900 uppercase tracking-tight">
+                            <span className="text-sm font-bold text-slate-900">
                               {t.name}
                             </span>
                           </div>
@@ -645,7 +645,7 @@ export default function Step4CurriculumModality({
                           )}
                         </div>
 
-                        <div className="text-[11px] font-mono font-bold text-[#002060] uppercase mb-1">
+                        <div className="text-[11px] font-semibold text-[#002060] mb-1">
                           {t.code === "Academic Track"
                             ? "Unified Core Foundations • Student Elective Selection"
                             : "Standardized Prescribed Curriculum • TESDA NC-Aligned"}
@@ -694,7 +694,7 @@ export default function Step4CurriculumModality({
             <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                  <span className="text-xs font-bold text-[#002060] block">
                     Section 7-B: Grade {targetGrade} Academic Track - Elective Part (Maximum 1 Subject)
                   </span>
                   <p className="text-xs text-slate-600 mt-0.5">
@@ -722,8 +722,8 @@ export default function Step4CurriculumModality({
                 </div>
               ) : academicElectiveSubjects.length === 0 ? (
                 <div className="p-6 text-center bg-white border border-slate-200 space-y-2 rounded-md">
-                  <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-                    No Elective Subjects On Record For Grade {targetGrade} Academic Track
+                  <span className="text-xs font-bold text-slate-600 block">
+                    No Elective Subjects on Record for Grade {targetGrade} Academic Track
                   </span>
                   <p className="text-xs text-slate-600 max-w-md mx-auto">
                     The school administrator has not yet scheduled specific elective subjects for Grade {targetGrade} Academic Track. You may proceed with enrollment and your assigned adviser will confirm your schedule upon registration.
@@ -732,7 +732,7 @@ export default function Step4CurriculumModality({
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                    <label className="block text-xs font-bold text-slate-900">
                       Select Elective Subject (Choose Maximum 1) <span className="text-red-700">*</span>
                     </label>
                     <span className="text-[11px] font-mono text-slate-500">
@@ -805,7 +805,7 @@ export default function Step4CurriculumModality({
             <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                  <span className="text-xs font-bold text-[#002060] block">
                     Section 7-B: Grade {targetGrade} Technical-Professional Track - Prescribed Curriculum
                   </span>
                   <p className="text-xs text-slate-600 mt-0.5">
@@ -828,8 +828,8 @@ export default function Step4CurriculumModality({
                 </div>
               ) : techproSpecializedSubjects.length === 0 ? (
                 <div className="p-6 text-center bg-white border border-slate-200 space-y-2 rounded-md">
-                  <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-                    No Specialized TechPro Subjects On Record For Grade {targetGrade}
+                  <span className="text-xs font-bold text-slate-600 block">
+                    No Specialized TechPro Subjects on Record for Grade {targetGrade}
                   </span>
                   <p className="text-xs text-slate-600 max-w-md mx-auto">
                     The administrator has not yet registered specific specialized courses for Grade {targetGrade} TechPro.
@@ -838,10 +838,10 @@ export default function Step4CurriculumModality({
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900 uppercase">
+                    <span className="text-xs font-bold text-slate-900">
                       Prescribed Industry Specialization Courses ({techproSpecializedSubjects.length} Courses)
                     </span>
-                    <span className="text-[10px] font-mono text-slate-500 uppercase">
+                    <span className="text-[10px] font-medium text-slate-500">
                       TESDA NC-Aligned Standards
                     </span>
                   </div>
@@ -873,7 +873,7 @@ export default function Step4CurriculumModality({
                   </div>
 
                   <div className="p-3 bg-amber-50/80 border border-amber-300 text-xs text-amber-950 rounded-md">
-                    <strong className="uppercase block text-[11px] mb-0.5">Automatic Enrollment Policy:</strong>
+                    <strong className="block text-[11px] mb-0.5">Automatic Enrollment Policy:</strong>
                     Under DepEd Technical-Professional track guidelines, learners undergo a standardized, unified industry syllabus without elective branching. All courses above will be studied throughout the entire academic year as configured by the school administration.
                   </div>
                 </div>
@@ -905,7 +905,7 @@ export default function Step4CurriculumModality({
               <div className="space-y-4 p-6 bg-white border-2 border-slate-300 rounded-md">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
                   <div>
-                    <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                    <span className="text-xs font-bold text-[#002060] block">
                       Section 7-C: Grade {targetGrade} Mandatory Unified Core Subjects
                     </span>
                     <p className="text-xs text-slate-600 mt-0.5">
@@ -970,7 +970,7 @@ export default function Step4CurriculumModality({
 
           {/* SECTION 7-D: WORK IMMERSION & FIELD EXPERIENCE NOTICE */}
           <div className="p-4 bg-slate-100 border border-slate-300 text-xs space-y-1 rounded-md">
-            <span className="font-bold text-slate-900 uppercase block">
+            <span className="text-xs font-bold text-slate-900 block">
               DepEd Work Immersion & Field Experience Requirement
             </span>
             <p className="text-slate-700 leading-relaxed">
@@ -987,7 +987,7 @@ export default function Step4CurriculumModality({
       {/* ========================================================================= */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+          <span className="text-xs font-bold text-[#002060] block">
             Section 5: Special Needs Education (SNEd) &amp; Inclusive Support
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
@@ -997,7 +997,7 @@ export default function Step4CurriculumModality({
 
         {/* SNEd Yes/No Selector */}
         <div>
-          <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
+          <label className="block text-xs font-bold text-slate-900 mb-2">
             Does the learner have a diagnosed disability, health condition, or require special education support? <span className="text-red-700">*</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
@@ -1028,7 +1028,7 @@ export default function Step4CurriculumModality({
                 }}
                 className="accent-[#002060]"
               />
-              <div className="text-xs font-bold uppercase">
+              <div className="text-xs font-bold">
                 No (General Education Learner)
               </div>
             </label>
@@ -1052,7 +1052,7 @@ export default function Step4CurriculumModality({
                 }}
                 className="accent-[#002060]"
               />
-              <div className="text-xs font-bold uppercase">
+              <div className="text-xs font-bold">
                 Yes (SNEd / Inclusive Learner)
               </div>
             </label>
@@ -1063,7 +1063,7 @@ export default function Step4CurriculumModality({
         {data.isSned && (
           <div className="p-5 bg-white border-2 border-blue-200 space-y-4 rounded-md">
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Classification Assessment Basis <span className="text-red-700">*</span>
               </label>
               <div className="flex flex-wrap gap-4 pt-1">
@@ -1101,7 +1101,7 @@ export default function Step4CurriculumModality({
 
             {/* Category Checklists */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
+              <label className="block text-xs font-bold text-slate-900 mb-2">
                 Specific Learning Need / Condition (DepEd Official Form Checklist) <span className="text-red-700">*</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-3 border border-slate-300 bg-slate-50 rounded-md">
@@ -1151,7 +1151,7 @@ export default function Step4CurriculumModality({
       {/* ========================================================================= */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+          <span className="text-xs font-bold text-[#002060] block">
             Section 8: Preferred Distance Learning Modalities
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
@@ -1211,14 +1211,14 @@ export default function Step4CurriculumModality({
         <button
           type="button"
           onClick={onBack}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
+          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-md"
         >
           &larr; Back to Family Background (Step 3)
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="w-full sm:w-auto px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded-md"
+          className="w-full sm:w-auto px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors shadow-xs rounded-md"
         >
           Proceed to Document Upload (Step 5) &rarr;
         </button>

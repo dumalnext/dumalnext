@@ -80,8 +80,8 @@ export default function RegisterPage() {
     <div className="max-w-xl mx-auto space-y-6 font-sans">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4 text-center">
-        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-          DUMALNEG NATIONAL HIGH SCHOOL &bull; STUDENT PORTAL
+        <span className="text-xs font-semibold text-[#002060]">
+          Dumalneg National High School &bull; Student Portal
         </span>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
           Create Student Account
@@ -95,7 +95,7 @@ export default function RegisterPage() {
       {errors.form && (
         <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
           <p className="text-xs font-bold text-red-900 leading-normal">
-            REGISTRATION NOTICE: {errors.form}
+            Registration Notice: {errors.form}
           </p>
         </div>
       )}
@@ -104,7 +104,7 @@ export default function RegisterPage() {
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-lg shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="border-b border-slate-200 pb-2">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#002060]">
               1. Official Learner Identification
             </span>
           </div>
@@ -112,7 +112,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Last Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Last Name <span className="text-red-700">*</span>
               </label>
               <input
@@ -134,7 +134,7 @@ export default function RegisterPage() {
 
             {/* First Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 First Name <span className="text-red-700">*</span>
               </label>
               <input
@@ -158,7 +158,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Middle Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Middle Name (Optional)
               </label>
               <input
@@ -174,7 +174,7 @@ export default function RegisterPage() {
 
             {/* 12-Digit LRN */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 12-Digit DepEd LRN (Optional)
               </label>
               <input
@@ -200,14 +200,14 @@ export default function RegisterPage() {
           </div>
 
           <div className="border-b border-slate-200 pt-2 pb-2">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#002060]">
               2. Account Access Credentials
             </span>
           </div>
 
           {/* Email Address */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Email Address <span className="text-red-700">*</span>
             </label>
             <input
@@ -233,7 +233,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Password */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Password <span className="text-red-700">*</span>
               </label>
               <input
@@ -255,7 +255,7 @@ export default function RegisterPage() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Confirm Password <span className="text-red-700">*</span>
               </label>
               <input
@@ -281,7 +281,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
             >
               {isSubmitting ? "Creating Official Account..." : "Register Account & Proceed to Enrollment"}
             </button>
@@ -290,7 +290,7 @@ export default function RegisterPage() {
 
         <div className="text-center pt-2 border-t border-slate-200 text-xs text-slate-600">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#002060] font-bold uppercase hover:underline">
+          <Link href="/login" className="text-[#002060] font-bold hover:underline">
             Sign In with Email or LRN &rarr;
           </Link>
         </div>

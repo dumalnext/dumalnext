@@ -240,10 +240,10 @@ export default function Step1ApplicantType({
       {/* Step Header */}
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="font-mono text-xs font-bold text-[#002060] uppercase tracking-wider">
+          <span className="font-mono text-xs font-bold text-[#002060] tracking-wider">
             Step 1 of 5 &bull; Academic Classification
           </span>
-          <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold uppercase tracking-wider shadow-xs rounded-xs">
+          <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold tracking-wider shadow-xs rounded-xs">
             School Year: {schoolYear}
           </span>
         </div>
@@ -258,7 +258,7 @@ export default function Step1ApplicantType({
       {/* Part 1: Curriculum Program (DepEd Section 2) */}
       <div className="space-y-3">
         <div className="border-l-4 border-[#002060] pl-3">
-          <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-slate-900 tracking-wider block">
             1. Curriculum Program (DepEd Section 2)
           </label>
           <span className="text-xs text-slate-500">
@@ -328,7 +328,7 @@ export default function Step1ApplicantType({
       {/* Part 2: Learner Classification Category */}
       <div className="space-y-3 pt-2">
         <div className="border-l-4 border-[#002060] pl-3">
-          <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-slate-900 tracking-wider block">
             2. Learner Classification Category
           </label>
           <span className="text-xs text-slate-500">
@@ -461,7 +461,7 @@ export default function Step1ApplicantType({
       {isTransfereeOrReturning && (
         <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
           <div className="border-l-4 border-[#002060] pl-3">
-            <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+            <label className="text-xs font-bold text-slate-900 tracking-wider block">
               3. Target Grade Level at Dumalneg NHS (Grades 7 to 12)
             </label>
             <p className="text-xs text-slate-600 mt-0.5">
@@ -512,7 +512,7 @@ export default function Step1ApplicantType({
         <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
           <div className="border-b-2 border-slate-200 pb-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+              <span className="text-xs font-bold text-[#002060] tracking-wider block">
                 DepEd Section 6: Previous School Attended &amp; Academic History
               </span>
               <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded-xs">
@@ -538,7 +538,7 @@ export default function Step1ApplicantType({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Last Grade Level Completed */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Last Grade Level Completed <span className="text-red-700">*</span>
               </label>
               <select
@@ -569,7 +569,7 @@ export default function Step1ApplicantType({
 
             {/* Last School Year Completed */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Last School Year Completed <span className="text-red-700">*</span>
               </label>
               <input
@@ -592,7 +592,7 @@ export default function Step1ApplicantType({
             {/* School Attended Selector: 2 Choices (Dumalneg Elementary School vs Others) */}
             <div className="sm:col-span-2 space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase">
+                <label className="block text-xs font-bold text-slate-900">
                   {data.applicantType === "Grade 7"
                     ? "Official Name of Elementary School Graduated / Last Attended"
                     : data.applicantType === "Grade 11"
@@ -696,7 +696,7 @@ export default function Step1ApplicantType({
               {isDefaultSchool && (
                 <div className="p-3.5 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs rounded-md">
                   <div>
-                    <span className="font-bold text-emerald-950 uppercase block">
+                    <span className="font-bold text-emerald-950 block">
                       Automatic Feeder Applied: {defaultFeederSchoolName}
                     </span>
                     <span className="text-[11px] text-emerald-800">
@@ -713,7 +713,7 @@ export default function Step1ApplicantType({
               {!isDefaultSchool && (
                 <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner rounded-md">
                   <div className="border-b border-slate-200 pb-2">
-                    <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+                    <span className="text-xs font-bold text-[#002060] tracking-wider block">
                       Manual School Specification
                     </span>
                     <p className="text-[11px] text-slate-600 mt-0.5">
@@ -722,7 +722,7 @@ export default function Step1ApplicantType({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-900 mb-1">
                       Official School Name <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -753,7 +753,7 @@ export default function Step1ApplicantType({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-900 mb-1">
                       DepEd School ID (6 Numeric Digits) <span className="text-red-700">*</span>
                     </label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -795,8 +795,8 @@ export default function Step1ApplicantType({
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
         <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-md">
-          <div className="font-bold text-[#002060] uppercase tracking-wider flex items-center justify-between">
-            <span>ENROLLMENT CLASSIFICATION SUMMARY</span>
+          <div className="font-bold text-[#002060] tracking-wider flex items-center justify-between">
+            <span>Enrollment Classification Summary</span>
             <span className="font-mono text-[11px] text-blue-900">VERIFIED</span>
           </div>
           <p className="text-slate-900 leading-relaxed">
@@ -823,7 +823,7 @@ export default function Step1ApplicantType({
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-md"
+          className="btn-primary text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-md"
         >
           Proceed: Learner&apos;s Personal Information (Step 2)
         </button>

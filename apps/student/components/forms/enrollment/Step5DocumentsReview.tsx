@@ -527,16 +527,16 @@ export default function Step5DocumentsReview({
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans rounded-lg shadow-sm">
         {/* Acknowledgment Header */}
         <div className="border-b-2 border-slate-200 pb-5 text-center">
-          <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#002060]">
-            DEPARTMENT OF EDUCATION &bull; REGION I &bull; DIVISION OF ILOCOS NORTE
+          <div className="text-xs font-bold tracking-wider text-[#002060]">
+            Department of Education &bull; Region I &bull; Division of Ilocos Norte
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 uppercase tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
             Dumalneg National High School
           </h2>
-          <div className="text-xs font-semibold text-slate-600 mt-0.5">
+          <div className="text-xs font-medium text-slate-600 mt-0.5">
             Dumalneg, Ilocos Norte &bull; DepEd School ID: 300017
           </div>
-          <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-mono font-bold px-4 py-1 uppercase tracking-wider rounded">
+          <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-bold px-4 py-1 tracking-wide rounded">
             {existingApplication
               ? "Official Online Enrollment Resubmission Acknowledgment Slip"
               : "Official Online Enrollment Acknowledgment Slip"}
@@ -564,7 +564,7 @@ export default function Step5DocumentsReview({
 
         {/* Reference Code Box */}
         <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-md shadow-xs">
-          <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+          <div className="text-xs font-bold text-slate-600 tracking-wide">
             Official Application Tracking Reference Number
           </div>
           <div className="text-2xl sm:text-3xl font-mono font-bold text-[#002060] tracking-widest">
@@ -577,28 +577,28 @@ export default function Step5DocumentsReview({
 
         {/* Learner & Enrollment Summary */}
         <div className="border-2 border-slate-300 p-5 space-y-4 rounded-md shadow-xs">
-          <div className="text-xs font-bold text-[#002060] uppercase tracking-wider border-b border-slate-200 pb-2">
+          <div className="text-xs font-bold text-[#002060] border-b border-slate-200 pb-2">
             Official Application Summary
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Learner Name</span>
-              <span className="font-bold text-slate-900 uppercase">
+              <span className="font-bold text-slate-500 block text-[10px]">Learner Name</span>
+              <span className="font-bold text-slate-900">
                 {data.lastName}, {data.firstName} {data.middleName || ""} {data.extensionName || ""}
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Learner Reference Number (LRN)</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Learner Reference Number (LRN)</span>
               <span className="font-mono font-bold text-slate-900">{data.lrn || "N/A"}</span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Enrollment Level</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Enrollment Level</span>
               <span className="font-bold text-slate-900">
                 Grade {data.step1.targetGradeLevel} ({data.step1.applicantType})
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Curriculum Program / Track</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Curriculum Program / Track</span>
               <span className="font-bold text-slate-900">
                 {isG7
                   ? data.jhsProgram === "SPS"
@@ -608,13 +608,13 @@ export default function Step5DocumentsReview({
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Residential Address</span>
-              <span className="font-bold text-slate-900 uppercase">
+              <span className="font-bold text-slate-500 block text-[10px]">Residential Address</span>
+              <span className="font-bold text-slate-900">
                 Brgy. {data.currentBarangay}, {data.currentSitio ? `Sitio ${data.currentSitio}, ` : ""}Dumalneg
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Emergency School Contact</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Emergency School Contact</span>
               <span className="font-bold text-slate-900">
                 {data.primaryContactPerson} (
                 {data.primaryContactPerson === "Father"
@@ -626,7 +626,7 @@ export default function Step5DocumentsReview({
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Linked Student Account</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Linked Student Account</span>
               <span className="font-bold text-[#002060]">
                 {user ? `${user.fullName} (${user.email})` : "Guest / Direct Submission"}
               </span>
@@ -636,7 +636,7 @@ export default function Step5DocumentsReview({
 
         {/* Next Steps for Student / Parent */}
         <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3 rounded-md shadow-xs">
-          <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+          <div className="text-xs font-bold text-[#002060]">
             Instructions &amp; Next Steps for Dumalneg NHS Enrollees
           </div>
           <ol className="list-decimal list-inside text-xs text-slate-700 space-y-2 leading-relaxed">
@@ -660,13 +660,13 @@ export default function Step5DocumentsReview({
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
+            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-md"
           >
             Print Acknowledgment Slip
           </button>
           <a
             href={`/track?ref=${referenceNumber}`}
-            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors text-center shadow-xs rounded-md"
+            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors text-center shadow-xs rounded-md"
           >
             Track Application Live &rarr;
           </a>
@@ -683,10 +683,10 @@ export default function Step5DocumentsReview({
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-            STEP 05 OF 05
+          <span className="text-xs font-bold tracking-wider text-[#002060]">
+            Step 05 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-medium text-slate-500">
             DepEd Requirements &bull; Final Submission
           </span>
         </div>
@@ -712,7 +712,7 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+          <span className="text-xs font-bold text-[#002060] block">
             Section 9: Official Document Upload (Automated Compressor &lt; 350KB)
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
@@ -724,7 +724,7 @@ export default function Step5DocumentsReview({
           {/* 1. PSA Birth Certificate */}
           <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
+              <label className="text-xs font-bold text-slate-900">
                 1. PSA Birth Certificate <span className="text-red-700">*</span>
               </label>
               <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
@@ -758,7 +758,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("birth_certificate")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -783,7 +783,7 @@ export default function Step5DocumentsReview({
           {/* 2. Form 138 / SF9 Report Card */}
           <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
+              <label className="text-xs font-bold text-slate-900">
                 2. Learner&apos;s Progress Report Card (SF9 / Form 138) <span className="text-red-700">*</span>
               </label>
               <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
@@ -821,7 +821,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("form_138")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -844,7 +844,7 @@ export default function Step5DocumentsReview({
           {/* 3. 2x2 Official ID Picture */}
           <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
+              <label className="text-xs font-bold text-slate-900">
                 3. Formal 2x2 or 1x1 ID Picture <span className="text-red-700">*</span>
               </label>
               <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
@@ -878,7 +878,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("id_picture")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -901,7 +901,7 @@ export default function Step5DocumentsReview({
           {/* 4. Certificate of Good Moral Character */}
           <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
+              <label className="text-xs font-bold text-slate-900">
                 4. Certificate of Good Moral Character
                 {(isG11 || isTransferee) && <span className="text-red-700"> *</span>}
               </label>
@@ -938,7 +938,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("good_moral")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -962,7 +962,7 @@ export default function Step5DocumentsReview({
           {data.is4psBeneficiary && (
             <div className="p-4 bg-white border-2 border-blue-200 space-y-2 rounded-md">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 uppercase">
+                <label className="text-xs font-bold text-slate-900">
                   5. Pantawid Pamilya (4Ps) Household ID Card
                 </label>
                 <span className="text-[10px] font-mono text-blue-700 font-bold">4PS BENEFICIARY</span>
@@ -996,7 +996,7 @@ export default function Step5DocumentsReview({
                   <button
                     type="button"
                     onClick={() => handleRemoveDoc("household_4ps")}
-                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
+                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                   >
                     Remove
                   </button>
@@ -1018,7 +1018,7 @@ export default function Step5DocumentsReview({
           {data.hasPwdId && (
             <div className="p-4 bg-white border-2 border-blue-200 space-y-2 rounded-md">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 uppercase">
+                <label className="text-xs font-bold text-slate-900">
                   6. Official Persons with Disability (PWD) ID
                 </label>
                 <span className="text-[10px] font-mono text-blue-700 font-bold">SNED / INCLUSIVE</span>
@@ -1052,7 +1052,7 @@ export default function Step5DocumentsReview({
                   <button
                     type="button"
                     onClick={() => handleRemoveDoc("pwd_id")}
-                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
+                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                   >
                     Remove
                   </button>
@@ -1078,7 +1078,7 @@ export default function Step5DocumentsReview({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+            <span className="text-xs font-bold text-[#002060] block">
               Online Application Review Card
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
@@ -1094,51 +1094,51 @@ export default function Step5DocumentsReview({
         <div className="space-y-4">
           {/* Card 1: Learner Identity */}
           <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               1. Learner Civil Registry &amp; Personal Details
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Last Name</span>
-                <span className="font-bold text-slate-900 uppercase">{data.lastName || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Last Name</span>
+                <span className="font-bold text-slate-900">{data.lastName || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">First Name</span>
-                <span className="font-bold text-slate-900 uppercase">{data.firstName || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">First Name</span>
+                <span className="font-bold text-slate-900">{data.firstName || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Middle Name</span>
-                <span className="font-bold text-slate-900 uppercase">{data.middleName || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Middle Name</span>
+                <span className="font-bold text-slate-900">{data.middleName || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Extension</span>
-                <span className="font-bold text-slate-900 uppercase">{data.extensionName || "None"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Extension</span>
+                <span className="font-bold text-slate-900">{data.extensionName || "None"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">12-Digit LRN</span>
+                <span className="text-[10px] font-bold text-slate-500 block">12-Digit LRN</span>
                 <span className="font-mono font-bold text-slate-900">{data.lrn || "None (First Time Enrollee)"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Date of Birth / Age</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Date of Birth / Age</span>
                 <span className="font-bold text-slate-900">{data.dateOfBirth || "-"} ({data.age} yrs old)</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Gender</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Gender</span>
                 <span className="font-bold text-slate-900">{data.gender || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Mother Tongue</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Mother Tongue</span>
                 <span className="font-bold text-slate-900">{data.motherTongue || "Ilokano"}</span>
               </div>
               {data.isIpCommunity && (
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">IP Community</span>
+                  <span className="text-[10px] font-bold text-slate-500 block">IP Community</span>
                   <span className="font-bold text-blue-900">{data.ipCommunityName || "Isnag"}</span>
                 </div>
               )}
               {data.is4psBeneficiary && (
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">4Ps Household ID</span>
+                  <span className="text-[10px] font-bold text-slate-500 block">4Ps Household ID</span>
                   <span className="font-mono font-bold text-blue-900">{data.householdId4ps || "Beneficiary"}</span>
                 </div>
               )}
@@ -1147,20 +1147,20 @@ export default function Step5DocumentsReview({
 
           {/* Card 2: Academic Classification & Feeder School */}
           <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               2. Enrollment Placement &amp; Academic Background
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Target Grade Level</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Target Grade Level</span>
                 <span className="font-bold text-slate-900">Grade {data.step1.targetGradeLevel}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Applicant Category</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Applicant Category</span>
                 <span className="font-bold text-slate-900">{data.step1.applicantType}</span>
               </div>
               <div className="col-span-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Curricular Program / Track</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Curricular Program / Track</span>
                 <span className="font-bold text-[#002060]">
                   {isG7
                     ? data.jhsProgram === "SPS"
@@ -1171,19 +1171,19 @@ export default function Step5DocumentsReview({
               </div>
               {data.careerPathway && (
                 <div className="col-span-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Career Pathway Specialization</span>
+                  <span className="text-[10px] font-bold text-slate-500 block">Career Pathway Specialization</span>
                   <span className="font-bold text-slate-900">{data.careerPathway}</span>
                 </div>
               )}
               {data.doorwayElectives && data.doorwayElectives.length > 0 && (
                 <div className="col-span-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Doorway Cross-Track Electives</span>
+                  <span className="text-[10px] font-bold text-slate-500 block">Doorway Cross-Track Electives</span>
                   <span className="font-bold text-blue-900">{data.doorwayElectives.join(", ")}</span>
                 </div>
               )}
               {data.selectedElectives && data.selectedElectives.length > 0 && (
                 <div className="col-span-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                  <span className="text-[10px] font-bold text-slate-500 block">
                     Elective / Prescribed Course Offerings
                   </span>
                   <span className="font-mono font-bold text-[#002060]">
@@ -1192,17 +1192,17 @@ export default function Step5DocumentsReview({
                 </div>
               )}
               <div className="col-span-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Last School Attended</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Last School Attended</span>
+                <span className="font-bold text-slate-900">
                   {data.step1.lastSchoolAttended || "-"}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">DepEd School ID</span>
+                <span className="text-[10px] font-bold text-slate-500 block">DepEd School ID</span>
                 <span className="font-mono font-bold text-slate-900">{data.step1.lastSchoolId || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Last S.Y. Completed</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Last S.Y. Completed</span>
                 <span className="font-bold text-slate-900">{data.step1.lastSchoolYearCompleted || "-"}</span>
               </div>
             </div>
@@ -1210,26 +1210,26 @@ export default function Step5DocumentsReview({
 
           {/* Card 3: Residential Address */}
           <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               3. Residential Address
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Barangay</span>
-                <span className="font-bold text-slate-900 uppercase">{data.currentBarangay}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Barangay</span>
+                <span className="font-bold text-slate-900">{data.currentBarangay}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Sitio / House No.</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Sitio / House No.</span>
+                <span className="font-bold text-slate-900">
                   {data.currentSitio ? `Sitio ${data.currentSitio}` : data.currentHouseNo || "Poblacion"}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Municipality &amp; Province</span>
-                <span className="font-bold text-slate-900 uppercase">DUMALNEG, ILOCOS NORTE</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Municipality &amp; Province</span>
+                <span className="font-bold text-slate-900">Dumalneg, Ilocos Norte</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Zip Code</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Zip Code</span>
                 <span className="font-mono font-bold text-slate-900">2921</span>
               </div>
             </div>
@@ -1237,13 +1237,13 @@ export default function Step5DocumentsReview({
 
           {/* Card 4: Parent & Guardian Information */}
           <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               4. Parents &amp; Legal Guardian
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Father&apos;s Full Name</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Father&apos;s Full Name</span>
+                <span className="font-bold text-slate-900">
                   {data.fatherLastName === "N/A"
                     ? "N/A (Not Available)"
                     : `${data.fatherLastName || ""}, ${data.fatherFirstName || ""} ${data.fatherMiddleName || ""}`}
@@ -1253,8 +1253,8 @@ export default function Step5DocumentsReview({
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Mother&apos;s Maiden Name</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Mother&apos;s Maiden Name</span>
+                <span className="font-bold text-slate-900">
                   {data.motherMaidenLastName === "N/A"
                     ? "N/A (Not Available)"
                     : `${data.motherMaidenLastName || ""}, ${data.motherFirstName || ""} ${data.motherMiddleName || ""}`}
@@ -1264,8 +1264,8 @@ export default function Step5DocumentsReview({
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Legal Guardian</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Legal Guardian</span>
+                <span className="font-bold text-slate-900">
                   {data.guardianLastName
                     ? `${data.guardianLastName}, ${data.guardianFirstName} (${data.guardianRelationship || "Guardian"})`
                     : "Living with Parents"}
@@ -1278,7 +1278,7 @@ export default function Step5DocumentsReview({
               </div>
             </div>
             <div className="pt-2 border-t border-slate-100 text-xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">Primary Emergency Contact Dispatcher</span>
+              <span className="text-[10px] font-bold text-slate-500 block">Primary Emergency Contact Dispatcher</span>
               <span className="font-bold text-[#002060]">
                 {data.primaryContactPerson} &bull; Contact Number:{" "}
                 {data.primaryContactPerson === "Father"
@@ -1292,12 +1292,12 @@ export default function Step5DocumentsReview({
 
           {/* Card 5: SNEd & Modality */}
           <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               5. Inclusive Education &amp; Preferred Modality
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Special Education (SNEd)</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Special Education (SNEd)</span>
                 <span className="font-bold text-slate-900">
                   {data.isSned
                     ? `Yes - ${data.snedCategory}: ${(data.snedDetails || []).join(", ")}`
@@ -1305,7 +1305,7 @@ export default function Step5DocumentsReview({
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Preferred Emergency Learning Modalities</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Preferred Emergency Learning Modalities</span>
                 <span className="font-bold text-slate-900">
                   {(data.preferredModalities || ["Modular (Print)"]).join(", ")}
                 </span>
@@ -1319,7 +1319,7 @@ export default function Step5DocumentsReview({
       {/* SECTION C: DATA PRIVACY ACT OF 2012 (RA 10173) & DEPED CERTIFICATION      */}
       {/* ========================================================================= */}
       <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-md">
-        <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+        <div className="text-xs font-bold text-[#002060]">
           DepEd Sworn Certification &amp; Republic Act No. 10173 (Data Privacy Act of 2012)
         </div>
         <p className="text-xs text-slate-700 leading-relaxed">
@@ -1368,7 +1368,7 @@ export default function Step5DocumentsReview({
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
+          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-md"
         >
           &larr; Back to Step 4 (Curriculum &amp; Modality)
         </button>
@@ -1376,13 +1376,13 @@ export default function Step5DocumentsReview({
           type="button"
           onClick={handleSubmitApplication}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded-md"
+          className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded-md"
         >
           {isSubmitting
-            ? "PROCESSING OFFICIAL SUBMISSION..."
+            ? "Processing Official Submission..."
             : existingApplication
-            ? "RESUBMIT REVISED ENROLLMENT APPLICATION"
-            : "SUBMIT ENROLLMENT APPLICATION"}
+            ? "Resubmit Revised Enrollment Application"
+            : "Submit Enrollment Application"}
         </button>
       </div>
     </div>

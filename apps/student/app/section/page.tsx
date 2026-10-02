@@ -630,7 +630,7 @@ function SectionPageContent() {
       <div className="max-w-5xl mx-auto py-12 px-4 space-y-6 font-sans">
         <div className="bg-white border-2 border-slate-300 p-8 text-center space-y-3 rounded-lg shadow-sm">
           <div className="w-8 h-8 border-4 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-mono font-bold text-slate-700 uppercase tracking-widest">
+          <p className="text-xs font-mono font-bold text-slate-700 tracking-wide">
             Synchronizing Official Class Section Records...
           </p>
         </div>
@@ -642,13 +642,13 @@ function SectionPageContent() {
     <div className="max-w-5xl mx-auto py-6 px-4 space-y-6 font-sans">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-mono text-slate-500 pb-2 border-b border-slate-200">
-        <Link href="/" className="hover:text-[#002060] hover:underline uppercase">
+        <Link href="/" className="hover:text-[#002060] hover:underline">
           Home Dashboard
         </Link>
         <span>/</span>
-        <span className="text-slate-400 uppercase">Portal Modules</span>
+        <span className="text-slate-400">Portal Modules</span>
         <span>/</span>
-        <span className="font-bold text-[#002060] uppercase">
+        <span className="font-bold text-[#002060]">
           04 Class Section &amp; Advisory
         </span>
       </nav>
@@ -657,7 +657,7 @@ function SectionPageContent() {
       <section className="bg-white border-l-4 border-[#002060] p-6 shadow-xs border border-slate-200 rounded-lg">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
+            <span className="text-xs font-bold tracking-wide text-[#002060] block mb-1">
               DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS
             </span>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
@@ -669,8 +669,8 @@ function SectionPageContent() {
           </div>
           {user && (
             <div className="text-left sm:text-right bg-slate-50 border border-slate-200 p-2.5 font-mono text-xs rounded-md">
-              <span className="text-[10px] text-slate-500 uppercase block">Active Learner</span>
-              <strong className="text-slate-900 uppercase block">{user.firstName} {user.lastName}</strong>
+              <span className="text-[10px] text-slate-500 block">Active Learner</span>
+              <strong className="text-slate-900 block">{user.firstName} {user.lastName}</strong>
               <span className="text-[10px] text-[#002060]">LRN: {user.lrn || user.userId}</span>
             </div>
           )}
@@ -695,7 +695,7 @@ function SectionPageContent() {
                     {activeTermNumber >= 2 ? "Automatic Continuing Roster" : "Official Roster Enrolled"}
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-emerald-950 uppercase tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-bold text-emerald-950 tracking-tight">
                   Assigned in Section: <span className="underline decoration-emerald-500">{assignedSection.section_name}</span>
                 </h2>
                 <p className="text-xs font-mono text-emerald-800">
@@ -704,8 +704,8 @@ function SectionPageContent() {
               </div>
 
               <div className="text-left sm:text-right shrink-0">
-                <span className="text-[10px] font-mono text-emerald-800 uppercase block">Class Advisory Status</span>
-                <span className="inline-block px-3 py-1 bg-white border border-emerald-300 font-mono text-xs font-bold text-emerald-900 shadow-xs uppercase rounded">
+                <span className="text-[10px] font-mono text-emerald-800 block">Class Advisory Status</span>
+                <span className="inline-block px-3 py-1 bg-white border border-emerald-300 font-mono text-xs font-bold text-emerald-900 shadow-xs rounded">
                   Confirmed Placement
                 </span>
               </div>
@@ -714,7 +714,7 @@ function SectionPageContent() {
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
               <div className="bg-white p-3 border border-emerald-200 rounded-md shadow-2xs">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block">Grade &amp; Curriculum</span>
+                <span className="text-[10px] font-mono text-slate-500 block">Grade &amp; Curriculum</span>
                 <strong className="text-slate-900 text-xs sm:text-sm">
                   Grade {assignedSection.grade_level}
                 </strong>
@@ -723,21 +723,21 @@ function SectionPageContent() {
                 </span>
               </div>
               <div className="bg-white p-3 border border-emerald-200 rounded-md shadow-2xs">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block">Classroom / Wing</span>
+                <span className="text-[10px] font-mono text-slate-500 block">Classroom / Wing</span>
                 <strong className="text-slate-900 text-xs sm:text-sm">
                   {assignedSection.room || "Room 101 - Main Wing"}
                 </strong>
                 <span className="text-[10px] text-slate-500 block">Dumalneg NHS Campus</span>
               </div>
               <div className="bg-white p-3 border border-emerald-200 rounded-md shadow-2xs">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block">Class Adviser</span>
+                <span className="text-[10px] font-mono text-slate-500 block">Class Adviser</span>
                 <strong className="text-slate-900 text-xs sm:text-sm truncate block">
                   {assignedSection.adviser_name || "Faculty Adviser Assigned"}
                 </strong>
                 <span className="text-[10px] text-slate-500 block">Homeroom Teacher</span>
               </div>
               <div className="bg-white p-3 border border-emerald-200 rounded-md shadow-2xs">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block">Enrolled Learners</span>
+                <span className="text-[10px] font-mono text-slate-500 block">Enrolled Learners</span>
                 <strong className="text-emerald-900 text-xs sm:text-sm font-mono">
                   {classmates.length} {assignedSection.capacity ? `/ ${assignedSection.capacity} max` : "Learners"}
                 </strong>
@@ -749,10 +749,10 @@ function SectionPageContent() {
             {assignedSection.grade_level >= 11 && (
               <div className="p-4 bg-white border-2 border-blue-900/30 shadow-xs space-y-3 rounded-md">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-200 pb-2">
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
+                  <span className="text-xs font-mono font-bold text-[#002060] tracking-wide block">
                     SHS Dual Cohort Sectioning &bull; DepEd MATATAG
                   </span>
-                  <span className="text-[10px] font-mono font-bold bg-blue-100 text-[#002060] px-2 py-0.5 border border-blue-300 self-start sm:self-auto uppercase rounded-xs">
+                  <span className="text-[10px] font-mono font-bold bg-blue-100 text-[#002060] px-2 py-0.5 border border-blue-300 self-start sm:self-auto rounded-xs">
                     Dual Active Section Assignments
                   </span>
                 </div>
@@ -761,7 +761,7 @@ function SectionPageContent() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="p-3 bg-blue-50/70 border border-blue-300 space-y-1 rounded-md">
-                    <span className="text-[10px] font-mono font-bold text-blue-950 uppercase block">
+                    <span className="text-[10px] font-mono font-bold text-blue-950 block">
                       1. Primary Track Section (Core / Common Subjects)
                     </span>
                     <strong className="text-sm font-bold text-[#002060] block">
@@ -773,7 +773,7 @@ function SectionPageContent() {
                   </div>
 
                   <div className="p-3 bg-purple-50/70 border border-purple-300 space-y-1 rounded-md">
-                    <span className="text-[10px] font-mono font-bold text-purple-950 uppercase block">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 block">
                       2. Specialized Elective Section (Elective Period)
                     </span>
                     <strong className="text-sm font-bold text-purple-950 block">
@@ -789,7 +789,7 @@ function SectionPageContent() {
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex border-b-2 border-slate-300 gap-1 text-xs font-mono font-bold uppercase">
+          <div className="flex border-b-2 border-slate-300 gap-1 text-xs font-mono font-bold">
             <button
               type="button"
               onClick={() => setActiveTab("overview")}
@@ -829,10 +829,10 @@ function SectionPageContent() {
           {activeTab === "overview" && (
             <div className="bg-white border-2 border-slate-300 p-6 space-y-6 rounded-lg shadow-sm">
               <div>
-                <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+                <span className="text-xs font-mono font-bold text-[#002060] block mb-1">
                   Official Advisory Information
                 </span>
-                <h3 className="text-base font-bold text-slate-900 uppercase">
+                <h3 className="text-base font-bold text-slate-900">
                   Class Profile &bull; {assignedSection.section_name}
                 </h3>
                 <p className="text-xs text-slate-600 mt-1">
@@ -842,7 +842,7 @@ function SectionPageContent() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div className="p-4 bg-slate-50 border border-slate-200 space-y-3 rounded-md">
-                  <h4 className="font-bold text-slate-800 uppercase font-mono text-[11px] border-b border-slate-200 pb-1">
+                  <h4 className="font-bold text-slate-800 font-mono text-[11px] border-b border-slate-200 pb-1">
                     Class Advisory Details
                   </h4>
                   <div className="space-y-2">
@@ -866,7 +866,7 @@ function SectionPageContent() {
                 </div>
 
                 <div className="p-4 bg-slate-50 border border-slate-200 space-y-3 rounded-md">
-                  <h4 className="font-bold text-slate-800 uppercase font-mono text-[11px] border-b border-slate-200 pb-1">
+                  <h4 className="font-bold text-slate-800 font-mono text-[11px] border-b border-slate-200 pb-1">
                     Faculty &amp; Facility Assignment
                   </h4>
                   <div className="space-y-2">
@@ -891,7 +891,7 @@ function SectionPageContent() {
 
                 {assignedSection.grade_level >= 11 && electiveInfo && (
                   <div className="p-4 bg-purple-50/70 border border-purple-200 space-y-3 md:col-span-2 rounded-md">
-                    <h4 className="font-bold text-purple-950 uppercase font-mono text-[11px] border-b border-purple-200 pb-1 flex items-center justify-between">
+                    <h4 className="font-bold text-purple-950 font-mono text-[11px] border-b border-purple-200 pb-1 flex items-center justify-between">
                       <span>Specialized Elective Section Details</span>
                       <span className="text-[10px] bg-purple-200/80 px-2 py-0.5 font-bold rounded-xs">Elective Cohort</span>
                     </h4>
@@ -926,19 +926,19 @@ function SectionPageContent() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("classmates")}
-                  className="btn-primary text-xs uppercase font-bold py-2.5 px-4 cursor-pointer rounded-md"
+                  className="btn-primary text-xs font-bold py-2.5 px-4 cursor-pointer rounded-md"
                 >
                   View Section Classmates List &rarr;
                 </button>
                 <Link
                   href="/track"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold transition-colors inline-block rounded-md"
                 >
                   03 Track Full Application
                 </Link>
                 <Link
                   href="/"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold transition-colors inline-block rounded-md"
                 >
                   01 Return to Home Dashboard
                 </Link>
@@ -951,10 +951,10 @@ function SectionPageContent() {
             <div className="bg-white border-2 border-slate-300 p-6 space-y-5 rounded-lg shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
+                  <span className="text-xs font-mono font-bold text-[#002060] block">
                     Official Classmates Directory
                   </span>
-                  <h3 className="text-base font-bold text-slate-900 uppercase">
+                  <h3 className="text-base font-bold text-slate-900">
                     {assignedSection.grade_level >= 11 && electiveInfo
                       ? classmatesViewType === "track"
                         ? `Track Classmates • ${assignedSection.section_name}`
@@ -974,7 +974,7 @@ function SectionPageContent() {
               {assignedSection.grade_level >= 11 && electiveInfo && (
                 <div className="p-3 bg-slate-50 border border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md">
                   <div className="space-y-0.5">
-                    <span className="text-[10px] font-mono font-bold text-slate-600 uppercase block">
+                    <span className="text-[10px] font-mono font-bold text-slate-600 block">
                       Select Cohort Directory:
                     </span>
                     <p className="text-xs text-slate-700">
@@ -987,7 +987,7 @@ function SectionPageContent() {
                     <button
                       type="button"
                       onClick={() => setClassmatesViewType("track")}
-                      className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition-colors cursor-pointer border rounded-md ${
+                      className={`px-3 py-1.5 text-xs font-mono font-bold transition-colors cursor-pointer border rounded-md ${
                         classmatesViewType === "track"
                           ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                           : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
@@ -998,7 +998,7 @@ function SectionPageContent() {
                     <button
                       type="button"
                       onClick={() => setClassmatesViewType("elective")}
-                      className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition-colors cursor-pointer border rounded-md ${
+                      className={`px-3 py-1.5 text-xs font-mono font-bold transition-colors cursor-pointer border rounded-md ${
                         classmatesViewType === "elective"
                           ? "bg-purple-900 text-white border-purple-900 shadow-xs"
                           : "bg-white text-purple-950 border-purple-300 hover:bg-purple-50"
@@ -1022,7 +1022,7 @@ function SectionPageContent() {
                   <div className="overflow-x-auto border border-slate-200 rounded-md">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono uppercase text-slate-700">
+                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono text-slate-700">
                           <th className="py-2.5 px-3 w-12 text-center">#</th>
                           <th className="py-2.5 px-3">Learner Name</th>
                           <th className="py-2.5 px-3 font-mono">Learner Reference No.</th>
@@ -1047,7 +1047,7 @@ function SectionPageContent() {
                                 {String(idx + 1).padStart(2, "0")}
                               </td>
                               <td className="py-2.5 px-3">
-                                <span className="text-slate-900 uppercase">
+                                <span className="text-slate-900">
                                   {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
                                 </span>
                                 {isCurrentLearner && (
@@ -1085,7 +1085,7 @@ function SectionPageContent() {
                   <div className="overflow-x-auto border border-purple-200 rounded-md">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-purple-100/60 border-b border-purple-300 text-[10px] font-mono uppercase text-purple-950">
+                        <tr className="bg-purple-100/60 border-b border-purple-300 text-[10px] font-mono text-purple-950">
                           <th className="py-2.5 px-3 w-12 text-center">#</th>
                           <th className="py-2.5 px-3">Learner Name</th>
                           <th className="py-2.5 px-3 font-mono">Learner Reference No.</th>
@@ -1111,7 +1111,7 @@ function SectionPageContent() {
                                 {String(idx + 1).padStart(2, "0")}
                               </td>
                               <td className="py-2.5 px-3">
-                                <span className="text-slate-900 uppercase">
+                                <span className="text-slate-900">
                                   {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
                                 </span>
                                 {isCurrentLearner && (
@@ -1151,10 +1151,10 @@ function SectionPageContent() {
           {activeTab === "schedule" && (
             <div className="bg-white border-2 border-slate-300 p-6 space-y-6 rounded-lg shadow-sm">
               <div className="border-b border-slate-200 pb-3">
-                <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
+                <span className="text-xs font-mono font-bold text-[#002060] block">
                   Prescribed Class Curriculum
                 </span>
-                <h3 className="text-base font-bold text-slate-900 uppercase">
+                <h3 className="text-base font-bold text-slate-900">
                   Subjects &amp; Timetable &bull; Grade {assignedSection.grade_level}
                 </h3>
                 <p className="text-xs text-slate-600 mt-1">
@@ -1164,14 +1164,14 @@ function SectionPageContent() {
 
               {/* Prescribed Subjects Table */}
               <div className="space-y-2">
-                <h4 className="text-xs font-mono font-bold text-slate-700 uppercase">
+                <h4 className="text-xs font-mono font-bold text-slate-700">
                   Prescribed Curriculum Subjects
                 </h4>
                 {subjects.length > 0 ? (
                   <div className="overflow-x-auto border border-slate-200 rounded-md">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono uppercase text-slate-700">
+                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono text-slate-700">
                           <th className="py-2 px-3">Subject Code</th>
                           <th className="py-2 px-3">Subject Description</th>
                           <th className="py-2 px-3">Classification</th>
@@ -1210,13 +1210,13 @@ function SectionPageContent() {
               {/* Timetable Schedules if present */}
               {timetableSchedules.length > 0 && (
                 <div className="space-y-2 pt-2">
-                  <h4 className="text-xs font-mono font-bold text-slate-700 uppercase">
+                  <h4 className="text-xs font-mono font-bold text-slate-700">
                     Weekly Class Timetable
                   </h4>
                   <div className="overflow-x-auto border border-slate-200 rounded-md">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono uppercase text-slate-700">
+                        <tr className="bg-slate-100 border-b border-slate-300 text-[10px] font-mono text-slate-700">
                           <th className="py-2 px-3">Day</th>
                           <th className="py-2 px-3">Time Window</th>
                           <th className="py-2 px-3">Subject</th>
@@ -1227,7 +1227,7 @@ function SectionPageContent() {
                       <tbody className="divide-y divide-slate-200">
                         {timetableSchedules.map((sch: any, idx: number) => (
                           <tr key={sch.id || idx} className="hover:bg-slate-50">
-                            <td className="py-2 px-3 font-mono font-bold text-slate-800 uppercase">
+                            <td className="py-2 px-3 font-mono font-bold text-slate-800">
                               {sch.day_of_week || "Mon-Fri"}
                             </td>
                             <td className="py-2 px-3 font-mono text-slate-700">
@@ -1260,7 +1260,7 @@ function SectionPageContent() {
            ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-4 rounded-lg">
-            <div className="flex items-center justify-between border-b border-blue-200 pb-3">
+            <div className="flex items-center justify-between border-blue-200 border-b pb-3">
               <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
                 ENROLLMENT REQUIRED
               </span>
@@ -1271,7 +1271,7 @@ function SectionPageContent() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Please enroll to see your section assignment
               </h2>
               <p className="text-xs text-slate-700 leading-relaxed font-medium">
@@ -1282,7 +1282,7 @@ function SectionPageContent() {
 
             {/* Explanatory Policy Box */}
             <div className="p-4 bg-white border border-blue-300 text-xs space-y-2 rounded-md">
-              <span className="font-mono font-bold text-[#002060] uppercase block text-[11px]">
+              <span className="font-mono font-bold text-[#002060] block text-[11px]">
                 DepEd Dumalneg NHS Continuing Enrollment Policy
               </span>
               <p className="text-slate-700 leading-relaxed">
@@ -1295,13 +1295,13 @@ function SectionPageContent() {
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/enroll"
-                className="btn-primary text-xs uppercase font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-md"
+                className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-md"
               >
                 02 Complete Continuing Enrollment Now &rarr;
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold transition-colors inline-block rounded-md"
               >
                 01 Return to Home Dashboard
               </Link>
@@ -1328,7 +1328,7 @@ function SectionPageContent() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-black text-amber-950 uppercase tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight">
                 You&apos;re not yet assigned to a section
               </h2>
               <p className="text-xs text-amber-950 leading-relaxed font-medium">
@@ -1339,7 +1339,7 @@ function SectionPageContent() {
 
             {/* Explanatory Callout */}
             <div className="p-4 bg-white border border-amber-300 text-xs space-y-2 rounded-md">
-              <span className="font-mono font-bold text-amber-900 uppercase block text-[11px]">
+              <span className="font-mono font-bold text-amber-900 block text-[11px]">
                 Official Transferee Placement Protocol
               </span>
               <p className="text-slate-800 leading-relaxed">
@@ -1353,13 +1353,13 @@ function SectionPageContent() {
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs uppercase font-bold py-2.5 px-4 inline-block rounded-md"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-md"
               >
                 03 Track Transferee Application Status &rarr;
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold transition-colors inline-block rounded-md"
               >
                 01 Return to Home Dashboard
               </Link>
@@ -1375,7 +1375,7 @@ function SectionPageContent() {
         <div className="space-y-6">
           <div className="p-6 bg-amber-50 border-2 border-amber-400 shadow-xs space-y-4 rounded-lg">
             <div className="flex items-center justify-between border-b border-amber-200 pb-3">
-              <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
+              <span className="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
                 SECTION STATUS
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400 rounded-xs">
@@ -1385,7 +1385,7 @@ function SectionPageContent() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-black text-amber-950 uppercase tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight">
                 You&apos;re not yet assigned to a section
               </h2>
               <p className="text-xs text-amber-950 leading-relaxed font-medium">
@@ -1396,21 +1396,21 @@ function SectionPageContent() {
             {/* Explanatory Steps */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
               <div className="bg-white p-3.5 border border-amber-300 space-y-1 rounded-md">
-                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase block">Step 01</span>
+                <span className="text-[10px] font-mono font-bold text-slate-400 block">Step 01</span>
                 <strong className="text-slate-900 block">Enrollment Submission</strong>
                 <p className="text-[11px] text-slate-600">
                   Ensure your DepEd enrollment form and documents have been submitted.
                 </p>
               </div>
               <div className="bg-white p-3.5 border border-amber-300 space-y-1 rounded-md">
-                <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Step 02 &bull; Active</span>
+                <span className="text-[10px] font-mono font-bold text-amber-700 block">Step 02 &bull; Active</span>
                 <strong className="text-amber-950 block">Registrar Evaluation</strong>
                 <p className="text-[11px] text-amber-900">
                   School administrators verify academic eligibility and curriculum tracks.
                 </p>
               </div>
               <div className="bg-white p-3.5 border border-amber-300 space-y-1 rounded-md">
-                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase block">Step 03 &bull; Next</span>
+                <span className="text-[10px] font-mono font-bold text-slate-400 block">Step 03 &bull; Next</span>
                 <strong className="text-slate-900 block">Class Section Slotting</strong>
                 <p className="text-[11px] text-slate-600">
                   Official class section, room, and adviser will appear here automatically.
@@ -1426,13 +1426,13 @@ function SectionPageContent() {
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs uppercase font-bold py-2.5 px-4 inline-block rounded-md"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-md"
               >
                 03 Track Application Status
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold uppercase tracking-wider transition-colors inline-block rounded-md"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 font-mono text-xs font-bold transition-colors inline-block rounded-md"
               >
                 01 Return to Home Dashboard
               </Link>

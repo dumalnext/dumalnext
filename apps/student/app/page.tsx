@@ -588,7 +588,7 @@ function StudentHomeContent() {
     <div className="max-w-4xl mx-auto space-y-8 font-sans">
       {/* DepEd & DNHS Institutional Banner */}
       <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200 rounded-lg">
-        <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
+        <span className="text-xs font-bold tracking-wide text-[#002060] block mb-1">
           DepEd Region I &bull; Schools Division of Ilocos Norte &bull; Dumalneg NHS
         </span>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
@@ -603,8 +603,8 @@ function StudentHomeContent() {
       {/* Access Restriction Notice (When redirected from protected routes) */}
       {noticeQuery === "auth_required" && (
         <div className="p-4 bg-amber-50 border-2 border-amber-500 shadow-xs rounded-md">
-          <span className="text-xs font-bold text-amber-900 uppercase tracking-wider block mb-1">
-            ACCESS RESTRICTED: AUTHENTICATION REQUIRED
+          <span className="text-xs font-bold text-amber-900 tracking-wide block mb-1">
+            Access Restricted: Authentication Required
           </span>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
             You must <strong>Sign In</strong> to your student account or <strong>Create a New Account</strong> below 
@@ -622,7 +622,7 @@ function StudentHomeContent() {
           <div className="bg-white border-2 border-[#002060] p-6 sm:p-8 space-y-4 rounded-lg shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
-                <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-0.5">
+                <span className="text-xs font-mono font-bold text-[#002060] block mb-0.5">
                   Authenticated Applicant Account
                 </span>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900">
@@ -650,7 +650,7 @@ function StudentHomeContent() {
                       {activeTermNum >= 2 ? "Automatic Continuing Roster" : "Official Roster"}
                     </span>
                   </div>
-                  <div className="text-sm sm:text-base font-bold text-emerald-950 uppercase">
+                  <div className="text-sm sm:text-base font-bold text-emerald-950">
                     Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
                   </div>
                   <div className="text-xs font-mono text-emerald-800">
@@ -663,7 +663,7 @@ function StudentHomeContent() {
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     View Section &rarr;
                   </Link>
@@ -694,7 +694,7 @@ function StudentHomeContent() {
                   </span>
                   <Link
                     href="/enroll"
-                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     Complete Enrollment &rarr;
                   </Link>
@@ -725,7 +725,7 @@ function StudentHomeContent() {
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     Check Status &rarr;
                   </Link>
@@ -756,7 +756,7 @@ function StudentHomeContent() {
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     Check Status &rarr;
                   </Link>
@@ -769,7 +769,7 @@ function StudentHomeContent() {
               <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-300 space-y-4 rounded-lg shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
-                    <span className="text-[11px] font-bold text-slate-500 uppercase block">
+                    <span className="text-[11px] font-bold text-slate-500 block">
                       Submitted Enrollment Application (S.Y. {userApplication.schoolYear} &bull; {userApplication.semester})
                     </span>
                     <span className="text-base font-bold font-mono text-[#002060]">
@@ -778,19 +778,19 @@ function StudentHomeContent() {
                   </div>
                   <div>
                     {userApplication.status === "Approved" ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-600 border border-emerald-700 shrink-0" />
-                        STATUS: APPROVED &amp; OFFICIALLY ENROLLED
+                        Status: Approved &amp; Officially Enrolled
                       </span>
                     ) : userApplication.status === "Needs Revision" ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-xs">
                         <span className="w-2 h-2 rounded-full bg-red-600 border border-red-700 shrink-0" />
-                        STATUS: NEEDS REVISION / ACTION REQUIRED
+                        Status: Needs Revision / Action Required
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-xs">
                         <span className="w-2 h-2 rounded-full bg-amber-500 border border-amber-600 shrink-0" />
-                        STATUS: PENDING REGISTRAR VERIFICATION
+                        Status: Pending Registrar Verification
                       </span>
                     )}
                   </div>
@@ -817,7 +817,7 @@ function StudentHomeContent() {
 
                 {userApplication.remarks && (
                   <div className="p-3 bg-white border border-slate-200 text-xs rounded-md">
-                    <span className="font-bold text-slate-700 block mb-0.5 uppercase tracking-wide">
+                    <span className="font-bold text-slate-700 block mb-0.5 tracking-wide">
                       Registrar Notes / Remarks:
                     </span>
                     <p className="text-slate-800">{userApplication.remarks}</p>
@@ -828,7 +828,7 @@ function StudentHomeContent() {
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link
                     href={`/track?ref=${userApplication.referenceNumber}`}
-                    className="btn-primary text-xs uppercase font-bold py-2.5 px-4 rounded"
+                    className="btn-primary text-xs font-bold py-2.5 px-4 rounded"
                   >
                     View / Track Application Details
                   </Link>
@@ -836,7 +836,7 @@ function StudentHomeContent() {
                   {userApplication.status === "Approved" && (
                     <Link
                       href={`/track?ref=${userApplication.referenceNumber}#timetable`}
-                      className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider shadow-xs inline-flex items-center gap-1 rounded"
+                      className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs inline-flex items-center gap-1 rounded"
                     >
                       View Enrolled Subjects &amp; Timetable &rarr;
                     </Link>
@@ -845,7 +845,7 @@ function StudentHomeContent() {
                   {userApplication.status === "Needs Revision" && (
                     <Link
                       href="/enroll"
-                      className="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider shadow-xs rounded"
+                      className="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold shadow-xs rounded"
                     >
                       Edit &amp; Resubmit Application
                     </Link>
@@ -943,7 +943,7 @@ function StudentHomeContent() {
                         }
                       }}
                       disabled={isDownloadingPdf}
-                      className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase px-4 py-2.5 transition-colors rounded"
+                      className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2.5 transition-colors rounded"
                     >
                       {isDownloadingPdf ? "Generating Official PDF..." : "Download Official DepEd Form (PDF)"}
                     </button>
@@ -959,10 +959,10 @@ function StudentHomeContent() {
                   <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${
                     isEnrollmentOpen ? "bg-emerald-500" : "bg-red-500"
                   }`} />
-                  <span className={`text-xs font-mono font-bold uppercase ${
+                  <span className={`text-xs font-bold ${
                     isEnrollmentOpen ? "text-emerald-900" : "text-red-900"
                   }`}>
-                    [ ONLINE ENROLLMENT: {isEnrollmentOpen ? `OPEN FOR S.Y. ${schoolYear} • ${semester}` : `CLOSED FOR S.Y. ${schoolYear} • ${semester}`} ]
+                    Online Enrollment: {isEnrollmentOpen ? `Open for S.Y. ${schoolYear} • ${semester}` : `Closed for S.Y. ${schoolYear} • ${semester}`}
                   </span>
                 </div>
 
@@ -998,7 +998,7 @@ function StudentHomeContent() {
                       <div className="pt-2">
                         <Link
                           href="/enroll"
-                          className={`inline-block text-xs uppercase tracking-wider font-bold py-3 px-8 rounded-md ${
+                          className={`inline-block text-xs font-bold py-3 px-8 rounded-md ${
                             isEnrollmentOpen
                               ? "btn-primary"
                               : "bg-red-800 hover:bg-red-900 text-white shadow-xs"
@@ -1023,7 +1023,7 @@ function StudentHomeContent() {
             {pastApplications.length > 0 && (
               <div className="p-4 bg-slate-50 border border-slate-300 space-y-3 rounded-lg shadow-xs">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <span className="text-xs font-mono font-bold text-slate-700 uppercase">
+                  <span className="text-xs font-mono font-bold text-slate-700">
                     Previous Academic Term Records ({pastApplications.length})
                   </span>
                   <span className="text-[11px] text-slate-500 font-medium">
@@ -1086,7 +1086,7 @@ function StudentHomeContent() {
            ========================================================================= */
         <div className="bg-white border-2 border-[#002060] shadow-sm rounded-lg overflow-hidden">
           {/* Tab Selector: Sign In vs Create Account */}
-          <div className="grid grid-cols-2 border-b-2 border-slate-200 text-center font-bold text-xs uppercase tracking-wider">
+          <div className="grid grid-cols-2 border-b-2 border-slate-200 text-center font-bold text-xs">
             <button
               type="button"
               onClick={() => {
@@ -1125,7 +1125,7 @@ function StudentHomeContent() {
             {activeTab === "signin" && (
               <div className="max-w-md mx-auto space-y-6">
                 <div className="border-b border-slate-200 pb-3 text-center">
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+                  <span className="text-xs font-mono font-bold text-[#002060] block mb-1">
                     Phase 1: Student Account Authentication
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
@@ -1138,8 +1138,8 @@ function StudentHomeContent() {
 
                 {regSuccessNotice && (
                   <div className="p-4 bg-emerald-50 border-2 border-emerald-600 shadow-xs rounded-md">
-                    <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider block mb-1">
-                      REGISTRATION SUCCESSFUL &bull; VERIFICATION LINK SENT
+                    <span className="text-xs font-bold text-emerald-950 block mb-1">
+                      Registration Successful &bull; Verification Link Sent
                     </span>
                     <p className="text-xs text-emerald-900 leading-relaxed font-medium">
                       {regSuccessNotice}
@@ -1152,8 +1152,8 @@ function StudentHomeContent() {
                   <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5 rounded-md">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
-                      <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                        6-DIGIT GMAIL VERIFICATION CODE REQUIRED
+                      <span className="text-xs font-bold text-amber-950">
+                        6-Digit Gmail Verification Code Required
                       </span>
                     </div>
                     <p className="text-xs text-amber-950 leading-relaxed font-medium">
@@ -1170,7 +1170,7 @@ function StudentHomeContent() {
                           setOtpSuccess("");
                           setShowOtpModal(true);
                         }}
-                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs rounded"
+                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs rounded"
                       >
                         Enter 6-Digit Code
                       </button>
@@ -1178,7 +1178,7 @@ function StudentHomeContent() {
                         type="button"
                         disabled={isResending || resendCooldown > 0}
                         onClick={handleResendVerification}
-                        className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-400 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer rounded"
+                        className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-400 text-xs font-bold transition-colors disabled:opacity-60 cursor-pointer rounded"
                       >
                         {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "Resend Code"}
                       </button>
@@ -1195,7 +1195,7 @@ function StudentHomeContent() {
                 {isLoggingIn && (
                   <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-md">
                     <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                      <span>SYSTEM AUTHENTICATING</span>
+                      <span>System Authenticating</span>
                       <span>{loginProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden rounded-full">
@@ -1213,14 +1213,14 @@ function StudentHomeContent() {
                 {loginError && (
                   <div className="p-3 bg-red-50 border-2 border-red-400 rounded-md">
                     <p className="text-xs font-bold text-red-900 leading-normal">
-                      AUTHENTICATION ERROR: {loginError}
+                      Authentication Error: {loginError}
                     </p>
                   </div>
                 )}
 
                 <form onSubmit={handleLoginSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-900 mb-1">
                       Registered Email Address <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -1241,7 +1241,7 @@ function StudentHomeContent() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-900 mb-1">
                       Account Password <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -1262,7 +1262,7 @@ function StudentHomeContent() {
                     <button
                       type="submit"
                       disabled={isLoggingIn}
-                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-md"
+                      className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-md"
                     >
                       {isLoggingIn ? "Authenticating... Please Wait" : "Sign In & Proceed to Student Portal"}
                     </button>
@@ -1277,7 +1277,7 @@ function StudentHomeContent() {
             {activeTab === "register" && (
               <div className="max-w-xl mx-auto space-y-6">
                 <div className="border-b border-slate-200 pb-3 text-center">
-                  <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
+                  <span className="text-xs font-mono font-bold text-[#002060] block mb-1">
                     Phase 1: New Learner Registration
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
@@ -1293,7 +1293,7 @@ function StudentHomeContent() {
                 {isRegistering && (
                   <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-md">
                     <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                      <span>SYSTEM REGISTERING APPLICANT</span>
+                      <span>System Registering Applicant</span>
                       <span>{regProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden rounded-full">
@@ -1311,7 +1311,7 @@ function StudentHomeContent() {
                 {regErrors.form && (
                   <div className="p-3 bg-red-50 border-2 border-red-400 rounded-md">
                     <p className="text-xs font-bold text-red-900 leading-normal">
-                      REGISTRATION NOTICE: {regErrors.form}
+                      Registration Notice: {regErrors.form}
                     </p>
                   </div>
                 )}
@@ -1320,7 +1320,7 @@ function StudentHomeContent() {
                   {/* Name Fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      <label className="block text-xs font-bold text-slate-900 mb-1">
                         Last Name <span className="text-red-700">*</span>
                       </label>
                       <input
@@ -1338,7 +1338,7 @@ function StudentHomeContent() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      <label className="block text-xs font-bold text-slate-900 mb-1">
                         First Name <span className="text-red-700">*</span>
                       </label>
                       <input
@@ -1356,7 +1356,7 @@ function StudentHomeContent() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      <label className="block text-xs font-bold text-slate-900 mb-1">
                         Middle Name
                       </label>
                       <input
@@ -1372,7 +1372,7 @@ function StudentHomeContent() {
 
                   {/* Email Address */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                    <label className="block text-xs font-bold text-slate-900 mb-1">
                       Account Email Address <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -1395,7 +1395,7 @@ function StudentHomeContent() {
                   {/* Passwords */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      <label className="block text-xs font-bold text-slate-900 mb-1">
                         Security Password <span className="text-red-700">*</span>
                       </label>
                       <input
@@ -1413,7 +1413,7 @@ function StudentHomeContent() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                      <label className="block text-xs font-bold text-slate-900 mb-1">
                         Confirm Password <span className="text-red-700">*</span>
                       </label>
                       <input
@@ -1432,7 +1432,7 @@ function StudentHomeContent() {
                   </div>
 
                   <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 rounded-md">
-                    <strong className="text-slate-800 block mb-0.5 uppercase tracking-wide">
+                    <strong className="text-slate-800 block mb-0.5 tracking-wide">
                       DepEd Enrollment Notice:
                     </strong>
                     Your 12-digit Learner Reference Number (LRN), Dumalneg Elementary School background, and document attachments 
@@ -1443,7 +1443,7 @@ function StudentHomeContent() {
                     <button
                       type="submit"
                       disabled={isRegistering}
-                      className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-md"
+                      className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-md"
                     >
                       {isRegistering ? "Creating Account... Please Wait" : "Create Account & Register"}
                     </button>
@@ -1457,7 +1457,7 @@ function StudentHomeContent() {
 
       {/* Institutional Services Reference Section */}
       <section className="bg-slate-100 p-6 border border-slate-200 rounded-lg">
-        <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase mb-3">
+        <h3 className="text-xs font-bold tracking-wider text-slate-700 mb-3">
           Dumalneg National High School Enrollment Services
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
@@ -1491,10 +1491,10 @@ function StudentHomeContent() {
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-blue-200 block">
-                  SECURITY VERIFICATION &bull; STEP 2 OF 2
+                <span className="text-[10px] font-mono font-bold tracking-widest text-blue-200 block">
+                  Security Verification &bull; Step 2 of 2
                 </span>
-                <h3 className="text-lg font-bold uppercase tracking-tight text-white mt-0.5">
+                <h3 className="text-lg font-bold tracking-tight text-white mt-0.5">
                   Enter 6-Digit Verification Code
                 </h3>
               </div>
@@ -1531,7 +1531,7 @@ function StudentHomeContent() {
 
               <form onSubmit={handleVerifyOtpSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase text-center mb-2">
+                  <label className="block text-xs font-bold text-slate-800 text-center mb-2">
                     Enter Verification Code (6 to 8 Digits)
                   </label>
                   <input
@@ -1558,7 +1558,7 @@ function StudentHomeContent() {
                   <button
                     type="submit"
                     disabled={isVerifyingOtp || otpCode.replace(/\D/g, "").length < 6}
-                    className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer rounded-md"
+                    className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer rounded-md"
                   >
                     {isVerifyingOtp ? "Verifying Code..." : "Verify & Activate Account"}
                   </button>

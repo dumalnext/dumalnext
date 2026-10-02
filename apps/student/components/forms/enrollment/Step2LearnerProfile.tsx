@@ -288,10 +288,10 @@ export default function Step2LearnerProfile({
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded">
-            STEP 02 OF 05
+          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded">
+            Step 02 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 tracking-wider">
             DepEd Form Section 3
           </span>
         </div>
@@ -306,7 +306,7 @@ export default function Step2LearnerProfile({
       {/* Part A: Official DepEd Identifiers (LRN & PSA) */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
             Part A: Official DepEd Identifiers
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
@@ -317,7 +317,7 @@ export default function Step2LearnerProfile({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* LRN (12 Digits) */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Learner Reference Number (LRN) <span className="text-red-700">*</span>
             </label>
             <input
@@ -352,7 +352,7 @@ export default function Step2LearnerProfile({
 
           {/* PSA Birth Certificate No. */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               PSA Birth Certificate No. <span className="text-slate-400 font-normal">(Optional upon registration)</span>
             </label>
             <input
@@ -372,8 +372,8 @@ export default function Step2LearnerProfile({
       {/* Part B: Legal Name Details */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part B: Learner&apos;s Legal Name (As Appearing on PSA Birth Certificate) ]
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Part B: Learner&apos;s Legal Name (As Appearing on PSA Birth Certificate)
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
             Print legibly in capital letters. Do not use nicknames or informal abbreviations.
@@ -383,7 +383,7 @@ export default function Step2LearnerProfile({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Last Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Last Name <span className="text-red-700">*</span>
             </label>
             <input
@@ -402,7 +402,7 @@ export default function Step2LearnerProfile({
 
           {/* First Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               First Name <span className="text-red-700">*</span>
             </label>
             <input
@@ -422,7 +422,7 @@ export default function Step2LearnerProfile({
           {/* Middle Name */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold text-slate-900 uppercase">
+              <label className="text-xs font-bold text-slate-900">
                 Middle Name {!hasNoMiddleName && <span className="text-red-700">*</span>}
               </label>
               <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
@@ -469,7 +469,7 @@ export default function Step2LearnerProfile({
 
           {/* Extension Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Extension Name <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
             <select
@@ -493,16 +493,16 @@ export default function Step2LearnerProfile({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Part C: Demographics &amp; Smart Age Calculation ]
+            <span className="text-xs font-bold text-[#002060] tracking-wider block">
+              Part C: Demographics &amp; Smart Age Calculation
             </span>
             {isUnderage || errors.age ? (
-              <span className="text-[11px] font-mono bg-red-100 text-red-800 border border-red-400 px-2 py-0.5 font-bold uppercase rounded">
-                [ INELIGIBLE: UNDERAGE FOR GRADE {targetGrade} ]
+              <span className="text-[11px] font-mono bg-red-100 text-red-800 border border-red-400 px-2 py-0.5 font-bold rounded">
+                Ineligible: Underage for Grade {targetGrade}
               </span>
             ) : (
               <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded">
-                [ AUTO-AGE COMPUTATION ACTIVE &bull; GRADE {targetGrade} ]
+                Auto-Age Computation Active &bull; Grade {targetGrade}
               </span>
             )}
           </div>
@@ -514,7 +514,7 @@ export default function Step2LearnerProfile({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Date of Birth */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Date of Birth <span className="text-red-700">*</span>
             </label>
             <input
@@ -532,7 +532,7 @@ export default function Step2LearnerProfile({
 
           {/* Age (Auto-Calculated) */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Age (Years Old) <span className="text-red-700">*</span>
             </label>
             <div className="flex items-center gap-2">
@@ -553,8 +553,8 @@ export default function Step2LearnerProfile({
             </div>
             {(isUnderage || errors.age) ? (
               <div className="mt-1.5 p-2.5 bg-red-100 border border-red-400 text-red-900 space-y-1 rounded-md">
-                <div className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-red-800">
-                  <span>[ INELIGIBLE FOR GRADE {targetGrade} ]</span>
+                <div className="text-[11px] font-bold tracking-wider flex items-center gap-1.5 text-red-800">
+                  <span>Ineligible for Grade {targetGrade}</span>
                 </div>
                 <p className="text-[11px] text-red-700 font-semibold leading-tight">
                   {errors.age || `Learners aged ${maxUnderageLimit} and below are not eligible for Grade ${targetGrade}. Minimum required age is ${minRequiredAge} years old.`}
@@ -569,7 +569,7 @@ export default function Step2LearnerProfile({
 
           {/* Sex (Male / Female) */}
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Sex <span className="text-red-700">*</span>
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -589,13 +589,13 @@ export default function Step2LearnerProfile({
                         });
                       }
                     }}
-                    className={`p-3 border-2 font-bold text-xs uppercase tracking-wider transition-all rounded-md ${
+                    className={`p-3 border-2 font-bold text-xs tracking-wider transition-all rounded-md ${
                       isSelected
                         ? "bg-[#002060] text-white border-[#002060] shadow-sm"
                         : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
                     }`}
                   >
-                    [ {isSelected ? "X" : " "} ] {genderOption}
+                    {isSelected ? "✓ " : ""}{genderOption}
                   </button>
                 );
               })}
@@ -609,7 +609,7 @@ export default function Step2LearnerProfile({
 
           {/* Place of Birth */}
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Place of Birth (Municipality/City) <span className="text-red-700">*</span>
             </label>
             <input
@@ -628,7 +628,7 @@ export default function Step2LearnerProfile({
 
           {/* Mother Tongue */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Mother Tongue <span className="text-red-700">*</span>
             </label>
             <select
@@ -661,7 +661,7 @@ export default function Step2LearnerProfile({
 
             {isOtherMotherTongue && (
               <div className="mt-2">
-                <label className="block text-[11px] font-bold text-slate-800 uppercase mb-1">
+                <label className="block text-[11px] font-bold text-slate-800 mb-1">
                   Please specify Mother Tongue <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -695,7 +695,7 @@ export default function Step2LearnerProfile({
 
           {/* Religion */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Religion <span className="text-slate-500 font-normal">(Select or specify)</span>
             </label>
             <select
@@ -729,7 +729,7 @@ export default function Step2LearnerProfile({
 
             {isOtherReligion && (
               <div className="mt-2">
-                <label className="block text-[11px] font-bold text-slate-800 uppercase mb-1">
+                <label className="block text-[11px] font-bold text-slate-800 mb-1">
                   Please specify Religion <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -766,8 +766,8 @@ export default function Step2LearnerProfile({
       {/* Part D: Social Welfare & Indigenous Cultural Community */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part D: Indigenous Cultural Community &amp; 4Ps Beneficiary Data ]
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Part D: Indigenous Cultural Community &amp; 4Ps Beneficiary Data
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
             Dumalneg is an ancestral domain of the Isnag/Itneg people. Specify cultural heritage and national social welfare affiliations.
@@ -777,7 +777,7 @@ export default function Step2LearnerProfile({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* IP Community Toggle & Specifier */}
           <div className="p-4 bg-white border-2 border-slate-200 space-y-3 rounded-md">
-            <label className="block text-xs font-bold text-slate-900 uppercase">
+            <label className="block text-xs font-bold text-slate-900">
               Belonging to any Indigenous Peoples (IP) Community? <span className="text-red-700">*</span>
             </label>
             <div className="flex gap-4">
@@ -789,7 +789,7 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ isIpCommunity: true, ipCommunityName: data.ipCommunityName || "Isnag" })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>YES</span>
+                <span>Yes</span>
               </label>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
                 <input
@@ -799,13 +799,13 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ isIpCommunity: false, ipCommunityName: "" })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>NO</span>
+                <span>No</span>
               </label>
             </div>
 
             {data.isIpCommunity && (
               <div className="pt-2">
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Specify Indigenous Community Name <span className="text-red-700">*</span>
                 </label>
                 <div className="flex gap-2 mb-2">
@@ -842,7 +842,7 @@ export default function Step2LearnerProfile({
 
           {/* 4Ps Beneficiary Toggle & 16-Digit ID */}
           <div className="p-4 bg-white border-2 border-slate-200 space-y-3 rounded-md">
-            <label className="block text-xs font-bold text-slate-900 uppercase">
+            <label className="block text-xs font-bold text-slate-900">
               Is your family a beneficiary of 4Ps (Pantawid Pamilya)? <span className="text-red-700">*</span>
             </label>
             <div className="flex gap-4">
@@ -854,7 +854,7 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ is4psBeneficiary: true })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>YES</span>
+                <span>Yes</span>
               </label>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
                 <input
@@ -864,13 +864,13 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ is4psBeneficiary: false, householdId4ps: "" })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>NO</span>
+                <span>No</span>
               </label>
             </div>
 
             {data.is4psBeneficiary && (
               <div className="pt-2">
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   4Ps Household ID Number (16 Digits) <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -901,8 +901,8 @@ export default function Step2LearnerProfile({
       {/* Part E: Residential Addresses */}
       <div className="space-y-6 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part E: Current &amp; Permanent Residential Address ]
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Part E: Current &amp; Permanent Residential Address
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
             Provide the physical domicile address of the enrolling student.
@@ -911,13 +911,13 @@ export default function Step2LearnerProfile({
 
         {/* Current Address */}
         <div className="space-y-3">
-          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block border-l-3 border-[#002060] pl-2">
+          <span className="text-xs font-bold text-slate-900 tracking-wider block border-l-3 border-[#002060] pl-2">
             Current Residential Address
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* House No */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 House No. / Street
               </label>
               <input
@@ -931,7 +931,7 @@ export default function Step2LearnerProfile({
 
             {/* Sitio */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Sitio / Purok
               </label>
               <input
@@ -945,7 +945,7 @@ export default function Step2LearnerProfile({
 
             {/* Municipality Dropdown */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Municipality / City <span className="text-red-700">*</span>
               </label>
               <select
@@ -986,7 +986,7 @@ export default function Step2LearnerProfile({
 
               {currentMuniMode === "OTHER" && (
                 <div className="mt-2">
-                  <label className="block text-[11px] font-bold text-slate-800 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-slate-800 mb-1">
                     Specify Municipality / City <span className="text-red-700">*</span>
                   </label>
                   <input
@@ -1027,7 +1027,7 @@ export default function Step2LearnerProfile({
 
             {/* Barangay (Smart Dropdown for Dumalneg, Text Box for Other) */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Barangay <span className="text-red-700">*</span>
               </label>
               {currentMuniMode === "DUMALNEG" ? (
@@ -1082,7 +1082,7 @@ export default function Step2LearnerProfile({
 
             {/* Province */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Province <span className="text-red-700">*</span>
               </label>
               <input
@@ -1100,7 +1100,7 @@ export default function Step2LearnerProfile({
 
             {/* Country */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Country
               </label>
               <input
@@ -1113,7 +1113,7 @@ export default function Step2LearnerProfile({
 
             {/* Zip Code */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Zip Code
               </label>
               <input
@@ -1131,7 +1131,7 @@ export default function Step2LearnerProfile({
 
             {/* Contact Number */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Learner / Family Mobile No. <span className="text-red-700">*</span>
               </label>
               <input
@@ -1158,7 +1158,7 @@ export default function Step2LearnerProfile({
         <div className="pt-3 border-t border-slate-200">
           <div className="flex items-center justify-between p-4 bg-white border-2 border-slate-200 rounded-md">
             <div>
-              <span className="text-xs font-bold text-slate-900 uppercase block">
+              <span className="text-xs font-bold text-slate-900 block">
                 Permanent Residential Address
               </span>
               <span className="text-[11px] text-slate-600">
@@ -1169,24 +1169,24 @@ export default function Step2LearnerProfile({
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(true)}
-                className={`px-4 py-2 border-2 text-xs font-bold uppercase transition-all rounded-md ${
+                className={`px-4 py-2 border-2 text-xs font-bold transition-all rounded-md ${
                   data.isPermanentSameAsCurrent
                     ? "bg-[#002060] text-white border-[#002060]"
                     : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
                 }`}
               >
-                [ {data.isPermanentSameAsCurrent ? "X" : " "} ] YES (SAME)
+                {data.isPermanentSameAsCurrent ? "✓ " : ""}Yes (Same)
               </button>
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(false)}
-                className={`px-4 py-2 border-2 text-xs font-bold uppercase transition-all rounded-md ${
+                className={`px-4 py-2 border-2 text-xs font-bold transition-all rounded-md ${
                   !data.isPermanentSameAsCurrent
                     ? "bg-[#002060] text-white border-[#002060]"
                     : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
                 }`}
               >
-                [ {!data.isPermanentSameAsCurrent ? "X" : " "} ] NO (DIFFERENT)
+                {!data.isPermanentSameAsCurrent ? "✓ " : ""}No (Different)
               </button>
             </div>
           </div>
@@ -1195,7 +1195,7 @@ export default function Step2LearnerProfile({
           {!data.isPermanentSameAsCurrent && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white border-2 border-t-0 border-slate-200 rounded-b-md">
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent House No. / Street
                 </label>
                 <input
@@ -1206,7 +1206,7 @@ export default function Step2LearnerProfile({
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Sitio / Purok
                 </label>
                 <input
@@ -1217,7 +1217,7 @@ export default function Step2LearnerProfile({
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Municipality <span className="text-red-700">*</span>
                 </label>
                 <select
@@ -1258,7 +1258,7 @@ export default function Step2LearnerProfile({
 
                 {permanentMuniMode === "OTHER" && (
                   <div className="mt-2">
-                    <label className="block text-[11px] font-bold text-slate-800 uppercase mb-1">
+                    <label className="block text-[11px] font-bold text-slate-800 mb-1">
                       Specify Municipality / City <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -1295,7 +1295,7 @@ export default function Step2LearnerProfile({
                 )}
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Barangay <span className="text-red-700">*</span>
                 </label>
                 {permanentMuniMode === "DUMALNEG" ? (
@@ -1348,7 +1348,7 @@ export default function Step2LearnerProfile({
                 )}
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Province <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -1365,7 +1365,7 @@ export default function Step2LearnerProfile({
                 )}
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Zip Code
                 </label>
                 <input
@@ -1390,14 +1390,14 @@ export default function Step2LearnerProfile({
         <button
           type="button"
           onClick={onBack}
-          className="btn-secondary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center rounded-md"
+          className="btn-secondary text-xs tracking-wider font-bold py-3.5 px-8 text-center rounded-md"
         >
           Back to Step 1: Classification
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-md"
+          className="btn-primary text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-md"
         >
           Proceed: Family Background (Step 3)
         </button>

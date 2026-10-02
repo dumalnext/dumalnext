@@ -49,8 +49,8 @@ export default function LoginPage() {
     <div className="max-w-md mx-auto space-y-6 font-sans">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4 text-center">
-        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-          DUMALNEG NATIONAL HIGH SCHOOL &bull; STUDENT PORTAL
+        <span className="text-xs font-semibold text-[#002060]">
+          Dumalneg National High School &bull; Student Portal
         </span>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
           Student Portal Sign In
@@ -64,7 +64,7 @@ export default function LoginPage() {
       {error && (
         <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
           <p className="text-xs font-bold text-red-900 leading-normal">
-            AUTHENTICATION ERROR: {error}
+            Authentication Error: {error}
           </p>
         </div>
       )}
@@ -74,7 +74,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Identifier: Email First */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Registered Email Address <span className="text-red-700">*</span>
             </label>
             <input
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Account Password <span className="text-red-700">*</span>
             </label>
             <input
@@ -116,7 +116,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs uppercase font-bold tracking-wider hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
             >
               {isSubmitting ? "Authenticating Account..." : "Sign In to Student Portal"}
             </button>
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
         {/* Capstone Defense Testing Quick Buttons */}
         <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] rounded-md">
-          <span className="font-bold text-slate-600 block uppercase text-[10px]">
+          <span className="font-bold text-slate-600 block text-[10px] uppercase tracking-wider">
             Capstone Defense Demo Shortcuts:
           </span>
           <div className="flex flex-col gap-1">
@@ -155,7 +155,7 @@ export default function LoginPage() {
         {/* Register Account Link */}
         <div className="text-center pt-2 border-t border-slate-200 text-xs text-slate-600">
           First time enrolling or don&apos;t have an account yet?{" "}
-          <Link href="/register" className="text-[#002060] font-bold uppercase hover:underline block mt-1">
+          <Link href="/register" className="text-[#002060] font-bold hover:underline block mt-1">
             Register New Student Account &rarr;
           </Link>
         </div>

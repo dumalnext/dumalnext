@@ -268,10 +268,10 @@ export default function Step3FamilyBackground({
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded">
-            STEP 03 OF 05
+          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded">
+            Step 03 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 tracking-wider">
             DepEd Form Section 4
           </span>
         </div>
@@ -302,7 +302,7 @@ export default function Step3FamilyBackground({
       {/* Primary Emergency Contact Dispatcher */}
       <div className="p-5 bg-blue-50/50 border-2 border-blue-200 space-y-3 rounded-md">
         <div>
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
             Primary School Contact / Designated Custodian
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
@@ -330,7 +330,7 @@ export default function Step3FamilyBackground({
               className="accent-[#002060]"
             />
             <div className="text-xs">
-              <div className="font-bold uppercase">Father</div>
+              <div className="font-bold">Father</div>
               <div className={primaryContact === "Father" && !isFatherNotAvailable ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
                 {isFatherNotAvailable ? "Unavailable" : "Primary Emergency Contact"}
               </div>
@@ -356,7 +356,7 @@ export default function Step3FamilyBackground({
               className="accent-[#002060]"
             />
             <div className="text-xs">
-              <div className="font-bold uppercase">Mother</div>
+              <div className="font-bold">Mother</div>
               <div className={primaryContact === "Mother" && !isMotherNotAvailable ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
                 {isMotherNotAvailable ? "Unavailable" : "Primary Emergency Contact"}
               </div>
@@ -379,7 +379,7 @@ export default function Step3FamilyBackground({
               className="accent-[#002060]"
             />
             <div className="text-xs">
-              <div className="font-bold uppercase">Legal Guardian</div>
+              <div className="font-bold">Legal Guardian</div>
               <div className={primaryContact === "Guardian" ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
                 {isBothParentsUnavailable ? "Mandatory Custodian" : "Authorized Custodian"}
               </div>
@@ -392,7 +392,7 @@ export default function Step3FamilyBackground({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+            <span className="text-xs font-bold text-[#002060] tracking-wider block">
               Section A: Father&apos;s Legal Information
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
@@ -419,7 +419,7 @@ export default function Step3FamilyBackground({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Father Last Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Father&apos;s Last Name <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -447,7 +447,7 @@ export default function Step3FamilyBackground({
 
               {/* Father First Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Father&apos;s First Name <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -476,7 +476,7 @@ export default function Step3FamilyBackground({
               {/* Father Middle Name */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-900 uppercase">
+                  <label className="text-xs font-bold text-slate-900">
                     Father&apos;s Middle Name {!hasNoFatherMiddleName && <span className="text-red-700">*</span>}
                   </label>
                   <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
@@ -535,7 +535,7 @@ export default function Step3FamilyBackground({
 
             {/* Father Contact Number */}
             <div className="max-w-md">
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Father&apos;s Mobile Contact Number
               </label>
               <div className="relative">
@@ -575,7 +575,7 @@ export default function Step3FamilyBackground({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+            <span className="text-xs font-bold text-[#002060] tracking-wider block">
               Section B: Mother&apos;s Maiden Legal Information
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
@@ -606,7 +606,7 @@ export default function Step3FamilyBackground({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Mother Maiden Last Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Mother&apos;s Maiden Last Name <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -634,7 +634,7 @@ export default function Step3FamilyBackground({
 
               {/* Mother First Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Mother&apos;s First Name <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -663,7 +663,7 @@ export default function Step3FamilyBackground({
               {/* Mother Middle Name */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-900 uppercase">
+                  <label className="text-xs font-bold text-slate-900">
                     Mother&apos;s Middle Name {!hasNoMotherMiddleName && <span className="text-red-700">*</span>}
                   </label>
                   <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
@@ -722,7 +722,7 @@ export default function Step3FamilyBackground({
 
             {/* Mother Contact Number */}
             <div className="max-w-md">
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Mother&apos;s Mobile Contact Number
               </label>
               <div className="relative">
@@ -765,18 +765,18 @@ export default function Step3FamilyBackground({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className={`text-xs font-bold uppercase tracking-wider block ${
+              <span className={`text-xs font-bold tracking-wider block ${
                 isBothParentsUnavailable ? "text-red-900" : "text-[#002060]"
               }`}>
                 Section C: Legal Guardian / Authorized Custodian
               </span>
               {isBothParentsUnavailable ? (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-700 text-white font-mono rounded">
-                  REQUIRED BY DEPED
+                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-red-700 text-white font-mono rounded">
+                  Required by DepEd
                 </span>
               ) : (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700 border border-slate-300 rounded">
-                  OPTIONAL
+                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-slate-200 text-slate-700 border border-slate-300 rounded">
+                  Optional
                 </span>
               )}
             </div>
@@ -791,7 +791,7 @@ export default function Step3FamilyBackground({
         <div className="space-y-4">
           {/* Guardian Relationship Selector */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Guardian&apos;s Relationship to Learner {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
             </label>
             <select
@@ -810,7 +810,7 @@ export default function Step3FamilyBackground({
                 errors.guardianRelationship ? "border-red-600 bg-red-50" : "border-slate-300"
               }`}
             >
-              <option value="">-- SELECT RELATIONSHIP --</option>
+              <option value="">-- Select Relationship --</option>
               {GUARDIAN_RELATIONSHIPS.map((rel) => (
                 <option key={rel} value={rel}>
                   {rel}
@@ -825,7 +825,7 @@ export default function Step3FamilyBackground({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Guardian Last Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Guardian&apos;s Last Name {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
               </label>
               <input
@@ -853,7 +853,7 @@ export default function Step3FamilyBackground({
 
             {/* Guardian First Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Guardian&apos;s First Name {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
               </label>
               <input
@@ -882,7 +882,7 @@ export default function Step3FamilyBackground({
             {/* Guardian Middle Name */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-bold text-slate-900 uppercase">
+                <label className="text-xs font-bold text-slate-900">
                   Guardian&apos;s Middle Name {isBothParentsUnavailable && !hasNoGuardianMiddleName ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
                 </label>
                 <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
@@ -941,7 +941,7 @@ export default function Step3FamilyBackground({
 
           {/* Guardian Contact Number */}
           <div className="max-w-md">
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Guardian&apos;s Mobile Contact Number {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
             </label>
             <div className="relative">
@@ -981,14 +981,14 @@ export default function Step3FamilyBackground({
         <button
           type="button"
           onClick={onBack}
-          className="w-full sm:w-auto px-6 py-3 border-2 border-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 transition-colors rounded-md"
+          className="w-full sm:w-auto px-6 py-3 border-2 border-slate-300 text-slate-700 font-bold text-xs tracking-wider hover:bg-slate-100 transition-colors rounded-md"
         >
           &larr; Back to Step 2
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="w-full sm:w-auto px-8 py-3 bg-[#002060] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded-md"
+          className="w-full sm:w-auto px-8 py-3 bg-[#002060] text-white font-bold text-xs tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded-md"
         >
           Proceed to Step 4 &rarr;
         </button>
