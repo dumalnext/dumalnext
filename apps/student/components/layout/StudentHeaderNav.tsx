@@ -408,7 +408,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
-                  className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer rounded"
                 >
                   [ X Close ]
                 </button>
@@ -422,19 +422,19 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       [ ACTIVE LEARNER SESSION ]
                     </span>
                     {appStatus === "Approved" ? (
-                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-mono font-bold uppercase">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-mono font-bold uppercase rounded-sm">
                         APPROVED
                       </span>
                     ) : appStatus === "Needs Revision" ? (
-                      <span className="text-[10px] bg-red-100 text-red-900 px-2 py-0.5 border border-red-400 font-mono font-bold uppercase">
+                      <span className="text-[10px] bg-red-100 text-red-900 px-2 py-0.5 border border-red-400 font-mono font-bold uppercase rounded-sm">
                         REVISION NEEDED
                       </span>
                     ) : appStatus === "Pending" ? (
-                      <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-400 font-mono font-bold uppercase">
+                      <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-400 font-mono font-bold uppercase rounded-sm">
                         PENDING EVALUATION
                       </span>
                     ) : (
-                      <span className="text-[10px] bg-blue-100 text-blue-950 px-2 py-0.5 border border-blue-400 font-mono font-bold uppercase">
+                      <span className="text-[10px] bg-blue-100 text-blue-950 px-2 py-0.5 border border-blue-400 font-mono font-bold uppercase rounded-sm">
                         NEW APPLICANT
                       </span>
                     )}
@@ -457,13 +457,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer"
+                      className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
                           [ SECTION ASSIGNED ]
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 font-mono text-[9px] font-bold uppercase">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
                           Official Roster &rarr;
                         </span>
@@ -479,13 +479,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href="/enroll"
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer"
+                      className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
                           [ ENROLLMENT REQUIRED ]
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] font-mono text-[9px] font-bold uppercase">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
                           Action Needed &rarr;
                         </span>
@@ -501,13 +501,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer"
+                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
                           [ SECTION STATUS &bull; TRANSFEREE ]
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 font-mono text-[9px] font-bold uppercase">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
                           Pending Placement &rarr;
                         </span>
@@ -523,13 +523,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer"
+                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
                           [ SECTION STATUS ]
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 font-mono text-[9px] font-bold uppercase">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 font-mono text-[9px] font-bold uppercase rounded-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
                           Pending Placement &rarr;
                         </span>
@@ -564,7 +564,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href="/"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all ${
+                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
                     pathname === "/"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -585,7 +585,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href={enrollHref}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all ${
+                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
                     pathname === "/enroll"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -606,7 +606,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href={trackHref}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all ${
+                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
                     pathname === "/track"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -627,7 +627,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href={sectionHref}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all ${
+                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
                     pathname === "/section"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -661,7 +661,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     setIsMenuOpen(false);
                     logout();
                   }}
-                  className="w-full py-2.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border-2 border-red-300 hover:border-red-500 font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block"
+                  className="w-full py-2.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border-2 border-red-300 hover:border-red-500 font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded active:scale-[0.99]"
                 >
                   [ Sign Out Account ]
                 </button>
@@ -669,7 +669,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href="/?tab=signin"
                   onClick={() => setIsMenuOpen(false)}
-                  className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs"
+                  className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded active:scale-[0.99]"
                 >
                   [ Sign In / Register Account ]
                 </Link>

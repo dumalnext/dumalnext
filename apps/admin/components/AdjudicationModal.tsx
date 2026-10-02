@@ -560,7 +560,7 @@ export default function AdjudicationModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-      <div className="bg-white border-4 border-[#002060] w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl">
+      <div className="bg-white border-4 border-[#002060] w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl rounded-lg overflow-hidden">
         {/* Modal Header */}
         <div className="bg-[#002060] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
           <div>
@@ -568,7 +568,7 @@ export default function AdjudicationModal({
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
                 [ ENROLLMENT ADJUDICATION DOSSIER ]
               </span>
-              <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5">
+              <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5 rounded-xs">
                 REF: {application.application_id}
               </span>
             </div>
@@ -583,17 +583,17 @@ export default function AdjudicationModal({
           <div className="flex items-center gap-3">
             {/* Current Status Chip */}
             {application.status === "Approved" ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border-2 border-emerald-500">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border-2 border-emerald-500 rounded">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
                 APPROVED
               </span>
             ) : application.status === "Needs Revision" ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border-2 border-red-500">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border-2 border-red-500 rounded">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" />
                 REVISION REQUIRED
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border-2 border-amber-400">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border-2 border-amber-400 rounded">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 PENDING VERIFICATION
               </span>
@@ -602,7 +602,7 @@ export default function AdjudicationModal({
             <button
               type="button"
               onClick={onClose}
-              className="text-white hover:text-slate-300 font-mono text-xl font-bold px-2 py-1"
+              className="text-white hover:text-slate-300 font-mono text-xl font-bold px-2 py-1 rounded hover:bg-blue-900/40"
               title="Close modal"
             >
               &times;
@@ -615,7 +615,7 @@ export default function AdjudicationModal({
           <button
             type="button"
             onClick={() => setActiveTab("learner")}
-            className={`py-3 px-3.5 border-b-2 transition-colors ${
+            className={`py-3 px-3.5 border-b-2 transition-colors rounded-t ${
               activeTab === "learner"
                 ? "border-[#002060] bg-white text-[#002060]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
@@ -626,7 +626,7 @@ export default function AdjudicationModal({
           <button
             type="button"
             onClick={() => setActiveTab("family")}
-            className={`py-3 px-3.5 border-b-2 transition-colors ${
+            className={`py-3 px-3.5 border-b-2 transition-colors rounded-t ${
               activeTab === "family"
                 ? "border-[#002060] bg-white text-[#002060]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
@@ -637,7 +637,7 @@ export default function AdjudicationModal({
           <button
             type="button"
             onClick={() => setActiveTab("academic")}
-            className={`py-3 px-3.5 border-b-2 transition-colors ${
+            className={`py-3 px-3.5 border-b-2 transition-colors rounded-t ${
               activeTab === "academic"
                 ? "border-[#002060] bg-white text-[#002060]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
@@ -648,7 +648,7 @@ export default function AdjudicationModal({
           <button
             type="button"
             onClick={() => setActiveTab("documents")}
-            className={`py-3 px-3.5 border-b-2 transition-colors ${
+            className={`py-3 px-3.5 border-b-2 transition-colors rounded-t ${
               activeTab === "documents"
                 ? "border-[#002060] bg-white text-[#002060]"
                 : "border-transparent text-slate-600 hover:text-slate-900"
@@ -1584,11 +1584,11 @@ export default function AdjudicationModal({
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 placeholder="Leave blank for smart auto-dispatch ('Double check your...' on revision or 'You're enrolled...' on approval) or type custom remarks..."
-                className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none font-sans"
+                className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none font-sans rounded"
               />
 
               {!remarks.trim() && (
-                <div className="text-[10px] text-slate-500 font-mono bg-slate-50 p-1.5 border border-slate-200 flex flex-wrap items-center gap-2">
+                <div className="text-[10px] text-slate-500 font-mono bg-slate-50 p-1.5 border border-slate-200 flex flex-wrap items-center gap-2 rounded">
                   <span className="font-bold text-[#002060]">SMART DISPATCH:</span>
                   <span>Empty box auto-sends <strong>&ldquo;Double check your...&rdquo;</strong> on revision, or <strong>&ldquo;You&apos;re enrolled...&rdquo;</strong> on approval.</span>
                 </div>
@@ -1596,13 +1596,13 @@ export default function AdjudicationModal({
             </div>
 
             {actionError && (
-              <div className="p-2.5 bg-red-50 border border-red-400 text-xs text-red-900 font-bold">
+              <div className="p-2.5 bg-red-50 border border-red-400 text-xs text-red-900 font-bold rounded">
                 [ Error ]: {actionError}
               </div>
             )}
 
             {actionSuccess && (
-              <div className="p-2.5 bg-emerald-50 border border-emerald-500 text-xs text-emerald-900 font-bold">
+              <div className="p-2.5 bg-emerald-50 border border-emerald-500 text-xs text-emerald-900 font-bold rounded">
                 [ Success ]: {actionSuccess}
               </div>
             )}
@@ -1613,7 +1613,7 @@ export default function AdjudicationModal({
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold uppercase tracking-wider cursor-pointer"
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold uppercase tracking-wider cursor-pointer rounded"
               >
                 Close Inspection
               </button>
@@ -1623,7 +1623,7 @@ export default function AdjudicationModal({
                   type="button"
                   onClick={handleNeedsRevision}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer rounded"
                 >
                   {isSubmitting ? "Updating..." : "[ Request Revision ]"}
                 </button>
@@ -1632,7 +1632,7 @@ export default function AdjudicationModal({
                   type="button"
                   onClick={handleApprove}
                   disabled={isSubmitting}
-                  className={`px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs ${
+                  className={`px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs rounded ${
                     (isSHS ? (!selectedSectionId || !selectedElectiveSectionId) : !selectedSectionId)
                       ? "bg-amber-500 hover:bg-amber-600 text-slate-950 border-2 border-amber-600 font-extrabold cursor-pointer"
                       : "bg-[#002060] hover:bg-blue-950 text-white border-2 border-[#002060] cursor-pointer"

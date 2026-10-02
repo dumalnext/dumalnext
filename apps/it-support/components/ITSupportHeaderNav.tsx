@@ -28,7 +28,7 @@ export default function ITSupportHeaderNav({
           </div>
           <div className="flex items-center gap-3 font-mono text-[11px]">
             <span className="text-blue-200">PORTAL 04:</span>
-            <span className="bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold uppercase tracking-wider text-amber-300">
+            <span className="bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold uppercase tracking-wider text-amber-300 rounded-xs">
               IT SUPPORT &amp; SYSTEM ADMINISTRATION
             </span>
           </div>
@@ -49,7 +49,7 @@ export default function ITSupportHeaderNav({
         {/* Authenticated IT Support Account Badge & Sign Out */}
         {user && (
           <div className="flex flex-wrap items-center gap-3">
-            <div className="border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs">
+            <div className="border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs rounded-md">
               <span className="text-[10px] text-slate-500 font-mono block uppercase">
                 Active IT Support Session
               </span>
@@ -64,7 +64,7 @@ export default function ITSupportHeaderNav({
             <button
               type="button"
               onClick={logout}
-              className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+              className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs rounded"
             >
               [ Sign Out ]
             </button>
@@ -79,7 +79,7 @@ export default function ITSupportHeaderNav({
             <button
               type="button"
               onClick={() => onSelectTab("calendar")}
-              className={`px-4 py-3 border-b-2 transition-all cursor-pointer ${
+              className={`px-4 py-3 border-b-2 transition-all cursor-pointer rounded-t ${
                 activeTab === "calendar"
                   ? "border-[#002060] bg-white text-[#002060] font-black shadow-xs"
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
@@ -91,7 +91,7 @@ export default function ITSupportHeaderNav({
             <button
               type="button"
               onClick={() => onSelectTab("classrooms")}
-              className={`px-4 py-3 border-b-2 transition-all cursor-pointer ${
+              className={`px-4 py-3 border-b-2 transition-all cursor-pointer rounded-t ${
                 activeTab === "classrooms"
                   ? "border-[#002060] bg-white text-[#002060] font-black shadow-xs"
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
@@ -103,7 +103,7 @@ export default function ITSupportHeaderNav({
             <button
               type="button"
               onClick={() => onSelectTab("users")}
-              className={`px-4 py-3 border-b-2 transition-all cursor-pointer ${
+              className={`px-4 py-3 border-b-2 transition-all cursor-pointer rounded-t ${
                 activeTab === "users"
                   ? "border-[#002060] bg-white text-[#002060] font-black shadow-xs"
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
@@ -115,7 +115,7 @@ export default function ITSupportHeaderNav({
             <button
               type="button"
               onClick={() => onSelectTab("diagnostics")}
-              className={`px-4 py-3 border-b-2 transition-all cursor-pointer ${
+              className={`px-4 py-3 border-b-2 transition-all cursor-pointer rounded-t ${
                 activeTab === "diagnostics"
                   ? "border-[#002060] bg-white text-[#002060] font-black shadow-xs"
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"

@@ -53,7 +53,7 @@ export default function AdminHeaderNav({
           </div>
           <div className="flex items-center gap-3 font-mono text-[11px]">
             <span className="text-blue-200">PORTAL 03:</span>
-            <span className="bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold uppercase tracking-wider">
+            <span className="bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold uppercase tracking-wider rounded-xs">
               SCHOOL ADMINISTRATOR &amp; REGISTRAR
             </span>
             <Link
@@ -80,7 +80,7 @@ export default function AdminHeaderNav({
         {/* Authenticated Admin Account Badge & Sign Out */}
         {user && (
           <div className="flex flex-wrap items-center gap-3">
-            <div className="border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs">
+            <div className="border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs rounded-md">
               <span className="text-[10px] text-slate-500 font-mono block uppercase">
                 Active Administrator Session
               </span>
@@ -95,7 +95,7 @@ export default function AdminHeaderNav({
             <button
               type="button"
               onClick={logout}
-              className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+              className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs rounded"
             >
               [ Sign Out ]
             </button>
@@ -110,7 +110,7 @@ export default function AdminHeaderNav({
             <Link
               href="/adjudication"
               onClick={() => onSelectSection?.("adjudication")}
-              className={`py-3 px-4 border-b-2 transition-colors ${
+              className={`py-3 px-4 border-b-2 transition-colors rounded-t ${
                 isAdjudication
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
@@ -121,7 +121,7 @@ export default function AdminHeaderNav({
             <Link
               href="/sections"
               onClick={() => onSelectSection?.("sections")}
-              className={`py-3 px-4 border-b-2 transition-colors ${
+              className={`py-3 px-4 border-b-2 transition-colors rounded-t ${
                 isSections
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
@@ -132,7 +132,7 @@ export default function AdminHeaderNav({
             <Link
               href="/scheduling"
               onClick={() => onSelectSection?.("scheduling")}
-              className={`py-3 px-4 border-b-2 transition-colors ${
+              className={`py-3 px-4 border-b-2 transition-colors rounded-t ${
                 isScheduling
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
@@ -143,7 +143,7 @@ export default function AdminHeaderNav({
             <Link
               href="/subjects"
               onClick={() => onSelectSection?.("subjects")}
-              className={`py-3 px-4 border-b-2 transition-colors ${
+              className={`py-3 px-4 border-b-2 transition-colors rounded-t ${
                 isSubjects
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
@@ -154,7 +154,7 @@ export default function AdminHeaderNav({
             <Link
               href="/control-room"
               onClick={() => onSelectSection?.("control")}
-              className={`py-3 px-4 border-b-2 transition-colors ${
+              className={`py-3 px-4 border-b-2 transition-colors rounded-t ${
                 isControl
                   ? "border-[#002060] bg-white text-[#002060]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"

@@ -524,7 +524,7 @@ export default function Step5DocumentsReview({
   // =========================================================================
   if (isSubmitted) {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans rounded-lg shadow-sm">
         {/* Acknowledgment Header */}
         <div className="border-b-2 border-slate-200 pb-5 text-center">
           <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#002060]">
@@ -536,7 +536,7 @@ export default function Step5DocumentsReview({
           <div className="text-xs font-semibold text-slate-600 mt-0.5">
             Dumalneg, Ilocos Norte &bull; DepEd School ID: 300017
           </div>
-          <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-mono font-bold px-4 py-1 uppercase tracking-wider">
+          <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-mono font-bold px-4 py-1 uppercase tracking-wider rounded-sm">
             {existingApplication
               ? "Official Online Enrollment Resubmission Acknowledgment Slip"
               : "Official Online Enrollment Acknowledgment Slip"}
@@ -544,9 +544,9 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Status Banner - Color Coded (Yellow for Pending) with ZERO Emojis */}
-        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2">
+        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-md shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-sm">
               {existingApplication
                 ? "[ STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION ]"
                 : "[ STATUS: PENDING REGISTRAR VERIFICATION ]"}
@@ -563,7 +563,7 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Reference Code Box */}
-        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2">
+        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-md shadow-xs">
           <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
             Official Application Tracking Reference Number
           </div>
@@ -576,7 +576,7 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Learner & Enrollment Summary */}
-        <div className="border-2 border-slate-300 p-5 space-y-4">
+        <div className="border-2 border-slate-300 p-5 space-y-4 rounded-md shadow-xs">
           <div className="text-xs font-bold text-[#002060] uppercase tracking-wider border-b border-slate-200 pb-2">
             [ Official Application Summary ]
           </div>
@@ -635,7 +635,7 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Next Steps for Student / Parent */}
-        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3">
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3 rounded-md shadow-xs">
           <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
             [ Instructions &amp; Next Steps for Dumalneg NHS Enrollees ]
           </div>
@@ -660,13 +660,13 @@ export default function Step5DocumentsReview({
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
+            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded"
           >
             Print Acknowledgment Slip
           </button>
           <a
             href={`/track?ref=${referenceNumber}`}
-            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors text-center shadow-xs"
+            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors text-center shadow-xs rounded"
           >
             Track Application Live &rarr;
           </a>
@@ -679,7 +679,7 @@ export default function Step5DocumentsReview({
   // RENDER: STEP 5 FORM (DOCUMENTS UPLOAD & ONLINE REVIEW CARD)
   // =========================================================================
   return (
-    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 font-sans">
+    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 font-sans rounded-lg shadow-sm">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
@@ -700,7 +700,7 @@ export default function Step5DocumentsReview({
 
       {/* Global Error Banner */}
       {Object.keys(errors).length > 0 && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-md">
           <p className="text-xs font-bold text-red-800 leading-normal">
             [ Submission Requirement Notice ]: Please resolve the highlighted required items below before submitting your application.
           </p>
@@ -710,7 +710,7 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION A: OFFICIAL DOCUMENT UPLOAD SLOTS                                  */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
             [ Section 9: Official Document Upload (Automated Compressor &lt; 350KB) ]
@@ -722,7 +722,7 @@ export default function Step5DocumentsReview({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 1. PSA Birth Certificate */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
+          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase">
                 1. PSA Birth Certificate <span className="text-red-700">*</span>
@@ -733,16 +733,16 @@ export default function Step5DocumentsReview({
               Clear photo of Philippine Statistics Authority (PSA) Birth Certificate or Local Civil Registrar (LCR) / Barangay Certification.
             </p>
             {docs.birth_certificate ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded">
                 <div className="flex items-center gap-3 min-w-0">
                   {docs.birth_certificate.previewUrl && (docs.birth_certificate.previewUrl.startsWith("data:image/") || docs.birth_certificate.previewUrl.startsWith("blob:") || docs.birth_certificate.previewUrl.startsWith("http")) ? (
                     <img
                       src={docs.birth_certificate.previewUrl}
                       alt={docs.birth_certificate.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-xs"
                     />
                   ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded-xs">
                       DOC
                     </div>
                   )}
@@ -758,7 +758,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("birth_certificate")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -771,7 +771,7 @@ export default function Step5DocumentsReview({
                   onChange={(e) =>
                     handleFileUpload("birth_certificate", e.target.files?.[0] || null)
                   }
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
+                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded"
                 />
               </div>
             )}
@@ -781,7 +781,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* 2. Form 138 / SF9 Report Card */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
+          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase">
                 2. Learner&apos;s Progress Report Card (SF9 / Form 138) <span className="text-red-700">*</span>
@@ -796,16 +796,16 @@ export default function Step5DocumentsReview({
                 : "Report Card from previous school year completed."}
             </p>
             {docs.form_138 ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded">
                 <div className="flex items-center gap-3 min-w-0">
                   {docs.form_138.previewUrl && (docs.form_138.previewUrl.startsWith("data:image/") || docs.form_138.previewUrl.startsWith("blob:") || docs.form_138.previewUrl.startsWith("http")) ? (
                     <img
                       src={docs.form_138.previewUrl}
                       alt={docs.form_138.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-xs"
                     />
                   ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded-xs">
                       DOC
                     </div>
                   )}
@@ -821,7 +821,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("form_138")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -832,7 +832,7 @@ export default function Step5DocumentsReview({
                   type="file"
                   accept="image/*,.pdf"
                   onChange={(e) => handleFileUpload("form_138", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
+                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded"
                 />
               </div>
             )}
@@ -842,7 +842,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* 3. 2x2 Official ID Picture */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
+          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase">
                 3. Formal 2x2 or 1x1 ID Picture <span className="text-red-700">*</span>
@@ -853,16 +853,16 @@ export default function Step5DocumentsReview({
               Recent passport or 2x2 formal photo with white background and printed name tag of the learner.
             </p>
             {docs.id_picture ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded">
                 <div className="flex items-center gap-3 min-w-0">
                   {docs.id_picture.previewUrl && (docs.id_picture.previewUrl.startsWith("data:image/") || docs.id_picture.previewUrl.startsWith("blob:") || docs.id_picture.previewUrl.startsWith("http")) ? (
                     <img
                       src={docs.id_picture.previewUrl}
                       alt={docs.id_picture.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-xs"
                     />
                   ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded-xs">
                       DOC
                     </div>
                   )}
@@ -878,7 +878,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("id_picture")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -889,7 +889,7 @@ export default function Step5DocumentsReview({
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileUpload("id_picture", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
+                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded"
                 />
               </div>
             )}
@@ -899,7 +899,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* 4. Certificate of Good Moral Character */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
+          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase">
                 4. Certificate of Good Moral Character
@@ -913,16 +913,16 @@ export default function Step5DocumentsReview({
               Certificate issued by previous school certifying good moral standing and disciplinary record.
             </p>
             {docs.good_moral ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded">
                 <div className="flex items-center gap-3 min-w-0">
                   {docs.good_moral.previewUrl && (docs.good_moral.previewUrl.startsWith("data:image/") || docs.good_moral.previewUrl.startsWith("blob:") || docs.good_moral.previewUrl.startsWith("http")) ? (
                     <img
                       src={docs.good_moral.previewUrl}
                       alt={docs.good_moral.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-xs"
                     />
                   ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded-xs">
                       DOC
                     </div>
                   )}
@@ -938,7 +938,7 @@ export default function Step5DocumentsReview({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc("good_moral")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
+                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                 >
                   Remove
                 </button>
@@ -949,7 +949,7 @@ export default function Step5DocumentsReview({
                   type="file"
                   accept="image/*,.pdf"
                   onChange={(e) => handleFileUpload("good_moral", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
+                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded"
                 />
               </div>
             )}
@@ -960,7 +960,7 @@ export default function Step5DocumentsReview({
 
           {/* Conditional 4Ps Household ID Photocopy */}
           {data.is4psBeneficiary && (
-            <div className="p-4 bg-white border-2 border-blue-200 space-y-2">
+            <div className="p-4 bg-white border-2 border-blue-200 space-y-2 rounded-md">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-900 uppercase">
                   5. Pantawid Pamilya (4Ps) Household ID Card
@@ -971,16 +971,16 @@ export default function Step5DocumentsReview({
                 Photocopy or clear photo of DSWD 4Ps ID or Household Pantawid verification passbook.
               </p>
               {docs.household_4ps ? (
-                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded">
                   <div className="flex items-center gap-3 min-w-0">
                     {docs.household_4ps.previewUrl && (docs.household_4ps.previewUrl.startsWith("data:image/") || docs.household_4ps.previewUrl.startsWith("blob:") || docs.household_4ps.previewUrl.startsWith("http")) ? (
                       <img
                         src={docs.household_4ps.previewUrl}
                         alt={docs.household_4ps.file.name}
-                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-xs"
                       />
                     ) : (
-                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded-xs">
                         DOC
                       </div>
                     )}
@@ -996,7 +996,7 @@ export default function Step5DocumentsReview({
                   <button
                     type="button"
                     onClick={() => handleRemoveDoc("household_4ps")}
-                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
+                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                   >
                     Remove
                   </button>
@@ -1007,7 +1007,7 @@ export default function Step5DocumentsReview({
                     type="file"
                     accept="image/*,.pdf"
                     onChange={(e) => handleFileUpload("household_4ps", e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
+                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded"
                   />
                 </div>
               )}
@@ -1016,7 +1016,7 @@ export default function Step5DocumentsReview({
 
           {/* Conditional PWD ID Photocopy */}
           {data.hasPwdId && (
-            <div className="p-4 bg-white border-2 border-blue-200 space-y-2">
+            <div className="p-4 bg-white border-2 border-blue-200 space-y-2 rounded-md">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-900 uppercase">
                   6. Official Persons with Disability (PWD) ID
@@ -1027,16 +1027,16 @@ export default function Step5DocumentsReview({
                 Photocopy of Municipal Social Welfare and Development (MSWDO) PWD ID or Clinical Medical Assessment.
               </p>
               {docs.pwd_id ? (
-                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded">
                   <div className="flex items-center gap-3 min-w-0">
                     {docs.pwd_id.previewUrl && (docs.pwd_id.previewUrl.startsWith("data:image/") || docs.pwd_id.previewUrl.startsWith("blob:") || docs.pwd_id.previewUrl.startsWith("http")) ? (
                       <img
                         src={docs.pwd_id.previewUrl}
                         alt={docs.pwd_id.file.name}
-                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0"
+                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-xs"
                       />
                     ) : (
-                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0">
+                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded-xs">
                         DOC
                       </div>
                     )}
@@ -1052,7 +1052,7 @@ export default function Step5DocumentsReview({
                   <button
                     type="button"
                     onClick={() => handleRemoveDoc("pwd_id")}
-                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors"
+                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold uppercase hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
                   >
                     Remove
                   </button>
@@ -1063,7 +1063,7 @@ export default function Step5DocumentsReview({
                     type="file"
                     accept="image/*,.pdf"
                     onChange={(e) => handleFileUpload("pwd_id", e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
+                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded"
                   />
                 </div>
               )}
@@ -1075,7 +1075,7 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION B: ONLINE APPLICATION REVIEW CARD (NO PRE-APPROVAL PDF)           */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-md">
         <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
@@ -1085,7 +1085,7 @@ export default function Step5DocumentsReview({
               Review all encoded applicant information below. Ensure every entry matches your civil registry and academic records before submitting:
             </p>
           </div>
-          <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0">
+          <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded-sm">
             PRE-SUBMISSION VERIFICATION
           </span>
         </div>
@@ -1093,7 +1093,7 @@ export default function Step5DocumentsReview({
         {/* Review Card Grid */}
         <div className="space-y-4">
           {/* Card 1: Learner Identity */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
             <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
               1. Learner Civil Registry &amp; Personal Details
             </div>
@@ -1146,7 +1146,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 2: Academic Classification & Feeder School */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
             <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
               2. Enrollment Placement &amp; Academic Background
             </div>
@@ -1164,8 +1164,8 @@ export default function Step5DocumentsReview({
                 <span className="font-bold text-[#002060]">
                   {isG7
                     ? data.jhsProgram === "SPS"
-                      ? `Special Program in Sports (SPS: ${data.spsSport || "Selected"})`
-                      : "Regular Junior High School Curriculum"
+                    ? `Special Program in Sports (SPS: ${data.spsSport || "Selected"})`
+                    : "Regular Junior High School Curriculum"
                     : `${data.targetTrack} - ${data.targetStrand} (${data.targetSemester})`}
                 </span>
               </div>
@@ -1209,7 +1209,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 3: Residential Address */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
             <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
               3. Residential Address
             </div>
@@ -1236,7 +1236,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 4: Parent & Guardian Information */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
             <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
               4. Parents &amp; Legal Guardian
             </div>
@@ -1291,7 +1291,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 5: SNEd & Modality */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-md">
             <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
               5. Inclusive Education &amp; Preferred Modality
             </div>
@@ -1318,7 +1318,7 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION C: DATA PRIVACY ACT OF 2012 (RA 10173) & DEPED CERTIFICATION      */}
       {/* ========================================================================= */}
-      <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3">
+      <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-md">
         <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
           [ DepEd Sworn Certification &amp; Republic Act No. 10173 (Data Privacy Act of 2012) ]
         </div>
@@ -1330,7 +1330,7 @@ export default function Step5DocumentsReview({
           Data Privacy Act of 2012 (Republic Act No. 10173) and official DepEd civil registry guidelines.
         </p>
 
-        <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300">
+        <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300 rounded">
           <input
             type="checkbox"
             checked={data.dataPrivacyAccepted}
@@ -1356,7 +1356,7 @@ export default function Step5DocumentsReview({
       </div>
 
       {/* Notice About Official PDF Release */}
-      <div className="p-4 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed">
+      <div className="p-4 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-md">
         <strong>Important Official Note</strong>: In accordance with DepEd enrollment verification procedures, 
         your official accomplished DepEd Basic Education Enrollment Form (PDF) will become accessible and downloadable 
         immediately once your application and credentials have been officially verified and <strong>Approved</strong> by the Dumalneg NHS Registrar.
@@ -1368,7 +1368,7 @@ export default function Step5DocumentsReview({
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
+          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors rounded"
         >
           &larr; Back to Step 4 (Curriculum &amp; Modality)
         </button>
@@ -1376,7 +1376,7 @@ export default function Step5DocumentsReview({
           type="button"
           onClick={handleSubmitApplication}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded"
         >
           {isSubmitting
             ? "[ PROCESSING OFFICIAL SUBMISSION... ]"

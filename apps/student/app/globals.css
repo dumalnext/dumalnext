@@ -273,3 +273,36 @@ body {
   border-color: var(--deped-navy);
   box-shadow: 0 0 0 3px rgba(0, 32, 96, 0.15);
 }
+
+/* Universal Form Controls Border Radius Standard (4px / --radius-sm) */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="file"],
+select,
+textarea {
+  border-radius: var(--radius-sm);
+}
+
+/* Institutional Cards & Panels Standard (6px / --radius-md) */
+.deped-card,
+.card-container,
+.panel-container {
+  border-radius: var(--radius-md);
+}
+
+/* Modals & Dialogs Standard (8px / --radius-lg) */
+.modal-container,
+.dialog-container,
+.overlay-card {
+  border-radius: var(--radius-lg);
+}
+
+/* Responsive Table Standard (6px / --radius-md) */
+.table-responsive,
+.table-wrapper {
+  border-radius: var(--radius-md);
+}

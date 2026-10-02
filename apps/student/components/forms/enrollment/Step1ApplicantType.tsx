@@ -271,7 +271,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => onChange({ isGraded: true })}
-            className={`p-5 border-2 text-left transition-all relative ${
+            className={`p-5 border-2 text-left transition-all relative rounded-md ${
               data.isGraded
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -279,7 +279,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -299,7 +299,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => onChange({ isGraded: false })}
-            className={`p-5 border-2 text-left transition-all relative ${
+            className={`p-5 border-2 text-left transition-all relative rounded-md ${
               !data.isGraded
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -307,7 +307,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   !data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -337,7 +337,7 @@ export default function Step1ApplicantType({
         </div>
 
         {errors.applicantType && (
-          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs">
+          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs rounded-sm">
             [ Validation Required ]: {errors.applicantType}
           </div>
         )}
@@ -347,7 +347,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 7")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-md ${
               data.applicantType === "Grade 7"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -355,7 +355,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Grade 7"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -375,7 +375,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 11")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-md ${
               data.applicantType === "Grade 11"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -383,7 +383,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Grade 11"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -403,7 +403,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Transferee")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-md ${
               data.applicantType === "Transferee"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -411,7 +411,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Transferee"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -431,7 +431,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Returning")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-md ${
               data.applicantType === "Returning"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -439,7 +439,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Returning"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"

@@ -264,11 +264,11 @@ export default function Step3FamilyBackground({
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-lg">
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider">
+          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded-xs">
             STEP 03 OF 05
           </span>
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">

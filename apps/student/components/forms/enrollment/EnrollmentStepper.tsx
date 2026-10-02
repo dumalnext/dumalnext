@@ -765,7 +765,7 @@ export default function EnrollmentStepper({
       )}
 
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
-      <div className="bg-white border border-slate-300 p-4 sm:p-6 shadow-sm">
+      <div className="bg-white border border-slate-300 p-4 sm:p-6 shadow-sm rounded-lg">
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#002060]">
@@ -780,7 +780,7 @@ export default function EnrollmentStepper({
               <button
                 type="button"
                 onClick={handleResetDraft}
-                className="text-[10px] font-mono font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 uppercase tracking-wider transition-colors cursor-pointer"
+                className="text-[10px] font-mono font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 uppercase tracking-wider transition-colors cursor-pointer rounded active:scale-95"
                 title="Reset enrollment progress and start over from Step 1"
               >
                 [ Reset / Start Over ]
@@ -798,16 +798,16 @@ export default function EnrollmentStepper({
         </div>
 
         {/* Smart Linear Progress Bar (Universal for all devices) */}
-        <div className="w-full bg-slate-200 h-2 overflow-hidden mb-4">
+        <div className="w-full bg-slate-200 h-2.5 overflow-hidden mb-4 rounded-full">
           <div
-            className="bg-[#002060] h-full transition-all duration-300 ease-out"
+            className="bg-[#002060] h-full transition-all duration-300 ease-out rounded-full"
             style={{ width: `${(currentStep / 5) * 100}%` }}
           />
         </div>
 
         {/* MOBILE VIEW (< sm): Clean Compact Step Navigation Pills */}
         <div className="sm:hidden space-y-2">
-          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200">
+          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200 rounded">
             <span className="font-bold text-[#002060] uppercase text-[11px]">
               Active: {STEP_LABELS[currentStep - 1].label}
             </span>
@@ -830,7 +830,7 @@ export default function EnrollmentStepper({
                     }
                   }}
                   disabled={existingApp?.status !== "Needs Revision" && item.step > currentStep}
-                  className={`py-2 text-center text-xs font-mono font-bold border transition-all ${
+                  className={`py-2 text-center text-xs font-mono font-bold border rounded transition-all active:scale-95 ${
                     isActive
                       ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                       : isDone || existingApp?.status === "Needs Revision"
@@ -859,11 +859,11 @@ export default function EnrollmentStepper({
                     setCurrentStep(item.step);
                   }
                 }}
-                className={`p-2.5 border transition-colors ${
+                className={`p-2.5 border rounded-md transition-all ${
                   isActive
-                    ? "bg-[#002060] text-white border-[#002060]"
+                    ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : isDone || existingApp?.status === "Needs Revision"
-                    ? "bg-blue-50 text-[#002060] border-blue-200 cursor-pointer"
+                    ? "bg-blue-50 text-[#002060] border-blue-200 cursor-pointer hover:border-[#002060]"
                     : "bg-slate-50 text-slate-500 border-slate-200 cursor-not-allowed"
                 }`}
               >
