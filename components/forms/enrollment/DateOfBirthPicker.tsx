@@ -138,19 +138,19 @@ export default function DateOfBirthPicker({
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
         <label className="block text-xs font-bold text-slate-900 uppercase">
           {label} {required && <span className="text-red-700">*</span>}
         </label>
         {formattedDate && (
-          <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-[4px]">
+          <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-[4px] shrink-0">
             {formattedDate}
           </span>
         )}
       </div>
 
       {/* 3 Modern DepEd Styled Drop Boxes: Month, Day, Year */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
         {/* Month Drop Box */}
         <div>
           <CustomSelect
@@ -160,6 +160,7 @@ export default function DateOfBirthPicker({
             placeholder="Month"
             disabled={disabled}
             fullWidth
+            dropdownClassName="min-w-[140px] sm:w-full"
             error={Boolean(error)}
           />
         </div>

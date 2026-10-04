@@ -739,16 +739,16 @@ export default function EnrollmentStepper({
 
       {/* Authenticated Applicant Status Banner */}
       {user ? (
-        <div className="p-3 bg-blue-50 border border-blue-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-md">
+        <div className="p-3 bg-blue-50 border border-blue-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[4px]">
           <span className="text-slate-700">
             Authenticated Applicant Account: <strong>{user.fullName}</strong> ({user.email})
           </span>
-          <span className="text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0 rounded-xs">
+          <span className="text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0 rounded-[4px]">
             Linked Account: {user.userId}
           </span>
         </div>
       ) : (
-        <div className="p-3 bg-amber-50 border border-amber-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-md">
+        <div className="p-3 bg-amber-50 border border-amber-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[4px]">
           <span className="text-amber-900">
             You are currently filling out this enrollment form as a Guest. To link this submission to your personal student account for easier tracking, please sign in or register.
           </span>
@@ -765,32 +765,32 @@ export default function EnrollmentStepper({
       )}
 
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
-      <div className="bg-white border border-slate-300 p-4 sm:p-6 shadow-sm rounded-lg">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
-          <div>
-            <span className="text-xs font-bold tracking-widest text-[#002060]">
+      <div className="bg-white border border-slate-300 p-3.5 sm:p-5 md:p-6 shadow-sm rounded-[4px]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
+          <div className="min-w-0 flex-1">
+            <span className="text-[11px] sm:text-xs font-bold tracking-wider sm:tracking-widest text-[#002060] block truncate">
               Dumalneg NHS Online Enrollment &bull; S.Y. {formData.schoolYear || schoolYear} &bull; {formData.semester || semester}
             </span>
-            <h1 className="text-lg font-bold text-slate-900">
+            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
               Basic Education Enrollment Form
             </h1>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
             {currentStep > 1 && (
               <button
                 type="button"
                 onClick={handleResetDraft}
-                className="text-[10px] font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 tracking-wider transition-colors cursor-pointer rounded active:scale-95"
+                className="text-[11px] sm:text-xs font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
                 title="Reset enrollment progress and start over from Step 1"
               >
                 Reset / Start Over
               </button>
             )}
-            <div className="text-right">
-              <span className="text-xs font-bold text-slate-600 block">
+            <div className="text-right shrink-0">
+              <span className="text-xs font-bold text-slate-700 block whitespace-nowrap">
                 Step {currentStep} of 5
               </span>
-              <span className="text-[10px] text-[#002060] font-bold tracking-wider">
+              <span className="text-[11px] text-[#002060] font-bold tracking-wider whitespace-nowrap">
                 {Math.round((currentStep / 5) * 100)}% Complete
               </span>
             </div>
@@ -807,7 +807,7 @@ export default function EnrollmentStepper({
 
         {/* MOBILE VIEW (< sm): Clean Compact Step Navigation Pills */}
         <div className="sm:hidden space-y-2">
-          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200 rounded">
+          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200 rounded-[4px]">
             <span className="font-bold text-[#002060] text-[11px]">
               Active: {STEP_LABELS[currentStep - 1].label}
             </span>
@@ -830,7 +830,7 @@ export default function EnrollmentStepper({
                     }
                   }}
                   disabled={existingApp?.status !== "Needs Revision" && item.step > currentStep}
-                  className={`py-2 text-center text-xs font-bold border rounded transition-all active:scale-95 ${
+                  className={`py-2 text-center text-xs font-bold border rounded-[4px] transition-all active:scale-95 ${
                     isActive
                       ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                       : isDone || existingApp?.status === "Needs Revision"
@@ -859,7 +859,7 @@ export default function EnrollmentStepper({
                     setCurrentStep(item.step);
                   }
                 }}
-                className={`p-2.5 border rounded-md transition-all ${
+                className={`p-2.5 border rounded-[4px] transition-all ${
                   isActive
                     ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : isDone || existingApp?.status === "Needs Revision"

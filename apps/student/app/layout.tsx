@@ -42,13 +42,13 @@ export default function StudentLayout({
                   />
                 </Link>
                 <div className="min-w-0">
-                  <p className="text-[9px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase truncate">
+                  <p className="hidden md:block text-[9px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase truncate">
                     Republic of the Philippines | Department of Education | Region I
                   </p>
-                  <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
+                  <h1 className="text-xs sm:text-base md:text-lg lg:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
                     DUMALNEG NATIONAL HIGH SCHOOL
                   </h1>
-                  <p className="text-[10px] sm:text-xs text-slate-300 font-medium truncate">
+                  <p className="hidden xs:block text-[10px] sm:text-xs text-slate-300 font-medium truncate">
                     Student Online Portal &amp; Basic Education Enrollment System
                   </p>
                 </div>

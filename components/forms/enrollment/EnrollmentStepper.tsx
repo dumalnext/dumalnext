@@ -255,21 +255,21 @@ export default function EnrollmentStepper() {
       )}
 
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
-      <div className="bg-white border border-slate-300 p-4 sm:p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-[#002060]">
-              [ Dumalneg NHS Online Enrollment ]
+      <div className="bg-white border border-slate-300 p-3.5 sm:p-5 md:p-6 shadow-sm rounded-[4px]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
+          <div className="min-w-0 flex-1">
+            <span className="text-[11px] sm:text-xs font-bold tracking-wider sm:tracking-widest text-[#002060] block truncate">
+              Dumalneg NHS Online Enrollment
             </span>
-            <h1 className="text-lg font-bold text-slate-900">
+            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
               Basic Education Enrollment Form
             </h1>
           </div>
-          <div className="text-right">
-            <span className="text-xs font-mono font-bold text-slate-600 block">
+          <div className="text-right shrink-0">
+            <span className="text-xs font-mono font-bold text-slate-700 block whitespace-nowrap">
               Step {currentStep} of 5
             </span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+            <span className="text-[10px] text-slate-500 uppercase tracking-wider whitespace-nowrap">
               {Math.round((currentStep / 5) * 100)}% Complete
             </span>
           </div>
@@ -284,7 +284,7 @@ export default function EnrollmentStepper() {
             return (
               <div
                 key={item.step}
-                className={`p-2.5 border transition-colors ${
+                className={`p-2.5 border rounded-[4px] transition-colors ${
                   isActive
                     ? "bg-[#002060] text-white border-[#002060]"
                     : isDone

@@ -272,7 +272,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => onChange({ isGraded: true })}
-            className={`p-5 border-2 text-left transition-all relative rounded-md ${
+            className={`p-5 border-2 text-left transition-all relative rounded-[4px] ${
               data.isGraded
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -280,7 +280,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
                   data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -300,7 +300,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => onChange({ isGraded: false })}
-            className={`p-5 border-2 text-left transition-all relative rounded-md ${
+            className={`p-5 border-2 text-left transition-all relative rounded-[4px] ${
               !data.isGraded
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -308,7 +308,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
                   !data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -338,7 +338,7 @@ export default function Step1ApplicantType({
         </div>
 
         {errors.applicantType && (
-          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs rounded-sm">
+          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs rounded-[4px]">
             Validation Required: {errors.applicantType}
           </div>
         )}
@@ -348,7 +348,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 7")}
-            className={`p-5 border-2 text-left transition-all rounded-md ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Grade 7"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -356,7 +356,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
                   data.applicantType === "Grade 7"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -376,7 +376,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 11")}
-            className={`p-5 border-2 text-left transition-all rounded-md ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Grade 11"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -384,7 +384,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
                   data.applicantType === "Grade 11"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -404,7 +404,7 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Transferee")}
-            className={`p-5 border-2 text-left transition-all rounded-md ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Transferee"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
@@ -412,7 +412,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
                   data.applicantType === "Transferee"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -794,7 +794,7 @@ export default function Step1ApplicantType({
 
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
-        <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-md">
+        <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-[4px]">
           <div className="font-bold text-[#002060] tracking-wider flex items-center justify-between">
             <span>Enrollment Classification Summary</span>
             <span className="text-[11px] text-blue-900">VERIFIED</span>
@@ -823,7 +823,7 @@ export default function Step1ApplicantType({
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-md"
+          className="btn-primary text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-[4px]"
         >
           Proceed: Learner&apos;s Personal Information (Step 2)
         </button>

@@ -322,7 +322,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           ref={buttonRef}
           type="button"
           onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer shadow-sm rounded active:scale-90 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer shadow-sm rounded-[4px] active:scale-90 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           aria-label="Toggle Portal Navigation Menu"
           aria-expanded={isMenuOpen}
         >
@@ -355,26 +355,26 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         {user ? (
           <Link
             href={appStatus ? trackHref : "/enroll"}
-            className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded shadow-xs"
+            className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
             title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
           >
             <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
               {user.firstName} {user.lastName}
             </span>
             {appStatus === "Approved" ? (
-              <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-xs">
+              <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px]">
                 APPROVED
               </span>
             ) : appStatus === "Needs Revision" ? (
-              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-xs">
+              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px]">
                 REVISION
               </span>
             ) : appStatus === "Pending" ? (
-              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-xs">
+              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px]">
                 PENDING
               </span>
             ) : (
-              <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-xs">
+              <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-[4px]">
                 ENROLL NOW
               </span>
             )}
@@ -382,7 +382,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         ) : (
           <Link
             href="/?tab=signin"
-            className="inline-block bg-white text-[#002060] font-bold py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs rounded active:scale-95"
+            className="inline-block bg-white text-[#002060] font-bold py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs rounded-[4px] active:scale-95"
           >
             Login
           </Link>
@@ -401,7 +401,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       >
         <div
           ref={menuRef}
-          className={`w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] rounded-r-xl flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -427,7 +427,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(false)}
-                className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-bold uppercase tracking-wider transition-all duration-200 ease-in-out cursor-pointer rounded active:scale-95"
+                className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-bold uppercase tracking-wider transition-all duration-200 ease-in-out cursor-pointer rounded-[4px] active:scale-95"
               >
                 Close
               </button>
@@ -441,15 +441,15 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       ACTIVE LEARNER SESSION
                     </span>
                     {appStatus === "Approved" ? (
-                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-bold uppercase rounded-sm">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-bold uppercase rounded-[4px]">
                         APPROVED
                       </span>
                     ) : appStatus === "Needs Revision" ? (
-                      <span className="text-[10px] bg-red-100 text-red-900 px-2 py-0.5 border border-red-400 font-bold uppercase rounded-sm">
+                      <span className="text-[10px] bg-red-100 text-red-900 px-2 py-0.5 border border-red-400 font-bold uppercase rounded-[4px]">
                         REVISION NEEDED
                       </span>
                     ) : appStatus === "Pending" ? (
-                      <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-400 font-bold uppercase rounded-sm">
+                      <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-400 font-bold uppercase rounded-[4px]">
                         PENDING EVALUATION
                       </span>
                     ) : (

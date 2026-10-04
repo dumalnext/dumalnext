@@ -92,22 +92,10 @@ body {
   box-sizing: border-box;
 }
 
-/* Touch-friendly interactive targets & iOS auto-zoom prevention on mobile */
+/* Touch-friendly interactive targets for primary action buttons on mobile */
 @media (max-width: 640px) {
-  .btn-primary, .btn-secondary, .btn-outline, .btn-danger, .btn-ghost, button {
+  .btn-primary, .btn-secondary, .btn-outline, .btn-danger, .btn-ghost {
     min-height: 42px;
-  }
-
-  /* Prevent iOS Safari auto-zoom on mobile inputs */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="tel"],
-  input[type="date"],
-  select,
-  textarea {
-    font-size: 16px !important;
   }
 }
 
