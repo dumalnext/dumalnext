@@ -36,6 +36,36 @@ interface ApplicationRecord {
   formData?: FullEnrollmentFormData;
 }
 
+/**
+ * Convert 24-hour military time (e.g. "07:30", "13:00", "15:30:00") into 12-hour AM/PM format (e.g. "7:30 AM", "1:00 PM", "3:30 PM").
+ */
+function formatTo12Hour(timeStr?: string | null): string {
+  if (!timeStr) return "";
+  const cleaned = timeStr.trim();
+  if (/am|pm/i.test(cleaned)) return cleaned;
+
+  const parts = cleaned.split(":");
+  if (parts.length === 0) return cleaned;
+
+  const rawHour = parseInt(parts[0], 10);
+  if (isNaN(rawHour)) return cleaned;
+
+  const minutes = parts.length > 1 ? parts[1].slice(0, 2) : "00";
+  const period = rawHour >= 12 ? "PM" : "AM";
+  const hour12 = rawHour % 12 === 0 ? 12 : rawHour % 12;
+
+  return `${hour12}:${minutes} ${period}`;
+}
+
+function formatTimeRange(start?: string | null, end?: string | null): string {
+  const formattedStart = formatTo12Hour(start);
+  const formattedEnd = formatTo12Hour(end);
+  if (formattedStart && formattedEnd) {
+    return `${formattedStart} - ${formattedEnd}`;
+  }
+  return formattedStart || formattedEnd || "";
+}
+
 function TrackApplicationContent() {
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -1004,11 +1034,11 @@ function TrackApplicationContent() {
                 {filteredTimetable.map((item: any) => (
                   <div
                     key={item.id}
-                    className="p-3.5 border-2 border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060] transition-colors space-y-2 rounded-md"
+                    className="p-3.5 border-2 border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060] transition-colors space-y-2 rounded-[4px]"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="inline-block px-2.5 py-1 text-[11px] font-bold bg-[#002060] text-white uppercase tracking-wider rounded-xs">
-                        {item.day_of_week} &bull; {item.start_time} - {item.end_time}
+                      <span className="inline-block px-2.5 py-1 text-[11px] font-bold bg-[#002060] text-white uppercase tracking-wider rounded-[4px]">
+                        {item.day_of_week} &bull; {formatTimeRange(item.start_time, item.end_time)}
                       </span>
                       <span className="text-[10px] font-bold text-slate-500 uppercase">
                         {item.subject_code}

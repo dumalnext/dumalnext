@@ -82,6 +82,36 @@ type SectionStateMode =
   | "NOT_ASSIGNED_TRANSFEREE"
   | "ENROLLMENT_REQUIRED";
 
+/**
+ * Convert 24-hour military time (e.g. "07:30", "13:00", "15:30:00") into 12-hour AM/PM format (e.g. "7:30 AM", "1:00 PM", "3:30 PM").
+ */
+function formatTo12Hour(timeStr?: string | null): string {
+  if (!timeStr) return "";
+  const cleaned = timeStr.trim();
+  if (/am|pm/i.test(cleaned)) return cleaned;
+
+  const parts = cleaned.split(":");
+  if (parts.length === 0) return cleaned;
+
+  const rawHour = parseInt(parts[0], 10);
+  if (isNaN(rawHour)) return cleaned;
+
+  const minutes = parts.length > 1 ? parts[1].slice(0, 2) : "00";
+  const period = rawHour >= 12 ? "PM" : "AM";
+  const hour12 = rawHour % 12 === 0 ? 12 : rawHour % 12;
+
+  return `${hour12}:${minutes} ${period}`;
+}
+
+function formatTimeRange(start?: string | null, end?: string | null): string {
+  const formattedStart = formatTo12Hour(start);
+  const formattedEnd = formatTo12Hour(end);
+  if (formattedStart && formattedEnd) {
+    return `${formattedStart} - ${formattedEnd}`;
+  }
+  return formattedStart || formattedEnd || "";
+}
+
 function SectionPageContent() {
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -1235,7 +1265,7 @@ function SectionPageContent() {
                               {sch.day_of_week || "Mon-Fri"}
                             </td>
                             <td className="py-2 px-3 text-slate-700">
-                              {sch.start_time} - {sch.end_time}
+                              {formatTimeRange(sch.start_time, sch.end_time)}
                             </td>
                             <td className="py-2 px-3 text-slate-900 font-semibold">
                               {sch.subject_name || sch.subjectCode}
