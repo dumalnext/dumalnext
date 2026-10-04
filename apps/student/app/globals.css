@@ -3,6 +3,14 @@
 @theme {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius: 4px;
 }
 
 :root {
@@ -19,13 +27,16 @@
   --deped-text-main: #0f172a;
   --deped-text-muted: #475569;
 
-  /* Global Geometry & Border Radius Tokens */
-  --radius-xs: 0.125rem; /* 2px */
-  --radius-sm: 0.25rem;  /* 4px - standard DepEd institutional control radius */
-  --radius-md: 0.375rem; /* 6px - buttons & cards */
-  --radius-lg: 0.5rem;   /* 8px - containers & modals */
-  --radius-xl: 0.75rem;  /* 12px - elevated panels */
-  --radius-full: 9999px; /* pill badges */
+  /* Global Geometry & Border Radius Tokens (Standardized to 4px for all boxes) */
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius: 4px;
+  --radius-full: 9999px; /* circular indicator dots */
 
   /* Layered Elevation & Shadow Tokens (Tinted with Navy depth) */
   --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -377,35 +388,72 @@ select:disabled,
   box-shadow: 0 2px 4px -1px rgba(0, 32, 96, 0.06);
 }
 
-/* Universal Form Controls Border Radius Standard (6px / --radius-md) */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-input[type="date"],
-input[type="file"],
+/* =========================================================================
+   UNIVERSAL 4PX BORDER RADIUS FOR ALL BOXES & CONTROLS
+   Standardizes crisp 4px corner geometry across every box, card, container,
+   button, input, drop box / select, dropdown popup, modal, badge, and table.
+   ========================================================================= */
+button:not([class*="rounded-t"]):not([class*="rounded-b"]):not(.rounded-full):not([class*="rounded-full"]),
+input,
 select,
-textarea {
-  border-radius: var(--radius-md);
-}
-
-/* Institutional Cards & Panels Standard (6px / --radius-md) */
+textarea,
+[role="button"]:not([class*="rounded-t"]):not([class*="rounded-b"]):not(.rounded-full):not([class*="rounded-full"]),
+[role="listbox"],
+[role="menu"],
+[role="menuitem"],
+[role="option"],
+[role="combobox"],
+[role="dialog"],
+[role="alertdialog"],
+[role="alert"],
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-danger,
+.btn-ghost,
+.btn-sm,
+.btn-md,
+.btn-lg,
+.badge,
+.badge-status,
+.badge-pending,
+.badge-approved,
+.badge-revision,
+.badge-neutral,
+.form-input,
+.form-textarea,
+.form-select,
+.deped-select,
+.file-drop-box,
 .deped-card,
+.card,
 .card-container,
-.panel-container {
-  border-radius: var(--radius-md);
-}
-
-/* Modals & Dialogs Standard (8px / --radius-lg) */
+.panel-container,
 .modal-container,
 .dialog-container,
-.overlay-card {
-  border-radius: var(--radius-lg);
-}
-
-/* Responsive Table Standard (6px / --radius-md) */
+.overlay-card,
+.roster-modal-container,
 .table-responsive,
 .table-wrapper {
-  border-radius: var(--radius-md);
+  border-radius: 4px !important;
+}
+
+/* All box containers (cards, panels, bordered boxes, shadow boxes) */
+:not(html):not(body):not(header):not(nav):not(footer):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(svg):not(path):not(circle):not(polygon):not(polyline):not(line):not(hr):not(.rounded-full):not([class*="rounded-full"])[class*="shadow-"] {
+  border-radius: 4px;
+}
+
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border-2"],
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border "],
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border-slate-"],
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border-blue-"],
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border-amber-"],
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border-emerald-"],
+div:not(header):not(nav):not(footer):not([class*="border-b"]):not([class*="border-t"]):not([class*="border-l"]):not([class*="border-r"]):not(.rounded-full):not([class*="rounded-full"])[class*="border-red-"] {
+  border-radius: 4px;
+}
+
+span:not(.rounded-full):not([class*="rounded-full"])[class*="border"],
+label:not(.rounded-full):not([class*="rounded-full"])[class*="border"] {
+  border-radius: 4px;
 }

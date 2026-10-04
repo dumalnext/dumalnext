@@ -82,7 +82,7 @@ export default function CustomSelect({
         onClick={() => !disabled && setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border text-xs font-sans transition-all cursor-pointer select-none shrink-0 ${
+        className={`flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border text-xs font-sans transition-all cursor-pointer select-none shrink-0 rounded-[4px] ${
           isOpen
             ? "border-[#002060] bg-white ring-2 ring-[#002060]/20 shadow-xs"
             : "border-slate-300 hover:border-[#002060]"
@@ -120,7 +120,7 @@ export default function CustomSelect({
           tabIndex={-1}
           className={`absolute ${
             align === "right" ? "right-0" : "left-0"
-          } mt-1 min-w-[200px] w-auto max-w-[320px] bg-white border-2 border-[#002060] shadow-xl z-50 py-1 ${dropdownClassName}`}
+          } mt-1 min-w-[200px] w-auto max-w-[320px] bg-white border-2 border-[#002060] shadow-xl z-50 py-1 rounded-[4px] overflow-hidden ${dropdownClassName}`}
         >
           {/* Subtle Dropdown Title Bar */}
           {label && (
@@ -155,7 +155,7 @@ export default function CustomSelect({
                   <div className="flex items-center gap-1.5 shrink-0">
                     {option.badge && (
                       <span
-                        className={`text-[9px] px-1.5 py-0.5 font-mono uppercase font-bold ${
+                        className={`text-[9px] px-1.5 py-0.5 font-mono uppercase font-bold rounded-[4px] ${
                           isSelected
                             ? "bg-white/20 text-white"
                             : "bg-blue-100 text-[#002060]"
