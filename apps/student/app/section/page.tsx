@@ -752,7 +752,7 @@ function SectionPageContent() {
                 <strong className="text-slate-900 text-xs sm:text-sm">
                   Grade {assignedSection.grade_level}
                 </strong>
-                <span className="text-[10px] text-slate-500 block truncate">
+                <span className="text-[10px] text-slate-500 block break-words">
                   {assignedSection.strand || "General / Regular"}
                 </span>
               </div>
@@ -765,7 +765,7 @@ function SectionPageContent() {
               </div>
               <div className="bg-white p-3 border border-emerald-200 rounded-[4px] shadow-2xs">
                 <span className="text-[10px] text-slate-500 block">Class Adviser</span>
-                <strong className="text-slate-900 text-xs sm:text-sm truncate block">
+                <strong className="text-slate-900 text-xs sm:text-sm break-words block leading-tight">
                   {assignedSection.adviser_name || "Faculty Adviser Assigned"}
                 </strong>
                 <span className="text-[10px] text-slate-500 block">Homeroom Teacher</span>

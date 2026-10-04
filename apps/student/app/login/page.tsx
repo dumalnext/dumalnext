@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       {/* Error Alert Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border-2 border-red-400 rounded-md">
+        <div className="p-4 bg-red-50 border-2 border-red-400 rounded-[4px]">
           <p className="text-xs font-bold text-red-900 leading-normal">
             Authentication Error: {error}
           </p>
@@ -70,7 +70,7 @@ export default function LoginPage() {
       )}
 
       {/* Sign In Card */}
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-lg shadow-sm">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-[4px] shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Identifier: Email First */}
           <div>
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="e.g. student@example.com"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-md"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px]"
               required
             />
             <p className="text-[10px] text-slate-500 mt-1">
@@ -106,7 +106,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="Enter your account password"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none rounded-md"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none rounded-[4px]"
               required
             />
           </div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-md"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px]"
             >
               {isSubmitting ? "Authenticating Account..." : "Sign In to Student Portal"}
             </button>
@@ -124,7 +124,7 @@ export default function LoginPage() {
         </form>
 
         {/* Capstone Defense Testing Quick Buttons */}
-        <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] rounded-md">
+        <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] rounded-[4px]">
           <span className="font-bold text-slate-600 block text-[10px] uppercase tracking-wider">
             Capstone Defense Demo Shortcuts:
           </span>

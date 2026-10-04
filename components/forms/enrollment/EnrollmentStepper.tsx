@@ -256,12 +256,12 @@ export default function EnrollmentStepper() {
 
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
       <div className="bg-white border border-slate-300 p-3.5 sm:p-5 md:p-6 shadow-sm rounded-[4px]">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
+        <div className="flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
           <div className="min-w-0 flex-1">
-            <span className="text-[11px] sm:text-xs font-bold tracking-wider sm:tracking-widest text-[#002060] block truncate">
+            <span className="text-[11px] sm:text-xs font-bold tracking-normal sm:tracking-wider text-[#002060] block leading-snug break-words">
               Dumalneg NHS Online Enrollment
             </span>
-            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight mt-0.5">
               Basic Education Enrollment Form
             </h1>
           </div>

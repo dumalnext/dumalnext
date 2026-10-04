@@ -392,23 +392,23 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 7")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Grade 7"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
                   data.applicantType === "Grade 7"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} ] CATEGORY 01
+                {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 01
               </span>
-              <span className="text-xs font-bold text-[#002060]">Target: Grade 7</span>
+              <span className="text-[11px] sm:text-xs font-bold text-[#002060] whitespace-nowrap shrink-0">Target: Grade 7</span>
             </div>
             <div className="text-base font-bold text-slate-900">Incoming Grade 7</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -420,23 +420,23 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 11")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Grade 11"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
                   data.applicantType === "Grade 11"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} ] CATEGORY 02
+                {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 02
               </span>
-              <span className="text-xs font-bold text-[#002060]">Target: Grade 11</span>
+              <span className="text-[11px] sm:text-xs font-bold text-[#002060] whitespace-nowrap shrink-0">Target: Grade 11</span>
             </div>
             <div className="text-base font-bold text-slate-900">Incoming Grade 11</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -448,23 +448,23 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Transferee")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Transferee"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
                   data.applicantType === "Transferee"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Transferee" ? "ACTIVE" : "SELECT"} ] CATEGORY 03
+                {data.applicantType === "Transferee" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 03
               </span>
-              <span className="text-xs font-bold text-amber-800">Grades 7–12</span>
+              <span className="text-[11px] sm:text-xs font-bold text-amber-800 whitespace-nowrap shrink-0">Grades 7–12</span>
             </div>
             <div className="text-base font-bold text-slate-900">Transferee (Move-In)</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -476,23 +476,23 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Returning")}
-            className={`p-5 border-2 text-left transition-all ${
+            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
               data.applicantType === "Returning"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
                   data.applicantType === "Returning"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                [ {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} ] CATEGORY 04
+                {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 04
               </span>
-              <span className="text-xs font-bold text-indigo-800">Balik-Aral (Grades 7–12)</span>
+              <span className="text-[11px] sm:text-xs font-bold text-indigo-800 whitespace-nowrap shrink-0">Balik-Aral (Grades 7–12)</span>
             </div>
             <div className="text-base font-bold text-slate-900">Returning Learner (Balik-Aral)</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">

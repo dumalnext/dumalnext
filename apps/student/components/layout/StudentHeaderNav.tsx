@@ -453,7 +453,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                         PENDING EVALUATION
                       </span>
                     ) : (
-                      <span className="text-[10px] bg-blue-100 text-blue-950 px-2 py-0.5 border border-blue-400 font-bold uppercase rounded-sm">
+                      <span className="text-[10px] bg-blue-100 text-blue-950 px-2 py-0.5 border border-blue-400 font-bold uppercase rounded-[4px]">
                         NEW APPLICANT
                       </span>
                     )}
@@ -476,13 +476,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
+                      className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-bold text-emerald-800 uppercase tracking-widest block">
                           SECTION ASSIGNED
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 text-[9px] font-bold uppercase rounded-xs">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 text-[9px] font-bold uppercase rounded-[4px]">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
                           Official Roster &rarr;
                         </span>
@@ -498,13 +498,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href="/enroll"
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
+                      className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-bold text-[#002060] uppercase tracking-widest block">
                           ENROLLMENT REQUIRED
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] text-[9px] font-bold uppercase rounded-xs">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] text-[9px] font-bold uppercase rounded-[4px]">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
                           Action Needed &rarr;
                         </span>
@@ -520,13 +520,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
+                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-bold text-amber-900 uppercase tracking-widest block">
                           SECTION STATUS &bull; TRANSFEREE
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-bold uppercase rounded-xs">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-bold uppercase rounded-[4px]">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
                           Pending Placement &rarr;
                         </span>
@@ -542,13 +542,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <Link
                       href={sectionHref}
                       onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer rounded-md shadow-xs"
+                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-bold text-amber-800 uppercase tracking-widest block">
                           SECTION STATUS
                         </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 text-[9px] font-bold uppercase rounded-xs">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 text-[9px] font-bold uppercase rounded-[4px]">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
                           Pending Placement &rarr;
                         </span>

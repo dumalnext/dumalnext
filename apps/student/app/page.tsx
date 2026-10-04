@@ -1491,7 +1491,7 @@ function StudentHomeContent() {
       {/* ========================================================================= */}
       {showOtpModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs ">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-md shadow-2xl overflow-hidden rounded-xl">
+          <div className="bg-white border-4 border-[#002060] w-full max-w-md shadow-2xl overflow-hidden rounded-[4px]">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
               <div>
