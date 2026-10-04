@@ -36,7 +36,7 @@ export async function GET() {
       supabase.from("sections").select("id, section_name, grade_level, strand"),
       supabase
         .from("enrollment_applications")
-        .select("student_id, submitted_documents")
+        .select("id, student_id")
         .order("created_at", { ascending: false }),
     ]);
 
@@ -75,14 +75,7 @@ export async function GET() {
         const section = (sections || []).find((sec: any) => sec.id === st.current_section_id);
 
         const app = (applications || []).find((a: any) => a.student_id === st.id);
-        const docs = app?.submitted_documents || [];
-        const idPic = docs.find((d: any) => {
-          const t = (d.docType || "").toLowerCase();
-          return t.includes("id") || t.includes("picture") || t.includes("photo");
-        });
-        if (idPic?.fileData) {
-          photoUrl = idPic.fileData;
-        }
+        photoUrl = null;
 
         details = {
           lrn: st.student_id || "Not assigned",

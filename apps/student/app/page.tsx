@@ -193,7 +193,7 @@ function StudentHomeContent() {
         if (studentRec) {
           const { data: appData } = await supabase
             .from("enrollment_applications")
-            .select("*")
+            .select("id, application_id, student_id, applicant_type, school_year, target_grade_level, target_strand, status, admin_feedback, selected_electives, submission_date, created_at, updated_at")
             .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
@@ -214,9 +214,9 @@ function StudentHomeContent() {
           let targetSecId = studentRec.current_section_id;
           if (resolvedTermNum >= 2 && !isTransferee && isEnrolledInActiveTerm) {
             if (!targetSecId) {
-              const priorApp = userApps.find((a: any) => a.status === "Approved" && (a.section_id || a.assigned_section_id));
+              const priorApp = userApps.find((a: any) => a.status === "Approved" && ((a as any).section_id || (a as any).assigned_section_id || a.selected_electives?.[0]?.assigned_track_section_id));
               if (priorApp) {
-                targetSecId = priorApp.section_id || priorApp.assigned_section_id;
+                targetSecId = (priorApp as any).section_id || (priorApp as any).assigned_section_id || (priorApp as any).selected_electives?.[0]?.assigned_track_section_id;
                 await supabase.from("students").update({ current_section_id: targetSecId }).eq("id", studentRec.id);
               }
             }
@@ -355,8 +355,12 @@ function StudentHomeContent() {
     };
     window.addEventListener("dumalnext:data-changed", onDataChanged);
 
-    // 4. 10-Second Silent Heartbeat Polling
-    const heartbeat = setInterval(fetchApp, 10000);
+    // 4. Fallback Heartbeat Polling (every 2 minutes, active tab only)
+    const heartbeat = setInterval(() => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchApp();
+      }
+    }, 120000);
 
     // 5. Supabase Realtime Channels: Instant live update on application AND section assignments
     const channel = supabase

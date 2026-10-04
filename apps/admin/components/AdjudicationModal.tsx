@@ -118,28 +118,37 @@ export default function AdjudicationModal({
   const [actionSuccess, setActionSuccess] = useState<string>("");
   const [inspectingDoc, setInspectingDoc] = useState<DocumentInspectionItem | null>(null);
   const [documents, setDocuments] = useState<any[]>(
-    Array.isArray(application.submitted_documents) ? application.submitted_documents : []
+    Array.isArray(application.submitted_documents) && application.submitted_documents.length > 0
+      ? application.submitted_documents
+      : []
+  );
+  const [isLoadingDocs, setIsLoadingDocs] = useState<boolean>(
+    !application.submitted_documents || application.submitted_documents.length === 0
   );
 
   // Lazy fetch documents on-demand only for this specific student when modal is opened
   useEffect(() => {
     if (Array.isArray(application.submitted_documents) && application.submitted_documents.length > 0) {
       setDocuments(application.submitted_documents);
+      setIsLoadingDocs(false);
       return;
     }
     let isMounted = true;
     const fetchDocs = async () => {
+      setIsLoadingDocs(true);
       try {
         const { data } = await supabase
           .from("enrollment_applications")
           .select("submitted_documents")
           .eq("id", application.id)
-          .single();
+          .maybeSingle();
         if (isMounted && data?.submitted_documents && Array.isArray(data.submitted_documents)) {
           setDocuments(data.submitted_documents);
         }
       } catch (err) {
         console.warn("Lazy documents fetch notice:", err);
+      } finally {
+        if (isMounted) setIsLoadingDocs(false);
       }
     };
     fetchDocs();
@@ -1023,7 +1032,7 @@ export default function AdjudicationModal({
                     Submitted Learner Credentials &amp; Scanned Documents:
                   </span>
                   <span className="text-[10px] font-mono text-slate-500 uppercase">
-                    Click picture or &quot;[ View Picture ]&quot; to inspect in full resolution
+                    {isLoadingDocs ? "[ Loading credentials on-demand... ]" : "Click picture or \"[ View Picture ]\" to inspect in full resolution"}
                   </span>
                 </div>
 

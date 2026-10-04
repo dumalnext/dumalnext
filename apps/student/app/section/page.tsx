@@ -577,8 +577,12 @@ function SectionPageContent() {
     window.addEventListener("focus", onVisibilityChange);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    // 10-Second Heartbeat Polling
-    const heartbeat = setInterval(fetchSectionData, 10000);
+    // Fallback Heartbeat Polling (every 2 minutes, active tab only)
+    const heartbeat = setInterval(() => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchSectionData();
+      }
+    }, 120000);
 
     // Supabase Realtime Channels: Instant updates on students and sections changes
     const studentChannel = supabase

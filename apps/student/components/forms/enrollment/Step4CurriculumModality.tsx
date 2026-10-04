@@ -215,10 +215,12 @@ export default function Step4CurriculumModality({
     window.addEventListener("storage", handleStorage);
     window.addEventListener("focus", handleUpdate);
 
-    // 5. Silent 3-second background polling fallback to guarantee synchronization
+    // 5. Silent background polling fallback (every 2 minutes, active tab only)
     const pollInterval = setInterval(() => {
-      fetchLiveSubjects(false);
-    }, 3000);
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchLiveSubjects(false);
+      }
+    }, 120000);
 
     return () => {
       clearInterval(pollInterval);

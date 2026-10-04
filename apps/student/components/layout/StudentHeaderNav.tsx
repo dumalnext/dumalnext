@@ -226,8 +226,12 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
     };
     window.addEventListener("dumalnext:data-changed", onDataChanged);
 
-    // 4. 10-Second Silent Heartbeat Polling
-    const heartbeat = setInterval(fetchStatus, 10000);
+    // 4. Fallback Heartbeat Polling (every 2 minutes, active tab only)
+    const heartbeat = setInterval(() => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchStatus();
+      }
+    }, 120000);
 
     // 5. Supabase Realtime Channels: Instant live push on enrollment applications AND student section changes
     const appChannel = supabase

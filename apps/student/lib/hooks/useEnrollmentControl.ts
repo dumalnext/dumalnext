@@ -133,8 +133,12 @@ export function useEnrollmentControl() {
     window.addEventListener("dumalnext:data-changed", onSync);
     window.addEventListener("dumalnext:admin-data-changed", onSync);
 
-    // 5. 2-Second Silent Fallback Polling (bypasses cache with timestamp)
-    const interval = setInterval(fetchSettings, 2000);
+    // 5. Silent Fallback Polling (relaxed to 2 minutes, active tab only)
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchSettings();
+      }
+    }, 120000);
 
     return () => {
       supabase.removeChannel(realtimeChannel);

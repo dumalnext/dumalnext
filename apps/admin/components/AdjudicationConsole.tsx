@@ -372,10 +372,12 @@ export default function AdjudicationConsole() {
       )
       .subscribe();
 
-    // 3. Fallback Heartbeat Polling (every 12 seconds)
+    // 3. Fallback Heartbeat Polling (every 2 minutes, active tab only)
     const intervalId = setInterval(() => {
-      fetchData(true);
-    }, 12000);
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchData(true);
+      }
+    }, 120000);
 
     // 4. Tab focus auto-sync
     const handleVisibilityChange = () => {

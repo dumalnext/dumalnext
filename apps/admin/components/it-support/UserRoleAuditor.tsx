@@ -103,10 +103,12 @@ export default function UserRoleAuditor() {
     window.addEventListener("focus", handleVisibilitySync);
     document.addEventListener("visibilitychange", handleVisibilitySync);
 
-    // 3. 5-Second Silent Heartbeat Polling
+    // 3. Fallback Heartbeat Polling (every 2 minutes, active tab only)
     const heartbeat = setInterval(() => {
-      fetchUsers(true);
-    }, 5000);
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchUsers(true);
+      }
+    }, 120000);
 
     return () => {
       supabase.removeChannel(channel);

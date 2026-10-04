@@ -368,10 +368,12 @@ function TrackApplicationContent() {
     window.addEventListener("dumalnext:teacher-data-changed", handleDataChanged);
     window.addEventListener("dumalnext:admin-data-changed", handleDataChanged);
 
-    // 4. 10-Second Silent Heartbeat Polling
+    // 4. Fallback Heartbeat Polling (every 2 minutes, active tab only)
     const heartbeat = setInterval(() => {
-      fetchRecord(true);
-    }, 10000);
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchRecord(true);
+      }
+    }, 120000);
 
     // 5. Supabase Realtime Channel: Instant push on enrollment_applications, sections, and teachers changes
     const channel = supabase

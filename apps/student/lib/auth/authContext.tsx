@@ -174,8 +174,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     document.addEventListener("visibilitychange", handleVisibilitySync);
 
     const heartbeatTimer = setInterval(() => {
-      refreshSession();
-    }, 15000);
+      if (typeof document !== "undefined" && !document.hidden) {
+        refreshSession();
+      }
+    }, 300000);
 
     return () => {
       subscription.unsubscribe();
