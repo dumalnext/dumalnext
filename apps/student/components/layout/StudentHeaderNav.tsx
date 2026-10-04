@@ -583,7 +583,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href="/"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
+                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
                     pathname === "/"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -591,7 +591,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900">
-                      01 &bull; Home Dashboard
+                      Home Dashboard
                     </span>
                     <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -604,7 +604,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href={enrollHref}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
+                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
                     pathname === "/enroll"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -612,7 +612,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900">
-                      02 &bull; Basic Education Enrollment
+                      Basic Education Enrollment
                     </span>
                     <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -625,7 +625,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href={trackHref}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
+                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
                     pathname === "/track"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -633,7 +633,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900">
-                      03 &bull; Track Application Status
+                      Track Application Status
                     </span>
                     <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                   </div>
@@ -646,7 +646,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <Link
                   href={sectionHref}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-md shadow-xs ${
+                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
                     pathname === "/section"
                       ? "bg-blue-50/80 border-[#002060] text-[#002060]"
                       : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
@@ -654,7 +654,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900">
-                      04 &bull; Class Section &amp; Advisory
+                      Class Section &amp; Advisory
                     </span>
                     <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                   </div>

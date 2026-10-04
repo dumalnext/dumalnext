@@ -966,15 +966,15 @@ function SectionPageContent() {
                 </button>
                 <Link
                   href="/track"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-md"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
                 >
-                  03 Track Full Application
+                  Track Full Application
                 </Link>
                 <Link
                   href="/"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-md"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
                 >
-                  01 Return to Home Dashboard
+                  Return to Home Dashboard
                 </Link>
               </div>
             </div>
@@ -1329,15 +1329,15 @@ function SectionPageContent() {
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/enroll"
-                className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-md"
+                className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-[4px]"
               >
-                02 Complete Continuing Enrollment Now &rarr;
+                Complete Continuing Enrollment Now &rarr;
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-md"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
               >
-                01 Return to Home Dashboard
+                Return to Home Dashboard
               </Link>
             </div>
           </div>
@@ -1387,15 +1387,15 @@ function SectionPageContent() {
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-md"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-[4px]"
               >
-                03 Track Transferee Application Status &rarr;
+                Track Transferee Application Status &rarr;
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-md"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
               >
-                01 Return to Home Dashboard
+                Return to Home Dashboard
               </Link>
             </div>
           </div>
@@ -1460,15 +1460,15 @@ function SectionPageContent() {
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-md"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-[4px]"
               >
-                03 Track Application Status
+                Track Application Status
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-md"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
               >
-                01 Return to Home Dashboard
+                Return to Home Dashboard
               </Link>
             </div>
           </div>
