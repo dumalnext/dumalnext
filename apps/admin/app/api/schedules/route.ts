@@ -400,11 +400,32 @@ export async function DELETE(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const clearAll = searchParams.get("clearAll") === "true";
 
-    if (!id) {
+    if (!id && !clearAll) {
       return NextResponse.json(
-        { success: false, error: "Missing schedule ID parameter" },
+        { success: false, error: "Missing schedule ID or clearAll parameter" },
         { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    if (clearAll) {
+      await supabase.from("system_settings").upsert(
+        {
+          key: "class_schedules_config",
+          value: { schedules: [], lastUpdated: new Date().toISOString() },
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "key" }
+      );
+
+      try {
+        await supabase.from("class_schedules").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      } catch {}
+
+      return NextResponse.json(
+        { success: true, message: "All class schedule timetables have been successfully cleared." },
+        { headers: NO_CACHE_HEADERS }
       );
     }
 

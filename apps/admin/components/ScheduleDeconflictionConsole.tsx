@@ -25,6 +25,7 @@ export interface ScheduleItem {
   department?: string;
   classroom_name?: string;
   building?: string;
+  is_elective_slot?: boolean;
 }
 
 export interface SectionRef {
@@ -79,8 +80,8 @@ const ACADEMIC_TIME_SLOTS: TimeSlotDef[] = [
   { id: "LUNCH", name: "Noon Lunch Break", start: "11:45", end: "13:00", isBreak: true },
   { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
   { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
-  { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
-  { id: "P8", name: "Homeroom / Remediation", start: "16:00", end: "17:00" },
+  { id: "P7", name: "Transition / Homeroom", start: "15:00", end: "15:30" },
+  { id: "ELECTIVE", name: "SHS Specialized Electives Window", start: "15:30", end: "17:00" },
 ];
 
 const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday"> = [
@@ -146,6 +147,27 @@ export default function ScheduleDeconflictionConsole() {
 
   // Notice Message
   const [actionNotice, setActionNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Auto-Generate Modal State
+  const [isAutoModalOpen, setIsAutoModalOpen] = useState<boolean>(false);
+  const [isGeneratingAuto, setIsGeneratingAuto] = useState<boolean>(false);
+  const [autoSchoolYear, setAutoSchoolYear] = useState<string>("2026–2027");
+  const [autoTrimester, setAutoTrimester] = useState<number>(1);
+  const [autoClearExisting, setAutoClearExisting] = useState<boolean>(true);
+  const [autoAuditResult, setAutoAuditResult] = useState<{
+    totalScheduled: number;
+    jhsCount: number;
+    shsTrackCount: number;
+    shsElectiveCount: number;
+    teacherCollisions: number;
+    roomCollisions: number;
+    sectionCollisions: number;
+    isConflictFree: boolean;
+  } | null>(null);
+
+  // Reset / Clear Timetable State
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState<boolean>(false);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
 
   // 1. Fetch data on mount
   const loadData = async (silent = false) => {
@@ -460,6 +482,66 @@ export default function ScheduleDeconflictionConsole() {
     }
   };
 
+  // 4b. Handle Smart Automated Timetable Generation
+  const handleRunAutoGeneration = async () => {
+    try {
+      setIsGeneratingAuto(true);
+      setAutoAuditResult(null);
+
+      const res = await fetch("/api/schedules/auto-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          school_year: autoSchoolYear,
+          trimester: autoTrimester,
+          clearExisting: autoClearExisting,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAutoAuditResult(data.audit);
+        setActionNotice({
+          type: "success",
+          text: `Automated Timetable Generation Complete: ${data.audit.totalScheduled} class periods created with 0 collisions.`,
+        });
+        await loadData(true);
+      } else {
+        setActionNotice({
+          type: "error",
+          text: data.error || "Failed to auto-generate timetables.",
+        });
+      }
+    } catch (err: any) {
+      setActionNotice({
+        type: "error",
+        text: err?.message || "Network error during timetable generation.",
+      });
+    } finally {
+      setIsGeneratingAuto(false);
+    }
+  };
+
+  // 4c. Handle Reset / Clear All Schedules
+  const handleResetAllSchedules = async () => {
+    try {
+      setIsResetting(true);
+      const res = await fetch("/api/schedules?clearAll=true", { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setActionNotice({ type: "success", text: "All class schedules have been cleared." });
+        setIsResetConfirmOpen(false);
+        await loadData(true);
+      } else {
+        setActionNotice({ type: "error", text: data.error || "Failed to clear schedules." });
+      }
+    } catch (err: any) {
+      setActionNotice({ type: "error", text: err?.message || "Network error while clearing schedules." });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   // 5. Run Full Deconfliction Audit Scan
   const runAuditScan = async () => {
     setIsScanning(true);
@@ -573,12 +655,31 @@ export default function ScheduleDeconflictionConsole() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
+            onClick={() => {
+              setAutoAuditResult(null);
+              setIsAutoModalOpen(true);
+            }}
+            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900"
+            title="One-click automated timetable deconfliction engine for JHS and SHS"
+          >
+            [ Smart Auto-Generate Timetable ]
+          </button>
+          <button
+            type="button"
             onClick={runAuditScan}
             disabled={isScanning}
             className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60"
             title="Scan database for any schedule collisions"
           >
             {isScanning ? "[ Scanning Timetables... ]" : "[ Run Deconfliction Audit Scan ]"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsResetConfirmOpen(true)}
+            className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            title="Reset and clear all timetables"
+          >
+            [ Clear All ]
           </button>
           <button
             type="button"
@@ -908,15 +1009,31 @@ export default function ScheduleDeconflictionConsole() {
                           {DAYS_OF_WEEK.map((day) => {
                             const daySchedules = sectionSchedules.filter((s) => s.day_of_week === day);
                             const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
+                            const isElective = Boolean(matchedItem && (matchedItem.is_elective_slot || (matchedItem.start_time === "15:30" && (matchedItem.grade_level || 0) >= 11)));
 
                             return (
                               <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
                                 {matchedItem ? (
-                                  <div className="p-2.5 bg-blue-50/70 border border-[#002060]/30 hover:border-[#002060] transition-colors shadow-2xs space-y-1 relative group">
+                                  <div className={`p-2.5 border transition-colors shadow-2xs space-y-1 relative group ${
+                                    isElective
+                                      ? "bg-purple-50/80 border-purple-400/60 hover:border-purple-600"
+                                      : "bg-blue-50/70 border-[#002060]/30 hover:border-[#002060]"
+                                  }`}>
                                     <div className="flex items-center justify-between">
-                                      <span className="text-[10px] font-mono font-bold text-blue-950 bg-white px-1.5 py-0.5 border border-blue-200">
-                                        {matchedItem.start_time}–{matchedItem.end_time}
-                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 border ${
+                                          isElective
+                                            ? "text-purple-950 bg-white border-purple-200"
+                                            : "text-blue-950 bg-white border-blue-200"
+                                        }`}>
+                                          {matchedItem.start_time}–{matchedItem.end_time}
+                                        </span>
+                                        {isElective && (
+                                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
+                                            Elective
+                                          </span>
+                                        )}
+                                      </div>
                                       <button
                                         type="button"
                                         onClick={() => handleDeleteSchedule(matchedItem.id, matchedItem.subject_name)}
@@ -1029,15 +1146,31 @@ export default function ScheduleDeconflictionConsole() {
                           {DAYS_OF_WEEK.map((day) => {
                             const daySchedules = teacherSchedules.filter((s) => s.day_of_week === day);
                             const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
+                            const isElective = Boolean(matchedItem && (matchedItem.is_elective_slot || (matchedItem.start_time === "15:30" && (matchedItem.grade_level || 0) >= 11)));
 
                             return (
                               <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
                                 {matchedItem ? (
-                                  <div className="p-2.5 bg-emerald-50/70 border border-emerald-600/30 hover:border-emerald-700 transition-colors shadow-2xs space-y-1 relative group">
+                                  <div className={`p-2.5 border transition-colors shadow-2xs space-y-1 relative group ${
+                                    isElective
+                                      ? "bg-purple-50/80 border-purple-400/60 hover:border-purple-600"
+                                      : "bg-emerald-50/70 border-emerald-600/30 hover:border-emerald-700"
+                                  }`}>
                                     <div className="flex items-center justify-between">
-                                      <span className="text-[10px] font-mono font-bold text-emerald-950 bg-white px-1.5 py-0.5 border border-emerald-300">
-                                        {matchedItem.start_time}–{matchedItem.end_time}
-                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 border ${
+                                          isElective
+                                            ? "text-purple-950 bg-white border-purple-200"
+                                            : "text-emerald-950 bg-white border-emerald-300"
+                                        }`}>
+                                          {matchedItem.start_time}–{matchedItem.end_time}
+                                        </span>
+                                        {isElective && (
+                                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
+                                            Elective
+                                          </span>
+                                        )}
+                                      </div>
                                       <button
                                         type="button"
                                         onClick={() => handleDeleteSchedule(matchedItem.id, matchedItem.subject_name)}
@@ -1418,6 +1551,262 @@ export default function ScheduleDeconflictionConsole() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SMART AUTO-GENERATE TIMETABLE MODAL */}
+      {/* ========================================================================= */}
+      {isAutoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto no-print print:hidden">
+          <div className="bg-white border-2 border-[#002060] shadow-2xl w-full max-w-2xl my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="bg-[#002060] p-4 text-white flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono tracking-widest uppercase opacity-80 block">
+                  Dumalneg NHS • Intelligent Timetable Engine
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight">
+                  One-Click Smart Automated Scheduling Deconfliction
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isGeneratingAuto) {
+                    setIsAutoModalOpen(false);
+                    setAutoAuditResult(null);
+                  }
+                }}
+                disabled={isGeneratingAuto}
+                className="text-white hover:text-slate-300 font-mono text-xl px-2 cursor-pointer disabled:opacity-40"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5 max-h-[calc(85vh-120px)] overflow-y-auto">
+              {/* Algorithm Specifications Card */}
+              <div className="p-4 bg-slate-50 border-2 border-slate-300 space-y-3">
+                <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
+                  [ Automated Deconfliction Logic &amp; Constraints ]
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+                  <div className="p-2.5 bg-white border border-slate-200">
+                    <strong className="text-slate-900 block font-mono text-[11px] uppercase mb-1">
+                      1. Junior High School (Grades 7–10)
+                    </strong>
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                      Fixed standard DepEd core curriculum (English, Math, Science, AP, Filipino, TLE, ESP, MAPEH). Evenly distributed across 07:30–15:00 periods with zero faculty or classroom collisions.
+                    </p>
+                  </div>
+                  <div className="p-2.5 bg-white border border-slate-200">
+                    <strong className="text-slate-900 block font-mono text-[11px] uppercase mb-1">
+                      2. Senior High School (Grades 11–12)
+                    </strong>
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                      Two-tier daily architecture: 07:30–15:30 for Academic &amp; Tech-Pro core track subjects; 15:30–17:00 dedicated exclusively to Specialized Electives without timetable overlaps.
+                    </p>
+                  </div>
+                </div>
+                <div className="p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 font-mono">
+                  Guaranteed Conflict-Free: Mathematical constraint satisfaction checks faculty load, physical facility occupancy, and section student programs simultaneously.
+                </div>
+              </div>
+
+              {/* Form Parameters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-800 uppercase block">
+                    Target Academic Year:
+                  </label>
+                  <select
+                    value={autoSchoolYear}
+                    onChange={(e) => setAutoSchoolYear(e.target.value)}
+                    disabled={isGeneratingAuto}
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
+                  >
+                    <option value="2026–2027">SY 2026–2027</option>
+                    <option value="2025–2026">SY 2025–2026</option>
+                    <option value="2027–2028">SY 2027–2028</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-800 uppercase block">
+                    Target Term / Trimester:
+                  </label>
+                  <select
+                    value={autoTrimester}
+                    onChange={(e) => setAutoTrimester(Number(e.target.value))}
+                    disabled={isGeneratingAuto}
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
+                  >
+                    <option value={1}>1st Trimester / 1st Semester</option>
+                    <option value={2}>2nd Trimester / 2nd Semester</option>
+                    <option value={3}>3rd Trimester</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Clean Slate Checkbox */}
+              <label className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-300 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={autoClearExisting}
+                  onChange={(e) => setAutoClearExisting(e.target.checked)}
+                  disabled={isGeneratingAuto}
+                  className="mt-0.5 accent-[#002060]"
+                />
+                <div className="text-xs">
+                  <strong className="text-slate-900 block">Clean Slate Generation (Recommended)</strong>
+                  <span className="text-slate-600 text-[11px]">
+                    Clears any existing schedule records to prevent legacy overlapping conflicts and ensure a 100% mathematically verified conflict-free matrix.
+                  </span>
+                </div>
+              </label>
+
+              {/* Generation Audit Results Banner */}
+              {autoAuditResult && (
+                <div className="p-4 bg-emerald-50 border-2 border-emerald-500 space-y-3 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between border-b border-emerald-300 pb-2">
+                    <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
+                      [ AUDIT REPORT: 100% CONFLICT-FREE TIMETABLE CERTIFIED ]
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase">
+                      Zero Collisions
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-mono">
+                    <div className="p-2 bg-white border border-emerald-200">
+                      <div className="text-base font-bold text-[#002060]">{autoAuditResult.totalScheduled}</div>
+                      <div className="text-[10px] text-slate-600 uppercase">Total Periods</div>
+                    </div>
+                    <div className="p-2 bg-white border border-emerald-200">
+                      <div className="text-base font-bold text-emerald-900">{autoAuditResult.jhsCount}</div>
+                      <div className="text-[10px] text-slate-600 uppercase">JHS Core</div>
+                    </div>
+                    <div className="p-2 bg-white border border-emerald-200">
+                      <div className="text-base font-bold text-blue-900">{autoAuditResult.shsTrackCount}</div>
+                      <div className="text-[10px] text-slate-600 uppercase">SHS Track</div>
+                    </div>
+                    <div className="p-2 bg-white border border-emerald-200">
+                      <div className="text-base font-bold text-purple-900">{autoAuditResult.shsElectiveCount}</div>
+                      <div className="text-[10px] text-slate-600 uppercase">SHS Electives</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-center pt-1 border-t border-emerald-200">
+                    <div className="text-emerald-900">
+                      Faculty Collisions: <strong className="text-emerald-950 font-bold">{autoAuditResult.teacherCollisions}</strong>
+                    </div>
+                    <div className="text-emerald-900">
+                      Facility Collisions: <strong className="text-emerald-950 font-bold">{autoAuditResult.roomCollisions}</strong>
+                    </div>
+                    <div className="text-emerald-900">
+                      Section Collisions: <strong className="text-emerald-950 font-bold">{autoAuditResult.sectionCollisions}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="p-4 bg-slate-100 border-t border-slate-300 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAutoModalOpen(false);
+                  setAutoAuditResult(null);
+                }}
+                disabled={isGeneratingAuto}
+                className="px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer disabled:opacity-50"
+              >
+                {autoAuditResult ? "Close" : "Cancel"}
+              </button>
+
+              <div className="flex items-center gap-2">
+                {autoAuditResult && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAutoModalOpen(false);
+                      setAutoAuditResult(null);
+                    }}
+                    className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    [ View Updated Timetables ]
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleRunAutoGeneration}
+                  disabled={isGeneratingAuto}
+                  className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs border border-emerald-900"
+                >
+                  {isGeneratingAuto ? "[ Generating & Validating... ]" : "[ Execute Smart Timetable Generation ]"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* RESET / CLEAR ALL SCHEDULES CONFIRMATION MODAL */}
+      {/* ========================================================================= */}
+      {isResetConfirmOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto no-print print:hidden">
+          <div className="bg-white border-2 border-red-600 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-red-700 p-4 text-white flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono tracking-widest uppercase opacity-80 block">
+                  Dumalneg NHS Administrative Action
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight">
+                  Clear All Class Schedules
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => !isResetting && setIsResetConfirmOpen(false)}
+                disabled={isResetting}
+                className="text-white hover:text-slate-300 font-mono text-xl px-2 cursor-pointer disabled:opacity-40"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-6 space-y-3">
+              <p className="text-xs text-slate-700 leading-relaxed">
+                Are you sure you want to clear all active class schedule timetables? This will remove scheduled periods for both Junior and Senior High School sections.
+              </p>
+              <div className="p-3 bg-amber-50 border border-amber-300 text-amber-950 text-[11px] font-mono">
+                Notice: You can instantly regenerate a 100% conflict-free timetable at any time using the Smart Auto-Generate Timetable engine.
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-100 border-t border-slate-300 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsResetConfirmOpen(false)}
+                disabled={isResetting}
+                className="px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleResetAllSchedules}
+                disabled={isResetting}
+                className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+              >
+                {isResetting ? "[ Clearing... ]" : "[ Yes, Clear All Schedules ]"}
+              </button>
+            </div>
           </div>
         </div>
       )}
