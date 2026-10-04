@@ -140,10 +140,10 @@ export default function TeachingSchedulePage() {
     return (
       <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-2">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          [ DUMALNEG NATIONAL HIGH SCHOOL ]
+          DUMALNEG NATIONAL HIGH SCHOOL
         </span>
         <p className="text-xs font-mono text-slate-600">
-          [ Loading Teaching Load &amp; Schedule... ]
+          Loading Teaching Load &amp; Schedule...
         </p>
       </div>
     );
@@ -187,7 +187,7 @@ export default function TeachingSchedulePage() {
       <div className="p-5 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ PORTAL 02: INSTRUCTIONAL SCHEDULE HUB ]
+            PORTAL 02: INSTRUCTIONAL SCHEDULE HUB
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Teaching Load &amp; Class Schedule
@@ -205,7 +205,7 @@ export default function TeachingSchedulePage() {
             className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer border border-slate-300 shadow-2xs shrink-0 disabled:opacity-50"
             title="Synchronize schedule from official database"
           >
-            {isLoadingSchedules ? "[ Synchronizing... ]" : "[ Refresh Timetable ]"}
+            {isLoadingSchedules ? "Synchronizing..." : "Refresh Timetable"}
           </button>
           {schedules.length > 0 ? (
             <>
@@ -215,15 +215,15 @@ export default function TeachingSchedulePage() {
                 className="px-3 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer border border-blue-400 shadow-2xs shrink-0"
                 title="Print certified weekly teaching load timetable"
               >
-                [ Print Weekly Schedule ]
+                Print Weekly Schedule
               </button>
               <span className="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-mono text-xs font-bold uppercase border border-emerald-400 shrink-0">
-                [ STATUS: TIMETABLE ACTIVE &bull; {schedules.length} HOURS / WK ]
+                STATUS: TIMETABLE ACTIVE &bull; {schedules.length} HOURS / WK
               </span>
             </>
           ) : (
             <span className="px-3 py-1.5 bg-amber-100 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400 shrink-0">
-              [ STATUS: AWAITING TIMETABLE RELEASE ]
+              STATUS: AWAITING TIMETABLE RELEASE
             </span>
           )}
         </div>
@@ -265,7 +265,7 @@ export default function TeachingSchedulePage() {
         <div className="p-8 sm:p-14 bg-white border-2 border-slate-300 shadow-xs text-center space-y-4">
           <div className="max-w-xl mx-auto space-y-3">
             <span className="inline-block px-3 py-1 bg-slate-100 border border-slate-300 font-mono font-bold text-xs text-slate-700 uppercase">
-              [ NO CLASS SCHEDULE ASSIGNED YET ]
+              NO CLASS SCHEDULE ASSIGNED YET
             </span>
             <h3 className="text-lg font-bold text-slate-900 uppercase">
               Awaiting Administrative Schedule Assignment
@@ -301,7 +301,7 @@ export default function TeachingSchedulePage() {
               <thead>
                 <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
                   <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
-                    [ Time Period ]
+                    Time Period
                   </th>
                   {DAYS_OF_WEEK.map((day) => (
                     <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
@@ -320,7 +320,7 @@ export default function TeachingSchedulePage() {
                           <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                         </td>
                         <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                          [ {slot.start} – {slot.end} &bull; {slot.name} ]
+                          {slot.start} – {slot.end} &bull; {slot.name}
                         </td>
                       </tr>
                     );
@@ -379,7 +379,7 @@ export default function TeachingSchedulePage() {
           <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto no-print print:hidden">
             <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                [ COMPLETE INSTRUCTIONAL LOAD MASTERLIST &bull; {schedules.length} PERIODS ]
+                COMPLETE INSTRUCTIONAL LOAD MASTERLIST &bull; {schedules.length} PERIODS
               </span>
               <span className="text-[10px] font-mono text-slate-500 uppercase">
                 Dumalneg NHS Academic Timetable

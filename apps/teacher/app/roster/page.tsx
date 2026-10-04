@@ -248,10 +248,10 @@ export default function ClassSectionRosterPage() {
     return (
       <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-2">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          [ DUMALNEG NATIONAL HIGH SCHOOL ]
+          DUMALNEG NATIONAL HIGH SCHOOL
         </span>
         <p className="text-xs font-mono text-slate-600">
-          [ Verifying Faculty Session... ]
+          Verifying Faculty Session...
         </p>
       </div>
     );
@@ -277,7 +277,7 @@ export default function ClassSectionRosterPage() {
       <div className="bg-white p-5 border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ PORTAL 02: OFFICIAL ADVISORY CLASS MASTERLIST ]
+            PORTAL 02: OFFICIAL ADVISORY CLASS MASTERLIST
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Advisory Section Roster
@@ -299,7 +299,7 @@ export default function ClassSectionRosterPage() {
               className="px-3 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold border border-blue-400 uppercase cursor-pointer transition-colors shadow-2xs shrink-0"
               title="Print official advisory class roster"
             >
-              [ Print Class Roster ]
+              Print Class Roster
             </button>
           )}
 
@@ -332,7 +332,7 @@ export default function ClassSectionRosterPage() {
         /* SCENARIO: NO ADVISORY SECTION CURRENTLY DESIGNATED BY ADMIN */
         <div className="bg-white p-8 border-2 border-slate-300 text-center space-y-3 shadow-xs">
           <span className="text-xs font-mono font-bold text-amber-800 uppercase block">
-            [ NO ADVISORY CLASS SECTION CURRENTLY ASSIGNED ]
+            NO ADVISORY CLASS SECTION CURRENTLY ASSIGNED
           </span>
           <h3 className="text-lg font-bold text-slate-900 uppercase">
             No Designated Advisory Class Found
@@ -346,7 +346,7 @@ export default function ClassSectionRosterPage() {
               How Advisory Class Assignment Works:
             </span>
             <p>
-              1. The School Principal or Registrar assigns you as Class Adviser in the Admin Portal under [ Section Quota &amp; Capacity Management ].
+              1. The School Principal or Registrar assigns you as Class Adviser in the Admin Portal under Section Quota &amp; Capacity Management.
             </p>
             <p>
               2. Once assigned, your section and all officially enrolled learners will appear here in real time automatically.
@@ -368,7 +368,7 @@ export default function ClassSectionRosterPage() {
                 <div className="text-slate-600">
                   Designated Class Adviser: <strong className="text-emerald-800 uppercase">{currentSection.adviser_name}</strong>
                   <span className="ml-2 text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-300 font-bold uppercase">
-                    [ Official Adviser ]
+                    Official Adviser
                   </span>
                 </div>
               </div>
@@ -431,7 +431,7 @@ export default function ClassSectionRosterPage() {
                     onClick={() => setRosterSearch("")}
                     className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase cursor-pointer shrink-0"
                   >
-                    [ Clear ]
+                    Clear
                   </button>
                 )}
               </div>
@@ -447,7 +447,7 @@ export default function ClassSectionRosterPage() {
             ) : filteredStudents.length === 0 ? (
               <div className="p-8 bg-slate-50 border border-slate-200 text-center text-xs font-mono text-slate-600 space-y-1">
                 <p className="font-bold">
-                  {rosterSearch ? "[ No students matching search query. ]" : "[ No students currently enrolled in this advisory section. ]"}
+                  {rosterSearch ? "No students matching search query." : "No students currently enrolled in this advisory section."}
                 </p>
                 {!rosterSearch && (
                   <p className="text-[11px] text-slate-500">

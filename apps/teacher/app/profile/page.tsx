@@ -22,10 +22,10 @@ export default function FacultyProfilePage() {
     return (
       <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-2">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          [ DUMALNEG NATIONAL HIGH SCHOOL ]
+          DUMALNEG NATIONAL HIGH SCHOOL
         </span>
         <p className="text-xs font-mono text-slate-600">
-          [ Loading Faculty Profile... ]
+          Loading Faculty Profile...
         </p>
       </div>
     );
@@ -109,7 +109,7 @@ export default function FacultyProfilePage() {
         window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
       }
 
-      setSaveSuccess(`Faculty Name officially updated to [ ${newFullName} ]. Synchronized in real time across Teacher, Admin, and Student portals.`);
+      setSaveSuccess(`Faculty Name officially updated to ${newFullName}. Synchronized in real time across Teacher, Admin, and Student portals.`);
       setIsEditingName(false);
     } catch (err: any) {
       setSaveError(err?.message || "Failed to update name. Please check database connection.");
@@ -124,7 +124,7 @@ export default function FacultyProfilePage() {
       <div className="p-5 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ PORTAL 02: FACULTY PROFILE &amp; VERIFICATION RECORD ]
+            PORTAL 02: FACULTY PROFILE &amp; VERIFICATION RECORD
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Faculty Profile &amp; Credentials
@@ -139,7 +139,7 @@ export default function FacultyProfilePage() {
           onClick={logout}
           className="px-4 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer shrink-0"
         >
-          [ Sign Out ]
+          Sign Out
         </button>
       </div>
 
@@ -153,11 +153,11 @@ export default function FacultyProfilePage() {
       <div className="bg-white p-6 border-2 border-slate-300 shadow-xs space-y-6">
         <div className="border-b border-slate-200 pb-3 flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-mono font-bold text-[#002060] uppercase">
-            [ ACADEMIC STAFF VERIFICATION DETAILS ]
+            ACADEMIC STAFF VERIFICATION DETAILS
           </span>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-xs font-bold uppercase border border-emerald-300">
-              [ VERIFIED INSTITUTIONAL FACULTY ]
+              VERIFIED INSTITUTIONAL FACULTY
             </span>
             {!isEditingName && (
               <button
@@ -165,7 +165,7 @@ export default function FacultyProfilePage() {
                 onClick={handleStartEdit}
                 className="px-3 py-1 bg-slate-100 hover:bg-[#002060] text-[#002060] hover:text-white border border-slate-300 hover:border-[#002060] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
               >
-                [ Edit Faculty Name ]
+                Edit Faculty Name
               </button>
             )}
           </div>
@@ -176,7 +176,7 @@ export default function FacultyProfilePage() {
           <div className="p-5 bg-blue-50/60 border-2 border-[#002060] space-y-4">
             <div className="flex items-center justify-between border-b border-blue-200 pb-2">
               <span className="text-xs font-mono font-bold text-[#002060] uppercase">
-                [ MODIFY OFFICIAL FACULTY NAME ]
+                MODIFY OFFICIAL FACULTY NAME
               </span>
               <span className="text-[11px] font-mono text-slate-600">
                 Real-time synchronization across Admin &amp; Student Portals
@@ -239,7 +239,7 @@ export default function FacultyProfilePage() {
                   disabled={isSavingName}
                   className="px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:opacity-50"
                 >
-                  {isSavingName ? "[ Saving Name... ]" : "[ Save Updated Name ]"}
+                  {isSavingName ? "Saving Name..." : "Save Updated Name"}
                 </button>
                 <button
                   type="button"
@@ -247,7 +247,7 @@ export default function FacultyProfilePage() {
                   disabled={isSavingName}
                   className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  [ Cancel ]
+                  Cancel
                 </button>
               </div>
             </form>
@@ -265,7 +265,7 @@ export default function FacultyProfilePage() {
                   onClick={handleStartEdit}
                   className="text-[11px] text-[#002060] font-bold uppercase underline cursor-pointer hover:text-blue-950"
                 >
-                  [ Edit ]
+                  Edit
                 </button>
               )}
             </div>
@@ -290,7 +290,7 @@ export default function FacultyProfilePage() {
             <span className="text-[11px] font-mono text-slate-500 uppercase block">Verified Gmail Address</span>
             <strong className="text-sm font-mono text-slate-900 block">{user.email}</strong>
             <span className="text-[10px] font-mono text-emerald-800">
-              [ Institutional Google Account ]
+              Institutional Google Account
             </span>
           </div>
 

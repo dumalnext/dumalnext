@@ -48,7 +48,7 @@ export default function TeacherLoginForm() {
     setResendStatus("Sending confirmation link...");
     const res = await resendVerification(unconfirmedEmail);
     if (res.success) {
-      setResendStatus(`Verification email resent to [ ${unconfirmedEmail} ]. Please check your Gmail inbox or spam folder.`);
+      setResendStatus(`Verification email resent to ${unconfirmedEmail}. Please check your Gmail inbox or spam folder.`);
     } else {
       setResendStatus(res.error || "Failed to resend confirmation email. Rate limit may apply.");
     }
@@ -59,7 +59,7 @@ export default function TeacherLoginForm() {
       {/* Notice Banner */}
       <div className="bg-white border-l-4 border-[#002060] p-6 shadow-xs border border-slate-200">
         <span className="text-xs font-mono font-bold tracking-widest text-[#002060] uppercase block mb-1">
-          [ PORTAL 02: FACULTY &amp; ACADEMIC STAFF WORKSTATION ]
+          PORTAL 02: FACULTY &amp; ACADEMIC STAFF WORKSTATION
         </span>
         <h2 className="text-lg font-bold text-slate-900 uppercase">
           Faculty Member Sign-In
@@ -74,7 +74,7 @@ export default function TeacherLoginForm() {
       <div className="bg-white p-6 sm:p-8 border-2 border-[#002060] shadow-sm space-y-6">
         <div className="border-b border-slate-200 pb-3">
           <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-            [ SECURE ACCESS AUTHENTICATION ]
+            SECURE ACCESS AUTHENTICATION
           </span>
           <h3 className="text-base font-bold text-slate-900">
             Faculty Member Credentials
@@ -85,21 +85,21 @@ export default function TeacherLoginForm() {
           <div className="p-3.5 bg-red-50 border-2 border-red-500 text-xs text-red-950 space-y-2">
             <div className="font-bold flex items-center gap-2">
               <span className="px-2 py-0.5 bg-red-200 border border-red-400 font-mono text-[10px] uppercase">
-                [ AUTHENTICATION ERROR ]
+                AUTHENTICATION ERROR
               </span>
               <span>{errorMsg}</span>
             </div>
             {unconfirmedEmail && (
               <div className="pt-2 border-t border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <span className="text-[11px] text-red-900">
-                  Did not receive confirmation link for [ {unconfirmedEmail} ]?
+                  Did not receive confirmation link for {unconfirmedEmail}?
                 </span>
                 <button
                   type="button"
                   onClick={handleResend}
                   className="px-3 py-1 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0"
                 >
-                  [ Resend Verification Email ]
+                  Resend Verification Email
                 </button>
               </div>
             )}
@@ -150,7 +150,7 @@ export default function TeacherLoginForm() {
               disabled={isSubmitting}
               className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
             >
-              {isSubmitting ? "[ Authenticating... ]" : "[ Authenticate & Enter Faculty Workstation ]"}
+              {isSubmitting ? "Authenticating..." : "Authenticate & Enter Faculty Workstation"}
             </button>
           </div>
         </form>
@@ -158,7 +158,7 @@ export default function TeacherLoginForm() {
         {/* Authorized Faculty Accounts Information */}
         <div className="pt-4 border-t border-slate-200">
           <span className="text-[11px] font-mono font-bold text-slate-600 uppercase block mb-2">
-            [ PRE-AUTHORIZED FACULTY ACCOUNTS (DUMALNEG NHS) ]:
+            PRE-AUTHORIZED FACULTY ACCOUNTS (DUMALNEG NHS):
           </span>
           <div className="space-y-1 text-xs font-mono text-slate-700 bg-slate-50 p-3 border border-slate-200">
             <div className="flex justify-between items-center py-0.5 border-b border-slate-200">

@@ -151,7 +151,7 @@ export default function TeacherDashboard() {
               {user.teacherId}
             </span>
             <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-xs font-bold uppercase border border-emerald-300">
-              [ ACTIVE FACULTY ]
+              ACTIVE FACULTY
             </span>
             <span className="px-2.5 py-0.5 bg-slate-100 text-slate-800 font-mono text-xs font-bold uppercase border border-slate-300">
               Dept: {user.department}
@@ -171,7 +171,7 @@ export default function TeacherDashboard() {
             onClick={logout}
             className="px-4 py-2 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-900 border border-slate-300 hover:border-red-400 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
-            [ Sign Out ]
+            Sign Out
           </button>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function TeacherDashboard() {
               : "bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200"
           }`}
         >
-          [ Teaching Load &amp; Schedule ]
+          Teaching Load &amp; Schedule
         </button>
 
         <button
@@ -199,7 +199,7 @@ export default function TeacherDashboard() {
               : "bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200"
           }`}
         >
-          [ Class Section Rosters ]
+          Class Section Rosters
         </button>
 
         <button
@@ -211,7 +211,7 @@ export default function TeacherDashboard() {
               : "bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200"
           }`}
         >
-          [ Faculty Profile &amp; Credentials ]
+          Faculty Profile &amp; Credentials
         </button>
       </div>
 
@@ -221,14 +221,14 @@ export default function TeacherDashboard() {
           <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                [ OFFICIAL TIMETABLE &amp; TEACHING LOAD STATUS ]
+                OFFICIAL TIMETABLE &amp; TEACHING LOAD STATUS
               </span>
               <h3 className="text-base font-bold text-slate-900 uppercase">
                 School Year 2026–2027 Timetable
               </h3>
             </div>
             <span className="px-3 py-1 bg-amber-100 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400">
-              [ STATUS: PENDING TIMETABLE RELEASE ]
+              STATUS: PENDING TIMETABLE RELEASE
             </span>
           </div>
 
@@ -237,7 +237,7 @@ export default function TeacherDashboard() {
             <div className="p-8 sm:p-12 bg-white border-2 border-slate-300 shadow-xs text-center space-y-4">
               <div className="max-w-xl mx-auto space-y-3">
                 <span className="inline-block px-3 py-1 bg-slate-100 border border-slate-300 font-mono font-bold text-xs text-slate-700 uppercase">
-                  [ NO CLASS SCHEDULE ASSIGNED YET ]
+                  NO CLASS SCHEDULE ASSIGNED YET
                 </span>
                 <h4 className="text-lg font-bold text-slate-900 uppercase">
                   Awaiting Administrative Schedule Assignment
@@ -293,7 +293,7 @@ export default function TeacherDashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                  [ OFFICIAL ENROLLED CLASS ROSTER LOOKUP ]
+                  OFFICIAL ENROLLED CLASS ROSTER LOOKUP
                 </span>
                 <h3 className="text-base font-bold text-slate-900 uppercase">
                   Class Sections &amp; Student Masterlists
@@ -348,7 +348,7 @@ export default function TeacherDashboard() {
                   onClick={() => setRosterSearch("")}
                   className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase cursor-pointer"
                 >
-                  [ Clear ]
+                  Clear
                 </button>
               )}
             </div>
@@ -356,11 +356,11 @@ export default function TeacherDashboard() {
             {/* Roster Table */}
             {isLoadingRoster ? (
               <div className="p-8 text-center text-xs font-mono text-slate-500">
-                [ Loading Official Class Roster... ]
+                Loading Official Class Roster...
               </div>
             ) : filteredStudents.length === 0 ? (
               <div className="p-8 bg-slate-50 border border-slate-200 text-center text-xs font-mono text-slate-600">
-                {rosterSearch ? "[ No students matching search query. ]" : "[ No students currently enrolled in this section. ]"}
+                {rosterSearch ? "No students matching search query." : "No students currently enrolled in this section."}
               </div>
             ) : (
               <div className="overflow-x-auto border border-slate-200">
@@ -401,7 +401,7 @@ export default function TeacherDashboard() {
         <div className="bg-white p-6 border-2 border-slate-300 shadow-xs space-y-6">
           <div className="border-b border-slate-200 pb-3">
             <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-              [ OFFICIAL DEPED FACULTY PROFILE ]
+              OFFICIAL DEPED FACULTY PROFILE
             </span>
             <h3 className="text-base font-bold text-slate-900 uppercase">
               Academic Staff Verification Record
@@ -433,7 +433,7 @@ export default function TeacherDashboard() {
               <span className="text-[11px] font-mono text-slate-500 uppercase block">Verified Gmail Address</span>
               <strong className="text-sm font-mono text-slate-900 block">{user.email}</strong>
               <span className="text-[10px] font-mono text-emerald-800">
-                [ Verified Institutional Account ]
+                Verified Institutional Account
               </span>
             </div>
 

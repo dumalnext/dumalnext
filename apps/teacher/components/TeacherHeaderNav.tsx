@@ -63,7 +63,7 @@ export default function TeacherHeaderNav() {
               onClick={logout}
               className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer rounded"
             >
-              [ Sign Out ]
+              Sign Out
             </button>
           </div>
         )}
@@ -81,7 +81,7 @@ export default function TeacherHeaderNav() {
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              [ Overview ]
+              Overview
             </Link>
 
             <Link
@@ -92,7 +92,7 @@ export default function TeacherHeaderNav() {
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              [ Teaching Load &amp; Schedule ]
+              Teaching Load &amp; Schedule
             </Link>
 
             <Link
@@ -103,7 +103,7 @@ export default function TeacherHeaderNav() {
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              [ Advisory Section Roster ]
+              Advisory Section Roster
             </Link>
 
             <Link
@@ -114,7 +114,7 @@ export default function TeacherHeaderNav() {
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
-              [ Faculty Profile &amp; Credentials ]
+              Faculty Profile &amp; Credentials
             </Link>
           </div>
         </div>
