@@ -415,7 +415,7 @@ export default function Step4CurriculumModality({
   };
 
   return (
-    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 font-sans rounded-lg shadow-sm">
+    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 rounded-lg shadow-sm">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
@@ -499,7 +499,7 @@ export default function Step4CurriculumModality({
                         </span>
                       </div>
                       {isSelected && (
-                        <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded">
+                        <span className="text-[10px] font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded">
                           SELECTED
                         </span>
                       )}
@@ -548,7 +548,7 @@ export default function Step4CurriculumModality({
                   The Strengthened Senior High School Program offers two (2) distinct tracks with unified core foundations and specialized elective clusters:
                 </p>
               </div>
-              <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider w-fit rounded">
+              <span className="text-[10px] font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider w-fit rounded">
                 DEPED REFORM STANDARD
               </span>
             </div>
@@ -563,16 +563,16 @@ export default function Step4CurriculumModality({
                   <div className="text-sm font-bold text-[#002060]">
                     {activeSemester}
                   </div>
-                  <div className="text-[11px] font-mono text-slate-600">
+                  <div className="text-[11px] text-slate-600">
                     School Year {activeSchoolYear}
                     {activeTerm?.startDate && activeTerm?.endDate ? ` (${activeTerm.startDate} to ${activeTerm.endDate})` : ""}
                   </div>
                 </div>
-                <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 border border-emerald-400 px-2.5 py-1 uppercase tracking-wider shrink-0 rounded">
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-950 border border-emerald-400 px-2.5 py-1 uppercase tracking-wider shrink-0 rounded">
                   AUTO-SYNCED (ACTIVE)
                 </span>
               </div>
-              <p className="text-[10px] font-mono text-slate-500 mt-1">
+              <p className="text-[10px] text-slate-500 mt-1">
                 Centrally managed and synchronized with IT-Support Registered Academic Terms
               </p>
             </div>
@@ -641,7 +641,7 @@ export default function Step4CurriculumModality({
                             </span>
                           </div>
                           {isSelected && (
-                            <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded">
+                            <span className="text-[10px] font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded">
                               SELECTED
                             </span>
                           )}
@@ -659,7 +659,7 @@ export default function Step4CurriculumModality({
                             : "Prescribed technical-vocational training with standardized specialized courses for the full academic year without elective choices."}
                         </p>
 
-                        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200 text-[10px] font-mono text-slate-600">
+                        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200 text-[10px] text-slate-600">
                           {t.code === "Academic Track" ? (
                             <>
                               <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded">STEM</span>
@@ -704,10 +704,10 @@ export default function Step4CurriculumModality({
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase rounded">
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase rounded">
                     {(data.selectedElectives || []).length} / 1 SELECTED
                   </span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-blue-100 text-[#002060] border border-blue-300 uppercase rounded">
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-[#002060] border border-blue-300 uppercase rounded">
                     MAX 1 PER SEMESTER
                   </span>
                 </div>
@@ -715,7 +715,7 @@ export default function Step4CurriculumModality({
 
               {isLoadingSubjects ? (
                 <div className="p-8 text-center bg-white border border-slate-200 space-y-2 rounded-md">
-                  <div className="text-xs font-mono font-bold text-[#002060] animate-pulse">
+                  <div className="text-xs font-bold text-[#002060] animate-pulse">
                     Synchronizing elective subject offerings with Administrator catalog...
                   </div>
                   <p className="text-[11px] text-slate-500">
@@ -737,7 +737,7 @@ export default function Step4CurriculumModality({
                     <label className="block text-xs font-bold text-slate-900">
                       Select Elective Subject (Choose Maximum 1) <span className="text-red-700">*</span>
                     </label>
-                    <span className="text-[11px] font-mono text-slate-500">
+                    <span className="text-[11px] text-slate-500">
                       Click any card to select or switch your elective
                     </span>
                   </div>
@@ -766,12 +766,12 @@ export default function Step4CurriculumModality({
                                   onChange={() => {}}
                                   className="accent-[#002060] pointer-events-none"
                                 />
-                                <span className="text-xs font-mono font-bold text-[#002060]">
+                                <span className="text-xs font-bold text-[#002060]">
                                   {sub.subject_code}
                                 </span>
                               </div>
                               <span
-                                className={`text-[9px] font-mono font-bold px-2 py-0.5 uppercase border rounded ${
+                                className={`text-[9px] font-bold px-2 py-0.5 uppercase border rounded ${
                                   isSelected
                                     ? "bg-[#002060] text-white border-[#002060]"
                                     : "bg-purple-100 text-purple-950 border-purple-300"
@@ -814,14 +814,14 @@ export default function Step4CurriculumModality({
                     Standardized TechPro Curriculum: All specialized industry subjects configured by administration are fixed and automatically assigned for the full academic year.
                   </p>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase shrink-0 rounded">
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase shrink-0 rounded">
                   FIXED CURRICULUM (NO ELECTIVES)
                 </span>
               </div>
 
               {isLoadingSubjects ? (
                 <div className="p-8 text-center bg-white border border-slate-200 space-y-2 rounded-md">
-                  <div className="text-xs font-mono font-bold text-[#002060] animate-pulse">
+                  <div className="text-xs font-bold text-[#002060] animate-pulse">
                     Synchronizing TechPro specialized courses with Administrator catalog...
                   </div>
                   <p className="text-[11px] text-slate-500">
@@ -855,10 +855,10 @@ export default function Step4CurriculumModality({
                         className="p-4 bg-white border-2 border-amber-300 space-y-1.5 shadow-2xs rounded-md"
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <span className="text-xs font-mono font-bold text-[#002060]">
+                          <span className="text-xs font-bold text-[#002060]">
                             {sub.subject_code}
                           </span>
-                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase rounded">
+                          <span className="text-[9px] font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase rounded">
                             PRESCRIBED / SPECIALIZED
                           </span>
                         </div>
@@ -915,7 +915,7 @@ export default function Step4CurriculumModality({
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase rounded">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase rounded">
                       AUTOMATICALLY ENROLLED
                     </span>
                     <button
@@ -929,7 +929,7 @@ export default function Step4CurriculumModality({
                 </div>
 
                 {isLoadingSubjects && displayCoreSubjects.length === 0 ? (
-                  <div className="p-6 text-center text-xs font-mono font-bold text-[#002060] animate-pulse">
+                  <div className="p-6 text-center text-xs font-bold text-[#002060] animate-pulse">
                     Synchronizing core curriculum foundation...
                   </div>
                 ) : displayCoreSubjects.length === 0 ? (
@@ -944,10 +944,10 @@ export default function Step4CurriculumModality({
                         className="p-3 bg-slate-50 border border-slate-200 space-y-1 rounded-md"
                       >
                         <div className="flex items-center justify-between gap-1">
-                          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">
                             {sub.subject_code || `Core 0${idx + 1}`}
                           </span>
-                          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-blue-100 text-[#002060] font-bold rounded">
+                          <span className="text-[10px] px-1.5 py-0.2 bg-blue-100 text-[#002060] font-bold rounded">
                             CORE
                           </span>
                         </div>

@@ -557,15 +557,15 @@ export default function EnrollmentStepper({
   // 1.5. Lockout State: Online Enrollment is Closed
   if (!isEnrollmentOpen) {
     return (
-      <div className="bg-white border-2 border-red-500 p-6 sm:p-10 text-center space-y-6 font-sans shadow-sm rounded-lg">
+      <div className="bg-white border-2 border-red-500 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-lg">
         <div className="border-b-2 border-red-200 pb-4">
-          <span className="text-xs font-mono font-bold tracking-widest text-[#002060] block">
+          <span className="text-xs font-bold tracking-widest text-[#002060] block">
             Department of Education &bull; Region I &bull; Dumalneg NHS
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
             Online Basic Education Enrollment is Currently Closed
           </h2>
-          <div className="text-xs font-mono text-slate-500 mt-1">
+          <div className="text-xs text-slate-500 mt-1">
             School Year: <strong className="text-[#002060] text-sm">{schoolYear}</strong>
           </div>
         </div>
@@ -573,7 +573,7 @@ export default function EnrollmentStepper({
         <div className="p-5 bg-red-50 border-2 border-red-400 text-left space-y-2 max-w-2xl mx-auto rounded-md">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block shrink-0" />
-            <span className="text-xs font-mono font-bold text-red-950">
+            <span className="text-xs font-bold text-red-950">
               DepEd Official Notice: Submission System Temporarily Locked
             </span>
           </div>
@@ -603,15 +603,15 @@ export default function EnrollmentStepper({
   // 2. Lockout State: Pending Verification (One-time submission rule)
   if (existingApp && existingApp.status === "Pending") {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 font-sans shadow-sm rounded-lg">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-lg">
         <div className="border-b-2 border-slate-200 pb-4">
-          <span className="text-xs font-mono font-bold tracking-widest text-[#002060] block">
+          <span className="text-xs font-bold tracking-widest text-[#002060] block">
             Dumalneg National High School &bull; Admissions Committee
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
             Enrollment Application Already Submitted
           </h2>
-          <div className="text-xs font-mono text-slate-500 mt-1">
+          <div className="text-xs text-slate-500 mt-1">
             Official Reference Number: <strong className="text-[#002060] text-sm">{existingApp.application_id}</strong>
           </div>
         </div>
@@ -619,7 +619,7 @@ export default function EnrollmentStepper({
         <div className="p-5 bg-amber-50 border-2 border-amber-300 text-left space-y-2 max-w-2xl mx-auto rounded-md">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shrink-0" />
-            <span className="text-xs font-mono font-bold text-amber-950">
+            <span className="text-xs font-bold text-amber-950">
               Submission Locked: Pending Registrar Verification
             </span>
           </div>
@@ -652,15 +652,15 @@ export default function EnrollmentStepper({
   // 3. Lockout State: Officially Approved & Enrolled
   if (existingApp && existingApp.status === "Approved") {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 font-sans shadow-sm rounded-lg">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-lg">
         <div className="border-b-2 border-slate-200 pb-4">
-          <span className="text-xs font-mono font-bold tracking-widest text-[#002060] block">
+          <span className="text-xs font-bold tracking-widest text-[#002060] block">
             Department of Education &bull; Region I
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
             Official Enrollment Confirmed
           </h2>
-          <div className="text-xs font-mono text-slate-500 mt-1">
+          <div className="text-xs text-slate-500 mt-1">
             Official Reference: <strong className="text-[#002060] text-sm">{existingApp.application_id}</strong>
           </div>
         </div>
@@ -668,7 +668,7 @@ export default function EnrollmentStepper({
         <div className="p-5 bg-emerald-50 border-2 border-emerald-400 text-left space-y-2 max-w-2xl mx-auto rounded-md">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shrink-0" />
-            <span className="text-xs font-mono font-bold text-emerald-950">
+            <span className="text-xs font-bold text-emerald-950">
               Status: Approved &amp; Officially Enrolled
             </span>
           </div>
@@ -716,10 +716,10 @@ export default function EnrollmentStepper({
       {existingApp?.status === "Needs Revision" && (
         <div className="p-4 bg-red-50 border-2 border-red-500 text-slate-900 space-y-2 shadow-xs rounded-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-            <span className="text-xs font-mono font-bold text-red-950">
+            <span className="text-xs font-bold text-red-950">
               Registrar Notice: Application Dossier Returned for Revision
             </span>
-            <span className="text-[10px] font-mono bg-red-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded-xs">
+            <span className="text-[10px] bg-red-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded-xs">
               REF: {existingApp.application_id}
             </span>
           </div>
@@ -743,7 +743,7 @@ export default function EnrollmentStepper({
           <span className="text-slate-700">
             Authenticated Applicant Account: <strong>{user.fullName}</strong> ({user.email})
           </span>
-          <span className="font-mono text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0 rounded-xs">
+          <span className="text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0 rounded-xs">
             Linked Account: {user.userId}
           </span>
         </div>
@@ -780,14 +780,14 @@ export default function EnrollmentStepper({
               <button
                 type="button"
                 onClick={handleResetDraft}
-                className="text-[10px] font-mono font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 tracking-wider transition-colors cursor-pointer rounded active:scale-95"
+                className="text-[10px] font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2 py-1 tracking-wider transition-colors cursor-pointer rounded active:scale-95"
                 title="Reset enrollment progress and start over from Step 1"
               >
                 Reset / Start Over
               </button>
             )}
             <div className="text-right">
-              <span className="text-xs font-mono font-bold text-slate-600 block">
+              <span className="text-xs font-bold text-slate-600 block">
                 Step {currentStep} of 5
               </span>
               <span className="text-[10px] text-[#002060] font-bold tracking-wider">
@@ -830,7 +830,7 @@ export default function EnrollmentStepper({
                     }
                   }}
                   disabled={existingApp?.status !== "Needs Revision" && item.step > currentStep}
-                  className={`py-2 text-center text-xs font-mono font-bold border rounded transition-all active:scale-95 ${
+                  className={`py-2 text-center text-xs font-bold border rounded transition-all active:scale-95 ${
                     isActive
                       ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                       : isDone || existingApp?.status === "Needs Revision"
@@ -867,7 +867,7 @@ export default function EnrollmentStepper({
                     : "bg-slate-50 text-slate-500 border-slate-200 cursor-not-allowed"
                 }`}
               >
-                <div className="font-mono font-bold text-[10px] uppercase">
+                <div className="font-bold text-[10px] uppercase">
                   {isDone ? "OK" : `0${item.step}`}
                 </div>
                 <div className="font-bold truncate mt-0.5">{item.label}</div>

@@ -589,7 +589,7 @@ function StudentHomeContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 font-sans">
+    <div className="max-w-4xl mx-auto space-y-8 ">
       {/* DepEd & DNHS Institutional Banner */}
       <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200 rounded-lg">
         <span className="text-xs font-bold tracking-wide text-[#002060] block mb-1">
@@ -626,16 +626,16 @@ function StudentHomeContent() {
           <div className="bg-white border-2 border-[#002060] p-6 sm:p-8 space-y-4 rounded-lg shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
-                <span className="text-xs font-mono font-bold text-[#002060] block mb-0.5">
+                <span className="text-xs font-bold text-[#002060] block mb-0.5">
                   Authenticated Applicant Account
                 </span>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                   Welcome back, {user.firstName} {user.lastName}
                 </h2>
                 <p className="text-xs text-slate-600 mt-1">
-                  Registered Email: <strong className="text-slate-900">{user.email}</strong> &bull; Account ID: <span className="font-mono">{user.userId}</span>
+                  Registered Email: <strong className="text-slate-900">{user.email}</strong> &bull; Account ID: <span className="">{user.userId}</span>
                   {user.lrn && /^\d{12}$/.test(user.lrn) && (
-                    <> &bull; DepEd LRN: <span className="font-mono font-bold text-[#002060]">{user.lrn}</span></>
+                    <> &bull; DepEd LRN: <span className="font-bold text-[#002060]">{user.lrn}</span></>
                   )}
                 </p>
               </div>
@@ -646,10 +646,10 @@ function StudentHomeContent() {
               <div className="p-3.5 sm:p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-md">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-widest block">
+                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest block">
                       SECTION ASSIGNED
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 font-mono text-[10px] font-bold uppercase rounded-xs">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
                       {activeTermNum >= 2 ? "Automatic Continuing Roster" : "Official Roster"}
                     </span>
@@ -657,17 +657,17 @@ function StudentHomeContent() {
                   <div className="text-sm sm:text-base font-bold text-emerald-950">
                     Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
                   </div>
-                  <div className="text-xs font-mono text-emerald-800">
+                  <div className="text-xs text-emerald-800">
                     Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase rounded-xs">
+                  <span className="text-[11px] font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase rounded-xs">
                     Official Class Placement
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     View Section &rarr;
                   </Link>
@@ -677,10 +677,10 @@ function StudentHomeContent() {
               <div className="p-3.5 sm:p-4 bg-blue-50 border-2 border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-md">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
+                    <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
                       ENROLLMENT REQUIRED
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] font-mono text-[10px] font-bold uppercase rounded-xs">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
                       Action Needed
                     </span>
@@ -693,12 +693,12 @@ function StudentHomeContent() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-100 border border-blue-300 px-2.5 py-1 inline-block uppercase rounded-xs">
+                  <span className="text-[11px] font-bold text-[#002060] bg-blue-100 border border-blue-300 px-2.5 py-1 inline-block uppercase rounded-xs">
                     Enrollment Required
                   </span>
                   <Link
                     href="/enroll"
-                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     Complete Enrollment &rarr;
                   </Link>
@@ -708,10 +708,10 @@ function StudentHomeContent() {
               <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-md">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-amber-900 uppercase tracking-widest block">
+                    <span className="text-[10px] font-bold text-amber-900 uppercase tracking-widest block">
                       SECTION STATUS &bull; TRANSFEREE
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 font-mono text-[10px] font-bold uppercase rounded-xs">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
                       Transferee Evaluation
                     </span>
@@ -724,12 +724,12 @@ function StudentHomeContent() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase rounded-xs">
+                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase rounded-xs">
                     Pending Admin Evaluation
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     Check Status &rarr;
                   </Link>
@@ -739,10 +739,10 @@ function StudentHomeContent() {
               <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-md">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-widest block">
+                    <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block">
                       SECTION STATUS
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 font-mono text-[10px] font-bold uppercase rounded-xs">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 text-[10px] font-bold uppercase rounded-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
                       Pending Placement
                     </span>
@@ -755,12 +755,12 @@ function StudentHomeContent() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase rounded-xs">
+                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase rounded-xs">
                     In Queue for Placement
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded"
                   >
                     Check Status &rarr;
                   </Link>
@@ -776,7 +776,7 @@ function StudentHomeContent() {
                     <span className="text-[11px] font-bold text-slate-500 block">
                       Submitted Enrollment Application (S.Y. {userApplication.schoolYear} &bull; {userApplication.semester})
                     </span>
-                    <span className="text-base font-bold font-mono text-[#002060]">
+                    <span className="text-base font-bold text-[#002060]">
                       {userApplication.referenceNumber}
                     </span>
                   </div>
@@ -813,7 +813,7 @@ function StudentHomeContent() {
                   </div>
                   <div>
                     <span className="text-slate-500 block">Submission Date:</span>
-                    <strong className="text-slate-900 font-mono">
+                    <strong className="text-slate-900 ">
                       {new Date(userApplication.applicationDate).toLocaleDateString()}
                     </strong>
                   </div>
@@ -1027,7 +1027,7 @@ function StudentHomeContent() {
             {pastApplications.length > 0 && (
               <div className="p-4 bg-slate-50 border border-slate-300 space-y-3 rounded-lg shadow-xs">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <span className="text-xs font-mono font-bold text-slate-700">
+                  <span className="text-xs font-bold text-slate-700">
                     Previous Academic Term Records ({pastApplications.length})
                   </span>
                   <span className="text-[11px] text-slate-500 font-medium">
@@ -1042,7 +1042,7 @@ function StudentHomeContent() {
                     >
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono font-bold text-[#002060]">
+                          <span className="font-bold text-[#002060]">
                             {pApp.referenceNumber}
                           </span>
                           <span className="text-slate-600">
@@ -1129,7 +1129,7 @@ function StudentHomeContent() {
             {activeTab === "signin" && (
               <div className="max-w-md mx-auto space-y-6">
                 <div className="border-b border-slate-200 pb-3 text-center">
-                  <span className="text-xs font-mono font-bold text-[#002060] block mb-1">
+                  <span className="text-xs font-bold text-[#002060] block mb-1">
                     Phase 1: Student Account Authentication
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
@@ -1161,7 +1161,7 @@ function StudentHomeContent() {
                       </span>
                     </div>
                     <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                      A 6-digit confirmation code was dispatched to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
+                      A 6-digit confirmation code was dispatched to: <strong className="underline">{unconfirmedEmail}</strong>.
                       Please enter the 6-digit code to activate your account and access enrollment.
                     </p>
                     <div className="pt-1 flex flex-wrap items-center gap-2">
@@ -1198,7 +1198,7 @@ function StudentHomeContent() {
                 {/* Real-time Authentication Progress Bar & Status */}
                 {isLoggingIn && (
                   <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-md">
-                    <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
                       <span>System Authenticating</span>
                       <span>{loginProgress}%</span>
                     </div>
@@ -1235,7 +1235,7 @@ function StudentHomeContent() {
                         if (loginError) setLoginError("");
                       }}
                       placeholder="e.g. student@example.com"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-md"
+                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-md"
                       disabled={isLoggingIn}
                       required
                     />
@@ -1281,7 +1281,7 @@ function StudentHomeContent() {
             {activeTab === "register" && (
               <div className="max-w-xl mx-auto space-y-6">
                 <div className="border-b border-slate-200 pb-3 text-center">
-                  <span className="text-xs font-mono font-bold text-[#002060] block mb-1">
+                  <span className="text-xs font-bold text-[#002060] block mb-1">
                     Phase 1: New Learner Registration
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
@@ -1296,7 +1296,7 @@ function StudentHomeContent() {
                 {/* Real-time Registration Progress Bar & Status */}
                 {isRegistering && (
                   <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-md">
-                    <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
                       <span>System Registering Applicant</span>
                       <span>{regProgress}%</span>
                     </div>
@@ -1384,7 +1384,7 @@ function StudentHomeContent() {
                       value={regForm.email}
                       onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
                       placeholder="e.g. mark.agcaoili@example.com"
-                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-md"
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-md"
                       disabled={isRegistering}
                       required
                     />
@@ -1490,12 +1490,12 @@ function StudentHomeContent() {
       {/* MODAL: 6-DIGIT GMAIL SECURITY CODE VERIFICATION */}
       {/* ========================================================================= */}
       {showOtpModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs ">
           <div className="bg-white border-4 border-[#002060] w-full max-w-md shadow-2xl overflow-hidden rounded-xl">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold tracking-widest text-blue-200 block">
+                <span className="text-[10px] font-bold tracking-widest text-blue-200 block">
                   Security Verification &bull; Step 2 of 2
                 </span>
                 <h3 className="text-lg font-bold tracking-tight text-white mt-0.5">
@@ -1505,7 +1505,7 @@ function StudentHomeContent() {
               <button
                 type="button"
                 onClick={() => setShowOtpModal(false)}
-                className="text-white hover:text-slate-300 font-mono text-2xl font-bold px-2 cursor-pointer"
+                className="text-white hover:text-slate-300 text-2xl font-bold px-2 cursor-pointer"
                 title="Close modal"
               >
                 &times;
@@ -1516,7 +1516,7 @@ function StudentHomeContent() {
             <div className="p-5 sm:p-6 space-y-4">
               <p className="text-xs text-slate-700 leading-relaxed">
                 An official 6-digit confirmation code has been dispatched to your Gmail address:
-                <strong className="block text-[#002060] font-mono text-sm mt-1 break-all bg-blue-50/60 p-2 border border-blue-200 rounded-md">
+                <strong className="block text-[#002060] text-sm mt-1 break-all bg-blue-50/60 p-2 border border-blue-200 rounded-md">
                   {otpEmail}
                 </strong>
               </p>
@@ -1551,7 +1551,7 @@ function StudentHomeContent() {
                       if (otpError) setOtpError("");
                     }}
                     placeholder="______"
-                    className="w-full text-center font-mono font-bold text-2xl sm:text-3xl tracking-[0.25em] p-3 border-2 border-[#002060] bg-blue-50/40 text-[#002060] outline-none placeholder:text-slate-300 rounded-md"
+                    className="w-full text-center font-bold text-2xl sm:text-3xl tracking-[0.25em] p-3 border-2 border-[#002060] bg-blue-50/40 text-[#002060] outline-none placeholder:text-slate-300 rounded-md"
                   />
                   <span className="text-[10px] text-slate-500 text-center block mt-1">
                     Please check your Gmail Inbox (or Spam folder) for the verification code.
@@ -1572,7 +1572,7 @@ function StudentHomeContent() {
                       type="button"
                       disabled={resendCooldown > 0 || isResending}
                       onClick={handleOtpResend}
-                      className="text-xs font-mono font-bold text-[#002060] hover:underline disabled:text-slate-400 disabled:no-underline cursor-pointer rounded"
+                      className="text-xs font-bold text-[#002060] hover:underline disabled:text-slate-400 disabled:no-underline cursor-pointer rounded"
                     >
                       {resendCooldown > 0
                         ? `Resend Code (${resendCooldown}s)`
@@ -1605,7 +1605,7 @@ export default function StudentHomePage() {
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-xs font-mono text-slate-500">
+        <div className="p-8 text-center text-xs text-slate-500">
           Loading Dumalneg NHS Student Portal...
         </div>
       }

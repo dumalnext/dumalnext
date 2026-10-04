@@ -20,8 +20,8 @@ export default function StudentEnrollPage() {
 
   if (isLoading && !user) {
     return (
-      <div className="max-w-4xl mx-auto p-8 bg-white border-2 border-slate-300 text-center font-sans rounded-lg shadow-sm">
-        <span className="text-xs font-mono font-bold text-[#002060] block mb-1">
+      <div className="max-w-4xl mx-auto p-8 bg-white border-2 border-slate-300 text-center rounded-lg shadow-sm">
+        <span className="text-xs font-bold text-[#002060] block mb-1">
           Authenticating Applicant Session
         </span>
         <p className="text-xs font-bold text-slate-800">
@@ -33,7 +33,7 @@ export default function StudentEnrollPage() {
 
   if (!user) {
     return (
-      <div className="max-w-4xl mx-auto p-8 bg-amber-50 border-2 border-amber-400 text-center font-sans space-y-3 rounded-lg shadow-sm">
+      <div className="max-w-4xl mx-auto p-8 bg-amber-50 border-2 border-amber-400 text-center space-y-3 rounded-lg shadow-sm">
         <span className="text-xs font-bold text-amber-900 block">
           Access Restricted: Authentication Required
         </span>
@@ -49,7 +49,7 @@ export default function StudentEnrollPage() {
   // ===========================================================================
   if (!isEnrollmentOpen) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 font-sans">
+      <div className="max-w-4xl mx-auto space-y-6 ">
         {/* Top Breadcrumb Navigation */}
         <div className="flex items-center justify-between text-xs text-slate-600 bg-white p-3 border border-slate-300 rounded-md">
           <div className="flex items-center space-x-2">
@@ -59,7 +59,7 @@ export default function StudentEnrollPage() {
             <span>/</span>
             <span className="text-slate-800 font-medium">Online Enrollment Notice</span>
           </div>
-          <div className="font-mono text-[11px] text-slate-500">
+          <div className="text-[11px] text-slate-500">
             DEPED MEMORANDUM &bull; S.Y. {schoolYear}
           </div>
         </div>
@@ -68,10 +68,10 @@ export default function StudentEnrollPage() {
         <div className="bg-white border-2 border-red-500 shadow-sm p-6 sm:p-8 space-y-6 rounded-lg">
           <div className="border-b-2 border-red-200 pb-4 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 bg-red-100 text-red-900 border border-red-400 text-xs font-mono font-bold rounded-xs">
+              <span className="px-2.5 py-1 bg-red-100 text-red-900 border border-red-400 text-xs font-bold rounded-xs">
                 DepEd Official Advisory: Online Enrollment is Currently Closed
               </span>
-              <span className="text-xs font-mono font-bold text-slate-600">
+              <span className="text-xs font-bold text-slate-600">
                 School Year: <strong>{schoolYear}</strong>
               </span>
             </div>
@@ -79,7 +79,7 @@ export default function StudentEnrollPage() {
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               Online Basic Education Enrollment is Currently Closed
             </h2>
-            <p className="text-xs font-mono text-slate-600">
+            <p className="text-xs text-slate-600">
               Department of Education &bull; Region I &bull; Division of Ilocos Norte &bull; Dumalneg National High School
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function StudentEnrollPage() {
             <span className="font-bold block text-red-900">
               Official Message from the Dumalneg NHS Registrar's Office:
             </span>
-            <p className="whitespace-pre-line text-sm font-sans text-slate-800">
+            <p className="whitespace-pre-line text-sm text-slate-800">
               {closedMessage}
             </p>
           </div>
@@ -97,7 +97,7 @@ export default function StudentEnrollPage() {
           {/* Information & Assistance Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2">
             <div className="p-4 bg-slate-50 border border-slate-200 space-y-1 rounded-md">
-              <span className="text-[10px] font-mono font-bold text-slate-500 block">
+              <span className="text-[10px] font-bold text-slate-500 block">
                 Official School Inquiries
               </span>
               <p className="font-bold text-slate-900">Dumalneg NHS Registrar&apos;s Office</p>
@@ -106,7 +106,7 @@ export default function StudentEnrollPage() {
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 space-y-1 rounded-md">
-              <span className="text-[10px] font-mono font-bold text-slate-500 block">
+              <span className="text-[10px] font-bold text-slate-500 block">
                 Application Tracking
               </span>
               <p className="text-slate-700">
@@ -142,7 +142,7 @@ export default function StudentEnrollPage() {
   // OPEN ENROLLMENT STATE (MASTER SWITCH IS ON)
   // ===========================================================================
   return (
-    <div className="max-w-4xl mx-auto space-y-6 font-sans">
+    <div className="max-w-4xl mx-auto space-y-6 ">
       {/* Top Breadcrumb Navigation */}
       <div className="flex items-center justify-between text-xs text-slate-600 bg-white p-3 border border-slate-300 rounded-md">
         <div className="flex items-center space-x-2">
@@ -152,7 +152,7 @@ export default function StudentEnrollPage() {
           <span>/</span>
           <span className="text-slate-800 font-medium">Online Enrollment Form (S.Y. {schoolYear} &bull; {semester})</span>
         </div>
-        <div className="font-mono text-[11px] text-slate-500">
+        <div className="text-[11px] text-slate-500">
           DEPED FORM &bull; S.Y. {schoolYear} &bull; {semester}
         </div>
       </div>

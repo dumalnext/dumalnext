@@ -81,7 +81,7 @@ function DocumentDropBox({
           {label} {isMandatory && <span className="text-red-700">*</span>}
         </label>
         <span
-          className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
             badgeType === "blue"
               ? "bg-blue-100 text-[#002060] border border-blue-200"
               : badgeType === "amber"
@@ -108,7 +108,7 @@ function DocumentDropBox({
                 className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
               />
             ) : (
-              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
+              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-bold text-[#002060] shrink-0 rounded">
                 DOC
               </div>
             )}
@@ -117,10 +117,10 @@ function DocumentDropBox({
                 {uploadedDoc.file.name}
               </span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-500 font-mono">
+                <span className="text-[10px] text-slate-500 ">
                   {uploadedDoc.originalSizeKb}KB &rarr; {uploadedDoc.compressedSizeKb}KB (Compressed)
                 </span>
-                <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded">
+                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded">
                   Ready
                 </span>
               </div>
@@ -699,7 +699,7 @@ export default function Step5DocumentsReview({
   // =========================================================================
   if (isSubmitted) {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans rounded-lg shadow-sm">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 rounded-lg shadow-sm">
         {/* Acknowledgment Header */}
         <div className="border-b-2 border-slate-200 pb-5 text-center">
           <div className="text-xs font-bold tracking-wider text-[#002060]">
@@ -721,12 +721,12 @@ export default function Step5DocumentsReview({
         {/* Status Banner - Color Coded (Yellow for Pending) with ZERO Emojis */}
         <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-md shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded">
               {existingApplication
                 ? "STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION"
                 : "STATUS: PENDING REGISTRAR VERIFICATION"}
             </span>
-            <span className="text-xs font-mono text-amber-900 font-bold">
+            <span className="text-xs text-amber-900 font-bold">
               DATE: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
             </span>
           </div>
@@ -742,7 +742,7 @@ export default function Step5DocumentsReview({
           <div className="text-xs font-bold text-slate-600 tracking-wide">
             Official Application Tracking Reference Number
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-bold text-[#002060] tracking-widest">
+          <div className="text-2xl sm:text-3xl font-bold text-[#002060] tracking-widest">
             {referenceNumber}
           </div>
           <p className="text-[11px] text-slate-500">
@@ -764,7 +764,7 @@ export default function Step5DocumentsReview({
             </div>
             <div>
               <span className="font-bold text-slate-500 block text-[10px]">Learner Reference Number (LRN)</span>
-              <span className="font-mono font-bold text-slate-900">{data.lrn || "N/A"}</span>
+              <span className="font-bold text-slate-900">{data.lrn || "N/A"}</span>
             </div>
             <div>
               <span className="font-bold text-slate-500 block text-[10px]">Enrollment Level</span>
@@ -854,7 +854,7 @@ export default function Step5DocumentsReview({
   // RENDER: STEP 5 FORM (DOCUMENTS UPLOAD & ONLINE REVIEW CARD)
   // =========================================================================
   return (
-    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 font-sans rounded-lg shadow-sm">
+    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 rounded-lg shadow-sm">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
@@ -1010,7 +1010,7 @@ export default function Step5DocumentsReview({
               Review all encoded applicant information below. Ensure every entry matches your civil registry and academic records before submitting:
             </p>
           </div>
-          <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded">
+          <span className="text-[11px] bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded">
             PRE-SUBMISSION VERIFICATION
           </span>
         </div>
@@ -1041,7 +1041,7 @@ export default function Step5DocumentsReview({
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 block">12-Digit LRN</span>
-                <span className="font-mono font-bold text-slate-900">{data.lrn || "None (First Time Enrollee)"}</span>
+                <span className="font-bold text-slate-900">{data.lrn || "None (First Time Enrollee)"}</span>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 block">Date of Birth / Age</span>
@@ -1064,7 +1064,7 @@ export default function Step5DocumentsReview({
               {data.is4psBeneficiary && (
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 block">4Ps Household ID</span>
-                  <span className="font-mono font-bold text-blue-900">{data.householdId4ps || "Beneficiary"}</span>
+                  <span className="font-bold text-blue-900">{data.householdId4ps || "Beneficiary"}</span>
                 </div>
               )}
             </div>
@@ -1111,7 +1111,7 @@ export default function Step5DocumentsReview({
                   <span className="text-[10px] font-bold text-slate-500 block">
                     Elective / Prescribed Course Offerings
                   </span>
-                  <span className="font-mono font-bold text-[#002060]">
+                  <span className="font-bold text-[#002060]">
                     {data.selectedElectives.join(", ")}
                   </span>
                 </div>
@@ -1124,7 +1124,7 @@ export default function Step5DocumentsReview({
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 block">DepEd School ID</span>
-                <span className="font-mono font-bold text-slate-900">{data.step1.lastSchoolId || "-"}</span>
+                <span className="font-bold text-slate-900">{data.step1.lastSchoolId || "-"}</span>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 block">Last S.Y. Completed</span>
@@ -1155,7 +1155,7 @@ export default function Step5DocumentsReview({
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 block">Zip Code</span>
-                <span className="font-mono font-bold text-slate-900">2921</span>
+                <span className="font-bold text-slate-900">2921</span>
               </div>
             </div>
           </div>
@@ -1173,7 +1173,7 @@ export default function Step5DocumentsReview({
                     ? "N/A (Not Available)"
                     : `${data.fatherLastName || ""}, ${data.fatherFirstName || ""} ${data.fatherMiddleName || ""}`}
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 block">
+                <span className="text-[10px] text-slate-500 block">
                   {data.fatherContactNumber || "No mobile specified"}
                 </span>
               </div>
@@ -1184,7 +1184,7 @@ export default function Step5DocumentsReview({
                     ? "N/A (Not Available)"
                     : `${data.motherMaidenLastName || ""}, ${data.motherFirstName || ""} ${data.motherMiddleName || ""}`}
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 block">
+                <span className="text-[10px] text-slate-500 block">
                   {data.motherContactNumber || "No mobile specified"}
                 </span>
               </div>
@@ -1196,7 +1196,7 @@ export default function Step5DocumentsReview({
                     : "Living with Parents"}
                 </span>
                 {data.guardianContactNumber && (
-                  <span className="text-[10px] font-mono text-slate-500 block">
+                  <span className="text-[10px] text-slate-500 block">
                     {data.guardianContactNumber}
                   </span>
                 )}

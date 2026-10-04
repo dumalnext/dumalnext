@@ -240,10 +240,10 @@ export default function Step1ApplicantType({
       {/* Step Header */}
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="font-mono text-xs font-bold text-[#002060] tracking-wider">
+          <span className="text-xs font-bold text-[#002060] tracking-wider">
             Step 1 of 5 &bull; Academic Classification
           </span>
-          <span className="px-2.5 py-0.5 bg-[#002060] text-white font-mono text-xs font-bold tracking-wider shadow-xs rounded-xs">
+          <span className="px-2.5 py-0.5 bg-[#002060] text-white text-xs font-bold tracking-wider shadow-xs rounded-xs">
             School Year: {schoolYear}
           </span>
         </div>
@@ -279,7 +279,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -287,7 +287,7 @@ export default function Step1ApplicantType({
               >
                 {data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
               </span>
-              <span className="text-[11px] font-bold text-slate-400 font-mono">CODE: GRADED</span>
+              <span className="text-[11px] font-bold text-slate-400 ">CODE: GRADED</span>
             </div>
             <div className="text-base font-bold text-slate-900">Graded Curriculum Program</div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
@@ -307,7 +307,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   !data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -315,7 +315,7 @@ export default function Step1ApplicantType({
               >
                 {!data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
               </span>
-              <span className="text-[11px] font-bold text-slate-400 font-mono">CODE: SNED-ONLY</span>
+              <span className="text-[11px] font-bold text-slate-400 ">CODE: SNED-ONLY</span>
             </div>
             <div className="text-base font-bold text-slate-900">Non-Graded Program (SNEd Only)</div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
@@ -355,7 +355,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Grade 7"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -383,7 +383,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Grade 11"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -411,7 +411,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Transferee"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -439,7 +439,7 @@ export default function Step1ApplicantType({
           >
             <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
+                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm ${
                   data.applicantType === "Returning"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -485,12 +485,12 @@ export default function Step1ApplicantType({
                       : "bg-white text-slate-800 border-slate-300 hover:border-[#002060] hover:bg-slate-100"
                   }`}
                 >
-                  <div className="text-xs uppercase font-mono tracking-wider opacity-80">
+                  <div className="text-xs uppercase tracking-wider opacity-80">
                     {isJHSLevel ? "JHS" : "SHS"}
                   </div>
                   <div className="text-base sm:text-lg font-bold">Grade {lvl}</div>
                   {isSelected && (
-                    <span className="block text-[10px] font-mono uppercase text-blue-200 mt-0.5">
+                    <span className="block text-[10px] uppercase text-blue-200 mt-0.5">
                       TARGET
                     </span>
                   )}
@@ -515,7 +515,7 @@ export default function Step1ApplicantType({
               <span className="text-xs font-bold text-[#002060] tracking-wider block">
                 DepEd Section 6: Previous School Attended &amp; Academic History
               </span>
-              <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded-xs">
+              <span className="text-[11px] bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded-xs">
                 SMART PREREQUISITE VALIDATION ACTIVE
               </span>
             </div>
@@ -632,7 +632,7 @@ export default function Step1ApplicantType({
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs ${
+                      className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs ${
                         isDefaultSchool
                           ? "bg-[#002060] text-white"
                           : "bg-slate-200 text-slate-700"
@@ -640,7 +640,7 @@ export default function Step1ApplicantType({
                     >
                       {isDefaultSchool ? "SELECTED" : "SELECT"}
                     </span>
-                    <span className="text-[11px] font-mono font-bold text-[#002060]">
+                    <span className="text-[11px] font-bold text-[#002060]">
                       ID: {defaultFeederSchoolId}
                     </span>
                   </div>
@@ -671,7 +671,7 @@ export default function Step1ApplicantType({
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs ${
+                      className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs ${
                         !isDefaultSchool
                           ? "bg-[#002060] text-white"
                           : "bg-slate-200 text-slate-700"
@@ -679,7 +679,7 @@ export default function Step1ApplicantType({
                     >
                       {!isDefaultSchool ? "SELECTED" : "SELECT"}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-500 uppercase font-bold">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold">
                       MANUAL ENTRY
                     </span>
                   </div>
@@ -703,7 +703,7 @@ export default function Step1ApplicantType({
                       DepEd School ID: <strong>{defaultFeederSchoolId}</strong> (Division of Ilocos Norte). Ready for verification.
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto rounded-xs">
+                  <span className="text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto rounded-xs">
                     AUTO-PRESET VERIFIED
                   </span>
                 </div>
@@ -773,7 +773,7 @@ export default function Step1ApplicantType({
                           }
                         }}
                         placeholder="100XXX"
-                        className={`w-40 p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-widest text-center focus:border-[#002060] outline-none rounded-md ${
+                        className={`w-40 p-2.5 bg-white border-2 text-xs font-bold tracking-widest text-center focus:border-[#002060] outline-none rounded-md ${
                           errors.lastSchoolId ? "border-red-600 bg-red-50" : "border-slate-300"
                         }`}
                       />
@@ -797,7 +797,7 @@ export default function Step1ApplicantType({
         <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-md">
           <div className="font-bold text-[#002060] tracking-wider flex items-center justify-between">
             <span>Enrollment Classification Summary</span>
-            <span className="font-mono text-[11px] text-blue-900">VERIFIED</span>
+            <span className="text-[11px] text-blue-900">VERIFIED</span>
           </div>
           <p className="text-slate-900 leading-relaxed">
             Applicant is registering as:{" "}

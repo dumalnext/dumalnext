@@ -77,7 +77,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-6 font-sans">
+    <div className="max-w-xl mx-auto space-y-6 ">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4 text-center">
         <span className="text-xs font-semibold text-[#002060]">
@@ -187,7 +187,7 @@ export default function RegisterPage() {
                   if (errors.lrn) setErrors({ ...errors, lrn: "" });
                 }}
                 placeholder="e.g. 100050123456"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                   errors.lrn ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -218,7 +218,7 @@ export default function RegisterPage() {
                 if (errors.email) setErrors({ ...errors, email: "" });
               }}
               placeholder="e.g. student.name@gmail.com"
-              className={`w-full p-2.5 bg-white border-2 text-xs font-mono focus:border-[#002060] outline-none rounded-md ${
+              className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none rounded-md ${
                 errors.email ? "border-red-600 bg-red-50" : "border-slate-300"
               }`}
             />

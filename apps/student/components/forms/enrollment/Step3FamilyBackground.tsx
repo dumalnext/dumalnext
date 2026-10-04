@@ -268,7 +268,7 @@ export default function Step3FamilyBackground({
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded">
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded">
             Step 03 of 05
           </span>
           <span className="text-xs font-semibold text-slate-500 tracking-wider">
@@ -555,7 +555,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                     errors.fatherContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -742,7 +742,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                     errors.motherContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -771,7 +771,7 @@ export default function Step3FamilyBackground({
                 Section C: Legal Guardian / Authorized Custodian
               </span>
               {isBothParentsUnavailable ? (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-red-700 text-white font-mono rounded">
+                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-red-700 text-white rounded">
                   Required by DepEd
                 </span>
               ) : (
@@ -961,7 +961,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="09XXXXXXXXX"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-md ${
                   errors.guardianContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />

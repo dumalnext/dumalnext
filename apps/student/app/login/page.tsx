@@ -46,7 +46,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-6 font-sans">
+    <div className="max-w-md mx-auto space-y-6 ">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4 text-center">
         <span className="text-xs font-semibold text-[#002060]">
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="e.g. student@example.com"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none rounded-md"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-md"
               required
             />
             <p className="text-[10px] text-slate-500 mt-1">
@@ -135,7 +135,7 @@ export default function LoginPage() {
                 setIdentifier("100050123456");
                 setPassword("password123");
               }}
-              className="text-left text-[#002060] font-mono hover:underline truncate cursor-pointer"
+              className="text-left text-[#002060] hover:underline truncate cursor-pointer"
             >
               &bull; Login as Mark Agcaoili (LRN: 100050123456)
             </button>
@@ -145,7 +145,7 @@ export default function LoginPage() {
                 setIdentifier("john.lozano@example.com");
                 setPassword("password123");
               }}
-              className="text-left text-[#002060] font-mono hover:underline truncate cursor-pointer"
+              className="text-left text-[#002060] hover:underline truncate cursor-pointer"
             >
               &bull; Login as John Lozano (Email: john.lozano@example.com)
             </button>
