@@ -840,7 +840,7 @@ export default function Step2LearnerProfile({
 
         {/* Permanent Address Toggle */}
         <div className="pt-3 border-t border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border-2 border-slate-200 rounded-[4px]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 bg-white border-2 border-slate-200 rounded-[4px]">
             <div className="min-w-0 flex-1">
               <span className="text-xs font-bold text-slate-900 block leading-tight">
                 Permanent Residential Address
@@ -849,11 +849,11 @@ export default function Step2LearnerProfile({
                 Is your permanent address identical to your current residential address?
               </p>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center shrink-0">
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(true)}
-                className={`flex-1 sm:flex-none px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
+                className={`w-full sm:w-auto px-2.5 sm:px-4 py-2 border-2 text-[11px] sm:text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
                   data.isPermanentSameAsCurrent
                     ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
@@ -864,7 +864,7 @@ export default function Step2LearnerProfile({
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(false)}
-                className={`flex-1 sm:flex-none px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
+                className={`w-full sm:w-auto px-2.5 sm:px-4 py-2 border-2 text-[11px] sm:text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
                   !data.isPermanentSameAsCurrent
                     ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
