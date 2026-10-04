@@ -124,8 +124,17 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json().catch(() => ({}));
-    const schoolYear = body.school_year || "2026–2027";
-    const trimester = Number(body.trimester) || 1;
+
+    // 0. Fetch active academic term configured by IT Support
+    const { data: termsData } = await supabase
+      .from("academic_terms")
+      .select("schoolYear, termNumber, termName, isActive")
+      .order("schoolYear", { ascending: false });
+
+    const activeTerm = (termsData || []).find((t: any) => t.isActive);
+    const schoolYear = body.school_year || activeTerm?.schoolYear || "2026–2027";
+    const trimester = Number(body.trimester) || Number(activeTerm?.termNumber) || 1;
+    const termName = activeTerm?.termName || `Trimester ${trimester}`;
     const clearExisting = body.clearExisting !== false; // Default true to prevent stale collisions
 
     // 1. Fetch current database state: sections, teachers, classrooms, subjects
@@ -645,6 +654,9 @@ export async function POST(req: Request) {
         message: `Successfully auto-generated ${generatedSchedules.length} conflict-free class schedule periods for Dumalneg National High School.`,
         audit: {
           totalScheduled: generatedSchedules.length,
+          schoolYear,
+          trimester,
+          termName,
           jhsCount,
           shsTrackCount,
           shsElectiveCount,

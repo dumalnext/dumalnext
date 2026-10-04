@@ -156,6 +156,9 @@ export default function ScheduleDeconflictionConsole() {
   const [autoClearExisting, setAutoClearExisting] = useState<boolean>(true);
   const [autoAuditResult, setAutoAuditResult] = useState<{
     totalScheduled: number;
+    schoolYear?: string;
+    trimester?: number;
+    termName?: string;
     jhsCount: number;
     shsTrackCount: number;
     shsElectiveCount: number;
@@ -163,6 +166,13 @@ export default function ScheduleDeconflictionConsole() {
     roomCollisions: number;
     sectionCollisions: number;
     isConflictFree: boolean;
+  } | null>(null);
+
+  // Active Term from IT Support State
+  const [activeTermInfo, setActiveTermInfo] = useState<{
+    schoolYear: string;
+    termNumber: number;
+    termName: string;
   } | null>(null);
 
   // Reset / Clear Timetable State
@@ -174,12 +184,13 @@ export default function ScheduleDeconflictionConsole() {
     try {
       if (!silent) setIsLoading(true);
 
-      const [schedRes, secRes, subRes, tchRes, rmRes] = await Promise.all([
+      const [schedRes, secRes, subRes, tchRes, rmRes, termsRes] = await Promise.all([
         fetch(`/api/schedules?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/subjects?_t=${Date.now()}`, { cache: "no-store" }),
         supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department").order("last_name"),
         supabase.from("classrooms").select("id, classroom_id, room_name, building").order("room_name"),
+        supabase.from("academic_terms").select("*").order("schoolYear", { ascending: false }),
       ]);
 
       if (schedRes.ok) {
@@ -254,6 +265,20 @@ export default function ScheduleDeconflictionConsole() {
 
       if (rmRes.data) {
         setClassrooms(rmRes.data);
+      }
+
+      if (termsRes?.data) {
+        const active = termsRes.data.find((t: any) => t.isActive);
+        if (active) {
+          const info = {
+            schoolYear: active.schoolYear,
+            termNumber: Number(active.termNumber) || 1,
+            termName: active.termName || `Trimester ${active.termNumber}`,
+          };
+          setActiveTermInfo(info);
+          setAutoSchoolYear(active.schoolYear);
+          setAutoTrimester(Number(active.termNumber) || 1);
+        }
       }
     } catch (err) {
       console.error("Failed to load scheduling data:", err);
@@ -439,8 +464,8 @@ export default function ScheduleDeconflictionConsole() {
           day_of_week: formDayOfWeek,
           start_time: formStartTime,
           end_time: formEndTime,
-          school_year: "2025–2026",
-          trimester: 1,
+          school_year: activeTermInfo?.schoolYear || autoSchoolYear || "2026–2027",
+          trimester: activeTermInfo?.termNumber || autoTrimester || 1,
         }),
       });
 
@@ -488,12 +513,15 @@ export default function ScheduleDeconflictionConsole() {
       setIsGeneratingAuto(true);
       setAutoAuditResult(null);
 
+      const targetSY = activeTermInfo?.schoolYear || autoSchoolYear || "2026–2027";
+      const targetTerm = activeTermInfo?.termNumber || autoTrimester || 1;
+
       const res = await fetch("/api/schedules/auto-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          school_year: autoSchoolYear,
-          trimester: autoTrimester,
+          school_year: targetSY,
+          trimester: targetTerm,
           clearExisting: autoClearExisting,
         }),
       });
@@ -921,7 +949,7 @@ export default function ScheduleDeconflictionConsole() {
             Dumalneg, Ilocos Norte • School ID: 300017
           </div>
           <div className="font-bold text-slate-900 uppercase">
-            OFFICIAL CLASS PROGRAM &amp; TIMETABLE • SY 2025–2026
+            OFFICIAL CLASS PROGRAM &amp; TIMETABLE • SY {activeTermInfo?.schoolYear || autoSchoolYear || "2026–2027"}
           </div>
           <div>
             {viewMode === "bySection" && currentSection
@@ -1616,39 +1644,43 @@ export default function ScheduleDeconflictionConsole() {
                 </div>
               </div>
 
-              {/* Form Parameters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-800 uppercase block">
-                    Target Academic Year:
-                  </label>
-                  <select
-                    value={autoSchoolYear}
-                    onChange={(e) => setAutoSchoolYear(e.target.value)}
-                    disabled={isGeneratingAuto}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
-                  >
-                    <option value="2026–2027">SY 2026–2027</option>
-                    <option value="2025–2026">SY 2025–2026</option>
-                    <option value="2027–2028">SY 2027–2028</option>
-                  </select>
+              {/* Active Academic Term Card (Automatically Synced with IT Support) */}
+              <div className="p-4 bg-blue-50/70 border-2 border-[#002060]/30 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-200/80 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+                    <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider">
+                      [ ACTIVE TERM CONFIGURED BY IT SUPPORT ]
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase tracking-wider">
+                    Synced with IT Support
+                  </span>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-800 uppercase block">
-                    Target Term / Trimester:
-                  </label>
-                  <select
-                    value={autoTrimester}
-                    onChange={(e) => setAutoTrimester(Number(e.target.value))}
-                    disabled={isGeneratingAuto}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
-                  >
-                    <option value={1}>1st Trimester / 1st Semester</option>
-                    <option value={2}>2nd Trimester / 2nd Semester</option>
-                    <option value={3}>3rd Trimester</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                    <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">
+                      Target Academic Year:
+                    </span>
+                    <div className="text-sm font-bold font-mono text-[#002060] mt-0.5">
+                      {activeTermInfo ? activeTermInfo.schoolYear : autoSchoolYear}
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                    <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">
+                      Target Academic Term:
+                    </span>
+                    <div className="text-sm font-bold font-mono text-[#002060] mt-0.5">
+                      {activeTermInfo ? activeTermInfo.termName : `Trimester ${autoTrimester}`}
+                    </div>
+                  </div>
                 </div>
+
+                <p className="text-[11px] text-slate-600 font-sans">
+                  Awtomatikong naka-sync sa kasalukuyang active enrollment cycle na itinakda ni IT Support sa Control Room. Hindi na kailangang pumili nang manu-mano.
+                </p>
               </div>
 
               {/* Clean Slate Checkbox */}
