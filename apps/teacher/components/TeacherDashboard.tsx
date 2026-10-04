@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 import { useTeacherAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 
@@ -302,20 +303,15 @@ export default function TeacherDashboard() {
 
               {/* Section Dropdown */}
               <div className="flex items-center gap-2">
-                <label className="text-xs font-bold text-slate-800 uppercase shrink-0">
-                  Select Section:
-                </label>
-                <select
+                <CustomSelect
+                  label="Section:"
                   value={selectedSectionId}
-                  onChange={(e) => setSelectedSectionId(e.target.value)}
-                  className="p-2 bg-slate-50 border-2 border-slate-400 text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                >
-                  {sections.map((sec) => (
-                    <option key={sec.id} value={sec.id}>
-                      {sec.section_name} (Grade {sec.grade_level})
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedSectionId}
+                  options={sections.map((sec) => ({
+                    value: sec.id,
+                    label: `${sec.section_name} (Grade ${sec.grade_level})`,
+                  }))}
+                />
               </div>
             </div>
 

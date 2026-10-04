@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import CustomSelect, { CustomSelectOption } from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 
 export interface ScheduleItem {
@@ -860,39 +861,29 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-4 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
           {viewMode === "bySection" && (
             <div className="flex items-center gap-2">
-              <label className="text-xs font-bold text-slate-800 uppercase shrink-0">
-                Select Class Section:
-              </label>
-              <select
+              <CustomSelect
+                label="Section:"
                 value={selectedSectionId}
-                onChange={(e) => setSelectedSectionId(e.target.value)}
-                className="p-2 bg-white border border-slate-400 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                {sections.map((sec) => (
-                  <option key={sec.id} value={sec.id}>
-                    {sec.section_name} (Grade {sec.grade_level}{sec.strand ? ` • ${sec.strand}` : ""})
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedSectionId}
+                options={sections.map((sec) => ({
+                  value: sec.id,
+                  label: `${sec.section_name} (Grade ${sec.grade_level}${sec.strand ? ` • ${sec.strand}` : ""})`,
+                }))}
+              />
             </div>
           )}
 
           {viewMode === "byTeacher" && (
             <div className="flex items-center gap-2">
-              <label className="text-xs font-bold text-slate-800 uppercase shrink-0">
-                Select Faculty Member:
-              </label>
-              <select
+              <CustomSelect
+                label="Faculty:"
                 value={selectedTeacherId}
-                onChange={(e) => setSelectedTeacherId(e.target.value)}
-                className="p-2 bg-white border border-slate-400 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                {teachers.map((tch) => (
-                  <option key={tch.id} value={tch.id}>
-                    {tch.fullName} ({tch.department})
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedTeacherId}
+                options={teachers.map((tch) => ({
+                  value: tch.id,
+                  label: `${tch.fullName} (${tch.department})`,
+                }))}
+              />
             </div>
           )}
 
@@ -905,16 +896,15 @@ export default function ScheduleDeconflictionConsole() {
                 placeholder="Search Subject, Teacher, Section, Room..."
                 className="p-1.5 bg-white border border-slate-400 text-xs font-mono w-64 outline-none"
               />
-              <select
+              <CustomSelect
+                label="Day:"
                 value={dayFilter}
-                onChange={(e) => setDayFilter(e.target.value)}
-                className="p-1.5 bg-white border border-slate-400 text-xs font-bold text-slate-800 outline-none cursor-pointer"
-              >
-                <option value="ALL">All Days</option>
-                {DAYS_OF_WEEK.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
+                onChange={setDayFilter}
+                options={[
+                  { value: "ALL", label: "All Days" },
+                  ...DAYS_OF_WEEK.map((d) => ({ value: d, label: d })),
+                ]}
+              />
             </div>
           )}
 

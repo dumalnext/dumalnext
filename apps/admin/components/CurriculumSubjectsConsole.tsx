@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 import { CourseSubjectItem } from "@/app/api/subjects/route";
 import { createClient } from "@/lib/supabase/client";
 
@@ -830,45 +831,37 @@ export default function CurriculumSubjectsConsole() {
           </div>
 
           {/* Classification Type Filter */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-[11px] font-mono uppercase text-slate-600 font-bold whitespace-nowrap">
-              Type:
-            </span>
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 bg-white border border-slate-300 text-xs font-bold focus:border-[#002060] outline-none w-full sm:w-auto"
-            >
-              <option value="ALL">All Classification Types</option>
-              <option value="Core">Core Subjects</option>
-              <option value="Specialized">Specialized Subjects</option>
-              <option value="Applied">Applied Subjects</option>
-              <option value="Elective">Elective Subjects</option>
-              <option value="Intervention">Intervention (ARAL)</option>
-            </select>
-          </div>
+          <CustomSelect
+            label="Type:"
+            value={typeFilter}
+            onChange={setTypeFilter}
+            options={[
+              { value: "ALL", label: "All Classification Types" },
+              { value: "Core", label: "Core Subjects" },
+              { value: "Specialized", label: "Specialized Subjects" },
+              { value: "Applied", label: "Applied Subjects" },
+              { value: "Elective", label: "Elective Subjects" },
+              { value: "Intervention", label: "Intervention (ARAL)" },
+            ]}
+          />
 
           {/* Strand Filter */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-[11px] font-mono uppercase text-slate-600 font-bold whitespace-nowrap">
-              Program:
-            </span>
-            <select
-              value={strandFilter}
-              onChange={(e) => setStrandFilter(e.target.value)}
-              className="px-3 py-2 bg-white border border-slate-300 text-xs font-bold focus:border-[#002060] outline-none w-full sm:w-auto"
-            >
-              <option value="ALL">All Programs / Tracks</option>
-              <option value="Academic">Academic Track (Strengthened SHS)</option>
-              <option value="TechPro">Technical-Professional (TechPro) Track</option>
-              <option value="Regular">Regular Basic Education (JHS)</option>
-              <option value="SPS">Special Program in Sports (SPS)</option>
-              <option value="STEM">STEM Track (Legacy SHS)</option>
-              <option value="TVL-ICT">TVL-ICT Track (Legacy SHS)</option>
-              <option value="HUMSS">HUMSS Track (Legacy SHS)</option>
-              <option value="General">General / Core (SHS)</option>
-            </select>
-          </div>
+          <CustomSelect
+            label="Program:"
+            value={strandFilter}
+            onChange={setStrandFilter}
+            options={[
+              { value: "ALL", label: "All Programs / Tracks" },
+              { value: "Academic", label: "Academic Track (Strengthened SHS)" },
+              { value: "TechPro", label: "Technical-Professional (TechPro) Track" },
+              { value: "Regular", label: "Regular Basic Education (JHS)" },
+              { value: "SPS", label: "Special Program in Sports (SPS)" },
+              { value: "STEM", label: "STEM Track (Legacy SHS)" },
+              { value: "TVL-ICT", label: "TVL-ICT Track (Legacy SHS)" },
+              { value: "HUMSS", label: "HUMSS Track (Legacy SHS)" },
+              { value: "General", label: "General / Core (SHS)" },
+            ]}
+          />
         </div>
 
         {/* Active Filter Indicator */}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import AdjudicationModal, { ApplicationDetail, SectionItem } from "@/components/AdjudicationModal";
+import CustomSelect, { CustomSelectOption } from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AdjudicationConsole() {
@@ -695,12 +696,38 @@ export default function AdjudicationConsole() {
             onClick={() => setSelectedApp(app)}
             className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
           >
-            [ Review Dossier ]
+            Review Dossier
           </button>
         </td>
       </tr>
     );
   };
+
+  const syOptions: CustomSelectOption[] = [
+    { value: "ACTIVE", label: `Active (${activeTerm?.schoolYear || "2026-2027"})`, badge: "Current" },
+    ...availableSchoolYears
+      .filter((sy) => sy !== (activeTerm?.schoolYear || "2026-2027"))
+      .map((sy) => ({ value: sy, label: `S.Y. ${sy}` })),
+    { value: "ALL", label: "All School Years" },
+  ];
+
+  const termOptions: CustomSelectOption[] = [
+    { value: "ACTIVE", label: `Active (${activeTerm?.termName || "Trimester 1"})`, badge: "Current" },
+    { value: "Trimester 1", label: "Trimester 1" },
+    { value: "Trimester 2", label: "Trimester 2" },
+    { value: "Trimester 3", label: "Trimester 3" },
+    { value: "ALL", label: "All Terms" },
+  ];
+
+  const gradeOptions: CustomSelectOption[] = [
+    { value: "ALL", label: "All Grade Levels" },
+    { value: "7", label: "Grade 7" },
+    { value: "8", label: "Grade 8" },
+    { value: "9", label: "Grade 9" },
+    { value: "10", label: "Grade 10" },
+    { value: "11", label: "Grade 11 (SHS)" },
+    { value: "12", label: "Grade 12 (SHS)" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -708,7 +735,7 @@ export default function AdjudicationConsole() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ ENROLLMENT ADJUDICATION &bull; REGISTRAR QUEUE ]
+            ENROLLMENT ADJUDICATION &bull; REGISTRAR QUEUE
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Basic Education Enrollment Applications Queue
@@ -886,62 +913,28 @@ export default function AdjudicationConsole() {
           {/* Academic Period, Grade & Search Filter Controls */}
           <div className="flex flex-wrap items-center gap-2">
             {/* School Year Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">SY:</span>
-              <select
-                value={selectedSY}
-                onChange={(e) => setSelectedSY(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ACTIVE">
-                  Active ({activeTerm?.schoolYear || "2026-2027"})
-                </option>
-                {availableSchoolYears
-                  .filter((sy) => sy !== (activeTerm?.schoolYear || "2026-2027"))
-                  .map((sy) => (
-                    <option key={sy} value={sy}>
-                      S.Y. {sy}
-                    </option>
-                  ))}
-                <option value="ALL">All School Years</option>
-              </select>
-            </div>
+            <CustomSelect
+              label="SY:"
+              value={selectedSY}
+              onChange={setSelectedSY}
+              options={syOptions}
+            />
 
             {/* Term / Trimester Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Term:</span>
-              <select
-                value={selectedTerm}
-                onChange={(e) => setSelectedTerm(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ACTIVE">
-                  Active ({activeTerm?.termName || "Trimester 1"})
-                </option>
-                <option value="Trimester 1">Trimester 1</option>
-                <option value="Trimester 2">Trimester 2</option>
-                <option value="Trimester 3">Trimester 3</option>
-                <option value="ALL">All Terms</option>
-              </select>
-            </div>
+            <CustomSelect
+              label="Term:"
+              value={selectedTerm}
+              onChange={setSelectedTerm}
+              options={termOptions}
+            />
 
             {/* Grade Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 px-2 py-1.5 shrink-0">
-              <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">Grade:</span>
-              <select
-                value={gradeFilter}
-                onChange={(e) => setGradeFilter(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[#002060] outline-none cursor-pointer"
-              >
-                <option value="ALL">All Grade Levels</option>
-                <option value="7">Grade 7</option>
-                <option value="8">Grade 8</option>
-                <option value="9">Grade 9</option>
-                <option value="10">Grade 10</option>
-                <option value="11">Grade 11 (SHS)</option>
-                <option value="12">Grade 12 (SHS)</option>
-              </select>
-            </div>
+            <CustomSelect
+              label="Grade:"
+              value={gradeFilter}
+              onChange={setGradeFilter}
+              options={gradeOptions}
+            />
 
             {/* Search Input */}
             <div className="relative flex-1 min-w-[180px] sm:w-64">
@@ -976,7 +969,7 @@ export default function AdjudicationConsole() {
           <div className="p-3 bg-blue-50/80 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
               <span className="font-mono font-bold text-[#002060] uppercase">
-                [ SEARCH ACTIVE: &ldquo;{searchQuery.trim()}&rdquo; ]
+                SEARCH ACTIVE: &ldquo;{searchQuery.trim()}&rdquo;
               </span>
               <span className="text-slate-600">
                 Found <strong>{filteredApplications.length}</strong> matching applicant{filteredApplications.length === 1 ? "" : "s"}.
@@ -984,7 +977,7 @@ export default function AdjudicationConsole() {
             </div>
             {filteredApplications.length > 0 && (
               <span className="text-[11px] font-mono text-[#002060] font-bold">
-                Click [ Review Dossier ] below to inspect full credentials.
+                Click Review Dossier below to inspect full credentials.
               </span>
             )}
           </div>
@@ -995,12 +988,12 @@ export default function AdjudicationConsole() {
       {isFetchingApps && !hasLoadedAppsOnce.current ? (
         <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center">
           <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <span className="text-xs font-mono uppercase text-slate-500">[ Loading Adjudication Queue... ]</span>
+          <span className="text-xs font-mono uppercase text-slate-500">Loading Adjudication Queue...</span>
         </div>
       ) : filteredApplications.length === 0 ? (
         <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center space-y-3">
           <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-            [ NO APPLICATIONS FOUND FOR S.Y. {effectiveSY} &bull; {effectiveTerm} ]
+            NO APPLICATIONS FOUND FOR S.Y. {effectiveSY} &bull; {effectiveTerm}
           </span>
           <p className="text-xs text-slate-600 max-w-md mx-auto">
             {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE"

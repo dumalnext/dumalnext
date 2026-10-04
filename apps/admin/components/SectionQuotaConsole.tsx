@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 
 export const SHS_TRACKS = [
@@ -1333,22 +1334,20 @@ export default function SectionQuotaConsole() {
       {/* Filter Bar */}
       <div className="p-4 bg-white border-2 border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono font-bold text-slate-600 uppercase">
-            Filter by Grade Level:
-          </span>
-          <select
+          <CustomSelect
+            label="Grade Level:"
             value={gradeFilter}
-            onChange={(e) => setGradeFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-300 text-xs font-bold text-[#002060] px-3 py-1.5 outline-none cursor-pointer"
-          >
-            <option value="ALL">All Grade Levels</option>
-            <option value="7">Grade 7</option>
-            <option value="8">Grade 8</option>
-            <option value="9">Grade 9</option>
-            <option value="10">Grade 10</option>
-            <option value="11">Grade 11 (SHS)</option>
-            <option value="12">Grade 12 (SHS)</option>
-          </select>
+            onChange={setGradeFilter}
+            options={[
+              { value: "ALL", label: "All Grade Levels" },
+              { value: "7", label: "Grade 7" },
+              { value: "8", label: "Grade 8" },
+              { value: "9", label: "Grade 9" },
+              { value: "10", label: "Grade 10" },
+              { value: "11", label: "Grade 11 (SHS)" },
+              { value: "12", label: "Grade 12 (SHS)" },
+            ]}
+          />
         </div>
 
         <div className="flex items-center gap-3">
