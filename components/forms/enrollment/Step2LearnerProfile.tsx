@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { DUMALNEG_BARANGAYS } from "@/lib/types/enrollment";
 import CustomSelect from "@/components/CustomSelect";
+import DateOfBirthPicker from "./DateOfBirthPicker";
 
 interface Step2LearnerProfileProps {
   data: FullEnrollmentFormData;
@@ -430,27 +431,18 @@ export default function Step2LearnerProfile({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Date of Birth */}
-          <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-              Date of Birth <span className="text-red-700">*</span>
-            </label>
-            <input
-              type="date"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+          {/* Date of Birth (Spans 2 columns on sm/lg) */}
+          <div className="sm:col-span-2 lg:col-span-2">
+            <DateOfBirthPicker
               value={data.dateOfBirth || ""}
-              onChange={(e) => handleDateOfBirthChange(e.target.value)}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+              onChange={(dob) => handleDateOfBirthChange(dob)}
+              error={errors.dateOfBirth}
             />
-            {errors.dateOfBirth && (
-              <span className="text-xs text-red-700 font-semibold mt-1 block">
-                {errors.dateOfBirth}
-              </span>
-            )}
           </div>
 
           {/* Age (Auto-Calculated) */}
-          <div>
+          <div className="sm:col-span-1 lg:col-span-1">
             <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
               Age (Years Old) <span className="text-red-700">*</span>
             </label>
@@ -460,7 +452,7 @@ export default function Step2LearnerProfile({
                 value={data.age || ""}
                 readOnly
                 placeholder="Auto"
-                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-sm font-bold text-slate-800 cursor-not-allowed outline-none text-center"
+                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-sm font-bold text-slate-800 cursor-not-allowed outline-none text-center rounded-[4px]"
               />
               <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Y/O</span>
             </div>
@@ -472,11 +464,11 @@ export default function Step2LearnerProfile({
           </div>
 
           {/* Sex (Male / Female) */}
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-1 lg:col-span-1">
             <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
               Sex <span className="text-red-700">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {(["Male", "Female"] as const).map((genderOption) => {
                 const isSelected = data.gender === genderOption;
                 return (
@@ -493,13 +485,13 @@ export default function Step2LearnerProfile({
                         });
                       }
                     }}
-                    className={`p-3 border-2 font-bold text-xs uppercase tracking-wider transition-all ${
+                    className={`p-3 border-2 font-bold text-xs uppercase tracking-wider transition-all rounded-[4px] cursor-pointer ${
                       isSelected
                         ? "bg-[#002060] text-white border-[#002060] shadow-sm"
                         : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
                     }`}
                   >
-                    [ {isSelected ? "X" : " "} ] {genderOption}
+                    {isSelected ? "✓ " : ""}{genderOption}
                   </button>
                 );
               })}

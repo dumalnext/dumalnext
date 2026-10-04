@@ -809,9 +809,11 @@ export default function Step3FamilyBackground({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Guardian Last Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Guardian&apos;s Last Name <span className="text-red-700">*</span>
-                </label>
+                <div className="h-6 flex items-center mb-1">
+                  <label className="text-xs font-bold text-slate-900 uppercase">
+                    Guardian&apos;s Last Name <span className="text-red-700">*</span>
+                  </label>
+                </div>
                 <input
                   type="text"
                   value={data.guardianLastName || ""}
@@ -837,9 +839,11 @@ export default function Step3FamilyBackground({
 
               {/* Guardian First Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Guardian&apos;s First Name <span className="text-red-700">*</span>
-                </label>
+                <div className="h-6 flex items-center mb-1">
+                  <label className="text-xs font-bold text-slate-900 uppercase">
+                    Guardian&apos;s First Name <span className="text-red-700">*</span>
+                  </label>
+                </div>
                 <input
                   type="text"
                   value={data.guardianFirstName || ""}
@@ -865,11 +869,11 @@ export default function Step3FamilyBackground({
 
               {/* Guardian Middle Name */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-900 uppercase">
+                <div className="h-6 flex items-center justify-between mb-1 gap-2">
+                  <label className="text-xs font-bold text-slate-900 uppercase truncate">
                     Guardian&apos;s Middle Name {!hasNoGuardianMiddleName && <span className="text-red-700">*</span>}
                   </label>
-                  <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
+                  <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer shrink-0">
                     <input
                       type="checkbox"
                       checked={hasNoGuardianMiddleName}
