@@ -840,37 +840,37 @@ export default function Step2LearnerProfile({
 
         {/* Permanent Address Toggle */}
         <div className="pt-3 border-t border-slate-200">
-          <div className="flex items-center justify-between p-4 bg-white border-2 border-slate-200">
-            <div>
-              <span className="text-xs font-bold text-slate-900 uppercase block">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border-2 border-slate-200 rounded-[4px]">
+            <div className="min-w-0 flex-1">
+              <span className="text-xs font-bold text-slate-900 block leading-tight">
                 Permanent Residential Address
               </span>
-              <span className="text-[11px] text-slate-600">
+              <p className="text-[11px] text-slate-600 mt-0.5 leading-normal">
                 Is your permanent address identical to your current residential address?
-              </span>
+              </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(true)}
-                className={`px-4 py-2 border-2 text-xs font-bold uppercase transition-all ${
+                className={`flex-1 sm:flex-none px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
                   data.isPermanentSameAsCurrent
-                    ? "bg-[#002060] text-white border-[#002060]"
-                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
+                    ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
                 }`}
               >
-                [ {data.isPermanentSameAsCurrent ? "X" : " "} ] YES (SAME)
+                Yes (Same)
               </button>
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(false)}
-                className={`px-4 py-2 border-2 text-xs font-bold uppercase transition-all ${
+                className={`flex-1 sm:flex-none px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
                   !data.isPermanentSameAsCurrent
-                    ? "bg-[#002060] text-white border-[#002060]"
-                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
+                    ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
                 }`}
               >
-                [ {!data.isPermanentSameAsCurrent ? "X" : " "} ] NO (DIFFERENT)
+                No (Different)
               </button>
             </div>
           </div>

@@ -812,7 +812,7 @@ export default function Step2LearnerProfile({
                       key={ip}
                       type="button"
                       onClick={() => onChange({ ipCommunityName: ip })}
-                      className={`text-[11px] font-bold px-2.5 py-1 border transition-all rounded ${
+                      className={`text-[11px] font-bold px-2.5 py-1 border transition-all rounded-[4px] ${
                         data.ipCommunityName === ip
                           ? "bg-[#002060] text-white border-[#002060]"
                           : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
@@ -1157,44 +1157,44 @@ export default function Step2LearnerProfile({
 
         {/* Permanent Address Toggle */}
         <div className="pt-3 border-t border-slate-200">
-          <div className="flex items-center justify-between p-4 bg-white border-2 border-slate-200 rounded-[4px]">
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border-2 border-slate-200 rounded-[4px]">
+            <div className="min-w-0 flex-1">
+              <span className="text-xs font-bold text-slate-900 block leading-tight">
                 Permanent Residential Address
               </span>
-              <span className="text-[11px] text-slate-600">
+              <p className="text-[11px] text-slate-600 mt-0.5 leading-normal">
                 Is your permanent address identical to your current residential address?
-              </span>
+              </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(true)}
-                className={`px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] ${
+                className={`flex-1 sm:flex-none px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
                   data.isPermanentSameAsCurrent
-                    ? "bg-[#002060] text-white border-[#002060]"
-                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
+                    ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
                 }`}
               >
-                {data.isPermanentSameAsCurrent ? "✓ " : ""}Yes (Same)
+                Yes (Same)
               </button>
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(false)}
-                className={`px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] ${
+                className={`flex-1 sm:flex-none px-4 py-2 border-2 text-xs font-bold transition-all rounded-[4px] whitespace-nowrap text-center cursor-pointer ${
                   !data.isPermanentSameAsCurrent
-                    ? "bg-[#002060] text-white border-[#002060]"
-                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
+                    ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                    : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
                 }`}
               >
-                {!data.isPermanentSameAsCurrent ? "✓ " : ""}No (Different)
+                No (Different)
               </button>
             </div>
           </div>
 
           {/* If Permanent Address is different */}
           {!data.isPermanentSameAsCurrent && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white border-2 border-t-0 border-slate-200 rounded-b-md">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white border-2 border-t-0 border-slate-200 rounded-b-[4px]">
               <div>
                 <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent House No. / Street

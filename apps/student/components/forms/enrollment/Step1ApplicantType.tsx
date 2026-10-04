@@ -278,9 +278,9 @@ export default function Step1ApplicantType({
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
                   data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -288,7 +288,7 @@ export default function Step1ApplicantType({
               >
                 {data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
               </span>
-              <span className="text-[11px] font-bold text-slate-400 ">CODE: GRADED</span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 whitespace-nowrap shrink-0">CODE: GRADED</span>
             </div>
             <div className="text-base font-bold text-slate-900">Graded Curriculum Program</div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
@@ -306,9 +306,9 @@ export default function Step1ApplicantType({
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
                   !data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
@@ -316,7 +316,7 @@ export default function Step1ApplicantType({
               >
                 {!data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
               </span>
-              <span className="text-[11px] font-bold text-slate-400 ">CODE: SNED-ONLY</span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 whitespace-nowrap shrink-0">CODE: SNED-ONLY</span>
             </div>
             <div className="text-base font-bold text-slate-900">Non-Graded Program (SNEd Only)</div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">

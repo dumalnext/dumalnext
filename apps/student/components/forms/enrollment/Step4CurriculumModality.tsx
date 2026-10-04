@@ -558,8 +558,8 @@ export default function Step4CurriculumModality({
               <label className="block text-xs font-bold text-slate-900 mb-1">
                 Semester / Trimester of Enrollment
               </label>
-              <div className="p-3.5 bg-white border-2 border-[#002060] flex items-center justify-between shadow-xs rounded-[4px]">
-                <div className="space-y-0.5">
+              <div className="p-3.5 bg-white border-2 border-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-xs rounded-[4px]">
+                <div className="space-y-0.5 min-w-0 flex-1">
                   <div className="text-sm font-bold text-[#002060]">
                     {activeSemester}
                   </div>

@@ -96,8 +96,8 @@ function DocumentDropBox({
       <p className="text-[11px] text-slate-600 leading-relaxed">{sublabel}</p>
 
       {uploadedDoc ? (
-        <div className="p-3 bg-blue-50/90 border border-blue-200 flex items-center justify-between text-xs rounded-[4px]">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="p-3 bg-blue-50/90 border border-blue-200 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs rounded-[4px]">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             {uploadedDoc.previewUrl &&
             (uploadedDoc.previewUrl.startsWith("data:image/") ||
               uploadedDoc.previewUrl.startsWith("blob:") ||
@@ -126,7 +126,7 @@ function DocumentDropBox({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+          <div className="flex items-center gap-1.5 shrink-0 ml-auto sm:ml-2">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
