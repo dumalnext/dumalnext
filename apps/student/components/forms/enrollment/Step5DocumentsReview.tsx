@@ -22,6 +22,181 @@ interface UploadedDocState {
   isCompressing: boolean;
 }
 
+interface DocumentDropBoxProps {
+  id: string;
+  docKey: string;
+  label: React.ReactNode;
+  sublabel: string;
+  badgeText: string;
+  badgeType?: "slate" | "amber" | "blue";
+  accept?: string;
+  uploadedDoc: UploadedDocState | null;
+  error?: string;
+  onUpload: (file: File) => void;
+  onRemove: () => void;
+  isMandatory?: boolean;
+}
+
+function DocumentDropBox({
+  id,
+  label,
+  sublabel,
+  badgeText,
+  badgeType = "slate",
+  accept = "image/*,.pdf",
+  uploadedDoc,
+  error,
+  onUpload,
+  onRemove,
+  isMandatory = false,
+}: DocumentDropBoxProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  return (
+    <div className="p-4 bg-white border-2 border-slate-300 space-y-2.5 rounded-md shadow-2xs hover:border-slate-400 transition-colors">
+      <div className="flex items-center justify-between gap-2">
+        <label htmlFor={id} className="text-xs font-bold text-slate-900 cursor-pointer">
+          {label} {isMandatory && <span className="text-red-700">*</span>}
+        </label>
+        <span
+          className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+            badgeType === "blue"
+              ? "bg-blue-100 text-[#002060] border border-blue-200"
+              : badgeType === "amber"
+              ? "bg-amber-100 text-amber-900 border border-amber-300"
+              : "bg-slate-100 text-slate-600 border border-slate-200"
+          }`}
+        >
+          {badgeText}
+        </span>
+      </div>
+
+      <p className="text-[11px] text-slate-600 leading-relaxed">{sublabel}</p>
+
+      {uploadedDoc ? (
+        <div className="p-3 bg-blue-50/90 border border-blue-200 flex items-center justify-between text-xs rounded-md">
+          <div className="flex items-center gap-3 min-w-0">
+            {uploadedDoc.previewUrl &&
+            (uploadedDoc.previewUrl.startsWith("data:image/") ||
+              uploadedDoc.previewUrl.startsWith("blob:") ||
+              uploadedDoc.previewUrl.startsWith("http")) ? (
+              <img
+                src={uploadedDoc.previewUrl}
+                alt={uploadedDoc.file.name}
+                className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
+              />
+            ) : (
+              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
+                DOC
+              </div>
+            )}
+            <div className="min-w-0">
+              <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[240px]">
+                {uploadedDoc.file.name}
+              </span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[10px] text-slate-500 font-mono">
+                  {uploadedDoc.originalSizeKb}KB &rarr; {uploadedDoc.compressedSizeKb}KB (Compressed)
+                </span>
+                <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded">
+                  Ready
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="px-2.5 py-1 bg-white border border-slate-300 text-xs text-slate-700 font-medium hover:bg-slate-100 transition-colors rounded shadow-2xs cursor-pointer"
+            >
+              Replace
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              className="px-2.5 py-1 bg-white border border-red-300 text-xs text-red-700 font-bold hover:bg-red-50 transition-colors rounded shadow-2xs cursor-pointer"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-md p-4 transition-all text-center cursor-pointer group flex flex-col items-center justify-center gap-1.5 ${
+            isDragging
+              ? "border-[#002060] bg-blue-50/70 scale-[1.01]"
+              : "border-slate-300 hover:border-[#002060] bg-slate-50/60 hover:bg-blue-50/30"
+          }`}
+        >
+          <div className="w-9 h-9 rounded-full bg-blue-100/80 text-[#002060] flex items-center justify-center group-hover:scale-105 group-hover:bg-[#002060] group-hover:text-white transition-all shadow-2xs">
+            <svg
+              className="w-4.5 h-4.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+          </div>
+          <div className="text-xs font-bold text-slate-800 group-hover:text-[#002060] transition-colors">
+            Click to upload or drag and drop file
+          </div>
+          <div className="text-[10px] text-slate-500">
+            Supports JPG, PNG, or PDF (Auto-compressed &lt; 350KB)
+          </div>
+        </div>
+      )}
+
+      <input
+        ref={fileInputRef}
+        id={id}
+        type="file"
+        accept={accept}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onUpload(file);
+          e.target.value = "";
+        }}
+        className="hidden"
+      />
+
+      {error && <p className="text-[11px] font-bold text-red-700">{error}</p>}
+    </div>
+  );
+}
+
 export default function Step5DocumentsReview({
   data,
   onChange,
@@ -722,352 +897,102 @@ export default function Step5DocumentsReview({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 1. PSA Birth Certificate */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900">
-                1. PSA Birth Certificate <span className="text-red-700">*</span>
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              Clear photo of Philippine Statistics Authority (PSA) Birth Certificate or Local Civil Registrar (LCR) / Barangay Certification.
-            </p>
-            {docs.birth_certificate ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded-md">
-                <div className="flex items-center gap-3 min-w-0">
-                  {docs.birth_certificate.previewUrl && (docs.birth_certificate.previewUrl.startsWith("data:image/") || docs.birth_certificate.previewUrl.startsWith("blob:") || docs.birth_certificate.previewUrl.startsWith("http")) ? (
-                    <img
-                      src={docs.birth_certificate.previewUrl}
-                      alt={docs.birth_certificate.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
-                      DOC
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
-                      {docs.birth_certificate.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono block">
-                      {docs.birth_certificate.originalSizeKb}KB &rarr; {docs.birth_certificate.compressedSizeKb}KB (Compressed)
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("birth_certificate")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) =>
-                    handleFileUpload("birth_certificate", e.target.files?.[0] || null)
-                  }
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded-md"
-                />
-              </div>
-            )}
-            {errors.birth_certificate && (
-              <p className="text-[11px] font-bold text-red-700">{errors.birth_certificate}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-birth-cert"
+            docKey="birth_certificate"
+            label="1. PSA Birth Certificate"
+            sublabel="Clear photo of Philippine Statistics Authority (PSA) Birth Certificate or Local Civil Registrar (LCR) / Barangay Certification."
+            badgeText="MANDATORY"
+            badgeType="slate"
+            uploadedDoc={docs.birth_certificate}
+            error={errors.birth_certificate}
+            onUpload={(file) => handleFileUpload("birth_certificate", file)}
+            onRemove={() => handleRemoveDoc("birth_certificate")}
+            isMandatory
+          />
 
           {/* 2. Form 138 / SF9 Report Card */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900">
-                2. Learner&apos;s Progress Report Card (SF9 / Form 138) <span className="text-red-700">*</span>
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              {isG7
+          <DocumentDropBox
+            id="file-form-138"
+            docKey="form_138"
+            label="2. Learner's Progress Report Card (SF9 / Form 138)"
+            sublabel={
+              isG7
                 ? "Grade 6 Elementary Progress Report Card indicating learner eligibility for Junior High School."
                 : isG11
                 ? "Grade 10 Junior High School Report Card indicating eligibility for Senior High School."
-                : "Report Card from previous school year completed."}
-            </p>
-            {docs.form_138 ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded-md">
-                <div className="flex items-center gap-3 min-w-0">
-                  {docs.form_138.previewUrl && (docs.form_138.previewUrl.startsWith("data:image/") || docs.form_138.previewUrl.startsWith("blob:") || docs.form_138.previewUrl.startsWith("http")) ? (
-                    <img
-                      src={docs.form_138.previewUrl}
-                      alt={docs.form_138.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
-                      DOC
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
-                      {docs.form_138.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono block">
-                      {docs.form_138.originalSizeKb}KB &rarr; {docs.form_138.compressedSizeKb}KB (Compressed)
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("form_138")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload("form_138", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded-md"
-                />
-              </div>
-            )}
-            {errors.form_138 && (
-              <p className="text-[11px] font-bold text-red-700">{errors.form_138}</p>
-            )}
-          </div>
+                : "Report Card from previous school year completed."
+            }
+            badgeText="MANDATORY"
+            badgeType="slate"
+            uploadedDoc={docs.form_138}
+            error={errors.form_138}
+            onUpload={(file) => handleFileUpload("form_138", file)}
+            onRemove={() => handleRemoveDoc("form_138")}
+            isMandatory
+          />
 
           {/* 3. 2x2 Official ID Picture */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900">
-                3. Formal 2x2 or 1x1 ID Picture <span className="text-red-700">*</span>
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              Recent passport or 2x2 formal photo with white background and printed name tag of the learner.
-            </p>
-            {docs.id_picture ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded-md">
-                <div className="flex items-center gap-3 min-w-0">
-                  {docs.id_picture.previewUrl && (docs.id_picture.previewUrl.startsWith("data:image/") || docs.id_picture.previewUrl.startsWith("blob:") || docs.id_picture.previewUrl.startsWith("http")) ? (
-                    <img
-                      src={docs.id_picture.previewUrl}
-                      alt={docs.id_picture.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
-                      DOC
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
-                      {docs.id_picture.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono block">
-                      {docs.id_picture.originalSizeKb}KB &rarr; {docs.id_picture.compressedSizeKb}KB (Compressed)
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("id_picture")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload("id_picture", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded-md"
-                />
-              </div>
-            )}
-            {errors.id_picture && (
-              <p className="text-[11px] font-bold text-red-700">{errors.id_picture}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-id-picture"
+            docKey="id_picture"
+            label="3. Formal 2x2 or 1x1 ID Picture"
+            sublabel="Recent passport or 2x2 formal photo with white background and printed name tag of the learner."
+            badgeText="MANDATORY"
+            badgeType="slate"
+            accept="image/*"
+            uploadedDoc={docs.id_picture}
+            error={errors.id_picture}
+            onUpload={(file) => handleFileUpload("id_picture", file)}
+            onRemove={() => handleRemoveDoc("id_picture")}
+            isMandatory
+          />
 
           {/* 4. Certificate of Good Moral Character */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2 rounded-md">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900">
-                4. Certificate of Good Moral Character
-                {(isG11 || isTransferee) && <span className="text-red-700"> *</span>}
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">
-                {isG11 || isTransferee ? "MANDATORY" : "OPTIONAL FOR G7"}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              Certificate issued by previous school certifying good moral standing and disciplinary record.
-            </p>
-            {docs.good_moral ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded-md">
-                <div className="flex items-center gap-3 min-w-0">
-                  {docs.good_moral.previewUrl && (docs.good_moral.previewUrl.startsWith("data:image/") || docs.good_moral.previewUrl.startsWith("blob:") || docs.good_moral.previewUrl.startsWith("http")) ? (
-                    <img
-                      src={docs.good_moral.previewUrl}
-                      alt={docs.good_moral.file.name}
-                      className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
-                      DOC
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
-                      {docs.good_moral.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono block">
-                      {docs.good_moral.originalSizeKb}KB &rarr; {docs.good_moral.compressedSizeKb}KB (Compressed)
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("good_moral")}
-                  className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload("good_moral", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded-md"
-                />
-              </div>
-            )}
-            {errors.good_moral && (
-              <p className="text-[11px] font-bold text-red-700">{errors.good_moral}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-good-moral"
+            docKey="good_moral"
+            label="4. Certificate of Good Moral Character"
+            sublabel="Certificate issued by previous school certifying good moral standing and disciplinary record."
+            badgeText={isG11 || isTransferee ? "MANDATORY" : "OPTIONAL FOR G7"}
+            badgeType={isG11 || isTransferee ? "slate" : "blue"}
+            uploadedDoc={docs.good_moral}
+            error={errors.good_moral}
+            onUpload={(file) => handleFileUpload("good_moral", file)}
+            onRemove={() => handleRemoveDoc("good_moral")}
+            isMandatory={isG11 || isTransferee}
+          />
 
-          {/* Conditional 4Ps Household ID Photocopy */}
+          {/* 5. Conditional 4Ps Household ID Photocopy */}
           {data.is4psBeneficiary && (
-            <div className="p-4 bg-white border-2 border-blue-200 space-y-2 rounded-md">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900">
-                  5. Pantawid Pamilya (4Ps) Household ID Card
-                </label>
-                <span className="text-[10px] font-mono text-blue-700 font-bold">4PS BENEFICIARY</span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                Photocopy or clear photo of DSWD 4Ps ID or Household Pantawid verification passbook.
-              </p>
-              {docs.household_4ps ? (
-                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded-md">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {docs.household_4ps.previewUrl && (docs.household_4ps.previewUrl.startsWith("data:image/") || docs.household_4ps.previewUrl.startsWith("blob:") || docs.household_4ps.previewUrl.startsWith("http")) ? (
-                      <img
-                        src={docs.household_4ps.previewUrl}
-                        alt={docs.household_4ps.file.name}
-                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
-                        DOC
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
-                        {docs.household_4ps.file.name}
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono block">
-                        {docs.household_4ps.originalSizeKb}KB &rarr; {docs.household_4ps.compressedSizeKb}KB (Compressed)
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveDoc("household_4ps")}
-                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={(e) => handleFileUpload("household_4ps", e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded-md"
-                  />
-                </div>
-              )}
-            </div>
+            <DocumentDropBox
+              id="file-household-4ps"
+              docKey="household_4ps"
+              label="5. Pantawid Pamilya (4Ps) Household ID Card"
+              sublabel="Photocopy or clear photo of DSWD 4Ps ID or Household Pantawid verification passbook."
+              badgeText="4PS BENEFICIARY"
+              badgeType="blue"
+              uploadedDoc={docs.household_4ps}
+              error={errors.household_4ps}
+              onUpload={(file) => handleFileUpload("household_4ps", file)}
+              onRemove={() => handleRemoveDoc("household_4ps")}
+            />
           )}
 
-          {/* Conditional PWD ID Photocopy */}
+          {/* 6. Conditional PWD ID Photocopy */}
           {data.hasPwdId && (
-            <div className="p-4 bg-white border-2 border-blue-200 space-y-2 rounded-md">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900">
-                  6. Official Persons with Disability (PWD) ID
-                </label>
-                <span className="text-[10px] font-mono text-blue-700 font-bold">SNED / INCLUSIVE</span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                Photocopy of Municipal Social Welfare and Development (MSWDO) PWD ID or Clinical Medical Assessment.
-              </p>
-              {docs.pwd_id ? (
-                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs rounded-md">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {docs.pwd_id.previewUrl && (docs.pwd_id.previewUrl.startsWith("data:image/") || docs.pwd_id.previewUrl.startsWith("blob:") || docs.pwd_id.previewUrl.startsWith("http")) ? (
-                      <img
-                        src={docs.pwd_id.previewUrl}
-                        alt={docs.pwd_id.file.name}
-                        className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-mono font-bold text-[#002060] shrink-0 rounded">
-                        DOC
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[220px]">
-                        {docs.pwd_id.file.name}
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono block">
-                        {docs.pwd_id.originalSizeKb}KB &rarr; {docs.pwd_id.compressedSizeKb}KB (Compressed)
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveDoc("pwd_id")}
-                    className="px-2.5 py-1 bg-white border border-red-400 text-xs text-red-700 font-bold hover:bg-red-50 ml-2 shrink-0 transition-colors rounded"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={(e) => handleFileUpload("pwd_id", e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1 rounded-md"
-                  />
-                </div>
-              )}
-            </div>
+            <DocumentDropBox
+              id="file-pwd-id"
+              docKey="pwd_id"
+              label="6. Official Persons with Disability (PWD) ID"
+              sublabel="Photocopy of Municipal Social Welfare and Development (MSWDO) PWD ID or Clinical Medical Assessment."
+              badgeText="SNED / INCLUSIVE"
+              badgeType="blue"
+              uploadedDoc={docs.pwd_id}
+              error={errors.pwd_id}
+              onUpload={(file) => handleFileUpload("pwd_id", file)}
+              onRemove={() => handleRemoveDoc("pwd_id")}
+            />
           )}
         </div>
       </div>
