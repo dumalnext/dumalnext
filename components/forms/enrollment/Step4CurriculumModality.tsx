@@ -10,6 +10,7 @@ import {
   SNED_MANIFESTATIONS,
   DISTANCE_LEARNING_MODALITIES,
 } from "@/lib/types/enrollment";
+import CustomSelect from "@/components/CustomSelect";
 
 interface Step4CurriculumModalityProps {
   data: FullEnrollmentFormData;
@@ -284,10 +285,10 @@ export default function Step4CurriculumModality({
                 <p className="text-xs text-slate-600 mb-2">
                   Indicate the primary athletic event or sports discipline the student-athlete specializes in for varsity training and Division Meet representation:
                 </p>
-                <select
+                <CustomSelect
                   value={currentSpsSport}
-                  onChange={(e) => {
-                    onChange({ spsSport: e.target.value });
+                  onChange={(val) => {
+                    onChange({ spsSport: val });
                     if (errors.spsSport) {
                       setErrors((prev) => {
                         const next = { ...prev };
@@ -296,17 +297,15 @@ export default function Step4CurriculumModality({
                       });
                     }
                   }}
-                  className={`w-full sm:w-96 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                    errors.spsSport ? "border-red-600 bg-red-50" : "border-slate-300"
-                  }`}
-                >
-                  <option value="">-- SELECT SPORT DISCIPLINE --</option>
-                  {SPS_SPORTS.map((sport) => (
-                    <option key={sport} value={sport}>
-                      {sport}
-                    </option>
-                  ))}
-                </select>
+                  options={SPS_SPORTS.map((sport) => ({
+                    value: sport,
+                    label: sport,
+                  }))}
+                  placeholder="-- SELECT SPORT DISCIPLINE --"
+                  className="w-full sm:w-96"
+                  fullWidth
+                  error={Boolean(errors.spsSport)}
+                />
                 {errors.spsSport && (
                   <p className="text-[11px] font-bold text-red-700 mt-1">{errors.spsSport}</p>
                 )}
@@ -334,13 +333,13 @@ export default function Step4CurriculumModality({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Semester of Enrollment <span className="text-red-700">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={currentSemester}
-                onChange={(e) => {
-                  const val = e.target.value as "1st Semester" | "2nd Semester";
+                onChange={(val) => {
+                  const sVal = val as "1st Semester" | "2nd Semester";
                   onChange({
-                    targetSemester: val,
-                    step1: { ...data.step1, targetSemester: val },
+                    targetSemester: sVal,
+                    step1: { ...data.step1, targetSemester: sVal },
                   });
                   if (errors.targetSemester) {
                     setErrors((prev) => {
@@ -350,13 +349,14 @@ export default function Step4CurriculumModality({
                     });
                   }
                 }}
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                  errors.targetSemester ? "border-red-600 bg-red-50" : "border-slate-300"
-                }`}
-              >
-                <option value="1st Semester">1st Semester (August - December)</option>
-                <option value="2nd Semester">2nd Semester (January - May)</option>
-              </select>
+                options={[
+                  { value: "1st Semester", label: "1st Semester (August - December)" },
+                  { value: "2nd Semester", label: "2nd Semester (January - May)" },
+                ]}
+                placeholder="Select Semester"
+                fullWidth
+                error={Boolean(errors.targetSemester)}
+              />
               {errors.targetSemester && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetSemester}</p>
               )}
@@ -367,15 +367,14 @@ export default function Step4CurriculumModality({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Senior High Track <span className="text-red-700">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={currentTrack}
-                onChange={(e) => {
-                  const newTrack = e.target.value;
-                  const defaultNewStrand = newTrack === "Academic Track" ? "STEM" : "TVL-ICT";
+                onChange={(val) => {
+                  const defaultNewStrand = val === "Academic Track" ? "STEM" : "TVL-ICT";
                   onChange({
-                    targetTrack: newTrack,
+                    targetTrack: val,
                     targetStrand: defaultNewStrand,
-                    step1: { ...data.step1, targetTrack: newTrack, targetStrand: defaultNewStrand },
+                    step1: { ...data.step1, targetTrack: val, targetStrand: defaultNewStrand },
                   });
                   if (errors.targetTrack) {
                     setErrors((prev) => {
@@ -385,15 +384,14 @@ export default function Step4CurriculumModality({
                     });
                   }
                 }}
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                  errors.targetTrack ? "border-red-600 bg-red-50" : "border-slate-300"
-                }`}
-              >
-                <option value="Academic Track">Academic Track</option>
-                <option value="Technical-Vocational-Livelihood Track">
-                  Technical-Vocational-Livelihood (TVL) Track
-                </option>
-              </select>
+                options={[
+                  { value: "Academic Track", label: "Academic Track" },
+                  { value: "Technical-Vocational-Livelihood Track", label: "Technical-Vocational-Livelihood (TVL) Track" },
+                ]}
+                placeholder="Select Track"
+                fullWidth
+                error={Boolean(errors.targetTrack)}
+              />
               {errors.targetTrack && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetTrack}</p>
               )}
@@ -404,10 +402,9 @@ export default function Step4CurriculumModality({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Specialized Strand <span className="text-red-700">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={currentStrand}
-                onChange={(e) => {
-                  const val = e.target.value;
+                onChange={(val) => {
                   onChange({
                     targetStrand: val,
                     step1: { ...data.step1, targetStrand: val },
@@ -420,16 +417,14 @@ export default function Step4CurriculumModality({
                     });
                   }
                 }}
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                  errors.targetStrand ? "border-red-600 bg-red-50" : "border-slate-300"
-                }`}
-              >
-                {availableStrands.map((s) => (
-                  <option key={s.code} value={s.code}>
-                    [{s.code}] {s.name}
-                  </option>
-                ))}
-              </select>
+                options={availableStrands.map((s) => ({
+                  value: s.code,
+                  label: `[${s.code}] ${s.name}`,
+                }))}
+                placeholder="Select Strand"
+                fullWidth
+                error={Boolean(errors.targetStrand)}
+              />
               {errors.targetStrand && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetStrand}</p>
               )}

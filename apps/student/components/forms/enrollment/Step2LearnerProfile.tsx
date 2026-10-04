@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { DUMALNEG_BARANGAYS } from "@/lib/types/enrollment";
+import CustomSelect from "@/components/CustomSelect";
 
 const STANDARD_MOTHER_TONGUES = ["Ilokano", "Isnag", "Tagalog", "English"];
 
@@ -472,19 +473,21 @@ export default function Step2LearnerProfile({
             <label className="block text-xs font-bold text-slate-900 mb-1">
               Extension Name <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
-            <select
+            <CustomSelect
               value={data.extensionName || ""}
-              onChange={(e) => onChange({ extensionName: e.target.value })}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-md"
-            >
-              <option value="">None</option>
-              <option value="JR.">JR.</option>
-              <option value="SR.">SR.</option>
-              <option value="II">II</option>
-              <option value="III">III</option>
-              <option value="IV">IV</option>
-              <option value="V">V</option>
-            </select>
+              onChange={(val) => onChange({ extensionName: val })}
+              options={[
+                { value: "", label: "None" },
+                { value: "JR.", label: "JR." },
+                { value: "SR.", label: "SR." },
+                { value: "II", label: "II" },
+                { value: "III", label: "III" },
+                { value: "IV", label: "IV" },
+                { value: "V", label: "V" },
+              ]}
+              placeholder="None"
+              fullWidth
+            />
           </div>
         </div>
       </div>
@@ -631,10 +634,9 @@ export default function Step2LearnerProfile({
             <label className="block text-xs font-bold text-slate-900 mb-1">
               Mother Tongue <span className="text-red-700">*</span>
             </label>
-            <select
+            <CustomSelect
               value={isOtherMotherTongue ? "Other" : (data.motherTongue || "Ilokano")}
-              onChange={(e) => {
-                const val = e.target.value;
+              onChange={(val) => {
                 if (val === "Other") {
                   setIsOtherMotherTongue(true);
                   onChange({ motherTongue: customMotherTongue || "Other" });
@@ -650,14 +652,17 @@ export default function Step2LearnerProfile({
                   });
                 }
               }}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-md"
-            >
-              <option value="Ilokano">Ilokano</option>
-              <option value="Isnag">Isnag</option>
-              <option value="Tagalog">Tagalog</option>
-              <option value="English">English</option>
-              <option value="Other">Other (Please specify)</option>
-            </select>
+              options={[
+                { value: "Ilokano", label: "Ilokano" },
+                { value: "Isnag", label: "Isnag" },
+                { value: "Tagalog", label: "Tagalog" },
+                { value: "English", label: "English" },
+                { value: "Other", label: "Other (Please specify)" },
+              ]}
+              placeholder="Select Mother Tongue"
+              fullWidth
+              error={Boolean(errors.motherTongue)}
+            />
 
             {isOtherMotherTongue && (
               <div className="mt-2">
@@ -698,10 +703,9 @@ export default function Step2LearnerProfile({
             <label className="block text-xs font-bold text-slate-900 mb-1">
               Religion <span className="text-slate-500 font-normal">(Select or specify)</span>
             </label>
-            <select
+            <CustomSelect
               value={isOtherReligion ? "Other" : (data.religion || "Roman Catholic")}
-              onChange={(e) => {
-                const val = e.target.value;
+              onChange={(val) => {
                 if (val === "Other") {
                   setIsOtherReligion(true);
                   onChange({ religion: customReligion || "Other" });
@@ -717,15 +721,17 @@ export default function Step2LearnerProfile({
                   });
                 }
               }}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-md"
-            >
-              {STANDARD_RELIGIONS.map((rel) => (
-                <option key={rel} value={rel}>
-                  {rel}
-                </option>
-              ))}
-              <option value="Other">Other (Please specify)</option>
-            </select>
+              options={[
+                ...STANDARD_RELIGIONS.map((rel) => ({
+                  value: rel,
+                  label: rel,
+                })),
+                { value: "Other", label: "Other (Please specify)" },
+              ]}
+              placeholder="Select Religion"
+              fullWidth
+              error={Boolean(errors.religion)}
+            />
 
             {isOtherReligion && (
               <div className="mt-2">
@@ -948,10 +954,10 @@ export default function Step2LearnerProfile({
               <label className="block text-xs font-bold text-slate-900 mb-1">
                 Municipality / City <span className="text-red-700">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={currentMuniMode}
-                onChange={(e) => {
-                  const mode = e.target.value as "DUMALNEG" | "OTHER";
+                onChange={(val) => {
+                  const mode = val as "DUMALNEG" | "OTHER";
                   setCurrentMuniMode(mode);
                   if (mode === "DUMALNEG") {
                     handleCurrentAddressChange({
@@ -978,11 +984,14 @@ export default function Step2LearnerProfile({
                     });
                   }
                 }}
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md"
-              >
-                <option value="DUMALNEG">DUMALNEG</option>
-                <option value="OTHER">OTHER (OUTSIDE DUMALNEG)</option>
-              </select>
+                options={[
+                  { value: "DUMALNEG", label: "DUMALNEG" },
+                  { value: "OTHER", label: "OTHER (OUTSIDE DUMALNEG)" },
+                ]}
+                placeholder="Select Municipality"
+                fullWidth
+                error={Boolean(errors.currentMunicipality)}
+              />
 
               {currentMuniMode === "OTHER" && (
                 <div className="mt-2">
@@ -1031,10 +1040,10 @@ export default function Step2LearnerProfile({
                 Barangay <span className="text-red-700">*</span>
               </label>
               {currentMuniMode === "DUMALNEG" ? (
-                <select
+                <CustomSelect
                   value={(data.currentBarangay || "CABARITAN").toUpperCase()}
-                  onChange={(e) => {
-                    handleCurrentAddressChange({ currentBarangay: e.target.value.toUpperCase() });
+                  onChange={(val) => {
+                    handleCurrentAddressChange({ currentBarangay: val.toUpperCase() });
                     if (errors.currentBarangay) {
                       setErrors((prev) => {
                         const next = { ...prev };
@@ -1043,14 +1052,14 @@ export default function Step2LearnerProfile({
                       });
                     }
                   }}
-                  className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md"
-                >
-                  {DUMALNEG_BARANGAYS.map((brgy) => (
-                    <option key={brgy} value={brgy.toUpperCase()} className="uppercase font-bold">
-                      BRGY. {brgy.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
+                  options={DUMALNEG_BARANGAYS.map((brgy) => ({
+                    value: brgy.toUpperCase(),
+                    label: `BRGY. ${brgy.toUpperCase()}`,
+                  }))}
+                  placeholder="Select Barangay"
+                  fullWidth
+                  error={Boolean(errors.currentBarangay)}
+                />
               ) : (
                 <input
                   type="text"
@@ -1220,10 +1229,10 @@ export default function Step2LearnerProfile({
                 <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Municipality <span className="text-red-700">*</span>
                 </label>
-                <select
+                <CustomSelect
                   value={permanentMuniMode}
-                  onChange={(e) => {
-                    const mode = e.target.value as "DUMALNEG" | "OTHER";
+                  onChange={(val) => {
+                    const mode = val as "DUMALNEG" | "OTHER";
                     setPermanentMuniMode(mode);
                     if (mode === "DUMALNEG") {
                       onChange({
@@ -1250,11 +1259,14 @@ export default function Step2LearnerProfile({
                       });
                     }
                   }}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md"
-                >
-                  <option value="DUMALNEG">DUMALNEG</option>
-                  <option value="OTHER">OTHER (OUTSIDE DUMALNEG)</option>
-                </select>
+                  options={[
+                    { value: "DUMALNEG", label: "DUMALNEG" },
+                    { value: "OTHER", label: "OTHER (OUTSIDE DUMALNEG)" },
+                  ]}
+                  placeholder="Select Municipality"
+                  fullWidth
+                  error={Boolean(errors.permanentMunicipality)}
+                />
 
                 {permanentMuniMode === "OTHER" && (
                   <div className="mt-2">
@@ -1299,10 +1311,10 @@ export default function Step2LearnerProfile({
                   Permanent Barangay <span className="text-red-700">*</span>
                 </label>
                 {permanentMuniMode === "DUMALNEG" ? (
-                  <select
+                  <CustomSelect
                     value={(data.permanentBarangay || "CABARITAN").toUpperCase()}
-                    onChange={(e) => {
-                      onChange({ permanentBarangay: e.target.value.toUpperCase() });
+                    onChange={(val) => {
+                      onChange({ permanentBarangay: val.toUpperCase() });
                       if (errors.permanentBarangay) {
                         setErrors((prev) => {
                           const next = { ...prev };
@@ -1311,14 +1323,14 @@ export default function Step2LearnerProfile({
                         });
                       }
                     }}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-md"
-                  >
-                    {DUMALNEG_BARANGAYS.map((brgy) => (
-                      <option key={brgy} value={brgy.toUpperCase()} className="uppercase font-bold">
-                        BRGY. {brgy.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+                    options={DUMALNEG_BARANGAYS.map((brgy) => ({
+                      value: brgy.toUpperCase(),
+                      label: `BRGY. ${brgy.toUpperCase()}`,
+                    }))}
+                    placeholder="Select Barangay"
+                    fullWidth
+                    error={Boolean(errors.permanentBarangay)}
+                  />
                 ) : (
                   <input
                     type="text"

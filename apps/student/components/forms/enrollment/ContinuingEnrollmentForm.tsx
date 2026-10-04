@@ -15,6 +15,7 @@ import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/authContext";
 import { extractTermNumber } from "@/lib/utils/academicTerm";
+import CustomSelect from "@/components/CustomSelect";
 
 interface ContinuingEnrollmentFormProps {
   priorApprovedApp: any;
@@ -1236,10 +1237,10 @@ export default function ContinuingEnrollmentForm({
                   <label className="block text-xs font-bold text-slate-900 mb-1">
                     Senior High Track <span className="text-red-700">*</span>
                   </label>
-                  <select
+                  <CustomSelect
                     value={currentTrack}
-                    onChange={(e) => {
-                      const newTrack = e.target.value;
+                    onChange={(val) => {
+                      const newTrack = val;
                       const defaultStrand =
                         newTrack === "Academic Track" ? "STEM" : "TVL-ICT";
                       setFormData((prev) => ({
@@ -1253,37 +1254,39 @@ export default function ContinuingEnrollmentForm({
                         },
                       }));
                     }}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none rounded-md"
-                  >
-                    <option value="Academic Track">Academic Track</option>
-                    <option value="Technical-Vocational-Livelihood Track">
-                      Technical-Vocational-Livelihood (TVL) Track
-                    </option>
-                  </select>
+                    options={[
+                      { value: "Academic Track", label: "Academic Track" },
+                      {
+                        value: "Technical-Vocational-Livelihood Track",
+                        label: "Technical-Vocational-Livelihood (TVL) Track",
+                      },
+                    ]}
+                    placeholder="Select Senior High Track"
+                    fullWidth
+                  />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-900 mb-1">
                     Specialized Strand <span className="text-red-700">*</span>
                   </label>
-                  <select
+                  <CustomSelect
                     value={currentStrand}
-                    onChange={(e) => {
-                      const newStrand = e.target.value;
+                    onChange={(val) => {
+                      const newStrand = val;
                       setFormData((prev) => ({
                         ...prev,
                         targetStrand: newStrand,
                         step1: { ...prev.step1, targetStrand: newStrand },
                       }));
                     }}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none rounded-md"
-                  >
-                    {availableStrands.map((s) => (
-                      <option key={s.code} value={s.code}>
-                        {s.code} - {s.name}
-                      </option>
-                    ))}
-                  </select>
+                    options={availableStrands.map((s) => ({
+                      value: s.code,
+                      label: `${s.code} - ${s.name}`,
+                    }))}
+                    placeholder="Select Specialized Strand"
+                    fullWidth
+                  />
                 </div>
               </div>
             </div>

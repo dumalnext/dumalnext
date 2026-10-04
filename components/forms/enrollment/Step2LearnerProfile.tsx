@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { DUMALNEG_BARANGAYS } from "@/lib/types/enrollment";
+import CustomSelect from "@/components/CustomSelect";
 
 interface Step2LearnerProfileProps {
   data: FullEnrollmentFormData;
@@ -394,19 +395,21 @@ export default function Step2LearnerProfile({
             <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
               Extension Name <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
-            <select
+            <CustomSelect
               value={data.extensionName || ""}
-              onChange={(e) => onChange({ extensionName: e.target.value })}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
-            >
-              <option value="">None</option>
-              <option value="JR.">JR.</option>
-              <option value="SR.">SR.</option>
-              <option value="II">II</option>
-              <option value="III">III</option>
-              <option value="IV">IV</option>
-              <option value="V">V</option>
-            </select>
+              onChange={(val) => onChange({ extensionName: val })}
+              options={[
+                { value: "", label: "None" },
+                { value: "JR.", label: "JR." },
+                { value: "SR.", label: "SR." },
+                { value: "II", label: "II" },
+                { value: "III", label: "III" },
+                { value: "IV", label: "IV" },
+                { value: "V", label: "V" },
+              ]}
+              placeholder="None"
+              fullWidth
+            />
           </div>
         </div>
       </div>
@@ -532,17 +535,19 @@ export default function Step2LearnerProfile({
             <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
               Mother Tongue <span className="text-red-700">*</span>
             </label>
-            <select
+            <CustomSelect
               value={data.motherTongue || "Ilokano"}
-              onChange={(e) => onChange({ motherTongue: e.target.value })}
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
-            >
-              <option value="Ilokano">Ilokano</option>
-              <option value="Isnag">Isnag</option>
-              <option value="Tagalog">Tagalog</option>
-              <option value="English">English</option>
-              <option value="Other">Other</option>
-            </select>
+              onChange={(val) => onChange({ motherTongue: val })}
+              options={[
+                { value: "Ilokano", label: "Ilokano" },
+                { value: "Isnag", label: "Isnag" },
+                { value: "Tagalog", label: "Tagalog" },
+                { value: "English", label: "English" },
+                { value: "Other", label: "Other" },
+              ]}
+              placeholder="Select Mother Tongue"
+              fullWidth
+            />
           </div>
 
           {/* Religion */}
@@ -746,17 +751,17 @@ export default function Step2LearnerProfile({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Barangay <span className="text-red-700">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={(data.currentBarangay || "CABARITAN").toUpperCase()}
-                onChange={(e) => handleCurrentAddressChange({ currentBarangay: e.target.value.toUpperCase() })}
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
-              >
-                {DUMALNEG_BARANGAYS.map((brgy) => (
-                  <option key={brgy} value={brgy.toUpperCase()} className="uppercase font-bold">
-                    BRGY. {brgy.toUpperCase()}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => handleCurrentAddressChange({ currentBarangay: val.toUpperCase() })}
+                options={DUMALNEG_BARANGAYS.map((brgy) => ({
+                  value: brgy.toUpperCase(),
+                  label: `BRGY. ${brgy.toUpperCase()}`,
+                }))}
+                placeholder="Select Barangay"
+                fullWidth
+                error={Boolean(errors.currentBarangay)}
+              />
               {errors.currentBarangay && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.currentBarangay}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ApplicantType } from "@/lib/types/enrollment";
+import CustomSelect from "@/components/CustomSelect";
 
 export interface Step1Data {
   isGraded: boolean;
@@ -541,22 +542,21 @@ export default function Step1ApplicantType({
               <label className="block text-xs font-bold text-slate-900 mb-1">
                 Last Grade Level Completed <span className="text-red-700">*</span>
               </label>
-              <select
-                value={data.lastGradeCompleted || ""}
-                onChange={(e) =>
+              <CustomSelect
+                value={data.lastGradeCompleted?.toString() || ""}
+                onChange={(val) =>
                   onChange({
-                    lastGradeCompleted: e.target.value ? Number(e.target.value) : "",
+                    lastGradeCompleted: val ? Number(val) : "",
                   })
                 }
-                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-md"
-              >
-                <option value="">-- Select Completed Grade Level --</option>
-                {availableCompletedGrades.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                options={availableCompletedGrades.map((opt) => ({
+                  value: opt.value.toString(),
+                  label: opt.label,
+                }))}
+                placeholder="-- Select Completed Grade Level --"
+                fullWidth
+                error={Boolean(errors.lastGradeCompleted)}
+              />
               <span className="text-[11px] text-slate-500 mt-1 block">
                 Prerequisite for Grade {data.targetGradeLevel || 7}: Successful completion of Grade {(Number(data.targetGradeLevel) || 7) - 1}.
               </span>

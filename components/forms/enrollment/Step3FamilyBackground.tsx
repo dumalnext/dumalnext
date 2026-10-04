@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
+import CustomSelect from "@/components/CustomSelect";
 
 interface Step3FamilyBackgroundProps {
   data: FullEnrollmentFormData;
@@ -779,10 +780,10 @@ export default function Step3FamilyBackground({
               <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                 Guardian&apos;s Relationship to Learner <span className="text-red-700">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={data.guardianRelationship || ""}
-                onChange={(e) => {
-                  onChange({ guardianRelationship: e.target.value });
+                onChange={(val) => {
+                  onChange({ guardianRelationship: val });
                   if (errors.guardianRelationship) {
                     setErrors((prev) => {
                       const next = { ...prev };
@@ -791,17 +792,15 @@ export default function Step3FamilyBackground({
                     });
                   }
                 }}
-                className={`w-full sm:w-80 p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none ${
-                  errors.guardianRelationship ? "border-red-600 bg-red-50" : "border-slate-300"
-                }`}
-              >
-                <option value="">-- SELECT RELATIONSHIP --</option>
-                {GUARDIAN_RELATIONSHIPS.map((rel) => (
-                  <option key={rel} value={rel}>
-                    {rel}
-                  </option>
-                ))}
-              </select>
+                options={GUARDIAN_RELATIONSHIPS.map((rel) => ({
+                  value: rel,
+                  label: rel,
+                }))}
+                placeholder="-- SELECT RELATIONSHIP --"
+                className="w-full sm:w-80"
+                fullWidth
+                error={Boolean(errors.guardianRelationship)}
+              />
               {errors.guardianRelationship && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianRelationship}</p>
               )}
