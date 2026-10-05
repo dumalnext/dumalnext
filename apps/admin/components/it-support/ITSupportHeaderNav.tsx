@@ -104,7 +104,7 @@ export default function ITSupportHeaderNav({
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
               }`}
             >
-              [ 2. Classrooms &amp; Facilities ]
+              2. Classrooms &amp; Facilities
             </button>
 
             <button
@@ -116,7 +116,7 @@ export default function ITSupportHeaderNav({
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
               }`}
             >
-              [ 3. User Accounts &amp; Roles ]
+              3. User Accounts &amp; Roles
             </button>
 
             <button
@@ -128,7 +128,7 @@ export default function ITSupportHeaderNav({
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
               }`}
             >
-              [ 4. System Diagnostics &amp; Privacy ]
+              4. System Diagnostics &amp; Privacy
             </button>
           </div>
         </div>

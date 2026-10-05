@@ -281,8 +281,8 @@ export default function CurriculumSubjectsConsole() {
         setModalLockedTrack(null);
         setSuccessMessage(
           isEditing
-            ? `Subject [ ${formCode.toUpperCase()} ] updated successfully.`
-            : `New subject [ ${formCode.toUpperCase()} ] created successfully.`
+            ? `Subject ${formCode.toUpperCase()} updated successfully.`
+            : `New subject ${formCode.toUpperCase()} created successfully.`
         );
         fetchSubjects();
         broadcastCurriculumChanged();
@@ -313,7 +313,7 @@ export default function CurriculumSubjectsConsole() {
       const json = await res.json();
       if (json.success) {
         setSuccessMessage(
-          `Subject [ ${deleteSubjectTarget.subject_code} ] removed successfully.`
+          `Subject ${deleteSubjectTarget.subject_code} removed successfully.`
         );
         setDeleteSubjectTarget(null);
         fetchSubjects();
@@ -398,7 +398,7 @@ export default function CurriculumSubjectsConsole() {
       return (
         <div className="p-6 text-center space-y-2 bg-slate-50/50">
           <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-            [ {emptyMessage} ]
+            {emptyMessage}
           </span>
           <p className="text-xs text-slate-600 max-w-md mx-auto">
             No subjects currently match this category or active filter. Click below to add a new subject.
@@ -711,7 +711,7 @@ export default function CurriculumSubjectsConsole() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-              [ DEPED COURSE CATALOG &amp; SUBJECT OFFERINGS ]
+              DEPED COURSE CATALOG &amp; SUBJECT OFFERINGS
             </span>
             <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 uppercase">
               Live Subject Catalog
@@ -1090,7 +1090,7 @@ export default function CurriculumSubjectsConsole() {
               <div className="bg-blue-50 border-b-2 border-blue-200 px-6 py-2.5 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-[#002060] uppercase">
-                    [ Track Mode: Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track.toUpperCase()} ]
+                    Track Mode: Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track.toUpperCase()}
                   </span>
                   <span className="text-slate-600 font-bold uppercase">
                     • {modalLockedTrack.category === "Core" ? "Core Subject" : "Elective / Specialized"}

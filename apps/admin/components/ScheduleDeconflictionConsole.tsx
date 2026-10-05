@@ -831,7 +831,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            [ View by Class Section (Timetable Matrix) ]
+            View by Class Section (Timetable Matrix)
           </button>
           <button
             type="button"
@@ -842,7 +842,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            [ View by Teacher Load (Timetable Matrix) ]
+            View by Teacher Load (Timetable Matrix)
           </button>
           <button
             type="button"
@@ -853,7 +853,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            [ Master Timetable Registry ({schedules.length}) ]
+            Master Timetable Registry ({schedules.length})
           </button>
         </div>
 
@@ -1004,7 +1004,7 @@ export default function ScheduleDeconflictionConsole() {
                               <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                             </td>
                             <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                              [ {slot.start} – {slot.end} &bull; {slot.name} ]
+                              {slot.start} – {slot.end} &bull; {slot.name}
                             </td>
                           </tr>
                         );
@@ -1142,7 +1142,7 @@ export default function ScheduleDeconflictionConsole() {
                               <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                             </td>
                             <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                              [ {slot.start} – {slot.end} &bull; {slot.name} ]
+                              {slot.start} – {slot.end} &bull; {slot.name}
                             </td>
                           </tr>
                         );
@@ -1244,7 +1244,7 @@ export default function ScheduleDeconflictionConsole() {
             <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border-none print:shadow-none">
               <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">
                 <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                  [ MASTER TIMETABLE ALLOCATIONS &bull; {masterlistFiltered.length} ITEMS ]
+                  MASTER TIMETABLE ALLOCATIONS &bull; {masterlistFiltered.length} ITEMS
                 </span>
                 <span className="text-[10px] font-mono text-slate-500 uppercase">
                   DepEd Conflict-Free Timetable Engine
@@ -1328,7 +1328,7 @@ export default function ScheduleDeconflictionConsole() {
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
-                  [ SCHEDULE BUILDER &bull; DECONFLICTION GUARD ]
+                  SCHEDULE BUILDER &bull; DECONFLICTION GUARD
                 </span>
                 <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-white mt-0.5">
                   Assign Class Timetable Period
@@ -1609,7 +1609,7 @@ export default function ScheduleDeconflictionConsole() {
               {/* Algorithm Specifications Card */}
               <div className="p-4 bg-slate-50 border-2 border-slate-300 space-y-3">
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                  [ Automated Deconfliction Logic &amp; Constraints ]
+                  Automated Deconfliction Logic &amp; Constraints
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
                   <div className="p-2.5 bg-white border border-slate-200">
@@ -1695,7 +1695,7 @@ export default function ScheduleDeconflictionConsole() {
                 <div className="p-4 bg-emerald-50 border-2 border-emerald-500 space-y-3 animate-in fade-in duration-200">
                   <div className="flex items-center justify-between border-b border-emerald-300 pb-2">
                     <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-                      [ AUDIT REPORT: 100% CONFLICT-FREE TIMETABLE CERTIFIED ]
+                      AUDIT REPORT: 100% CONFLICT-FREE TIMETABLE CERTIFIED
                     </span>
                     <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase">
                       Zero Collisions

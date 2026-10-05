@@ -650,7 +650,7 @@ export default function AdjudicationConsole() {
           )}
           {(app as any).isTransferRequested && (
             <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-400">
-              [ TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"} ]
+              TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"}
             </span>
           )}
           <div className="mt-1">
@@ -756,7 +756,7 @@ export default function AdjudicationConsole() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
           <span className="font-mono font-bold text-[#002060] text-xs uppercase tracking-wider">
-            [ ACTIVE ACADEMIC PERIOD QUEUE &bull; S.Y. {activeTerm?.schoolYear || "2026-2027"} &bull; {activeTerm?.termName || "Trimester 1"} ]
+            ACTIVE ACADEMIC PERIOD QUEUE &bull; S.Y. {activeTerm?.schoolYear || "2026-2027"} &bull; {activeTerm?.termName || "Trimester 1"}
           </span>
           <span className="text-xs text-slate-600">
             {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE" ? (

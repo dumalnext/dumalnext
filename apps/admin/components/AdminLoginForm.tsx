@@ -77,7 +77,7 @@ export default function AdminLoginForm() {
       {/* Notice Banner */}
       <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200">
         <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
-          [ PORTAL 03 &bull; DUMALNEG NATIONAL HIGH SCHOOL &bull; ADMISSIONS ]
+          PORTAL 03 &bull; DUMALNEG NATIONAL HIGH SCHOOL &bull; ADMISSIONS
         </span>
         <h2 className="text-lg sm:text-xl font-bold text-slate-900 uppercase">
           School Administration &amp; Enrollment Adjudication Console

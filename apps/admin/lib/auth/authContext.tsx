@@ -289,7 +289,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       if (adminUserRecord.user_role !== "admin") {
         return {
           success: false,
-          error: `Access denied. Account role is [ ${adminUserRecord.user_role} ]. Administrator credentials are required.`,
+          error: `Access denied. Account role is "${adminUserRecord.user_role}". Administrator credentials are required.`,
         };
       }
 

@@ -175,7 +175,7 @@ export default function EnrollmentControlRoom() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-300 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ ENROLLMENT CONTROL ROOM &bull; MASTER SYSTEM OPERATIONS ]
+            ENROLLMENT CONTROL ROOM &bull; MASTER SYSTEM OPERATIONS
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             DepEd Online Enrollment Master Control Room
@@ -318,7 +318,7 @@ export default function EnrollmentControlRoom() {
       <div className="bg-white border-2 border-slate-300 p-5 sm:p-6 space-y-6 shadow-xs">
         <div className="border-b border-slate-200 pb-2">
           <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-            [ DepEd Academic Year (S.Y.) &amp; Term Parameters &bull; Synchronized from IT Support ]
+            DepEd Academic Year (S.Y.) &amp; Term Parameters &bull; Synchronized from IT Support
           </span>
         </div>
 
@@ -363,7 +363,7 @@ export default function EnrollmentControlRoom() {
               Official DepEd Closed Advisory Message (Visible to Students when System is OFF):
             </label>
             <span className="text-[10px] font-mono text-slate-500">
-              [ Markdown &amp; Plain Text Supported ]
+              Markdown &amp; Plain Text Supported
             </span>
           </div>
 
@@ -437,7 +437,7 @@ export default function EnrollmentControlRoom() {
               />
               <span>
                 {settings.isEnrollmentOpen
-                  ? `[ 5-Step Online Enrollment Active for S.Y. ${settings.schoolYear} ]`
+                  ? `5-Step Online Enrollment Active for S.Y. ${settings.schoolYear}`
                   : `DEPED OFFICIAL NOTICE: ONLINE ENROLLMENT IS CURRENTLY CLOSED`}
               </span>
             </div>

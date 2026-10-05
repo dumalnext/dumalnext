@@ -733,7 +733,7 @@ export default function SectionQuotaConsole() {
       const conflict = getExistingAdvisorySection(newAdviser);
       if (conflict) {
         setAddError(
-          `Adviser Conflict Detected: [ ${newAdviser.trim()} ] is already designated as Class Adviser to section [ ${conflict.section_name} ] (Grade ${conflict.grade_level}). Under DepEd staffing rules, a faculty member can only advise ONE section per school year. Please select an available teacher or unassign the previous section first.`
+          `Adviser Conflict Detected: ${newAdviser.trim()} is already designated as Class Adviser to section ${conflict.section_name} (Grade ${conflict.grade_level}). Under DepEd staffing rules, a faculty member can only advise ONE section per school year. Please select an available teacher or unassign the previous section first.`
         );
         return;
       }
@@ -766,7 +766,7 @@ export default function SectionQuotaConsole() {
 
       setStatusNotice({
         type: "success",
-        text: `Section [ ${fullSectionName} ] has been successfully created with a fixed capacity of ${finalCapacity} students (governed by IT Facilities).`,
+        text: `Section ${fullSectionName} has been successfully created with a fixed capacity of ${finalCapacity} students (governed by IT Facilities).`,
       });
 
       // Reset form
@@ -854,7 +854,7 @@ export default function SectionQuotaConsole() {
 
     if (conflictSection && !autoTransferAdviser) {
       setEditError(
-        `Adviser Conflict Detected: [ ${editAdviser.trim()} ] is already designated as Class Adviser to section [ ${conflictSection.section_name} ] (Grade ${conflictSection.grade_level}). Under DepEd staffing policy, a faculty member can only advise ONE section per school year. Please check "1-Click Automated Transfer" below to transfer them automatically, or select an available teacher.`
+        `Adviser Conflict Detected: ${editAdviser.trim()} is already designated as Class Adviser to section ${conflictSection.section_name} (Grade ${conflictSection.grade_level}). Under DepEd staffing policy, a faculty member can only advise ONE section per school year. Please check "1-Click Automated Transfer" below to transfer them automatically, or select an available teacher.`
       );
       return;
     }
@@ -901,8 +901,8 @@ export default function SectionQuotaConsole() {
       setStatusNotice({
         type: "success",
         text: conflictSection && autoTransferAdviser
-          ? `Automated Advisory Transfer Complete: [ ${editAdviser.trim()} ] was unassigned from [ ${conflictSection.section_name} ] and successfully assigned as Class Adviser of [ ${fullSectionName} ].`
-          : `Section [ ${fullSectionName} ] updated successfully (Class Adviser: ${editAdviser.trim() || "Unassigned"}).`,
+          ? `Automated Advisory Transfer Complete: ${editAdviser.trim()} was unassigned from ${conflictSection.section_name} and successfully assigned as Class Adviser of ${fullSectionName}.`
+          : `Section ${fullSectionName} updated successfully (Class Adviser: ${editAdviser.trim() || "Unassigned"}).`,
       });
 
       setEditingSection(null);
@@ -921,13 +921,13 @@ export default function SectionQuotaConsole() {
   const handleDeleteSection = async (sec: SectionDetail) => {
     if (sec.enrolledCount > 0) {
       alert(
-        `Cannot delete section [ ${sec.section_name} ]:\n\nThere are currently ${sec.enrolledCount} student(s) officially enrolled in this section.\n\nDepEd Quota Control requires reassigning these learners to another section before removing this section.`
+        `Cannot delete section ${sec.section_name}:\n\nThere are currently ${sec.enrolledCount} student(s) officially enrolled in this section.\n\nDepEd Quota Control requires reassigning these learners to another section before removing this section.`
       );
       return;
     }
 
     const confirmed = window.confirm(
-      `DepEd Administrative Action:\n\nAre you sure you want to permanently remove section [ ${sec.section_name} ]?\n\nThis action cannot be undone.`
+      `DepEd Administrative Action:\n\nAre you sure you want to permanently remove section ${sec.section_name}?\n\nThis action cannot be undone.`
     );
     if (!confirmed) return;
 
@@ -943,7 +943,7 @@ export default function SectionQuotaConsole() {
 
       setStatusNotice({
         type: "success",
-        text: `Section [ ${sec.section_name} ] has been removed successfully.`,
+        text: `Section ${sec.section_name} has been removed successfully.`,
       });
 
       await fetchSections(true);
@@ -965,7 +965,7 @@ export default function SectionQuotaConsole() {
 
     if (targetSec.enrolledCount >= targetSec.capacity) {
       const proceed = window.confirm(
-        `Warning: Target section [ ${targetSec.section_name} ] is already at full capacity (${targetSec.enrolledCount}/${targetSec.capacity}).\n\nDo you wish to override and reassign this student anyway?`
+        `Warning: Target section ${targetSec.section_name} is already at full capacity (${targetSec.enrolledCount}/${targetSec.capacity}).\n\nDo you wish to override and reassign this student anyway?`
       );
       if (!proceed) return;
     }
@@ -983,7 +983,7 @@ export default function SectionQuotaConsole() {
 
       setReassignMessage({
         type: "success",
-        text: `Learner successfully reassigned to [ ${targetSec.section_name} ].`,
+        text: `Learner successfully reassigned to ${targetSec.section_name}.`,
       });
 
       // Refresh current roster and section stats
@@ -1035,7 +1035,7 @@ export default function SectionQuotaConsole() {
 
       setReassignMessage({
         type: "success",
-        text: `Learner [ ${studentName} ] was removed from this section roster successfully.`,
+        text: `Learner ${studentName} was removed from this section roster successfully.`,
       });
 
       // Refresh current roster and section stats
@@ -1250,7 +1250,7 @@ export default function SectionQuotaConsole() {
               : "bg-red-50 border-red-500 text-red-950"
           }`}
         >
-          <span>[ {statusNotice.type === "success" ? "Notice" : "Error"} ]: {statusNotice.text}</span>
+          <span>{statusNotice.type === "success" ? "Notice" : "Error"}: {statusNotice.text}</span>
           <button
             type="button"
             onClick={() => setStatusNotice(null)}

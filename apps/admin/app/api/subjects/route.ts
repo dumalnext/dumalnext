@@ -408,7 +408,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       subject: newSubject,
-      message: `Subject [ ${cleanCode} ] created successfully.`,
+      message: `Subject ${cleanCode} created successfully.`,
     }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
     console.error("POST /api/subjects error:", err);
@@ -521,7 +521,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({
       success: true,
       subject: updatedSubject,
-      message: `Subject [ ${cleanCode} ] updated successfully.`,
+      message: `Subject ${cleanCode} updated successfully.`,
     }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
     console.error("PUT /api/subjects error:", err);
@@ -560,7 +560,7 @@ export async function DELETE(req: Request) {
         if (schedData && schedData.length > 0) {
           return NextResponse.json({
             success: false,
-            error: `Cannot delete subject [ ${cleanCode} ] because it is actively assigned in one or more class schedules. Please remove or re-assign class schedules first.`,
+            error: `Cannot delete subject ${cleanCode} because it is actively assigned in one or more class schedules. Please remove or re-assign class schedules first.`,
           }, { status: 409, headers: NO_CACHE_HEADERS });
         }
       } catch {}
@@ -616,7 +616,7 @@ export async function DELETE(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Subject [ ${cleanCode} ] removed successfully.`,
+      message: `Subject ${cleanCode} removed successfully.`,
     }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
     console.error("DELETE /api/subjects error:", err);

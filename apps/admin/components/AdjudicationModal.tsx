@@ -512,8 +512,8 @@ export default function AdjudicationModal({
 
       setActionSuccess(
         isAlreadyApproved
-          ? `Section assignments updated successfully: [ ${trackSectionName || selectedSectionId} ]${isSHS ? ` & [ ${elecSectionName || selectedElectiveSectionId} ]` : ""}. Real-time rosters updated.`
-          : `Application officially APPROVED & ENROLLED with official section assignments: [ ${trackSectionName || selectedSectionId} ]${isSHS ? ` & [ ${elecSectionName || selectedElectiveSectionId} ]` : ""}. Real-time rosters updated.`
+          ? `Section assignments updated successfully: ${trackSectionName || selectedSectionId}${isSHS ? ` & ${elecSectionName || selectedElectiveSectionId}` : ""}. Real-time rosters updated.`
+          : `Application officially APPROVED & ENROLLED with official section assignments: ${trackSectionName || selectedSectionId}${isSHS ? ` & ${elecSectionName || selectedElectiveSectionId}` : ""}. Real-time rosters updated.`
       );
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
@@ -820,7 +820,7 @@ export default function AdjudicationModal({
             <div className="space-y-5">
               <div className="border-b border-slate-200 pb-2">
                 <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-                  [ DepEd Family Background &bull; Parent &amp; Legal Guardian Records ]
+                  DepEd Family Background &bull; Parent &amp; Legal Guardian Records
                 </span>
               </div>
 
@@ -894,7 +894,7 @@ export default function AdjudicationModal({
             <div className="space-y-5">
               <div className="border-b border-slate-200 pb-2">
                 <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-                  [ DepEd Academic Classification, Feeder School, &amp; Modality ]
+                  DepEd Academic Classification, Feeder School, &amp; Modality
                 </span>
               </div>
 
@@ -1021,7 +1021,7 @@ export default function AdjudicationModal({
             <div className="space-y-5">
               <div className="border-b border-slate-200 pb-2">
                 <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-                  [ Submitted Documentary Requirements &amp; Section Assignment ]
+                  Submitted Documentary Requirements &amp; Section Assignment
                 </span>
               </div>
 
