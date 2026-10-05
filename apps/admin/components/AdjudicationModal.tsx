@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 import DocumentViewerModal, { DocumentInspectionItem } from "./DocumentViewerModal";
 import { generateDepEdDocPreview } from "@/lib/utils/documentPreviewGenerator";
@@ -1214,30 +1215,29 @@ export default function AdjudicationModal({
                         </div>
                       ) : (
                         <div className="space-y-1.5">
-                          <select
+                          <CustomSelect
+                            fullWidth
+                            placeholder="-- Select Official Track Section (Required) --"
                             value={selectedSectionId}
-                            onChange={(e) => {
-                              setSelectedSectionId(e.target.value);
-                              if (e.target.value) {
+                            error={sectionError}
+                            onChange={(val) => {
+                              setSelectedSectionId(val);
+                              if (val) {
                                 setSectionError(false);
                                 if (actionError.includes("Track Section")) setActionError("");
                               }
                             }}
-                            className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
-                              sectionError ? "border-red-600 bg-red-50/20" : selectedSectionId ? "border-blue-600" : "border-slate-400"
-                            }`}
-                          >
-                            <option value="">-- Select Official Track Section (Required) --</option>
-                            {eligibleSections.map((sec) => {
+                            options={eligibleSections.map((sec) => {
                               const isFull = (sec.enrolledCount || 0) >= sec.capacity;
-                              return (
-                                <option key={sec.id} value={sec.id}>
-                                  {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
-                                  {isFull ? " (At Full Capacity)" : ""}
-                                </option>
-                              );
+                              return {
+                                value: sec.id,
+                                label: sec.section_name,
+                                sublabel: `Enrolled: ${sec.enrolledCount || 0} / Max Capacity: ${sec.capacity}`,
+                                badge: isFull ? "FULL" : `${sec.enrolledCount || 0}/${sec.capacity}`,
+                                badgeVariant: isFull ? "danger" : "default",
+                              };
                             })}
-                          </select>
+                          />
                           {selectedSectionId && (
                             <div className="text-[10px] font-mono text-blue-900 bg-blue-50 p-1.5 border border-blue-200">
                               Track Confirmed: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong>
@@ -1307,26 +1307,29 @@ export default function AdjudicationModal({
                         </div>
                       ) : (
                         <div className="space-y-1.5">
-                          <select
+                          <CustomSelect
+                            fullWidth
+                            placeholder="-- Select Elective Section (Required) --"
                             value={selectedElectiveSectionId}
-                            onChange={(e) => {
-                              setSelectedElectiveSectionId(e.target.value);
-                              if (e.target.value) {
+                            error={electiveSectionError}
+                            onChange={(val) => {
+                              setSelectedElectiveSectionId(val);
+                              if (val) {
                                 setElectiveSectionError(false);
                                 if (actionError.includes("Elective Section")) setActionError("");
                               }
                             }}
-                            className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
-                              electiveSectionError ? "border-red-600 bg-red-50/20" : selectedElectiveSectionId ? "border-purple-600" : "border-slate-400"
-                            }`}
-                          >
-                            <option value="">-- Select Elective Section (Required) --</option>
-                            {displayedElectiveSections.map((sec) => (
-                              <option key={sec.id} value={sec.id}>
-                                {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
-                              </option>
-                            ))}
-                          </select>
+                            options={displayedElectiveSections.map((sec) => {
+                              const isFull = (sec.enrolledCount || 0) >= sec.capacity;
+                              return {
+                                value: sec.id,
+                                label: sec.section_name,
+                                sublabel: `Enrolled: ${sec.enrolledCount || 0} / Max Capacity: ${sec.capacity}`,
+                                badge: isFull ? "FULL" : `${sec.enrolledCount || 0}/${sec.capacity}`,
+                                badgeVariant: isFull ? "danger" : "default",
+                              };
+                            })}
+                          />
 
                           {/* Toggle to show other electives if needed */}
                           {matchedElectiveSection && (
@@ -1411,36 +1414,31 @@ export default function AdjudicationModal({
                     </div>
                   ) : (
                     <div className="space-y-1.5">
-                      <select
+                      <CustomSelect
+                        fullWidth
+                        placeholder="-- Select Section Assignment (Required for Official Approval) --"
                         value={selectedSectionId}
-                        onChange={(e) => {
-                          setSelectedSectionId(e.target.value);
-                          if (e.target.value) {
+                        error={sectionError}
+                        onChange={(val) => {
+                          setSelectedSectionId(val);
+                          if (val) {
                             setSectionError(false);
                             if (actionError.includes("Official Section")) {
                               setActionError("");
                             }
                           }
                         }}
-                        className={`w-full p-2.5 bg-white border-2 text-xs font-bold text-slate-900 outline-none transition-colors ${
-                          sectionError
-                            ? "border-red-600 bg-red-50/20"
-                            : selectedSectionId
-                            ? "border-emerald-600"
-                            : "border-slate-400 focus:border-[#002060]"
-                        }`}
-                      >
-                        <option value="">-- Select Section Assignment (Required for Official Approval) --</option>
-                        {eligibleSections.map((sec) => {
+                        options={eligibleSections.map((sec) => {
                           const isFull = (sec.enrolledCount || 0) >= sec.capacity;
-                          return (
-                            <option key={sec.id} value={sec.id}>
-                              {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
-                              {isFull ? " (At Full Capacity)" : ""}
-                            </option>
-                          );
+                          return {
+                            value: sec.id,
+                            label: sec.section_name,
+                            sublabel: `Enrolled: ${sec.enrolledCount || 0} / Max Capacity: ${sec.capacity}`,
+                            badge: isFull ? "FULL" : `${sec.enrolledCount || 0}/${sec.capacity}`,
+                            badgeVariant: isFull ? "danger" : "default",
+                          };
                         })}
-                      </select>
+                      />
 
                       {sectionError && (
                         <p className="text-[11px] font-bold text-red-700">

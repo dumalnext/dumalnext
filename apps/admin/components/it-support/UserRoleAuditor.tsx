@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 
 export interface SystemUser {
@@ -778,10 +779,11 @@ export default function UserRoleAuditor() {
                 <label className="block font-bold uppercase text-slate-800 mb-1">
                   User Role Classification <span className="text-red-700">*</span>
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
                   value={formData.userRole}
-                  onChange={(e) => {
-                    const role = e.target.value;
+                  onChange={(val) => {
+                    const role = val as any;
                     let prefix = "DNHS-TCH";
                     if (role === "admin") prefix = "DNHS-ADM";
                     if (role === "student") prefix = "DNHS-STU";
@@ -792,13 +794,13 @@ export default function UserRoleAuditor() {
                       userId: `${prefix}-${Math.floor(100 + Math.random() * 900)}`,
                     });
                   }}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
-                >
-                  <option value="teacher">Teacher (Faculty Member)</option>
-                  <option value="admin">School Administrator (Registrar)</option>
-                  <option value="it_support">IT Support Staff</option>
-                  <option value="student">Student (Learner)</option>
-                </select>
+                  options={[
+                    { value: "teacher", label: "Teacher (Faculty Member)", badge: "Faculty" },
+                    { value: "admin", label: "School Administrator (Registrar)", badge: "Admin" },
+                    { value: "it_support", label: "IT Support Staff", badge: "IT" },
+                    { value: "student", label: "Student (Learner)", badge: "Student" },
+                  ]}
+                />
               </div>
 
               <div>
@@ -860,15 +862,16 @@ export default function UserRoleAuditor() {
                   <label className="block font-bold uppercase text-slate-800 mb-1">
                     Faculty Department
                   </label>
-                  <select
+                  <CustomSelect
+                    fullWidth
                     value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value="CROSS_LEVEL">CROSS_LEVEL (JHS &amp; SHS)</option>
-                    <option value="JHS">Junior High School</option>
-                    <option value="SHS">Senior High School</option>
-                  </select>
+                    onChange={(val) => setFormData({ ...formData, department: val })}
+                    options={[
+                      { value: "CROSS_LEVEL", label: "CROSS_LEVEL (JHS & SHS)", badge: "All" },
+                      { value: "JHS", label: "Junior High School", badge: "JHS" },
+                      { value: "SHS", label: "Senior High School", badge: "SHS" },
+                    ]}
+                  />
                 </div>
               )}
 

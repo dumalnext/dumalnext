@@ -81,7 +81,9 @@ export default function CustomSelect({
   return (
     <div
       ref={containerRef}
-      className={`relative ${fullWidth ? "w-full" : "inline-block"} text-left ${className}`}
+      className={`relative ${fullWidth ? "w-full" : "inline-block"} text-left ${
+        isOpen ? "z-30" : ""
+      } ${className}`}
     >
       {/* Trigger Button */}
       <button

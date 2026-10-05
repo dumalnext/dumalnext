@@ -1368,19 +1368,17 @@ export default function ScheduleDeconflictionConsole() {
                 <label className="text-xs font-bold text-slate-800 uppercase block">
                   Target Class Section: <span className="text-red-600">*</span>
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
+                  placeholder="-- Choose Class Section --"
                   value={formSectionId}
-                  onChange={(e) => handleSectionChange(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                  required
-                >
-                  <option value="">-- Choose Class Section --</option>
-                  {sections.map((sec) => (
-                    <option key={sec.id} value={sec.id}>
-                      {sec.section_name} (Grade {sec.grade_level}{sec.strand ? ` • ${sec.strand}` : ""})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleSectionChange(val)}
+                  options={sections.map((sec) => ({
+                    value: sec.id,
+                    label: `${sec.section_name} (Grade ${sec.grade_level}${sec.strand ? ` • ${sec.strand}` : ""})`,
+                    badge: `Gr. ${sec.grade_level}`,
+                  }))}
+                />
               </div>
 
               {/* Smart Automation Status Banner */}
@@ -1407,27 +1405,29 @@ export default function ScheduleDeconflictionConsole() {
                   <label className="text-xs font-bold text-slate-800 uppercase block">
                     Curricular Subject: <span className="text-red-600">*</span>
                   </label>
-                  <select
+                  <CustomSelect
+                    fullWidth
+                    placeholder={
+                      selectedFormSection
+                        ? `-- Choose Grade ${selectedFormSection.grade_level} Subject --`
+                        : "-- Choose DepEd Subject --"
+                    }
                     value={formSubjectCode}
-                    onChange={(e) => {
-                      setFormSubjectCode(e.target.value);
-                      const s = subjects.find((sub) => sub.subject_code === e.target.value);
+                    onChange={(val) => {
+                      setFormSubjectCode(val);
+                      const s = subjects.find((sub) => sub.subject_code === val);
                       if (s) setFormCustomSubject(s.subject_name);
                     }}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono text-slate-900 outline-none focus:border-[#002060]"
-                  >
-                    <option value="">
-                      {selectedFormSection
-                        ? `-- Choose Grade ${selectedFormSection.grade_level} Subject --`
-                        : "-- Choose DepEd Subject --"}
-                    </option>
-                    {filteredFormSubjects.map((sub) => (
-                      <option key={sub.id} value={sub.subject_code}>
-                        {sub.subject_name} ({sub.subject_code}) {sub.subject_type ? `• ${sub.subject_type}` : ""}
-                      </option>
-                    ))}
-                    <option value="CUSTOM">Custom / Special Subject</option>
-                  </select>
+                    options={[
+                      ...filteredFormSubjects.map((sub) => ({
+                        value: sub.subject_code,
+                        label: `${sub.subject_name} (${sub.subject_code})`,
+                        badge: sub.subject_type || "Subject",
+                        sublabel: `Code: ${sub.subject_code}`,
+                      })),
+                      { value: "CUSTOM", label: "Custom / Special Subject", badge: "Custom" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-1">
@@ -1449,19 +1449,18 @@ export default function ScheduleDeconflictionConsole() {
                 <label className="text-xs font-bold text-slate-800 uppercase block">
                   Assigned Faculty Member (Teacher): <span className="text-red-600">*</span>
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
+                  placeholder="-- Choose Faculty Member --"
                   value={formTeacherId}
-                  onChange={(e) => setFormTeacherId(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                  required
-                >
-                  <option value="">-- Choose Faculty Member --</option>
-                  {teachers.map((tch) => (
-                    <option key={tch.id} value={tch.id}>
-                      {tch.fullName} ({tch.department} &bull; {tch.email})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormTeacherId(val)}
+                  options={teachers.map((tch) => ({
+                    value: tch.id,
+                    label: tch.fullName,
+                    sublabel: `${tch.department} • ${tch.email}`,
+                    badge: tch.department,
+                  }))}
+                />
               </div>
 
               {/* 4. Classroom Facility Selection */}
@@ -1469,19 +1468,18 @@ export default function ScheduleDeconflictionConsole() {
                 <label className="text-xs font-bold text-slate-800 uppercase block">
                   Classroom / Physical Facility: <span className="text-red-600">*</span>
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
+                  placeholder="-- Choose Classroom or Laboratory --"
                   value={formClassroomId}
-                  onChange={(e) => setFormClassroomId(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-300 text-xs font-mono text-slate-900 outline-none focus:border-[#002060]"
-                  required
-                >
-                  <option value="">-- Choose Classroom or Laboratory --</option>
-                  {classrooms.map((rm) => (
-                    <option key={rm.id} value={rm.id}>
-                      {rm.room_name} ({rm.building})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormClassroomId(val)}
+                  options={classrooms.map((rm) => ({
+                    value: rm.id,
+                    label: rm.room_name,
+                    sublabel: rm.building,
+                    badge: rm.building,
+                  }))}
+                />
               </div>
 
               {/* 5. Day & Time Selection */}
@@ -1490,16 +1488,15 @@ export default function ScheduleDeconflictionConsole() {
                   <label className="text-xs font-bold text-slate-800 uppercase block">
                     Day of Week: <span className="text-red-600">*</span>
                   </label>
-                  <select
+                  <CustomSelect
+                    fullWidth
                     value={formDayOfWeek}
-                    onChange={(e) => setFormDayOfWeek(e.target.value as any)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                    required
-                  >
-                    {DAYS_OF_WEEK.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setFormDayOfWeek(val as any)}
+                    options={DAYS_OF_WEEK.map((d) => ({
+                      value: d,
+                      label: d,
+                    }))}
+                  />
                 </div>
 
                 <div className="space-y-1">

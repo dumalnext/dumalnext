@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 
 export interface Classroom {
   id: string;
@@ -302,20 +303,21 @@ export default function ClassroomFacilityManager() {
                 <label className="block font-bold uppercase text-slate-800 mb-1">
                   Building Location <span className="text-red-700">*</span>
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
+                  placeholder="-- Select Building Location --"
                   value={formData.building}
-                  onChange={(e) => setFormData({ ...formData, building: e.target.value })}
-                  className="w-full p-2 border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
-                >
-                  {PRESET_BUILDINGS.map((bldg) => (
-                    <option key={bldg} value={bldg}>
-                      {bldg}
-                    </option>
-                  ))}
-                  {formData.building && !PRESET_BUILDINGS.includes(formData.building) && (
-                    <option value={formData.building}>{formData.building}</option>
-                  )}
-                </select>
+                  onChange={(val) => setFormData({ ...formData, building: val })}
+                  options={[
+                    ...PRESET_BUILDINGS.map((bldg) => ({
+                      value: bldg,
+                      label: bldg,
+                    })),
+                    ...(formData.building && !PRESET_BUILDINGS.includes(formData.building)
+                      ? [{ value: formData.building, label: formData.building }]
+                      : []),
+                  ]}
+                />
               </div>
 
               <div>

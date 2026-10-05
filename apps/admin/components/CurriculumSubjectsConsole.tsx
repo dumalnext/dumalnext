@@ -1190,10 +1190,11 @@ export default function CurriculumSubjectsConsole() {
                       </span>
                     </div>
                   ) : (
-                    <select
-                      value={formGrade}
-                      onChange={(e) => {
-                        const g = Number(e.target.value);
+                    <CustomSelect
+                      fullWidth
+                      value={String(formGrade)}
+                      onChange={(val) => {
+                        const g = Number(val);
                         setFormGrade(g);
                         if (g <= 10 && formStrand !== "Regular" && formStrand !== "SPS") {
                           setFormStrand("Regular");
@@ -1201,15 +1202,15 @@ export default function CurriculumSubjectsConsole() {
                           setFormStrand("Academic");
                         }
                       }}
-                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                    >
-                      <option value={7}>Grade 7 (JHS)</option>
-                      <option value={8}>Grade 8 (JHS)</option>
-                      <option value={9}>Grade 9 (JHS)</option>
-                      <option value={10}>Grade 10 (JHS)</option>
-                      <option value={11}>Grade 11 (SHS)</option>
-                      <option value={12}>Grade 12 (SHS)</option>
-                    </select>
+                      options={[
+                        { value: "7", label: "Grade 7 (JHS)", badge: "JHS" },
+                        { value: "8", label: "Grade 8 (JHS)", badge: "JHS" },
+                        { value: "9", label: "Grade 9 (JHS)", badge: "JHS" },
+                        { value: "10", label: "Grade 10 (JHS)", badge: "JHS" },
+                        { value: "11", label: "Grade 11 (SHS)", badge: "SHS" },
+                        { value: "12", label: "Grade 12 (SHS)", badge: "SHS" },
+                      ]}
+                    />
                   )}
                 </div>
 
@@ -1242,17 +1243,18 @@ export default function CurriculumSubjectsConsole() {
                       </span>
                     </div>
                   ) : (
-                    <select
+                    <CustomSelect
+                      fullWidth
                       value={formType}
-                      onChange={(e) => setFormType(e.target.value as any)}
-                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                    >
-                      <option value="Core">Core Subject</option>
-                      <option value="Specialized">Specialized Subject</option>
-                      <option value="Applied">Applied Subject</option>
-                      <option value="Elective">Elective</option>
-                      <option value="Intervention">Intervention (ARAL)</option>
-                    </select>
+                      onChange={(val) => setFormType(val as any)}
+                      options={[
+                        { value: "Core", label: "Core Subject", badge: "Core" },
+                        { value: "Specialized", label: "Specialized Subject", badge: "Specialized" },
+                        { value: "Applied", label: "Applied Subject", badge: "Applied" },
+                        { value: "Elective", label: "Elective", badge: "Elective" },
+                        { value: "Intervention", label: "Intervention (ARAL)", badge: "ARAL" },
+                      ]}
+                    />
                   )}
                 </div>
               </div>
@@ -1279,30 +1281,32 @@ export default function CurriculumSubjectsConsole() {
                     </span>
                   </div>
                 ) : formGrade <= 10 ? (
-                  <select
+                  <CustomSelect
+                    fullWidth
                     value={formStrand}
-                    onChange={(e) => setFormStrand(e.target.value)}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value="Regular">Regular Basic Education</option>
-                    <option value="SPS">Special Program in Sports (General SPS)</option>
-                  </select>
+                    onChange={(val) => setFormStrand(val)}
+                    options={[
+                      { value: "Regular", label: "Regular Basic Education" },
+                      { value: "SPS", label: "Special Program in Sports (General SPS)", badge: "SPS" },
+                    ]}
+                  />
                 ) : (
-                  <select
+                  <CustomSelect
+                    fullWidth
                     value={formStrand}
-                    onChange={(e) => setFormStrand(e.target.value)}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
-                  >
-                    <option value="Academic">Academic Track (Strengthened SHS)</option>
-                    <option value="TechPro">Technical-Professional Track (TechPro)</option>
-                    <option value="General">General (All SHS Tracks / Core)</option>
-                    <option value="STEM">Science, Technology, Engineering &amp; Math (STEM)</option>
-                    <option value="TVL-ICT">TVL - Information &amp; Communications Tech (ICT)</option>
-                    <option value="HUMSS">Humanities &amp; Social Sciences (HUMSS)</option>
-                    <option value="GAS">General Academic Strand (GAS)</option>
-                    <option value="ABM">Accountancy, Business &amp; Management (ABM)</option>
-                    <option value="TVL-Agri-Fishery">TVL - Agri-Fishery Arts</option>
-                  </select>
+                    onChange={(val) => setFormStrand(val)}
+                    options={[
+                      { value: "Academic", label: "Academic Track (Strengthened SHS)", badge: "ACAD" },
+                      { value: "TechPro", label: "Technical-Professional Track (TechPro)", badge: "TVL" },
+                      { value: "General", label: "General (All SHS Tracks / Core)" },
+                      { value: "STEM", label: "Science, Technology, Engineering & Math (STEM)", badge: "STEM" },
+                      { value: "TVL-ICT", label: "TVL - Information & Communications Tech (ICT)", badge: "ICT" },
+                      { value: "HUMSS", label: "Humanities & Social Sciences (HUMSS)", badge: "HUMSS" },
+                      { value: "GAS", label: "General Academic Strand (GAS)", badge: "GAS" },
+                      { value: "ABM", label: "Accountancy, Business & Management (ABM)", badge: "ABM" },
+                      { value: "TVL-Agri-Fishery", label: "TVL - Agri-Fishery Arts", badge: "AFA" },
+                    ]}
+                  />
                 )}
               </div>
 
