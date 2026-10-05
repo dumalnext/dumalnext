@@ -1786,8 +1786,8 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {isResetConfirmOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto no-print print:hidden">
-          <div className="bg-white border-2 border-red-600 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="bg-red-700 p-4 text-white flex items-center justify-between">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-[#002060] p-4 text-white flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono tracking-widest uppercase opacity-80 block">
                   Dumalneg NHS Administrative Action
@@ -1840,10 +1840,10 @@ export default function ScheduleDeconflictionConsole() {
       {/* Modern Confirm Delete Schedule Period Modal */}
       {deleteTargetItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
-            <div className="border-b border-red-200 pb-2.5 flex items-center justify-between">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
                   Schedule Deconfliction Registry
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">

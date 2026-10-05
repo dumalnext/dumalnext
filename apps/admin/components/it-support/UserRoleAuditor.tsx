@@ -690,10 +690,10 @@ export default function UserRoleAuditor() {
       {/* Account Deletion Confirmation Modal */}
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white border-4 border-red-600 max-w-md w-full p-6 space-y-4 shadow-xl">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] max-w-md w-full p-6 space-y-4 shadow-xl">
             <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
+                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
                   SECURITY CONFIRMATION &bull; SUPABASE SYNC
                 </span>
                 <h3 className="text-base font-bold text-slate-900 uppercase">

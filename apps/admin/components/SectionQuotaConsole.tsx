@@ -2728,10 +2728,10 @@ export default function SectionQuotaConsole() {
       {/* Modern Confirm Delete Section Modal */}
       {deleteSectionTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
-            <div className="border-b border-red-200 pb-2.5 flex items-center justify-between">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
                   DepEd Section Management
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
@@ -2839,10 +2839,10 @@ export default function SectionQuotaConsole() {
       {/* Modern Reassign Capacity Override Modal */}
       {reassignOverridePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-amber-600 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
-            <div className="border-b border-amber-200 pb-2.5 flex items-center justify-between">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
                   Capacity Limit Warning
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">

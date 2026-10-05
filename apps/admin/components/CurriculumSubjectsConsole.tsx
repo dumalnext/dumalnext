@@ -1356,9 +1356,9 @@ export default function CurriculumSubjectsConsole() {
       {/* ========================================================================= */}
       {deleteSubjectTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
-            <div className="border-b border-red-200 pb-2">
-              <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
+            <div className="border-b-2 border-slate-200 pb-2">
+              <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
                 CONFIRM REMOVAL OF SUBJECT
               </span>
               <h3 className="text-base font-bold text-slate-900 uppercase">
