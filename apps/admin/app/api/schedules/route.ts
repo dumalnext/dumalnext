@@ -452,20 +452,20 @@ export async function PATCH(req: Request) {
     const checkCollision = (targetItem: ScheduleItem, targetDay: string, targetStart: string, targetEnd: string, excludedIds: string[]) => {
       for (const item of activeList) {
         if (excludedIds.includes(item.id)) continue;
-        if (item.day_of_week === targetDay && timesOverlap(item.start_time, item.end_time, targetStart, targetEnd)) {
-          if (item.teacher_id === targetItem.teacher_id) {
+        if (item.day_of_week.toLowerCase() === targetDay.toLowerCase() && timesOverlap(item.start_time, item.end_time, targetStart, targetEnd)) {
+          if (targetItem.teacher_id && item.teacher_id && item.teacher_id === targetItem.teacher_id) {
             const teacherObj = (teachersData || []).find((t) => t.id === targetItem.teacher_id);
             const teacherName = teacherObj ? `${teacherObj.first_name} ${teacherObj.last_name}` : "Faculty Member";
             const conflictingSection = (sectionsData || []).find((s) => s.id === item.section_id)?.section_name || "another class";
             return `Teacher Collision: Faculty ${teacherName} is already assigned to teach ${item.subject_name || item.subject_code} in ${conflictingSection} on ${targetDay} at ${item.start_time}–${item.end_time}.`;
           }
-          if (item.classroom_id === targetItem.classroom_id) {
+          if (targetItem.classroom_id && item.classroom_id && item.classroom_id !== "unassigned" && targetItem.classroom_id !== "unassigned" && item.classroom_id === targetItem.classroom_id) {
             const roomObj = (classroomsData || []).find((r) => r.id === targetItem.classroom_id);
             const roomName = roomObj ? roomObj.room_name : "Selected Classroom";
             const conflictingSection = (sectionsData || []).find((s) => s.id === item.section_id)?.section_name || "another class";
             return `Room Collision: ${roomName} is already occupied by ${conflictingSection} on ${targetDay} at ${item.start_time}–${item.end_time}.`;
           }
-          if (item.section_id === targetItem.section_id) {
+          if (targetItem.section_id && item.section_id && item.section_id === targetItem.section_id) {
             const sectionObj = (sectionsData || []).find((s) => s.id === targetItem.section_id);
             const sectionName = sectionObj ? sectionObj.section_name : "Selected Section";
             return `Section Collision: ${sectionName} already has ${item.subject_name || item.subject_code} scheduled on ${targetDay} at ${item.start_time}–${item.end_time}.`;

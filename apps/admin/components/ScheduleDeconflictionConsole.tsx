@@ -186,6 +186,7 @@ export default function ScheduleDeconflictionConsole() {
 
   // Drag and Drop & Slot Reassignment State
   const [draggedSchedule, setDraggedSchedule] = useState<ScheduleItem | null>(null);
+  const draggedScheduleRef = React.useRef<ScheduleItem | null>(null);
   const [dragOverSlot, setDragOverSlot] = useState<{ day: string; start: string; end: string } | null>(null);
   const [isDropping, setIsDropping] = useState<boolean>(false);
 
@@ -533,22 +534,27 @@ export default function ScheduleDeconflictionConsole() {
     occupantItem?: ScheduleItem,
     sourceItemOverride?: ScheduleItem
   ) => {
-    const activeItem = sourceItemOverride || draggedSchedule;
+    const activeItem = sourceItemOverride || draggedSchedule || draggedScheduleRef.current;
     if (!activeItem) return;
     if (isDropping) return;
+
+    const cleanStart = targetStart.slice(0, 5);
+    const cleanEnd = targetEnd.slice(0, 5);
 
     // Dropped onto exact same slot: no action needed
     if (
       activeItem.day_of_week === targetDay &&
-      activeItem.start_time === targetStart &&
-      activeItem.end_time === targetEnd
+      activeItem.start_time.slice(0, 5) === cleanStart &&
+      activeItem.end_time.slice(0, 5) === cleanEnd
     ) {
+      draggedScheduleRef.current = null;
       setDraggedSchedule(null);
       setDragOverSlot(null);
       return;
     }
 
     if (occupantItem && occupantItem.id === activeItem.id) {
+      draggedScheduleRef.current = null;
       setDraggedSchedule(null);
       setDragOverSlot(null);
       return;
@@ -564,14 +570,14 @@ export default function ScheduleDeconflictionConsole() {
     ) => {
       for (const sc of schedules) {
         if (excludeIds.includes(sc.id)) continue;
-        if (sc.day_of_week === day && timesOverlap(sc.start_time, sc.end_time, start, end)) {
-          if (sc.teacher_id === item.teacher_id) {
+        if (sc.day_of_week.toLowerCase() === day.toLowerCase() && timesOverlap(sc.start_time, sc.end_time, start, end)) {
+          if (item.teacher_id && sc.teacher_id && sc.teacher_id === item.teacher_id) {
             return `Faculty Collision: ${item.teacher_name || "Faculty"} is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${day} at ${sc.start_time}–${sc.end_time}.`;
           }
-          if (sc.classroom_id === item.classroom_id) {
+          if (item.classroom_id && sc.classroom_id && item.classroom_id !== "unassigned" && sc.classroom_id !== "unassigned" && sc.classroom_id === item.classroom_id) {
             return `Room Collision: ${item.classroom_name || "Facility"} is already occupied by ${sc.section_name || "another class"} on ${day} at ${sc.start_time}–${sc.end_time}.`;
           }
-          if (sc.section_id === item.section_id) {
+          if (item.section_id && sc.section_id && sc.section_id === item.section_id) {
             return `Section Collision: ${item.section_name || "Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${day} at ${sc.start_time}–${sc.end_time}.`;
           }
         }
@@ -584,12 +590,13 @@ export default function ScheduleDeconflictionConsole() {
       const conflictA = checkItemConflict(
         activeItem,
         targetDay,
-        targetStart,
-        targetEnd,
+        cleanStart,
+        cleanEnd,
         [activeItem.id, occupantItem.id]
       );
       if (conflictA) {
         setActionNotice({ type: "error", text: `Cannot swap: ${conflictA}` });
+        draggedScheduleRef.current = null;
         setDraggedSchedule(null);
         setDragOverSlot(null);
         return;
@@ -604,6 +611,7 @@ export default function ScheduleDeconflictionConsole() {
       );
       if (conflictB) {
         setActionNotice({ type: "error", text: `Cannot swap: ${conflictB}` });
+        draggedScheduleRef.current = null;
         setDraggedSchedule(null);
         setDragOverSlot(null);
         return;
@@ -613,20 +621,21 @@ export default function ScheduleDeconflictionConsole() {
       const prevSchedules = [...schedules];
       const nextSchedules = schedules.map((sc) => {
         if (sc.id === activeItem.id) {
-          return { ...sc, day_of_week: targetDay, start_time: targetStart, end_time: targetEnd };
+          return { ...sc, day_of_week: targetDay, start_time: cleanStart, end_time: cleanEnd };
         }
         if (sc.id === occupantItem.id) {
           return {
             ...sc,
             day_of_week: activeItem.day_of_week,
-            start_time: activeItem.start_time,
-            end_time: activeItem.end_time,
+            start_time: activeItem.start_time.slice(0, 5),
+            end_time: activeItem.end_time.slice(0, 5),
           };
         }
         return sc;
       });
 
       setSchedules(nextSchedules);
+      draggedScheduleRef.current = null;
       setDraggedSchedule(null);
       setDragOverSlot(null);
       setIsDropping(true);
@@ -666,10 +675,11 @@ export default function ScheduleDeconflictionConsole() {
       return;
     }
 
-    // CASE 2: MOVE to vacant slot
-    const conflict = checkItemConflict(activeItem, targetDay, targetStart, targetEnd, [activeItem.id]);
+    // CASE 2: MOVE to vacant / empty slot
+    const conflict = checkItemConflict(activeItem, targetDay, cleanStart, cleanEnd, [activeItem.id]);
     if (conflict) {
       setActionNotice({ type: "error", text: `Cannot move: ${conflict}` });
+      draggedScheduleRef.current = null;
       setDraggedSchedule(null);
       setDragOverSlot(null);
       return;
@@ -679,12 +689,13 @@ export default function ScheduleDeconflictionConsole() {
     const prevSchedules = [...schedules];
     const nextSchedules = schedules.map((sc) => {
       if (sc.id === activeItem.id) {
-        return { ...sc, day_of_week: targetDay, start_time: targetStart, end_time: targetEnd };
+        return { ...sc, day_of_week: targetDay, start_time: cleanStart, end_time: cleanEnd };
       }
       return sc;
     });
 
     setSchedules(nextSchedules);
+    draggedScheduleRef.current = null;
     setDraggedSchedule(null);
     setDragOverSlot(null);
     setIsDropping(true);
@@ -697,8 +708,8 @@ export default function ScheduleDeconflictionConsole() {
           action: "move",
           id: activeItem.id,
           day_of_week: targetDay,
-          start_time: targetStart,
-          end_time: targetEnd,
+          start_time: cleanStart,
+          end_time: cleanEnd,
         }),
       });
       const data = await res.json();
@@ -711,7 +722,7 @@ export default function ScheduleDeconflictionConsole() {
       } else {
         setActionNotice({
           type: "success",
-          text: `Successfully moved "${activeItem.subject_name}" to ${targetDay} ${targetStart}–${targetEnd}.`,
+          text: `Successfully moved "${activeItem.subject_name}" to ${targetDay} ${cleanStart}–${cleanEnd}.`,
         });
       }
     } catch (err: any) {
@@ -727,11 +738,13 @@ export default function ScheduleDeconflictionConsole() {
 
   // Touch Drag Handlers (for mobile & tablet devices)
   const handleTouchStart = (item: ScheduleItem) => {
+    draggedScheduleRef.current = item;
     setDraggedSchedule(item);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!draggedSchedule) return;
+    const activeItem = draggedSchedule || draggedScheduleRef.current;
+    if (!activeItem) return;
     const touch = e.touches[0];
     const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
     const cellEl = targetEl?.closest("[data-schedule-cell]");
@@ -746,7 +759,8 @@ export default function ScheduleDeconflictionConsole() {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!draggedSchedule) return;
+    const activeItem = draggedSchedule || draggedScheduleRef.current;
+    if (!activeItem) return;
     const touch = e.changedTouches[0];
     const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
     const cellEl = targetEl?.closest("[data-schedule-cell]");
@@ -757,10 +771,11 @@ export default function ScheduleDeconflictionConsole() {
       const occupantId = cellEl.getAttribute("data-occupant-id");
       const occupant = occupantId ? schedules.find((s) => s.id === occupantId) : undefined;
       if (cellDay && cellStart && cellEnd) {
-        handleDropOnSlot(cellDay, cellStart, cellEnd, occupant);
+        handleDropOnSlot(cellDay, cellStart, cellEnd, occupant, activeItem);
         return;
       }
     }
+    draggedScheduleRef.current = null;
     setDraggedSchedule(null);
     setDragOverSlot(null);
   };
@@ -840,7 +855,10 @@ export default function ScheduleDeconflictionConsole() {
         const a = schedules[i];
         const b = schedules[j];
         if (a.day_of_week === b.day_of_week && timesOverlap(a.start_time, a.end_time, b.start_time, b.end_time)) {
-          if (a.teacher_id === b.teacher_id || a.classroom_id === b.classroom_id || a.section_id === b.section_id) {
+          const teacherCol = Boolean(a.teacher_id && b.teacher_id && a.teacher_id === b.teacher_id);
+          const roomCol = Boolean(a.classroom_id && b.classroom_id && a.classroom_id !== "unassigned" && b.classroom_id !== "unassigned" && a.classroom_id === b.classroom_id);
+          const sectionCol = Boolean(a.section_id && b.section_id && a.section_id === b.section_id);
+          if (teacherCol || roomCol || sectionCol) {
             collisionCount++;
           }
         }
@@ -1303,7 +1321,6 @@ export default function ScheduleDeconflictionConsole() {
                                 data-end={slot.end}
                                 data-occupant-id={matchedItem?.id || ""}
                                 onDragOver={(e) => {
-                                  if (!draggedSchedule) return;
                                   e.preventDefault();
                                   e.dataTransfer.dropEffect = "move";
                                   if (dragOverSlot?.day !== day || dragOverSlot?.start !== slot.start || dragOverSlot?.end !== slot.end) {
@@ -1318,9 +1335,15 @@ export default function ScheduleDeconflictionConsole() {
                                 }}
                                 onDrop={(e) => {
                                   e.preventDefault();
+                                  e.stopPropagation();
                                   setDragOverSlot(null);
-                                  if (draggedSchedule) {
-                                    handleDropOnSlot(day, slot.start, slot.end, matchedItem);
+                                  const droppedId = e.dataTransfer.getData("text/plain");
+                                  const itemToDrop =
+                                    (droppedId ? schedules.find((s) => s.id === droppedId) : null) ||
+                                    draggedScheduleRef.current ||
+                                    draggedSchedule;
+                                  if (itemToDrop) {
+                                    handleDropOnSlot(day, slot.start, slot.end, matchedItem, itemToDrop);
                                   }
                                 }}
                                 className={`p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5 relative transition-all duration-150 ${
@@ -1349,9 +1372,11 @@ export default function ScheduleDeconflictionConsole() {
                                     onDragStart={(e) => {
                                       e.dataTransfer.setData("text/plain", matchedItem.id);
                                       e.dataTransfer.effectAllowed = "move";
+                                      draggedScheduleRef.current = matchedItem;
                                       setDraggedSchedule(matchedItem);
                                     }}
                                     onDragEnd={() => {
+                                      draggedScheduleRef.current = null;
                                       setDraggedSchedule(null);
                                       setDragOverSlot(null);
                                     }}
@@ -1429,35 +1454,61 @@ export default function ScheduleDeconflictionConsole() {
                                       Room: {matchedItem.classroom_name}
                                     </div>
                                   </div>
-                                ) : isDragOver ? (
-                                  <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-[#002060] bg-blue-100/90 flex flex-col items-center justify-center text-center animate-pulse">
-                                    <span className="font-mono text-xs font-bold text-[#002060]">
-                                      ⤵ Drop to Move Here
-                                    </span>
-                                    <span className="text-[10px] text-blue-900 mt-0.5 font-medium">
-                                      {day} &bull; {slot.start}–{slot.end}
-                                    </span>
-                                  </div>
                                 ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                      className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
-                                        draggedSchedule ? "border-blue-300 bg-blue-50/20" : ""
-                                      }`}
-                                      title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
-                                    >
-                                      <span className={`font-bold transition-opacity ${
-                                        draggedSchedule ? "opacity-70 text-blue-800" : "opacity-0 group-hover:opacity-100"
-                                      }`}>
-                                        {draggedSchedule ? "Drop Here" : "+ Assign Slot"}
-                                      </span>
-                                    </button>
-                                    <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
-                                      —
-                                    </div>
-                                  </>
+                                  <div
+                                    onDragOver={(e) => {
+                                      e.preventDefault();
+                                      e.dataTransfer.dropEffect = "move";
+                                      if (dragOverSlot?.day !== day || dragOverSlot?.start !== slot.start) {
+                                        setDragOverSlot({ day, start: slot.start, end: slot.end });
+                                      }
+                                    }}
+                                    onDrop={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setDragOverSlot(null);
+                                      const droppedId = e.dataTransfer.getData("text/plain");
+                                      const itemToDrop =
+                                        (droppedId ? schedules.find((s) => s.id === droppedId) : null) ||
+                                        draggedScheduleRef.current ||
+                                        draggedSchedule;
+                                      if (itemToDrop) {
+                                        handleDropOnSlot(day, slot.start, slot.end, undefined, itemToDrop);
+                                      }
+                                    }}
+                                    className="w-full h-full min-h-[58px] relative flex flex-col"
+                                  >
+                                    {isDragOver ? (
+                                      <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-[#002060] bg-blue-100/90 flex flex-col items-center justify-center text-center animate-pulse pointer-events-none">
+                                        <span className="font-mono text-xs font-bold text-[#002060]">
+                                          ⤵ Drop to Move Here
+                                        </span>
+                                        <span className="text-[10px] text-blue-900 mt-0.5 font-medium">
+                                          {day} &bull; {slot.start}–{slot.end}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <button
+                                          type="button"
+                                          onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
+                                          className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
+                                            draggedSchedule ? "border-blue-400 bg-blue-50/40 text-blue-800" : ""
+                                          }`}
+                                          title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
+                                        >
+                                          <span className={`font-bold transition-opacity ${
+                                            draggedSchedule ? "opacity-100 text-[#002060]" : "opacity-0 group-hover:opacity-100"
+                                          }`}>
+                                            {draggedSchedule ? "+ Drop to Move Here" : "+ Assign Slot"}
+                                          </span>
+                                        </button>
+                                        <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
+                                          —
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
                                 )}
                               </td>
                             );
@@ -1554,7 +1605,6 @@ export default function ScheduleDeconflictionConsole() {
                                 data-end={slot.end}
                                 data-occupant-id={matchedItem?.id || ""}
                                 onDragOver={(e) => {
-                                  if (!draggedSchedule) return;
                                   e.preventDefault();
                                   e.dataTransfer.dropEffect = "move";
                                   if (dragOverSlot?.day !== day || dragOverSlot?.start !== slot.start || dragOverSlot?.end !== slot.end) {
@@ -1569,9 +1619,15 @@ export default function ScheduleDeconflictionConsole() {
                                 }}
                                 onDrop={(e) => {
                                   e.preventDefault();
+                                  e.stopPropagation();
                                   setDragOverSlot(null);
-                                  if (draggedSchedule) {
-                                    handleDropOnSlot(day, slot.start, slot.end, matchedItem);
+                                  const droppedId = e.dataTransfer.getData("text/plain");
+                                  const itemToDrop =
+                                    (droppedId ? schedules.find((s) => s.id === droppedId) : null) ||
+                                    draggedScheduleRef.current ||
+                                    draggedSchedule;
+                                  if (itemToDrop) {
+                                    handleDropOnSlot(day, slot.start, slot.end, matchedItem, itemToDrop);
                                   }
                                 }}
                                 className={`p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5 relative transition-all duration-150 ${
@@ -1600,9 +1656,11 @@ export default function ScheduleDeconflictionConsole() {
                                     onDragStart={(e) => {
                                       e.dataTransfer.setData("text/plain", matchedItem.id);
                                       e.dataTransfer.effectAllowed = "move";
+                                      draggedScheduleRef.current = matchedItem;
                                       setDraggedSchedule(matchedItem);
                                     }}
                                     onDragEnd={() => {
+                                      draggedScheduleRef.current = null;
                                       setDraggedSchedule(null);
                                       setDragOverSlot(null);
                                     }}
@@ -1680,35 +1738,61 @@ export default function ScheduleDeconflictionConsole() {
                                       Facility: {matchedItem.classroom_name}
                                     </div>
                                   </div>
-                                ) : isDragOver ? (
-                                  <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-emerald-700 bg-emerald-100/90 flex flex-col items-center justify-center text-center animate-pulse">
-                                    <span className="font-mono text-xs font-bold text-emerald-900">
-                                      ⤵ Drop to Move Here
-                                    </span>
-                                    <span className="text-[10px] text-emerald-800 mt-0.5 font-medium">
-                                      {day} &bull; {slot.start}–{slot.end}
-                                    </span>
-                                  </div>
                                 ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                      className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
-                                        draggedSchedule ? "border-emerald-300 bg-emerald-50/20" : ""
-                                      }`}
-                                      title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
-                                    >
-                                      <span className={`font-bold transition-opacity ${
-                                        draggedSchedule ? "opacity-70 text-emerald-800" : "opacity-0 group-hover:opacity-100"
-                                      }`}>
-                                        {draggedSchedule ? "Drop Here" : "+ Vacant (Assign)"}
-                                      </span>
-                                    </button>
-                                    <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
-                                      —
-                                    </div>
-                                  </>
+                                  <div
+                                    onDragOver={(e) => {
+                                      e.preventDefault();
+                                      e.dataTransfer.dropEffect = "move";
+                                      if (dragOverSlot?.day !== day || dragOverSlot?.start !== slot.start) {
+                                        setDragOverSlot({ day, start: slot.start, end: slot.end });
+                                      }
+                                    }}
+                                    onDrop={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setDragOverSlot(null);
+                                      const droppedId = e.dataTransfer.getData("text/plain");
+                                      const itemToDrop =
+                                        (droppedId ? schedules.find((s) => s.id === droppedId) : null) ||
+                                        draggedScheduleRef.current ||
+                                        draggedSchedule;
+                                      if (itemToDrop) {
+                                        handleDropOnSlot(day, slot.start, slot.end, undefined, itemToDrop);
+                                      }
+                                    }}
+                                    className="w-full h-full min-h-[58px] relative flex flex-col"
+                                  >
+                                    {isDragOver ? (
+                                      <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-emerald-700 bg-emerald-100/90 flex flex-col items-center justify-center text-center animate-pulse pointer-events-none">
+                                        <span className="font-mono text-xs font-bold text-emerald-900">
+                                          ⤵ Drop to Move Here
+                                        </span>
+                                        <span className="text-[10px] text-emerald-800 mt-0.5 font-medium">
+                                          {day} &bull; {slot.start}–{slot.end}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <button
+                                          type="button"
+                                          onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
+                                          className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
+                                            draggedSchedule ? "border-emerald-400 bg-emerald-50/40 text-emerald-800" : ""
+                                          }`}
+                                          title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
+                                        >
+                                          <span className={`font-bold transition-opacity ${
+                                            draggedSchedule ? "opacity-100 text-emerald-800" : "opacity-0 group-hover:opacity-100"
+                                          }`}>
+                                            {draggedSchedule ? "+ Drop to Move Here" : "+ Vacant (Assign)"}
+                                          </span>
+                                        </button>
+                                        <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
+                                          —
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
                                 )}
                               </td>
                             );
