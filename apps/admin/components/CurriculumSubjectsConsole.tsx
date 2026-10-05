@@ -1103,7 +1103,7 @@ export default function CurriculumSubjectsConsole() {
             )}
 
             {/* Modal Form Body */}
-            <form onSubmit={handleSaveSubject} className="p-6 space-y-4 overflow-y-auto text-xs">
+            <form onSubmit={handleSaveSubject} className="p-6 space-y-4 overflow-y-auto text-xs stable-gutter custom-scrollbar">
               {formError && (
                 <div className="p-3 bg-red-50 border-2 border-red-400 text-red-900 font-bold text-xs">
                   {formError}

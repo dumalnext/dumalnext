@@ -1673,7 +1673,7 @@ export default function SectionQuotaConsole() {
               </button>
             </div>
 
-            <form onSubmit={handleAddSection} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1">
+            <form onSubmit={handleAddSection} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1 stable-gutter custom-scrollbar">
               {addError && (
                 <div className="p-2.5 bg-red-50 border border-red-400 text-red-900 font-bold">
                   Error: {addError}
@@ -1976,7 +1976,7 @@ export default function SectionQuotaConsole() {
               </button>
             </div>
 
-            <form onSubmit={handleEditSection} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1">
+            <form onSubmit={handleEditSection} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1 stable-gutter custom-scrollbar">
               {editError && (
                 <div className="p-2.5 bg-red-50 border border-red-400 text-red-900 font-bold">
                   Error: {editError}
@@ -2476,7 +2476,7 @@ export default function SectionQuotaConsole() {
             </div>
 
             {/* Students Table */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 print:overflow-visible print:p-0 print:m-0">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 print:overflow-visible print:p-0 print:m-0 stable-gutter custom-scrollbar">
               {isLoadingRoster ? (
                 <div className="p-8 text-center">
                   <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />

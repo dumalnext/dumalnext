@@ -1344,7 +1344,7 @@ export default function ScheduleDeconflictionConsole() {
             </div>
 
             {/* Modal Body / Form */}
-            <form onSubmit={handleAddSchedule} className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
+            <form onSubmit={handleAddSchedule} className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1 stable-gutter custom-scrollbar">
               {/* Error Notice */}
               {addError && (
                 <div className="p-3 bg-red-50 border-2 border-red-500 text-red-950 text-xs font-bold">
@@ -1602,7 +1602,7 @@ export default function ScheduleDeconflictionConsole() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 space-y-5 max-h-[calc(85vh-120px)] overflow-y-auto">
+            <div className="p-6 space-y-5 max-h-[calc(85vh-120px)] overflow-y-auto stable-gutter custom-scrollbar">
               {/* Algorithm Specifications Card */}
               <div className="p-4 bg-slate-50 border-2 border-slate-300 space-y-3">
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block">

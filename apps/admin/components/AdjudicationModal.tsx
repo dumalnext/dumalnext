@@ -669,7 +669,7 @@ export default function AdjudicationModal({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 space-y-6 text-xs text-slate-800">
+        <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 space-y-6 text-xs text-slate-800 stable-gutter custom-scrollbar">
           {/* Continuing JHS Transfer Request High-Visibility Banner */}
           {isTransferRequested && (
             <div className="p-4 bg-amber-50 border-2 border-amber-500 space-y-2 shadow-xs">
