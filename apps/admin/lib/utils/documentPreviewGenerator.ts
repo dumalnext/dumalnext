@@ -212,7 +212,7 @@ export function generateDepEdDocPreview(docType: string, ctx: DocPreviewContext)
       <text x="60" y="685" font-family="sans-serif" font-size="11" fill="#334155">Eligible for admission to: <tspan font-weight="bold" fill="#002060">GRADE 7 (Junior High School)</tspan></text>
       <text x="60" y="705" font-family="sans-serif" font-size="11" fill="#334155">Target Institution: <tspan font-weight="bold" fill="#002060">DUMALNEG NATIONAL HIGH SCHOOL</tspan></text>
       <text x="60" y="725" font-family="sans-serif" font-size="11" fill="#334155">Canceled credential / SF9 released on: <tspan font-weight="bold">June 15, 2025</tspan></text>
-      <text x="60" y="745" font-family="sans-serif" font-size="11" fill="#047857" font-weight="bold">[ SF9 STATUS: COMPLETE &#8226; NO ACADEMIC DEFICIENCIES ]</text>
+      <text x="60" y="745" font-family="sans-serif" font-size="11" fill="#047857" font-weight="bold">SF9 STATUS: COMPLETE &#8226; NO ACADEMIC DEFICIENCIES</text>
       
       <!-- Signatures -->
       <line x1="80" y1="870" x2="260" y2="870" stroke="#0f172a" stroke-width="1.5"/>

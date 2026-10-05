@@ -93,7 +93,7 @@ export default function ITSupportLoginForm() {
             disabled={isSubmitting}
             className="w-full py-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-400 text-slate-800 font-bold text-xs uppercase tracking-wider transition-colors font-mono"
           >
-            [ Quick Sign-In: dumalnext@gmail.com ]
+            Quick Sign-In: dumalnext@gmail.com
           </button>
         </div>
       </form>

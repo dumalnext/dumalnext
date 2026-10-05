@@ -47,7 +47,7 @@ export default function SystemDiagnosticsMonitor() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ RRL Section 2.1.3: Data Privacy &amp; Platform Integrity Monitor ]
+              RRL Section 2.1.3: Data Privacy &amp; Platform Integrity Monitor
             </span>
             <p className="text-xs text-slate-700 mt-1">
               Verifies system security, database connectivity, and compliance with the Philippine Data Privacy Act of 2012 (RA 10173) for Dumalneg NHS learner data.

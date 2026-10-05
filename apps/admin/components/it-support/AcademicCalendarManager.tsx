@@ -432,7 +432,7 @@ export default function AcademicCalendarManager() {
                                   }}
                                   className="text-xs font-mono font-bold text-slate-600 hover:text-slate-950 cursor-pointer"
                                 >
-                                  [ COLLAPSE BOX ▲ ]
+                                  COLLAPSE BOX ▲
                                 </button>
                               </div>
 
@@ -595,7 +595,7 @@ export default function AcademicCalendarManager() {
                                         className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                                         title="Click to deactivate"
                                       >
-                                        [ ACTIVE OFFICIAL CALENDAR &bull; CLICK TO SET INACTIVE ]
+                                        ACTIVE OFFICIAL CALENDAR &bull; CLICK TO SET INACTIVE
                                       </button>
                                     ) : (
                                       <button
@@ -888,7 +888,7 @@ export default function AcademicCalendarManager() {
                                 onClick={() => setEditingTerm({ ...editingTerm, isActive: false })}
                                 className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase cursor-pointer"
                               >
-                                [ ACTIVE &bull; CLICK TO SET INACTIVE ]
+                                ACTIVE &bull; CLICK TO SET INACTIVE
                               </button>
                             ) : (
                               <button
@@ -935,7 +935,7 @@ export default function AcademicCalendarManager() {
                           onClick={handleSaveTermDates}
                           className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
                         >
-                          {isSubmitting ? "SAVING..." : `[ SAVE ${editingTerm.termName.toUpperCase()} DATES ]`}
+                          {isSubmitting ? "SAVING..." : `SAVE ${editingTerm.termName.toUpperCase()} DATES`}
                         </button>
                       </div>
                     )}

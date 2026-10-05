@@ -60,7 +60,7 @@ export default function AdminHeaderNav({
               href="/it-support"
               className="text-white hover:text-amber-200 underline font-mono text-[10px] ml-2"
             >
-              [ Switch to IT Support Portal &rarr; ]
+              Switch to IT Support Portal &rarr;
             </Link>
           </div>
         </div>

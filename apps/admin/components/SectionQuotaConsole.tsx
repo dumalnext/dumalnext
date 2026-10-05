@@ -1096,7 +1096,7 @@ export default function SectionQuotaConsole() {
               {isElectiveView && (
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-900 border border-purple-300 px-1.5 py-0.2 uppercase">
-                    [ ELECTIVE: {sec.electiveCode || "SHS-ELEC"} ]
+                    ELECTIVE: {sec.electiveCode || "SHS-ELEC"}
                   </span>
                 </div>
               )}
@@ -1181,7 +1181,7 @@ export default function SectionQuotaConsole() {
               isElectiveView ? "bg-purple-900 hover:bg-purple-950" : "bg-[#002060] hover:bg-blue-950"
             }`}
           >
-            [ View {isElectiveView ? "Elective" : "Class"} Roster ({count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} in Roster` : ""}) ]
+            View {isElectiveView ? "Elective" : "Class"} Roster ({count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} in Roster` : ""})
           </button>
 
           <div className="flex items-center gap-2">
@@ -1191,7 +1191,7 @@ export default function SectionQuotaConsole() {
               className="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider text-center transition-colors cursor-pointer"
               title={isElectiveView ? "Assign room or instructor" : "Edit capacity and details"}
             >
-              [ {isElectiveView ? "Assign Facility" : "Edit Capacity"} ]
+              {isElectiveView ? "Assign Facility" : "Edit Capacity"}
             </button>
             <button
               type="button"
@@ -1214,7 +1214,7 @@ export default function SectionQuotaConsole() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ SECTION QUOTA &bull; CLASSROOM CAPACITY CONTROL ]
+            SECTION QUOTA &bull; CLASSROOM CAPACITY CONTROL
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Class Sections &amp; Quota Limits Management
@@ -1770,7 +1770,7 @@ export default function SectionQuotaConsole() {
                       Classroom &amp; Building <span className="text-slate-500 font-normal">(IT Facilities)</span>
                     </label>
                     <span className="text-[10px] font-mono text-[#002060] uppercase">
-                      [ IT Facilities: {classroomsList.length} Rooms ]
+                      IT Facilities: {classroomsList.length} Rooms
                     </span>
                   </div>
                   <select
@@ -1787,16 +1787,16 @@ export default function SectionQuotaConsole() {
                   >
                     <option value="">-- Select Classroom / Room (From IT Facilities) --</option>
                     {Object.entries(classroomsByBuilding).map(([bldg, rooms]) => (
-                      <optgroup key={bldg} label={`[ BUILDING: ${bldg.toUpperCase()} ]`}>
+                      <optgroup key={bldg} label={`BUILDING: ${bldg.toUpperCase()}`}>
                         {rooms.map((rm) => {
                           const optionVal = `${rm.room_name} (${rm.building})`;
                           const occupyingSec = getSectionOccupyingRoom(optionVal);
                           const statusTag = occupyingSec
-                            ? `[ OCCUPIED BY: ${occupyingSec.section_name} ]`
+                            ? `OCCUPIED BY: ${occupyingSec.section_name}`
                             : "AVAILABLE";
                           return (
                             <option key={rm.id} value={optionVal}>
-                              {rm.classroom_id ? `[ ${rm.classroom_id} ] ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
+                              {rm.classroom_id ? `${rm.classroom_id} • ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
                             </option>
                           );
                         })}
@@ -1836,7 +1836,7 @@ export default function SectionQuotaConsole() {
                       Class Adviser / Teacher
                     </label>
                     <span className="text-[10px] font-mono text-[#002060] uppercase">
-                      [ Registered Faculty: {teachersList.length} ]
+                      Registered Faculty: {teachersList.length}
                     </span>
                   </div>
                   <select
@@ -1850,7 +1850,7 @@ export default function SectionQuotaConsole() {
                         (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
                       );
                       const statusTag = alreadyAssignedSec
-                        ? `[ ALREADY ADVISING: ${alreadyAssignedSec.section_name} ]`
+                        ? `ALREADY ADVISING: ${alreadyAssignedSec.section_name}`
                         : "AVAILABLE";
 
                       return (
@@ -1898,7 +1898,7 @@ export default function SectionQuotaConsole() {
                         </span>
                         {matchedRoom ? (
                           <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 px-2 py-0.5 border border-emerald-400 uppercase">
-                            [ FIXED BY IT FACILITY: {matchedRoom.classroom_id || matchedRoom.room_name} ]
+                            FIXED BY IT FACILITY: {matchedRoom.classroom_id || matchedRoom.room_name}
                           </span>
                         ) : (
                           <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-300 uppercase">
@@ -1961,7 +1961,7 @@ export default function SectionQuotaConsole() {
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200 block">
-                  [ EDIT SECTION CAPACITY &amp; DETAILS ]
+                  EDIT SECTION CAPACITY &amp; DETAILS
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-white mt-0.5">
                   {editingSection.section_name}
@@ -2081,7 +2081,7 @@ export default function SectionQuotaConsole() {
                       Classroom &amp; Building <span className="text-slate-500 font-normal">(IT Facilities)</span>
                     </label>
                     <span className="text-[10px] font-mono text-[#002060] uppercase">
-                      [ IT Facilities: {classroomsList.length} Rooms ]
+                      IT Facilities: {classroomsList.length} Rooms
                     </span>
                   </div>
                   <select
@@ -2112,7 +2112,7 @@ export default function SectionQuotaConsole() {
                         </option>
                       )}
                     {Object.entries(classroomsByBuilding).map(([bldg, rooms]) => (
-                      <optgroup key={bldg} label={`[ BUILDING: ${bldg.toUpperCase()} ]`}>
+                      <optgroup key={bldg} label={`BUILDING: ${bldg.toUpperCase()}`}>
                         {rooms.map((rm) => {
                           const optionVal = `${rm.room_name} (${rm.building})`;
                           const occupyingSec = getSectionOccupyingRoom(optionVal, editingSection?.id);
@@ -2126,12 +2126,12 @@ export default function SectionQuotaConsole() {
                           const statusTag = isCurrent
                             ? "CURRENT ROOM OF THIS SECTION"
                             : occupyingSec
-                            ? `[ ASSIGNED TO: ${occupyingSec.section_name} ]`
+                            ? `ASSIGNED TO: ${occupyingSec.section_name}`
                             : "AVAILABLE";
 
                           return (
                             <option key={rm.id} value={optionVal}>
-                              {rm.classroom_id ? `[ ${rm.classroom_id} ] ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
+                              {rm.classroom_id ? `${rm.classroom_id} • ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
                             </option>
                           );
                         })}
@@ -2171,7 +2171,7 @@ export default function SectionQuotaConsole() {
                       Class Adviser / Teacher
                     </label>
                     <span className="text-[10px] font-mono text-[#002060] uppercase">
-                      [ Registered Faculty: {teachersList.length} ]
+                      Registered Faculty: {teachersList.length}
                     </span>
                   </div>
                   <select
@@ -2197,7 +2197,7 @@ export default function SectionQuotaConsole() {
                       const statusTag = isCurrent
                         ? "CURRENT ADVISER OF THIS SECTION"
                         : assignedSec
-                        ? `[ ALREADY ADVISING: ${assignedSec.section_name} ]`
+                        ? `ALREADY ADVISING: ${assignedSec.section_name}`
                         : "AVAILABLE";
 
                       return (
@@ -2258,7 +2258,7 @@ export default function SectionQuotaConsole() {
                         </span>
                         {matchedRoom ? (
                           <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 px-2 py-0.5 border border-emerald-400 uppercase">
-                            [ FIXED BY IT FACILITY: {matchedRoom.classroom_id || matchedRoom.room_name} ]
+                            FIXED BY IT FACILITY: {matchedRoom.classroom_id || matchedRoom.room_name}
                           </span>
                         ) : (
                           <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-300 uppercase">
@@ -2474,7 +2474,7 @@ export default function SectionQuotaConsole() {
               ) : filteredRoster.length === 0 ? (
                 <div className="p-12 text-center space-y-2 bg-slate-50 border-2 border-dashed border-slate-300">
                   <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-                    [ {rosterSearch ? "NO MATCHING STUDENTS IN THIS SECTION" : "NO STUDENTS CURRENTLY ENROLLED IN THIS SECTION"} ]
+                    {rosterSearch ? "NO MATCHING STUDENTS IN THIS SECTION" : "NO STUDENTS CURRENTLY ENROLLED IN THIS SECTION"}
                   </span>
                   <p className="text-xs text-slate-600 max-w-md mx-auto">
                     {rosterSearch

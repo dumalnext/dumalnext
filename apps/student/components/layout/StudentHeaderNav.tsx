@@ -391,9 +391,18 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
       <div
-        className={`fixed inset-0 h-full h-[100dvh] w-full z-50 bg-slate-950/70 backdrop-blur-xs flex justify-start overflow-hidden transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 w-full z-50 bg-slate-950/70 backdrop-blur-xs flex justify-start overflow-hidden transition-opacity duration-300 ease-in-out ${
           isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: "100%",
+          maxHeight: "100dvh",
+        }}
         aria-hidden={!isMenuOpen}
         onClick={(e) => {
           if (e.target === e.currentTarget) setIsMenuOpen(false);
@@ -401,9 +410,14 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       >
         <div
           ref={menuRef}
-          className={`relative w-full max-w-sm sm:max-w-md bg-white h-full min-h-screen sm:min-h-0 max-h-screen max-h-[100dvh] shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`relative w-full max-w-sm sm:max-w-md bg-white shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
+          style={{
+            height: "100%",
+            maxHeight: "100%",
+            minHeight: 0,
+          }}
         >
           {/* Drawer Top Header (Pinned at Top) */}
           <div className="shrink-0 bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
@@ -673,7 +687,12 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           </div>
 
           {/* Drawer Bottom Actions (Pinned at the very below of the menu across ALL devices) */}
-          <div className="shrink-0 p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div
+            className="shrink-0 w-full p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5 z-10"
+            style={{
+              paddingBottom: "max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))",
+            }}
+          >
             {user ? (
               <button
                 type="button"
@@ -681,7 +700,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs"
+                className="w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs touch-manipulation"
+                style={{ touchAction: "manipulation" }}
               >
                 SIGN OUT ACCOUNT
               </button>
@@ -689,13 +709,14 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <Link
                 href="/?tab=signin"
                 onClick={() => setIsMenuOpen(false)}
-                className="w-full py-2.5 sm:py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-[4px] active:scale-[0.99]"
+                className="w-full py-2.5 sm:py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-[4px] active:scale-[0.99] touch-manipulation"
+                style={{ touchAction: "manipulation" }}
               >
                 Sign In / Register Account
               </Link>
             )}
 
-            <div className="text-center text-[10px] sm:text-xs text-slate-500">
+            <div className="text-center text-[10px] sm:text-xs text-slate-500 font-medium">
               Dumalneg National High School &bull; School ID: 300017
             </div>
           </div>

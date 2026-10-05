@@ -204,7 +204,7 @@ export default function UserRoleAuditor() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                [ Role-Based Access Control (RBAC) &amp; Credential Directory ]
+                Role-Based Access Control (RBAC) &amp; Credential Directory
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
@@ -469,7 +469,7 @@ export default function UserRoleAuditor() {
 
                 <div>
                   <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                    [ DNHS Credential &amp; Profile Dossier ]
+                    DNHS Credential &amp; Profile Dossier
                   </span>
                   <h3 className="text-lg font-black text-slate-900 uppercase mt-0.5">
                     {viewingUser.fullName || viewingUser.userId}

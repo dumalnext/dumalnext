@@ -140,7 +140,7 @@ export default function ClassroomFacilityManager() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ School Facility &amp; Physical Classroom Registry ]
+              School Facility &amp; Physical Classroom Registry
             </span>
             <p className="text-xs text-slate-700 mt-1">
               Registered classrooms feed directly into the Schedule Deconfliction Engine. Room capacities are validated against section quotas to prevent physical overcrowding.
@@ -254,7 +254,7 @@ export default function ClassroomFacilityManager() {
                   IT SUPPORT FACILITY DESK
                 </span>
                 <h3 className="text-base font-bold text-slate-900 uppercase">
-                  {editingRoom ? `[ Edit Classroom Space: ${editingRoom.classroomId} ]` : "Register Classroom Space"}
+                  {editingRoom ? `Edit Classroom Space: ${editingRoom.classroomId}` : "Register Classroom Space"}
                 </h3>
               </div>
               <button

@@ -36,7 +36,7 @@ export default function ITSupportHeaderNav({
               href="/adjudication"
               className="text-white hover:text-amber-200 underline font-mono text-[10px] ml-2"
             >
-              [ Switch to Administrator Portal &rarr; ]
+              Switch to Administrator Portal &rarr;
             </Link>
           </div>
         </div>
