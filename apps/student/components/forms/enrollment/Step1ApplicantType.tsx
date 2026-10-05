@@ -240,12 +240,12 @@ export default function Step1ApplicantType({
     <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
       {/* Step Header */}
       <div className="border-b border-slate-200 pb-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-bold text-[#002060] tracking-wider">
-            Step 1 of 5 &bull; Academic Classification
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
+            Step 01 of 05
           </span>
-          <span className="px-2.5 py-0.5 bg-[#002060] text-white text-xs font-bold tracking-wider shadow-xs rounded-[4px]">
-            School Year: {schoolYear}
+          <span className="text-xs font-semibold text-slate-500 tracking-wider">
+            DepEd Form Sections 2, 6 &amp; 7
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-1">

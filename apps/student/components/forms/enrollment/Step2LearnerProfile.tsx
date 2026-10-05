@@ -290,7 +290,7 @@ export default function Step2LearnerProfile({
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded">
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
             Step 02 of 05
           </span>
           <span className="text-xs font-semibold text-slate-500 tracking-wider">
