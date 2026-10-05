@@ -401,7 +401,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       >
         <div
           ref={menuRef}
-          className={`relative w-full max-w-sm sm:max-w-md bg-white h-full max-h-[100dvh] shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`relative w-full max-w-sm sm:max-w-md bg-white h-full min-h-screen sm:min-h-0 max-h-screen max-h-[100dvh] shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -670,7 +670,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 </p>
               </Link>
 
-              {/* 5. Direct Sign Out Module (Inside Menu for Phone Devices and Tablets) */}
+              {/* 5. Universal Sign Out Module Action (Applies to ALL devices: Mobile, Tablet, Laptop, PC, Desktop) */}
               {user && (
                 <button
                   type="button"
@@ -678,7 +678,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     setIsMenuOpen(false);
                     logout();
                   }}
-                  className="w-full p-3 bg-red-50/70 hover:bg-red-100 border-2 border-red-300 hover:border-red-500 transition-all rounded-[4px] shadow-xs text-left cursor-pointer active:scale-[0.99] block mt-2"
+                  className="w-full p-3 bg-red-50/80 hover:bg-red-100 border-2 border-red-300 hover:border-red-500 transition-all rounded-[4px] shadow-xs text-left cursor-pointer active:scale-[0.99] block mt-2"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -697,7 +697,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             </div>
           </div>
 
-          {/* Drawer Bottom Actions (Pinned at the very below of the menu) */}
+          {/* Drawer Bottom Actions (Pinned at the very below of the menu across ALL devices) */}
           <div className="shrink-0 p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5 pb-[max(1rem,env(safe-area-inset-bottom))]">
             {user ? (
               <button
@@ -706,21 +706,21 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="w-full py-2.5 bg-red-50/60 hover:bg-red-100 text-red-800 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs"
+                className="w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs"
               >
-                Sign Out Account
+                SIGN OUT ACCOUNT
               </button>
             ) : (
               <Link
                 href="/?tab=signin"
                 onClick={() => setIsMenuOpen(false)}
-                className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-[4px] active:scale-[0.99]"
+                className="w-full py-2.5 sm:py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-[4px] active:scale-[0.99]"
               >
                 Sign In / Register Account
               </Link>
             )}
 
-            <div className="text-center text-[10px] text-slate-500">
+            <div className="text-center text-[10px] sm:text-xs text-slate-500">
               Dumalneg National High School &bull; School ID: 300017
             </div>
           </div>
