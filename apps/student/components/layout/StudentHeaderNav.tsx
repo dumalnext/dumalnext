@@ -353,32 +353,43 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       {/* Upper-Right: Quick Status Tag / User Info / Login */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {user ? (
-          <Link
-            href={appStatus ? trackHref : "/enroll"}
-            className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
-            title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
-          >
-            <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
-              {user.firstName} {user.lastName}
-            </span>
-            {appStatus === "Approved" ? (
-              <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px]">
-                APPROVED
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Link
+              href={appStatus ? trackHref : "/enroll"}
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
+              title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
+            >
+              <span className="font-bold tracking-tight truncate max-w-[85px] xs:max-w-[120px] sm:max-w-[160px] md:max-w-[200px]">
+                {user.firstName} {user.lastName}
               </span>
-            ) : appStatus === "Needs Revision" ? (
-              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px]">
-                REVISION
-              </span>
-            ) : appStatus === "Pending" ? (
-              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px]">
-                PENDING
-              </span>
-            ) : (
-              <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-[4px]">
-                ENROLL NOW
-              </span>
-            )}
-          </Link>
+              {appStatus === "Approved" ? (
+                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
+                  APPROVED
+                </span>
+              ) : appStatus === "Needs Revision" ? (
+                <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
+                  REVISION
+                </span>
+              ) : appStatus === "Pending" ? (
+                <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
+                  PENDING
+                </span>
+              ) : (
+                <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-[4px] whitespace-nowrap">
+                  ENROLL NOW
+                </span>
+              )}
+            </Link>
+            <button
+              type="button"
+              onClick={logout}
+              className="px-2 sm:px-2.5 py-1.5 bg-red-950/80 hover:bg-red-900 border border-red-500/50 hover:border-red-400 text-white text-xs font-bold uppercase tracking-wider transition-colors rounded-[4px] shadow-xs cursor-pointer active:scale-95 shrink-0"
+              title="Sign Out of student session"
+            >
+              <span className="hidden sm:inline">Sign Out</span>
+              <span className="sm:hidden text-[11px]">Exit</span>
+            </button>
+          </div>
         ) : (
           <Link
             href="/?tab=signin"
@@ -401,66 +412,68 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       >
         <div
           ref={menuRef}
-          className={`w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`w-full max-w-sm sm:max-w-md bg-white h-full max-h-[100dvh] shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          {/* Drawer Top Header */}
-          <div>
-            <div className="bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
-              <div className="flex items-center gap-2.5">
-                <img
-                  src="/dumalneg-logo.png"
-                  alt="Dumalneg National High School"
-                  className="w-9 h-9 object-contain shrink-0"
-                />
-                <div>
-                  <span className="text-[10px] text-blue-200 uppercase tracking-wider block">
-                    DUMALNEG NHS &bull; PORTAL MENU
-                  </span>
-                  <h3 className="text-sm font-bold tracking-tight mt-0.5">
-                    Navigation &amp; Services
-                  </h3>
-                </div>
+          {/* Drawer Top Header (Pinned at Top) */}
+          <div className="shrink-0 bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/dumalneg-logo.png"
+                alt="Dumalneg National High School"
+                className="w-9 h-9 object-contain shrink-0"
+              />
+              <div>
+                <span className="text-[10px] text-blue-200 uppercase tracking-wider block">
+                  DUMALNEG NHS &bull; PORTAL MENU
+                </span>
+                <h3 className="text-sm font-bold tracking-tight mt-0.5">
+                  Navigation &amp; Services
+                </h3>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setIsMenuOpen(false)}
-                className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-bold uppercase tracking-wider transition-all duration-200 ease-in-out cursor-pointer rounded-[4px] active:scale-95"
-              >
-                Close
-              </button>
             </div>
 
-              {/* Student Identity Section (If Authenticated) */}
-              {user ? (
-                <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">
-                      ACTIVE LEARNER SESSION
-                    </span>
-                    {appStatus === "Approved" ? (
-                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-bold uppercase rounded-[4px]">
-                        APPROVED
-                      </span>
-                    ) : appStatus === "Needs Revision" ? (
-                      <span className="text-[10px] bg-red-100 text-red-900 px-2 py-0.5 border border-red-400 font-bold uppercase rounded-[4px]">
-                        REVISION NEEDED
-                      </span>
-                    ) : appStatus === "Pending" ? (
-                      <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-400 font-bold uppercase rounded-[4px]">
-                        PENDING EVALUATION
-                      </span>
-                    ) : (
-                      <span className="text-[10px] bg-blue-100 text-blue-950 px-2 py-0.5 border border-blue-400 font-bold uppercase rounded-[4px]">
-                        NEW APPLICANT
-                      </span>
-                    )}
-                  </div>
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(false)}
+              className="px-2.5 py-1 bg-blue-900 hover:bg-red-900 text-white border border-blue-400/50 text-xs font-bold uppercase tracking-wider transition-all duration-200 ease-in-out cursor-pointer rounded-[4px] active:scale-95"
+            >
+              Close
+            </button>
+          </div>
 
-                  <div className="space-y-0.5">
-                    <h4 className="text-base font-bold text-slate-900">
+          {/* Drawer Scrollable Body (Middle) */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            {/* Student Identity Section (If Authenticated) */}
+            {user ? (
+              <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">
+                    ACTIVE LEARNER SESSION
+                  </span>
+                  {appStatus === "Approved" ? (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 border border-emerald-400 font-bold uppercase rounded-[4px] whitespace-nowrap shrink-0">
+                      APPROVED
+                    </span>
+                  ) : appStatus === "Needs Revision" ? (
+                    <span className="text-[10px] bg-red-100 text-red-900 px-2 py-0.5 border border-red-400 font-bold uppercase rounded-[4px] whitespace-nowrap shrink-0">
+                      REVISION NEEDED
+                    </span>
+                  ) : appStatus === "Pending" ? (
+                    <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-400 font-bold uppercase rounded-[4px] whitespace-nowrap shrink-0">
+                      PENDING EVALUATION
+                    </span>
+                  ) : (
+                    <span className="text-[10px] bg-blue-100 text-blue-950 px-2 py-0.5 border border-blue-400 font-bold uppercase rounded-[4px] whitespace-nowrap shrink-0">
+                      NEW APPLICANT
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-0.5 min-w-0">
+                    <h4 className="text-base font-bold text-slate-900 truncate">
                       {user.firstName} {user.lastName}
                     </h4>
                     <p className="text-xs text-slate-600">
@@ -470,233 +483,248 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       {user.email}
                     </p>
                   </div>
-
-                  {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
-                  {sectionMode === "ASSIGNED" && assignedSection ? (
-                    <Link
-                      href={sectionHref}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-bold text-emerald-800 uppercase tracking-widest block">
-                          SECTION ASSIGNED
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 text-[9px] font-bold uppercase rounded-[4px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
-                          Official Roster &rarr;
-                        </span>
-                      </div>
-                      <div className="text-xs font-bold text-emerald-950">
-                        Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
-                      </div>
-                      <div className="text-[10px] text-emerald-800">
-                        Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
-                      </div>
-                    </Link>
-                  ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
-                    <Link
-                      href="/enroll"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-bold text-[#002060] uppercase tracking-widest block">
-                          ENROLLMENT REQUIRED
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] text-[9px] font-bold uppercase rounded-[4px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
-                          Action Needed &rarr;
-                        </span>
-                      </div>
-                      <div className="text-xs font-bold text-slate-900">
-                        Please enroll to see your section
-                      </div>
-                      <p className="text-[10px] text-slate-600 leading-tight">
-                        Enroll in Trimester {activeTermNum} to unlock your continuing section placement.
-                      </p>
-                    </Link>
-                  ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
-                    <Link
-                      href={sectionHref}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-bold text-amber-900 uppercase tracking-widest block">
-                          SECTION STATUS &bull; TRANSFEREE
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-bold uppercase rounded-[4px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
-                          Pending Placement &rarr;
-                        </span>
-                      </div>
-                      <div className="text-xs font-bold text-amber-950">
-                        You&apos;re not yet assigned to a section
-                      </div>
-                      <p className="text-[10px] text-amber-900 leading-tight">
-                        Transferee evaluation in progress by the school administrator.
-                      </p>
-                    </Link>
-                  ) : (
-                    <Link
-                      href={sectionHref}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-bold text-amber-800 uppercase tracking-widest block">
-                          SECTION STATUS
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 text-[9px] font-bold uppercase rounded-[4px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-                          Pending Placement &rarr;
-                        </span>
-                      </div>
-                      <div className="text-xs font-bold text-amber-950">
-                        You&apos;re not yet assigned to a section
-                      </div>
-                      <p className="text-[10px] text-amber-800 leading-tight">
-                        Awaiting official section placement from the school administrator.
-                      </p>
-                    </Link>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      logout();
+                    }}
+                    className="px-2.5 py-1 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border border-red-300 hover:border-red-500 text-[11px] font-bold uppercase tracking-wider rounded-[4px] shrink-0 transition-colors cursor-pointer shadow-xs active:scale-95 inline-flex items-center gap-1"
+                    title="Sign Out of student session"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                  </button>
                 </div>
-              ) : (
-                <div className="p-4 bg-blue-50/70 border-b border-blue-200">
-                  <span className="text-[10px] font-bold text-[#002060] uppercase block">
-                    GUEST VISITOR
-                  </span>
-                  <p className="text-xs text-slate-700 mt-1">
-                    Sign in with your verified email to access online basic education enrollment or track your application status.
-                  </p>
-                </div>
-              )}
 
-              {/* Menu Navigation Links */}
-              <div className="p-4 space-y-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-                  PORTAL MODULES
+                {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
+                {sectionMode === "ASSIGNED" && assignedSection ? (
+                  <Link
+                    href={sectionHref}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-2.5 p-2.5 bg-emerald-50 hover:bg-emerald-100/70 border-2 border-emerald-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-bold text-emerald-800 uppercase tracking-widest block">
+                        SECTION ASSIGNED
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
+                        Official Roster &rarr;
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-emerald-950">
+                      Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
+                    </div>
+                    <div className="text-[10px] text-emerald-800">
+                      Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
+                    </div>
+                  </Link>
+                ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
+                  <Link
+                    href="/enroll"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-2.5 p-2.5 bg-blue-50 hover:bg-blue-100/70 border-2 border-[#002060] text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-bold text-[#002060] uppercase tracking-widest block">
+                        ENROLLMENT REQUIRED
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
+                        Action Needed &rarr;
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-900">
+                      Please enroll to see your section
+                    </div>
+                    <p className="text-[10px] text-slate-600 leading-tight">
+                      Enroll in Trimester {activeTermNum} to unlock your continuing section placement.
+                    </p>
+                  </Link>
+                ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
+                  <Link
+                    href={sectionHref}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-500 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-bold text-amber-900 uppercase tracking-widest block">
+                        SECTION STATUS &bull; TRANSFEREE
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
+                        Pending Placement &rarr;
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-amber-950">
+                      You&apos;re not yet assigned to a section
+                    </div>
+                    <p className="text-[10px] text-amber-900 leading-tight">
+                      Transferee evaluation in progress by the school administrator.
+                    </p>
+                  </Link>
+                ) : (
+                  <Link
+                    href={sectionHref}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-2.5 p-2.5 bg-amber-50 hover:bg-amber-100/70 border-2 border-amber-400 text-xs space-y-1 block transition-colors cursor-pointer rounded-[4px] shadow-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-bold text-amber-800 uppercase tracking-widest block">
+                        SECTION STATUS
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                        Pending Placement &rarr;
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-amber-950">
+                      You&apos;re not yet assigned to a section
+                    </div>
+                    <p className="text-[10px] text-amber-800 leading-tight">
+                      Awaiting official section placement from the school administrator.
+                    </p>
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 bg-blue-50/70 border-b border-blue-200">
+                <span className="text-[10px] font-bold text-[#002060] uppercase block">
+                  GUEST VISITOR
                 </span>
-
-                {/* 1. Home Link */}
-                <Link
-                  href="/"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
-                    pathname === "/"
-                      ? "bg-blue-50/80 border-[#002060] text-[#002060]"
-                      : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">
-                      Home Dashboard
-                    </span>
-                    <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    Return to student landing page, view school calendar advisories, and quick notices.
-                  </p>
-                </Link>
-
-                {/* 2. Enrollment Link */}
-                <Link
-                  href={enrollHref}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
-                    pathname === "/enroll"
-                      ? "bg-blue-50/80 border-[#002060] text-[#002060]"
-                      : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">
-                      Basic Education Enrollment
-                    </span>
-                    <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    Complete the 5-step official DepEd enrollment stepper for Junior and Senior High School.
-                  </p>
-                </Link>
-
-                {/* 3. Track Status Link */}
-                <Link
-                  href={trackHref}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
-                    pathname === "/track"
-                      ? "bg-blue-50/80 border-[#002060] text-[#002060]"
-                      : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">
-                      Track Application Status
-                    </span>
-                    <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    Real-time status tracking, registrar review remarks, and Certificate of Enrollment.
-                  </p>
-                </Link>
-
-                {/* 4. Section Placement & Advisory Link */}
-                <Link
-                  href={sectionHref}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
-                    pathname === "/section"
-                      ? "bg-blue-50/80 border-[#002060] text-[#002060]"
-                      : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">
-                      Class Section &amp; Advisory
-                    </span>
-                    <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    {sectionMode === "ASSIGNED" && assignedSection
-                      ? `Assigned in Section: ${assignedSection.name}`
-                      : sectionMode === "ENROLLMENT_REQUIRED"
-                      ? `Please enroll for Trimester ${activeTermNum} to see your section assignment.`
-                      : sectionMode === "NOT_ASSIGNED_TRANSFEREE"
-                      ? "You're not yet assigned to a section. Transferee evaluation in progress."
-                      : "You're not yet assigned to a section. Check official class placement."}
-                  </p>
-                </Link>
+                <p className="text-xs text-slate-700 mt-1">
+                  Sign in with your verified email to access online basic education enrollment or track your application status.
+                </p>
               </div>
+            )}
+
+            {/* Menu Navigation Links */}
+            <div className="p-4 space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
+                PORTAL MODULES
+              </span>
+
+              {/* 1. Home Link */}
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
+                  pathname === "/"
+                    ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                    : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">
+                    Home Dashboard
+                  </span>
+                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                  Return to student landing page, view school calendar advisories, and quick notices.
+                </p>
+              </Link>
+
+              {/* 2. Enrollment Link */}
+              <Link
+                href={enrollHref}
+                onClick={() => setIsMenuOpen(false)}
+                className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
+                  pathname === "/enroll"
+                    ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                    : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">
+                    Basic Education Enrollment
+                  </span>
+                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                  Complete the 5-step official DepEd enrollment stepper for Junior and Senior High School.
+                </p>
+              </Link>
+
+              {/* 3. Track Status Link */}
+              <Link
+                href={trackHref}
+                onClick={() => setIsMenuOpen(false)}
+                className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
+                  pathname === "/track"
+                    ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                    : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">
+                    Track Application Status
+                  </span>
+                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                  Real-time status tracking, registrar review remarks, and Certificate of Enrollment.
+                </p>
+              </Link>
+
+              {/* 4. Section Placement & Advisory Link */}
+              <Link
+                href={sectionHref}
+                onClick={() => setIsMenuOpen(false)}
+                className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
+                  pathname === "/section"
+                    ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                    : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">
+                    Class Section &amp; Advisory
+                  </span>
+                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                  {sectionMode === "ASSIGNED" && assignedSection
+                    ? `Assigned in Section: ${assignedSection.name}`
+                    : sectionMode === "ENROLLMENT_REQUIRED"
+                    ? `Please enroll for Trimester ${activeTermNum} to see your section assignment.`
+                    : sectionMode === "NOT_ASSIGNED_TRANSFEREE"
+                    ? "You're not yet assigned to a section. Transferee evaluation in progress."
+                    : "You're not yet assigned to a section. Check official class placement."}
+                </p>
+              </Link>
             </div>
+          </div>
 
-            {/* Drawer Bottom Actions */}
-            <div className="p-4 border-t-2 border-slate-200 bg-slate-50 space-y-3">
-              {user ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    logout();
-                  }}
-                  className="w-full py-2.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border-2 border-red-300 hover:border-red-500 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded active:scale-[0.99]"
-                >
-                  Sign Out Account
-                </button>
-              ) : (
-                <Link
-                  href="/?tab=signin"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded active:scale-[0.99]"
-                >
-                  Sign In / Register Account
-                </Link>
-              )}
+          {/* Drawer Bottom Actions (Pinned at Bottom!) */}
+          <div className="shrink-0 p-3 sm:p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2">
+            {user ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  logout();
+                }}
+                className="w-full py-2.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border-2 border-red-300 hover:border-red-500 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs"
+              >
+                Sign Out Account
+              </button>
+            ) : (
+              <Link
+                href="/?tab=signin"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-[4px] active:scale-[0.99]"
+              >
+                Sign In / Register Account
+              </Link>
+            )}
 
-              <div className="text-center text-[10px] text-slate-500">
-                Dumalneg National High School &bull; School ID: 300017
-              </div>
+            <div className="text-center text-[10px] text-slate-500">
+              Dumalneg National High School &bull; School ID: 300017
+            </div>
           </div>
         </div>
       </div>

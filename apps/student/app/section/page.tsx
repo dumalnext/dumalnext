@@ -1294,11 +1294,11 @@ function SectionPageContent() {
            ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-4 rounded-[4px]">
-            <div className="flex items-center justify-between border-blue-200 border-b pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-blue-200 border-b pb-3">
               <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
                 ENROLLMENT REQUIRED
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-200 text-[#002060] text-xs font-bold uppercase border border-blue-400 rounded-[4px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-200 text-[#002060] text-xs font-bold uppercase border border-blue-400 whitespace-nowrap shrink-0 rounded-[4px]">
                 <span className="w-2 h-2 rounded-full bg-[#002060] animate-pulse" />
                 Enrollment Needed
               </span>
@@ -1351,11 +1351,11 @@ function SectionPageContent() {
            ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-amber-50 border-2 border-amber-500 shadow-xs space-y-4 rounded-[4px]">
-            <div className="flex items-center justify-between border-b border-amber-300 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-300 pb-3">
               <span className="text-[10px] font-bold text-amber-900 uppercase tracking-widest block">
                 SECTION STATUS &bull; TRANSFEREE
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 text-xs font-bold uppercase border border-amber-400 rounded-[4px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 text-xs font-bold uppercase border border-amber-400 whitespace-nowrap shrink-0 rounded-[4px]">
                 <span className="w-2 h-2 rounded-full bg-amber-700 animate-pulse" />
                 Transferee Evaluation
               </span>
@@ -1408,11 +1408,11 @@ function SectionPageContent() {
            ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-amber-50 border-2 border-amber-400 shadow-xs space-y-4 rounded-[4px]">
-            <div className="flex items-center justify-between border-b border-amber-200 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-3">
               <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block">
                 SECTION STATUS
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 text-xs font-bold uppercase border border-amber-400 rounded-[4px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 text-xs font-bold uppercase border border-amber-400 whitespace-nowrap shrink-0 rounded-[4px]">
                 <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
                 Pending Placement
               </span>

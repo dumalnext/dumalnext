@@ -625,19 +625,48 @@ function StudentHomeContent() {
           {/* Welcome User Banner */}
           <div className="bg-white border-2 border-[#002060] p-6 sm:p-8 space-y-4 rounded-[4px] shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-              <div>
-                <span className="text-xs font-bold text-[#002060] block mb-0.5">
+              <div className="space-y-1.5 min-w-0">
+                <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
                   Authenticated Applicant Account
                 </span>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                   Welcome back, {user.firstName} {user.lastName}
                 </h2>
-                <p className="text-xs text-slate-600 mt-1">
-                  Registered Email: <strong className="text-slate-900">{user.email}</strong> &bull; Account ID: <span className="">{user.userId}</span>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-600 pt-0.5">
+                  <span className="inline-flex items-center gap-1.5 min-w-0">
+                    <span className="text-slate-500 font-medium">Registered Email:</span>
+                    <strong className="text-slate-900 break-all">{user.email}</strong>
+                  </span>
+                  <span className="hidden sm:inline text-slate-300" aria-hidden="true">&bull;</span>
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span className="text-slate-500 font-medium">Account ID:</span>
+                    <span className="font-semibold text-slate-800">{user.userId}</span>
+                  </span>
                   {user.lrn && /^\d{12}$/.test(user.lrn) && (
-                    <> &bull; DepEd LRN: <span className="font-bold text-[#002060]">{user.lrn}</span></>
+                    <>
+                      <span className="hidden sm:inline text-slate-300" aria-hidden="true">&bull;</span>
+                      <span className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                        <span className="text-slate-500 font-medium">DepEd LRN:</span>
+                        <span className="font-bold text-[#002060]">{user.lrn}</span>
+                      </span>
+                    </>
                   )}
-                </p>
+                </div>
+              </div>
+
+              {/* Direct Sign Out Action */}
+              <div className="flex sm:flex-col items-start sm:items-end justify-start sm:justify-center shrink-0 pt-1 sm:pt-0">
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="px-3 py-1.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border border-red-300 hover:border-red-500 text-xs font-bold uppercase tracking-wider transition-colors rounded-[4px] shadow-xs cursor-pointer active:scale-95 inline-flex items-center gap-1.5"
+                  title="Sign Out of student session"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign Out
+                </button>
               </div>
             </div>
 
@@ -645,11 +674,11 @@ function StudentHomeContent() {
             {sectionMode === "ASSIGNED" && assignedSection ? (
               <div className="p-3.5 sm:p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest block">
                       SECTION ASSIGNED
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase rounded-[4px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
                       {activeTermNum >= 2 ? "Automatic Continuing Roster" : "Official Roster"}
                     </span>
@@ -662,12 +691,12 @@ function StudentHomeContent() {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase rounded-[4px]">
+                  <span className="text-[11px] font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
                     Official Class Placement
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px]"
+                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
                   >
                     View Section &rarr;
                   </Link>
@@ -676,11 +705,11 @@ function StudentHomeContent() {
             ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
               <div className="p-3.5 sm:p-4 bg-blue-50 border-2 border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
                       ENROLLMENT REQUIRED
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] text-[10px] font-bold uppercase rounded-[4px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
                       Action Needed
                     </span>
@@ -693,12 +722,12 @@ function StudentHomeContent() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-[#002060] bg-blue-100 border border-blue-300 px-2.5 py-1 inline-block uppercase rounded-[4px]">
+                  <span className="text-[11px] font-bold text-[#002060] bg-blue-100 border border-blue-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
                     Enrollment Required
                   </span>
                   <Link
                     href="/enroll"
-                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px]"
+                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
                   >
                     Complete Enrollment &rarr;
                   </Link>
@@ -707,11 +736,11 @@ function StudentHomeContent() {
             ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
               <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-amber-900 uppercase tracking-widest block">
                       SECTION STATUS &bull; TRANSFEREE
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 text-[10px] font-bold uppercase rounded-[4px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
                       Transferee Evaluation
                     </span>
@@ -724,12 +753,12 @@ function StudentHomeContent() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase rounded-[4px]">
+                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
                     Pending Admin Evaluation
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px]"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
                   >
                     Check Status &rarr;
                   </Link>
@@ -738,11 +767,11 @@ function StudentHomeContent() {
             ) : (
               <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block">
                       SECTION STATUS
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 text-[10px] font-bold uppercase rounded-[4px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
                       Pending Placement
                     </span>
@@ -755,12 +784,12 @@ function StudentHomeContent() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase rounded-[4px]">
+                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
                     In Queue for Placement
                   </span>
                   <Link
                     href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px]"
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
                   >
                     Check Status &rarr;
                   </Link>
