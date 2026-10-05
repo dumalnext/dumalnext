@@ -669,31 +669,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     : "You're not yet assigned to a section. Check official class placement."}
                 </p>
               </Link>
-
-              {/* 5. Universal Sign Out Module Action (Applies to ALL devices: Mobile, Tablet, Laptop, PC, Desktop) */}
-              {user && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    logout();
-                  }}
-                  className="w-full p-3 bg-red-50/80 hover:bg-red-100 border-2 border-red-300 hover:border-red-500 transition-all rounded-[4px] shadow-xs text-left cursor-pointer active:scale-[0.99] block mt-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 text-red-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      Sign Out Account
-                    </span>
-                    <span className="text-[10px] text-red-700 font-bold uppercase">&rarr;</span>
-                  </div>
-                  <p className="text-[11px] text-red-700 mt-1 leading-normal">
-                    End active student session and return to guest portal.
-                  </p>
-                </button>
-              )}
             </div>
           </div>
 
