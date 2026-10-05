@@ -766,35 +766,51 @@ export default function EnrollmentStepper({
 
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
       <div className="bg-white border border-slate-300 p-3.5 sm:p-5 md:p-6 shadow-sm rounded-[4px]">
-        <div className="flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] sm:text-xs font-bold tracking-normal sm:tracking-wider text-[#002060] block leading-snug break-words">
-              Dumalneg NHS Online Enrollment &bull; S.Y. {formData.schoolYear || schoolYear} &bull; {formData.semester || semester}
-            </span>
-            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight mt-0.5">
-              Basic Education Enrollment Form
-            </h1>
+        <div className="mb-4 pb-3 border-b border-slate-200">
+          <div className="flex items-start sm:items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="text-[11px] sm:text-xs font-bold tracking-normal sm:tracking-wider text-[#002060] block leading-snug break-words">
+                Dumalneg NHS Online Enrollment &bull; S.Y. {formData.schoolYear || schoolYear} &bull; {formData.semester || semester}
+              </span>
+              <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight mt-0.5">
+                Basic Education Enrollment Form
+              </h1>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-start sm:self-center ml-auto">
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  onClick={handleResetDraft}
+                  className="hidden md:inline-flex text-xs font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
+                  title="Reset enrollment progress and start over from Step 1"
+                >
+                  Reset / Start Over
+                </button>
+              )}
+              <div className="text-right shrink-0">
+                <span className="text-xs font-bold text-slate-700 block whitespace-nowrap">
+                  Step {currentStep} of 5
+                </span>
+                <span className="text-[11px] text-[#002060] font-bold tracking-wider whitespace-nowrap">
+                  {Math.round((currentStep / 5) * 100)}% Complete
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-start sm:self-center ml-auto">
-            {currentStep > 1 && (
+
+          {/* Mobile & Small Tablet (< md): Dedicated action row for Reset / Start Over so title is NEVER squished */}
+          {currentStep > 1 && (
+            <div className="flex justify-end pt-2 md:hidden">
               <button
                 type="button"
                 onClick={handleResetDraft}
-                className="text-[11px] sm:text-xs font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
+                className="text-[11px] font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
                 title="Reset enrollment progress and start over from Step 1"
               >
                 Reset / Start Over
               </button>
-            )}
-            <div className="text-right shrink-0">
-              <span className="text-xs font-bold text-slate-700 block whitespace-nowrap">
-                Step {currentStep} of 5
-              </span>
-              <span className="text-[11px] text-[#002060] font-bold tracking-wider whitespace-nowrap">
-                {Math.round((currentStep / 5) * 100)}% Complete
-              </span>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Smart Linear Progress Bar (Universal for all devices) */}
