@@ -653,21 +653,6 @@ function StudentHomeContent() {
                   )}
                 </div>
               </div>
-
-              {/* Direct Sign Out Action */}
-              <div className="flex sm:flex-col items-start sm:items-end justify-start sm:justify-center shrink-0 pt-1 sm:pt-0">
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="px-3 py-1.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border border-red-300 hover:border-red-500 text-xs font-bold uppercase tracking-wider transition-colors rounded-[4px] shadow-xs cursor-pointer active:scale-95 inline-flex items-center gap-1.5"
-                  title="Sign Out of student session"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Sign Out
-                </button>
-              </div>
             </div>
 
             {/* Section Assignment Status Card */}

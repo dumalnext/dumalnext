@@ -353,43 +353,32 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       {/* Upper-Right: Quick Status Tag / User Info / Login */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {user ? (
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Link
-              href={appStatus ? trackHref : "/enroll"}
-              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
-              title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
-            >
-              <span className="font-bold tracking-tight truncate max-w-[85px] xs:max-w-[120px] sm:max-w-[160px] md:max-w-[200px]">
-                {user.firstName} {user.lastName}
+          <Link
+            href={appStatus ? trackHref : "/enroll"}
+            className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
+            title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
+          >
+            <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
+              {user.firstName} {user.lastName}
+            </span>
+            {appStatus === "Approved" ? (
+              <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
+                APPROVED
               </span>
-              {appStatus === "Approved" ? (
-                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
-                  APPROVED
-                </span>
-              ) : appStatus === "Needs Revision" ? (
-                <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
-                  REVISION
-                </span>
-              ) : appStatus === "Pending" ? (
-                <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
-                  PENDING
-                </span>
-              ) : (
-                <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-[4px] whitespace-nowrap">
-                  ENROLL NOW
-                </span>
-              )}
-            </Link>
-            <button
-              type="button"
-              onClick={logout}
-              className="px-2 sm:px-2.5 py-1.5 bg-red-950/80 hover:bg-red-900 border border-red-500/50 hover:border-red-400 text-white text-xs font-bold uppercase tracking-wider transition-colors rounded-[4px] shadow-xs cursor-pointer active:scale-95 shrink-0"
-              title="Sign Out of student session"
-            >
-              <span className="hidden sm:inline">Sign Out</span>
-              <span className="sm:hidden text-[11px]">Exit</span>
-            </button>
-          </div>
+            ) : appStatus === "Needs Revision" ? (
+              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
+                REVISION
+              </span>
+            ) : appStatus === "Pending" ? (
+              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
+                PENDING
+              </span>
+            ) : (
+              <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-[4px] whitespace-nowrap">
+                ENROLL NOW
+              </span>
+            )}
+          </Link>
         ) : (
           <Link
             href="/?tab=signin"
@@ -444,7 +433,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           </div>
 
           {/* Drawer Scrollable Body (Middle) */}
-          <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
             {/* Student Identity Section (If Authenticated) */}
             {user ? (
               <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
@@ -471,32 +460,16 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   )}
                 </div>
 
-                <div className="flex items-start justify-between gap-2">
-                  <div className="space-y-0.5 min-w-0">
-                    <h4 className="text-base font-bold text-slate-900 truncate">
-                      {user.firstName} {user.lastName}
-                    </h4>
-                    <p className="text-xs text-slate-600">
-                      LRN: <strong>{user.lrn || user.userId || "To be assigned"}</strong>
-                    </p>
-                    <p className="text-[11px] text-slate-500 truncate">
-                      {user.email}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      logout();
-                    }}
-                    className="px-2.5 py-1 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border border-red-300 hover:border-red-500 text-[11px] font-bold uppercase tracking-wider rounded-[4px] shrink-0 transition-colors cursor-pointer shadow-xs active:scale-95 inline-flex items-center gap-1"
-                    title="Sign Out of student session"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Sign Out
-                  </button>
+                <div className="space-y-0.5">
+                  <h4 className="text-base font-bold text-slate-900">
+                    {user.firstName} {user.lastName}
+                  </h4>
+                  <p className="text-xs text-slate-600">
+                    LRN: <strong>{user.lrn || user.userId || "To be assigned"}</strong>
+                  </p>
+                  <p className="text-[11px] text-slate-500 truncate">
+                    {user.email}
+                  </p>
                 </div>
 
                 {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
@@ -699,8 +672,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             </div>
           </div>
 
-          {/* Drawer Bottom Actions (Pinned at Bottom!) */}
-          <div className="shrink-0 p-3 sm:p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2">
+          {/* Drawer Bottom Actions (Pinned at Bottom of Menu) */}
+          <div className="shrink-0 p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5">
             {user ? (
               <button
                 type="button"
@@ -708,7 +681,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="w-full py-2.5 bg-white hover:bg-red-50 text-red-700 hover:text-red-900 border-2 border-red-300 hover:border-red-500 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs"
+                className="w-full py-2.5 bg-red-50/60 hover:bg-red-100 text-red-800 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs"
               >
                 Sign Out Account
               </button>
