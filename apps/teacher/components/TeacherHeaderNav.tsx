@@ -15,7 +15,7 @@ export default function TeacherHeaderNav() {
   const isOverview = pathname === "/" || pathname === "";
 
   return (
-    <header className="deped-header border-b-4 border-[#002060] bg-white text-slate-900 shadow-sm font-sans">
+    <header className="deped-header border-b-4 border-[#001744] bg-[#002060] text-white shadow-sm font-sans">
       {/* Top DepEd Region I Strip */}
       <div className="bg-[#002060] text-white px-4 sm:px-8 py-2.5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
@@ -36,10 +36,10 @@ export default function TeacherHeaderNav() {
       {/* Main Title & Faculty Info */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+          <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-widest block">
             Official Faculty Instruction &amp; Class Roster Management
           </span>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-950 uppercase">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white uppercase">
             Dumalneg National High School &bull; Faculty Portal
           </h1>
         </div>
