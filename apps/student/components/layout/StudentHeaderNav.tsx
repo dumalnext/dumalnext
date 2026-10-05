@@ -391,7 +391,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
       <div
-        className={`fixed inset-0 w-full z-50 bg-slate-950/70 backdrop-blur-xs flex justify-start overflow-hidden transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 w-full z-50 flex justify-start overflow-hidden transition-opacity duration-300 ease-in-out ${
           isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{
@@ -400,27 +400,32 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           left: 0,
           right: 0,
           bottom: 0,
-          height: "100%",
+          height: "100dvh",
           maxHeight: "100dvh",
         }}
         aria-hidden={!isMenuOpen}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) setIsMenuOpen(false);
-        }}
       >
+        {/* Semi-transparent Backdrop overlay (Click to dismiss) */}
+        <div
+          className="fixed inset-0 bg-slate-950/70 transition-opacity"
+          onClick={() => setIsMenuOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* Sliding Drawer Container with Strict Dynamic Viewport Height */}
         <div
           ref={menuRef}
-          className={`relative w-full max-w-sm sm:max-w-md bg-white shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`relative z-10 w-full max-w-sm sm:max-w-md bg-white shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col h-[100dvh] max-h-[100dvh] overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{
-            height: "100%",
-            maxHeight: "100%",
+            height: "100dvh",
+            maxHeight: "100dvh",
             minHeight: 0,
           }}
         >
           {/* Drawer Top Header (Pinned at Top) */}
-          <div className="shrink-0 bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900">
+          <div className="shrink-0 bg-[#002060] p-4 text-white flex items-center justify-between border-b-2 border-blue-900 z-10">
             <div className="flex items-center gap-2.5">
               <img
                 src="/dumalneg-logo.png"
@@ -446,8 +451,14 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             </button>
           </div>
 
-          {/* Drawer Scrollable Body (Middle) */}
-          <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
+          {/* Drawer Scrollable Body (Middle) - Mobile Touch Momentum Enabled */}
+          <div
+            className="flex-1 overflow-y-auto overscroll-contain min-h-0 touch-pan-y"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              overscrollBehavior: "contain",
+            }}
+          >
             {/* Student Identity Section (If Authenticated) */}
             {user ? (
               <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
@@ -475,15 +486,30 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 </div>
 
                 <div className="space-y-0.5">
-                  <h4 className="text-base font-bold text-slate-900">
-                    {user.firstName} {user.lastName}
-                  </h4>
-                  <p className="text-xs text-slate-600">
-                    LRN: <strong>{user.lrn || user.userId || "To be assigned"}</strong>
-                  </p>
-                  <p className="text-[11px] text-slate-500 truncate">
-                    {user.email}
-                  </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-base font-bold text-slate-900 truncate">
+                        {user.firstName} {user.lastName}
+                      </h4>
+                      <p className="text-xs text-slate-600">
+                        LRN: <strong>{user.lrn || user.userId || "To be assigned"}</strong>
+                      </p>
+                      <p className="text-[11px] text-slate-500 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        logout();
+                      }}
+                      className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-900 border border-red-300 font-bold uppercase text-[10px] tracking-wider rounded-[4px] cursor-pointer shrink-0 transition-colors active:scale-95 shadow-xs"
+                      title="Sign Out of Session"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
 
                 {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
@@ -700,7 +726,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-xs touch-manipulation"
+                className="w-full py-3 bg-red-700 hover:bg-red-800 active:bg-red-900 text-white border-2 border-red-800 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-md touch-manipulation"
                 style={{ touchAction: "manipulation" }}
               >
                 SIGN OUT ACCOUNT
