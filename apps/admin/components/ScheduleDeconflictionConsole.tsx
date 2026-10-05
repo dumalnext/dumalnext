@@ -956,26 +956,26 @@ export default function ScheduleDeconflictionConsole() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto">
           <button
             type="button"
             onClick={() => {
               setAutoAuditResult(null);
               setIsAutoModalOpen(true);
             }}
-            className="w-full sm:w-auto px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900 text-center"
+            className="w-full sm:w-auto px-3.5 sm:px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900 text-center"
             title="One-click automated timetable deconfliction engine for JHS and SHS"
           >
-            Smart Auto-Generate Timetable
+            Smart Auto-Generate
           </button>
           <button
             type="button"
             onClick={runAuditScan}
             disabled={isScanning}
-            className="w-full sm:w-auto px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60 text-center"
+            className="w-full sm:w-auto px-3 sm:px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60 text-center"
             title="Scan database for any schedule collisions"
           >
-            {isScanning ? "Scanning Timetables..." : "Run Deconfliction Audit Scan"}
+            {isScanning ? "Scanning..." : "Run Audit Scan"}
           </button>
           <button
             type="button"
@@ -1018,9 +1018,9 @@ export default function ScheduleDeconflictionConsole() {
 
               setIsAddModalOpen(true);
             }}
-            className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer text-center"
+            className="w-full sm:w-auto px-3.5 sm:px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer text-center"
           >
-            + Assign Class Schedule
+            + Assign Schedule
           </button>
         </div>
       </div>
@@ -1062,33 +1062,41 @@ export default function ScheduleDeconflictionConsole() {
       </div>
 
       {/* 3 Pillars of Conflict Checking Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print print:hidden">
-        <div className="p-4 bg-white border-2 border-slate-300 shadow-xs space-y-1">
-          <span className="text-[10px] font-mono text-slate-500 uppercase block">Active Timetable Slots</span>
-          <div className="text-2xl font-bold text-[#002060] font-mono">{schedules.length}</div>
-          <span className="text-[11px] text-slate-600">Total instructional periods assigned</span>
-        </div>
-
-        <div className="p-4 bg-white border-2 border-slate-300 shadow-xs space-y-1">
-          <span className="text-[10px] font-mono text-slate-500 uppercase block">Class Sections Programmed</span>
-          <div className="text-2xl font-bold text-emerald-800 font-mono">
-            {uniqueSectionsScheduled} / {sections.length}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print print:hidden">
+        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono text-slate-500 uppercase block">Active Timetable Slots</span>
+            <div className="text-2xl font-bold text-[#002060] font-mono mt-1">{schedules.length}</div>
           </div>
-          <span className="text-[11px] text-slate-600">Sections with active schedules</span>
+          <span className="text-[11px] text-slate-600 block leading-tight mt-1">Total instructional periods assigned</span>
         </div>
 
-        <div className="p-4 bg-white border-2 border-slate-300 shadow-xs space-y-1">
-          <span className="text-[10px] font-mono text-slate-500 uppercase block">Faculty Teaching Deployed</span>
-          <div className="text-2xl font-bold text-blue-900 font-mono">
-            {uniqueTeachersAssigned} / {teachers.length}
+        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono text-slate-500 uppercase block">Class Sections Programmed</span>
+            <div className="text-2xl font-bold text-emerald-800 font-mono mt-1">
+              {uniqueSectionsScheduled} / {sections.length}
+            </div>
           </div>
-          <span className="text-[11px] text-slate-600">Teachers with scheduled classes</span>
+          <span className="text-[11px] text-slate-600 block leading-tight mt-1">Sections with active schedules</span>
         </div>
 
-        <div className="p-4 bg-white border-2 border-slate-300 shadow-xs space-y-1">
-          <span className="text-[10px] font-mono text-slate-500 uppercase block">Collision Protection</span>
-          <div className="text-2xl font-bold text-emerald-700 font-mono">100%</div>
-          <span className="text-[11px] text-emerald-900 font-semibold">Zero overlapping double-assignments</span>
+        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono text-slate-500 uppercase block">Faculty Teaching Deployed</span>
+            <div className="text-2xl font-bold text-blue-900 font-mono mt-1">
+              {uniqueTeachersAssigned} / {teachers.length}
+            </div>
+          </div>
+          <span className="text-[11px] text-slate-600 block leading-tight mt-1">Teachers with scheduled classes</span>
+        </div>
+
+        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono text-slate-500 uppercase block">Collision Protection</span>
+            <div className="text-2xl font-bold text-emerald-700 font-mono mt-1">100%</div>
+          </div>
+          <span className="text-[11px] text-emerald-900 font-semibold block leading-tight mt-1">Zero overlapping double-assignments</span>
         </div>
       </div>
 
@@ -1096,7 +1104,7 @@ export default function ScheduleDeconflictionConsole() {
       {/* VIEW SELECTOR TABS */}
       {/* ========================================================================= */}
       <div className="bg-white border-2 border-slate-300 shadow-xs no-print print:hidden">
-        <div className="flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap border-b border-slate-200 text-xs font-bold uppercase tracking-wider">
+        <div className="flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap border-b border-slate-200 text-xs font-bold uppercase tracking-wider touch-pan-x">
           <button
             type="button"
             onClick={() => setViewMode("bySection")}
@@ -1260,7 +1268,10 @@ export default function ScheduleDeconflictionConsole() {
               )}
 
               {/* Matrix Table with Time Column on the Left */}
-              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border print:shadow-none">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
+                <span>&larr; Swipe horizontally to view full Mon–Fri schedule &rarr;</span>
+              </div>
+              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
                 <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
@@ -1546,7 +1557,10 @@ export default function ScheduleDeconflictionConsole() {
               )}
 
               {/* Matrix Table with Time Column on the Left */}
-              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border print:shadow-none">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
+                <span>&larr; Swipe horizontally to view full Mon–Fri schedule &rarr;</span>
+              </div>
+              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
                 <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
@@ -1810,15 +1824,19 @@ export default function ScheduleDeconflictionConsole() {
           {/* VIEW 3: MASTER TIMETABLE REGISTRY TABLE */}
           {/* ===================================================================== */}
           {viewMode === "all" && (
-            <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto print:border-none print:shadow-none">
-              <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">
-                <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                  MASTER TIMETABLE ALLOCATIONS &bull; {masterlistFiltered.length} ITEMS
-                </span>
-                <span className="text-[10px] font-mono text-slate-500 uppercase">
-                  DepEd Conflict-Free Timetable Engine
-                </span>
+            <div className="bg-white border-2 border-slate-300 shadow-xs overflow-hidden print:border-none print:shadow-none">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
+                <span>&larr; Swipe horizontally to view all columns &rarr;</span>
               </div>
+              <div className="overflow-x-auto touch-pan-x">
+                <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">
+                  <span className="text-xs font-mono font-bold text-slate-700 uppercase">
+                    MASTER TIMETABLE ALLOCATIONS &bull; {masterlistFiltered.length} ITEMS
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500 uppercase">
+                    DepEd Conflict-Free Timetable Engine
+                  </span>
+                </div>
 
               {masterlistFiltered.length === 0 ? (
                 <div className="p-12 text-center text-xs font-mono text-slate-500 uppercase">
@@ -1862,6 +1880,7 @@ export default function ScheduleDeconflictionConsole() {
                   </tbody>
                 </table>
               )}
+              </div>
             </div>
           )}
 

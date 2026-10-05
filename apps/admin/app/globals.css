@@ -522,3 +522,40 @@ label:not(.rounded-full):not([class*="rounded-full"])[class*="border"] {
   scrollbar-gutter: stable;
 }
 
+/* =========================================================================
+   IOS SAFARI & MOBILE RESPONSIVE ENHANCEMENTS
+   ========================================================================= */
+/* Prevent automatic zoom on iOS Safari when focusing form inputs */
+@media screen and (max-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Touch Momentum Scrolling & Touch-Action Utilities */
+.touch-pan-x {
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+
+.touch-pan-y {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe Area Padding for notch and bottom home indicators on iOS */
+.safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+.safe-top {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}

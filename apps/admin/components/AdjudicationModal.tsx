@@ -572,38 +572,38 @@ export default function AdjudicationModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
       <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-4xl max-h-[94vh] sm:max-h-[92vh] flex flex-col shadow-2xl rounded-lg overflow-hidden">
         {/* Modal Header */}
-        <div className="bg-[#002060] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
+        <div className="bg-[#002060] text-white p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
                 ENROLLMENT ADJUDICATION DOSSIER
               </span>
-              <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5 rounded-xs">
+              <span className="text-[9px] sm:text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-1.5 py-0.5 rounded-xs">
                 REF: {application.application_id}
               </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-white mt-1">
+            <h2 className="text-base sm:text-xl font-bold uppercase tracking-tight text-white mt-1 break-words leading-tight">
               {fullName}
             </h2>
-            <p className="text-xs text-blue-200">
+            <p className="text-[11px] sm:text-xs text-blue-200 break-words mt-0.5">
               Account: {application.userAccount?.email || "N/A"} &bull; Target: Grade {application.target_grade_level} {isSHS ? `(${shsTrackTitle})` : application.target_strand ? `(${application.target_strand})` : ""}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0">
             {/* Current Status Chip */}
             {application.status === "Approved" ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border-2 border-emerald-500 rounded">
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border-2 border-emerald-500 rounded">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
                 APPROVED
               </span>
             ) : application.status === "Needs Revision" ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border-2 border-red-500 rounded">
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border-2 border-red-500 rounded">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" />
                 REVISION REQUIRED
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border-2 border-amber-400 rounded">
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border-2 border-amber-400 rounded">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 PENDING VERIFICATION
               </span>
@@ -621,7 +621,7 @@ export default function AdjudicationModal({
         </div>
 
         {/* Tab Strip */}
-        <div className="bg-slate-100 border-b border-slate-300 px-3 sm:px-4 flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap gap-1 text-xs font-bold uppercase tracking-wider shrink-0">
+        <div className="bg-slate-100 border-b border-slate-300 px-2 sm:px-4 flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap gap-1 text-xs font-bold uppercase tracking-wider shrink-0 touch-pan-x">
           <button
             type="button"
             onClick={() => setActiveTab("learner")}

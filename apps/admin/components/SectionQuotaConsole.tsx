@@ -1305,50 +1305,58 @@ export default function SectionQuotaConsole() {
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 bg-white border-2 border-slate-300 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
-            Total Sections
-          </span>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
-            {totalSections}
+        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
+              Total Sections
+            </span>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
+              {totalSections}
+            </div>
           </div>
-          <span className="text-[10px] text-slate-500 block truncate">
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">
             {gradeFilter === "ALL" ? "All Grades Combined" : `Grade ${gradeFilter} Only`}
           </span>
         </div>
 
-        <div className="p-4 bg-blue-50/70 border-2 border-blue-300 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-            Total Capacity
-          </span>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-[#002060] mt-1">
-            {totalCapacity}
+        <div className="p-3.5 sm:p-4 bg-blue-50/70 border-2 border-blue-300 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
+              Total Capacity
+            </span>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-[#002060] mt-1">
+              {totalCapacity}
+            </div>
           </div>
-          <span className="text-[10px] text-blue-900 block truncate">
+          <span className="text-[10px] text-blue-900 block leading-tight mt-1.5 break-words">
             Configured Max Seats
           </span>
         </div>
 
-        <div className="p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
-            Officially Enrolled ({activeTerm.termName})
-          </span>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
-            {totalEnrolled}
+        <div className="p-3.5 sm:p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
+              Officially Enrolled ({activeTerm.termName})
+            </span>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
+              {totalEnrolled}
+            </div>
           </div>
-          <span className="text-[10px] text-emerald-900 block truncate">
+          <span className="text-[10px] text-emerald-900 block leading-tight mt-1.5 break-words">
             {overallPct}% Capacity Utilized
           </span>
         </div>
 
-        <div className="p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
-            Available Slots
-          </span>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
-            {totalAvailable}
+        <div className="p-3.5 sm:p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
+              Available Slots
+            </span>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
+              {totalAvailable}
+            </div>
           </div>
-          <span className="text-[10px] text-amber-900 block truncate">
+          <span className="text-[10px] text-amber-900 block leading-tight mt-1.5 break-words">
             Unfilled Seats Remaining
           </span>
         </div>
@@ -1356,7 +1364,7 @@ export default function SectionQuotaConsole() {
 
       {/* Filter Bar */}
       <div className="p-4 bg-white border-2 border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-2">
+        <div className="w-full sm:w-auto">
           <CustomSelect
             label="Grade Level:"
             value={gradeFilter}
@@ -1370,10 +1378,11 @@ export default function SectionQuotaConsole() {
               { value: "11", label: "Grade 11 (SHS)" },
               { value: "12", label: "Grade 12 (SHS)" },
             ]}
+            fullWidth
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
           <span className="text-xs text-slate-500 font-mono">
             Showing <strong>{filteredSections.length}</strong> section{filteredSections.length === 1 ? "" : "s"}
           </span>

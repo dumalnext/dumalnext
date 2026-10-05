@@ -93,17 +93,21 @@ export default function CustomSelect({
 
     let calculatedWidth = fullWidth
       ? rect.width
-      : Math.min(Math.max(rect.width, 220), viewportWidth - 24);
+      : Math.min(Math.max(rect.width, 220), viewportWidth - 16);
+
+    if (calculatedWidth > viewportWidth - 16) {
+      calculatedWidth = viewportWidth - 16;
+    }
 
     let calculatedLeft = align === "right" ? rect.right - calculatedWidth : rect.left;
 
     // Clamping to screen boundaries so it never clips off screen
-    if (calculatedLeft + calculatedWidth > viewportWidth - 10) {
-      calculatedLeft = Math.max(10, viewportWidth - calculatedWidth - 10);
+    if (calculatedLeft + calculatedWidth > viewportWidth - 8) {
+      calculatedLeft = Math.max(8, viewportWidth - calculatedWidth - 8);
     }
-    if (calculatedLeft < 10) {
-      calculatedLeft = 10;
-      calculatedWidth = Math.min(calculatedWidth, viewportWidth - 20);
+    if (calculatedLeft < 8) {
+      calculatedLeft = 8;
+      calculatedWidth = Math.min(calculatedWidth, viewportWidth - 16);
     }
 
     if (openUpwards) {
@@ -219,7 +223,7 @@ export default function CustomSelect({
             : "border-slate-300 hover:border-[#002060]"
         } ${disabled ? "opacity-50 cursor-not-allowed bg-slate-100" : ""}`}
       >
-        <div className="flex items-center gap-2 truncate text-left min-w-0">
+        <div className="flex items-center gap-2 text-left min-w-0 flex-1">
           {label && (
             <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-wider shrink-0">
               {label}
@@ -227,7 +231,7 @@ export default function CustomSelect({
           )}
 
           <span
-            className={`truncate ${
+            className={`min-w-0 flex-1 truncate ${
               selectedOption
                 ? "font-bold text-[#002060]"
                 : "font-normal text-slate-400 italic"
@@ -270,7 +274,7 @@ export default function CustomSelect({
               maxHeight: `${dropdownPosition.maxHeight}px`,
               zIndex: 99999,
             }}
-            className={`bg-white border-2 border-[#002060] shadow-2xl py-1 rounded-[4px] flex flex-col overflow-hidden animate-in fade-in-0 duration-100 ${dropdownClassName}`}
+            className={`bg-white border-2 border-[#002060] shadow-2xl py-1 rounded-[4px] flex flex-col overflow-hidden overscroll-contain animate-in fade-in-0 duration-100 ${dropdownClassName}`}
           >
             {/* Subtle Dropdown Title Bar */}
             {label && (
@@ -281,7 +285,7 @@ export default function CustomSelect({
             )}
 
             {/* Options List */}
-            <div className="py-1 overflow-y-auto divide-y divide-slate-100 flex-1 min-h-0 custom-scrollbar">
+            <div className="py-1 overflow-y-auto divide-y divide-slate-100 flex-1 min-h-0 custom-scrollbar overscroll-contain touch-pan-y">
               {options.map((option, idx) => {
                 const isSelected = String(option.value) === String(value);
                 const showCategoryHeader =

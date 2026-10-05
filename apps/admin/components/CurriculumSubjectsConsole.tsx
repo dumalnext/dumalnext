@@ -419,8 +419,12 @@ export default function CurriculumSubjectsConsole() {
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[650px] text-left text-xs border-collapse font-sans">
+      <div>
+        <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
+          <span>&larr; Swipe horizontally to view full subject details &rarr;</span>
+        </div>
+        <div className="overflow-x-auto touch-pan-x">
+          <table className="w-full min-w-[650px] text-left text-xs border-collapse font-sans">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-mono text-slate-700 uppercase">
               <th className="p-3 w-40">Subject Code</th>
@@ -517,6 +521,7 @@ export default function CurriculumSubjectsConsole() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
     );
   };
@@ -773,42 +778,50 @@ export default function CurriculumSubjectsConsole() {
 
       {/* Metrics Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-sans">
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
-            Total Active Subjects
-          </span>
-          <div className="text-2xl font-mono font-bold text-[#002060]">{totalCount}</div>
-          <span className="text-[10px] text-slate-500 block">Across all Grade 7-12 levels</span>
+        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+              Total Active Subjects
+            </span>
+            <div className="text-2xl font-mono font-bold text-[#002060] mt-1">{totalCount}</div>
+          </div>
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Across all Grade 7-12 levels</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
-            JHS Subjects (Grades 7–10)
-          </span>
-          <div className="text-2xl font-mono font-bold text-emerald-800">{jhsTotal}</div>
-          <span className="text-[10px] text-slate-500 block">Regular &amp; Special Program in Sports</span>
+        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+              JHS Subjects (Grades 7–10)
+            </span>
+            <div className="text-2xl font-mono font-bold text-emerald-800 mt-1">{jhsTotal}</div>
+          </div>
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Regular &amp; Special Program in Sports</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
-            SHS Subjects (Grades 11–12)
-          </span>
-          <div className="text-2xl font-mono font-bold text-blue-800">{shsTotal}</div>
-          <span className="text-[10px] text-slate-500 block">STEM, TVL, HUMSS &amp; Core Tracks</span>
+        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+              SHS Subjects (Grades 11–12)
+            </span>
+            <div className="text-2xl font-mono font-bold text-blue-800 mt-1">{shsTotal}</div>
+          </div>
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Academic, TechPro &amp; Core Tracks</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-4 space-y-1 shadow-xs">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
-            Specialized &amp; Electives
-          </span>
-          <div className="text-2xl font-mono font-bold text-indigo-800">{electivesCount}</div>
-          <span className="text-[10px] text-slate-500 block">Applied, Sports &amp; Track Subjects</span>
+        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+              Specialized &amp; Electives
+            </span>
+            <div className="text-2xl font-mono font-bold text-indigo-800 mt-1">{electivesCount}</div>
+          </div>
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Applied, Sports &amp; Track Subjects</span>
         </div>
       </div>
 
       {/* Global Filter & Search Bar */}
       <div className="bg-white border-2 border-slate-300 p-4 space-y-3 shadow-xs">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           {/* Search Box */}
           <div className="relative flex-1 w-full">
             <input
@@ -830,38 +843,46 @@ export default function CurriculumSubjectsConsole() {
             )}
           </div>
 
-          {/* Classification Type Filter */}
-          <CustomSelect
-            label="Type:"
-            value={typeFilter}
-            onChange={setTypeFilter}
-            options={[
-              { value: "ALL", label: "All Classification Types" },
-              { value: "Core", label: "Core Subjects" },
-              { value: "Specialized", label: "Specialized Subjects" },
-              { value: "Applied", label: "Applied Subjects" },
-              { value: "Elective", label: "Elective Subjects" },
-              { value: "Intervention", label: "Intervention (ARAL)" },
-            ]}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto">
+            {/* Classification Type Filter */}
+            <div className="w-full sm:w-auto">
+              <CustomSelect
+                label="Type:"
+                value={typeFilter}
+                onChange={setTypeFilter}
+                options={[
+                  { value: "ALL", label: "All Classification Types" },
+                  { value: "Core", label: "Core Subjects" },
+                  { value: "Specialized", label: "Specialized Subjects" },
+                  { value: "Applied", label: "Applied Subjects" },
+                  { value: "Elective", label: "Elective Subjects" },
+                  { value: "Intervention", label: "Intervention (ARAL)" },
+                ]}
+                fullWidth
+              />
+            </div>
 
-          {/* Strand Filter */}
-          <CustomSelect
-            label="Program:"
-            value={strandFilter}
-            onChange={setStrandFilter}
-            options={[
-              { value: "ALL", label: "All Programs / Tracks" },
-              { value: "Academic", label: "Academic Track (Strengthened SHS)" },
-              { value: "TechPro", label: "Technical-Professional (TechPro) Track" },
-              { value: "Regular", label: "Regular Basic Education (JHS)" },
-              { value: "SPS", label: "Special Program in Sports (SPS)" },
-              { value: "STEM", label: "STEM Track (Legacy SHS)" },
-              { value: "TVL-ICT", label: "TVL-ICT Track (Legacy SHS)" },
-              { value: "HUMSS", label: "HUMSS Track (Legacy SHS)" },
-              { value: "General", label: "General / Core (SHS)" },
-            ]}
-          />
+            {/* Strand Filter */}
+            <div className="w-full sm:w-auto">
+              <CustomSelect
+                label="Program:"
+                value={strandFilter}
+                onChange={setStrandFilter}
+                options={[
+                  { value: "ALL", label: "All Programs / Tracks" },
+                  { value: "Academic", label: "Academic Track (Strengthened SHS)" },
+                  { value: "TechPro", label: "Technical-Professional (TechPro) Track" },
+                  { value: "Regular", label: "Regular Basic Education (JHS)" },
+                  { value: "SPS", label: "Special Program in Sports (SPS)" },
+                  { value: "STEM", label: "STEM Track (Legacy SHS)" },
+                  { value: "TVL-ICT", label: "TVL-ICT Track (Legacy SHS)" },
+                  { value: "HUMSS", label: "HUMSS Track (Legacy SHS)" },
+                  { value: "General", label: "General / Core (SHS)" },
+                ]}
+                fullWidth
+              />
+            </div>
+          </div>
         </div>
 
         {/* Active Filter Indicator */}

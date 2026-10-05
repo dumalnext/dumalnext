@@ -653,17 +653,17 @@ export default function AdjudicationConsole() {
               TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"}
             </span>
           )}
-          <div className="mt-1">
+          <div className="flex flex-wrap items-center gap-1 mt-1">
             <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block">
               S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
             </span>
             {st?.current_section_id && (
-              <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block ml-1">
+              <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block">
                 {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
               </span>
             )}
             {app.target_grade_level >= 11 && ((app as any).selected_electives?.[0]?.assigned_elective_section_name || ((app as any).selected_electives?.[0]?.assigned_elective_name ? `Elective - ${(app as any).selected_electives[0].assigned_elective_name}` : null)) && (
-              <span className="text-[10px] font-mono font-bold text-purple-900 bg-purple-100 px-1.5 py-0.5 border border-purple-300 inline-block ml-1">
+              <span className="text-[10px] font-mono font-bold text-purple-900 bg-purple-100 px-1.5 py-0.5 border border-purple-300 inline-block">
                 {(app as any).selected_electives[0].assigned_elective_section_name || `Elective - ${(app as any).selected_electives[0].assigned_elective_name}`}
               </span>
             )}
@@ -784,14 +784,16 @@ export default function AdjudicationConsole() {
       {/* Executive KPI Metric Cards (Real-Time Dynamic Recalculation) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Applications */}
-        <div className="p-4 bg-white border-2 border-slate-300 shadow-xs transition-all">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
-            Total Applications
-          </span>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
-            {totalCount}
+        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs transition-all flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
+              Total Applications
+            </span>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
+              {totalCount}
+            </div>
           </div>
-          <span className="text-[10px] text-slate-500 block truncate">
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
               ? (gradeFilter === "ALL" ? "All Terms • All Grades" : `All Terms • Grade ${gradeFilter}`)
               : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
@@ -799,17 +801,19 @@ export default function AdjudicationConsole() {
         </div>
 
         {/* Pending (Yellow) */}
-        <div className="p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs transition-all">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
-            <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
-              Pending Verification
-            </span>
+        <div className="p-3.5 sm:p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+              <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
+                Pending Verification
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
+              {pendingCount}
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
-            {pendingCount}
-          </div>
-          <span className="text-[10px] text-amber-900 block truncate">
+          <span className="text-[10px] text-amber-900 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
               ? (gradeFilter === "ALL" ? "All Terms • Awaiting decision" : `Grade ${gradeFilter} • Awaiting decision`)
               : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
@@ -817,17 +821,19 @@ export default function AdjudicationConsole() {
         </div>
 
         {/* Approved (Green) */}
-        <div className="p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs transition-all">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
-            <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
-              Approved &amp; Enrolled
-            </span>
+        <div className="p-3.5 sm:p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
+              <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
+                Approved &amp; Enrolled
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
+              {approvedCount}
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
-            {approvedCount}
-          </div>
-          <span className="text-[10px] text-emerald-900 block truncate">
+          <span className="text-[10px] text-emerald-900 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
               ? (gradeFilter === "ALL" ? "All Terms • Official enrollees" : `Grade ${gradeFilter} • Official enrollees`)
               : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
@@ -835,17 +841,19 @@ export default function AdjudicationConsole() {
         </div>
 
         {/* Needs Revision (Red) */}
-        <div className="p-4 bg-red-50/70 border-2 border-red-500 shadow-xs transition-all">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0" />
-            <span className="text-[10px] font-mono font-bold text-red-950 uppercase block">
-              Needs Revision
-            </span>
+        <div className="p-3.5 sm:p-4 bg-red-50/70 border-2 border-red-500 shadow-xs transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0" />
+              <span className="text-[10px] font-mono font-bold text-red-950 uppercase block">
+                Needs Revision
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-red-950 mt-1">
+              {revisionCount}
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-red-950 mt-1">
-            {revisionCount}
-          </div>
-          <span className="text-[10px] text-red-900 block truncate">
+          <span className="text-[10px] text-red-900 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
               ? (gradeFilter === "ALL" ? "All Terms • Action required" : `Grade ${gradeFilter} • Action required`)
               : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
@@ -857,7 +865,7 @@ export default function AdjudicationConsole() {
       <div className="p-4 bg-white border-2 border-slate-300 space-y-3 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Status Tabs */}
-          <div className="flex flex-wrap gap-1.5 text-xs font-bold uppercase tracking-wider">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs font-bold uppercase tracking-wider">
             <button
               type="button"
               onClick={() => setStatusFilter("ALL")}
@@ -911,33 +919,42 @@ export default function AdjudicationConsole() {
           </div>
 
           {/* Academic Period, Grade & Search Filter Controls */}
-          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-wrap items-center gap-2 w-full lg:w-auto">
             {/* School Year Selector */}
-            <CustomSelect
-              label="SY:"
-              value={selectedSY}
-              onChange={setSelectedSY}
-              options={syOptions}
-            />
+            <div className="w-full sm:w-auto">
+              <CustomSelect
+                label="SY:"
+                value={selectedSY}
+                onChange={setSelectedSY}
+                options={syOptions}
+                fullWidth
+              />
+            </div>
 
             {/* Term / Trimester Selector */}
-            <CustomSelect
-              label="Term:"
-              value={selectedTerm}
-              onChange={setSelectedTerm}
-              options={termOptions}
-            />
+            <div className="w-full sm:w-auto">
+              <CustomSelect
+                label="Term:"
+                value={selectedTerm}
+                onChange={setSelectedTerm}
+                options={termOptions}
+                fullWidth
+              />
+            </div>
 
             {/* Grade Selector */}
-            <CustomSelect
-              label="Grade:"
-              value={gradeFilter}
-              onChange={setGradeFilter}
-              options={gradeOptions}
-            />
+            <div className="w-full sm:w-auto">
+              <CustomSelect
+                label="Grade:"
+                value={gradeFilter}
+                onChange={setGradeFilter}
+                options={gradeOptions}
+                fullWidth
+              />
+            </div>
 
             {/* Search Input */}
-            <div className="relative w-full sm:flex-1 sm:min-w-[180px] lg:w-64">
+            <div className="relative w-full sm:col-span-3 lg:col-span-1 lg:w-64">
               <input
                 type="text"
                 value={searchQuery}
@@ -948,7 +965,7 @@ export default function AdjudicationConsole() {
                   }
                 }}
                 placeholder="Search LRN, Ref Code, or Name..."
-                className="w-full pl-3 pr-7 py-1.5 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                className="w-full pl-3 pr-7 py-2 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
               />
               {searchQuery && (
                 <button
@@ -1057,23 +1074,28 @@ export default function AdjudicationConsole() {
                           No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
                         </div>
                       ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
-                            <thead>
-                              <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
-                                <th className="p-2.5">Reference No.</th>
-                                <th className="p-2.5">Learner Full Name</th>
-                                <th className="p-2.5">12-Digit LRN</th>
-                                <th className="p-2.5">Curriculum / Program</th>
-                                <th className="p-2.5">Date Submitted</th>
-                                <th className="p-2.5">Status</th>
-                                <th className="p-2.5 text-right">Adjudication Action</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                              {gradeApps.map((app) => renderApplicationRow(app))}
-                            </tbody>
-                          </table>
+                        <div>
+                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
+                            <span>&larr; Swipe horizontally to view full dossier details &rarr;</span>
+                          </div>
+                          <div className="overflow-x-auto touch-pan-x">
+                            <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
+                              <thead>
+                                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                  <th className="p-2.5">Reference No.</th>
+                                  <th className="p-2.5">Learner Full Name</th>
+                                  <th className="p-2.5">12-Digit LRN</th>
+                                  <th className="p-2.5">Curriculum / Program</th>
+                                  <th className="p-2.5">Date Submitted</th>
+                                  <th className="p-2.5">Status</th>
+                                  <th className="p-2.5 text-right">Adjudication Action</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {gradeApps.map((app) => renderApplicationRow(app))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1126,23 +1148,28 @@ export default function AdjudicationConsole() {
                           No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
                         </div>
                       ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
-                            <thead>
-                              <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
-                                <th className="p-2.5">Reference No.</th>
-                                <th className="p-2.5">Learner Full Name</th>
-                                <th className="p-2.5">12-Digit LRN</th>
-                                <th className="p-2.5">SHS Track &amp; Elective</th>
-                                <th className="p-2.5">Date Submitted</th>
-                                <th className="p-2.5">Status</th>
-                                <th className="p-2.5 text-right">Adjudication Action</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                              {gradeApps.map((app) => renderApplicationRow(app))}
-                            </tbody>
-                          </table>
+                        <div>
+                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
+                            <span>&larr; Swipe horizontally to view full dossier details &rarr;</span>
+                          </div>
+                          <div className="overflow-x-auto touch-pan-x">
+                            <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
+                              <thead>
+                                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                  <th className="p-2.5">Reference No.</th>
+                                  <th className="p-2.5">Learner Full Name</th>
+                                  <th className="p-2.5">12-Digit LRN</th>
+                                  <th className="p-2.5">SHS Track &amp; Elective</th>
+                                  <th className="p-2.5">Date Submitted</th>
+                                  <th className="p-2.5">Status</th>
+                                  <th className="p-2.5 text-right">Adjudication Action</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {gradeApps.map((app) => renderApplicationRow(app))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       )}
                     </div>
