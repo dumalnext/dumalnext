@@ -27,28 +27,29 @@ export default function StudentLayout({
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
         <StudentProviders>
           {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
-          <header className="deped-header px-3 sm:px-6 py-2.5 sm:py-3.5 shadow-md relative z-40">
+          <header className="deped-header px-3 sm:px-6 py-2 sm:py-3 shadow-md relative z-40">
             <StudentHeaderNav>
-              <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <Link
                   href="/"
-                  className="shrink-0 flex items-center group transition-transform active:scale-95"
+                  className="shrink-0 flex items-center justify-center group transition-transform active:scale-95"
                   title="Dumalneg National High School Portal Home"
                 >
                   <img
                     src="/dumalneg-logo.png"
                     alt="Dumalneg National High School Official Seal"
-                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+                    className="w-9 h-9 sm:w-10 sm:h-10 lg:w-13 lg:h-13 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
                   />
                 </Link>
-                <div className="min-w-0">
-                  <p className="hidden md:block text-[9px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase truncate">
+                {/* School Name & System Title: Hidden on mobile & tablets, displayed on PC/laptop */}
+                <div className="hidden lg:block min-w-0">
+                  <p className="text-[10px] sm:text-xs font-semibold tracking-wider text-slate-200 uppercase truncate">
                     Republic of the Philippines | Department of Education | Region I
                   </p>
-                  <h1 className="text-xs sm:text-base md:text-lg lg:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
+                  <h1 className="text-sm md:text-base lg:text-lg xl:text-xl font-bold tracking-tight text-white mt-0.5 truncate">
                     DUMALNEG NATIONAL HIGH SCHOOL
                   </h1>
-                  <p className="hidden xs:block text-[10px] sm:text-xs text-slate-300 font-medium truncate">
+                  <p className="text-[10px] sm:text-xs text-slate-300 font-medium truncate">
                     Student Online Portal &amp; Basic Education Enrollment System
                   </p>
                 </div>
