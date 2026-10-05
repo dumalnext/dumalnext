@@ -194,26 +194,26 @@ export default function DocumentViewerModal({
       </main>
 
       {/* Bottom Adjudication Inspection Bar */}
-      <footer className="bg-slate-900 border-t border-slate-800 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0">
-        <div className="flex items-center gap-4 text-slate-300">
+      <footer className="bg-slate-900 border-t border-slate-800 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs shrink-0">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-slate-300">
           <div>
             <span className="text-slate-500 text-[10px] uppercase block">Original File Name</span>
-            <span className="font-mono font-bold text-white text-[11px]">{document.fileName}</span>
+            <span className="font-mono font-bold text-white text-[11px] truncate max-w-[180px] block">{document.fileName}</span>
           </div>
           {document.sizeKb && (
-            <div className="border-l border-slate-800 pl-4">
+            <div className="border-l border-slate-800 pl-3 sm:pl-4">
               <span className="text-slate-500 text-[10px] uppercase block">Compressed Size</span>
               <span className="font-mono font-bold text-slate-200 text-[11px]">{document.sizeKb} KB</span>
             </div>
           )}
-          <div className="border-l border-slate-800 pl-4">
+          <div className="border-l border-slate-800 pl-3 sm:pl-4">
             <span className="text-slate-500 text-[10px] uppercase block">Authentication</span>
             <span className="text-emerald-400 font-bold font-mono text-[11px]">VALID CREDENTIAL</span>
           </div>
         </div>
 
         {/* Quick Review Feedback Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           {onFlagRevision && (
             <button
               type="button"
@@ -221,7 +221,7 @@ export default function DocumentViewerModal({
                 onFlagRevision(document.docTitle);
                 onClose();
               }}
-              className="px-3.5 py-1.5 bg-red-900/80 hover:bg-red-800 border border-red-600 text-white font-bold uppercase tracking-wider text-[11px]"
+              className="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 bg-red-900/80 hover:bg-red-800 border border-red-600 text-white font-bold uppercase tracking-wider text-[11px] cursor-pointer text-center"
             >
               Flag: Request Clearer Copy
             </button>
@@ -234,7 +234,7 @@ export default function DocumentViewerModal({
                 onVerify(document.docTitle);
                 onClose();
               }}
-              className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-700 border border-emerald-500 text-white font-bold uppercase tracking-wider text-[11px]"
+              className="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 bg-emerald-800 hover:bg-emerald-700 border border-emerald-500 text-white font-bold uppercase tracking-wider text-[11px] cursor-pointer text-center"
             >
               Mark Verified &amp; Legible
             </button>

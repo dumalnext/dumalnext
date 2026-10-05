@@ -420,7 +420,7 @@ export default function CurriculumSubjectsConsole() {
 
     return (
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse font-sans">
+        <table className="w-full min-w-[650px] text-left text-xs border-collapse font-sans">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-mono text-slate-700 uppercase">
               <th className="p-3 w-40">Subject Code</th>
@@ -725,18 +725,18 @@ export default function CurriculumSubjectsConsole() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
           <button
             type="button"
             onClick={fetchSubjects}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center"
           >
             Refresh Subjects
           </button>
           <button
             type="button"
             onClick={() => handleOpenCreateModal()}
-            className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer text-center"
           >
             + Add New Subject
           </button>
@@ -1058,8 +1058,8 @@ export default function CurriculumSubjectsConsole() {
       {/* 3. CREATE / EDIT SUBJECT MODAL (NO TRIMESTER FIELD) */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[90vh]">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
               <div>
@@ -1325,19 +1325,19 @@ export default function CurriculumSubjectsConsole() {
               </div>
 
               {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-3 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={handleCloseModal}
                   disabled={isSaving}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:bg-slate-400"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:bg-slate-400 text-center order-1 sm:order-2"
                 >
                   {isSaving
                     ? "Saving..."
@@ -1355,8 +1355,8 @@ export default function CurriculumSubjectsConsole() {
       {/* 4. CONFIRM DELETE MODAL */}
       {/* ========================================================================= */}
       {deleteSubjectTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-4 border-red-700 w-full max-w-md shadow-2xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
+          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
             <div className="border-b border-red-200 pb-2">
               <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
                 CONFIRM REMOVAL OF SUBJECT
@@ -1384,12 +1384,12 @@ export default function CurriculumSubjectsConsole() {
               Note: If this subject is actively assigned in any existing class schedules, removal will be prevented to protect timetable integrity.
             </p>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setDeleteSubjectTarget(null)}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
               >
                 Cancel
               </button>
@@ -1397,7 +1397,7 @@ export default function CurriculumSubjectsConsole() {
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:bg-slate-400"
+                className="w-full sm:w-auto px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:bg-slate-400 text-center order-1 sm:order-2"
               >
                 {isDeleting ? "Removing..." : "Confirm Delete"}
               </button>

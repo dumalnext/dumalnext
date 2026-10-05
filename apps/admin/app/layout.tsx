@@ -1,10 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AdminAuthProvider } from "@/lib/auth/authContext";
 
 export const metadata: Metadata = {
   title: "School Administrator Portal | Dumalneg National High School",
   description: "Official School Administrator & Admissions Portal for Dumalneg National High School",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function AdminLayout({
@@ -14,7 +20,7 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden">
         <AdminAuthProvider>
           <div className="flex-1 flex flex-col">
             {children}

@@ -911,7 +911,7 @@ export default function AdjudicationConsole() {
           </div>
 
           {/* Academic Period, Grade & Search Filter Controls */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
             {/* School Year Selector */}
             <CustomSelect
               label="SY:"
@@ -937,7 +937,7 @@ export default function AdjudicationConsole() {
             />
 
             {/* Search Input */}
-            <div className="relative flex-1 min-w-[180px] sm:w-64">
+            <div className="relative w-full sm:flex-1 sm:min-w-[180px] lg:w-64">
               <input
                 type="text"
                 value={searchQuery}
@@ -1058,7 +1058,7 @@ export default function AdjudicationConsole() {
                         </div>
                       ) : (
                         <div className="overflow-x-auto">
-                          <table className="w-full text-left border-collapse text-xs font-sans">
+                          <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
                             <thead>
                               <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
                                 <th className="p-2.5">Reference No.</th>
@@ -1127,7 +1127,7 @@ export default function AdjudicationConsole() {
                         </div>
                       ) : (
                         <div className="overflow-x-auto">
-                          <table className="w-full text-left border-collapse text-xs font-sans">
+                          <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
                             <thead>
                               <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
                                 <th className="p-2.5">Reference No.</th>

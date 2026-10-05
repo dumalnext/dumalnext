@@ -286,12 +286,12 @@ export default function EnrollmentControlRoom() {
           </div>
 
           {/* Master Switch Button */}
-          <div className="shrink-0 flex flex-col items-end gap-1.5">
+          <div className="shrink-0 flex flex-col items-stretch sm:items-end gap-1.5 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleToggleSwitch}
               disabled={isSaving}
-              className={`px-6 py-3.5 text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-sm border-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
+              className={`w-full sm:w-auto px-6 py-3.5 text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-sm border-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed text-center ${
                 settings.isEnrollmentOpen
                   ? "bg-red-700 hover:bg-red-800 text-white border-red-900"
                   : "bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-900"
@@ -305,7 +305,7 @@ export default function EnrollmentControlRoom() {
                 "TURN ON / OPEN ENROLLMENT"
               )}
             </button>
-            <span className="text-[10px] font-mono text-slate-500">
+            <span className="text-[10px] font-mono text-slate-500 text-center sm:text-right">
               Click to toggle &bull; Broadcasts instantly to student portal in real-time
             </span>
           </div>
@@ -450,19 +450,19 @@ export default function EnrollmentControlRoom() {
         </div>
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200">
           <div className="text-[11px] font-mono text-slate-500">
             {settings.updatedAt && (
               <>Last updated: {new Date(settings.updatedAt).toLocaleString()}</>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={loadSettings}
               disabled={isLoading || isSaving}
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase border border-slate-300 transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase border border-slate-300 transition-colors cursor-pointer text-center"
             >
               Discard / Reload
             </button>
@@ -471,7 +471,7 @@ export default function EnrollmentControlRoom() {
               type="button"
               onClick={() => handleSave()}
               disabled={isSaving}
-              className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-center"
             >
               {isSaving ? "Saving Settings..." : "Save & Broadcast Enrollment Controls"}
             </button>

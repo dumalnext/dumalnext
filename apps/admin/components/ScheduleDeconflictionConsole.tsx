@@ -681,14 +681,14 @@ export default function ScheduleDeconflictionConsole() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto">
           <button
             type="button"
             onClick={() => {
               setAutoAuditResult(null);
               setIsAutoModalOpen(true);
             }}
-            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900"
+            className="w-full sm:w-auto px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900 text-center"
             title="One-click automated timetable deconfliction engine for JHS and SHS"
           >
             Smart Auto-Generate Timetable
@@ -697,7 +697,7 @@ export default function ScheduleDeconflictionConsole() {
             type="button"
             onClick={runAuditScan}
             disabled={isScanning}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60"
+            className="w-full sm:w-auto px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60 text-center"
             title="Scan database for any schedule collisions"
           >
             {isScanning ? "Scanning Timetables..." : "Run Deconfliction Audit Scan"}
@@ -705,7 +705,7 @@ export default function ScheduleDeconflictionConsole() {
           <button
             type="button"
             onClick={() => setIsResetConfirmOpen(true)}
-            className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer text-center"
             title="Reset and clear all timetables"
           >
             Clear All
@@ -743,7 +743,7 @@ export default function ScheduleDeconflictionConsole() {
 
               setIsAddModalOpen(true);
             }}
-            className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer text-center"
           >
             + Assign Class Schedule
           </button>
@@ -821,11 +821,11 @@ export default function ScheduleDeconflictionConsole() {
       {/* VIEW SELECTOR TABS */}
       {/* ========================================================================= */}
       <div className="bg-white border-2 border-slate-300 shadow-xs no-print print:hidden">
-        <div className="flex border-b border-slate-200 text-xs font-bold uppercase tracking-wider">
+        <div className="flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap border-b border-slate-200 text-xs font-bold uppercase tracking-wider">
           <button
             type="button"
             onClick={() => setViewMode("bySection")}
-            className={`py-3 px-5 border-b-2 transition-colors cursor-pointer ${
+            className={`py-3 px-3.5 sm:px-5 shrink-0 border-b-2 transition-colors cursor-pointer ${
               viewMode === "bySection"
                 ? "border-[#002060] text-[#002060] bg-slate-50"
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -836,7 +836,7 @@ export default function ScheduleDeconflictionConsole() {
           <button
             type="button"
             onClick={() => setViewMode("byTeacher")}
-            className={`py-3 px-5 border-b-2 transition-colors cursor-pointer ${
+            className={`py-3 px-3.5 sm:px-5 shrink-0 border-b-2 transition-colors cursor-pointer ${
               viewMode === "byTeacher"
                 ? "border-[#002060] text-[#002060] bg-slate-50"
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -847,7 +847,7 @@ export default function ScheduleDeconflictionConsole() {
           <button
             type="button"
             onClick={() => setViewMode("all")}
-            className={`py-3 px-5 border-b-2 transition-colors cursor-pointer ${
+            className={`py-3 px-3.5 sm:px-5 shrink-0 border-b-2 transition-colors cursor-pointer ${
               viewMode === "all"
                 ? "border-[#002060] text-[#002060] bg-slate-50"
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -1256,7 +1256,7 @@ export default function ScheduleDeconflictionConsole() {
                   No schedules matching your filter query.
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse text-xs font-sans">
+                <table className="w-full min-w-[720px] text-left border-collapse text-xs font-sans">
                   <thead>
                     <tr className="bg-slate-100 border-b-2 border-slate-300 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                       <th className="p-3">Day</th>
@@ -1322,8 +1322,8 @@ export default function ScheduleDeconflictionConsole() {
       {/* MODAL: ASSIGN NEW CLASS SCHEDULE (WITH REAL-TIME DECONFLICTION GUARD) */}
       {/* ========================================================================= */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-2xl shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
               <div>
@@ -1549,18 +1549,18 @@ export default function ScheduleDeconflictionConsole() {
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0">
+              <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider cursor-pointer text-center order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingAdd || Boolean(preFlightConflict)}
-                  className="px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-2xs text-center order-1 sm:order-2"
                 >
                   {isSubmittingAdd ? "Verifying..." : "Save & Confirm Schedule"}
                 </button>
@@ -1734,7 +1734,7 @@ export default function ScheduleDeconflictionConsole() {
             </div>
 
             {/* Modal Actions */}
-            <div className="p-4 bg-slate-100 border-t border-slate-300 flex items-center justify-between gap-3">
+            <div className="p-4 bg-slate-100 border-t border-slate-300 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -1742,12 +1742,12 @@ export default function ScheduleDeconflictionConsole() {
                   setAutoAuditResult(null);
                 }}
                 disabled={isGeneratingAuto}
-                className="px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer disabled:opacity-50 text-center order-2 sm:order-1"
               >
                 {autoAuditResult ? "Close" : "Cancel"}
               </button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
                 {autoAuditResult && (
                   <button
                     type="button"
@@ -1755,7 +1755,7 @@ export default function ScheduleDeconflictionConsole() {
                       setIsAutoModalOpen(false);
                       setAutoAuditResult(null);
                     }}
-                    className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center"
                   >
                     View Updated Timetables
                   </button>
@@ -1764,7 +1764,7 @@ export default function ScheduleDeconflictionConsole() {
                   type="button"
                   onClick={handleRunAutoGeneration}
                   disabled={isGeneratingAuto}
-                  className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs border border-emerald-900"
+                  className="w-full sm:w-auto px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs border border-emerald-900 text-center"
                 >
                   {isGeneratingAuto ? "Generating & Validating..." : "Execute Smart Timetable Generation"}
                 </button>
@@ -1808,12 +1808,12 @@ export default function ScheduleDeconflictionConsole() {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-100 border-t border-slate-300 flex items-center justify-end gap-2">
+            <div className="p-4 bg-slate-100 border-t border-slate-300 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsResetConfirmOpen(false)}
                 disabled={isResetting}
-                className="px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer disabled:opacity-50 text-center order-2 sm:order-1"
               >
                 Cancel
               </button>
@@ -1821,7 +1821,7 @@ export default function ScheduleDeconflictionConsole() {
                 type="button"
                 onClick={handleResetAllSchedules}
                 disabled={isResetting}
-                className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
               >
                 {isResetting ? "Clearing..." : "Yes, Clear All Schedules"}
               </button>

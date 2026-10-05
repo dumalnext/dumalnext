@@ -37,7 +37,7 @@ export default function AdminPageShell({
   return (
     <div className="space-y-6 font-sans">
       <AdminHeaderNav activeSection={activeSection} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 space-y-6">
         {children}
       </main>
     </div>

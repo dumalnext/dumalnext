@@ -145,7 +145,7 @@ export default function CustomSelect({
           className={`absolute ${
             align === "right" ? "right-0" : "left-0"
           } mt-1.5 ${
-            fullWidth ? "w-full" : "min-w-[200px] w-auto max-w-[340px]"
+            fullWidth ? "w-full" : "min-w-[180px] sm:min-w-[200px] w-auto max-w-[calc(100vw-32px)] sm:max-w-[340px]"
           } bg-white border-2 border-[#002060] shadow-2xl z-50 py-1 rounded-[4px] overflow-hidden ${dropdownClassName}`}
         >
           {/* Subtle Dropdown Title Bar */}
