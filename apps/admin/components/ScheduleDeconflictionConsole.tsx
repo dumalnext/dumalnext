@@ -184,6 +184,16 @@ export default function ScheduleDeconflictionConsole() {
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
 
+  // Drag and Drop & Slot Reassignment State
+  const [draggedSchedule, setDraggedSchedule] = useState<ScheduleItem | null>(null);
+  const [dragOverSlot, setDragOverSlot] = useState<{ day: string; start: string; end: string } | null>(null);
+  const [isDropping, setIsDropping] = useState<boolean>(false);
+
+  // Modal to move / swap slot (for mobile touch devices or quick click access)
+  const [moveModalItem, setMoveModalItem] = useState<ScheduleItem | null>(null);
+  const [moveTargetDay, setMoveTargetDay] = useState<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday">("Monday");
+  const [moveTargetSlotId, setMoveTargetSlotId] = useState<string>("P1");
+
   // 1. Fetch data on mount
   const loadData = async (silent = false) => {
     try {
@@ -513,6 +523,246 @@ export default function ScheduleDeconflictionConsole() {
     } finally {
       setIsDeletingSchedule(false);
     }
+  };
+
+  // 4c. Handle Drag & Drop / Slot Reassignment with Automated Deconfliction
+  const handleDropOnSlot = async (
+    targetDay: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday",
+    targetStart: string,
+    targetEnd: string,
+    occupantItem?: ScheduleItem,
+    sourceItemOverride?: ScheduleItem
+  ) => {
+    const activeItem = sourceItemOverride || draggedSchedule;
+    if (!activeItem) return;
+    if (isDropping) return;
+
+    // Dropped onto exact same slot: no action needed
+    if (
+      activeItem.day_of_week === targetDay &&
+      activeItem.start_time === targetStart &&
+      activeItem.end_time === targetEnd
+    ) {
+      setDraggedSchedule(null);
+      setDragOverSlot(null);
+      return;
+    }
+
+    if (occupantItem && occupantItem.id === activeItem.id) {
+      setDraggedSchedule(null);
+      setDragOverSlot(null);
+      return;
+    }
+
+    // Helper to evaluate conflict against current active schedules
+    const checkItemConflict = (
+      item: ScheduleItem,
+      day: string,
+      start: string,
+      end: string,
+      excludeIds: string[]
+    ) => {
+      for (const sc of schedules) {
+        if (excludeIds.includes(sc.id)) continue;
+        if (sc.day_of_week === day && timesOverlap(sc.start_time, sc.end_time, start, end)) {
+          if (sc.teacher_id === item.teacher_id) {
+            return `Faculty Collision: ${item.teacher_name || "Faculty"} is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${day} at ${sc.start_time}–${sc.end_time}.`;
+          }
+          if (sc.classroom_id === item.classroom_id) {
+            return `Room Collision: ${item.classroom_name || "Facility"} is already occupied by ${sc.section_name || "another class"} on ${day} at ${sc.start_time}–${sc.end_time}.`;
+          }
+          if (sc.section_id === item.section_id) {
+            return `Section Collision: ${item.section_name || "Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${day} at ${sc.start_time}–${sc.end_time}.`;
+          }
+        }
+      }
+      return null;
+    };
+
+    // CASE 1: SWAP with existing occupant
+    if (occupantItem) {
+      const conflictA = checkItemConflict(
+        activeItem,
+        targetDay,
+        targetStart,
+        targetEnd,
+        [activeItem.id, occupantItem.id]
+      );
+      if (conflictA) {
+        setActionNotice({ type: "error", text: `Cannot swap: ${conflictA}` });
+        setDraggedSchedule(null);
+        setDragOverSlot(null);
+        return;
+      }
+
+      const conflictB = checkItemConflict(
+        occupantItem,
+        activeItem.day_of_week,
+        activeItem.start_time,
+        activeItem.end_time,
+        [activeItem.id, occupantItem.id]
+      );
+      if (conflictB) {
+        setActionNotice({ type: "error", text: `Cannot swap: ${conflictB}` });
+        setDraggedSchedule(null);
+        setDragOverSlot(null);
+        return;
+      }
+
+      // Optimistic update
+      const prevSchedules = [...schedules];
+      const nextSchedules = schedules.map((sc) => {
+        if (sc.id === activeItem.id) {
+          return { ...sc, day_of_week: targetDay, start_time: targetStart, end_time: targetEnd };
+        }
+        if (sc.id === occupantItem.id) {
+          return {
+            ...sc,
+            day_of_week: activeItem.day_of_week,
+            start_time: activeItem.start_time,
+            end_time: activeItem.end_time,
+          };
+        }
+        return sc;
+      });
+
+      setSchedules(nextSchedules);
+      setDraggedSchedule(null);
+      setDragOverSlot(null);
+      setIsDropping(true);
+
+      try {
+        const res = await fetch("/api/schedules", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "swap",
+            id: activeItem.id,
+            swapWithId: occupantItem.id,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          setSchedules(prevSchedules);
+          setActionNotice({
+            type: "error",
+            text: data.message || data.error || "Failed to swap class periods.",
+          });
+        } else {
+          setActionNotice({
+            type: "success",
+            text: `Successfully swapped "${activeItem.subject_name}" with "${occupantItem.subject_name}".`,
+          });
+        }
+      } catch (err: any) {
+        setSchedules(prevSchedules);
+        setActionNotice({
+          type: "error",
+          text: err?.message || "Network error while swapping class periods.",
+        });
+      } finally {
+        setIsDropping(false);
+      }
+      return;
+    }
+
+    // CASE 2: MOVE to vacant slot
+    const conflict = checkItemConflict(activeItem, targetDay, targetStart, targetEnd, [activeItem.id]);
+    if (conflict) {
+      setActionNotice({ type: "error", text: `Cannot move: ${conflict}` });
+      setDraggedSchedule(null);
+      setDragOverSlot(null);
+      return;
+    }
+
+    // Optimistic update
+    const prevSchedules = [...schedules];
+    const nextSchedules = schedules.map((sc) => {
+      if (sc.id === activeItem.id) {
+        return { ...sc, day_of_week: targetDay, start_time: targetStart, end_time: targetEnd };
+      }
+      return sc;
+    });
+
+    setSchedules(nextSchedules);
+    setDraggedSchedule(null);
+    setDragOverSlot(null);
+    setIsDropping(true);
+
+    try {
+      const res = await fetch("/api/schedules", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "move",
+          id: activeItem.id,
+          day_of_week: targetDay,
+          start_time: targetStart,
+          end_time: targetEnd,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setSchedules(prevSchedules);
+        setActionNotice({
+          type: "error",
+          text: data.message || data.error || "Failed to move class period.",
+        });
+      } else {
+        setActionNotice({
+          type: "success",
+          text: `Successfully moved "${activeItem.subject_name}" to ${targetDay} ${targetStart}–${targetEnd}.`,
+        });
+      }
+    } catch (err: any) {
+      setSchedules(prevSchedules);
+      setActionNotice({
+        type: "error",
+        text: err?.message || "Network error while moving class period.",
+      });
+    } finally {
+      setIsDropping(false);
+    }
+  };
+
+  // Touch Drag Handlers (for mobile & tablet devices)
+  const handleTouchStart = (item: ScheduleItem) => {
+    setDraggedSchedule(item);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!draggedSchedule) return;
+    const touch = e.touches[0];
+    const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cellEl = targetEl?.closest("[data-schedule-cell]");
+    if (cellEl) {
+      const cellDay = cellEl.getAttribute("data-day") as any;
+      const cellStart = cellEl.getAttribute("data-start");
+      const cellEnd = cellEl.getAttribute("data-end");
+      if (cellDay && cellStart && cellEnd) {
+        setDragOverSlot({ day: cellDay, start: cellStart, end: cellEnd });
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!draggedSchedule) return;
+    const touch = e.changedTouches[0];
+    const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cellEl = targetEl?.closest("[data-schedule-cell]");
+    if (cellEl) {
+      const cellDay = cellEl.getAttribute("data-day") as any;
+      const cellStart = cellEl.getAttribute("data-start");
+      const cellEnd = cellEl.getAttribute("data-end");
+      const occupantId = cellEl.getAttribute("data-occupant-id");
+      const occupant = occupantId ? schedules.find((s) => s.id === occupantId) : undefined;
+      if (cellDay && cellStart && cellEnd) {
+        handleDropOnSlot(cellDay, cellStart, cellEnd, occupant);
+        return;
+      }
+    }
+    setDraggedSchedule(null);
+    setDragOverSlot(null);
   };
 
   // 4b. Handle Smart Automated Timetable Generation
@@ -979,8 +1229,14 @@ export default function ScheduleDeconflictionConsole() {
                     Class Program: <strong className="text-[#002060] text-sm uppercase">{currentSection.section_name}</strong> &bull; Grade: <strong>Grade {currentSection.grade_level}</strong>
                     {currentSection.strand && <> &bull; Strand: <strong>{currentSection.strand}</strong></>}
                   </div>
-                  <div className="text-slate-700">
-                    Total Instructional Hours: <strong>{sectionSchedules.length} periods / week</strong>
+                  <div className="flex items-center gap-3 text-slate-700">
+                    <div>
+                      Total Instructional Hours: <strong>{sectionSchedules.length} periods / week</strong>
+                    </div>
+                    <div className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
+                      <span>⇄</span>
+                      <span>Drag cards to reschedule / swap slots</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1035,17 +1291,93 @@ export default function ScheduleDeconflictionConsole() {
                             const daySchedules = sectionSchedules.filter((s) => s.day_of_week === day);
                             const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
                             const isElective = Boolean(matchedItem && (matchedItem.is_elective_slot || (matchedItem.start_time === "15:30" && (matchedItem.grade_level || 0) >= 11)));
+                            const isDragOver = dragOverSlot?.day === day && dragOverSlot?.start === slot.start && dragOverSlot?.end === slot.end;
+                            const isCurrentlyDragged = Boolean(matchedItem && draggedSchedule?.id === matchedItem.id);
 
                             return (
-                              <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
+                              <td
+                                key={day}
+                                data-schedule-cell="true"
+                                data-day={day}
+                                data-start={slot.start}
+                                data-end={slot.end}
+                                data-occupant-id={matchedItem?.id || ""}
+                                onDragOver={(e) => {
+                                  if (!draggedSchedule) return;
+                                  e.preventDefault();
+                                  e.dataTransfer.dropEffect = "move";
+                                  if (dragOverSlot?.day !== day || dragOverSlot?.start !== slot.start || dragOverSlot?.end !== slot.end) {
+                                    setDragOverSlot({ day, start: slot.start, end: slot.end });
+                                  }
+                                }}
+                                onDragLeave={(e) => {
+                                  if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                                  if (dragOverSlot?.day === day && dragOverSlot?.start === slot.start) {
+                                    setDragOverSlot(null);
+                                  }
+                                }}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  setDragOverSlot(null);
+                                  if (draggedSchedule) {
+                                    handleDropOnSlot(day, slot.start, slot.end, matchedItem);
+                                  }
+                                }}
+                                className={`p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5 relative transition-all duration-150 ${
+                                  isDragOver
+                                    ? "bg-blue-100/90 ring-2 ring-inset ring-[#002060]"
+                                    : draggedSchedule && !matchedItem
+                                    ? "bg-blue-50/20 hover:bg-blue-50/60"
+                                    : ""
+                                }`}
+                              >
+                                {/* Swap indicator overlay when hovering over occupied cell */}
+                                {isDragOver && matchedItem && !isCurrentlyDragged && (
+                                  <div className="absolute inset-0 z-20 bg-blue-950/25 backdrop-blur-[1px] border-2 border-dashed border-[#002060] flex flex-col items-center justify-center p-1 text-center pointer-events-none animate-pulse">
+                                    <span className="bg-[#002060] text-white font-mono font-bold text-[10px] px-2 py-0.5 shadow-sm uppercase tracking-wider">
+                                      ⇄ Drop to Swap
+                                    </span>
+                                    <span className="text-[10px] text-white font-semibold mt-0.5 drop-shadow-sm line-clamp-1">
+                                      with {matchedItem.subject_name}
+                                    </span>
+                                  </div>
+                                )}
+
                                 {matchedItem ? (
-                                  <div className={`p-2.5 border transition-colors shadow-2xs space-y-1 relative group ${
-                                    isElective
-                                      ? "bg-purple-50/80 border-purple-400/60 hover:border-purple-600"
-                                      : "bg-blue-50/70 border-[#002060]/30 hover:border-[#002060]"
-                                  }`}>
+                                  <div
+                                    draggable={!isDropping}
+                                    onDragStart={(e) => {
+                                      e.dataTransfer.setData("text/plain", matchedItem.id);
+                                      e.dataTransfer.effectAllowed = "move";
+                                      setDraggedSchedule(matchedItem);
+                                    }}
+                                    onDragEnd={() => {
+                                      setDraggedSchedule(null);
+                                      setDragOverSlot(null);
+                                    }}
+                                    className={`p-2.5 border transition-all shadow-2xs space-y-1 relative group cursor-grab active:cursor-grabbing select-none ${
+                                      isCurrentlyDragged
+                                        ? "opacity-30 border-2 border-dashed border-[#002060] scale-[0.98] bg-blue-50"
+                                        : isElective
+                                        ? "bg-purple-50/80 border-purple-400/60 hover:border-purple-600 hover:shadow-md"
+                                        : "bg-blue-50/70 border-[#002060]/30 hover:border-[#002060] hover:shadow-md"
+                                    }`}
+                                  >
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-1">
+                                        {/* Drag handle with touch event support */}
+                                        <div
+                                          onTouchStart={(e) => {
+                                            e.stopPropagation();
+                                            handleTouchStart(matchedItem);
+                                          }}
+                                          onTouchMove={handleTouchMove}
+                                          onTouchEnd={handleTouchEnd}
+                                          className="touch-none text-slate-400 group-hover:text-[#002060] font-mono text-xs px-0.5 cursor-grab active:cursor-grabbing select-none hover:bg-blue-100/70 rounded-xs"
+                                          title="Drag or touch to reschedule/swap"
+                                        >
+                                          ⠿
+                                        </div>
                                         <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 border ${
                                           isElective
                                             ? "text-purple-950 bg-white border-purple-200"
@@ -1059,14 +1391,33 @@ export default function ScheduleDeconflictionConsole() {
                                           </span>
                                         )}
                                       </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => setDeleteTargetItem(matchedItem)}
-                                        className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
-                                        title="Remove this class period"
-                                      >
-                                        &times;
-                                      </button>
+                                      <div className="flex items-center gap-1 no-print print:hidden">
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setMoveModalItem(matchedItem);
+                                            setMoveTargetDay(matchedItem.day_of_week);
+                                            const foundSlot = ACADEMIC_TIME_SLOTS.find((s) => s.start === matchedItem.start_time);
+                                            if (foundSlot) setMoveTargetSlotId(foundSlot.id);
+                                          }}
+                                          className="text-slate-400 hover:text-[#002060] font-mono text-xs px-1 hover:bg-blue-100/70 rounded-xs cursor-pointer"
+                                          title="Move or swap to another time slot"
+                                        >
+                                          ⇄
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteTargetItem(matchedItem);
+                                          }}
+                                          className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 hover:bg-red-50 rounded-xs cursor-pointer"
+                                          title="Remove this class period"
+                                        >
+                                          &times;
+                                        </button>
+                                      </div>
                                     </div>
                                     <div className="font-bold text-slate-900 uppercase text-xs">
                                       {matchedItem.subject_name}
@@ -1078,16 +1429,29 @@ export default function ScheduleDeconflictionConsole() {
                                       Room: {matchedItem.classroom_name}
                                     </div>
                                   </div>
+                                ) : isDragOver ? (
+                                  <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-[#002060] bg-blue-100/90 flex flex-col items-center justify-center text-center animate-pulse">
+                                    <span className="font-mono text-xs font-bold text-[#002060]">
+                                      ⤵ Drop to Move Here
+                                    </span>
+                                    <span className="text-[10px] text-blue-900 mt-0.5 font-medium">
+                                      {day} &bull; {slot.start}–{slot.end}
+                                    </span>
+                                  </div>
                                 ) : (
                                   <>
                                     <button
                                       type="button"
                                       onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                      className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
+                                      className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
+                                        draggedSchedule ? "border-blue-300 bg-blue-50/20" : ""
+                                      }`}
                                       title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
                                     >
-                                      <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-                                        + Assign Slot
+                                      <span className={`font-bold transition-opacity ${
+                                        draggedSchedule ? "opacity-70 text-blue-800" : "opacity-0 group-hover:opacity-100"
+                                      }`}>
+                                        {draggedSchedule ? "Drop Here" : "+ Assign Slot"}
                                       </span>
                                     </button>
                                     <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
@@ -1118,8 +1482,14 @@ export default function ScheduleDeconflictionConsole() {
                     Faculty: <strong className="text-[#002060] text-sm uppercase">{currentTeacher.fullName}</strong> &bull; Dept: <strong>{currentTeacher.department}</strong>
                     {currentTeacher.email && <> &bull; Email: <strong>{currentTeacher.email}</strong></>}
                   </div>
-                  <div className="text-slate-700">
-                    Teaching Load: <strong className="text-emerald-800 font-bold">{teacherSchedules.length} Hours / Week</strong> (DepEd Limit: 30 Hours / Week)
+                  <div className="flex items-center gap-3 text-slate-700">
+                    <div>
+                      Teaching Load: <strong className="text-emerald-800 font-bold">{teacherSchedules.length} Hours / Week</strong> (DepEd Limit: 30 Hours / Week)
+                    </div>
+                    <div className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+                      <span>⇄</span>
+                      <span>Drag cards to reschedule / swap slots</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1172,17 +1542,93 @@ export default function ScheduleDeconflictionConsole() {
                             const daySchedules = teacherSchedules.filter((s) => s.day_of_week === day);
                             const matchedItem = findScheduleInSlot(daySchedules, slot.start, slot.end);
                             const isElective = Boolean(matchedItem && (matchedItem.is_elective_slot || (matchedItem.start_time === "15:30" && (matchedItem.grade_level || 0) >= 11)));
+                            const isDragOver = dragOverSlot?.day === day && dragOverSlot?.start === slot.start && dragOverSlot?.end === slot.end;
+                            const isCurrentlyDragged = Boolean(matchedItem && draggedSchedule?.id === matchedItem.id);
 
                             return (
-                              <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
+                              <td
+                                key={day}
+                                data-schedule-cell="true"
+                                data-day={day}
+                                data-start={slot.start}
+                                data-end={slot.end}
+                                data-occupant-id={matchedItem?.id || ""}
+                                onDragOver={(e) => {
+                                  if (!draggedSchedule) return;
+                                  e.preventDefault();
+                                  e.dataTransfer.dropEffect = "move";
+                                  if (dragOverSlot?.day !== day || dragOverSlot?.start !== slot.start || dragOverSlot?.end !== slot.end) {
+                                    setDragOverSlot({ day, start: slot.start, end: slot.end });
+                                  }
+                                }}
+                                onDragLeave={(e) => {
+                                  if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                                  if (dragOverSlot?.day === day && dragOverSlot?.start === slot.start) {
+                                    setDragOverSlot(null);
+                                  }
+                                }}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  setDragOverSlot(null);
+                                  if (draggedSchedule) {
+                                    handleDropOnSlot(day, slot.start, slot.end, matchedItem);
+                                  }
+                                }}
+                                className={`p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5 relative transition-all duration-150 ${
+                                  isDragOver
+                                    ? "bg-emerald-100/90 ring-2 ring-inset ring-emerald-700"
+                                    : draggedSchedule && !matchedItem
+                                    ? "bg-emerald-50/20 hover:bg-emerald-50/60"
+                                    : ""
+                                }`}
+                              >
+                                {/* Swap indicator overlay when hovering over occupied cell */}
+                                {isDragOver && matchedItem && !isCurrentlyDragged && (
+                                  <div className="absolute inset-0 z-20 bg-emerald-950/25 backdrop-blur-[1px] border-2 border-dashed border-emerald-700 flex flex-col items-center justify-center p-1 text-center pointer-events-none animate-pulse">
+                                    <span className="bg-emerald-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 shadow-sm uppercase tracking-wider">
+                                      ⇄ Drop to Swap
+                                    </span>
+                                    <span className="text-[10px] text-white font-semibold mt-0.5 drop-shadow-sm line-clamp-1">
+                                      with {matchedItem.subject_name}
+                                    </span>
+                                  </div>
+                                )}
+
                                 {matchedItem ? (
-                                  <div className={`p-2.5 border transition-colors shadow-2xs space-y-1 relative group ${
-                                    isElective
-                                      ? "bg-purple-50/80 border-purple-400/60 hover:border-purple-600"
-                                      : "bg-emerald-50/70 border-emerald-600/30 hover:border-emerald-700"
-                                  }`}>
+                                  <div
+                                    draggable={!isDropping}
+                                    onDragStart={(e) => {
+                                      e.dataTransfer.setData("text/plain", matchedItem.id);
+                                      e.dataTransfer.effectAllowed = "move";
+                                      setDraggedSchedule(matchedItem);
+                                    }}
+                                    onDragEnd={() => {
+                                      setDraggedSchedule(null);
+                                      setDragOverSlot(null);
+                                    }}
+                                    className={`p-2.5 border transition-all shadow-2xs space-y-1 relative group cursor-grab active:cursor-grabbing select-none ${
+                                      isCurrentlyDragged
+                                        ? "opacity-30 border-2 border-dashed border-emerald-700 scale-[0.98] bg-emerald-50"
+                                        : isElective
+                                        ? "bg-purple-50/80 border-purple-400/60 hover:border-purple-600 hover:shadow-md"
+                                        : "bg-emerald-50/70 border-emerald-600/30 hover:border-emerald-700 hover:shadow-md"
+                                    }`}
+                                  >
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-1">
+                                        {/* Drag handle with touch event support */}
+                                        <div
+                                          onTouchStart={(e) => {
+                                            e.stopPropagation();
+                                            handleTouchStart(matchedItem);
+                                          }}
+                                          onTouchMove={handleTouchMove}
+                                          onTouchEnd={handleTouchEnd}
+                                          className="touch-none text-slate-400 group-hover:text-emerald-800 font-mono text-xs px-0.5 cursor-grab active:cursor-grabbing select-none hover:bg-emerald-100/70 rounded-xs"
+                                          title="Drag or touch to reschedule/swap"
+                                        >
+                                          ⠿
+                                        </div>
                                         <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 border ${
                                           isElective
                                             ? "text-purple-950 bg-white border-purple-200"
@@ -1196,14 +1642,33 @@ export default function ScheduleDeconflictionConsole() {
                                           </span>
                                         )}
                                       </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => setDeleteTargetItem(matchedItem)}
-                                        className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
-                                        title="Remove this class period"
-                                      >
-                                        &times;
-                                      </button>
+                                      <div className="flex items-center gap-1 no-print print:hidden">
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setMoveModalItem(matchedItem);
+                                            setMoveTargetDay(matchedItem.day_of_week);
+                                            const foundSlot = ACADEMIC_TIME_SLOTS.find((s) => s.start === matchedItem.start_time);
+                                            if (foundSlot) setMoveTargetSlotId(foundSlot.id);
+                                          }}
+                                          className="text-slate-400 hover:text-emerald-800 font-mono text-xs px-1 hover:bg-emerald-100/70 rounded-xs cursor-pointer"
+                                          title="Move or swap to another time slot"
+                                        >
+                                          ⇄
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteTargetItem(matchedItem);
+                                          }}
+                                          className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 hover:bg-red-50 rounded-xs cursor-pointer"
+                                          title="Remove this class period"
+                                        >
+                                          &times;
+                                        </button>
+                                      </div>
                                     </div>
                                     <div className="font-bold text-slate-900 uppercase text-xs">
                                       {matchedItem.subject_name}
@@ -1215,16 +1680,29 @@ export default function ScheduleDeconflictionConsole() {
                                       Facility: {matchedItem.classroom_name}
                                     </div>
                                   </div>
+                                ) : isDragOver ? (
+                                  <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-emerald-700 bg-emerald-100/90 flex flex-col items-center justify-center text-center animate-pulse">
+                                    <span className="font-mono text-xs font-bold text-emerald-900">
+                                      ⤵ Drop to Move Here
+                                    </span>
+                                    <span className="text-[10px] text-emerald-800 mt-0.5 font-medium">
+                                      {day} &bull; {slot.start}–{slot.end}
+                                    </span>
+                                  </div>
                                 ) : (
                                   <>
                                     <button
                                       type="button"
                                       onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                      className="w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden"
+                                      className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
+                                        draggedSchedule ? "border-emerald-300 bg-emerald-50/20" : ""
+                                      }`}
                                       title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
                                     >
-                                      <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-                                        + Vacant (Assign)
+                                      <span className={`font-bold transition-opacity ${
+                                        draggedSchedule ? "opacity-70 text-emerald-800" : "opacity-0 group-hover:opacity-100"
+                                      }`}>
+                                        {draggedSchedule ? "Drop Here" : "+ Vacant (Assign)"}
                                       </span>
                                     </button>
                                     <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
@@ -1904,6 +2382,187 @@ export default function ScheduleDeconflictionConsole() {
                 className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 text-center order-1 sm:order-2"
               >
                 {isDeletingSchedule ? "Removing..." : "Confirm Removal"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* FLOATING DRAG CONTROLLER BADGE (DESKTOP / TOUCH) */}
+      {/* ========================================================================= */}
+      {draggedSchedule && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-[#002060] text-white px-4 py-3 shadow-2xl border-2 border-white rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-150 no-print print:hidden">
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping inline-block" />
+            <span>
+              Moving: <strong className="text-white uppercase">{draggedSchedule.subject_name}</strong> ({draggedSchedule.day_of_week} {draggedSchedule.start_time}–{draggedSchedule.end_time})
+            </span>
+          </div>
+          <span className="text-[11px] text-blue-200 hidden md:inline">
+            &bull; Drop on vacant slot to move, or occupied slot to swap
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setDraggedSchedule(null);
+              setDragOverSlot(null);
+            }}
+            className="text-xs font-mono font-bold bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded cursor-pointer transition-colors"
+          >
+            Cancel Drag
+          </button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: QUICK REASSIGN / SWAP CLASS PERIOD (MOBILE TOUCH FRIENDLY) */}
+      {/* ========================================================================= */}
+      {moveModalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150 no-print print:hidden">
+          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden rounded-[4px]">
+            <div className="bg-[#002060] text-white p-4 flex items-center justify-between shrink-0">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-200 block">
+                  Timetable Rescheduling &bull; Deconfliction Guard
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight text-white mt-0.5">
+                  Move or Swap Class Period
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMoveModalItem(null)}
+                className="text-white hover:text-slate-300 font-mono text-2xl font-bold px-2 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6 space-y-4 overflow-y-auto">
+              {/* Selected Class Period Details */}
+              <div className="p-3 bg-blue-50 border border-[#002060]/30 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 uppercase text-xs">
+                    {moveModalItem.subject_name}
+                  </span>
+                  <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
+                    Current: {moveModalItem.day_of_week} {moveModalItem.start_time}–{moveModalItem.end_time}
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-700">
+                  Section: <strong>{moveModalItem.section_name}</strong> &bull; Faculty: <strong>{moveModalItem.teacher_name}</strong>
+                </div>
+                <div className="text-[10px] font-mono text-slate-500">
+                  Facility: {moveModalItem.classroom_name || "Unassigned"}
+                </div>
+              </div>
+
+              {/* Day Selection */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block">
+                  Target Day of Week:
+                </label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {DAYS_OF_WEEK.map((day) => (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => setMoveTargetDay(day)}
+                      className={`p-2 text-xs font-mono font-bold uppercase border transition-colors cursor-pointer text-center ${
+                        moveTargetDay === day
+                          ? "bg-[#002060] text-white border-[#002060]"
+                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+                      }`}
+                    >
+                      {day.slice(0, 3)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Academic Slot Selection */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block">
+                  Target Academic Time Slot:
+                </label>
+                <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
+                  {ACADEMIC_TIME_SLOTS.filter((s) => !s.isBreak).map((slot) => {
+                    const relevantSchedules =
+                      viewMode === "byTeacher"
+                        ? schedules.filter((s) => s.teacher_id === moveModalItem.teacher_id && s.day_of_week === moveTargetDay)
+                        : schedules.filter((s) => s.section_id === moveModalItem.section_id && s.day_of_week === moveTargetDay);
+                    const occupant = findScheduleInSlot(relevantSchedules, slot.start, slot.end);
+                    const isSelected = moveTargetSlotId === slot.id;
+                    const isCurrent =
+                      moveTargetDay === moveModalItem.day_of_week &&
+                      slot.start === moveModalItem.start_time;
+
+                    return (
+                      <button
+                        key={slot.id}
+                        type="button"
+                        onClick={() => setMoveTargetSlotId(slot.id)}
+                        className={`w-full p-2.5 text-left border flex items-center justify-between transition-colors cursor-pointer ${
+                          isSelected
+                            ? "bg-blue-50 border-[#002060] ring-1 ring-[#002060]"
+                            : "bg-white border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        <div>
+                          <div className="font-mono text-xs font-bold text-slate-800">
+                            {slot.name} ({slot.start}–{slot.end})
+                          </div>
+                          <div className="text-[10px] mt-0.5">
+                            {isCurrent ? (
+                              <span className="text-blue-700 font-bold font-mono">Current Slot</span>
+                            ) : occupant ? (
+                              <span className="text-amber-700 font-semibold">
+                                Occupied by: {occupant.subject_name} &bull; <strong className="font-mono uppercase text-indigo-700">Will Swap</strong>
+                              </span>
+                            ) : (
+                              <span className="text-emerald-700 font-semibold font-mono">
+                                Vacant Slot &bull; Will Move
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="font-mono text-xs font-bold text-[#002060]">
+                          {isSelected ? "●" : "○"}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-100 border-t border-slate-300 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setMoveModalItem(null)}
+                className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 cursor-pointer text-center order-2 sm:order-1"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const targetSlot = ACADEMIC_TIME_SLOTS.find((s) => s.id === moveTargetSlotId);
+                  if (!targetSlot) return;
+                  const relevantSchedules =
+                    viewMode === "byTeacher"
+                      ? schedules.filter((s) => s.teacher_id === moveModalItem.teacher_id && s.day_of_week === moveTargetDay)
+                      : schedules.filter((s) => s.section_id === moveModalItem.section_id && s.day_of_week === moveTargetDay);
+                  const occupant = findScheduleInSlot(relevantSchedules, targetSlot.start, targetSlot.end);
+                  const itemToMove = moveModalItem;
+                  setMoveModalItem(null);
+                  handleDropOnSlot(moveTargetDay, targetSlot.start, targetSlot.end, occupant, itemToMove);
+                }}
+                disabled={isDropping}
+                className="w-full sm:w-auto px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
+              >
+                {isDropping ? "Saving..." : "Apply Rescheduling"}
               </button>
             </div>
           </div>

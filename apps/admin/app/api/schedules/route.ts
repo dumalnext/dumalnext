@@ -387,6 +387,233 @@ export async function POST(req: Request) {
   }
 }
 
+// PATCH /api/schedules - Move or swap a schedule item with Automated Deconfliction Guard
+export async function PATCH(req: Request) {
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: "Database client unavailable" },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    const body = await req.json();
+    const { action = "move", id, day_of_week, start_time, end_time, swapWithId } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Missing schedule ID." },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    // 1. Fetch current schedules and reference tables
+    const [
+      { data: sysSettingsData },
+      { data: dbSchedulesData },
+      { data: teachersData },
+      { data: classroomsData },
+      { data: sectionsData },
+    ] = await Promise.all([
+      supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
+      supabase.from("class_schedules").select("*"),
+      supabase.from("teachers").select("id, first_name, last_name"),
+      supabase.from("classrooms").select("id, room_name"),
+      supabase.from("sections").select("id, section_name"),
+    ]);
+
+    let currentSchedules: ScheduleItem[] = [];
+    if (sysSettingsData?.value && Array.isArray(sysSettingsData.value.schedules)) {
+      currentSchedules = sysSettingsData.value.schedules;
+    }
+
+    const scheduleMap = new Map<string, ScheduleItem>();
+    (dbSchedulesData || []).forEach((item: any) => {
+      scheduleMap.set(item.id, {
+        id: item.id,
+        section_id: item.section_id,
+        teacher_id: item.teacher_id,
+        classroom_id: item.classroom_id,
+        subject_code: item.subject_code,
+        subject_name: item.subject_name || item.subject_code,
+        day_of_week: item.day_of_week,
+        start_time: item.start_time?.slice(0, 5) || "08:00",
+        end_time: item.end_time?.slice(0, 5) || "09:00",
+        school_year: item.school_year || "2025–2026",
+        trimester: item.trimester || 1,
+      });
+    });
+    currentSchedules.forEach((item) => scheduleMap.set(item.id, item));
+
+    const activeList = Array.from(scheduleMap.values());
+
+    // Helper for collision checking
+    const checkCollision = (targetItem: ScheduleItem, targetDay: string, targetStart: string, targetEnd: string, excludedIds: string[]) => {
+      for (const item of activeList) {
+        if (excludedIds.includes(item.id)) continue;
+        if (item.day_of_week === targetDay && timesOverlap(item.start_time, item.end_time, targetStart, targetEnd)) {
+          if (item.teacher_id === targetItem.teacher_id) {
+            const teacherObj = (teachersData || []).find((t) => t.id === targetItem.teacher_id);
+            const teacherName = teacherObj ? `${teacherObj.first_name} ${teacherObj.last_name}` : "Faculty Member";
+            const conflictingSection = (sectionsData || []).find((s) => s.id === item.section_id)?.section_name || "another class";
+            return `Teacher Collision: Faculty ${teacherName} is already assigned to teach ${item.subject_name || item.subject_code} in ${conflictingSection} on ${targetDay} at ${item.start_time}–${item.end_time}.`;
+          }
+          if (item.classroom_id === targetItem.classroom_id) {
+            const roomObj = (classroomsData || []).find((r) => r.id === targetItem.classroom_id);
+            const roomName = roomObj ? roomObj.room_name : "Selected Classroom";
+            const conflictingSection = (sectionsData || []).find((s) => s.id === item.section_id)?.section_name || "another class";
+            return `Room Collision: ${roomName} is already occupied by ${conflictingSection} on ${targetDay} at ${item.start_time}–${item.end_time}.`;
+          }
+          if (item.section_id === targetItem.section_id) {
+            const sectionObj = (sectionsData || []).find((s) => s.id === targetItem.section_id);
+            const sectionName = sectionObj ? sectionObj.section_name : "Selected Section";
+            return `Section Collision: ${sectionName} already has ${item.subject_name || item.subject_code} scheduled on ${targetDay} at ${item.start_time}–${item.end_time}.`;
+          }
+        }
+      }
+      return null;
+    };
+
+    if (action === "swap" && swapWithId) {
+      const item1 = activeList.find((s) => s.id === id);
+      const item2 = activeList.find((s) => s.id === swapWithId);
+      if (!item1 || !item2) {
+        return NextResponse.json(
+          { success: false, error: "One or both schedule items not found for swap." },
+          { status: 404, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      // Check collision for item1 moving to item2's slot
+      const col1 = checkCollision(item1, item2.day_of_week, item2.start_time, item2.end_time, [item1.id, item2.id]);
+      if (col1) {
+        return NextResponse.json(
+          { success: false, conflictType: "swap_conflict", message: col1 },
+          { status: 409, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      // Check collision for item2 moving to item1's slot
+      const col2 = checkCollision(item2, item1.day_of_week, item1.start_time, item1.end_time, [item1.id, item2.id]);
+      if (col2) {
+        return NextResponse.json(
+          { success: false, conflictType: "swap_conflict", message: col2 },
+          { status: 409, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      const slot1Day = item1.day_of_week;
+      const slot1Start = item1.start_time;
+      const slot1End = item1.end_time;
+
+      const slot2Day = item2.day_of_week;
+      const slot2Start = item2.start_time;
+      const slot2End = item2.end_time;
+
+      // Swap coordinates in system_settings
+      const idx1 = currentSchedules.findIndex((s) => s.id === item1.id);
+      if (idx1 >= 0) {
+        currentSchedules[idx1] = { ...currentSchedules[idx1], day_of_week: slot2Day, start_time: slot2Start, end_time: slot2End };
+      }
+      const idx2 = currentSchedules.findIndex((s) => s.id === item2.id);
+      if (idx2 >= 0) {
+        currentSchedules[idx2] = { ...currentSchedules[idx2], day_of_week: slot1Day, start_time: slot1Start, end_time: slot1End };
+      }
+
+      await supabase.from("system_settings").upsert(
+        {
+          key: "class_schedules_config",
+          value: { schedules: currentSchedules, lastUpdated: new Date().toISOString() },
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "key" }
+      );
+
+      try {
+        await supabase.from("class_schedules").update({ day_of_week: slot2Day, start_time: slot2Start, end_time: slot2End }).eq("id", item1.id);
+        await supabase.from("class_schedules").update({ day_of_week: slot1Day, start_time: slot1Start, end_time: slot1End }).eq("id", item2.id);
+      } catch {}
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: `Successfully swapped "${item1.subject_name}" with "${item2.subject_name}".`,
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
+    } else {
+      // Move single item
+      const item = activeList.find((s) => s.id === id);
+      if (!item) {
+        return NextResponse.json(
+          { success: false, error: "Schedule item not found." },
+          { status: 404, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      if (!day_of_week || !start_time || !end_time) {
+        return NextResponse.json(
+          { success: false, error: "Missing target day or time period." },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      if (toMinutes(start_time) >= toMinutes(end_time)) {
+        return NextResponse.json(
+          { success: false, error: "Invalid time range: Start time must precede End time." },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      const col = checkCollision(item, day_of_week, start_time, end_time, [item.id]);
+      if (col) {
+        return NextResponse.json(
+          { success: false, conflictType: "move_conflict", message: col },
+          { status: 409, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      const cleanStart = start_time.slice(0, 5);
+      const cleanEnd = end_time.slice(0, 5);
+
+      const idx = currentSchedules.findIndex((s) => s.id === item.id);
+      if (idx >= 0) {
+        currentSchedules[idx] = { ...currentSchedules[idx], day_of_week, start_time: cleanStart, end_time: cleanEnd };
+      } else {
+        currentSchedules.push({ ...item, day_of_week, start_time: cleanStart, end_time: cleanEnd });
+      }
+
+      await supabase.from("system_settings").upsert(
+        {
+          key: "class_schedules_config",
+          value: { schedules: currentSchedules, lastUpdated: new Date().toISOString() },
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "key" }
+      );
+
+      try {
+        await supabase.from("class_schedules").update({ day_of_week, start_time: cleanStart, end_time: cleanEnd }).eq("id", item.id);
+      } catch {}
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: `Successfully moved "${item.subject_name}" to ${day_of_week} ${cleanStart}–${cleanEnd}.`,
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
+    }
+  } catch (err: any) {
+    console.error("PATCH /api/schedules error:", err);
+    return NextResponse.json(
+      { success: false, error: err?.message || "Failed to update schedule slot" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
+  }
+}
+
 // DELETE /api/schedules - Remove a schedule item by ID
 export async function DELETE(req: Request) {
   try {
