@@ -391,7 +391,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
       <div
-        className={`fixed inset-0 bg-slate-950/70 z-50 backdrop-blur-xs flex justify-start transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 h-full h-[100dvh] w-full z-50 bg-slate-950/70 backdrop-blur-xs flex justify-start overflow-hidden transition-opacity duration-300 ease-in-out ${
           isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         aria-hidden={!isMenuOpen}
@@ -401,7 +401,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       >
         <div
           ref={menuRef}
-          className={`w-full max-w-sm sm:max-w-md bg-white h-full max-h-[100dvh] shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
+          className={`relative w-full max-w-sm sm:max-w-md bg-white h-full max-h-[100dvh] shadow-2xl border-r-4 border-[#002060] rounded-r-[4px] flex flex-col justify-between overflow-hidden transform transition-transform duration-300 ease-in-out will-change-transform ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -669,11 +669,36 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     : "You're not yet assigned to a section. Check official class placement."}
                 </p>
               </Link>
+
+              {/* 5. Direct Sign Out Module (Inside Menu for Phone Devices and Tablets) */}
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full p-3 bg-red-50/70 hover:bg-red-100 border-2 border-red-300 hover:border-red-500 transition-all rounded-[4px] shadow-xs text-left cursor-pointer active:scale-[0.99] block mt-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-red-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Sign Out Account
+                    </span>
+                    <span className="text-[10px] text-red-700 font-bold uppercase">&rarr;</span>
+                  </div>
+                  <p className="text-[11px] text-red-700 mt-1 leading-normal">
+                    End active student session and return to guest portal.
+                  </p>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Drawer Bottom Actions (Pinned at Bottom of Menu) */}
-          <div className="shrink-0 p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5">
+          {/* Drawer Bottom Actions (Pinned at the very below of the menu) */}
+          <div className="shrink-0 p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5 pb-[max(1rem,env(safe-area-inset-bottom))]">
             {user ? (
               <button
                 type="button"
