@@ -415,9 +415,9 @@ export default function Step4CurriculumModality({
   };
 
   return (
-    <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-8 rounded-[4px] shadow-sm">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
       {/* Header Banner */}
-      <div className="border-b-2 border-slate-200 pb-4">
+      <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
           <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
             Step 04 of 05
