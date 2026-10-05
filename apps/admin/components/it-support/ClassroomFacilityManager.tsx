@@ -28,6 +28,8 @@ export default function ClassroomFacilityManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Classroom | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Classroom | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     classroomId: "",
@@ -114,23 +116,27 @@ export default function ClassroomFacilityManager() {
     }
   };
 
-  const handleDelete = async (id: string, code: string) => {
-    if (!confirm(`Are you sure you want to delete classroom ${code}? This will remove it from the scheduling directory.`)) {
-      return;
-    }
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/it-support/classrooms?id=${id}`, {
+      const res = await fetch(`/api/it-support/classrooms?id=${deleteTarget.id}`, {
         method: "DELETE",
       });
       const json = await res.json();
       if (json.success) {
-        setStatusMessage({ type: "success", text: `Classroom ${code} removed.` });
+        setStatusMessage({ type: "success", text: `Classroom ${deleteTarget.classroomId} removed successfully.` });
+        setDeleteTarget(null);
         fetchClassrooms();
       } else {
         setStatusMessage({ type: "error", text: json.error || "Failed to delete classroom." });
+        setDeleteTarget(null);
       }
     } catch (err: any) {
       setStatusMessage({ type: "error", text: "Error deleting classroom." });
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -223,15 +229,15 @@ export default function ClassroomFacilityManager() {
                         <button
                           type="button"
                           onClick={() => openEditModal(room)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase transition-colors"
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase transition-colors cursor-pointer"
                           title={`Edit ${room.classroomId}`}
                         >
                           Edit
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDelete(room.id, room.classroomId)}
-                          className="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 text-[11px] font-bold uppercase transition-colors"
+                          onClick={() => setDeleteTarget(room)}
+                          className="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 text-[11px] font-bold uppercase transition-colors cursor-pointer"
                         >
                           Delete
                         </button>
@@ -345,19 +351,89 @@ export default function ClassroomFacilityManager() {
                     setIsModalOpen(false);
                     setEditingRoom(null);
                   }}
-                  className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100"
+                  className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50"
+                  className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? "Saving..." : editingRoom ? "Update Classroom" : "Register Classroom"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Confirm Delete Classroom Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
+          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b border-red-200 pb-2.5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 block">
+                  DepEd Facility De-Registration
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
+                  Confirm Classroom Deletion
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="text-slate-400 hover:text-slate-600 font-mono text-xl font-bold px-2 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-3.5 bg-red-50 border border-red-300 text-xs space-y-2 text-red-950">
+              <p className="font-semibold text-slate-800">
+                Are you sure you want to delete classroom <strong className="font-mono text-[#002060]">{deleteTarget.classroomId}</strong>? This will remove it from the scheduling directory.
+              </p>
+              <div className="bg-white p-3 border border-red-200 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-sm text-[#002060]">
+                    {deleteTarget.classroomId}
+                  </span>
+                  <span className="font-mono text-[10px] bg-red-100 text-red-800 px-2 py-0.5 font-bold uppercase">
+                    {deleteTarget.capacity} Seats
+                  </span>
+                </div>
+                <div className="font-bold text-slate-900 text-xs">
+                  {deleteTarget.roomName}
+                </div>
+                <div className="text-[11px] text-slate-600">
+                  Building: <strong className="text-slate-800">{deleteTarget.building}</strong>
+                </div>
+              </div>
+              <p className="text-[11px] text-red-700 font-medium">
+                Warning: Removing this room will make it unavailable for section assignment and the Schedule Deconfliction Engine.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 text-center order-1 sm:order-2"
+              >
+                {isDeleting ? "Deleting..." : "Confirm Delete"}
+              </button>
+            </div>
           </div>
         </div>
       )}

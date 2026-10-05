@@ -193,6 +193,19 @@ export default function SectionQuotaConsole() {
   const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
   const [editError, setEditError] = useState<string>("");
 
+  // Delete Section Target Modal State
+  const [deleteSectionTarget, setDeleteSectionTarget] = useState<SectionDetail | null>(null);
+  const [isDeletingSection, setIsDeletingSection] = useState<boolean>(false);
+
+  // Reassign Over-Capacity Override Prompt Modal State
+  const [reassignOverridePrompt, setReassignOverridePrompt] = useState<{
+    studentId: string;
+    newSectionId: string;
+    targetSecName: string;
+    enrolled: number;
+    cap: number;
+  } | null>(null);
+
   // Automated Deconfliction Helper: Check if a teacher is already advising another section
   const getExistingAdvisorySection = (adviserName: string, excludeSectionId?: string): SectionDetail | undefined => {
     if (!adviserName || !adviserName.trim()) return undefined;
@@ -918,21 +931,13 @@ export default function SectionQuotaConsole() {
   };
 
   // Handle Delete Section
-  const handleDeleteSection = async (sec: SectionDetail) => {
-    if (sec.enrolledCount > 0) {
-      alert(
-        `Cannot delete section ${sec.section_name}:\n\nThere are currently ${sec.enrolledCount} student(s) officially enrolled in this section.\n\nDepEd Quota Control requires reassigning these learners to another section before removing this section.`
-      );
-      return;
-    }
+  const handleConfirmDeleteSection = async () => {
+    if (!deleteSectionTarget) return;
+    if (deleteSectionTarget.enrolledCount > 0) return;
 
-    const confirmed = window.confirm(
-      `DepEd Administrative Action:\n\nAre you sure you want to permanently remove section ${sec.section_name}?\n\nThis action cannot be undone.`
-    );
-    if (!confirmed) return;
-
+    setIsDeletingSection(true);
     try {
-      const res = await fetch(`/api/sections?id=${sec.id}`, {
+      const res = await fetch(`/api/sections?id=${deleteSectionTarget.id}`, {
         method: "DELETE",
       });
 
@@ -943,33 +948,28 @@ export default function SectionQuotaConsole() {
 
       setStatusNotice({
         type: "success",
-        text: `Section ${sec.section_name} has been removed successfully.`,
+        text: `Section ${deleteSectionTarget.section_name} has been removed successfully.`,
       });
 
+      setDeleteSectionTarget(null);
       await fetchSections(true);
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
       }
     } catch (err: any) {
-      alert(`Delete Error: ${err?.message || "Failed to delete section."}`);
+      setStatusNotice({
+        type: "error",
+        text: err?.message || "Failed to delete section.",
+      });
+      setDeleteSectionTarget(null);
+    } finally {
+      setIsDeletingSection(false);
     }
   };
 
-  // Handle Reassign Student to another section from Class Roster Modal
-  const handleReassignStudent = async (studentId: string, newSectionId: string) => {
-    if (!newSectionId) return;
-    setReassignMessage(null);
-
+  // Execute Reassign Student to another section from Class Roster Modal
+  const executeReassignStudent = async (studentId: string, newSectionId: string) => {
     const targetSec = sections.find((s) => s.id === newSectionId);
-    if (!targetSec) return;
-
-    if (targetSec.enrolledCount >= targetSec.capacity) {
-      const proceed = window.confirm(
-        `Warning: Target section ${targetSec.section_name} is already at full capacity (${targetSec.enrolledCount}/${targetSec.capacity}).\n\nDo you wish to override and reassign this student anyway?`
-      );
-      if (!proceed) return;
-    }
-
     try {
       const { error } = await supabase
         .from("students")
@@ -983,8 +983,12 @@ export default function SectionQuotaConsole() {
 
       setReassignMessage({
         type: "success",
-        text: `Learner successfully reassigned to ${targetSec.section_name}.`,
+        text: `Learner successfully reassigned to ${targetSec?.section_name || "new section"}.`,
       });
+
+      setReassignOverridePrompt(null);
+      setReassigningStudentId(null);
+      setReassignTargetSectionId("");
 
       // Refresh current roster and section stats
       if (selectedRosterSection) {
@@ -996,15 +1000,34 @@ export default function SectionQuotaConsole() {
         window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
         window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
       }
-
-      setReassigningStudentId(null);
-      setReassignTargetSectionId("");
     } catch (err: any) {
       setReassignMessage({
         type: "error",
         text: `Reassign Error: ${err?.message || "Failed to transfer student."}`,
       });
+      setReassignOverridePrompt(null);
     }
+  };
+
+  const handleReassignStudent = async (studentId: string, newSectionId: string) => {
+    if (!newSectionId) return;
+    setReassignMessage(null);
+
+    const targetSec = sections.find((s) => s.id === newSectionId);
+    if (!targetSec) return;
+
+    if (targetSec.enrolledCount >= targetSec.capacity) {
+      setReassignOverridePrompt({
+        studentId,
+        newSectionId,
+        targetSecName: targetSec.section_name,
+        enrolled: targetSec.enrolledCount,
+        cap: targetSec.capacity,
+      });
+      return;
+    }
+
+    await executeReassignStudent(studentId, newSectionId);
   };
 
   // Handle Remove Student from Section Roster (for learners not enrolled in active semester)
@@ -1195,7 +1218,7 @@ export default function SectionQuotaConsole() {
             </button>
             <button
               type="button"
-              onClick={() => handleDeleteSection(sec)}
+              onClick={() => setDeleteSectionTarget(sec)}
               className="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
               title="Remove section"
             >
@@ -2696,6 +2719,176 @@ export default function SectionQuotaConsole() {
                 className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold uppercase tracking-wider cursor-pointer"
               >
                 Close Roster
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Confirm Delete Section Modal */}
+      {deleteSectionTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
+          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b border-red-200 pb-2.5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 block">
+                  DepEd Section Management
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
+                  {deleteSectionTarget.enrolledCount > 0 ? "Cannot Delete Section" : "Confirm Section Deletion"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteSectionTarget(null)}
+                disabled={isDeletingSection}
+                className="text-slate-400 hover:text-slate-600 font-mono text-xl font-bold px-2 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            {deleteSectionTarget.enrolledCount > 0 ? (
+              <div className="p-3.5 bg-red-50 border border-red-300 text-xs space-y-3 text-red-950">
+                <div className="flex items-center gap-2">
+                  <span className="text-red-600 font-bold text-sm">&times;</span>
+                  <span className="font-bold">Active Learner Enrollment Lock</span>
+                </div>
+                <p>
+                  Cannot delete section <strong className="font-mono text-[#002060]">{deleteSectionTarget.section_name}</strong>:
+                </p>
+                <div className="bg-white p-3 border border-red-200 text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800">Enrolled Learners:</span>
+                    <strong className="font-mono text-red-700 font-bold text-sm">
+                      {deleteSectionTarget.enrolledCount} Students
+                    </strong>
+                  </div>
+                  <div className="text-[11px] text-slate-600">
+                    Grade {deleteSectionTarget.grade_level} {deleteSectionTarget.strand || "Core"}
+                  </div>
+                </div>
+                <p className="text-[11px] text-red-800 leading-relaxed">
+                  DepEd Quota Control mandates that all learners must be reassigned or transferred to another section before removing this section from the school roster.
+                </p>
+                <div className="pt-2 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = deleteSectionTarget;
+                      setDeleteSectionTarget(null);
+                      fetchRoster(target);
+                    }}
+                    className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs uppercase cursor-pointer text-center"
+                  >
+                    View Class Roster &amp; Reassign
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-3.5 bg-red-50 border border-red-300 text-xs space-y-2 text-red-950">
+                  <p className="font-semibold text-slate-800">
+                    Are you sure you want to permanently delete section <strong className="font-mono text-[#002060]">{deleteSectionTarget.section_name}</strong>?
+                  </p>
+                  <div className="bg-white p-3 border border-red-200 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-sm text-[#002060]">
+                        {deleteSectionTarget.section_name}
+                      </span>
+                      <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 font-bold uppercase">
+                        Grade {deleteSectionTarget.grade_level}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-600">
+                      Classroom: <strong className="text-slate-800">{deleteSectionTarget.room || "Unassigned"}</strong>
+                    </div>
+                    <div className="text-[11px] text-slate-600">
+                      Adviser: <strong className="text-slate-800">{deleteSectionTarget.adviser_name || "Unassigned"}</strong>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-red-700 font-medium">
+                    This action will remove the section from quota tracking and timetable scheduling.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteSectionTarget(null)}
+                    disabled={isDeletingSection}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmDeleteSection}
+                    disabled={isDeletingSection}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 text-center order-1 sm:order-2"
+                  >
+                    {isDeletingSection ? "Deleting..." : "Confirm Delete"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modern Reassign Capacity Override Modal */}
+      {reassignOverridePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
+          <div className="bg-white border-2 sm:border-4 border-amber-600 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b border-amber-200 pb-2.5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700 block">
+                  Capacity Limit Warning
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
+                  Section Over-Capacity Override
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReassignOverridePrompt(null)}
+                className="text-slate-400 hover:text-slate-600 font-mono text-xl font-bold px-2 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-3.5 bg-amber-50 border border-amber-300 text-xs space-y-2 text-amber-950">
+              <p className="font-semibold text-slate-800">
+                Target section <strong className="font-mono text-[#002060]">{reassignOverridePrompt.targetSecName}</strong> is already at or above maximum seating capacity:
+              </p>
+              <div className="bg-white p-3 border border-amber-200 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800">Current Occupancy:</span>
+                  <span className="font-mono font-bold text-amber-800">
+                    {reassignOverridePrompt.enrolled} / {reassignOverridePrompt.cap} Seats
+                  </span>
+                </div>
+              </div>
+              <p className="text-[11px] text-amber-900">
+                Do you wish to authorize an administrative quota override and transfer this student anyway?
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => setReassignOverridePrompt(null)}
+                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => executeReassignStudent(reassignOverridePrompt.studentId, reassignOverridePrompt.newSectionId)}
+                className="w-full sm:w-auto px-5 py-2.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-1 sm:order-2"
+              >
+                Authorize &amp; Reassign
               </button>
             </div>
           </div>

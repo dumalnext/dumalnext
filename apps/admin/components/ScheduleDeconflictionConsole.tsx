@@ -149,6 +149,10 @@ export default function ScheduleDeconflictionConsole() {
   // Notice Message
   const [actionNotice, setActionNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Delete Target Modal State
+  const [deleteTargetItem, setDeleteTargetItem] = useState<ScheduleItem | null>(null);
+  const [isDeletingSchedule, setIsDeletingSchedule] = useState<boolean>(false);
+
   // Auto-Generate Modal State
   const [isAutoModalOpen, setIsAutoModalOpen] = useState<boolean>(false);
   const [isGeneratingAuto, setIsGeneratingAuto] = useState<boolean>(false);
@@ -489,22 +493,25 @@ export default function ScheduleDeconflictionConsole() {
   };
 
   // 4. Handle Delete Schedule
-  const handleDeleteSchedule = async (id: string, subjectName: string) => {
-    if (!confirm(`Are you sure you want to remove the schedule period for "${subjectName}"?`)) {
-      return;
-    }
-
+  const handleConfirmDeleteSchedule = async () => {
+    if (!deleteTargetItem) return;
+    setIsDeletingSchedule(true);
     try {
-      const res = await fetch(`/api/schedules?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/schedules?id=${deleteTargetItem.id}`, { method: "DELETE" });
       const data = await res.json();
       if (res.ok && data.success) {
-        setActionNotice({ type: "success", text: `Schedule period for "${subjectName}" was removed.` });
-        setSchedules((prev) => prev.filter((s) => s.id !== id));
+        setActionNotice({ type: "success", text: `Schedule period for "${deleteTargetItem.subject_name}" was removed.` });
+        setSchedules((prev) => prev.filter((s) => s.id !== deleteTargetItem.id));
+        setDeleteTargetItem(null);
       } else {
         setActionNotice({ type: "error", text: data.error || "Failed to remove schedule." });
+        setDeleteTargetItem(null);
       }
     } catch (err: any) {
       setActionNotice({ type: "error", text: err?.message || "Network error removing schedule." });
+      setDeleteTargetItem(null);
+    } finally {
+      setIsDeletingSchedule(false);
     }
   };
 
@@ -1054,7 +1061,7 @@ export default function ScheduleDeconflictionConsole() {
                                       </div>
                                       <button
                                         type="button"
-                                        onClick={() => handleDeleteSchedule(matchedItem.id, matchedItem.subject_name)}
+                                        onClick={() => setDeleteTargetItem(matchedItem)}
                                         className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
                                         title="Remove this class period"
                                       >
@@ -1191,7 +1198,7 @@ export default function ScheduleDeconflictionConsole() {
                                       </div>
                                       <button
                                         type="button"
-                                        onClick={() => handleDeleteSchedule(matchedItem.id, matchedItem.subject_name)}
+                                        onClick={() => setDeleteTargetItem(matchedItem)}
                                         className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 no-print print:hidden cursor-pointer"
                                         title="Remove this class period"
                                       >
@@ -1282,7 +1289,7 @@ export default function ScheduleDeconflictionConsole() {
                         <td className="p-3 text-right no-print print:hidden">
                           <button
                             type="button"
-                            onClick={() => handleDeleteSchedule(item.id, item.subject_name)}
+                            onClick={() => setDeleteTargetItem(item)}
                             className="px-2 py-1 bg-slate-100 hover:bg-red-50 text-red-700 border border-slate-300 text-[10px] font-bold uppercase cursor-pointer"
                           >
                             Remove
@@ -1824,6 +1831,79 @@ export default function ScheduleDeconflictionConsole() {
                 className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
               >
                 {isResetting ? "Clearing..." : "Yes, Clear All Schedules"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Confirm Delete Schedule Period Modal */}
+      {deleteTargetItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
+          <div className="bg-white border-2 sm:border-4 border-red-700 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+            <div className="border-b border-red-200 pb-2.5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 block">
+                  Schedule Deconfliction Registry
+                </span>
+                <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
+                  Remove Schedule Period
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteTargetItem(null)}
+                disabled={isDeletingSchedule}
+                className="text-slate-400 hover:text-slate-600 font-mono text-xl font-bold px-2 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-3.5 bg-red-50 border border-red-300 text-xs space-y-2 text-red-950">
+              <p className="font-semibold text-slate-800">
+                Are you sure you want to remove the following assigned class period?
+              </p>
+              <div className="bg-white p-3 border border-red-200 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-sm text-[#002060]">
+                    {deleteTargetItem.subject_name}
+                  </span>
+                  <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
+                    {deleteTargetItem.day_of_week}
+                  </span>
+                </div>
+                <div className="font-bold text-slate-900 text-xs">
+                  Section: {deleteTargetItem.section_name}
+                </div>
+                <div className="text-[11px] text-slate-600 font-mono">
+                  {deleteTargetItem.teacher_name} &bull; Room: {deleteTargetItem.classroom_name || "Unassigned"}
+                </div>
+                <div className="text-[11px] text-slate-500 font-mono">
+                  Time: {deleteTargetItem.start_time} - {deleteTargetItem.end_time}
+                </div>
+              </div>
+              <p className="text-[11px] text-red-700 font-medium">
+                This will unassign the period and clear the timetable slot from the deconfliction grid.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetItem(null)}
+                disabled={isDeletingSchedule}
+                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteSchedule}
+                disabled={isDeletingSchedule}
+                className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 text-center order-1 sm:order-2"
+              >
+                {isDeletingSchedule ? "Removing..." : "Confirm Removal"}
               </button>
             </div>
           </div>
