@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import CustomSelect from "@/components/CustomSelect";
+import CustomSelect, { CustomSelectOption } from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 
 export const SHS_TRACKS = [
@@ -1654,8 +1654,8 @@ export default function SectionQuotaConsole() {
       {/* ========================================================================= */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
-            <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
+          <div className="bg-white border-4 border-[#002060] w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+            <div className="bg-[#002060] text-white p-4 flex items-center justify-between shrink-0">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200 block">
                   SECTION MANAGEMENT
@@ -1673,7 +1673,7 @@ export default function SectionQuotaConsole() {
               </button>
             </div>
 
-            <form onSubmit={handleAddSection} className="p-5 sm:p-6 space-y-4 text-xs">
+            <form onSubmit={handleAddSection} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1">
               {addError && (
                 <div className="p-2.5 bg-red-50 border border-red-400 text-red-900 font-bold">
                   Error: {addError}
@@ -1686,24 +1686,25 @@ export default function SectionQuotaConsole() {
                   <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                     Grade Level <span className="text-red-600">*</span>
                   </label>
-                  <select
-                    value={newGradeLevel}
-                    onChange={(e) => {
-                      const g = Number(e.target.value);
+                  <CustomSelect
+                    fullWidth
+                    value={String(newGradeLevel)}
+                    onChange={(val) => {
+                      const g = Number(val);
                       setNewGradeLevel(g);
                       if (g >= 11 && !newStrand) {
                         setNewStrand("Academic");
                       }
                     }}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value={7}>Grade 7 (Junior High School)</option>
-                    <option value={8}>Grade 8 (Junior High School)</option>
-                    <option value={9}>Grade 9 (Junior High School)</option>
-                    <option value={10}>Grade 10 (Junior High School)</option>
-                    <option value={11}>Grade 11 (Senior High School)</option>
-                    <option value={12}>Grade 12 (Senior High School)</option>
-                  </select>
+                    options={[
+                      { value: "7", label: "Grade 7", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "8", label: "Grade 8", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "9", label: "Grade 9", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "10", label: "Grade 10", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "11", label: "Grade 11", badge: "SHS", sublabel: "Senior High School" },
+                      { value: "12", label: "Grade 12", badge: "SHS", sublabel: "Senior High School" },
+                    ]}
+                  />
                 </div>
 
                 {newGradeLevel >= 11 ? (
@@ -1711,17 +1712,16 @@ export default function SectionQuotaConsole() {
                     <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                       Senior High School Track <span className="text-red-600">*</span>
                     </label>
-                    <select
+                    <CustomSelect
+                      fullWidth
                       value={newStrand || "Academic"}
-                      onChange={(e) => setNewStrand(e.target.value)}
-                      className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-                    >
-                      {SHS_TRACKS.map((t) => (
-                        <option key={t.code} value={t.code}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewStrand(val)}
+                      options={SHS_TRACKS.map((t) => ({
+                        value: t.code,
+                        label: t.name,
+                        badge: t.code,
+                      }))}
+                    />
                   </div>
                 ) : (
                   <div className="p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex flex-col justify-center">
@@ -1773,36 +1773,35 @@ export default function SectionQuotaConsole() {
                       IT Facilities: {classroomsList.length} Rooms
                     </span>
                   </div>
-                  <select
+                  <CustomSelect
+                    fullWidth
+                    placeholder="-- Select Classroom / Room (From IT Facilities) --"
                     value={newRoom}
-                    onChange={(e) => {
-                      const selectedVal = e.target.value;
+                    onChange={(selectedVal) => {
                       setNewRoom(selectedVal);
                       const matched = findClassroomDetails(selectedVal);
                       if (matched) {
                         setNewCapacity(matched.capacity);
                       }
                     }}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value="">-- Select Classroom / Room (From IT Facilities) --</option>
-                    {Object.entries(classroomsByBuilding).map(([bldg, rooms]) => (
-                      <optgroup key={bldg} label={`BUILDING: ${bldg.toUpperCase()}`}>
-                        {rooms.map((rm) => {
+                    options={[
+                      { value: "", label: "-- Select Classroom / Room (From IT Facilities) --" },
+                      ...Object.entries(classroomsByBuilding).flatMap(([bldg, rooms]) =>
+                        rooms.map((rm) => {
                           const optionVal = `${rm.room_name} (${rm.building})`;
                           const occupyingSec = getSectionOccupyingRoom(optionVal);
-                          const statusTag = occupyingSec
-                            ? `OCCUPIED BY: ${occupyingSec.section_name}`
-                            : "AVAILABLE";
-                          return (
-                            <option key={rm.id} value={optionVal}>
-                              {rm.classroom_id ? `${rm.classroom_id} • ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
-                            </option>
-                          );
-                        })}
-                      </optgroup>
-                    ))}
-                  </select>
+                          const isOccupied = Boolean(occupyingSec);
+                          return {
+                            value: optionVal,
+                            label: `${rm.classroom_id ? `${rm.classroom_id} • ` : ""}${rm.room_name}`,
+                            category: `BUILDING: ${bldg.toUpperCase()}`,
+                            badge: occupyingSec ? `OCCUPIED: ${occupyingSec.section_name}` : "AVAILABLE",
+                            sublabel: `Max Capacity: ${rm.capacity} seats`,
+                          };
+                        })
+                      ),
+                    ]}
+                  />
                   {classroomsList.length === 0 ? (
                     <p className="text-[11px] text-amber-700 mt-1">
                       No classrooms registered in IT Support facilities yet.
@@ -1839,27 +1838,28 @@ export default function SectionQuotaConsole() {
                       Registered Faculty: {teachersList.length}
                     </span>
                   </div>
-                  <select
+                  <CustomSelect
+                    fullWidth
+                    placeholder="-- Select Registered Teacher (Optional) --"
                     value={newAdviser}
-                    onChange={(e) => setNewAdviser(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value="">-- Select Registered Teacher (Optional) --</option>
-                    {teachersList.map((t) => {
-                      const alreadyAssignedSec = sections.find(
-                        (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
-                      );
-                      const statusTag = alreadyAssignedSec
-                        ? `ALREADY ADVISING: ${alreadyAssignedSec.section_name}`
-                        : "AVAILABLE";
-
-                      return (
-                        <option key={t.id} value={t.fullName}>
-                          {t.fullName} &bull; {statusTag} {t.email ? `(${t.email})` : ""}
-                        </option>
-                      );
-                    })}
-                  </select>
+                    onChange={(val) => setNewAdviser(val)}
+                    options={[
+                      { value: "", label: "-- Select Registered Teacher (Optional) --" },
+                      ...teachersList.map((t) => {
+                        const alreadyAssignedSec = sections.find(
+                          (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
+                        );
+                        return {
+                          value: t.fullName,
+                          label: t.fullName,
+                          sublabel: t.email || undefined,
+                          badge: alreadyAssignedSec
+                            ? `ADVISING: ${alreadyAssignedSec.section_name}`
+                            : "AVAILABLE",
+                        };
+                      }),
+                    ]}
+                  />
                   {teachersList.length === 0 && (
                     <p className="text-[11px] text-amber-700 mt-1">
                       No registered faculty accounts found in database.
@@ -1957,8 +1957,8 @@ export default function SectionQuotaConsole() {
       {/* ========================================================================= */}
       {editingSection && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
-            <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
+          <div className="bg-white border-4 border-[#002060] w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+            <div className="bg-[#002060] text-white p-4 flex items-center justify-between shrink-0">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200 block">
                   EDIT SECTION CAPACITY &amp; DETAILS
@@ -1976,7 +1976,7 @@ export default function SectionQuotaConsole() {
               </button>
             </div>
 
-            <form onSubmit={handleEditSection} className="p-5 sm:p-6 space-y-4 text-xs">
+            <form onSubmit={handleEditSection} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1">
               {editError && (
                 <div className="p-2.5 bg-red-50 border border-red-400 text-red-900 font-bold">
                   Error: {editError}
@@ -1997,24 +1997,25 @@ export default function SectionQuotaConsole() {
                   <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                     Grade Level <span className="text-red-600">*</span>
                   </label>
-                  <select
-                    value={editGradeLevel}
-                    onChange={(e) => {
-                      const g = Number(e.target.value);
+                  <CustomSelect
+                    fullWidth
+                    value={String(editGradeLevel)}
+                    onChange={(val) => {
+                      const g = Number(val);
                       setEditGradeLevel(g);
                       if (g >= 11 && !editStrand) {
                         setEditStrand("Academic");
                       }
                     }}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value={7}>Grade 7 (Junior High School)</option>
-                    <option value={8}>Grade 8 (Junior High School)</option>
-                    <option value={9}>Grade 9 (Junior High School)</option>
-                    <option value={10}>Grade 10 (Junior High School)</option>
-                    <option value={11}>Grade 11 (Senior High School)</option>
-                    <option value={12}>Grade 12 (Senior High School)</option>
-                  </select>
+                    options={[
+                      { value: "7", label: "Grade 7", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "8", label: "Grade 8", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "9", label: "Grade 9", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "10", label: "Grade 10", badge: "JHS", sublabel: "Junior High School" },
+                      { value: "11", label: "Grade 11", badge: "SHS", sublabel: "Senior High School" },
+                      { value: "12", label: "Grade 12", badge: "SHS", sublabel: "Senior High School" },
+                    ]}
+                  />
                 </div>
 
                 {editGradeLevel >= 11 ? (
@@ -2022,17 +2023,16 @@ export default function SectionQuotaConsole() {
                     <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
                       Senior High School Track <span className="text-red-600">*</span>
                     </label>
-                    <select
+                    <CustomSelect
+                      fullWidth
                       value={editStrand || "Academic"}
-                      onChange={(e) => setEditStrand(e.target.value)}
-                      className="w-full p-2.5 bg-white border border-slate-300 text-xs font-bold text-[#002060] outline-none cursor-pointer"
-                    >
-                      {SHS_TRACKS.map((t) => (
-                        <option key={t.code} value={t.code}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setEditStrand(val)}
+                      options={SHS_TRACKS.map((t) => ({
+                        value: t.code,
+                        label: t.name,
+                        badge: t.code,
+                      }))}
+                    />
                   </div>
                 ) : (
                   <div className="p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex flex-col justify-center">
@@ -2084,21 +2084,20 @@ export default function SectionQuotaConsole() {
                       IT Facilities: {classroomsList.length} Rooms
                     </span>
                   </div>
-                  <select
+                  <CustomSelect
+                    fullWidth
+                    placeholder="-- Select Classroom / Room (From IT Facilities) --"
                     value={editRoom}
-                    onChange={(e) => {
-                      const selectedVal = e.target.value;
+                    onChange={(selectedVal) => {
                       setEditRoom(selectedVal);
                       const matched = findClassroomDetails(selectedVal);
                       if (matched) {
                         setEditCapacity(matched.capacity);
                       }
                     }}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer font-medium"
-                  >
-                    <option value="">-- Select Classroom / Room (From IT Facilities) --</option>
-                    {/* Preserve custom or legacy room value if not yet in IT Support facilities */}
-                    {editRoom &&
+                    options={[
+                      { value: "", label: "-- Select Classroom / Room (From IT Facilities) --" },
+                      ...(editRoom &&
                       !classroomsList.some((r) => {
                         const standard = `${r.room_name} (${r.building})`.toLowerCase();
                         return (
@@ -2106,14 +2105,17 @@ export default function SectionQuotaConsole() {
                           r.room_name.toLowerCase() === editRoom.toLowerCase() ||
                           r.classroom_id.toLowerCase() === editRoom.toLowerCase()
                         );
-                      }) && (
-                        <option value={editRoom}>
-                          {editRoom} (Current / Unlisted Room)
-                        </option>
-                      )}
-                    {Object.entries(classroomsByBuilding).map(([bldg, rooms]) => (
-                      <optgroup key={bldg} label={`BUILDING: ${bldg.toUpperCase()}`}>
-                        {rooms.map((rm) => {
+                      })
+                        ? [
+                            {
+                              value: editRoom,
+                              label: `${editRoom} (Current / Unlisted Room)`,
+                              badge: "CURRENT",
+                            },
+                          ]
+                        : []),
+                      ...Object.entries(classroomsByBuilding).flatMap(([bldg, rooms]) =>
+                        rooms.map((rm) => {
                           const optionVal = `${rm.room_name} (${rm.building})`;
                           const occupyingSec = getSectionOccupyingRoom(optionVal, editingSection?.id);
                           const isCurrent =
@@ -2123,21 +2125,23 @@ export default function SectionQuotaConsole() {
                               editingSection.room.toLowerCase() === rm.room_name.toLowerCase() ||
                               editingSection.room.toLowerCase() === rm.classroom_id.toLowerCase());
 
-                          const statusTag = isCurrent
-                            ? "CURRENT ROOM OF THIS SECTION"
+                          const statusBadge = isCurrent
+                            ? "CURRENT ROOM"
                             : occupyingSec
-                            ? `ASSIGNED TO: ${occupyingSec.section_name}`
+                            ? `ASSIGNED: ${occupyingSec.section_name}`
                             : "AVAILABLE";
 
-                          return (
-                            <option key={rm.id} value={optionVal}>
-                              {rm.classroom_id ? `${rm.classroom_id} • ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
-                            </option>
-                          );
-                        })}
-                      </optgroup>
-                    ))}
-                  </select>
+                          return {
+                            value: optionVal,
+                            label: `${rm.classroom_id ? `${rm.classroom_id} • ` : ""}${rm.room_name}`,
+                            category: `BUILDING: ${bldg.toUpperCase()}`,
+                            badge: statusBadge,
+                            sublabel: `Max Capacity: ${rm.capacity} seats`,
+                          };
+                        })
+                      ),
+                    ]}
+                  />
                   {classroomsList.length === 0 ? (
                     <p className="text-[11px] text-amber-700 mt-1">
                       No classrooms registered in IT Support facilities yet.
@@ -2174,39 +2178,45 @@ export default function SectionQuotaConsole() {
                       Registered Faculty: {teachersList.length}
                     </span>
                   </div>
-                  <select
+                  <CustomSelect
+                    fullWidth
+                    placeholder="-- Select Registered Teacher (Unassigned) --"
                     value={editAdviser}
-                    onChange={(e) => {
-                      setEditAdviser(e.target.value);
+                    onChange={(val) => {
+                      setEditAdviser(val);
                       setAutoTransferAdviser(false);
                     }}
-                    className="w-full p-2.5 bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] outline-none cursor-pointer"
-                  >
-                    <option value="">-- Select Registered Teacher (Unassigned) --</option>
-                    {/* If editAdviser is already set to a custom or legacy name not yet in teachersList, preserve it as an option */}
-                    {editAdviser && !teachersList.some((t) => t.fullName === editAdviser) && (
-                      <option value={editAdviser}>
-                        {editAdviser} (Current Adviser)
-                      </option>
-                    )}
-                    {teachersList.map((t) => {
-                      const assignedSec = sections.find(
-                        (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
-                      );
-                      const isCurrent = editingSection && assignedSec && assignedSec.id === editingSection.id;
-                      const statusTag = isCurrent
-                        ? "CURRENT ADVISER OF THIS SECTION"
-                        : assignedSec
-                        ? `ALREADY ADVISING: ${assignedSec.section_name}`
-                        : "AVAILABLE";
+                    options={[
+                      { value: "", label: "-- Select Registered Teacher (Unassigned) --" },
+                      ...(editAdviser && !teachersList.some((t) => t.fullName === editAdviser)
+                        ? [
+                            {
+                              value: editAdviser,
+                              label: `${editAdviser} (Current Adviser)`,
+                              badge: "CURRENT",
+                            },
+                          ]
+                        : []),
+                      ...teachersList.map((t) => {
+                        const assignedSec = sections.find(
+                          (s) => s.adviser_name && s.adviser_name.trim().toLowerCase() === t.fullName.toLowerCase()
+                        );
+                        const isCurrent = editingSection && assignedSec && assignedSec.id === editingSection.id;
+                        const statusBadge = isCurrent
+                          ? "CURRENT ADVISER"
+                          : assignedSec
+                          ? `ADVISING: ${assignedSec.section_name}`
+                          : "AVAILABLE";
 
-                      return (
-                        <option key={t.id} value={t.fullName}>
-                          {t.fullName} &bull; {statusTag} {t.email ? `(${t.email})` : ""}
-                        </option>
-                      );
-                    })}
-                  </select>
+                        return {
+                          value: t.fullName,
+                          label: t.fullName,
+                          sublabel: t.email || undefined,
+                          badge: statusBadge,
+                        };
+                      }),
+                    ]}
+                  />
                   {(() => {
                     const conflict = getExistingAdvisorySection(editAdviser, editingSection?.id);
                     if (!conflict) return null;
@@ -2562,23 +2572,26 @@ export default function SectionQuotaConsole() {
                               ) : isEnrolled ? (
                                 isReassigningThis ? (
                                   <div className="inline-flex items-center gap-1.5">
-                                    <select
+                                    <CustomSelect
+                                      placeholder="-- Choose Section --"
+                                      align="right"
+                                      className="min-w-[170px]"
                                       value={reassignTargetSectionId}
-                                      onChange={(e) => setReassignTargetSectionId(e.target.value)}
-                                      className="p-1 bg-white border border-slate-400 text-xs font-bold text-[#002060] outline-none"
-                                    >
-                                      <option value="">-- Choose Section --</option>
-                                      {eligibleTargetSections.map((ts) => (
-                                        <option key={ts.id} value={ts.id}>
-                                          {ts.section_name} ({ts.enrolledCount}/{ts.capacity})
-                                        </option>
-                                      ))}
-                                    </select>
+                                      onChange={(val) => setReassignTargetSectionId(val)}
+                                      options={[
+                                        { value: "", label: "-- Choose Section --" },
+                                        ...eligibleTargetSections.map((ts) => ({
+                                          value: ts.id,
+                                          label: ts.section_name,
+                                          badge: `${ts.enrolledCount}/${ts.capacity}`,
+                                        })),
+                                      ]}
+                                    />
                                     <button
                                       type="button"
                                       onClick={() => handleReassignStudent(st.id, reassignTargetSectionId)}
                                       disabled={!reassignTargetSectionId}
-                                      className="px-2 py-1 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase disabled:opacity-50 cursor-pointer"
+                                      className="px-2.5 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase disabled:opacity-50 cursor-pointer rounded-[4px]"
                                     >
                                       Move
                                     </button>
@@ -2588,7 +2601,7 @@ export default function SectionQuotaConsole() {
                                         setReassigningStudentId(null);
                                         setReassignTargetSectionId("");
                                       }}
-                                      className="px-2 py-1 bg-slate-200 text-slate-700 text-[11px] font-bold uppercase cursor-pointer"
+                                      className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-bold uppercase cursor-pointer rounded-[4px]"
                                     >
                                       Cancel
                                     </button>
