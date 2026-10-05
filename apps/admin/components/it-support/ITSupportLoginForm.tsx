@@ -45,7 +45,7 @@ export default function ITSupportLoginForm() {
 
       {errorMessage && (
         <div className="mb-4 p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-800">
-          [ AUTHENTICATION ERROR ]: {errorMessage}
+          AUTHENTICATION ERROR: {errorMessage}
         </div>
       )}
 
@@ -83,7 +83,7 @@ export default function ITSupportLoginForm() {
           disabled={isSubmitting}
           className="w-full py-3 bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50"
         >
-          {isSubmitting ? "[ Verifying Credentials... ]" : "[ Authenticate IT Support Session ]"}
+          {isSubmitting ? "Verifying Credentials..." : "Authenticate IT Support Session"}
         </button>
 
         <div className="pt-2 border-t border-slate-200">

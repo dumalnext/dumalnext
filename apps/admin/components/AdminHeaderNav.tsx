@@ -97,7 +97,7 @@ export default function AdminHeaderNav({
               onClick={logout}
               className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs rounded"
             >
-              [ Sign Out ]
+              Sign Out
             </button>
           </div>
         )}

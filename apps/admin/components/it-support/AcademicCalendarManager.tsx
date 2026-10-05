@@ -140,7 +140,7 @@ export default function AcademicCalendarManager() {
       if (json.success) {
         setStatusMessage({
           type: "success",
-          text: `School Year ${newSchoolYear} initialized with Trimesters 1, 2, and 3. Click [ EDIT ] on any trimester to expand and configure dates.`,
+          text: `School Year ${newSchoolYear} initialized with Trimesters 1, 2, and 3. Click EDIT on any trimester to expand and configure dates.`,
         });
         setIsAddSYModalOpen(false);
         setNewSchoolYear("");
@@ -164,7 +164,7 @@ export default function AcademicCalendarManager() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ DEPED POLICY GUIDELINE: DYNAMIC TRISEM CALENDAR CONFIGURATION ]
+              DEPED POLICY GUIDELINE: DYNAMIC TRISEM CALENDAR CONFIGURATION
             </span>
             <p className="text-xs text-slate-700 mt-1">
               Zero Hardcoded Dates: School year boundaries, instructional periods, summative deadlines, and report card distribution dates are strictly configured dynamically through this IT Support console.
@@ -176,7 +176,7 @@ export default function AcademicCalendarManager() {
               onClick={() => setIsAddSYModalOpen(true)}
               className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
             >
-              [ + CONFIGURE NEW TERM ]
+              + CONFIGURE NEW TERM
             </button>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function AcademicCalendarManager() {
               : "bg-red-50 border-red-600 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "[ STATUS ]: " : "[ ERROR ]: "}
+          {statusMessage.type === "success" ? "STATUS: " : "ERROR: "}
           {statusMessage.text}
         </div>
       )}
@@ -277,7 +277,7 @@ export default function AcademicCalendarManager() {
                   : "bg-slate-200 hover:bg-slate-300 text-slate-700"
               }`}
             >
-              [ Table View ]
+              Table View
             </button>
             <button
               type="button"
@@ -288,14 +288,14 @@ export default function AcademicCalendarManager() {
                   : "bg-slate-200 hover:bg-slate-300 text-slate-700"
               }`}
             >
-              [ Trimester Boxes View ]
+              Trimester Boxes View
             </button>
           </div>
         </div>
 
         {isLoading ? (
           <div className="p-8 text-center text-xs font-mono text-slate-500 uppercase">
-            [ Loading Academic Terms from PostgreSQL Database... ]
+            Loading Academic Terms from PostgreSQL Database...
           </div>
         ) : terms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
@@ -380,7 +380,7 @@ export default function AcademicCalendarManager() {
                               className="px-2.5 py-1 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-700 font-mono font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer"
                               title="Click to activate this trimester for the school"
                             >
-                              [ SET ACTIVE ]
+                              SET ACTIVE
                             </button>
                           )}
                         </td>
@@ -396,7 +396,7 @@ export default function AcademicCalendarManager() {
                                 : "bg-white hover:bg-slate-100 text-[#002060] border-[#002060]"
                             }`}
                           >
-                            {isExpanded ? "[ CLOSE ▲ ]" : "[ EDIT ]"}
+                            {isExpanded ? "CLOSE ▲" : "EDIT"}
                           </button>
                         </td>
                       </tr>
@@ -410,7 +410,7 @@ export default function AcademicCalendarManager() {
                               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b-2 border-slate-200">
                                 <div className="flex flex-wrap items-center gap-3">
                                   <span className="px-2.5 py-1 bg-[#002060] text-white font-mono font-bold text-[10px] uppercase tracking-wider">
-                                    [ EXPANDED TRIMESTER BOX ]
+                                    EXPANDED TRIMESTER BOX
                                   </span>
                                   <div className="font-mono text-xs">
                                     <span className="text-slate-500 uppercase mr-1">SCHOOL YEAR:</span>
@@ -604,7 +604,7 @@ export default function AcademicCalendarManager() {
                                         className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                                         title="Click to activate"
                                       >
-                                        [ CLICK TO ACTIVATE THIS TRIMESTER ]
+                                        CLICK TO ACTIVATE THIS TRIMESTER
                                       </button>
                                     )}
                                     <span className="text-[11px] text-slate-600 font-mono">
@@ -631,7 +631,7 @@ export default function AcademicCalendarManager() {
                                     }}
                                     className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
                                   >
-                                    [ CANCEL ]
+                                    CANCEL
                                   </button>
                                   <button
                                     type="button"
@@ -639,7 +639,7 @@ export default function AcademicCalendarManager() {
                                     onClick={handleSaveTermDates}
                                     className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
                                   >
-                                    {isSubmitting ? "[ SAVING TO DATABASE... ]" : `[ SAVE ${editingTerm.termName.toUpperCase()} DATES ]`}
+                                    {isSubmitting ? "SAVING TO DATABASE..." : `SAVE ${editingTerm.termName.toUpperCase()} DATES`}
                                   </button>
                                 </div>
                               </div>
@@ -688,7 +688,7 @@ export default function AcademicCalendarManager() {
                           onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
                           className="px-2 py-0.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-700 font-mono font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer"
                         >
-                          [ SET ACTIVE ]
+                          SET ACTIVE
                         </button>
                       )}
                     </div>
@@ -702,7 +702,7 @@ export default function AcademicCalendarManager() {
                           : "bg-white hover:bg-slate-100 text-[#002060] border-[#002060]"
                       }`}
                     >
-                      {isExpanded ? "[ CLOSE BOX ▲ ]" : "[ EDIT DATES ]"}
+                      {isExpanded ? "CLOSE BOX ▲" : "EDIT DATES"}
                     </button>
                   </div>
 
@@ -896,7 +896,7 @@ export default function AcademicCalendarManager() {
                                 onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
                                 className="px-3 py-1.5 bg-[#002060] hover:bg-[#001845] text-white font-mono font-bold text-xs uppercase cursor-pointer"
                               >
-                                [ CLICK TO SET ACTIVE ]
+                                CLICK TO SET ACTIVE
                               </button>
                             )
                           ) : term.isActive ? (
@@ -909,7 +909,7 @@ export default function AcademicCalendarManager() {
                               onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
                               className="px-3 py-1 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase cursor-pointer"
                             >
-                              [ SET ACTIVE ]
+                              SET ACTIVE
                             </button>
                           )}
                         </div>
@@ -927,7 +927,7 @@ export default function AcademicCalendarManager() {
                           }}
                           className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
                         >
-                          [ CANCEL ]
+                          CANCEL
                         </button>
                         <button
                           type="button"
@@ -935,7 +935,7 @@ export default function AcademicCalendarManager() {
                           onClick={handleSaveTermDates}
                           className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
                         >
-                          {isSubmitting ? "[ SAVING... ]" : `[ SAVE ${editingTerm.termName.toUpperCase()} DATES ]`}
+                          {isSubmitting ? "SAVING..." : `[ SAVE ${editingTerm.termName.toUpperCase()} DATES ]`}
                         </button>
                       </div>
                     )}
@@ -965,7 +965,7 @@ export default function AcademicCalendarManager() {
                 onClick={() => setIsAddSYModalOpen(false)}
                 className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
               >
-                [ CLOSE X ]
+                CLOSE X
               </button>
             </div>
 
@@ -997,14 +997,14 @@ export default function AcademicCalendarManager() {
                   onClick={() => setIsAddSYModalOpen(false)}
                   className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100 cursor-pointer"
                 >
-                  [ Cancel ]
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
                 >
-                  {isSubmitting ? "[ Initializing... ]" : "[ Create 3 Trimesters ]"}
+                  {isSubmitting ? "Initializing..." : "Create 3 Trimesters"}
                 </button>
               </div>
             </form>

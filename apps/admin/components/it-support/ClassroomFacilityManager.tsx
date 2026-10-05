@@ -151,7 +151,7 @@ export default function ClassroomFacilityManager() {
             onClick={openAddModal}
             className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0"
           >
-            [ + Add New Classroom ]
+            + Add New Classroom
           </button>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function ClassroomFacilityManager() {
               : "bg-red-50 border-red-600 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "[ STATUS ]: " : "[ ERROR ]: "}
+          {statusMessage.type === "success" ? "STATUS: " : "ERROR: "}
           {statusMessage.text}
         </div>
       )}
@@ -183,7 +183,7 @@ export default function ClassroomFacilityManager() {
 
         {isLoading ? (
           <div className="p-8 text-center text-xs font-mono text-slate-500 uppercase">
-            [ Loading Facilities Directory from PostgreSQL... ]
+            Loading Facilities Directory from PostgreSQL...
           </div>
         ) : classrooms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
@@ -225,14 +225,14 @@ export default function ClassroomFacilityManager() {
                           className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase transition-colors"
                           title={`Edit ${room.classroomId}`}
                         >
-                          [ Edit ]
+                          Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(room.id, room.classroomId)}
                           className="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 text-[11px] font-bold uppercase transition-colors"
                         >
-                          [ Delete ]
+                          Delete
                         </button>
                       </div>
                     </td>
@@ -265,7 +265,7 @@ export default function ClassroomFacilityManager() {
                 }}
                 className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
               >
-                [ CLOSE X ]
+                CLOSE X
               </button>
             </div>
 
@@ -345,14 +345,14 @@ export default function ClassroomFacilityManager() {
                   }}
                   className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100"
                 >
-                  [ Cancel ]
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50"
                 >
-                  {isSubmitting ? "[ Saving... ]" : editingRoom ? "[ Update Classroom ]" : "[ Register Classroom ]"}
+                  {isSubmitting ? "Saving..." : editingRoom ? "Update Classroom" : "Register Classroom"}
                 </button>
               </div>
             </form>

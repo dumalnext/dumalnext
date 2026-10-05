@@ -671,7 +671,7 @@ export default function ScheduleDeconflictionConsole() {
       <div className="bg-white p-5 border-2 border-slate-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print print:hidden">
         <div>
           <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            [ AUTOMATED SCHEDULE DECONFLICTION HUB ]
+            AUTOMATED SCHEDULE DECONFLICTION HUB
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
             Timetable Conflict-Free Evaluation Hub
@@ -691,7 +691,7 @@ export default function ScheduleDeconflictionConsole() {
             className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900"
             title="One-click automated timetable deconfliction engine for JHS and SHS"
           >
-            [ Smart Auto-Generate Timetable ]
+            Smart Auto-Generate Timetable
           </button>
           <button
             type="button"
@@ -700,7 +700,7 @@ export default function ScheduleDeconflictionConsole() {
             className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60"
             title="Scan database for any schedule collisions"
           >
-            {isScanning ? "[ Scanning Timetables... ]" : "[ Run Deconfliction Audit Scan ]"}
+            {isScanning ? "Scanning Timetables..." : "Run Deconfliction Audit Scan"}
           </button>
           <button
             type="button"
@@ -708,7 +708,7 @@ export default function ScheduleDeconflictionConsole() {
             className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
             title="Reset and clear all timetables"
           >
-            [ Clear All ]
+            Clear All
           </button>
           <button
             type="button"
@@ -745,7 +745,7 @@ export default function ScheduleDeconflictionConsole() {
             }}
             className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
           >
-            [ + Assign Class Schedule ]
+            + Assign Class Schedule
           </button>
         </div>
       </div>
@@ -777,7 +777,7 @@ export default function ScheduleDeconflictionConsole() {
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
           <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-            [ STATUS: 0 TIMETABLE CONFLICTS DETECTED ]
+            STATUS: 0 TIMETABLE CONFLICTS DETECTED
           </span>
           <span className="text-xs text-emerald-900">&bull; {scanSummary}</span>
         </div>
@@ -914,7 +914,7 @@ export default function ScheduleDeconflictionConsole() {
             className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider border border-slate-400 cursor-pointer"
             title="Print printable class timetable program"
           >
-            [ Print Official Timetable ]
+            Print Official Timetable
           </button>
         </div>
       </div>
@@ -984,7 +984,7 @@ export default function ScheduleDeconflictionConsole() {
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
                       <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
-                        [ Time Period ]
+                        Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
                         <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
@@ -1123,7 +1123,7 @@ export default function ScheduleDeconflictionConsole() {
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
                       <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
-                        [ Time Period ]
+                        Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
                         <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
@@ -1253,7 +1253,7 @@ export default function ScheduleDeconflictionConsole() {
 
               {masterlistFiltered.length === 0 ? (
                 <div className="p-12 text-center text-xs font-mono text-slate-500 uppercase">
-                  [ No schedules matching your filter query. ]
+                  No schedules matching your filter query.
                 </div>
               ) : (
                 <table className="w-full text-left border-collapse text-xs font-sans">
@@ -1285,7 +1285,7 @@ export default function ScheduleDeconflictionConsole() {
                             onClick={() => handleDeleteSchedule(item.id, item.subject_name)}
                             className="px-2 py-1 bg-slate-100 hover:bg-red-50 text-red-700 border border-slate-300 text-[10px] font-bold uppercase cursor-pointer"
                           >
-                            [ Remove ]
+                            Remove
                           </button>
                         </td>
                       </tr>
@@ -1357,7 +1357,7 @@ export default function ScheduleDeconflictionConsole() {
                 <div className="p-3.5 bg-amber-50 border-2 border-amber-600 text-amber-950 text-xs font-sans space-y-1">
                   <div className="font-bold flex items-center gap-1.5 uppercase tracking-wide text-amber-900">
                     <span className="w-2 h-2 rounded-full bg-amber-600" />
-                    [ Automated Collision Warning ]
+                    Automated Collision Warning
                   </div>
                   <p className="leading-relaxed">{preFlightConflict.message}</p>
                 </div>
@@ -1390,7 +1390,7 @@ export default function ScheduleDeconflictionConsole() {
                     <span className="w-2.5 h-2.5 rounded-full bg-[#002060] shrink-0 animate-pulse" />
                     <div>
                       <span className="font-mono text-[#002060] font-bold text-[11px] uppercase block">
-                        [ SMART AUTOMATION ACTIVE ]: Grade {selectedFormSection.grade_level} Filter Enforced
+                        SMART AUTOMATION ACTIVE: Grade {selectedFormSection.grade_level} Filter Enforced
                       </span>
                       <span className="text-slate-700 text-[11px] block mt-0.5">
                         Detected Section: <strong>{selectedFormSection.section_name}</strong> (Grade {selectedFormSection.grade_level}
@@ -1565,7 +1565,7 @@ export default function ScheduleDeconflictionConsole() {
                   disabled={isSubmittingAdd || Boolean(preFlightConflict)}
                   className="px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
                 >
-                  {isSubmittingAdd ? "Verifying..." : "[ Save & Confirm Schedule ]"}
+                  {isSubmittingAdd ? "Verifying..." : "Save & Confirm Schedule"}
                 </button>
               </div>
             </form>
@@ -1640,7 +1640,7 @@ export default function ScheduleDeconflictionConsole() {
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
                     <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider">
-                      [ ACTIVE TERM CONFIGURED BY IT SUPPORT ]
+                      ACTIVE TERM CONFIGURED BY IT SUPPORT
                     </span>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase tracking-wider">
@@ -1760,7 +1760,7 @@ export default function ScheduleDeconflictionConsole() {
                     }}
                     className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                   >
-                    [ View Updated Timetables ]
+                    View Updated Timetables
                   </button>
                 )}
                 <button
@@ -1769,7 +1769,7 @@ export default function ScheduleDeconflictionConsole() {
                   disabled={isGeneratingAuto}
                   className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs border border-emerald-900"
                 >
-                  {isGeneratingAuto ? "[ Generating & Validating... ]" : "[ Execute Smart Timetable Generation ]"}
+                  {isGeneratingAuto ? "Generating & Validating..." : "Execute Smart Timetable Generation"}
                 </button>
               </div>
             </div>
@@ -1826,7 +1826,7 @@ export default function ScheduleDeconflictionConsole() {
                 disabled={isResetting}
                 className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
               >
-                {isResetting ? "[ Clearing... ]" : "[ Yes, Clear All Schedules ]"}
+                {isResetting ? "Clearing..." : "Yes, Clear All Schedules"}
               </button>
             </div>
           </div>

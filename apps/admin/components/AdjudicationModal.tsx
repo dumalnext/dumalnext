@@ -554,7 +554,7 @@ export default function AdjudicationModal({
 
       if (appErr) throw appErr;
 
-      setActionSuccess("Status updated to [ Needs Revision ]. Smart feedback dispatched to student portal in real-time.");
+      setActionSuccess("Status updated to Needs Revision. Smart feedback dispatched to student portal in real-time.");
       setTimeout(() => {
         onAdjudicationSuccess();
         onClose();
@@ -575,7 +575,7 @@ export default function AdjudicationModal({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
-                [ ENROLLMENT ADJUDICATION DOSSIER ]
+                ENROLLMENT ADJUDICATION DOSSIER
               </span>
               <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5 rounded-xs">
                 REF: {application.application_id}
@@ -674,7 +674,7 @@ export default function AdjudicationModal({
             <div className="p-4 bg-amber-50 border-2 border-amber-500 space-y-2 shadow-xs">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 bg-amber-200/80 px-2.5 py-0.5 border border-amber-400">
-                  [ JHS CURRICULAR PROGRAM TRANSFER REQUEST DETECTED ]
+                  JHS CURRICULAR PROGRAM TRANSFER REQUEST DETECTED
                 </span>
                 <span className="text-[11px] font-mono text-amber-900 font-bold">
                   ACTION: REQUIRES REGISTRAR REVIEW
@@ -696,7 +696,7 @@ export default function AdjudicationModal({
             <div className="space-y-5">
               <div className="border-b border-slate-200 pb-2">
                 <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-                  [ DepEd Learner's Personal Information &bull; Civil Registry ]
+                  DepEd Learner's Personal Information &bull; Civil Registry
                 </span>
               </div>
 
@@ -704,7 +704,7 @@ export default function AdjudicationModal({
                 {/* 2x2 Official Learner Photo Card */}
                 <div className="shrink-0 w-full sm:w-36 bg-white border-2 border-slate-300 p-2 shadow-xs text-center space-y-1.5">
                   <div className="text-[9px] font-mono font-bold text-[#002060] uppercase pb-1 border-b border-slate-200">
-                    [ 2x2 Photo ]
+                    2x2 Photo
                   </div>
                   <div
                     onClick={() => {
@@ -953,7 +953,7 @@ export default function AdjudicationModal({
                                 className="px-2.5 py-1 bg-purple-100 border border-purple-300 text-purple-950 font-mono font-bold text-[11px] inline-flex items-center gap-1.5"
                               >
                                 <span className="w-1.5 h-1.5 rounded-full bg-purple-700" />
-                                <span>[ ELECTIVE / SPECIALIZED ]: {displayName}</span>
+                                <span>ELECTIVE / SPECIALIZED: {displayName}</span>
                               </div>
                             );
                           })}
@@ -961,7 +961,7 @@ export default function AdjudicationModal({
                       ) : (
                         <div>
                           <span className="px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-900 text-[11px] font-mono font-bold uppercase inline-block">
-                            [ None Selected / Pending Enrollment Selection ]
+                            None Selected / Pending Enrollment Selection
                           </span>
                         </div>
                       )}
@@ -970,7 +970,7 @@ export default function AdjudicationModal({
                   {isTransferRequested && (
                     <div className="p-2.5 bg-amber-50 border border-amber-300 mt-2 space-y-1">
                       <span className="text-[10px] font-bold text-amber-950 uppercase block font-mono">
-                        [ Curricular Transfer Details ]
+                        Curricular Transfer Details
                       </span>
                       <div className="text-[11px] text-amber-900 space-y-0.5">
                         <div>Previous Program on Record: <strong>{previousProgram}</strong></div>
@@ -1032,7 +1032,7 @@ export default function AdjudicationModal({
                     Submitted Learner Credentials &amp; Scanned Documents:
                   </span>
                   <span className="text-[10px] font-mono text-slate-500 uppercase">
-                    {isLoadingDocs ? "[ Loading credentials on-demand... ]" : "Click picture or \"[ View Picture ]\" to inspect in full resolution"}
+                    {isLoadingDocs ? "Loading credentials on-demand..." : "Click picture or \"View Picture\" to inspect in full resolution"}
                   </span>
                 </div>
 
@@ -1056,7 +1056,7 @@ export default function AdjudicationModal({
                         <div>
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-[10px] font-mono font-bold text-[#002060] uppercase">
-                              [ DOC 0{index + 1} ]
+                              DOC 0{index + 1}
                             </span>
                             <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
                               Verified
@@ -1092,7 +1092,7 @@ export default function AdjudicationModal({
                           />
                           <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span className="text-[11px] font-mono font-bold text-white bg-[#002060] px-2.5 py-1 border border-white/50 uppercase shadow-md">
-                              [ Inspect Scan ]
+                              Inspect Scan
                             </span>
                           </div>
                         </div>
@@ -1104,7 +1104,7 @@ export default function AdjudicationModal({
                             onClick={() => setInspectingDoc(docItem)}
                             className="flex-1 py-1.5 px-2 bg-[#002060] hover:bg-blue-950 text-white text-[11px] font-bold uppercase tracking-wider text-center"
                           >
-                            [ View Picture ]
+                            View Picture
                           </button>
                           <button
                             type="button"
@@ -1135,7 +1135,7 @@ export default function AdjudicationModal({
                   <div className="p-3 bg-blue-50/80 border-2 border-blue-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                        [ SENIOR HIGH SCHOOL DUAL-SECTIONING &bull; DEPED MATATAG ]
+                        SENIOR HIGH SCHOOL DUAL-SECTIONING &bull; DEPED MATATAG
                       </span>
                       <h4 className="text-xs sm:text-sm font-bold text-slate-900 uppercase">
                         Dual Cohort Assignment: Track Section &amp; Elective Class Section
@@ -1156,11 +1156,11 @@ export default function AdjudicationModal({
                         <div className="flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
                           <span className="text-xs font-bold text-emerald-950 uppercase font-mono">
-                            [ CURRENTLY ENROLLED &bull; DUAL-SECTION CONFIRMED ]
+                            CURRENTLY ENROLLED &bull; DUAL-SECTION CONFIRMED
                           </span>
                         </div>
                         <span className="text-[10px] font-mono text-emerald-800 bg-white px-2 py-0.5 border border-emerald-300">
-                          [ Sections are Editable: Reassign below ]
+                          Sections are Editable: Reassign below
                         </span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-emerald-950">
@@ -1192,7 +1192,7 @@ export default function AdjudicationModal({
                       <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
                         <div>
                           <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-                            [ SECTION 1: HOMEROOM TRACK ]
+                            SECTION 1: HOMEROOM TRACK
                           </span>
                           <label className="text-xs font-bold text-slate-900 uppercase block">
                             {isTechPro ? "Tech-Pro Track Section" : "Academic Track Section"} <span className="text-red-600">*</span>
@@ -1233,19 +1233,19 @@ export default function AdjudicationModal({
                               return (
                                 <option key={sec.id} value={sec.id}>
                                   {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
-                                  {isFull ? " [AT FULL CAPACITY]" : ""}
+                                  {isFull ? " (At Full Capacity)" : ""}
                                 </option>
                               );
                             })}
                           </select>
                           {selectedSectionId && (
                             <div className="text-[10px] font-mono text-blue-900 bg-blue-50 p-1.5 border border-blue-200">
-                              [ Track Confirmed ]: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong>
+                              Track Confirmed: <strong>{modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId}</strong>
                             </div>
                           )}
                           {sectionError && (
                             <p className="text-[11px] font-bold text-red-700">
-                              [ Track Section Required ]: Please select an official track section.
+                              Track Section Required: Please select an official track section.
                             </p>
                           )}
                         </div>
@@ -1266,7 +1266,7 @@ export default function AdjudicationModal({
                       <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
                         <div>
                           <span className="text-[10px] font-mono font-bold text-purple-900 uppercase block">
-                            [ SECTION 2: SPECIALIZED ELECTIVE ]
+                            SECTION 2: SPECIALIZED ELECTIVE
                           </span>
                           <label className="text-xs font-bold text-slate-900 uppercase block">
                             Elective Subject Section <span className="text-red-600">*</span>
@@ -1290,7 +1290,7 @@ export default function AdjudicationModal({
                           <span>
                             {chosenElectiveName
                               ? `${chosenElectiveName}${chosenElectiveCode ? ` (${chosenElectiveCode})` : ""}`
-                              : "[ Pending Elective Choice ]"}
+                              : "Pending Elective Choice"}
                           </span>
                           {matchedElectiveSection && (
                             <span className="text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
@@ -1336,19 +1336,19 @@ export default function AdjudicationModal({
                                 onClick={() => setShowAllElectives((prev) => !prev)}
                                 className="text-[10px] font-mono text-[#002060] hover:underline cursor-pointer"
                               >
-                                {showAllElectives ? "[ Show Only Matched Elective ]" : `[ Change / View All Grade ${application.target_grade_level} Elective Classes ]`}
+                                {showAllElectives ? "Show Only Matched Elective" : `Change / View All Grade ${application.target_grade_level} Elective Classes`}
                               </button>
                             </div>
                           )}
 
                           {selectedElectiveSectionId && (
                             <div className="text-[10px] font-mono text-purple-900 bg-purple-50 p-1.5 border border-purple-200">
-                              [ Elective Confirmed ]: <strong>{modalElectiveSections.find((s) => s.id === selectedElectiveSectionId)?.section_name || selectedElectiveSectionId}</strong>
+                              Elective Confirmed: <strong>{modalElectiveSections.find((s) => s.id === selectedElectiveSectionId)?.section_name || selectedElectiveSectionId}</strong>
                             </div>
                           )}
                           {electiveSectionError && (
                             <p className="text-[11px] font-bold text-red-700">
-                              [ Elective Section Required ]: Please assign the student's elective section.
+                              Elective Section Required: Please assign the student's elective section.
                             </p>
                           )}
                         </div>
@@ -1388,22 +1388,22 @@ export default function AdjudicationModal({
                         <div className="flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
                           <span className="text-xs font-bold text-emerald-950 uppercase font-mono">
-                            [ CURRENTLY ENROLLED &amp; SECTIONED ]
+                            CURRENTLY ENROLLED &amp; SECTIONED
                           </span>
                         </div>
                         <span className="text-xs text-emerald-900 block mt-0.5">
-                          Assigned Section: <strong>{modalSections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || (selectedSectionId ? "[ Section Removed / Needs Reassignment ]" : "Not Assigned")}</strong>
+                          Assigned Section: <strong>{modalSections.find((s) => s.id === (application.student?.current_section_id || selectedSectionId))?.section_name || (selectedSectionId ? "Section Removed / Needs Reassignment" : "Not Assigned")}</strong>
                         </span>
                       </div>
                       <span className="text-[11px] font-mono text-emerald-800 bg-white px-2 py-1 border border-emerald-300">
-                        [ Section is Editable: Select below to reassign ]
+                        Section is Editable: Select below to reassign
                       </span>
                     </div>
                   )}
 
                   {eligibleSections.length === 0 ? (
                     <div className="p-3 bg-red-100 border border-red-400 text-xs text-red-950 space-y-1">
-                      <strong className="block">[ NO ELIGIBLE SECTIONS FOUND IN DATABASE ]</strong>
+                      <strong className="block">NO ELIGIBLE SECTIONS FOUND IN DATABASE</strong>
                       <p className="text-[11px]">
                         There are currently no active sections configured for Grade {application.target_grade_level} ({application.target_strand || "General"}).
                         Please create or activate sections in the Sections console before approving this student.
@@ -1436,7 +1436,7 @@ export default function AdjudicationModal({
                           return (
                             <option key={sec.id} value={sec.id}>
                               {sec.section_name} (Enrolled: {sec.enrolledCount || 0} / Max Capacity: {sec.capacity})
-                              {isFull ? " [AT FULL CAPACITY]" : ""}
+                              {isFull ? " (At Full Capacity)" : ""}
                             </option>
                           );
                         })}
@@ -1444,13 +1444,13 @@ export default function AdjudicationModal({
 
                       {sectionError && (
                         <p className="text-[11px] font-bold text-red-700">
-                          [ Section Required ]: You must select an official class section before you can approve this application.
+                          Section Required: You must select an official class section before you can approve this application.
                         </p>
                       )}
 
                       {selectedSectionId && (
                         <p className="text-[11px] text-emerald-900 font-bold">
-                          [ Confirmed ]: Learner will be officially enrolled in {modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
+                          Confirmed: Learner will be officially enrolled in {modalSections.find((s) => s.id === selectedSectionId)?.section_name || selectedSectionId} upon approval.
                         </p>
                       )}
                     </div>
@@ -1493,7 +1493,7 @@ export default function AdjudicationModal({
                       </span>
                     </div>
                     <span className="text-[10px] font-mono text-emerald-800 bg-white px-1.5 py-0.5 border border-emerald-300">
-                      [ DepEd MATATAG Dual-Section Quota Verified ]
+                      DepEd MATATAG Dual-Section Quota Verified
                     </span>
                   </div>
                 )
@@ -1526,14 +1526,14 @@ export default function AdjudicationModal({
                   Registrar Evaluation Remarks / Official Notice to Student:
                 </label>
                 <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 border border-slate-200">
-                  [ Smart Auto-Notice System Active ]
+                  Smart Auto-Notice System Active
                 </span>
               </div>
 
               {/* Smart Quick-Presets */}
               <div className="flex flex-wrap items-center gap-1.5 text-[10px] pb-1">
                 <span className="font-mono font-bold text-slate-600 uppercase shrink-0">
-                  [ Quick Presets ]:
+                  Quick Presets:
                 </span>
                 <button
                   type="button"
@@ -1545,7 +1545,7 @@ export default function AdjudicationModal({
                   className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-900 border border-red-300 font-semibold transition-colors cursor-pointer"
                   title="Insert revision notice"
                 >
-                  [ &ldquo;Double check your requirements...&rdquo; ]
+                  &ldquo;Double check your requirements...&rdquo;
                 </button>
                 <button
                   type="button"
@@ -1557,7 +1557,7 @@ export default function AdjudicationModal({
                   className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-900 border border-red-300 font-semibold transition-colors cursor-pointer"
                   title="Insert document revision notice"
                 >
-                  [ &ldquo;Double check your PSA &amp; SF9...&rdquo; ]
+                  &ldquo;Double check your PSA &amp; SF9...&rdquo;
                 </button>
                 <button
                   type="button"
@@ -1575,7 +1575,7 @@ export default function AdjudicationModal({
                   className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-semibold transition-colors cursor-pointer"
                   title="Insert enrollment approval notice"
                 >
-                  [ &ldquo;You&apos;re enrolled at Dumalneg NHS...&rdquo; ]
+                  &ldquo;You&apos;re enrolled at Dumalneg NHS...&rdquo;
                 </button>
                 {remarks && (
                   <button
@@ -1606,13 +1606,13 @@ export default function AdjudicationModal({
 
             {actionError && (
               <div className="p-2.5 bg-red-50 border border-red-400 text-xs text-red-900 font-bold rounded">
-                [ Error ]: {actionError}
+                Error: {actionError}
               </div>
             )}
 
             {actionSuccess && (
               <div className="p-2.5 bg-emerald-50 border border-emerald-500 text-xs text-emerald-900 font-bold rounded">
-                [ Success ]: {actionSuccess}
+                Success: {actionSuccess}
               </div>
             )}
 
@@ -1634,7 +1634,7 @@ export default function AdjudicationModal({
                   disabled={isSubmitting}
                   className="px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer rounded"
                 >
-                  {isSubmitting ? "Updating..." : "[ Request Revision ]"}
+                  {isSubmitting ? "Updating..." : "Request Revision"}
                 </button>
 
                 <button
@@ -1662,11 +1662,11 @@ export default function AdjudicationModal({
                       : "Approving Enrollment..."
                     : (isSHS ? (!selectedSectionId || !selectedElectiveSectionId) : !selectedSectionId)
                     ? isSHS
-                      ? "[ Assign Track & Elective Sections to Approve ]"
-                      : "[ Assign Section to Approve ]"
+                      ? "Assign Track & Elective Sections to Approve"
+                      : "Assign Section to Approve"
                     : application.status === "Approved"
-                    ? "[ Update Section Assignments ]"
-                    : "[ Approve & Confirm Enrollment ]"}
+                    ? "Update Section Assignments"
+                    : "Approve & Confirm Enrollment"}
                 </button>
               </div>
             </div>

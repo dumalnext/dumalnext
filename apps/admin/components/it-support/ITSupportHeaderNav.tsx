@@ -73,7 +73,7 @@ export default function ITSupportHeaderNav({
               onClick={logout}
               className="px-3.5 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
             >
-              [ Sign Out ]
+              Sign Out
             </button>
           </div>
         )}
@@ -92,7 +92,7 @@ export default function ITSupportHeaderNav({
                   : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
               }`}
             >
-              [ 1. Dynamic Trisem Calendar ]
+              1. Dynamic Trisem Calendar
             </button>
 
             <button

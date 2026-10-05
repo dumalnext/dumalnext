@@ -630,14 +630,14 @@ export default function AdjudicationConsole() {
                         className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block"
                         title={name || el}
                       >
-                        [ Elective ]: {name ? `${el} (${name})` : el}
+                        Elective: {name ? `${el} (${name})` : el}
                       </span>
                     );
                   })}
                 </div>
               ) : (
                 <span className="text-[10px] font-mono text-amber-800 bg-amber-50 px-1.5 py-0.5 border border-amber-200 inline-block">
-                  [ Pending Elective Selection ]
+                  Pending Elective Selection
                 </span>
               )}
             </div>
@@ -776,7 +776,7 @@ export default function AdjudicationConsole() {
             }}
             className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-mono font-bold text-[11px] uppercase transition-colors shrink-0 shadow-xs cursor-pointer"
           >
-            [ Reset to Active Term ]
+            Reset to Active Term
           </button>
         )}
       </div>
@@ -1010,7 +1010,7 @@ export default function AdjudicationConsole() {
                 }}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 uppercase tracking-wider transition-colors cursor-pointer"
               >
-                [ View Applications Across All Terms ]
+                View Applications Across All Terms
               </button>
             </div>
           )}
@@ -1024,7 +1024,7 @@ export default function AdjudicationConsole() {
               <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-300">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold uppercase tracking-wider text-xs sm:text-sm">
-                    [ JUNIOR HIGH SCHOOL (JHS) ENROLLEES ]
+                    JUNIOR HIGH SCHOOL (JHS) ENROLLEES
                   </span>
                   <span className="text-[11px] text-blue-200 hidden sm:inline">&bull; Grades 7, 8, 9, &amp; 10</span>
                 </div>
@@ -1046,7 +1046,7 @@ export default function AdjudicationConsole() {
                             Grade {grade}
                           </span>
                           <span className="text-[11px] font-mono text-slate-600 font-bold">
-                            [{gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"}]
+                            ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
                           </span>
                         </div>
                       </div>
@@ -1090,7 +1090,7 @@ export default function AdjudicationConsole() {
               <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-300">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold uppercase tracking-wider text-xs sm:text-sm">
-                    [ SENIOR HIGH SCHOOL (SHS) ENROLLEES ]
+                    SENIOR HIGH SCHOOL (SHS) ENROLLEES
                   </span>
                   <span className="text-[11px] text-blue-200 hidden sm:inline">&bull; Grades 11 &amp; 12 &bull; Academic &amp; Tech-Pro</span>
                 </div>
@@ -1112,7 +1112,7 @@ export default function AdjudicationConsole() {
                             Grade {grade}
                           </span>
                           <span className="text-[11px] font-mono text-slate-600 font-bold">
-                            [{gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"}]
+                            ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
                           </span>
                         </div>
                         <span className="text-[10px] font-mono text-slate-500 uppercase">

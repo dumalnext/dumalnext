@@ -17,7 +17,7 @@ function ITSupportPortalContent() {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
         <div className="bg-white border-2 border-slate-300 p-8 text-center space-y-2 font-mono text-xs uppercase font-bold text-[#002060]">
-          [ Verifying IT Support Authentication Credentials... ]
+          Verifying IT Support Authentication Credentials...
         </div>
       </div>
     );

@@ -410,7 +410,7 @@ export default function CurriculumSubjectsConsole() {
                 onClick={onAddClick}
                 className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-[#002060] uppercase tracking-wider transition-colors cursor-pointer"
               >
-                {addLabel || "[ + Add Subject ]"}
+                {addLabel || "+ Add Subject"}
               </button>
             </div>
           )}
@@ -502,14 +502,14 @@ export default function CurriculumSubjectsConsole() {
                       onClick={() => handleOpenEditModal(sub)}
                       className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                     >
-                      [ Edit ]
+                      Edit
                     </button>
                     <button
                       type="button"
                       onClick={() => setDeleteSubjectTarget(sub)}
                       className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                     >
-                      [ Delete ]
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -605,7 +605,7 @@ export default function CurriculumSubjectsConsole() {
               }
               className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
             >
-              [ + Add Core Subject ]
+              + Add Core Subject
             </button>
             <button
               type="button"
@@ -618,7 +618,7 @@ export default function CurriculumSubjectsConsole() {
               }
               className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
             >
-              [ + Add Elective Subject ]
+              + Add Elective Subject
             </button>
           </div>
         </div>
@@ -628,7 +628,7 @@ export default function CurriculumSubjectsConsole() {
           <div className="bg-blue-50/70 border-b border-blue-200 px-4 sm:px-6 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider">
-                [ Core Subjects ]
+                Core Subjects
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-100 text-[#002060] font-bold border border-blue-300">
                 {coreSubjects.length} {coreSubjects.length === 1 ? "COURSE" : "COURSES"}
@@ -645,7 +645,7 @@ export default function CurriculumSubjectsConsole() {
               }
               className="text-[11px] font-mono font-bold text-[#002060] hover:underline uppercase cursor-pointer"
             >
-              [ + Add Core ]
+              + Add Core
             </button>
           </div>
 
@@ -658,7 +658,7 @@ export default function CurriculumSubjectsConsole() {
                 category: "Core",
                 grade: gradeLevel,
               }),
-            "[ + Add Core Subject ]"
+            "+ Add Core Subject"
           )}
         </div>
 
@@ -667,7 +667,7 @@ export default function CurriculumSubjectsConsole() {
           <div className="bg-purple-50/60 border-b border-purple-200 px-4 sm:px-6 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-purple-950 uppercase tracking-wider">
-                [ Elective Part ]
+                Elective Part
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 bg-purple-100 text-purple-950 font-bold border border-purple-300">
                 {electiveSubjects.length} {electiveSubjects.length === 1 ? "COURSE" : "COURSES"}
@@ -684,7 +684,7 @@ export default function CurriculumSubjectsConsole() {
               }
               className="text-[11px] font-mono font-bold text-purple-900 hover:underline uppercase cursor-pointer"
             >
-              [ + Add Elective ]
+              + Add Elective
             </button>
           </div>
 
@@ -697,7 +697,7 @@ export default function CurriculumSubjectsConsole() {
                 category: "Elective",
                 grade: gradeLevel,
               }),
-            "[ + Add Elective Subject ]"
+            "+ Add Elective Subject"
           )}
         </div>
       </div>
@@ -731,14 +731,14 @@ export default function CurriculumSubjectsConsole() {
             onClick={fetchSubjects}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
-            [ Refresh Subjects ]
+            Refresh Subjects
           </button>
           <button
             type="button"
             onClick={() => handleOpenCreateModal()}
             className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
           >
-            [ + Add New Subject ]
+            + Add New Subject
           </button>
         </div>
       </div>
@@ -880,7 +880,7 @@ export default function CurriculumSubjectsConsole() {
               }}
               className="text-[11px] font-bold text-red-700 hover:text-red-900 underline cursor-pointer"
             >
-              [ Reset All Filters ]
+              Reset All Filters
             </button>
           </div>
         )}
@@ -929,7 +929,7 @@ export default function CurriculumSubjectsConsole() {
                 onClick={() => handleOpenCreateModal(7, "Regular")}
                 className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
               >
-                [ + Add JHS Subject ]
+                + Add JHS Subject
               </button>
             </div>
           </div>
@@ -942,7 +942,7 @@ export default function CurriculumSubjectsConsole() {
               7,
               "Grade 7 (Sub Headings)",
               "Regular",
-              "[ + Add Grade 7 Subject ]"
+              "+ Add Grade 7 Subject"
             )}
 
             {/* Grade 8 Sub-Heading */}
@@ -951,7 +951,7 @@ export default function CurriculumSubjectsConsole() {
               8,
               "Grade 8 (Sub Headings)",
               "Regular",
-              "[ + Add Grade 8 Subject ]"
+              "+ Add Grade 8 Subject"
             )}
 
             {/* Grade 9 Sub-Heading */}
@@ -960,7 +960,7 @@ export default function CurriculumSubjectsConsole() {
               9,
               "Grade 9 (Sub Headings)",
               "Regular",
-              "[ + Add Grade 9 Subject ]"
+              "+ Add Grade 9 Subject"
             )}
 
             {/* Grade 10 Sub-Heading */}
@@ -969,7 +969,7 @@ export default function CurriculumSubjectsConsole() {
               10,
               "Grade 10 (Sub Headings)",
               "Regular",
-              "[ + Add Grade 10 Subject ]"
+              "+ Add Grade 10 Subject"
             )}
           </div>
         </section>
@@ -1008,7 +1008,7 @@ export default function CurriculumSubjectsConsole() {
                 onClick={() => handleOpenCreateModal(11, "Academic")}
                 className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
               >
-                [ + Add SHS Subject ]
+                + Add SHS Subject
               </button>
             </div>
           </div>
@@ -1064,7 +1064,7 @@ export default function CurriculumSubjectsConsole() {
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-widest block">
-                  [ DEPED SUBJECT MANAGEMENT ]
+                  DEPED SUBJECT MANAGEMENT
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight">
                   {isEditing
@@ -1142,7 +1142,7 @@ export default function CurriculumSubjectsConsole() {
                     onClick={handleAutoGenerateCode}
                     className="text-[10px] font-mono text-[#002060] hover:underline font-bold cursor-pointer"
                   >
-                    [ Auto-Generate Code ]
+                    Auto-Generate Code
                   </button>
                 </div>
                 <input
@@ -1169,7 +1169,7 @@ export default function CurriculumSubjectsConsole() {
                   required
                 />
                 <span className="text-[10px] text-slate-500 block mt-0.5 font-mono">
-                  Standard format: [LEVEL]-[STRAND]-[TITLE][GRADE]
+                  Standard format: LEVEL-STRAND-TITLE-GRADE
                 </span>
               </div>
 
@@ -1186,7 +1186,7 @@ export default function CurriculumSubjectsConsole() {
                         Grade {modalLockedTrack.grade || formGrade} (SHS)
                       </span>
                       <span className="text-[10px] font-mono uppercase bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-300 font-bold">
-                        [ Locked ]
+                        Locked
                       </span>
                     </div>
                   ) : (
@@ -1238,7 +1238,7 @@ export default function CurriculumSubjectsConsole() {
                           modalLockedTrack.category === "Core" ? "bg-[#002060]" : "bg-purple-800"
                         }`}
                       >
-                        [ Locked ]
+                        Locked
                       </span>
                     </div>
                   ) : (
@@ -1275,7 +1275,7 @@ export default function CurriculumSubjectsConsole() {
                       </span>
                     </div>
                     <span className="text-[10px] font-mono uppercase bg-amber-400 text-slate-950 px-2 py-0.5 font-bold border border-amber-600">
-                      [ Auto-Assigned ]
+                      Auto-Assigned
                     </span>
                   </div>
                 ) : formGrade <= 10 ? (
@@ -1328,7 +1328,7 @@ export default function CurriculumSubjectsConsole() {
                   disabled={isSaving}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  [ Cancel ]
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -1338,8 +1338,8 @@ export default function CurriculumSubjectsConsole() {
                   {isSaving
                     ? "Saving..."
                     : isEditing
-                    ? "[ Update Subject ]"
-                    : "[ Save Subject ]"}
+                    ? "Update Subject"
+                    : "Save Subject"}
                 </button>
               </div>
             </form>
@@ -1355,7 +1355,7 @@ export default function CurriculumSubjectsConsole() {
           <div className="bg-white border-4 border-red-700 w-full max-w-md shadow-2xl p-6 space-y-4">
             <div className="border-b border-red-200 pb-2">
               <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
-                [ CONFIRM REMOVAL OF SUBJECT ]
+                CONFIRM REMOVAL OF SUBJECT
               </span>
               <h3 className="text-base font-bold text-slate-900 uppercase">
                 Remove Subject?
@@ -1387,7 +1387,7 @@ export default function CurriculumSubjectsConsole() {
                 disabled={isDeleting}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
               >
-                [ Cancel ]
+                Cancel
               </button>
               <button
                 type="button"
@@ -1395,7 +1395,7 @@ export default function CurriculumSubjectsConsole() {
                 disabled={isDeleting}
                 className="px-4 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:bg-slate-400"
               >
-                {isDeleting ? "Removing..." : "[ Confirm Delete ]"}
+                {isDeleting ? "Removing..." : "Confirm Delete"}
               </button>
             </div>
           </div>

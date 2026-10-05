@@ -202,7 +202,7 @@ export default function EnrollmentControlRoom() {
         <div className="p-4 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 font-mono font-bold uppercase text-[10px] text-emerald-950 shrink-0">
-              [ SUCCESS ]
+              SUCCESS
             </span>
             <span className="font-semibold">{saveSuccess}</span>
           </div>
@@ -221,7 +221,7 @@ export default function EnrollmentControlRoom() {
         <div className="p-4 bg-red-50 border-2 border-red-500 text-xs text-red-950 flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 bg-red-200 border border-red-400 font-mono font-bold uppercase text-[10px] text-red-950 shrink-0">
-              [ ERROR ]
+              ERROR
             </span>
             <span className="font-semibold">{saveError}</span>
           </div>
@@ -256,8 +256,8 @@ export default function EnrollmentControlRoom() {
                 }`}
               >
                 {settings.isEnrollmentOpen
-                  ? "[ STATUS: ENROLLMENT IS ACTIVE & OPEN ]"
-                  : "[ STATUS: ENROLLMENT IS OFFICIALLY CLOSED ]"}
+                  ? "STATUS: ENROLLMENT IS ACTIVE & OPEN"
+                  : "STATUS: ENROLLMENT IS OFFICIALLY CLOSED"}
               </span>
               <span className="text-xs font-mono text-slate-500">
                 School Year: <strong>{settings.schoolYear}</strong>
@@ -298,11 +298,11 @@ export default function EnrollmentControlRoom() {
               }`}
             >
               {isSaving ? (
-                "[ BROADCASTING REALTIME STATUS... ]"
+                "BROADCASTING REALTIME STATUS..."
               ) : settings.isEnrollmentOpen ? (
-                "[ TURN OFF / CLOSE ENROLLMENT ]"
+                "TURN OFF / CLOSE ENROLLMENT"
               ) : (
-                "[ TURN ON / OPEN ENROLLMENT ]"
+                "TURN ON / OPEN ENROLLMENT"
               )}
             </button>
             <span className="text-[10px] font-mono text-slate-500">
@@ -331,7 +331,7 @@ export default function EnrollmentControlRoom() {
             <div className="p-3 bg-slate-100 border-2 border-slate-300 font-mono font-black text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-2xs">
               <span>{settings.schoolYear}</span>
               <span className="px-2 py-0.5 bg-green-700 text-white font-mono font-bold text-[10px] uppercase tracking-wider">
-                [ SYNCED FROM IT SUPPORT ]
+                SYNCED FROM IT SUPPORT
               </span>
             </div>
             <span className="text-[11px] text-slate-500 block leading-normal">
@@ -347,7 +347,7 @@ export default function EnrollmentControlRoom() {
             <div className="p-3 bg-slate-100 border-2 border-slate-300 font-mono font-black text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-2xs">
               <span>{settings.semester}</span>
               <span className="px-2 py-0.5 bg-[#002060] text-white font-mono font-bold text-[10px] uppercase tracking-wider">
-                [ ACTIVE TRIMESTER ]
+                ACTIVE TRIMESTER
               </span>
             </div>
             <span className="text-[11px] text-slate-500 block leading-normal">
@@ -388,7 +388,7 @@ export default function EnrollmentControlRoom() {
               }
               className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
             >
-              [ Standard Closed Advisory ]
+              Standard Closed Advisory
             </button>
             <button
               type="button"
@@ -400,7 +400,7 @@ export default function EnrollmentControlRoom() {
               }
               className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
             >
-              [ Enrollment Window Concluded ]
+              Enrollment Window Concluded
             </button>
             <button
               type="button"
@@ -412,7 +412,7 @@ export default function EnrollmentControlRoom() {
               }
               className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
             >
-              [ Section Quota Paused ]
+              Section Quota Paused
             </button>
           </div>
         </div>
@@ -420,7 +420,7 @@ export default function EnrollmentControlRoom() {
         {/* Live Student Portal Preview */}
         <div className="p-4 bg-slate-50 border border-slate-300 space-y-2">
           <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-            [ Live Student Portal Preview: What Students Will See at /enroll ]
+            Live Student Portal Preview: What Students Will See at /enroll
           </span>
           <div
             className={`p-4 border-2 ${
@@ -438,7 +438,7 @@ export default function EnrollmentControlRoom() {
               <span>
                 {settings.isEnrollmentOpen
                   ? `[ 5-Step Online Enrollment Active for S.Y. ${settings.schoolYear} ]`
-                  : `[ DEPED OFFICIAL NOTICE: ONLINE ENROLLMENT IS CURRENTLY CLOSED ]`}
+                  : `DEPED OFFICIAL NOTICE: ONLINE ENROLLMENT IS CURRENTLY CLOSED`}
               </span>
             </div>
             <p className="text-xs text-slate-800 mt-1.5 leading-relaxed">
@@ -464,7 +464,7 @@ export default function EnrollmentControlRoom() {
               disabled={isLoading || isSaving}
               className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase border border-slate-300 transition-colors cursor-pointer"
             >
-              [ Discard / Reload ]
+              Discard / Reload
             </button>
 
             <button
@@ -473,7 +473,7 @@ export default function EnrollmentControlRoom() {
               disabled={isSaving}
               className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
             >
-              {isSaving ? "Saving Settings..." : "[ Save & Broadcast Enrollment Controls ]"}
+              {isSaving ? "Saving Settings..." : "Save & Broadcast Enrollment Controls"}
             </button>
           </div>
         </div>

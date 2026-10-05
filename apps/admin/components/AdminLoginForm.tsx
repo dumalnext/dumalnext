@@ -94,7 +94,7 @@ export default function AdminLoginForm() {
         <div className="bg-white p-6 sm:p-8 border-2 border-[#002060] shadow-sm space-y-5">
           <div className="border-b border-slate-200 pb-3">
             <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-              [ OFFICIAL ADMINISTRATOR AUTHENTICATION ]
+              OFFICIAL ADMINISTRATOR AUTHENTICATION
             </span>
             <h3 className="text-base font-bold text-slate-900 uppercase">
               Administrative Personnel Sign-In
@@ -108,7 +108,7 @@ export default function AdminLoginForm() {
           {isLoggingIn && (
             <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
               <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                <span>[ VERIFYING CREDENTIALS ]</span>
+                <span>VERIFYING CREDENTIALS</span>
                 <span>{loginProgress}%</span>
               </div>
               <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
@@ -128,7 +128,7 @@ export default function AdminLoginForm() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
                 <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                  [ GMAIL VERIFICATION REQUIRED ]
+                  GMAIL VERIFICATION REQUIRED
                 </span>
               </div>
               <p className="text-xs text-amber-950 leading-relaxed font-medium">
@@ -142,7 +142,7 @@ export default function AdminLoginForm() {
                   onClick={handleResend}
                   className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
                 >
-                  {isResending ? "Resending Link..." : "[ Resend Verification Link to Gmail ]"}
+                  {isResending ? "Resending Link..." : "Resend Verification Link to Gmail"}
                 </button>
                 {resendStatus && (
                   <span className="text-[11px] font-bold text-slate-800 block">
@@ -155,7 +155,7 @@ export default function AdminLoginForm() {
 
           {loginError && (
             <div className="p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-900 leading-normal">
-              [ AUTHENTICATION ERROR ]: {loginError}
+              AUTHENTICATION ERROR: {loginError}
             </div>
           )}
 
@@ -196,7 +196,7 @@ export default function AdminLoginForm() {
                 disabled={isLoggingIn}
                 className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isLoggingIn ? "[ AUTHENTICATING... PLEASE WAIT ]" : "Sign In to Administration Console"}
+                {isLoggingIn ? "AUTHENTICATING... PLEASE WAIT" : "Sign In to Administration Console"}
               </button>
             </div>
           </form>
@@ -206,7 +206,7 @@ export default function AdminLoginForm() {
         <div className="bg-slate-100 p-6 border border-slate-300 flex flex-col justify-between space-y-4">
           <div className="space-y-3 text-xs">
             <span className="font-mono font-bold text-[#002060] uppercase block">
-              [ DepEd Dumalneg NHS Security Clearance ]
+              DepEd Dumalneg NHS Security Clearance
             </span>
             <p className="text-slate-700 leading-relaxed">
               This portal is strictly restricted to authorized Dumalneg National High School personnel. 

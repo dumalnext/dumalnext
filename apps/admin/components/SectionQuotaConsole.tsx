@@ -1110,7 +1110,7 @@ export default function SectionQuotaConsole() {
                 </span>
               ) : (
                 <span className="inline-block mt-1 text-[10px] bg-amber-50 text-amber-900 border border-amber-300 font-mono font-bold px-1.5 py-0.5 uppercase">
-                  [ Needs Faculty Assignment ]
+                  Needs Faculty Assignment
                 </span>
               )}
               {sec.room && (
@@ -1199,7 +1199,7 @@ export default function SectionQuotaConsole() {
               className="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
               title="Remove section"
             >
-              [ Delete ]
+              Delete
             </button>
           </div>
         </div>
@@ -1360,7 +1360,7 @@ export default function SectionQuotaConsole() {
             className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-mono font-bold border border-slate-300 uppercase cursor-pointer"
             title="Refresh sections"
           >
-            [ Refresh List ]
+            Refresh List
           </button>
         </div>
       </div>
@@ -1373,7 +1373,7 @@ export default function SectionQuotaConsole() {
       ) : filteredSections.length === 0 && allElectivesMerged.length === 0 ? (
         <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-3">
           <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-            [ NO SECTIONS FOUND ]
+            NO SECTIONS FOUND
           </span>
           <p className="text-xs text-slate-600">No sections exist for the selected grade filter.</p>
           <button
@@ -1394,7 +1394,7 @@ export default function SectionQuotaConsole() {
               <div className="border-b-2 border-[#002060] pb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                    [ SECONDARY EDUCATION - JHS ]
+                    SECONDARY EDUCATION - JHS
                   </span>
                   <h3 className="text-lg sm:text-xl font-bold uppercase text-slate-900">
                     Junior High School (JHS)
@@ -1511,7 +1511,7 @@ export default function SectionQuotaConsole() {
               <div className="border-b-2 border-blue-900 pb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-[10px] font-mono font-bold text-blue-900 uppercase tracking-wider block">
-                    [ POST-SECONDARY EDUCATION - SHS ]
+                    POST-SECONDARY EDUCATION - SHS
                   </span>
                   <h3 className="text-lg sm:text-xl font-bold uppercase text-slate-900">
                     Senior High School (SHS)
@@ -1658,7 +1658,7 @@ export default function SectionQuotaConsole() {
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200 block">
-                  [ SECTION MANAGEMENT ]
+                  SECTION MANAGEMENT
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-white mt-0.5">
                   Create New Class Section
@@ -1676,7 +1676,7 @@ export default function SectionQuotaConsole() {
             <form onSubmit={handleAddSection} className="p-5 sm:p-6 space-y-4 text-xs">
               {addError && (
                 <div className="p-2.5 bg-red-50 border border-red-400 text-red-900 font-bold">
-                  [ Error ]: {addError}
+                  Error: {addError}
                 </div>
               )}
 
@@ -1758,7 +1758,7 @@ export default function SectionQuotaConsole() {
                       newGradeLevel,
                       newSectionName,
                       newGradeLevel >= 11 ? (newStrand || "Academic") : null
-                    ) || "[ Enter section name above ]"}
+                    ) || "Enter section name above"}
                   </strong>
                 </div>
               </div>
@@ -1793,7 +1793,7 @@ export default function SectionQuotaConsole() {
                           const occupyingSec = getSectionOccupyingRoom(optionVal);
                           const statusTag = occupyingSec
                             ? `[ OCCUPIED BY: ${occupyingSec.section_name} ]`
-                            : "[ AVAILABLE ]";
+                            : "AVAILABLE";
                           return (
                             <option key={rm.id} value={optionVal}>
                               {rm.classroom_id ? `[ ${rm.classroom_id} ] ` : ""}{rm.room_name} &bull; {statusTag} &bull; Max: {rm.capacity} seats
@@ -1851,7 +1851,7 @@ export default function SectionQuotaConsole() {
                       );
                       const statusTag = alreadyAssignedSec
                         ? `[ ALREADY ADVISING: ${alreadyAssignedSec.section_name} ]`
-                        : "[ AVAILABLE ]";
+                        : "AVAILABLE";
 
                       return (
                         <option key={t.id} value={t.fullName}>
@@ -1871,7 +1871,7 @@ export default function SectionQuotaConsole() {
                     return (
                       <div className="mt-2 p-2.5 bg-amber-50 border border-amber-400 text-xs text-amber-950 space-y-1">
                         <span className="font-mono font-bold text-amber-900 uppercase block text-[11px]">
-                          [ DECONFLICTION ALERT: SINGLE-ADVISER RULE ]
+                          DECONFLICTION ALERT: SINGLE-ADVISER RULE
                         </span>
                         <p>
                           <strong>{newAdviser}</strong> is already designated as Class Adviser to <strong>{conflict.section_name}</strong> (Grade {conflict.grade_level}).
@@ -1902,7 +1902,7 @@ export default function SectionQuotaConsole() {
                           </span>
                         ) : (
                           <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-300 uppercase">
-                            [ STANDARD QUOTA: UNASSIGNED ROOM ]
+                            STANDARD QUOTA: UNASSIGNED ROOM
                           </span>
                         )}
                       </div>
@@ -1944,7 +1944,7 @@ export default function SectionQuotaConsole() {
                   disabled={isSubmittingAdd}
                   className="px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmittingAdd ? "Saving Section..." : "[ Save Section ]"}
+                  {isSubmittingAdd ? "Saving Section..." : "Save Section"}
                 </button>
               </div>
             </form>
@@ -1979,7 +1979,7 @@ export default function SectionQuotaConsole() {
             <form onSubmit={handleEditSection} className="p-5 sm:p-6 space-y-4 text-xs">
               {editError && (
                 <div className="p-2.5 bg-red-50 border border-red-400 text-red-900 font-bold">
-                  [ Error ]: {editError}
+                  Error: {editError}
                 </div>
               )}
 
@@ -2069,7 +2069,7 @@ export default function SectionQuotaConsole() {
                       editGradeLevel,
                       editSectionName,
                       editGradeLevel >= 11 ? (editStrand || "Academic") : null
-                    ) || "[ Enter section name above ]"}
+                    ) || "Enter section name above"}
                   </strong>
                 </div>
               </div>
@@ -2124,10 +2124,10 @@ export default function SectionQuotaConsole() {
                               editingSection.room.toLowerCase() === rm.classroom_id.toLowerCase());
 
                           const statusTag = isCurrent
-                            ? "[ CURRENT ROOM OF THIS SECTION ]"
+                            ? "CURRENT ROOM OF THIS SECTION"
                             : occupyingSec
                             ? `[ ASSIGNED TO: ${occupyingSec.section_name} ]`
-                            : "[ AVAILABLE ]";
+                            : "AVAILABLE";
 
                           return (
                             <option key={rm.id} value={optionVal}>
@@ -2195,10 +2195,10 @@ export default function SectionQuotaConsole() {
                       );
                       const isCurrent = editingSection && assignedSec && assignedSec.id === editingSection.id;
                       const statusTag = isCurrent
-                        ? "[ CURRENT ADVISER OF THIS SECTION ]"
+                        ? "CURRENT ADVISER OF THIS SECTION"
                         : assignedSec
                         ? `[ ALREADY ADVISING: ${assignedSec.section_name} ]`
-                        : "[ AVAILABLE ]";
+                        : "AVAILABLE";
 
                       return (
                         <option key={t.id} value={t.fullName}>
@@ -2214,7 +2214,7 @@ export default function SectionQuotaConsole() {
                       <div className="mt-2 p-3 bg-amber-50 border-2 border-amber-400 text-xs text-amber-950 space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="font-mono font-bold text-amber-900 uppercase text-[11px]">
-                            [ AUTOMATED DECONFLICTION ALERT ]
+                            AUTOMATED DECONFLICTION ALERT
                           </span>
                           <span className="text-[10px] bg-amber-200 text-amber-950 px-1.5 py-0.5 font-bold uppercase font-mono">
                             Adviser Conflict
@@ -2233,7 +2233,7 @@ export default function SectionQuotaConsole() {
                             />
                             <span className="text-[11px] font-medium leading-tight text-slate-900">
                               <strong className="text-[#002060] uppercase block">
-                                [ 1-Click Automated Transfer ]
+                                1-Click Automated Transfer
                               </strong>
                               Automatically unassign <strong>{editAdviser}</strong> from <u>{conflict.section_name}</u> and designate as Class Adviser for <u>{editSectionName || editingSection?.section_name}</u> upon saving.
                             </span>
@@ -2262,7 +2262,7 @@ export default function SectionQuotaConsole() {
                           </span>
                         ) : (
                           <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 border border-amber-300 uppercase">
-                            [ STANDARD QUOTA: UNASSIGNED ROOM ]
+                            STANDARD QUOTA: UNASSIGNED ROOM
                           </span>
                         )}
                       </div>
@@ -2307,7 +2307,7 @@ export default function SectionQuotaConsole() {
                   disabled={isSubmittingEdit}
                   className="px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmittingEdit ? "Updating..." : "[ Save Changes ]"}
+                  {isSubmittingEdit ? "Updating..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -2367,7 +2367,7 @@ export default function SectionQuotaConsole() {
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
-                    [ OFFICIAL CLASS ROSTER ]
+                    OFFICIAL CLASS ROSTER
                   </span>
                   <span className="text-[10px] font-mono bg-blue-900 border border-blue-400/40 px-2 py-0.5 font-bold">
                     GRADE {selectedRosterSection.grade_level} {selectedRosterSection.grade_level >= 11 && selectedRosterSection.strand ? `• ${selectedRosterSection.strand === "TechPro" || selectedRosterSection.strand.toUpperCase().includes("TVL") ? "TechPro" : "Academic"}` : ""}
@@ -2391,7 +2391,7 @@ export default function SectionQuotaConsole() {
                   className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 text-white text-xs font-mono font-bold border border-blue-400 uppercase cursor-pointer"
                   title="Print official class roster"
                 >
-                  [ Print Class Roster ]
+                  Print Class Roster
                 </button>
                 <button
                   type="button"
@@ -2479,7 +2479,7 @@ export default function SectionQuotaConsole() {
                   <p className="text-xs text-slate-600 max-w-md mx-auto">
                     {rosterSearch
                       ? "Try searching for a different name or LRN."
-                      : `No learners have been assigned to ${selectedRosterSection.section_name} yet. To assign learners, go to [ Enrollment Adjudication ] and select this section when approving applications.`}
+                      : `No learners have been assigned to ${selectedRosterSection.section_name} yet. To assign learners, go to Enrollment Adjudication and select this section when approving applications.`}
                   </p>
                 </div>
               ) : (
@@ -2557,7 +2557,7 @@ export default function SectionQuotaConsole() {
                             <td className="p-3 text-right no-print print:hidden">
                               {selectedRosterSection.isElective ? (
                                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-50 text-purple-900 border border-purple-200 uppercase">
-                                  [ Elective Cohort ]
+                                  Elective Cohort
                                 </span>
                               ) : isEnrolled ? (
                                 isReassigningThis ? (
@@ -2604,7 +2604,7 @@ export default function SectionQuotaConsole() {
                                     className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                                     title="Transfer student to another section"
                                   >
-                                    [ Reassign ]
+                                    Reassign
                                   </button>
                                 )
                               ) : (
@@ -2638,7 +2638,7 @@ export default function SectionQuotaConsole() {
                                     className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                                     title="Remove learner who is not enrolled in this semester from this section roster"
                                   >
-                                    [ Remove ]
+                                    Remove
                                   </button>
                                 )
                               )}

@@ -69,7 +69,7 @@ export default function DocumentViewerModal({
         <div className="flex items-center gap-3">
           <div className="border-r border-blue-400/40 pr-3">
             <span className="text-[10px] font-mono tracking-wider uppercase text-blue-200 block">
-              [ OFFICIAL DOCUMENT INSPECTION ]
+              OFFICIAL DOCUMENT INSPECTION
             </span>
             <h2 className="text-sm sm:text-base font-bold uppercase tracking-tight text-white">
               {document.docTitle}
@@ -93,7 +93,7 @@ export default function DocumentViewerModal({
                 className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 disabled:opacity-40"
                 title="Zoom Out"
               >
-                [ - ]
+                -
               </button>
               <span className="px-2 py-1 bg-blue-950 text-blue-200 border border-blue-400/40 min-w-16 text-center">
                 {Math.round(zoom * 100)}%
@@ -105,7 +105,7 @@ export default function DocumentViewerModal({
                 className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 disabled:opacity-40"
                 title="Zoom In"
               >
-                [ + ]
+                +
               </button>
               <button
                 type="button"
@@ -113,14 +113,14 @@ export default function DocumentViewerModal({
                 className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800"
                 title="Rotate 90 Degrees"
               >
-                [ Rotate 90&deg; ]
+                Rotate 90&deg;
               </button>
               <button
                 type="button"
                 onClick={handleResetZoom}
                 className="px-2 py-1 bg-blue-950 border border-blue-400/40 text-[11px] hover:bg-blue-900"
               >
-                [ Reset ]
+                Reset
               </button>
             </>
           )}
@@ -131,7 +131,7 @@ export default function DocumentViewerModal({
               onClick={handleDownload}
               className="px-3 py-1 bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white font-bold ml-1"
             >
-              [ Download ]
+              Download
             </button>
           )}
 
@@ -140,7 +140,7 @@ export default function DocumentViewerModal({
             onClick={onClose}
             className="px-3 py-1 bg-red-700 hover:bg-red-800 text-white font-bold ml-2 border border-red-500"
           >
-            [ Close (Esc) ]
+            Close (Esc)
           </button>
         </div>
       </header>
@@ -156,7 +156,7 @@ export default function DocumentViewerModal({
                 download={document.fileName}
                 className="text-[#002060] font-bold underline uppercase"
               >
-                [ Download PDF ]
+                Download PDF
               </a>
             </div>
             <iframe
@@ -181,7 +181,7 @@ export default function DocumentViewerModal({
             ) : (
               <div className="p-8 bg-white border-2 border-slate-400 text-center max-w-md space-y-2 text-slate-900">
                 <span className="font-mono font-bold text-xs text-[#002060] uppercase block">
-                  [ DOCUMENT RECORD FOUND ]
+                  DOCUMENT RECORD FOUND
                 </span>
                 <p className="text-xs font-bold">{document.fileName}</p>
                 <p className="text-[11px] text-slate-600">
@@ -208,7 +208,7 @@ export default function DocumentViewerModal({
           )}
           <div className="border-l border-slate-800 pl-4">
             <span className="text-slate-500 text-[10px] uppercase block">Authentication</span>
-            <span className="text-emerald-400 font-bold font-mono text-[11px]">[ VALID CREDENTIAL ]</span>
+            <span className="text-emerald-400 font-bold font-mono text-[11px]">VALID CREDENTIAL</span>
           </div>
         </div>
 
@@ -223,7 +223,7 @@ export default function DocumentViewerModal({
               }}
               className="px-3.5 py-1.5 bg-red-900/80 hover:bg-red-800 border border-red-600 text-white font-bold uppercase tracking-wider text-[11px]"
             >
-              [ Flag: Request Clearer Copy ]
+              Flag: Request Clearer Copy
             </button>
           )}
 
@@ -236,7 +236,7 @@ export default function DocumentViewerModal({
               }}
               className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-700 border border-emerald-500 text-white font-bold uppercase tracking-wider text-[11px]"
             >
-              [ Mark Verified &amp; Legible ]
+              Mark Verified &amp; Legible
             </button>
           )}
         </div>

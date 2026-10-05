@@ -220,7 +220,7 @@ export default function UserRoleAuditor() {
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0"
           >
-            [ + Provision User Account ]
+            + Provision User Account
           </button>
         </div>
       </div>
@@ -233,7 +233,7 @@ export default function UserRoleAuditor() {
               : "bg-red-50 border-red-600 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "[ STATUS ]: " : "[ ERROR ]: "}
+          {statusMessage.type === "success" ? "STATUS: " : "ERROR: "}
           {statusMessage.text}
         </div>
       )}
@@ -327,7 +327,7 @@ export default function UserRoleAuditor() {
 
         {isLoading ? (
           <div className="p-8 text-center text-xs font-mono text-slate-500 uppercase">
-            [ Loading User Directory from PostgreSQL Database... ]
+            Loading User Directory from PostgreSQL Database...
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
@@ -408,7 +408,7 @@ export default function UserRoleAuditor() {
                           onClick={() => setViewingUser(user)}
                           className="px-3 py-1 text-[10px] font-mono font-bold uppercase border-2 border-[#002060] bg-blue-50 text-[#002060] hover:bg-[#002060] hover:text-white transition-colors cursor-pointer"
                         >
-                          [ View ]
+                          View
                         </button>
                       </td>
                     </tr>
@@ -462,7 +462,7 @@ export default function UserRoleAuditor() {
                   </div>
                   <div className="text-center mt-1">
                     <span className="text-[9px] font-mono font-bold text-[#002060] uppercase block">
-                      {viewingUser.photoUrl ? "[ 2x2 ID Photo ]" : "[ Official Avatar ]"}
+                      {viewingUser.photoUrl ? "2x2 ID Photo" : "Official Avatar"}
                     </span>
                   </div>
                 </div>
@@ -489,7 +489,7 @@ export default function UserRoleAuditor() {
                 onClick={() => setViewingUser(null)}
                 className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 p-1 cursor-pointer self-start sm:self-center"
               >
-                [ CLOSE X ]
+                CLOSE X
               </button>
             </div>
 
@@ -661,7 +661,7 @@ export default function UserRoleAuditor() {
               <div>
                 {viewingUser.email.toLowerCase() === "dumalnext@gmail.com" ? (
                   <span className="px-3 py-1.5 bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[10px] font-bold uppercase">
-                    [ MASTER IT ACCOUNT - PROTECTED AGAINST DELETION ]
+                    MASTER IT ACCOUNT - PROTECTED AGAINST DELETION
                   </span>
                 ) : (
                   <button
@@ -669,7 +669,7 @@ export default function UserRoleAuditor() {
                     onClick={() => setUserToDelete(viewingUser)}
                     className="px-4 py-2 border-2 border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-mono font-bold text-xs uppercase transition-colors cursor-pointer"
                   >
-                    [ Delete Account ]
+                    Delete Account
                   </button>
                 )}
               </div>
@@ -679,7 +679,7 @@ export default function UserRoleAuditor() {
                 onClick={() => setViewingUser(null)}
                 className="px-5 py-2 border-2 border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors w-full sm:w-auto text-center cursor-pointer"
               >
-                [ Close ]
+                Close
               </button>
             </div>
           </div>
@@ -705,7 +705,7 @@ export default function UserRoleAuditor() {
                 disabled={isDeleting}
                 className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
               >
-                [ CLOSE X ]
+                CLOSE X
               </button>
             </div>
 
@@ -736,7 +736,7 @@ export default function UserRoleAuditor() {
                 disabled={isDeleting}
                 className="px-4 py-2 border border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors"
               >
-                [ Cancel ]
+                Cancel
               </button>
               <button
                 type="button"
@@ -744,7 +744,7 @@ export default function UserRoleAuditor() {
                 disabled={isDeleting}
                 className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
               >
-                {isDeleting ? "[ Deleting... ]" : "[ Yes, Delete Account ]"}
+                {isDeleting ? "Deleting..." : "Yes, Delete Account"}
               </button>
             </div>
           </div>
@@ -769,7 +769,7 @@ export default function UserRoleAuditor() {
                 onClick={() => setIsModalOpen(false)}
                 className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
               >
-                [ CLOSE X ]
+                CLOSE X
               </button>
             </div>
 
@@ -878,14 +878,14 @@ export default function UserRoleAuditor() {
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 border border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors"
                 >
-                  [ Cancel ]
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-5 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
                 >
-                  {isSubmitting ? "[ Provisioning... ]" : "[ Save Account ]"}
+                  {isSubmitting ? "Provisioning..." : "Save Account"}
                 </button>
               </div>
             </form>
@@ -906,7 +906,7 @@ export default function UserRoleAuditor() {
             <div className="flex items-center justify-between border-b-2 border-slate-200 pb-2">
               <div>
                 <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                  [ 2x2 Official Learner / Personnel Photo ]
+                  2x2 Official Learner / Personnel Photo
                 </span>
                 <h4 className="text-sm font-black uppercase text-slate-900">{enlargedPhoto.name}</h4>
               </div>
@@ -915,7 +915,7 @@ export default function UserRoleAuditor() {
                 onClick={() => setEnlargedPhoto(null)}
                 className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 p-1 cursor-pointer"
               >
-                [ CLOSE X ]
+                CLOSE X
               </button>
             </div>
             <div className="flex items-center justify-center bg-slate-900/5 p-3 border-2 border-slate-200">
@@ -931,7 +931,7 @@ export default function UserRoleAuditor() {
                 onClick={() => setEnlargedPhoto(null)}
                 className="px-5 py-2 bg-[#002060] text-white text-xs font-bold uppercase cursor-pointer hover:bg-[#001845] transition-colors"
               >
-                [ Close Photo Preview ]
+                Close Photo Preview
               </button>
             </div>
           </div>

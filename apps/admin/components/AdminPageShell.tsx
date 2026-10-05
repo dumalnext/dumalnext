@@ -21,7 +21,7 @@ export default function AdminPageShell({
     return (
       <div className="max-w-md mx-auto my-20 p-8 bg-white border-2 border-slate-300 text-center font-sans space-y-2 shadow-xs">
         <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-          [ AUTHENTICATING ADMINISTRATIVE CREDENTIALS ]
+          AUTHENTICATING ADMINISTRATIVE CREDENTIALS
         </span>
         <p className="text-xs text-slate-600">Verifying session security clearance with DepEd Realm...</p>
       </div>
