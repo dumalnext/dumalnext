@@ -711,22 +711,24 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             </div>
           </div>
 
-          {/* Drawer Bottom Actions */}
+          {/* Drawer Bottom Actions: Hidden on mobile (Android/iOS) for logged-in students; visible on laptop/PC */}
           <div
-            className="shrink-0 w-full px-4 py-2.5 md:p-4 border-t-2 border-slate-200 bg-slate-50 md:space-y-2.5 z-10"
+            className={`${
+              user ? "hidden md:block" : "block"
+            } shrink-0 w-full p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5 z-10`}
             style={{
               paddingBottom: "max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem))",
             }}
           >
             {user ? (
-              /* Laptop Only: Original bottom Sign Out button */
+              /* Laptop/PC Only: Original bottom Sign Out button */
               <button
                 type="button"
                 onClick={() => {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="hidden md:block w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center rounded-[4px] active:scale-[0.99] shadow-xs touch-manipulation"
+                className="w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center rounded-[4px] active:scale-[0.99] shadow-xs touch-manipulation"
                 style={{ touchAction: "manipulation" }}
               >
                 SIGN OUT ACCOUNT
@@ -742,7 +744,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               </Link>
             )}
 
-            <div className="text-center text-[10px] sm:text-xs text-slate-500 font-medium">
+            {/* Laptop/PC Only: School ID Footer */}
+            <div className="hidden md:block text-center text-[10px] sm:text-xs text-slate-500 font-medium">
               Dumalneg National High School &bull; School ID: 300017
             </div>
           </div>
