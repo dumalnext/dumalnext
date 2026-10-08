@@ -314,7 +314,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
   const sectionHref = user ? "/section" : "/?tab=signin&reason=auth_required";
 
   return (
-    <div className="max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 w-full">
+    <div className="relative max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 w-full">
       {/* Upper-Left: 3-Line Hamburger Menu Button + School Branding */}
       <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
         {/* 3-Line Hamburger Menu Button (Upper-Left positioned for natural human eye-flow) */}
@@ -322,7 +322,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           ref={buttonRef}
           type="button"
           onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer shadow-sm rounded-[4px] active:scale-90 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+          className="relative z-10 flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer shadow-sm rounded-[4px] active:scale-90 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           aria-label="Toggle Portal Navigation Menu"
           aria-expanded={isMenuOpen}
         >
@@ -350,8 +350,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         {children}
       </div>
 
-      {/* Upper-Right: Quick Status Tag / User Info / Login */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      {/* Upper-Right: Quick Status Tag / User Info / Login - Hidden on Android and iOS devices (Laptop/PC only) */}
+      <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0 relative z-10">
         {user ? (
           <Link
             href={appStatus ? trackHref : "/enroll"}

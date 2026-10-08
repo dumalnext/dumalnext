@@ -32,7 +32,7 @@ export default function StudentLayout({
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <Link
                   href="/"
-                  className="shrink-0 flex items-center justify-center group transition-transform active:scale-95"
+                  className="shrink-0 flex items-center justify-center group transition-transform active:scale-95 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:static md:top-auto md:left-auto md:translate-x-0 md:translate-y-0 z-10"
                   title="Dumalneg National High School Portal Home"
                 >
                   <img
