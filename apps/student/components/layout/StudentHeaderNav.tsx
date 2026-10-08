@@ -486,30 +486,29 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 </div>
 
                 <div className="space-y-0.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-base font-bold text-slate-900 truncate">
-                        {user.firstName} {user.lastName}
-                      </h4>
-                      <p className="text-xs text-slate-600">
-                        LRN: <strong>{user.lrn || user.userId || "To be assigned"}</strong>
-                      </p>
-                      <p className="text-[11px] text-slate-500 truncate">
-                        {user.email}
-                      </p>
-                    </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-base font-bold text-slate-900 truncate min-w-0">
+                      {user.firstName} {user.lastName}
+                    </h4>
+                    {/* Mobile Only (Android & iOS): Sign Out button on the right side of user's name */}
                     <button
                       type="button"
                       onClick={() => {
                         setIsMenuOpen(false);
                         logout();
                       }}
-                      className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-900 border border-red-300 font-bold uppercase text-[10px] tracking-wider rounded-[4px] cursor-pointer shrink-0 transition-colors active:scale-95 shadow-xs"
+                      className="md:hidden px-2.5 py-1 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white border border-red-700 font-bold uppercase text-[10px] tracking-wider rounded-[4px] cursor-pointer shrink-0 transition-colors active:scale-95 shadow-xs touch-manipulation"
                       title="Sign Out of Session"
                     >
                       Sign Out
                     </button>
                   </div>
+                  <p className="text-xs text-slate-600">
+                    LRN: <strong>{user.lrn || user.userId || "To be assigned"}</strong>
+                  </p>
+                  <p className="text-[11px] text-slate-500 truncate">
+                    {user.email}
+                  </p>
                 </div>
 
                 {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
@@ -712,21 +711,22 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             </div>
           </div>
 
-          {/* Drawer Bottom Actions (Pinned at the very below of the menu across ALL devices) */}
+          {/* Drawer Bottom Actions */}
           <div
-            className="shrink-0 w-full p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2.5 z-10"
+            className="shrink-0 w-full px-4 py-2.5 md:p-4 border-t-2 border-slate-200 bg-slate-50 md:space-y-2.5 z-10"
             style={{
-              paddingBottom: "max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))",
+              paddingBottom: "max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem))",
             }}
           >
             {user ? (
+              /* Laptop Only: Original bottom Sign Out button */
               <button
                 type="button"
                 onClick={() => {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="w-full py-3 bg-red-700 hover:bg-red-800 active:bg-red-900 text-white border-2 border-red-800 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center block rounded-[4px] active:scale-[0.99] shadow-md touch-manipulation"
+                className="hidden md:block w-full py-2.5 sm:py-3 bg-red-50/70 hover:bg-red-100 text-red-900 hover:text-red-950 border-2 border-red-500 hover:border-red-600 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer text-center rounded-[4px] active:scale-[0.99] shadow-xs touch-manipulation"
                 style={{ touchAction: "manipulation" }}
               >
                 SIGN OUT ACCOUNT
