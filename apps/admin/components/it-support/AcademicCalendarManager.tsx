@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import ModernDatePicker from "@/components/ModernDatePicker";
 
 export interface AcademicTerm {
   id: string;
@@ -235,7 +236,7 @@ export default function AcademicCalendarManager() {
 
             <div className="p-3 bg-slate-50 border border-slate-200">
               <span className="text-[10px] font-mono text-slate-500 uppercase block">Late Enrollment Cutoff (Summative 2)</span>
-              <div className="font-bold text-red-800 mt-0.5 font-mono">
+              <div className="font-bold text-[#002060] mt-0.5 font-mono">
                 {activeTerm.summative2Date || "---"}
               </div>
             </div>
@@ -353,7 +354,7 @@ export default function AcademicCalendarManager() {
                         </td>
 
                         {/* Late Cutoff */}
-                        <td className="p-3 font-mono font-bold text-red-800">
+                        <td className="p-3 font-mono font-bold text-[#002060]">
                           {term.summative2Date || "---"}
                         </td>
 
@@ -462,22 +463,18 @@ export default function AcademicCalendarManager() {
                                       <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                         a. Start:
                                       </label>
-                                      <input
-                                        type="date"
+                                      <ModernDatePicker
                                         value={editingTerm.startDate || ""}
-                                        onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
-                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, startDate: val })}
                                       />
                                     </div>
                                     <div>
                                       <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                         b. End:
                                       </label>
-                                      <input
-                                        type="date"
+                                      <ModernDatePicker
                                         value={editingTerm.endDate || ""}
-                                        onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
-                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, endDate: val })}
                                       />
                                     </div>
                                   </div>
@@ -493,53 +490,45 @@ export default function AcademicCalendarManager() {
                                       <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                         a. Start:
                                       </label>
-                                      <input
-                                        type="date"
+                                      <ModernDatePicker
                                         value={editingTerm.instructionalStart || ""}
-                                        onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
-                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, instructionalStart: val })}
                                       />
                                     </div>
                                     <div>
                                       <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                         b. End:
                                       </label>
-                                      <input
-                                        type="date"
+                                      <ModernDatePicker
                                         value={editingTerm.instructionalEnd || ""}
-                                        onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
-                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, instructionalEnd: val })}
                                       />
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* 4. SUMMATIVE TEST DATE */}
-                                <div className="p-3 bg-red-50/40 border border-red-200 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-red-900 mb-2">
+                                <div className="p-3 bg-white border border-slate-300 shadow-2xs">
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     SUMMATIVE TEST DATE
                                   </span>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-red-500">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
                                     <div>
                                       <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                         a. Start (1st Summative):
                                       </label>
-                                      <input
-                                        type="date"
+                                      <ModernDatePicker
                                         value={editingTerm.summative1Date || ""}
-                                        onChange={(e) => setEditingTerm({ ...editingTerm, summative1Date: e.target.value })}
-                                        className="w-full p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-white focus:border-[#002060] outline-none"
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, summative1Date: val })}
                                       />
                                     </div>
                                     <div>
-                                      <label className="block text-[11px] font-mono font-bold text-red-900 mb-1">
+                                      <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                         b. End (2nd Summative / Late Cutoff):
                                       </label>
-                                      <input
-                                        type="date"
+                                      <ModernDatePicker
                                         value={editingTerm.summative2Date || ""}
-                                        onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
-                                        className="w-full p-2 border-2 border-red-400 font-mono text-xs font-bold text-red-900 bg-white focus:border-[#002060] outline-none"
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, summative2Date: val })}
                                       />
                                     </div>
                                   </div>
@@ -573,12 +562,12 @@ export default function AcademicCalendarManager() {
                                     <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
                                       Date:
                                     </label>
-                                    <input
-                                      type="date"
-                                      value={editingTerm.reportCardDate || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
-                                      className="w-full sm:w-80 p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
+                                    <div className="w-full sm:w-80">
+                                      <ModernDatePicker
+                                        value={editingTerm.reportCardDate || ""}
+                                        onChange={(val) => setEditingTerm({ ...editingTerm, reportCardDate: val })}
+                                      />
+                                    </div>
                                   </div>
                                 </div>
 
@@ -736,26 +725,22 @@ export default function AcademicCalendarManager() {
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
                           <div>
-                            <span className="block text-[11px] font-mono text-slate-600">a. Start:</span>
+                            <span className="block text-[11px] font-mono text-slate-600 mb-1">a. Start:</span>
                             {isExpanded && editingTerm ? (
-                              <input
-                                type="date"
+                              <ModernDatePicker
                                 value={editingTerm.startDate || ""}
-                                onChange={(e) => setEditingTerm({ ...editingTerm, startDate: e.target.value })}
-                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                                onChange={(val) => setEditingTerm({ ...editingTerm, startDate: val })}
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-slate-900">{term.startDate || "---"}</span>
                             )}
                           </div>
                           <div>
-                            <span className="block text-[11px] font-mono text-slate-600">b. End:</span>
+                            <span className="block text-[11px] font-mono text-slate-600 mb-1">b. End:</span>
                             {isExpanded && editingTerm ? (
-                              <input
-                                type="date"
+                              <ModernDatePicker
                                 value={editingTerm.endDate || ""}
-                                onChange={(e) => setEditingTerm({ ...editingTerm, endDate: e.target.value })}
-                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                                onChange={(val) => setEditingTerm({ ...editingTerm, endDate: val })}
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-slate-900">{term.endDate || "---"}</span>
@@ -771,26 +756,22 @@ export default function AcademicCalendarManager() {
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
                           <div>
-                            <span className="block text-[11px] font-mono text-slate-600">a. Start:</span>
+                            <span className="block text-[11px] font-mono text-slate-600 mb-1">a. Start:</span>
                             {isExpanded && editingTerm ? (
-                              <input
-                                type="date"
+                              <ModernDatePicker
                                 value={editingTerm.instructionalStart || ""}
-                                onChange={(e) => setEditingTerm({ ...editingTerm, instructionalStart: e.target.value })}
-                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                                onChange={(val) => setEditingTerm({ ...editingTerm, instructionalStart: val })}
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-slate-900">{term.instructionalStart || "---"}</span>
                             )}
                           </div>
                           <div>
-                            <span className="block text-[11px] font-mono text-slate-600">b. End:</span>
+                            <span className="block text-[11px] font-mono text-slate-600 mb-1">b. End:</span>
                             {isExpanded && editingTerm ? (
-                              <input
-                                type="date"
+                              <ModernDatePicker
                                 value={editingTerm.instructionalEnd || ""}
-                                onChange={(e) => setEditingTerm({ ...editingTerm, instructionalEnd: e.target.value })}
-                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                                onChange={(val) => setEditingTerm({ ...editingTerm, instructionalEnd: val })}
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-slate-900">{term.instructionalEnd || "---"}</span>
@@ -800,35 +781,31 @@ export default function AcademicCalendarManager() {
                       </div>
 
                       {/* 4. Summative Test Date */}
-                      <div className="p-2.5 bg-red-50/40 border border-red-200">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-red-900 mb-1.5">
+                      <div className="p-2.5 bg-white border border-slate-300">
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                           SUMMATIVE TEST DATE
                         </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-red-500">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
                           <div>
-                            <span className="block text-[11px] font-mono text-slate-600">a. Start (1st Summative):</span>
+                            <span className="block text-[11px] font-mono text-slate-600 mb-1">a. Start (1st Summative):</span>
                             {isExpanded && editingTerm ? (
-                              <input
-                                type="date"
+                              <ModernDatePicker
                                 value={editingTerm.summative1Date || ""}
-                                onChange={(e) => setEditingTerm({ ...editingTerm, summative1Date: e.target.value })}
-                                className="w-full p-1.5 border border-slate-300 font-mono text-xs font-bold"
+                                onChange={(val) => setEditingTerm({ ...editingTerm, summative1Date: val })}
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-slate-900">{term.summative1Date || "---"}</span>
                             )}
                           </div>
                           <div>
-                            <span className="block text-[11px] font-mono font-bold text-red-900">b. End (Late Cutoff):</span>
+                            <span className="block text-[11px] font-mono text-slate-700 mb-1">b. End (Late Cutoff):</span>
                             {isExpanded && editingTerm ? (
-                              <input
-                                type="date"
+                              <ModernDatePicker
                                 value={editingTerm.summative2Date || ""}
-                                onChange={(e) => setEditingTerm({ ...editingTerm, summative2Date: e.target.value })}
-                                className="w-full p-1.5 border-2 border-red-400 font-mono text-xs font-bold text-red-900"
+                                onChange={(val) => setEditingTerm({ ...editingTerm, summative2Date: val })}
                               />
                             ) : (
-                              <span className="font-mono text-xs font-bold text-red-800">{term.summative2Date || "---"}</span>
+                              <span className="font-mono text-xs font-bold text-[#002060]">{term.summative2Date || "---"}</span>
                             )}
                           </div>
                         </div>
@@ -861,14 +838,14 @@ export default function AcademicCalendarManager() {
                           REPORT CARD DISTRIBUTION (PTC)
                         </span>
                         <div className="pl-2 border-l-2 border-[#002060]">
-                          <span className="block text-[11px] font-mono text-slate-600">Date:</span>
+                          <span className="block text-[11px] font-mono text-slate-600 mb-1">Date:</span>
                           {isExpanded && editingTerm ? (
-                            <input
-                              type="date"
-                              value={editingTerm.reportCardDate || ""}
-                              onChange={(e) => setEditingTerm({ ...editingTerm, reportCardDate: e.target.value })}
-                              className="w-full sm:w-72 p-1.5 border border-slate-300 font-mono text-xs font-bold"
-                            />
+                            <div className="w-full sm:w-72">
+                              <ModernDatePicker
+                                value={editingTerm.reportCardDate || ""}
+                                onChange={(val) => setEditingTerm({ ...editingTerm, reportCardDate: val })}
+                              />
+                            </div>
                           ) : (
                             <span className="font-mono text-xs font-bold text-slate-900">{term.reportCardDate || "---"}</span>
                           )}
