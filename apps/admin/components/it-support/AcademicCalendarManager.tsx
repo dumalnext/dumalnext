@@ -24,6 +24,145 @@ export interface AcademicTerm {
   isActive: boolean;
 }
 
+const EXAM_MONTH_MAP: Record<string, string> = {
+  jan: "01", january: "01",
+  feb: "02", february: "02",
+  mar: "03", march: "03",
+  apr: "04", april: "04",
+  may: "05",
+  jun: "06", june: "06",
+  jul: "07", july: "07",
+  aug: "08", august: "08",
+  sep: "09", sept: "09", september: "09",
+  oct: "10", october: "10",
+  nov: "11", november: "11",
+  dec: "12", december: "12",
+};
+
+const EXAM_MONTH_ABBR = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+function parseTermExamDates(raw: string | null | undefined): { start: string; end: string } {
+  if (!raw || typeof raw !== "string") return { start: "", end: "" };
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed === "---") return { start: "", end: "" };
+
+  // Case 1: ISO Range "YYYY-MM-DD to YYYY-MM-DD" or "YYYY-MM-DD - YYYY-MM-DD"
+  const isoRange = trimmed.match(/^(\d{4}-\d{2}-\d{2})\s*(?:to|-)\s*(\d{4}-\d{2}-\d{2})$/i);
+  if (isoRange) {
+    return { start: isoRange[1], end: isoRange[2] };
+  }
+
+  // Case 2: Single ISO Date "YYYY-MM-DD"
+  const isoSingle = trimmed.match(/^(\d{4}-\d{2}-\d{2})$/);
+  if (isoSingle) {
+    return { start: isoSingle[1], end: isoSingle[1] };
+  }
+
+  // Case 3: "Nov 5-6, 2026" or "Nov 5 - 6, 2026" or "November 5-6, 2026"
+  const sameMonthRange = trimmed.match(/^([a-zA-Z]+)\s+(\d{1,2})\s*[-–]\s*(\d{1,2}),?\s*(\d{4})$/);
+  if (sameMonthRange) {
+    const mStr = sameMonthRange[1].toLowerCase();
+    const m = EXAM_MONTH_MAP[mStr];
+    if (m) {
+      const d1 = String(parseInt(sameMonthRange[2], 10)).padStart(2, "0");
+      const d2 = String(parseInt(sameMonthRange[3], 10)).padStart(2, "0");
+      const y = sameMonthRange[4];
+      return { start: `${y}-${m}-${d1}`, end: `${y}-${m}-${d2}` };
+    }
+  }
+
+  // Case 4: "Nov 28 - Dec 2, 2026" or "Nov 28 to Dec 2, 2026"
+  const diffMonthRange = trimmed.match(
+    /^([a-zA-Z]+)\s+(\d{1,2})\s*(?:[-–]|to)\s*([a-zA-Z]+)\s+(\d{1,2}),?\s*(\d{4})$/
+  );
+  if (diffMonthRange) {
+    const m1 = EXAM_MONTH_MAP[diffMonthRange[1].toLowerCase()];
+    const m2 = EXAM_MONTH_MAP[diffMonthRange[3].toLowerCase()];
+    if (m1 && m2) {
+      const d1 = String(parseInt(diffMonthRange[2], 10)).padStart(2, "0");
+      const d2 = String(parseInt(diffMonthRange[4], 10)).padStart(2, "0");
+      const y = diffMonthRange[5];
+      return { start: `${y}-${m1}-${d1}`, end: `${y}-${m2}-${d2}` };
+    }
+  }
+
+  // Case 5: "Nov 5, 2026" or "November 5, 2026"
+  const singleDate = trimmed.match(/^([a-zA-Z]+)\s+(\d{1,2}),?\s*(\d{4})$/);
+  if (singleDate) {
+    const m = EXAM_MONTH_MAP[singleDate[1].toLowerCase()];
+    if (m) {
+      const d = String(parseInt(singleDate[2], 10)).padStart(2, "0");
+      const y = singleDate[3];
+      return { start: `${y}-${m}-${d}`, end: `${y}-${m}-${d}` };
+    }
+  }
+
+  return { start: "", end: "" };
+}
+
+function formatTermExamDates(start: string, end: string): string {
+  if (!start && !end) return "";
+  if (start && !end) {
+    const parts = start.split("-");
+    if (parts.length === 3) {
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      return `${EXAM_MONTH_ABBR[mIdx] || parts[1]} ${d}, ${parts[0]}`;
+    }
+    return start;
+  }
+  if (!start && end) {
+    const parts = end.split("-");
+    if (parts.length === 3) {
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      return `${EXAM_MONTH_ABBR[mIdx] || parts[1]} ${d}, ${parts[0]}`;
+    }
+    return end;
+  }
+
+  if (start === end) {
+    const parts = start.split("-");
+    if (parts.length === 3) {
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      return `${EXAM_MONTH_ABBR[mIdx] || parts[1]} ${d}, ${parts[0]}`;
+    }
+    return start;
+  }
+
+  const p1 = start.split("-");
+  const p2 = end.split("-");
+
+  if (p1.length === 3 && p2.length === 3) {
+    const y1 = p1[0];
+    const m1Idx = parseInt(p1[1], 10) - 1;
+    const d1 = parseInt(p1[2], 10);
+
+    const y2 = p2[0];
+    const m2Idx = parseInt(p2[1], 10) - 1;
+    const d2 = parseInt(p2[2], 10);
+
+    // Same year & month: "Nov 5-6, 2026"
+    if (y1 === y2 && m1Idx === m2Idx) {
+      return `${EXAM_MONTH_ABBR[m1Idx] || p1[1]} ${d1}-${d2}, ${y1}`;
+    }
+
+    // Same year, diff month: "Nov 28 - Dec 2, 2026"
+    if (y1 === y2) {
+      return `${EXAM_MONTH_ABBR[m1Idx] || p1[1]} ${d1} - ${EXAM_MONTH_ABBR[m2Idx] || p2[1]} ${d2}, ${y1}`;
+    }
+
+    // Diff year: "Dec 30, 2026 - Jan 2, 2027"
+    return `${EXAM_MONTH_ABBR[m1Idx] || p1[1]} ${d1}, ${y1} - ${EXAM_MONTH_ABBR[m2Idx] || p2[1]} ${d2}, ${y2}`;
+  }
+
+  return `${start} to ${end}`;
+}
+
 export default function AcademicCalendarManager() {
   const [terms, setTerms] = useState<AcademicTerm[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -524,21 +663,43 @@ export default function AcademicCalendarManager() {
 
                                 {/* 5. TERM EXAMINATION */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
-                                    TERM EXAMINATION
-                                  </span>
-                                  <div className="pl-3 border-l-4 border-[#002060]">
-                                    <label className="block text-[11px] font-mono font-bold text-slate-700 mb-1">
-                                      Examination Date(s):
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={editingTerm.termExamDates || ""}
-                                      onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
-                                      placeholder="e.g. Nov 5-6, 2026"
-                                      className="w-full sm:w-80 p-2.5 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                                    />
+                                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                    <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
+                                      TERM EXAMINATION
+                                    </span>
+                                    {editingTerm.termExamDates && (
+                                      <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200">
+                                        {editingTerm.termExamDates}
+                                      </span>
+                                    )}
                                   </div>
+                                  {(() => {
+                                    const examRange = parseTermExamDates(editingTerm.termExamDates);
+                                    return (
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
+                                        <div>
+                                          <ModernDatePicker
+                                            label="a. Start Date:"
+                                            value={examRange.start}
+                                            onChange={(val) => {
+                                              const updated = formatTermExamDates(val, examRange.end);
+                                              setEditingTerm({ ...editingTerm, termExamDates: updated });
+                                            }}
+                                          />
+                                        </div>
+                                        <div>
+                                          <ModernDatePicker
+                                            label="b. End Date:"
+                                            value={examRange.end}
+                                            onChange={(val) => {
+                                              const updated = formatTermExamDates(examRange.start, val);
+                                              setEditingTerm({ ...editingTerm, termExamDates: updated });
+                                            }}
+                                          />
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
 
                                 {/* 6. REPORT CARD DISTRIBUTION (PTC) */}
@@ -817,19 +978,50 @@ export default function AcademicCalendarManager() {
 
                       {/* 5. Term Examination */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
-                          TERM EXAMINATION
-                        </span>
+                        <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                          <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
+                            TERM EXAMINATION
+                          </span>
+                          {!isExpanded && term.termExamDates && (
+                            <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200">
+                              {term.termExamDates}
+                            </span>
+                          )}
+                          {isExpanded && editingTerm?.termExamDates && (
+                            <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200">
+                              {editingTerm.termExamDates}
+                            </span>
+                          )}
+                        </div>
                         <div className="pl-2 border-l-2 border-[#002060]">
-                          <span className="block text-[11px] font-mono text-slate-600 mb-1">Date:</span>
                           {isExpanded && editingTerm ? (
-                            <input
-                              type="text"
-                              value={editingTerm.termExamDates || ""}
-                              onChange={(e) => setEditingTerm({ ...editingTerm, termExamDates: e.target.value })}
-                              placeholder="e.g. Nov 5-6, 2026"
-                              className="w-full sm:w-72 p-1.5 border border-slate-300 font-mono text-xs font-bold"
-                            />
+                            (() => {
+                              const examRange = parseTermExamDates(editingTerm.termExamDates);
+                              return (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  <div>
+                                    <ModernDatePicker
+                                      label="a. Start Date:"
+                                      value={examRange.start}
+                                      onChange={(val) => {
+                                        const updated = formatTermExamDates(val, examRange.end);
+                                        setEditingTerm({ ...editingTerm, termExamDates: updated });
+                                      }}
+                                    />
+                                  </div>
+                                  <div>
+                                    <ModernDatePicker
+                                      label="b. End Date:"
+                                      value={examRange.end}
+                                      onChange={(val) => {
+                                        const updated = formatTermExamDates(examRange.start, val);
+                                        setEditingTerm({ ...editingTerm, termExamDates: updated });
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })()
                           ) : (
                             <span className="font-mono text-xs font-bold text-slate-900">{term.termExamDates || "---"}</span>
                           )}
