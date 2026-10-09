@@ -663,16 +663,9 @@ export default function AcademicCalendarManager() {
 
                                 {/* 5. TERM EXAMINATION */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                                    <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-                                      TERM EXAMINATION
-                                    </span>
-                                    {editingTerm.termExamDates && (
-                                      <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200">
-                                        {editingTerm.termExamDates}
-                                      </span>
-                                    )}
-                                  </div>
+                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                    TERM EXAMINATION
+                                  </span>
                                   {(() => {
                                     const examRange = parseTermExamDates(editingTerm.termExamDates);
                                     return (
@@ -946,16 +939,9 @@ export default function AcademicCalendarManager() {
 
                       {/* 5. Term Examination */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
-                          <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-                            TERM EXAMINATION
-                          </span>
-                          {currentTerm.termExamDates && (
-                            <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200">
-                              {currentTerm.termExamDates}
-                            </span>
-                          )}
-                        </div>
+                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                          TERM EXAMINATION
+                        </span>
                         <div className="pl-2 border-l-2 border-[#002060]">
                           {(() => {
                             const examRange = parseTermExamDates(currentTerm.termExamDates);
