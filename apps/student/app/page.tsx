@@ -8,6 +8,7 @@ import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
+import SeparatedOtpInput from "@/components/SeparatedOtpInput";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -543,12 +544,12 @@ function StudentHomeContent() {
     }
   };
 
-  // Handle OTP Verification Submit (Supports both 6-digit and 8-digit codes)
+  // Handle OTP Verification Submit (6-Digit Code)
   const handleVerifyOtpSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const clean = otpCode.replace(/\D/g, "");
-    if (!otpEmail || clean.length < 6 || clean.length > 8) {
-      setOtpError("Please enter the complete verification code (6 to 8 digits).");
+    if (!otpEmail || clean.length !== 6) {
+      setOtpError("Please enter the complete 6-digit verification code.");
       return;
     }
 
@@ -1549,23 +1550,19 @@ function StudentHomeContent() {
 
               <form onSubmit={handleVerifyOtpSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 text-center mb-2">
-                    Enter Verification Code (6 to 8 Digits)
+                  <label className="block text-xs font-bold text-slate-800 text-center mb-1">
+                    Enter Verification Code
                   </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={8}
-                    autoFocus
+                  <SeparatedOtpInput
                     value={otpCode}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, "").slice(0, 8);
+                    onChange={(val) => {
                       setOtpCode(val);
                       if (otpError) setOtpError("");
                     }}
-                    placeholder="______"
-                    className="w-full text-center font-bold text-2xl sm:text-3xl tracking-[0.25em] p-3 border-2 border-[#002060] bg-blue-50/40 text-[#002060] outline-none placeholder:text-slate-300 rounded-[4px]"
+                    length={6}
+                    hasError={!!otpError}
+                    disabled={isVerifyingOtp}
+                    autoFocus={true}
                   />
                   <span className="text-[10px] text-slate-500 text-center block mt-1">
                     Please check your Gmail Inbox (or Spam folder) for the verification code.
