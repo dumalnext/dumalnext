@@ -171,8 +171,8 @@ export default function ModernDatePicker({
       {(label || formattedDate) && (
         <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
           {label ? (
-            <label className="block text-[11px] font-mono font-bold text-slate-700">
-              {label} {required && <span className="text-red-700">*</span>}
+            <label className="block text-xs font-bold text-slate-900 font-sans">
+              {label} {required && <span className="text-red-600 font-bold ml-0.5">*</span>}
             </label>
           ) : (
             <span />
@@ -180,14 +180,14 @@ export default function ModernDatePicker({
 
           {formattedDate && (
             <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-              <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-[4px] font-mono shadow-2xs">
+              <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-[4px] font-sans shadow-2xs">
                 {formattedDate}
               </span>
               {!disabled && (
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="text-[10px] text-slate-400 hover:text-red-700 font-mono px-1 py-0.5 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                  className="text-[10px] text-slate-400 hover:text-red-700 font-sans px-1 py-0.5 hover:bg-red-50 rounded transition-colors cursor-pointer"
                   title="Clear date"
                 >
                   Clear

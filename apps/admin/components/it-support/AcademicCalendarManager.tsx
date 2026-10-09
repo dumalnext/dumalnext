@@ -794,6 +794,17 @@ export default function AcademicCalendarManager() {
           <div className="p-5 space-y-4 bg-slate-100">
             {terms.map((term) => {
               const isExpanded = expandedTermId === term.id;
+              const currentTerm = isExpanded && editingTerm ? editingTerm : term;
+
+              const updateTermField = (field: keyof AcademicTerm, value: any) => {
+                if (isExpanded && editingTerm) {
+                  setEditingTerm({ ...editingTerm, [field]: value });
+                } else {
+                  setExpandedTermId(term.id);
+                  setEditingTerm({ ...term, [field]: value });
+                }
+              };
+
               return (
                 <div
                   key={term.id}
@@ -844,25 +855,24 @@ export default function AcademicCalendarManager() {
 
                   {/* Vertically Scrollable Content Box */}
                   <div className="p-4">
-                    <div className="max-h-[440px] overflow-y-auto pr-2 space-y-3 border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="max-h-[460px] overflow-y-auto pr-2 space-y-3 border border-slate-200 bg-slate-50/70 p-4">
                       {/* 1. Total Class Days */}
                       <div className="p-2.5 bg-white border border-slate-300">
                         <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
                           TOTAL CLASS DAYS
                         </span>
-                        {isExpanded && editingTerm ? (
-                          <input
-                            type="number"
-                            value={editingTerm.totalClassDays || ""}
-                            onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
-                            placeholder="e.g. 68"
-                            className="w-full sm:w-48 p-2 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
-                          />
-                        ) : (
-                          <div className="font-mono text-xs font-bold text-slate-900">
-                            {term.totalClassDays ? `${term.totalClassDays} Days` : "---"}
-                          </div>
-                        )}
+                        <input
+                          type="number"
+                          value={currentTerm.totalClassDays || ""}
+                          onChange={(e) =>
+                            updateTermField(
+                              "totalClassDays",
+                              e.target.value ? Number(e.target.value) : null
+                            )
+                          }
+                          placeholder="e.g. 68"
+                          className="w-full sm:w-48 p-2 border border-slate-300 font-mono text-xs font-bold text-slate-900 bg-white focus:border-[#002060] outline-none rounded-[4px]"
+                        />
                       </div>
 
                       {/* 2. Term Date */}
@@ -872,32 +882,18 @@ export default function AcademicCalendarManager() {
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
                           <div>
-                            {isExpanded && editingTerm ? (
-                              <ModernDatePicker
-                                label="a. Start:"
-                                value={editingTerm.startDate || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, startDate: val })}
-                              />
-                            ) : (
-                              <>
-                                <span className="block text-[11px] font-mono text-slate-600 mb-1">a. Start:</span>
-                                <span className="font-mono text-xs font-bold text-slate-900">{term.startDate || "---"}</span>
-                              </>
-                            )}
+                            <ModernDatePicker
+                              label="a. Start:"
+                              value={currentTerm.startDate || ""}
+                              onChange={(val) => updateTermField("startDate", val)}
+                            />
                           </div>
                           <div>
-                            {isExpanded && editingTerm ? (
-                              <ModernDatePicker
-                                label="b. End:"
-                                value={editingTerm.endDate || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, endDate: val })}
-                              />
-                            ) : (
-                              <>
-                                <span className="block text-[11px] font-mono text-slate-600 mb-1">b. End:</span>
-                                <span className="font-mono text-xs font-bold text-slate-900">{term.endDate || "---"}</span>
-                              </>
-                            )}
+                            <ModernDatePicker
+                              label="b. End:"
+                              value={currentTerm.endDate || ""}
+                              onChange={(val) => updateTermField("endDate", val)}
+                            />
                           </div>
                         </div>
                       </div>
@@ -909,32 +905,18 @@ export default function AcademicCalendarManager() {
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
                           <div>
-                            {isExpanded && editingTerm ? (
-                              <ModernDatePicker
-                                label="a. Start:"
-                                value={editingTerm.instructionalStart || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, instructionalStart: val })}
-                              />
-                            ) : (
-                              <>
-                                <span className="block text-[11px] font-mono text-slate-600 mb-1">a. Start:</span>
-                                <span className="font-mono text-xs font-bold text-slate-900">{term.instructionalStart || "---"}</span>
-                              </>
-                            )}
+                            <ModernDatePicker
+                              label="a. Start:"
+                              value={currentTerm.instructionalStart || ""}
+                              onChange={(val) => updateTermField("instructionalStart", val)}
+                            />
                           </div>
                           <div>
-                            {isExpanded && editingTerm ? (
-                              <ModernDatePicker
-                                label="b. End:"
-                                value={editingTerm.instructionalEnd || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, instructionalEnd: val })}
-                              />
-                            ) : (
-                              <>
-                                <span className="block text-[11px] font-mono text-slate-600 mb-1">b. End:</span>
-                                <span className="font-mono text-xs font-bold text-slate-900">{term.instructionalEnd || "---"}</span>
-                              </>
-                            )}
+                            <ModernDatePicker
+                              label="b. End:"
+                              value={currentTerm.instructionalEnd || ""}
+                              onChange={(val) => updateTermField("instructionalEnd", val)}
+                            />
                           </div>
                         </div>
                       </div>
@@ -946,32 +928,18 @@ export default function AcademicCalendarManager() {
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
                           <div>
-                            {isExpanded && editingTerm ? (
-                              <ModernDatePicker
-                                label="a. Start (1st Summative):"
-                                value={editingTerm.summative1Date || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, summative1Date: val })}
-                              />
-                            ) : (
-                              <>
-                                <span className="block text-[11px] font-mono text-slate-600 mb-1">a. Start (1st Summative):</span>
-                                <span className="font-mono text-xs font-bold text-slate-900">{term.summative1Date || "---"}</span>
-                              </>
-                            )}
+                            <ModernDatePicker
+                              label="a. Start (1st Summative):"
+                              value={currentTerm.summative1Date || ""}
+                              onChange={(val) => updateTermField("summative1Date", val)}
+                            />
                           </div>
                           <div>
-                            {isExpanded && editingTerm ? (
-                              <ModernDatePicker
-                                label="b. End (Late Cutoff):"
-                                value={editingTerm.summative2Date || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, summative2Date: val })}
-                              />
-                            ) : (
-                              <>
-                                <span className="block text-[11px] font-mono text-slate-700 mb-1">b. End (Late Cutoff):</span>
-                                <span className="font-mono text-xs font-bold text-[#002060]">{term.summative2Date || "---"}</span>
-                              </>
-                            )}
+                            <ModernDatePicker
+                              label="b. End (Late Cutoff):"
+                              value={currentTerm.summative2Date || ""}
+                              onChange={(val) => updateTermField("summative2Date", val)}
+                            />
                           </div>
                         </div>
                       </div>
@@ -982,49 +950,40 @@ export default function AcademicCalendarManager() {
                           <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
                             TERM EXAMINATION
                           </span>
-                          {!isExpanded && term.termExamDates && (
+                          {currentTerm.termExamDates && (
                             <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200">
-                              {term.termExamDates}
-                            </span>
-                          )}
-                          {isExpanded && editingTerm?.termExamDates && (
-                            <span className="text-[11px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200">
-                              {editingTerm.termExamDates}
+                              {currentTerm.termExamDates}
                             </span>
                           )}
                         </div>
                         <div className="pl-2 border-l-2 border-[#002060]">
-                          {isExpanded && editingTerm ? (
-                            (() => {
-                              const examRange = parseTermExamDates(editingTerm.termExamDates);
-                              return (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                  <div>
-                                    <ModernDatePicker
-                                      label="a. Start Date:"
-                                      value={examRange.start}
-                                      onChange={(val) => {
-                                        const updated = formatTermExamDates(val, examRange.end);
-                                        setEditingTerm({ ...editingTerm, termExamDates: updated });
-                                      }}
-                                    />
-                                  </div>
-                                  <div>
-                                    <ModernDatePicker
-                                      label="b. End Date:"
-                                      value={examRange.end}
-                                      onChange={(val) => {
-                                        const updated = formatTermExamDates(examRange.start, val);
-                                        setEditingTerm({ ...editingTerm, termExamDates: updated });
-                                      }}
-                                    />
-                                  </div>
+                          {(() => {
+                            const examRange = parseTermExamDates(currentTerm.termExamDates);
+                            return (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                  <ModernDatePicker
+                                    label="a. Start Date:"
+                                    value={examRange.start}
+                                    onChange={(val) => {
+                                      const updated = formatTermExamDates(val, examRange.end);
+                                      updateTermField("termExamDates", updated);
+                                    }}
+                                  />
                                 </div>
-                              );
-                            })()
-                          ) : (
-                            <span className="font-mono text-xs font-bold text-slate-900">{term.termExamDates || "---"}</span>
-                          )}
+                                <div>
+                                  <ModernDatePicker
+                                    label="b. End Date:"
+                                    value={examRange.end}
+                                    onChange={(val) => {
+                                      const updated = formatTermExamDates(examRange.start, val);
+                                      updateTermField("termExamDates", updated);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -1034,20 +993,13 @@ export default function AcademicCalendarManager() {
                           REPORT CARD DISTRIBUTION (PTC)
                         </span>
                         <div className="pl-2 border-l-2 border-[#002060]">
-                          {isExpanded && editingTerm ? (
-                            <div className="w-full sm:w-72">
-                              <ModernDatePicker
-                                label="Date:"
-                                value={editingTerm.reportCardDate || ""}
-                                onChange={(val) => setEditingTerm({ ...editingTerm, reportCardDate: val })}
-                              />
-                            </div>
-                          ) : (
-                            <>
-                              <span className="block text-[11px] font-mono text-slate-600 mb-1">Date:</span>
-                              <span className="font-mono text-xs font-bold text-slate-900">{term.reportCardDate || "---"}</span>
-                            </>
-                          )}
+                          <div className="w-full sm:w-72">
+                            <ModernDatePicker
+                              label="Date:"
+                              value={currentTerm.reportCardDate || ""}
+                              onChange={(val) => updateTermField("reportCardDate", val)}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -1057,35 +1009,33 @@ export default function AcademicCalendarManager() {
                           STATUS (CLICKABLE)
                         </span>
                         <div className="pl-2 border-l-2 border-[#002060] flex items-center gap-3">
-                          {isExpanded && editingTerm ? (
-                            editingTerm.isActive ? (
-                              <button
-                                type="button"
-                                onClick={() => setEditingTerm({ ...editingTerm, isActive: false })}
-                                className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase cursor-pointer"
-                              >
-                                ACTIVE &bull; CLICK TO SET INACTIVE
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
-                                className="px-3 py-1.5 bg-[#002060] hover:bg-[#001845] text-white font-mono font-bold text-xs uppercase cursor-pointer"
-                              >
-                                CLICK TO SET ACTIVE
-                              </button>
-                            )
-                          ) : term.isActive ? (
-                            <span className="px-3 py-1 bg-green-700 text-white font-mono font-bold text-xs uppercase">
-                              ACTIVE
-                            </span>
+                          {currentTerm.isActive ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isExpanded && editingTerm) {
+                                  setEditingTerm({ ...editingTerm, isActive: false });
+                                } else {
+                                  handleActivate(term.id, `${term.schoolYear} ${term.termName}`);
+                                }
+                              }}
+                              className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase cursor-pointer"
+                            >
+                              ACTIVE &bull; {isExpanded ? "CLICK TO SET INACTIVE" : "CURRENT SCHOOL TERM"}
+                            </button>
                           ) : (
                             <button
                               type="button"
-                              onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
-                              className="px-3 py-1 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase cursor-pointer"
+                              onClick={() => {
+                                if (isExpanded && editingTerm) {
+                                  setEditingTerm({ ...editingTerm, isActive: true });
+                                } else {
+                                  handleActivate(term.id, `${term.schoolYear} ${term.termName}`);
+                                }
+                              }}
+                              className="px-3 py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase cursor-pointer transition-colors"
                             >
-                              SET ACTIVE
+                              CLICK TO SET ACTIVE
                             </button>
                           )}
                         </div>
@@ -1094,25 +1044,30 @@ export default function AcademicCalendarManager() {
 
                     {/* Bottom Save Bar when Box is Expanded */}
                     {isExpanded && editingTerm && (
-                      <div className="mt-3 pt-3 border-t border-slate-200 flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setExpandedTermId(null);
-                            setEditingTerm(null);
-                          }}
-                          className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
-                        >
-                          CANCEL
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isSubmitting}
-                          onClick={handleSaveTermDates}
-                          className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
-                        >
-                          {isSubmitting ? "SAVING..." : `SAVE ${editingTerm.termName.toUpperCase()} DATES`}
-                        </button>
+                      <div className="mt-3 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-[11px] font-mono text-slate-600">
+                          Editing {term.termName}. Click save to apply changes.
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExpandedTermId(null);
+                              setEditingTerm(null);
+                            }}
+                            className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                          >
+                            CANCEL
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={handleSaveTermDates}
+                            className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
+                          >
+                            {isSubmitting ? "SAVING..." : `SAVE ${editingTerm.termName.toUpperCase()} DATES`}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>

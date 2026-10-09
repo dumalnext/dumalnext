@@ -217,14 +217,14 @@ export default function CustomSelect({
           triggerClassName
             ? triggerClassName
             : fullWidth
-            ? "w-full flex items-center justify-between p-2 sm:p-2.5"
+            ? "w-full flex items-center justify-between p-2.5 sm:p-3"
             : "flex items-center gap-1.5 px-2.5 py-1.5"
-        } bg-white hover:bg-slate-50 border-2 text-xs font-sans transition-all cursor-pointer select-none rounded-[4px] ${
+        } bg-white hover:bg-slate-50 border border-slate-300 hover:border-[#002060] text-xs font-sans transition-all cursor-pointer select-none rounded-[4px] ${
           error
-            ? "border-red-600 bg-red-50/50"
+            ? "!border-red-600 bg-red-50/50"
             : isOpen
-            ? "border-[#002060] ring-2 ring-[#002060]/20 shadow-xs"
-            : "border-slate-300 hover:border-[#002060]"
+            ? "!border-[#002060] ring-2 ring-[#002060]/20 shadow-xs"
+            : ""
         } ${disabled ? "opacity-50 cursor-not-allowed bg-slate-100" : ""}`}
       >
         <div className="flex items-center gap-2 text-left min-w-0 flex-1">
@@ -237,7 +237,7 @@ export default function CustomSelect({
           <span
             className={`min-w-0 flex-1 truncate ${
               selectedOption
-                ? "font-bold text-[#002060]"
+                ? "font-bold text-slate-900"
                 : "font-normal text-slate-400 italic"
             }`}
           >
