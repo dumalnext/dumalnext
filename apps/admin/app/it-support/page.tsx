@@ -8,6 +8,7 @@ import AcademicCalendarManager from "@/components/it-support/AcademicCalendarMan
 import ClassroomFacilityManager from "@/components/it-support/ClassroomFacilityManager";
 import UserRoleAuditor from "@/components/it-support/UserRoleAuditor";
 import SystemDiagnosticsMonitor from "@/components/it-support/SystemDiagnosticsMonitor";
+import StaffInvitationManager from "@/components/it-support/StaffInvitationManager";
 
 function ITSupportPortalContent() {
   const { user, isLoading } = useITSupportAuth();
@@ -40,6 +41,7 @@ function ITSupportPortalContent() {
         {activeTab === "classrooms" && <ClassroomFacilityManager />}
         {activeTab === "users" && <UserRoleAuditor />}
         {activeTab === "diagnostics" && <SystemDiagnosticsMonitor />}
+        {activeTab === "invitations" && <StaffInvitationManager />}
       </main>
 
       <footer className="bg-white border-t-2 border-slate-300 py-4 px-6 text-center text-[10px] font-mono uppercase text-slate-500">

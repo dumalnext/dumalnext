@@ -3,7 +3,7 @@
 import React from "react";
 import { useITSupportAuth } from "@/lib/auth/itSupportAuthContext";
 
-export type ITSupportActiveTab = "calendar" | "classrooms" | "users" | "diagnostics";
+export type ITSupportActiveTab = "calendar" | "classrooms" | "users" | "diagnostics" | "invitations";
 
 interface ITSupportHeaderNavProps {
   activeTab: ITSupportActiveTab;
@@ -122,6 +122,18 @@ export default function ITSupportHeaderNav({
               }`}
             >
               [ 4. System Diagnostics &amp; Privacy ]
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectTab("invitations")}
+              className={`px-4 py-3 border-b-2 transition-all cursor-pointer rounded-t ${
+                activeTab === "invitations"
+                  ? "border-[#002060] bg-white text-[#002060] font-black shadow-xs"
+                  : "border-transparent text-slate-700 hover:text-slate-950 hover:bg-slate-200"
+              }`}
+            >
+              [ 5. Staff Invitations &amp; Onboarding ]
             </button>
           </div>
         </div>
