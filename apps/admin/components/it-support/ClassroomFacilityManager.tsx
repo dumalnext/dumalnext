@@ -41,15 +41,25 @@ export default function ClassroomFacilityManager() {
   const fetchClassrooms = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/it-support/classrooms");
-      const json = await res.json();
-      if (json.success) {
+      let res = await fetch(`/api/it-support/classrooms?_t=${Date.now()}`, { cache: "no-store" });
+      if (res.status === 404) {
+        res = await fetch(`/api/classrooms?_t=${Date.now()}`, { cache: "no-store" });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setClassrooms(json.classrooms || []);
       } else {
         setStatusMessage({ type: "error", text: json.error || "Failed to load classrooms." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Network error loading classrooms." });
+      console.error("fetchClassrooms error:", err);
+      setStatusMessage({ type: "error", text: err.message || "Network error loading classrooms." });
     } finally {
       setIsLoading(false);
     }
@@ -89,13 +99,26 @@ export default function ClassroomFacilityManager() {
         ...formData,
         id: editingRoom ? editingRoom.id : undefined,
       };
-      const res = await fetch("/api/it-support/classrooms", {
+      let res = await fetch("/api/it-support/classrooms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const json = await res.json();
-      if (json.success) {
+      if (res.status === 404) {
+        res = await fetch("/api/classrooms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setStatusMessage({
           type: "success",
           text: editingRoom
@@ -110,7 +133,7 @@ export default function ClassroomFacilityManager() {
         setStatusMessage({ type: "error", text: json.error || "Failed to save classroom." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Error saving classroom facility." });
+      setStatusMessage({ type: "error", text: err.message || "Error saving classroom facility." });
     } finally {
       setIsSubmitting(false);
     }
@@ -120,11 +143,22 @@ export default function ClassroomFacilityManager() {
     if (!deleteTarget) return;
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/it-support/classrooms?id=${deleteTarget.id}`, {
+      let res = await fetch(`/api/it-support/classrooms?id=${deleteTarget.id}`, {
         method: "DELETE",
       });
-      const json = await res.json();
-      if (json.success) {
+      if (res.status === 404) {
+        res = await fetch(`/api/classrooms?id=${deleteTarget.id}`, {
+          method: "DELETE",
+        });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setStatusMessage({ type: "success", text: `Classroom ${deleteTarget.classroomId} removed successfully.` });
         setDeleteTarget(null);
         fetchClassrooms();
@@ -133,7 +167,7 @@ export default function ClassroomFacilityManager() {
         setDeleteTarget(null);
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Error deleting classroom." });
+      setStatusMessage({ type: "error", text: err.message || "Error deleting classroom." });
       setDeleteTarget(null);
     } finally {
       setIsDeleting(false);

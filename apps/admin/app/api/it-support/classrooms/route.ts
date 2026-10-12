@@ -1,17 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "";
+  if (!url || !key) return null;
+  return createSupabaseJsClient(url, key);
+}
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  Pragma: "no-cache",
+  Expires: "0",
+};
 
 // GET: Fetch all classrooms for facility management and scheduling
 export async function GET() {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client initialization failed. Missing credentials." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
+
     const { data: classrooms, error } = await supabase
       .from("classrooms")
       .select("*")
       .order("classroom_id", { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("GET classrooms error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
     }
 
     const formatted = (classrooms || []).map((c: any) => ({
@@ -25,16 +52,23 @@ export async function GET() {
       createdAt: c.created_at || c.createdAt || new Date().toISOString(),
     }));
 
-    return NextResponse.json({ success: true, classrooms: formatted });
+    return NextResponse.json({ success: true, classrooms: formatted }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch classrooms" }, { status: 500 });
+    console.error("GET classrooms exception:", err);
+    return NextResponse.json({ error: err.message || "Failed to fetch classrooms" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }
 
 // POST: Add or update a classroom
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client initialization failed. Missing credentials." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
     const body = await req.json();
 
     const { id, classroomId, roomName, building, capacity } = body;
@@ -46,7 +80,7 @@ export async function POST(req: NextRequest) {
     if (!roomCode || !name || !bldg) {
       return NextResponse.json(
         { error: "Room Code (e.g. RM-101), Room Name, and Building are required." },
-        { status: 400 }
+        { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
@@ -64,7 +98,8 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("POST update classroom error:", error);
+        return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
       }
 
       const formatted = {
@@ -77,7 +112,7 @@ export async function POST(req: NextRequest) {
         capacity: data.capacity,
       };
 
-      return NextResponse.json({ success: true, classroom: formatted });
+      return NextResponse.json({ success: true, classroom: formatted }, { headers: NO_CACHE_HEADERS });
     }
 
     const payload: Record<string, any> = {
@@ -94,7 +129,8 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("POST insert classroom error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
     }
 
     const formatted = {
@@ -107,9 +143,10 @@ export async function POST(req: NextRequest) {
       capacity: data.capacity,
     };
 
-    return NextResponse.json({ success: true, classroom: formatted });
+    return NextResponse.json({ success: true, classroom: formatted }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to save classroom" }, { status: 500 });
+    console.error("POST classroom exception:", err);
+    return NextResponse.json({ error: err.message || "Failed to save classroom" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }
 
@@ -121,12 +158,18 @@ export async function PUT(req: NextRequest) {
 // DELETE: Delete a classroom
 export async function DELETE(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client initialization failed. Missing credentials." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: "Classroom ID is required." }, { status: 400 });
+      return NextResponse.json({ error: "Classroom ID is required." }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
     // Check if classroom is actively referenced in class_schedules
@@ -139,17 +182,19 @@ export async function DELETE(req: NextRequest) {
     if (activeSchedules && activeSchedules.length > 0) {
       return NextResponse.json(
         { error: "Cannot delete this classroom because it has active class schedules assigned to it." },
-        { status: 400 }
+        { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
     const { error } = await supabase.from("classrooms").delete().eq("id", id);
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("DELETE classroom error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to delete classroom" }, { status: 500 });
+    console.error("DELETE classroom exception:", err);
+    return NextResponse.json({ error: err.message || "Failed to delete classroom" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }

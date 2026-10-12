@@ -1,9 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "";
+  if (!url || !key) return null;
+  return createSupabaseJsClient(url, key);
+}
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  Pragma: "no-cache",
+  Expires: "0",
+};
 
 export async function GET() {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client initialization failed. Missing credentials." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
+
     const { data: terms, error } = await supabase
       .from("academic_terms")
       .select("*")
@@ -11,7 +37,8 @@ export async function GET() {
       .order("termNumber", { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("GET academic_terms error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
     }
 
     const currentTerms = terms || [];
@@ -36,30 +63,46 @@ export async function GET() {
 
     if (missingToCreate.length > 0) {
       await supabase.from("academic_terms").upsert(missingToCreate, { onConflict: "schoolYear,termNumber" });
-      const { data: refreshed } = await supabase
+      const { data: refreshed, error: refreshError } = await supabase
         .from("academic_terms")
         .select("*")
         .order("schoolYear", { ascending: false })
         .order("termNumber", { ascending: true });
-      return NextResponse.json({ success: true, terms: refreshed || [] });
+
+      if (refreshError) {
+        console.error("Refresh academic_terms error:", refreshError);
+        return NextResponse.json({ error: refreshError.message }, { status: 500, headers: NO_CACHE_HEADERS });
+      }
+
+      return NextResponse.json({ success: true, terms: refreshed || [] }, { headers: NO_CACHE_HEADERS });
     }
 
-    return NextResponse.json({ success: true, terms: currentTerms });
+    return NextResponse.json({ success: true, terms: currentTerms }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch terms" }, { status: 500 });
+    console.error("GET academic_terms exception:", err);
+    return NextResponse.json({ error: err.message || "Failed to fetch terms" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client initialization failed. Missing credentials." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
     const body = await req.json();
 
     // ACTION: Create new School Year with 3 unconfigured Trimesters (1, 2, 3)
     if (body.action === "create_school_year" || (body.schoolYear && !body.termNumber)) {
       const cleanSY = String(body.schoolYear).trim();
       if (!cleanSY) {
-        return NextResponse.json({ error: "Please enter a valid School Year (e.g. 2027-2028)." }, { status: 400 });
+        return NextResponse.json(
+          { error: "Please enter a valid School Year (e.g. 2027-2028)." },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
       }
 
       const termsToCreate = [1, 2, 3].map((num) => ({
@@ -88,10 +131,11 @@ export async function POST(req: NextRequest) {
         .select();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("POST create_school_year error:", error);
+        return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
       }
 
-      return NextResponse.json({ success: true, schoolYear: cleanSY, terms: data });
+      return NextResponse.json({ success: true, schoolYear: cleanSY, terms: data }, { headers: NO_CACHE_HEADERS });
     }
 
     // ACTION: Update an existing Trimester's dates
@@ -119,7 +163,7 @@ export async function POST(req: NextRequest) {
     if (!schoolYear || !termNumber) {
       return NextResponse.json(
         { error: "School Year and Trimester Number are required." },
-        { status: 400 }
+        { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
@@ -161,23 +205,31 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("POST update term error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
     }
 
-    return NextResponse.json({ success: true, term: data });
+    return NextResponse.json({ success: true, term: data }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to save academic term" }, { status: 500 });
+    console.error("POST terms exception:", err);
+    return NextResponse.json({ error: err.message || "Failed to save academic term" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }
 
 export async function PATCH(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client initialization failed. Missing credentials." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
     const body = await req.json();
     const { id } = body;
 
     if (!id) {
-      return NextResponse.json({ error: "Term ID is required." }, { status: 400 });
+      return NextResponse.json({ error: "Term ID is required." }, { status: 400, headers: NO_CACHE_HEADERS });
     }
 
     // Deactivate all terms first
@@ -192,11 +244,13 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("PATCH activate term error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500, headers: NO_CACHE_HEADERS });
     }
 
-    return NextResponse.json({ success: true, activeTerm: data });
+    return NextResponse.json({ success: true, activeTerm: data }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to activate term" }, { status: 500 });
+    console.error("PATCH terms exception:", err);
+    return NextResponse.json({ error: err.message || "Failed to activate term" }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }

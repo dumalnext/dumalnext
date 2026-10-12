@@ -183,15 +183,25 @@ export default function AcademicCalendarManager() {
   const fetchTerms = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/it-support/terms");
-      const json = await res.json();
-      if (json.success) {
+      let res = await fetch(`/api/it-support/terms?_t=${Date.now()}`, { cache: "no-store" });
+      if (res.status === 404) {
+        res = await fetch(`/api/terms?_t=${Date.now()}`, { cache: "no-store" });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setTerms(json.terms || []);
       } else {
         setStatusMessage({ type: "error", text: json.error || "Failed to load academic terms." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Network error loading academic terms." });
+      console.error("fetchTerms error:", err);
+      setStatusMessage({ type: "error", text: err.message || "Network error loading academic terms." });
     } finally {
       setIsLoading(false);
     }
@@ -204,20 +214,33 @@ export default function AcademicCalendarManager() {
   // One-click Activate Term
   const handleActivate = async (termId: string, label: string) => {
     try {
-      const res = await fetch("/api/it-support/terms", {
+      let res = await fetch("/api/it-support/terms", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: termId }),
       });
-      const json = await res.json();
-      if (json.success) {
+      if (res.status === 404) {
+        res = await fetch("/api/terms", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: termId }),
+        });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setStatusMessage({ type: "success", text: `${label} has been activated as the official school calendar.` });
         fetchTerms();
       } else {
         setStatusMessage({ type: "error", text: json.error || "Failed to activate term." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Failed to activate academic term." });
+      setStatusMessage({ type: "error", text: err.message || "Failed to activate academic term." });
     }
   };
 
@@ -238,13 +261,26 @@ export default function AcademicCalendarManager() {
     if (!editingTerm) return;
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/it-support/terms", {
+      let res = await fetch("/api/it-support/terms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingTerm),
       });
-      const json = await res.json();
-      if (json.success) {
+      if (res.status === 404) {
+        res = await fetch("/api/terms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editingTerm),
+        });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setStatusMessage({
           type: "success",
           text: `Updated dates for ${editingTerm.schoolYear} - ${editingTerm.termName}.`,
@@ -256,7 +292,7 @@ export default function AcademicCalendarManager() {
         setStatusMessage({ type: "error", text: json.error || "Failed to update term dates." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Error saving trimester dates." });
+      setStatusMessage({ type: "error", text: err.message || "Error saving trimester dates." });
     } finally {
       setIsSubmitting(false);
     }
@@ -268,7 +304,7 @@ export default function AcademicCalendarManager() {
     if (!newSchoolYear.trim()) return;
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/it-support/terms", {
+      let res = await fetch("/api/it-support/terms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -276,8 +312,24 @@ export default function AcademicCalendarManager() {
           schoolYear: newSchoolYear.trim(),
         }),
       });
-      const json = await res.json();
-      if (json.success) {
+      if (res.status === 404) {
+        res = await fetch("/api/terms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "create_school_year",
+            schoolYear: newSchoolYear.trim(),
+          }),
+        });
+      }
+      const rawText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(rawText);
+      } catch {
+        throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
+      }
+      if (res.ok && json.success) {
         setStatusMessage({
           type: "success",
           text: `School Year ${newSchoolYear} initialized with Trimesters 1, 2, and 3. Click EDIT on any trimester to expand and configure dates.`,
@@ -289,7 +341,7 @@ export default function AcademicCalendarManager() {
         setStatusMessage({ type: "error", text: json.error || "Failed to create School Year." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Error creating School Year." });
+      setStatusMessage({ type: "error", text: err.message || "Error creating School Year." });
     } finally {
       setIsSubmitting(false);
     }
