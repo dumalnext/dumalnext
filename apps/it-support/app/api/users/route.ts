@@ -254,8 +254,70 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Generate an onboarding invitation link for staff roles
+    let inviteUrl = "";
+    let token = "";
+    if (["teacher", "admin", "it_support"].includes(cleanRole)) {
+      const randomHex = Math.random().toString(36).substring(2, 12);
+      token = `${Date.now()}_${randomHex}`;
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      try {
+        const { data: setRow } = await supabase
+          .from("system_settings")
+          .select("value")
+          .eq("key", "staff_invitations")
+          .maybeSingle();
+
+        let invitationsList: any[] = [];
+        if (setRow && setRow.value && Array.isArray(setRow.value.invitations)) {
+          invitationsList = setRow.value.invitations;
+        }
+
+        const newInv = {
+          id: `inv_${Date.now()}_${randomHex}`,
+          email: cleanEmail,
+          role: cleanRole,
+          fullName: fullName || "",
+          department: department || "",
+          token,
+          status: "pending",
+          invitedAt: new Date().toISOString(),
+          acceptedAt: null,
+          expiresAt,
+        };
+
+        const updated = invitationsList.filter(
+          (i: any) => !(i.email === cleanEmail && i.role === cleanRole && i.status === "pending")
+        );
+        updated.unshift(newInv);
+
+        await supabase.from("system_settings").upsert({
+          key: "staff_invitations",
+          value: { invitations: updated },
+          updated_at: new Date().toISOString(),
+        });
+      } catch (invErr) {
+        console.warn("Notice: could not save staff invitation in system_settings:", invErr);
+      }
+
+      const host = req.headers.get("host") || "";
+      const isLocal = req.url.includes("localhost") || req.url.includes("127.0.0.1") || host.includes("localhost");
+      let portalBaseUrl = "";
+      if (cleanRole === "teacher") {
+        portalBaseUrl = isLocal ? "http://localhost:3001" : (process.env.NEXT_PUBLIC_TEACHER_URL || "https://dumalnext-teacher.vercel.app");
+      } else if (cleanRole === "admin") {
+        portalBaseUrl = isLocal ? "http://localhost:3000" : (process.env.NEXT_PUBLIC_ADMIN_URL || "https://dumalnext-admin.vercel.app");
+      } else {
+        portalBaseUrl = isLocal ? "http://localhost:3003" : (process.env.NEXT_PUBLIC_ITSUPPORT_URL || "https://dumalnext-it-support.vercel.app");
+      }
+      inviteUrl = `${portalBaseUrl}/?token=${token}`;
+    }
+
     return NextResponse.json({
       success: true,
+      inviteUrl,
+      token,
       user: {
         id: userData.id,
         userId: userData.user_id || cleanUserId,

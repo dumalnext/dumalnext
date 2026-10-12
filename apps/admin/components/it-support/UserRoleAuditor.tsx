@@ -50,11 +50,13 @@ export default function UserRoleAuditor() {
   const [userToDelete, setUserToDelete] = useState<SystemUser | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [provisionedLink, setProvisionedLink] = useState<{ email: string; url: string; role: string } | null>(null);
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
+
   const [formData, setFormData] = useState({
     userId: "",
     fullName: "",
     email: "",
-    password: "password123",
     userRole: "teacher",
     department: "CROSS_LEVEL",
   });
@@ -132,14 +134,20 @@ export default function UserRoleAuditor() {
       if (json.success) {
         setStatusMessage({
           type: "success",
-          text: `User ${formData.userId} provisioned successfully with role ${formData.userRole}.`,
+          text: `User ${formData.userId} provisioned successfully with role ${formData.userRole}. An invitation link has been generated for ${formData.email}.`,
         });
+        if (json.inviteUrl) {
+          setProvisionedLink({
+            email: formData.email,
+            url: json.inviteUrl,
+            role: formData.userRole,
+          });
+        }
         setIsModalOpen(false);
         setFormData({
           userId: "",
           fullName: "",
           email: "",
-          password: "password123",
           userRole: "teacher",
           department: "CROSS_LEVEL",
         });
@@ -236,6 +244,57 @@ export default function UserRoleAuditor() {
         >
           {statusMessage.type === "success" ? "STATUS: " : "ERROR: "}
           {statusMessage.text}
+        </div>
+      )}
+
+      {provisionedLink && (
+        <div className="p-4 bg-emerald-50 border-2 border-emerald-600 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
+              [ ONBOARDING INVITATION LINK READY FOR {provisionedLink.email.toUpperCase()} ]
+            </span>
+            <button
+              type="button"
+              onClick={() => setProvisionedLink(null)}
+              className="text-[11px] font-mono font-bold text-emerald-800 hover:text-emerald-950"
+            >
+              [ CLOSE X ]
+            </button>
+          </div>
+          <p className="text-xs text-emerald-900">
+            Initial password field has been removed. Share this secure link with the recipient so they can create their own password:
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+            <input
+              type="text"
+              readOnly
+              value={provisionedLink.url}
+              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-none select-all text-slate-900"
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(provisionedLink.url);
+                  setCopiedLink(true);
+                  setTimeout(() => setCopiedLink(false), 3000);
+                } catch {
+                  prompt("Copy invite link:", provisionedLink.url);
+                }
+              }}
+              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer"
+            >
+              {copiedLink ? "[ COPIED TO CLIPBOARD ]" : "[ COPY INVITE LINK ]"}
+            </button>
+            <a
+              href={provisionedLink.url}
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center shrink-0"
+            >
+              [ OPEN LOGIN / CREATE PASSWORD ]
+            </a>
+          </div>
         </div>
       )}
 
@@ -844,17 +903,9 @@ export default function UserRoleAuditor() {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold uppercase text-slate-800 mb-1">
-                  Initial Password <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
-                />
+              <div className="p-3 bg-blue-50 border border-blue-200 text-[11px] text-[#002060]">
+                <strong className="block uppercase font-bold">Zero Initial Password Policy:</strong>
+                <span>IT Support does not set passwords. Saving this account will generate a secure invitation link for the user to create their own password upon onboarding.</span>
               </div>
 
               {formData.userRole === "teacher" && (
@@ -888,7 +939,7 @@ export default function UserRoleAuditor() {
                   disabled={isSubmitting}
                   className="px-5 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
                 >
-                  {isSubmitting ? "Provisioning..." : "Save Account"}
+                  {isSubmitting ? "Provisioning..." : "+ Save & Issue Invitation"}
                 </button>
               </div>
             </form>

@@ -211,15 +211,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Determine base URL
-    const origin =
-      req.headers.get("origin") ||
-      req.headers.get("referer")?.split("/").slice(0, 3).join("/") ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      process.env.NEXT_PUBLIC_ADMIN_URL ||
-      "http://localhost:3002";
+    // Determine role-specific portal URL
+    const host = req.headers.get("host") || "";
+    const isLocal = req.url.includes("localhost") || req.url.includes("127.0.0.1") || host.includes("localhost");
+    let portalBaseUrl = "";
+    if (role === "teacher") {
+      portalBaseUrl = isLocal ? "http://localhost:3001" : (process.env.NEXT_PUBLIC_TEACHER_URL || "https://dumalnext-teacher.vercel.app");
+    } else if (role === "admin") {
+      portalBaseUrl = isLocal ? "http://localhost:3000" : (process.env.NEXT_PUBLIC_ADMIN_URL || "https://dumalnext-admin.vercel.app");
+    } else {
+      portalBaseUrl = isLocal ? "http://localhost:3003" : (process.env.NEXT_PUBLIC_ITSUPPORT_URL || "https://dumalnext-it-support.vercel.app");
+    }
 
-    const inviteUrl = `${origin}/accept-invite?token=${token}`;
+    const inviteUrl = `${portalBaseUrl}/?token=${token}`;
 
     return NextResponse.json(
       {

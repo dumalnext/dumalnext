@@ -119,7 +119,17 @@ export default function StaffInvitationManager() {
       }
 
       if (res.ok && json.success) {
-        const fullUrl = json.inviteUrl || `${window.location.origin}/accept-invite?token=${json.invitation.token}`;
+        const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+        let defaultBase = "";
+        if (json.invitation.role === "teacher") {
+          defaultBase = isLocal ? "http://localhost:3001" : "https://dumalnext-teacher.vercel.app";
+        } else if (json.invitation.role === "admin") {
+          defaultBase = isLocal ? "http://localhost:3000" : "https://dumalnext-admin.vercel.app";
+        } else {
+          defaultBase = isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app";
+        }
+        const fullUrl = json.inviteUrl || `${defaultBase}/?token=${json.invitation.token}`;
+
         setLastGeneratedLink({
           email: json.invitation.email,
           role: json.invitation.role,
@@ -528,7 +538,16 @@ export default function StaffInvitationManager() {
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {filteredInvitations.map((inv) => {
-                  const inviteUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/accept-invite?token=${inv.token}`;
+                  const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+                  let portalBase = "";
+                  if (inv.role === "teacher") {
+                    portalBase = isLocal ? "http://localhost:3001" : "https://dumalnext-teacher.vercel.app";
+                  } else if (inv.role === "admin") {
+                    portalBase = isLocal ? "http://localhost:3000" : "https://dumalnext-admin.vercel.app";
+                  } else {
+                    portalBase = isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app";
+                  }
+                  const inviteUrl = `${portalBase}/?token=${inv.token}`;
                   const isPending = inv.status === "pending";
 
                   return (
