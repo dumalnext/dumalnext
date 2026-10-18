@@ -68,19 +68,34 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
       }
 
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user && session.user.email?.toLowerCase() === AUTHORIZED_IT_EMAIL.toLowerCase()) {
-        const verifiedUser: ITSupportUser = {
-          id: session.user.id,
-          userId: "DNHS-IT-001",
-          email: AUTHORIZED_IT_EMAIL,
-          fullName: "DNHS IT Operations & Systems Desk",
-          systemRole: "System Administrator",
-          userRole: "it_support",
-        };
-        setUser(verifiedUser);
-        setSessionCookie(verifiedUser);
-        setIsLoading(false);
-        return;
+      if (session?.user) {
+        const sEmail = (session.user.email || "").toLowerCase().trim();
+        const { data: itUsers } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role")
+          .eq("email", sEmail)
+          .maybeSingle();
+
+        if (itUsers && itUsers.user_role === "it_support") {
+          const verifiedUser: ITSupportUser = {
+            id: session.user.id,
+            userId: itUsers.user_id || "DNHS-IT-001",
+            email: sEmail,
+            fullName: "DNHS IT Operations & Systems Desk",
+            systemRole: "System Administrator",
+            userRole: "it_support",
+          };
+          setUser(verifiedUser);
+          setSessionCookie(verifiedUser);
+          setIsLoading(false);
+          return;
+        } else {
+          await supabase.auth.signOut();
+          clearSessionCookie();
+          setUser(null);
+          setIsLoading(false);
+          return;
+        }
       }
 
       setUser(null);
@@ -104,17 +119,84 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
     const cleanPass = password.trim();
 
     if (!cleanId) {
-      return { success: false, error: "Please enter your authorized IT Support email (dumalnext@gmail.com)." };
+      return { success: false, error: "Please enter your authorized IT Support email or username." };
     }
     if (!cleanPass) {
       return { success: false, error: "Please enter your account password." };
     }
 
-    if (cleanId !== AUTHORIZED_IT_EMAIL.toLowerCase() && cleanId !== "dnhs-it-001") {
-      return {
-        success: false,
-        error: "Access Denied: Only the authorized administrator email (dumalnext@gmail.com) is permitted to access the IT Support portal.",
-      };
+    // Check if entered email belongs to another stakeholder role
+    if (cleanId.includes("@")) {
+      const { data: matchedRoleUsers } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role")
+        .eq("email", cleanId)
+        .limit(1);
+
+      if (matchedRoleUsers && matchedRoleUsers.length > 0) {
+        const uRole = (matchedRoleUsers[0].user_role || "").toLowerCase();
+        if (uRole && uRole !== "it_support") {
+          let roleTitle = "School User";
+          let portalUrl = "https://dumalnext.vercel.app";
+          if (uRole === "student") {
+            roleTitle = "Student Learner";
+            portalUrl = "https://dumalnext.vercel.app";
+          } else if (uRole === "teacher") {
+            roleTitle = "Faculty Teacher";
+            portalUrl = "https://dumalnext-teacher.vercel.app";
+          } else if (uRole === "admin") {
+            roleTitle = "School Administrator";
+            portalUrl = "https://dumalnext-admin.vercel.app";
+          }
+          return {
+            success: false,
+            error: `Access Denied: This account is officially registered as a ${roleTitle}. Please sign in through the designated portal (${portalUrl}).`,
+          };
+        }
+      }
+    }
+
+    const isMasterIT = cleanId === AUTHORIZED_IT_EMAIL.toLowerCase() || cleanId === "dnhs-it-001";
+    if (!isMasterIT) {
+      const { data: itStaffUser } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role")
+        .eq("email", cleanId)
+        .eq("user_role", "it_support")
+        .maybeSingle();
+
+      if (!itStaffUser) {
+        return {
+          success: false,
+          error: "Access Denied: Only authorized IT Support personnel of Dumalneg NHS are permitted to access this workstation.",
+        };
+      }
+
+      const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+        email: cleanId,
+        password: cleanPass,
+      });
+
+      if (authErr) {
+        return {
+          success: false,
+          error: "Invalid IT Support password. Please check your credentials or reset your password.",
+        };
+      }
+
+      if (authData.user) {
+        const sessionUser: ITSupportUser = {
+          id: authData.user.id,
+          userId: itStaffUser.user_id || "DNHS-IT-STAFF",
+          email: cleanId,
+          fullName: "DNHS IT Operations & Systems Desk",
+          systemRole: "System Administrator",
+          userRole: "it_support",
+        };
+        setUser(sessionUser);
+        setSessionCookie(sessionUser);
+        return { success: true };
+      }
     }
 
     if (cleanPass !== AUTHORIZED_IT_PASS) {

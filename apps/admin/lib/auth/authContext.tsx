@@ -66,31 +66,45 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const authUser = session.user;
+        const cleanEmail = (authUser.email || "").trim().toLowerCase();
         let { data: suUsers } = await supabase
           .from("users")
           .select("id, user_id, email, user_role")
-          .eq("email", authUser.email || "")
+          .eq("email", cleanEmail)
           .limit(1);
 
         let suUser = suUsers?.[0];
+
+        // Strict Role Gate: If session belongs to student, teacher, or it_support, deny admin access
+        if (suUser && suUser.user_role && suUser.user_role !== "admin") {
+          await supabase.auth.signOut();
+          clearSessionCookie();
+          setUser(null);
+          return;
+        }
+
         if (!suUser) {
-          const newAdmin = {
-            id: authUser.id,
-            user_id: "DNHS-ADM-001",
-            email: authUser.email || "",
-            user_role: "admin",
-          };
-          await supabase.from("users").insert(newAdmin);
-          await supabase.from("school_administrators").insert({
-            user_id: authUser.id,
-            first_name: "OFFICE OF THE",
-            last_name: "REGISTRAR",
-            department: "Academic Admissions",
-          });
-          suUser = newAdmin as any;
-        } else if (suUser.user_role !== "admin") {
-          await supabase.from("users").update({ user_role: "admin" }).eq("id", suUser.id);
-          suUser.user_role = "admin";
+          if (cleanEmail === "heartistrichford@gmail.com") {
+            const newAdmin = {
+              id: authUser.id,
+              user_id: "DNHS-ADM-001",
+              email: cleanEmail,
+              user_role: "admin",
+            };
+            await supabase.from("users").insert(newAdmin);
+            await supabase.from("school_administrators").insert({
+              user_id: authUser.id,
+              first_name: "OFFICE OF THE",
+              last_name: "REGISTRAR",
+              department: "Academic Admissions",
+            });
+            suUser = newAdmin as any;
+          } else {
+            await supabase.auth.signOut();
+            clearSessionCookie();
+            setUser(null);
+            return;
+          }
         }
 
         if (suUser && suUser.user_role === "admin") {
@@ -209,6 +223,35 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // 1. If email, attempt Supabase Auth with Gmail verification check
       if (cleanId.includes("@")) {
+        // Pre-check role in public.users table
+        const { data: preCheckRole } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role")
+          .eq("email", cleanId)
+          .limit(1);
+
+        if (preCheckRole && preCheckRole.length > 0) {
+          const uRole = (preCheckRole[0].user_role || "").toLowerCase();
+          if (uRole && uRole !== "admin") {
+            let roleTitle = "School User";
+            let portalUrl = "https://dumalnext.vercel.app";
+            if (uRole === "student") {
+              roleTitle = "Student Learner";
+              portalUrl = "https://dumalnext.vercel.app";
+            } else if (uRole === "teacher") {
+              roleTitle = "Faculty Teacher";
+              portalUrl = "https://dumalnext-teacher.vercel.app";
+            } else if (uRole === "it_support") {
+              roleTitle = "IT Support";
+              portalUrl = "https://dumalnext-it-support.vercel.app";
+            }
+            return {
+              success: false,
+              error: `Access Denied: This account is officially registered as a ${roleTitle}. Please sign in through the designated portal (${portalUrl}).`,
+            };
+          }
+        }
+
         const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
           email: cleanId,
           password: cleanPass,
@@ -224,6 +267,23 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
             };
           }
         } else if (authData.user) {
+          const { data: postCheckRole } = await supabase
+            .from("users")
+            .select("id, user_role")
+            .eq("email", cleanId)
+            .limit(1);
+
+          const postRole = postCheckRole?.[0]?.user_role;
+          if (postRole && postRole !== "admin") {
+            await supabase.auth.signOut();
+            clearSessionCookie();
+            setUser(null);
+            return {
+              success: false,
+              error: `Access Denied: This account is registered as "${postRole}". Administrator access is prohibited.`,
+            };
+          }
+
           await refreshSession();
           return { success: true };
         }
@@ -353,6 +413,23 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // Pre-check role collision across all stakeholders
+      const { data: existingUsers } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role")
+        .eq("email", cleanEmail)
+        .limit(1);
+
+      if (existingUsers && existingUsers.length > 0) {
+        const existingRole = (existingUsers[0].user_role || "").toLowerCase();
+        if (existingRole !== "admin") {
+          return {
+            success: false,
+            error: `Registration Denied: This email is already registered under role "${existingRole}". An email cannot hold multiple stakeholder roles.`,
+          };
+        }
+      }
+
       const redirectUrl = typeof window !== "undefined"
         ? `${window.location.origin}/auth/callback?next=/adjudication`
         : "https://dumalnext-admin.vercel.app/auth/callback?next=/adjudication";

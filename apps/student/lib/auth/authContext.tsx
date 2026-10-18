@@ -79,13 +79,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const authUser = session.user;
+        const cleanEmail = (authUser.email || "").trim().toLowerCase();
         const { data: suUserData } = await supabase
           .from("users")
           .select("id, user_id, email, user_role")
-          .eq("email", authUser.email || "")
+          .eq("email", cleanEmail)
           .limit(1);
 
         const suUser = suUserData?.[0];
+
+        // Strict Role Gate: If session belongs to a teacher, admin, or it_support, deny student access
+        if (suUser && suUser.user_role && suUser.user_role !== "student") {
+          await supabase.auth.signOut();
+          clearSessionCookie();
+          setUser(null);
+          return;
+        }
+
         const userDbId = suUser?.id || authUser.id;
         const userDisplayId = suUser?.user_id || `DNHS-STU-${authUser.id.slice(0, 5).toUpperCase()}`;
 
@@ -134,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from("users")
         .select("id, user_id, email, user_role")
         .eq("id", cachedUser.id)
+        .eq("user_role", "student")
         .limit(1);
 
       if (verified && verified.length > 0) {
@@ -202,6 +213,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // 1. If identifier is an Email, authenticate via Supabase Auth
       if (cleanId.includes("@")) {
+        // Pre-check users table for role collision
+        const { data: preRoleUsers } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role")
+          .eq("email", cleanId)
+          .limit(1);
+
+        const existingRole = preRoleUsers?.[0]?.user_role;
+        if (existingRole && existingRole !== "student") {
+          let roleTitle = "School Staff";
+          let portalLink = "https://dumalnext.vercel.app";
+          if (existingRole === "teacher") {
+            roleTitle = "Faculty Teacher";
+            portalLink = "https://dumalnext-teacher.vercel.app";
+          } else if (existingRole === "admin") {
+            roleTitle = "School Administrator";
+            portalLink = "https://dumalnext-admin.vercel.app";
+          } else if (existingRole === "it_support") {
+            roleTitle = "IT Operations / Support";
+            portalLink = "https://dumalnext-it-support.vercel.app";
+          }
+          return {
+            success: false,
+            error: `Access Denied: This email address is officially registered as a ${roleTitle} account. Please sign in via your designated portal: ${portalLink}.`,
+          };
+        }
+
         const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
           email: cleanId,
           password: cleanPass,
@@ -226,6 +264,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (authData.user) {
+          // Post-auth role verification
+          const { data: postUsers } = await supabase
+            .from("users")
+            .select("id, user_id, email, user_role")
+            .eq("email", cleanId)
+            .limit(1);
+
+          const postRole = postUsers?.[0]?.user_role;
+          if (postRole && postRole !== "student") {
+            await supabase.auth.signOut();
+            clearSessionCookie();
+            setUser(null);
+            return {
+              success: false,
+              error: `Access Denied: This account is officially registered as ${postRole}. Only enrolled learners and student applicants can access this portal.`,
+            };
+          }
+
           await refreshSession();
           return { success: true };
         }
@@ -334,7 +390,102 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: "Password must be at least 6 characters in length." };
     }
 
+    // Strict Trapping 1: Reserved Institutional Accounts
+    if (cleanEmail === "dumalnext@gmail.com") {
+      return {
+        success: false,
+        error: "Access Denied: dumalnext@gmail.com is permanently reserved as the Master IT Support account. It cannot be registered as a Student account.",
+      };
+    }
+    if (cleanEmail === "heartistrichford@gmail.com") {
+      return {
+        success: false,
+        error: "Access Denied: heartistrichford@gmail.com is permanently reserved as the School Administrator account. It cannot be registered as a Student account.",
+      };
+    }
+
     try {
+      // Strict Trapping 2: Check existing accounts in public.users table
+      const { data: existingUsers, error: userLookupErr } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role")
+        .eq("email", cleanEmail)
+        .limit(1);
+
+      if (!userLookupErr && existingUsers && existingUsers.length > 0) {
+        const found = existingUsers[0];
+        const role = (found.user_role || "").toLowerCase();
+        if (role === "teacher") {
+          return {
+            success: false,
+            error: "Error: This email address is already registered as an official Faculty Teacher account. Under institutional policy, an email cannot be reused for multiple stakeholder roles.",
+          };
+        }
+        if (role === "admin") {
+          return {
+            success: false,
+            error: "Error: This email address is already registered as an official School Administrator account. Under institutional policy, an email cannot be reused for multiple stakeholder roles.",
+          };
+        }
+        if (role === "it_support") {
+          return {
+            success: false,
+            error: "Error: This email address is already registered as an official IT Support account. Under institutional policy, an email cannot be reused for multiple stakeholder roles.",
+          };
+        }
+        if (role === "student") {
+          return {
+            success: false,
+            error: "An account with this Gmail address already exists in the learner database. Please sign in or reset your password.",
+            unconfirmedEmail: cleanEmail,
+          };
+        }
+        return {
+          success: false,
+          error: `Error: This email address is already in use by a ${role} account. A single email cannot be shared across multiple roles.`,
+        };
+      }
+
+      // Strict Trapping 3: Check public.teachers table
+      const { data: teacherFound } = await supabase
+        .from("teachers")
+        .select("id, teacher_id, first_name, last_name, email")
+        .eq("email", cleanEmail)
+        .limit(1);
+
+      if (teacherFound && teacherFound.length > 0) {
+        const t = teacherFound[0];
+        return {
+          success: false,
+          error: `Error: This email address belongs to Faculty Teacher ${t.first_name || ""} ${t.last_name || ""} (${t.teacher_id || "Faculty"}). Faculty emails cannot be used to create a Student account.`,
+        };
+      }
+
+      // Strict Trapping 4: Check system_settings for staff invitations
+      const { data: settingsData } = await supabase
+        .from("system_settings")
+        .select("value")
+        .eq("key", "staff_invitations")
+        .maybeSingle();
+
+      if (settingsData?.value?.invitations && Array.isArray(settingsData.value.invitations)) {
+        const inv = settingsData.value.invitations.find(
+          (i: any) => i.email && i.email.toLowerCase() === cleanEmail && i.status !== "revoked"
+        );
+        if (inv) {
+          const roleLabel =
+            inv.role === "teacher"
+              ? "Faculty Teacher"
+              : inv.role === "admin"
+              ? "School Administrator"
+              : "IT Support";
+          return {
+            success: false,
+            error: `Error: This email address has been provisioned under an official ${roleLabel} invitation. It cannot be used to register a Student account. Please check your invitation email.`,
+          };
+        }
+      }
+
       const redirectUrl = typeof window !== "undefined"
         ? `${window.location.origin}/auth/callback?next=/enroll`
         : "https://dumalnext.vercel.app/auth/callback?next=/enroll";
@@ -365,8 +516,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
         return {
           success: false,
-          error: "An account with this Gmail address already exists. Please sign in or click Resend Verification.",
+          error: "An account with this Gmail address already exists in the system. Please sign in or click Resend Verification.",
           unconfirmedEmail: cleanEmail,
+        };
+      }
+
+      // Verify once more that no concurrent process inserted another role
+      const { data: finalCheck } = await supabase
+        .from("users")
+        .select("id, user_role")
+        .eq("email", cleanEmail)
+        .maybeSingle();
+
+      if (finalCheck && finalCheck.user_role && finalCheck.user_role !== "student") {
+        return {
+          success: false,
+          error: `Critical Error: Account collision detected. This email is assigned to role "${finalCheck.user_role}".`,
         };
       }
 
@@ -374,7 +539,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const newUserId = `DNHS-STU-${Math.floor(10000 + Math.random() * 90000)}`;
       const authUserId = authData.user?.id;
 
-      // 2. Direct Cloud Insert/Upsert to Supabase 'users' table
+      // 2. Direct Cloud Insert to Supabase 'users' table
       const userPayload: Record<string, any> = {
         id: authUserId,
         user_id: newUserId,

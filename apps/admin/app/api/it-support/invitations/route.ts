@@ -174,7 +174,86 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Reserved Accounts Verification
+    if (cleanEmail === "dumalnext@gmail.com" && role !== "it_support") {
+      return NextResponse.json(
+        { error: "Stakeholder policy violation: dumalnext@gmail.com is permanently reserved as the Master IT Support account." },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+    if (cleanEmail === "heartistrichford@gmail.com" && role !== "admin") {
+      return NextResponse.json(
+        { error: "Stakeholder policy violation: heartistrichford@gmail.com is permanently reserved as the Primary School Administrator account." },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    // Check public.users table for cross-role collision
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id, user_id, email, user_role")
+      .eq("email", cleanEmail)
+      .maybeSingle();
+
+    if (existingUser) {
+      const existingRole = (existingUser.user_role || "").toLowerCase();
+      if (existingRole === "student") {
+        return NextResponse.json(
+          { error: `Stakeholder conflict: ${cleanEmail} is already registered as an enrolled or applicant Student (${existingUser.user_id || "Student"}). Under institutional policy, student emails cannot be invited to staff roles.` },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
+      }
+      if (existingRole !== role) {
+        return NextResponse.json(
+          { error: `Stakeholder conflict: ${cleanEmail} is already registered with role "${existingRole}". An email address cannot hold multiple stakeholder roles.` },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
+      }
+      if (existingRole === role) {
+        return NextResponse.json(
+          { error: `Account already active: An active ${role} account (${cleanEmail}) already exists in the system.` },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
+      }
+    }
+
+    // Check public.teachers table
+    const { data: teacherFound } = await supabase
+      .from("teachers")
+      .select("id, teacher_id, first_name, last_name, email")
+      .eq("email", cleanEmail)
+      .maybeSingle();
+
+    if (teacherFound && role !== "teacher") {
+      return NextResponse.json(
+        { error: `Stakeholder conflict: ${cleanEmail} is already assigned to Faculty Teacher ${teacherFound.first_name || ""} ${teacherFound.last_name || ""} (${teacherFound.teacher_id || "Faculty"}).` },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
     const invitations = await getStoredInvitations(supabase);
+
+    // Check cross-role collision in existing invitations
+    const conflictInvite = invitations.find(
+      (i) => i.email === cleanEmail && i.role !== role && i.status !== "revoked"
+    );
+    if (conflictInvite) {
+      const assignedRoleLabel = conflictInvite.role === "teacher" ? "Faculty Teacher" : conflictInvite.role === "admin" ? "School Administrator" : "IT Support";
+      return NextResponse.json(
+        { error: `Stakeholder conflict: ${cleanEmail} already has an active invitation for ${assignedRoleLabel}. Please revoke the existing invitation before inviting under a different role.` },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    const alreadyAccepted = invitations.find(
+      (i) => i.email === cleanEmail && i.role === role && i.status === "accepted"
+    );
+    if (alreadyAccepted) {
+      return NextResponse.json(
+        { error: `This invitation for ${cleanEmail} has already been accepted and activated.` },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
 
     // Generate unique secure token
     const randomHex = Math.random().toString(36).substring(2, 12);

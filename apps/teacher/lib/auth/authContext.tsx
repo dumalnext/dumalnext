@@ -78,6 +78,14 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
 
         const suUser = suUsers?.[0];
 
+        // Strict Role Gate: If session belongs to student, admin, or it_support, deny teacher access
+        if (suUser && suUser.user_role && suUser.user_role !== "teacher") {
+          await supabase.auth.signOut();
+          clearSessionCookie();
+          setUser(null);
+          return;
+        }
+
         // Query teacher profile
         const { data: teachers } = await supabase
           .from("teachers")
@@ -86,6 +94,13 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
           .limit(1);
 
         const teacherRecord = teachers?.[0];
+        if (!teacherRecord && suUser?.user_role !== "teacher") {
+          await supabase.auth.signOut();
+          clearSessionCookie();
+          setUser(null);
+          return;
+        }
+
         const firstName = teacherRecord?.first_name || "Faculty";
         const lastName = teacherRecord?.last_name || "Member";
         const department = teacherRecord?.department || "CROSS_LEVEL";
@@ -112,15 +127,28 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
 
       // 2. Fallback to session cookie
       const cookieUser = getSessionCookie();
-      if (cookieUser) {
-        setUser(cookieUser);
+      if (cookieUser && cookieUser.userRole === "teacher") {
+        const { data: verified } = await supabase
+          .from("users")
+          .select("id, user_role")
+          .eq("id", cookieUser.id)
+          .eq("user_role", "teacher")
+          .limit(1);
+
+        if (verified && verified.length > 0) {
+          setUser(cookieUser);
+        } else {
+          clearSessionCookie();
+          setUser(null);
+        }
       } else {
+        clearSessionCookie();
         setUser(null);
       }
     } catch (err) {
       console.warn("Notice reading teacher session:", err);
-      const cookieUser = getSessionCookie();
-      if (cookieUser) setUser(cookieUser);
+      clearSessionCookie();
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +210,36 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         }
       }
 
-      // 2. Sign in with Supabase Auth
+      // 2. Pre-check role in public.users table to prevent cross-role login
+      const { data: preUsers } = await supabase
+        .from("users")
+        .select("id, user_id, email, user_role")
+        .eq("email", targetEmail)
+        .limit(1);
+
+      if (preUsers && preUsers.length > 0) {
+        const uRole = (preUsers[0].user_role || "").toLowerCase();
+        if (uRole && uRole !== "teacher") {
+          let roleTitle = "School User";
+          let portalUrl = "https://dumalnext.vercel.app";
+          if (uRole === "student") {
+            roleTitle = "Student Learner";
+            portalUrl = "https://dumalnext.vercel.app";
+          } else if (uRole === "admin") {
+            roleTitle = "School Administrator";
+            portalUrl = "https://dumalnext-admin.vercel.app";
+          } else if (uRole === "it_support") {
+            roleTitle = "IT Support";
+            portalUrl = "https://dumalnext-it-support.vercel.app";
+          }
+          return {
+            success: false,
+            error: `Access Denied: This account is registered as a ${roleTitle}. Please sign in through the designated portal (${portalUrl}).`,
+          };
+        }
+      }
+
+      // 3. Sign in with Supabase Auth
       const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
         email: targetEmail,
         password: cleanPass,
@@ -225,7 +282,7 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         return { success: false, error: "Authentication failed. Please try again." };
       }
 
-      // Fetch teacher record
+      // 4. Fetch teacher record & verify teacher role
       const { data: teacherRecords } = await supabase
         .from("teachers")
         .select("*")
@@ -233,6 +290,33 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         .limit(1);
 
       const tch = teacherRecords?.[0];
+      const { data: verifyRole } = await supabase
+        .from("users")
+        .select("user_role")
+        .eq("email", targetEmail)
+        .limit(1);
+
+      const dbRole = verifyRole?.[0]?.user_role;
+      if (dbRole && dbRole !== "teacher") {
+        await supabase.auth.signOut();
+        clearSessionCookie();
+        setUser(null);
+        return {
+          success: false,
+          error: `Access Denied: This account has role "${dbRole}". Only authorized teachers may access the Faculty Workstation.`,
+        };
+      }
+
+      if (!tch && dbRole !== "teacher") {
+        await supabase.auth.signOut();
+        clearSessionCookie();
+        setUser(null);
+        return {
+          success: false,
+          error: "Access Denied: No active faculty profile found for this email address.",
+        };
+      }
+
       const firstName = tch?.first_name || "Faculty";
       const lastName = tch?.last_name || "Member";
       const department = tch?.department || "CROSS_LEVEL";

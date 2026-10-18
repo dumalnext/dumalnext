@@ -181,6 +181,16 @@ export async function POST(req: NextRequest) {
     let userData = existingUsers?.[0] || null;
 
     if (userData) {
+      const existingRole = (userData.user_role || "").toLowerCase();
+      if (existingRole && existingRole !== cleanRole) {
+        return NextResponse.json(
+          {
+            error: `Stakeholder Conflict: This account (${cleanEmail}) is already registered as a "${existingRole}". Under institutional policy, an email address cannot be reassigned to a different role.`,
+          },
+          { status: 400 }
+        );
+      }
+
       const { data: updated, error: updateError } = await supabase
         .from("users")
         .update({

@@ -173,9 +173,18 @@ export async function POST(req: NextRequest) {
 
     const { data: existingUserRow } = await supabase
       .from("users")
-      .select("user_id")
+      .select("user_id, user_role")
       .eq("email", email)
       .maybeSingle();
+
+    if (existingUserRow && existingUserRow.user_role && existingUserRow.user_role !== "teacher") {
+      return NextResponse.json(
+        {
+          error: `Stakeholder Conflict: This email address is already registered as a "${existingUserRow.user_role}". Faculty invitation acceptance is blocked under institutional single-role policy.`,
+        },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
 
     if (existingUserRow && existingUserRow.user_id) {
       userPayload.user_id = existingUserRow.user_id;
