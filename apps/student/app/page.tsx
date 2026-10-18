@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 import SeparatedOtpInput from "@/components/SeparatedOtpInput";
+import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/components/StudentVideoTutorials";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -1097,13 +1098,22 @@ function StudentHomeContent() {
                 </div>
               </div>
             )}
+
+            {/* Online Enrollment Video Tutorials by Grade Level (0 MB Storage Stream) */}
+            <GradeLevelEnrollmentTutorials
+              initialGrade={assignedSection?.gradeLevel || pastApplications[0]?.gradeLevel || 7}
+              schoolYear={schoolYear}
+              semester={semester}
+              isEnrollmentOpen={isEnrollmentOpen}
+            />
           </div>
         </div>
       ) : (
         /* =========================================================================
            VIEW B: UNAUTHENTICATED APPLICANT PORTAL (LOGIN OR REGISTER FIRST)
            ========================================================================= */
-        <div className="bg-white border-2 border-[#002060] shadow-sm rounded-[4px] overflow-hidden">
+        <div className="space-y-6">
+          <div className="bg-white border-2 border-[#002060] shadow-sm rounded-[4px] overflow-hidden">
           {/* Tab Selector: Sign In vs Create Account */}
           <div className="grid grid-cols-2 border-b-2 border-slate-200 text-center font-bold text-xs">
             <button
@@ -1472,7 +1482,20 @@ function StudentHomeContent() {
             )}
           </div>
         </div>
-      )}
+
+        {/* Account Creation Video Tutorial (0 MB Storage Stream) */}
+        <AccountCreationTutorial
+          onSwitchToRegister={() => {
+            setActiveTab("register");
+            setRegErrors({});
+            setRegSuccessNotice("");
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        />
+      </div>
+    )}
 
       {/* Institutional Services Reference Section */}
       <section className="bg-slate-100 p-6 border border-slate-200 rounded-[4px]">

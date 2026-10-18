@@ -1,0 +1,385 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+
+interface AccountCreationTutorialProps {
+  onSwitchToRegister?: () => void;
+}
+
+/**
+ * Account Creation Video Tutorial Component
+ * Displayed on the unauthenticated login / registration view.
+ * Embedded directly from YouTube with 0 MB storage consumption.
+ */
+export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationTutorialProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoId = "BrsmQqatC5w";
+  const youtubeUrl = `https://youtu.be/${videoId}`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&autoplay=1`;
+
+  return (
+    <section className="bg-white border-2 border-[#002060] shadow-sm rounded-[4px] overflow-hidden my-6">
+      {/* Header Banner */}
+      <div className="bg-[#002060] text-white px-4 py-3 sm:px-6 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-950">
+        <div>
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-200 block">
+            Step-by-Step Video Guide
+          </span>
+          <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+            Paano Gumawa ng Student Account (Account Registration Guide)
+          </h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-[2px]">
+            YouTube Stream • 0 MB Storage
+          </span>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-6 space-y-4">
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Panoorin ang opisyal na video walkthrough ng Dumalneg National High School upang matutunan ang hakbang-hakbang na proseso sa paggawa ng account at pag-verify ng 6-digit security code sa Gmail bago mag-enroll.
+        </p>
+
+        {/* Responsive Video Container (16:9 Aspect Ratio) */}
+        <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
+          {!isPlaying ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900 text-white">
+              <div className="mb-3 px-3 py-1 bg-[#002060] border border-blue-400 text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+                Official Video Tutorial
+              </div>
+              <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
+                CREATE NEW ACCOUNT | DUMALNEXT SYSTEM
+              </h4>
+              <p className="text-[11px] text-slate-300 max-w-sm mb-4">
+                Pindutin ang Play button upang simulan ang video tutorial nang direkta sa pahinang ito.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPlaying(true)}
+                  className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer"
+                >
+                  Play Tutorial Video
+                </button>
+                <a
+                  href={youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
+                >
+                  Open in YouTube &rarr;
+                </a>
+              </div>
+            </div>
+          ) : (
+            <iframe
+              src={embedUrl}
+              title="Paano Gumawa ng Account sa Dumalneg NHS Student Portal"
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          )}
+        </div>
+
+        {/* Quick Steps & Registration Call-to-Action */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1">
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
+            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 1:</strong>
+            <span className="text-slate-600 text-[11px]">Piliin ang <strong>Tab 2: Create Account</strong> sa itaas ng portal.</span>
+          </div>
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
+            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 2:</strong>
+            <span className="text-slate-600 text-[11px]">I-encode ang opisyal na Buong Pangalan ayon sa PSA Birth Certificate.</span>
+          </div>
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
+            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 3:</strong>
+            <span className="text-slate-600 text-[11px]">Gamitin ang aktibong personal na Gmail address at magtakda ng secure password.</span>
+          </div>
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
+            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 4:</strong>
+            <span className="text-slate-600 text-[11px]">Ilagay ang 6-digit verification code mula sa Gmail upang ma-activate ang account.</span>
+          </div>
+        </div>
+
+        {onSwitchToRegister && (
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
+            <p className="text-[11px] text-slate-500 italic">
+              Napanood na ang gabay? Handa ka nang simulan ang paggawa ng iyong student applicant account.
+            </p>
+            <button
+              type="button"
+              onClick={onSwitchToRegister}
+              className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-[4px] shrink-0"
+            >
+              Simulan ang Pag-register sa Tab 2 &rarr;
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+interface GradeLevelEnrollmentTutorialsProps {
+  initialGrade?: string | number;
+  schoolYear?: string;
+  semester?: string;
+  isEnrollmentOpen?: boolean;
+}
+
+interface TutorialItem {
+  id: "grade7" | "grade8to10" | "grade11" | "grade12";
+  tabLabel: string;
+  badgeLabel: string;
+  title: string;
+  description: string;
+  videoId: string;
+  youtubeUrl: string;
+  targetAudience: string;
+  keyPoints: string[];
+}
+
+const ENROLLMENT_TUTORIALS: TutorialItem[] = [
+  {
+    id: "grade7",
+    tabLabel: "Grade 7",
+    badgeLabel: "Incoming JHS",
+    title: "INCOMING GRADE 7 | DUMALNEXT SYSTEM",
+    description: "Opisyal na gabay para sa mga mag-aaral na papasok sa Grade 7 Junior High School. Kasama rito ang pagpili sa pagitan ng Regular JHS Program at Special Program in Sports (SPS), feeder school verification, at pag-upload ng documentary requirements (PSA Birth Certificate at Form 138 / SF9).",
+    videoId: "sst31YJmb_4",
+    youtubeUrl: "https://youtu.be/sst31YJmb_4",
+    targetAudience: "Para sa mga nagtapos ng Grade 6 sa Dumalneg Elementary School o ibang feeder elementary schools.",
+    keyPoints: [
+      "Ihanda ang 12-digit Learner Reference Number (LRN) mula sa elementary SF9.",
+      "Pumili sa pagitan ng JHS Regular Curriculum o Special Program in Sports (SPS).",
+      "Siguraduhing malinaw at nababasa ang litrato o scan ng PSA Birth Certificate at Form 138.",
+    ],
+  },
+  {
+    id: "grade8to10",
+    tabLabel: "Grade 8, 9, or 10",
+    badgeLabel: "Continuing JHS",
+    title: "INCOMING GRADE 8,9,10 | DUMALNEXT SYSTEM",
+    description: "Gabay para sa mga continuing Junior High School learners ng Dumalneg NHS (Grade 8, Grade 9, at Grade 10). Dahil fixed at prescribed ang core subjects ng JHS, mas mabilis at direkta ang proseso gamit ang 1-Click Continuing Enrollment.",
+    videoId: "VlM7VKMVcX8",
+    youtubeUrl: "https://youtu.be/VlM7VKMVcX8",
+    targetAudience: "Para sa kasalukuyang mga mag-aaral ng Dumalneg NHS sa Junior High School.",
+    keyPoints: [
+      "Fixed core curriculum ang JHS kaya walang electives na kailangang piliin.",
+      "Awtomatikong nire-retrieve ng system ang inyong previous approved records.",
+      "I-verify ang contact details at i-submit para sa mabilisang section schedule assignment.",
+    ],
+  },
+  {
+    id: "grade11",
+    tabLabel: "Grade 11",
+    badgeLabel: "Incoming SHS",
+    title: "INCOMING GRADE 11 | DUMALNEXT SYSTEM",
+    description: "Komprehensibong tutorial para sa mga papasok sa Senior High School (Grade 11). Ipinaliliwanag dito ang pagpili ng Senior High School track, Academic o Technical-Professional (Tech-Pro) strand, at ang pagpili ng opisyal na trimester elective subjects.",
+    videoId: "Xm9mn7eg1Rc",
+    youtubeUrl: "https://youtu.be/Xm9mn7eg1Rc",
+    targetAudience: "Para sa mga Grade 10 Completers na papasok sa Senior High School sa Dumalneg NHS.",
+    keyPoints: [
+      "Pumili ng Track at Strand na angkop sa inyong career at college pathway.",
+      "Pumili ng Trimester Elective Subject mula sa mga itinalagang kurso ng paaralan ngayong sem.",
+      "Mag-upload ng certified SF9 / Form 138 na may General Average mula sa Grade 10.",
+    ],
+  },
+  {
+    id: "grade12",
+    tabLabel: "Grade 12",
+    badgeLabel: "Continuing SHS",
+    title: "INCOMING GRADE 12 | DUMALNEXT SYSTEM",
+    description: "Gabay para sa Grade 12 Senior High School learners sa pagkumpleto ng enrollment para sa kasalukuyang academic trimester, pagpili ng advanced specialized electives, at pag-verify ng graduation credential checklist.",
+    videoId: "l-eODho9Z1U",
+    youtubeUrl: "https://youtu.be/l-eODho9Z1U",
+    targetAudience: "Para sa kasalukuyang Grade 11 na tutuntong sa Grade 12 Senior High School.",
+    keyPoints: [
+      "I-review ang inyong mga nakalipas na trimester grades at naipon na units.",
+      "Pumili ng authorized elective para sa kasalukuyang trimester alinsunod sa inyong strand.",
+      "Tiyaking kumpleto ang documentary records para sa Department of Education graduation clearance.",
+    ],
+  },
+];
+
+/**
+ * Grade-Level Enrollment Tutorials Component
+ * Displayed on the authenticated student dashboard.
+ * Features 4 grade-level tabs (Grade 7, Grade 8-10, Grade 11, Grade 12).
+ * Streams directly from YouTube with 0 MB database/storage consumption.
+ */
+export function GradeLevelEnrollmentTutorials({
+  initialGrade,
+  schoolYear = "2026-2027",
+  semester = "Trimester 1",
+  isEnrollmentOpen = true,
+}: GradeLevelEnrollmentTutorialsProps) {
+  // Resolve default tab based on user grade level if available
+  const resolveDefaultTab = (): "grade7" | "grade8to10" | "grade11" | "grade12" => {
+    if (!initialGrade) return "grade7";
+    const g = Number(initialGrade);
+    if (g === 7) return "grade7";
+    if (g >= 8 && g <= 10) return "grade8to10";
+    if (g === 11) return "grade11";
+    if (g === 12) return "grade12";
+    return "grade7";
+  };
+
+  const [activeTab, setActiveTab] = useState<"grade7" | "grade8to10" | "grade11" | "grade12">(resolveDefaultTab());
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const currentTutorial = ENROLLMENT_TUTORIALS.find((t) => t.id === activeTab) || ENROLLMENT_TUTORIALS[0];
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${currentTutorial.videoId}?rel=0&autoplay=1`;
+
+  const handleTabChange = (tabId: "grade7" | "grade8to10" | "grade11" | "grade12") => {
+    setActiveTab(tabId);
+    setIsPlaying(false);
+  };
+
+  return (
+    <section className="bg-white border-2 border-[#002060] shadow-sm rounded-[4px] overflow-hidden my-6">
+      {/* Header Banner */}
+      <div className="bg-[#002060] text-white px-4 py-3 sm:px-6 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-950">
+        <div>
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-200 block">
+            Student Guidance &amp; Video Walkthroughs
+          </span>
+          <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+            Online Enrollment Tutorials by Grade Level
+          </h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-[2px]">
+            YouTube Stream • 0 MB Storage
+          </span>
+        </div>
+      </div>
+
+      {/* Grade Selector Tabs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 border-b-2 border-slate-200 text-center font-bold text-xs bg-slate-50">
+        {ENROLLMENT_TUTORIALS.map((tutorial) => {
+          const isActive = activeTab === tutorial.id;
+          return (
+            <button
+              key={tutorial.id}
+              type="button"
+              onClick={() => handleTabChange(tutorial.id)}
+              className={`p-3 sm:py-3.5 sm:px-4 text-left sm:text-center transition-colors border-r last:border-r-0 border-slate-200 cursor-pointer ${
+                isActive
+                  ? "bg-white text-[#002060] border-b-2 border-b-[#002060] shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              }`}
+            >
+              <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">
+                {tutorial.badgeLabel}
+              </span>
+              <span className={`text-xs font-bold block ${isActive ? "text-[#002060]" : "text-slate-800"}`}>
+                {tutorial.tabLabel}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="p-4 sm:p-6 space-y-4">
+        {/* Active Tutorial Title and Description */}
+        <div className="border-b border-slate-200 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <h4 className="text-xs sm:text-sm font-bold text-[#002060]">
+              {currentTutorial.title}
+            </h4>
+            <a
+              href={currentTutorial.youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1 text-[11px] font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-300 transition-colors rounded-[3px]"
+            >
+              Open in YouTube &rarr;
+            </a>
+          </div>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            {currentTutorial.description}
+          </p>
+          <p className="text-[11px] text-[#002060] font-semibold mt-1">
+            Target Audience: {currentTutorial.targetAudience}
+          </p>
+        </div>
+
+        {/* Responsive 16:9 Video Player */}
+        <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
+          {!isPlaying ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900 text-white">
+              <div className="mb-3 px-3 py-1 bg-[#002060] border border-blue-400 text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+                {currentTutorial.tabLabel} Enrollment Guide
+              </div>
+              <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
+                {currentTutorial.title}
+              </h4>
+              <p className="text-[11px] text-slate-300 max-w-sm mb-4">
+                Pindutin ang Play button upang panoorin ang opisyal na walkthrough para sa {currentTutorial.tabLabel}.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPlaying(true)}
+                  className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer"
+                >
+                  Play Tutorial Video
+                </button>
+                <a
+                  href={currentTutorial.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
+                >
+                  Open in YouTube &rarr;
+                </a>
+              </div>
+            </div>
+          ) : (
+            <iframe
+              src={embedUrl}
+              title={currentTutorial.title}
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          )}
+        </div>
+
+        {/* Key Reminders & Checklist */}
+        <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-[4px] space-y-2">
+          <strong className="text-xs font-bold text-[#002060] block tracking-wide">
+            Mahahalagang Paalala para sa {currentTutorial.tabLabel}:
+          </strong>
+          <ul className="space-y-1.5 text-xs text-slate-700">
+            {currentTutorial.keyPoints.map((point, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="font-bold text-[#002060] shrink-0">&bull;</span>
+                <span className="text-[11px] leading-relaxed">{point}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Quick Shortcut to Start Form */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
+          <p className="text-[11px] text-slate-500 italic">
+            Tapos nang panoorin ang video? Maaari mo nang simulan o ipagpatuloy ang enrollment form.
+          </p>
+          <Link
+            href="/enroll"
+            className="px-5 py-2.5 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] shrink-0"
+          >
+            {isEnrollmentOpen ? `Buksan ang Enrollment Form (${semester}) &rarr;` : "Tingnan ang Enrollment Form"}
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
