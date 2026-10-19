@@ -301,13 +301,31 @@ BEGIN
   -- ===============================================================================
   FOR i IN 1..20 LOOP
     IF i <= 15 THEN
-      -- Active Teacher (1..15)
-      SELECT id INTO v_auth_uid FROM auth.users WHERE email = v_tch_emails[i] LIMIT 1;
+      -- Look for existing auth or public user by email or user_id
+      SELECT id INTO v_auth_uid FROM public.users WHERE user_id = ('DNHS-TCH-' || LPAD((100 + i)::text, 3, '0')) OR email = v_tch_emails[i] LIMIT 1;
+      IF v_auth_uid IS NULL THEN
+        SELECT id INTO v_auth_uid FROM auth.users WHERE email = v_tch_emails[i] LIMIT 1;
+      END IF;
       IF v_auth_uid IS NULL THEN
         v_auth_uid := v_tch_auth_uuids[i];
       ELSE
         v_tch_auth_uuids[i] := v_auth_uid;
       END IF;
+
+      -- Look for existing teacher profile id
+      SELECT id INTO v_temp_id FROM public.teachers WHERE teacher_id = ('DNHS-TCH-' || LPAD((100 + i)::text, 3, '0')) OR email = v_tch_emails[i] LIMIT 1;
+      IF v_temp_id IS NOT NULL THEN
+        v_tch_profile_uuids[i] := v_temp_id;
+      END IF;
+
+      -- Clean up any conflicting stale rows in public.users or public.teachers with different id
+      DELETE FROM public.users 
+       WHERE (user_id = ('DNHS-TCH-' || LPAD((100 + i)::text, 3, '0')) OR email = v_tch_emails[i])
+         AND id <> v_auth_uid;
+
+      DELETE FROM public.teachers 
+       WHERE (teacher_id = ('DNHS-TCH-' || LPAD((100 + i)::text, 3, '0')) OR email = v_tch_emails[i])
+         AND id <> v_tch_profile_uuids[i];
 
       INSERT INTO auth.users (
         instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -361,7 +379,8 @@ BEGIN
         'teacher'
       )
       ON CONFLICT (id) DO UPDATE
-        SET email = EXCLUDED.email,
+        SET user_id = EXCLUDED.user_id,
+            email = EXCLUDED.email,
             user_role = 'teacher';
 
       INSERT INTO public.teachers (
@@ -654,13 +673,33 @@ BEGIN
       v_contact   := '0917' || LPAD((5000000 + v_stu_num * 137)::text, 7, '0');
       v_bday      := MAKE_DATE(2026 - (v_grade + 5), ((v_stu_num % 12) + 1), ((v_stu_num % 27) + 1));
 
-      -- Deterministic UUIDs
-      SELECT id INTO v_auth_uid FROM auth.users WHERE email = v_stu_email LIMIT 1;
+      -- Deterministic UUIDs & deduplication
+      SELECT id INTO v_auth_uid FROM public.users WHERE user_id = v_stu_code OR email = v_stu_email LIMIT 1;
+      IF v_auth_uid IS NULL THEN
+        SELECT id INTO v_auth_uid FROM auth.users WHERE email = v_stu_email LIMIT 1;
+      END IF;
       IF v_auth_uid IS NULL THEN
         v_auth_uid := ('b0000000-0000-4000-8000-000000001' || LPAD(v_stu_num::text, 3, '0'))::UUID;
       END IF;
-      v_stu_uid := ('b0000000-0000-4000-8000-000000002' || LPAD(v_stu_num::text, 3, '0'))::UUID;
+
+      -- Look for existing student profile id
+      SELECT id INTO v_temp_id FROM public.students WHERE student_id = v_lrn OR user_id = v_auth_uid LIMIT 1;
+      IF v_temp_id IS NOT NULL THEN
+        v_stu_uid := v_temp_id;
+      ELSE
+        v_stu_uid := ('b0000000-0000-4000-8000-000000002' || LPAD(v_stu_num::text, 3, '0'))::UUID;
+      END IF;
+
       v_app_uid := ('b0000000-0000-4000-8000-000000003' || LPAD(v_stu_num::text, 3, '0'))::UUID;
+
+      -- Clean up any conflicting stale rows in public.users or public.students with different id
+      DELETE FROM public.users 
+       WHERE (user_id = v_stu_code OR email = v_stu_email)
+         AND id <> v_auth_uid;
+
+      DELETE FROM public.students 
+       WHERE student_id = v_lrn 
+         AND id <> v_stu_uid;
 
       -- Status & Section Assignment (15 Approved / 5 Unfinished per classroom)
       IF s_idx <= 15 THEN
@@ -744,7 +783,8 @@ BEGIN
       INSERT INTO public.users (id, user_id, email, user_role)
       VALUES (v_auth_uid, v_stu_code, v_stu_email, 'student')
       ON CONFLICT (id) DO UPDATE
-        SET email = EXCLUDED.email,
+        SET user_id = EXCLUDED.user_id,
+            email = EXCLUDED.email,
             user_role = 'student';
 
       -- 6C. Upsert public.students
