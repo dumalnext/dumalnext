@@ -1,72 +1,39 @@
 -- =================================================================================
 -- DUMALNEG NATIONAL HIGH SCHOOL (DUMAL-NEXT)
--- REALISTIC FULL-SCHOOL DATASET SEED SCRIPT (CLEAN SUBJECTS, 40 MAX PER ROOM, RANDOMIZED 70-80% PROGRESS)
+-- FULL-SCHOOL DUMMY DATASET SEED SCRIPT (CLEAN SUBJECTS, 40 MAX PER ROOM, RANDOMIZED 70-80% PROGRESS)
 -- =================================================================================
--- HOW TO USE:
--- 1. Open your Supabase SQL Editor:
---    https://supabase.com/dashboard/project/fvybtqghtuarjzlpbwnr/sql
--- 2. Paste this entire file and click "Run".
--- 3. Safe to re-run anytime (idempotent & cleans up duplicate subjects automatically).
---
--- WHAT THIS DOES:
--- 1. CLEANS UP DUPLICATE SUBJECTS:
---    - Removes legacy "-T1" and "G7-*" duplicate subject rows so Grade 7–12 only display
---      the official DepEd MATATAG & Strengthened SHS curriculum subjects.
--- 2. 8 CLASSROOMS & 8 SECTIONS (40 MAXIMUM CAPACITY PER CLASSROOM = 320 TOTAL SEATS):
---    - Each classroom has a realistic, varied enrollment count (between 26/40 and 33/40):
---        • Grade 7 - Rizal:      31 / 40 Enrolled (77.5%)
---        • Grade 7 - Bonifacio:  27 / 40 Enrolled (67.5%)
---        • Grade 8 - Luna:       33 / 40 Enrolled (82.5%)
---        • Grade 9 - Mabini:     29 / 40 Enrolled (72.5%)
---        • Grade 10 - Del Pilar: 32 / 40 Enrolled (80.0%)
---        • Grade 11 - Einstein:  28 / 40 Enrolled (70.0%)
---        • Grade 11 - Aquino:    30 / 40 Enrolled (75.0%)
---        • Grade 12 - Turing:    26 / 40 Enrolled (65.0%)
--- 3. 320 STUDENTS (INTERLEAVED / RANDOMIZED STATUSES — 73.8% FINISHED, 26.2% UNFINISHED):
---    - 236 Approved & Sectioned Students (73.8%)
---    - 52 Pending Applications (16.3%) mixed naturally across all grades & timestamps
---    - 18 Needs Revision Applications (5.6%) with realistic Registrar feedback notes
---    - 14 Registered-Only Student Accounts (4.4%) who haven't submitted their BEEF form yet
---    - Logins: student001@gmail.com .. student320@gmail.com (Password: Student@123)
--- 4. 22 TEACHERS (INTERLEAVED — 72.7% ONBOARDED, 27.3% PENDING INVITATIONS):
---    - 16 Active Onboarded Teachers (Password: Teacher@123)
---    - 6 Pending Staff Invitations mixed throughout the roster in IT Support
--- 5. CLASS SCHEDULES (77.5% COMPLETE / 22.5% OPEN SLOTS FOR TESTING):
---    - 31 deconflicted schedule blocks across the 8 sections (some sections have 4-5 blocks,
---      others have 3 blocks so you can naturally test adding the remaining 22.5% schedules).
+-- IMPORTANT: When running in Supabase SQL Editor, make sure NO blank line is
+-- highlighted/selected (or press Ctrl+A to select the whole file) before clicking "Run".
 -- =================================================================================
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
 DO $$
 DECLARE
   v_instance_id UUID := '00000000-0000-0000-0000-000000000000';
-  v_teacher_pw TEXT := extensions.crypt('Teacher@123', extensions.gen_salt('bf'));
-  v_student_pw TEXT := extensions.crypt('Student@123', extensions.gen_salt('bf'));
+  v_teacher_pw TEXT;
+  v_student_pw TEXT;
 
   v_active_sy TEXT := '2026-2027';
   v_active_term INT := 1;
   v_active_term_name TEXT := 'Trimester 1';
 
-  -- Realistic Filipino Name Pools
   v_first_names_m TEXT[] := ARRAY[
     'Juan', 'Mark', 'Carlo', 'Joshua', 'Christian', 'Rafael', 'Gabriel', 'Daniel', 'Miguel', 'Kenneth',
     'Jerome', 'Angelo', 'John Paul', 'Francis', 'Vincent', 'Adrian', 'Paolo', 'Nathaniel', 'Dominic', 'Renz',
     'Marco', 'Aldrin', 'Jayson', 'Kevin', 'Bryan', 'Jasper', 'Liam', 'Noah', 'Ethan', 'Lucas',
     'Mateo', 'Sebastian', 'Julian', 'Leo', 'Isaac', 'Samuel', 'David', 'Joseph', 'Caleb', 'Ryan',
-    'kurt', 'Tristan', 'Clarence', 'Cedric', 'harvey', 'Lance', 'Andrei', 'xander', 'Joaquin', 'inigo'
+    'Kurt', 'Tristan', 'Clarence', 'Cedric', 'Harvey', 'Lance', 'Andrei', 'Xander', 'Joaquin', 'Inigo'
   ];
   v_first_names_f TEXT[] := ARRAY[
     'Maria', 'Angela', 'Bea', 'Sophia', 'Patricia', 'Camille', 'Jasmine', 'Alyssa', 'Katrina', 'Clarisse',
     'Hannah', 'Nicole', 'Gabrielle', 'Samantha', 'Angelica', 'Christine', 'Bianca', 'Denise', 'Erika', 'Therese',
     'Maricar', 'Jocelyn', 'Rica', 'Mae', 'Princess', 'Chloe', 'Isabella', 'Mia', 'Amelia', 'Harper',
     'Evelyn', 'Abigail', 'Emily', 'Eliza', 'Victoria', 'Grace', 'Zoey', 'Nora', 'Lily', 'Hanna',
-    'Kyla', 'Andrea', 'Danica', 'Faith', 'Gwyneth', 'Irish', 'Janelle', 'kristine', 'Loraine', 'Nadine'
+    'Kyla', 'Andrea', 'Danica', 'Faith', 'Gwyneth', 'Irish', 'Janelle', 'Kristine', 'Loraine', 'Nadine'
   ];
   v_middle_names TEXT[] := ARRAY[
     'Reyes', 'Santos', 'Cruz', 'Bautista', 'Ocampo', 'Garcia', 'Mendoza', 'Torres', 'Tomas', 'Andres',
     'Castillo', 'Villanueva', 'Ramos', 'Castro', 'Rivera', 'Aquino', 'Navarro', 'Salazar', 'Mercado', 'Dela Cruz',
-    'Domingo', 'Gomez', 'Marquez', 'beltran', 'Carpio'
+    'Domingo', 'Gomez', 'Marquez', 'Beltran', 'Carpio'
   ];
   v_last_names TEXT[] := ARRAY[
     'Agbayani', 'Baguio', 'Cabanatan', 'Dumalneg', 'Espiritu', 'Fernandez', 'Guerrero', 'Hernandez', 'Ibanez', 'Javier',
@@ -78,7 +45,7 @@ DECLARE
   v_barangays TEXT[] := ARRAY['Cabaritan', 'Kalabakan', 'Quibel', 'San Isidro'];
 
   v_revision_reasons TEXT[] := ARRAY[
-    'Blurred PSA Birth Certificate scan — please upload a clearer, readable copy.',
+    'Blurred PSA Birth Certificate scan - please upload a clearer, readable copy.',
     'SF9 Report Card is missing the back page showing signed final general average.',
     'Learner Reference Number (LRN) on the form does not match the uploaded SF9 card.',
     'Parent/Guardian emergency contact number is incomplete (missing 1 digit).',
@@ -86,7 +53,7 @@ DECLARE
     'Please upload the official PSA Birth Certificate instead of a local civil registry draft.'
   ];
 
-  -- 22 Teachers (16 Active Onboarded + 6 Pending Invitations interleaved at indices 4, 9, 13, 17, 20, 22)
+  -- 22 Teachers (16 Active Onboarded + 6 Pending Invitations interleaved at 4, 9, 13, 17, 20, 22)
   v_tch_first TEXT[] := ARRAY[
     'Maria Clara', 'Roberto Carlos', 'Elena Rose', 'Gregorio Ben', 'Antonio Luis',
     'Carmen Joy', 'Ferdinand Mark', 'Lourdes Grace', 'Annaliza Joy', 'Ricardo Jose',
@@ -146,10 +113,9 @@ DECLARE
     'a0000000-0000-4000-8000-000000000221'::UUID,
     'a0000000-0000-4000-8000-000000000222'::UUID
   ];
-  -- Active teacher indices for advisers & schedules (16 active teachers)
   v_active_tch_indices INT[] := ARRAY[1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 14, 15, 16, 18, 19, 21];
 
-  -- 8 Classroom & Section Definitions (40 Max Capacity per Classroom)
+  -- 8 Classrooms & Sections (40 Max Capacity per Classroom)
   v_room_codes TEXT[] := ARRAY['RM-101', 'RM-102', 'RM-103', 'RM-104', 'RM-105', 'RM-201', 'RM-202', 'RM-203'];
   v_room_names TEXT[] := ARRAY[
     'Room 101 - Rizal Hall',
@@ -188,17 +154,10 @@ DECLARE
   v_sec_grades INT[] := ARRAY[7, 7, 8, 9, 10, 11, 11, 12];
   v_sec_strands TEXT[] := ARRAY['Regular', 'SPS', 'Regular', 'Regular', 'Regular', 'Academic', 'Academic', 'TechPro'];
 
-  -- Varied realistic enrollment quotas per classroom (Out of 40 max capacity)
-  -- Total Approved = 31 + 27 + 33 + 29 + 32 + 28 + 30 + 26 = 236 (73.75% finished)
-  -- Total Unfinished = 84 (26.25% unfinished: 52 Pending, 18 Needs Revision, 14 Unsubmitted)
-  v_sec_approved_target INT[]    := ARRAY[31, 27, 33, 29, 32, 28, 30, 26];
-  v_sec_pending_target INT[]     := ARRAY[6,  8,  4,  7,  5,  7,  6,  9];
-  v_sec_revision_target INT[]    := ARRAY[2,  3,  2,  2,  2,  3,  2,  2];
-  -- Remaining per classroom (40 - approved - pending - revision) are Unsubmitted registered accounts:
-  -- [1, 2, 1, 2, 1, 2, 2, 3] = 14 Unsubmitted accounts
-
-  -- Varied schedule blocks per section (out of 5 days) so ~22.5% of timetable slots remain open to test
-  v_sec_sched_days INT[] := ARRAY[5, 4, 5, 3, 4, 4, 3, 3]; -- 31 schedule blocks total out of 40
+  v_sec_approved_target INT[] := ARRAY[31, 27, 33, 29, 32, 28, 30, 26];
+  v_sec_pending_target INT[]  := ARRAY[6,  8,  4,  7,  5,  7,  6,  9];
+  v_sec_revision_target INT[] := ARRAY[2,  3,  2,  2,  2,  3,  2,  2];
+  v_sec_sched_days INT[]      := ARRAY[5, 4, 5, 3, 4, 4, 3, 3];
 
   v_room_uuids UUID[] := ARRAY[
     'c0000000-0000-4000-8000-000000000101'::UUID,
@@ -221,7 +180,6 @@ DECLARE
     'd0000000-0000-4000-8000-000000000008'::UUID
   ];
 
-  -- Loop & scratch variables
   i INT;
   s_idx INT;
   c_idx INT;
@@ -252,7 +210,6 @@ DECLARE
   v_auth_uid UUID;
   v_stu_uid UUID;
   v_app_uid UUID;
-  v_tmp_uuid UUID;
   v_electives JSONB;
   v_docs JSONB;
   v_form_payload JSONB;
@@ -271,9 +228,12 @@ DECLARE
   v_tch_idx INT;
   v_adviser_idx INT;
 BEGIN
-  -- ===============================================================================
-  -- 0. DETECT OR INITIALIZE ACTIVE ACADEMIC TERM
-  -- ===============================================================================
+  CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+
+  v_teacher_pw := extensions.crypt('Teacher@123', extensions.gen_salt('bf'));
+  v_student_pw := extensions.crypt('Student@123', extensions.gen_salt('bf'));
+
+  -- 0. Detect or initialize active academic term
   BEGIN
     SELECT "schoolYear", "termNumber", "termName"
       INTO v_active_sy, v_active_term, v_active_term_name
@@ -300,9 +260,7 @@ BEGIN
     v_active_term_name := 'Trimester 1';
   END;
 
-  -- ===============================================================================
-  -- 1. CLEAN UP DUPLICATE SUBJECTS & PREVIOUS SEED ROWS
-  -- ===============================================================================
+  -- 1. Clean up previous seed data in strict foreign-key order
   DELETE FROM public.enrollment_applications
    WHERE application_id LIKE 'DNHS-2026-SEED-%'
       OR application_id LIKE 'DNHS-2026-99%';
@@ -311,10 +269,37 @@ BEGIN
   DELETE FROM public.course_subjects;
   DELETE FROM public.system_settings WHERE key = 'subjects_config';
 
-  -- Insert ONLY the clean, official Subject Codes matching DEFAULT_FALLBACK_SUBJECTS
+  DELETE FROM public.students WHERE student_id LIKE '100050260%';
+  DELETE FROM public.teachers WHERE teacher_id LIKE 'DNHS-TCH-1%';
+  DELETE FROM public.users
+   WHERE user_id LIKE 'DNHS-TCH-1%'
+      OR user_id LIKE 'DNHS-STU-2%'
+      OR email LIKE 'teacher%@dnhs.edu.ph'
+      OR email LIKE 'student%@gmail.com';
+
+  DELETE FROM auth.identities
+   WHERE user_id IN (
+     SELECT id FROM auth.users
+      WHERE email LIKE 'teacher%@dnhs.edu.ph'
+         OR email LIKE 'student%@gmail.com'
+   );
+
+  DELETE FROM auth.users
+   WHERE email LIKE 'teacher%@dnhs.edu.ph'
+      OR email LIKE 'student%@gmail.com';
+
+  -- Update course_subjects check constraint while table is empty
+  BEGIN
+    ALTER TABLE public.course_subjects DROP CONSTRAINT IF EXISTS course_subjects_subject_type_check;
+    ALTER TABLE public.course_subjects ADD CONSTRAINT course_subjects_subject_type_check
+      CHECK (subject_type IN ('Core', 'Elective', 'Applied', 'Specialized', 'Intervention'));
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+
+  -- Insert official curriculum subjects (matching DEFAULT_FALLBACK_SUBJECTS without duplicates)
   INSERT INTO public.course_subjects (subject_code, subject_name, subject_type, grade_level, trimester, strand)
   VALUES
-    -- Grade 7 (10 Official Offerings — no duplicates!)
     ('JHS-VAL7',  'Values Education (EsP)',                       'Core',         7,  1, 'Regular'),
     ('JHS-FIL7',  'Filipino',                                     'Core',         7,  1, 'Regular'),
     ('JHS-ENG7',  'English',                                      'Core',         7,  1, 'Regular'),
@@ -324,7 +309,7 @@ BEGIN
     ('JHS-TLE7',  'Technology & Livelihood Education (TLE)',      'Core',         7,  1, 'Regular'),
     ('JHS-MAP7',  'MAPEH (Music, Arts, PE, Health)',              'Core',         7,  1, 'Regular'),
     ('JHS-SPS7',  'General Sports & Athletic Training',           'Specialized',  7,  1, 'SPS'),
-    -- Grade 8 (9 Official Offerings)
+    ('JHS-ARAL7', 'ARAL Program (Academic Recovery)',             'Intervention', 7,  1, 'Regular'),
     ('JHS-VAL8',  'Values Education (EsP)',                       'Core',         8,  1, 'Regular'),
     ('JHS-FIL8',  'Filipino',                                     'Core',         8,  1, 'Regular'),
     ('JHS-ENG8',  'English',                                      'Core',         8,  1, 'Regular'),
@@ -334,7 +319,6 @@ BEGIN
     ('JHS-TLE8',  'Technology & Livelihood Education (TLE)',      'Core',         8,  1, 'Regular'),
     ('JHS-MAP8',  'MAPEH (Music, Arts, PE, Health)',              'Core',         8,  1, 'Regular'),
     ('JHS-SPS8',  'General Sports & Athletic Training',           'Specialized',  8,  1, 'SPS'),
-    -- Grade 9 (9 Official Offerings)
     ('JHS-VAL9',  'Values Education (EsP)',                       'Core',         9,  1, 'Regular'),
     ('JHS-FIL9',  'Filipino',                                     'Core',         9,  1, 'Regular'),
     ('JHS-ENG9',  'English',                                      'Core',         9,  1, 'Regular'),
@@ -344,7 +328,6 @@ BEGIN
     ('JHS-TLE9',  'Technology & Livelihood Education (TLE)',      'Core',         9,  1, 'Regular'),
     ('JHS-MAP9',  'MAPEH (Music, Arts, PE, Health)',              'Core',         9,  1, 'Regular'),
     ('JHS-SPS9',  'General Sports & Athletic Training',           'Specialized',  9,  1, 'SPS'),
-    -- Grade 10 (9 Official Offerings)
     ('JHS-VAL10', 'Values Education (EsP)',                       'Core',         10, 1, 'Regular'),
     ('JHS-FIL10', 'Filipino',                                     'Core',         10, 1, 'Regular'),
     ('JHS-ENG10', 'English',                                      'Core',         10, 1, 'Regular'),
@@ -354,24 +337,23 @@ BEGIN
     ('JHS-TLE10', 'Technology & Livelihood Education (TLE)',      'Core',         10, 1, 'Regular'),
     ('JHS-MAP10', 'MAPEH (Music, Arts, PE, Health)',              'Core',         10, 1, 'Regular'),
     ('JHS-SPS10', 'General Sports & Athletic Training',           'Specialized',  10, 1, 'SPS'),
-    -- Senior High School Core & Key Electives
-    ('SHS-EFFCOM11',   'Effective Communication / Mabisang Komunikasyon', 'Core', 11, 1, 'General'),
-    ('SHS-GMATH11',    'General Mathematics',                     'Core',         11, 1, 'General'),
-    ('SHS-GSCI11',     'General Science',                         'Core',         11, 1, 'General'),
-    ('SHS-LCSKILLS11', 'Life and Career Skills',                  'Core',         11, 1, 'General'),
-    ('SHS-KASAY11',    'Pag-aaral ng Kasaysayan at Lipunang Pilipino', 'Core',    11, 1, 'General'),
-    ('ACAD-PHYS1',     'Physics 1',                               'Elective',     11, 1, 'Academic'),
-    ('ACAD-CHEM1',     'Chemistry 1',                             'Elective',     11, 1, 'Academic'),
-    ('ACAD-BIO1',      'Biology 1',                               'Elective',     11, 1, 'Academic'),
-    ('ACAD-MALIKPAG',  'Malikhaing Pagsulat',                     'Elective',     11, 1, 'Academic'),
-    ('ACAD-GOV',       'Philippine Governance (Politics and Governance)', 'Elective', 11, 1, 'Academic'),
-    ('ACAD-SOCSCI',    'Social Sciences (Theory and Practice)',   'Elective',     11, 1, 'Academic'),
-    ('ACAD-PRECAL1',   'Pre-calculus 1',                          'Elective',     12, 1, 'Academic'),
-    ('ACAD-ADVMATH1',  'Advanced Mathematics 1',                  'Elective',     12, 1, 'Academic'),
-    ('ACAD-RESMETH',   'Research Methods',                        'Applied',      12, 1, 'Academic'),
-    ('TECH-JAVA',      'Computer Programming (Java NC III)',      'Specialized',  11, 1, 'TechPro'),
-    ('TECH-DOTNET',    'Computer Programming (.Net Technology NC III)', 'Specialized', 11, 1, 'TechPro'),
-    ('TECH-CSS',       'Computer Systems Servicing (NC II)',      'Specialized',  11, 1, 'TechPro'),
+    ('SHS-EFFCOM11',       'Effective Communication / Mabisang Komunikasyon', 'Core', 11, 1, 'General'),
+    ('SHS-GMATH11',        'General Mathematics',                     'Core',         11, 1, 'General'),
+    ('SHS-GSCI11',         'General Science',                         'Core',         11, 1, 'General'),
+    ('SHS-LCSKILLS11',     'Life and Career Skills',                  'Core',         11, 1, 'General'),
+    ('SHS-KASAY11',        'Pag-aaral ng Kasaysayan at Lipunang Pilipino', 'Core',    11, 1, 'General'),
+    ('ACAD-PHYS1',         'Physics 1',                               'Elective',     11, 1, 'Academic'),
+    ('ACAD-CHEM1',         'Chemistry 1',                             'Elective',     11, 1, 'Academic'),
+    ('ACAD-BIO1',          'Biology 1',                               'Elective',     11, 1, 'Academic'),
+    ('ACAD-MALIKPAG',      'Malikhaing Pagsulat',                     'Elective',     11, 1, 'Academic'),
+    ('ACAD-GOV',           'Philippine Governance (Politics and Governance)', 'Elective', 11, 1, 'Academic'),
+    ('ACAD-SOCSCI',        'Social Sciences (Theory and Practice)',   'Elective',     11, 1, 'Academic'),
+    ('ACAD-PRECAL1',       'Pre-calculus 1',                          'Elective',     12, 1, 'Academic'),
+    ('ACAD-ADVMATH1',      'Advanced Mathematics 1',                  'Elective',     12, 1, 'Academic'),
+    ('ACAD-RESMETH',       'Research Methods',                        'Applied',      12, 1, 'Academic'),
+    ('TECH-JAVA',          'Computer Programming (Java NC III)',      'Specialized',  11, 1, 'TechPro'),
+    ('TECH-DOTNET',        'Computer Programming (.Net Technology NC III)', 'Specialized', 11, 1, 'TechPro'),
+    ('TECH-CSS',           'Computer Systems Servicing (NC II)',      'Specialized',  11, 1, 'TechPro'),
     ('TECH-WORKIMMERSION', 'Work Immersion (Mandatory TechPro Apprenticeship)', 'Specialized', 12, 1, 'TechPro')
   ON CONFLICT (subject_code) DO UPDATE
     SET subject_name = EXCLUDED.subject_name,
@@ -379,9 +361,7 @@ BEGIN
         grade_level  = EXCLUDED.grade_level,
         strand       = EXCLUDED.strand;
 
-  -- ===============================================================================
-  -- 2. SEED 8 PHYSICAL CLASSROOMS (Capacity = 40 Maximum Students per Classroom)
-  -- ===============================================================================
+  -- 2. Seed 8 Physical Classrooms (Capacity = 40 Max Students per Classroom)
   FOR c_idx IN 1..8 LOOP
     INSERT INTO public.classrooms (id, classroom_id, room_name, building, capacity)
     VALUES (
@@ -395,22 +375,15 @@ BEGIN
       SET room_name = EXCLUDED.room_name,
           building  = EXCLUDED.building,
           capacity  = 40
-    RETURNING id INTO v_tmp_uuid;
-    v_room_uuids[c_idx] := v_tmp_uuid;
+    RETURNING id INTO v_room_uuids[c_idx];
   END LOOP;
 
-  -- ===============================================================================
-  -- 3. SEED 22 TEACHERS (INTERLEAVED: 16 ACTIVE [72.7%] + 6 PENDING [27.3%])
-  -- ===============================================================================
+  -- 3. Seed 22 Teachers (16 Active Onboarded + 6 Pending Invitations interleaved)
   FOR i IN 1..22 LOOP
     v_tch_email := 'teacher' || i::text || '@dnhs.edu.ph';
 
     IF NOT v_tch_is_pending[i] THEN
-      -- Active Onboarded Teacher
-      SELECT id INTO v_auth_uid FROM auth.users WHERE email = v_tch_email LIMIT 1;
-      IF v_auth_uid IS NULL THEN
-        v_auth_uid := ('a0000000-0000-4000-8000-000000000' || LPAD((100 + i)::text, 3, '0'))::UUID;
-      END IF;
+      v_auth_uid := ('a0000000-0000-4000-8000-000000000' || LPAD((100 + i)::text, 3, '0'))::UUID;
 
       INSERT INTO auth.users (
         instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -442,7 +415,6 @@ BEGIN
             raw_user_meta_data = EXCLUDED.raw_user_meta_data,
             updated_at = NOW();
 
-      DELETE FROM auth.identities WHERE user_id = v_auth_uid AND provider = 'email';
       INSERT INTO auth.identities (
         id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at
       ) VALUES (
@@ -486,8 +458,7 @@ BEGIN
             last_name   = EXCLUDED.last_name,
             email       = EXCLUDED.email,
             department  = EXCLUDED.department
-      RETURNING id INTO v_tmp_uuid;
-      v_tch_profile_ids[i] := v_tmp_uuid;
+      RETURNING id INTO v_tch_profile_ids[i];
 
       v_invitations_json := v_invitations_json || jsonb_build_array(
         jsonb_build_object(
@@ -504,7 +475,6 @@ BEGIN
         )
       );
     ELSE
-      -- Interleaved Pending Teacher Invitation (Indices 4, 9, 13, 17, 20, 22)
       v_invitations_json := v_invitations_json || jsonb_build_array(
         jsonb_build_object(
           'id', 'inv-seed-tch-' || i,
@@ -514,7 +484,7 @@ BEGIN
           'department', v_tch_dept[i],
           'token', 'tok-pending-tch-' || LPAD(i::text, 2, '0'),
           'status', 'pending',
-          'invitedAt', (NOW() - ((i % 5 + 1) || ' days')::INTERVAL)::text,
+          'invitedAt', (NOW() - (((i % 5) + 1) || ' days')::INTERVAL)::text,
           'acceptedAt', NULL,
           'expiresAt', (NOW() + INTERVAL '30 days')::text
         )
@@ -528,9 +498,7 @@ BEGIN
     SET value = EXCLUDED.value,
         updated_at = NOW();
 
-  -- ===============================================================================
-  -- 4. SEED 8 SECTIONS (Capacity = 40 Max per Classroom)
-  -- ===============================================================================
+  -- 4. Seed 8 Sections (Capacity = 40 Max per Classroom)
   FOR c_idx IN 1..8 LOOP
     v_adviser_idx := v_active_tch_indices[c_idx];
 
@@ -551,8 +519,7 @@ BEGIN
           strand       = EXCLUDED.strand,
           capacity     = 40,
           school_year  = v_active_sy
-    RETURNING id INTO v_tmp_uuid;
-    v_sec_uuids[c_idx] := v_tmp_uuid;
+    RETURNING id INTO v_sec_uuids[c_idx];
 
     v_sections_json := v_sections_json || jsonb_build_array(
       jsonb_build_object(
@@ -579,10 +546,7 @@ BEGIN
     SET value = EXCLUDED.value,
         updated_at = NOW();
 
-  -- ===============================================================================
-  -- 5. SEED DECONFLICTED CLASS SCHEDULES (31 OF 40 SLOTS FILLED = 77.5% COMPLETE)
-  --    Leaves 9 weekly subject slots (22.5%) & 2 onboarded teachers open for testing!
-  -- ===============================================================================
+  -- 5. Seed Deconflicted Class Schedules (31 of 40 slots filled = 77.5% complete)
   FOR c_idx IN 1..8 LOOP
     FOR i IN 1..v_sec_sched_days[c_idx] LOOP
       v_day := v_days[i];
@@ -608,7 +572,6 @@ BEGIN
 
       SELECT subject_name INTO v_subj_name FROM public.course_subjects WHERE subject_code = v_subj_code LIMIT 1;
 
-      -- Rotate across the first 14 active teachers (leaving active teachers #19 & #21 free for testing)
       v_tch_idx := v_active_tch_indices[((c_idx + i - 2) % 14) + 1];
 
       INSERT INTO public.class_schedules (
@@ -665,12 +628,7 @@ BEGIN
     SET value = EXCLUDED.value,
         updated_at = NOW();
 
-  -- ===============================================================================
-  -- 6. SEED 320 STUDENTS (40 MAX PER CLASSROOM x 8 CLASSROOMS)
-  --    Uses a coprime permutation ((s_idx * 17 + c_idx * 13) % 40) + 1 so that
-  --    Approved, Pending, Needs Revision, and Unsubmitted students are randomly
-  --    interleaved throughout the roster (not grouped in rigid blocks!).
-  -- ===============================================================================
+  -- 6. Seed 320 Students (40 Max per Classroom x 8 Classrooms, Interleaved Statuses)
   FOR c_idx IN 1..8 LOOP
     v_grade    := v_sec_grades[c_idx];
     v_strand   := v_sec_strands[c_idx];
@@ -682,39 +640,31 @@ BEGIN
     v_rev_cut  := v_pend_cut + v_sec_revision_target[c_idx];
 
     FOR s_idx IN 1..40 LOOP
-      v_stu_num := (c_idx - 1) * 40 + s_idx; -- 1 .. 320
+      v_stu_num := (c_idx - 1) * 40 + s_idx;
+      v_perm_slot := (((s_idx * 17) + (c_idx * 13)) % 40) + 1;
 
-      -- Permuted slot 1..40 (17 is coprime to 40, so it visits every number 1..40 once per classroom in a scrambled order)
-      v_perm_slot := ((s_idx * 17 + c_idx * 13) % 40) + 1;
-
-      -- Pseudo-random gender & name selection
-      IF ((v_stu_num * 11 + c_idx) % 2) = 1 THEN
+      IF (((v_stu_num * 11) + c_idx) % 2) = 1 THEN
         v_gender := 'Male';
-        v_fname  := INITCAP(v_first_names_m[((v_stu_num * 7 + c_idx * 3) % array_length(v_first_names_m, 1)) + 1]);
+        v_fname  := INITCAP(v_first_names_m[(((v_stu_num * 7) + (c_idx * 3)) % array_length(v_first_names_m, 1)) + 1]);
       ELSE
         v_gender := 'Female';
-        v_fname  := INITCAP(v_first_names_f[((v_stu_num * 7 + c_idx * 3) % array_length(v_first_names_f, 1)) + 1]);
+        v_fname  := INITCAP(v_first_names_f[(((v_stu_num * 7) + (c_idx * 3)) % array_length(v_first_names_f, 1)) + 1]);
       END IF;
 
-      v_mname := INITCAP(v_middle_names[((v_stu_num * 9 + s_idx) % array_length(v_middle_names, 1)) + 1]);
-      v_lname := INITCAP(v_last_names[((v_stu_num * 13 + c_idx * 5) % array_length(v_last_names, 1)) + 1]);
+      v_mname := INITCAP(v_middle_names[(((v_stu_num * 9) + s_idx) % array_length(v_middle_names, 1)) + 1]);
+      v_lname := INITCAP(v_last_names[(((v_stu_num * 13) + (c_idx * 5)) % array_length(v_last_names, 1)) + 1]);
 
-      -- Unique 12-digit LRN: 100050260001 .. 100050260320
       v_lrn       := '100050260' || LPAD(v_stu_num::text, 3, '0');
       v_stu_email := 'student' || LPAD(v_stu_num::text, 3, '0') || '@gmail.com';
       v_stu_code  := 'DNHS-STU-' || (20000 + v_stu_num)::text;
-      v_brgy      := v_barangays[((v_stu_num * 5 + c_idx) % 4) + 1];
-      v_contact   := '0917' || LPAD((3000000 + v_stu_num * 219)::text, 7, '0');
-      v_bday      := MAKE_DATE(2026 - (v_grade + 5), ((v_stu_num * 3 % 12) + 1), ((v_stu_num * 7 % 27) + 1));
+      v_brgy      := v_barangays[(((v_stu_num * 5) + c_idx) % 4) + 1];
+      v_contact   := '0917' || LPAD((3000000 + (v_stu_num * 219))::text, 7, '0');
+      v_bday      := MAKE_DATE(2026 - (v_grade + 5), (((v_stu_num * 3) % 12) + 1), (((v_stu_num * 7) % 27) + 1));
 
-      SELECT id INTO v_auth_uid FROM auth.users WHERE email = v_stu_email LIMIT 1;
-      IF v_auth_uid IS NULL THEN
-        v_auth_uid := ('b0000000-0000-4000-8000-000000001' || LPAD(v_stu_num::text, 3, '0'))::UUID;
-      END IF;
-      v_stu_uid := ('b0000000-0000-4000-8000-000000002' || LPAD(v_stu_num::text, 3, '0'))::UUID;
-      v_app_uid := ('b0000000-0000-4000-8000-000000003' || LPAD(v_stu_num::text, 3, '0'))::UUID;
+      v_auth_uid := ('b0000000-0000-4000-8000-000000001' || LPAD(v_stu_num::text, 3, '0'))::UUID;
+      v_stu_uid  := ('b0000000-0000-4000-8000-000000002' || LPAD(v_stu_num::text, 3, '0'))::UUID;
+      v_app_uid  := ('b0000000-0000-4000-8000-000000003' || LPAD(v_stu_num::text, 3, '0'))::UUID;
 
-      -- Assign status based on scrambled v_perm_slot
       IF v_perm_slot <= v_app_cut THEN
         v_status          := 'Approved';
         v_assigned_sec_id := v_sec_id;
@@ -733,7 +683,6 @@ BEGIN
         v_feedback        := NULL;
       END IF;
 
-      -- Applicant Type
       IF v_grade = 7 THEN
         v_app_type := 'Grade 7';
       ELSIF v_grade = 11 THEN
@@ -744,7 +693,6 @@ BEGIN
         v_app_type := 'Returning';
       END IF;
 
-      -- 6A. Upsert auth.users
       INSERT INTO auth.users (
         instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
         raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
@@ -777,7 +725,6 @@ BEGIN
             raw_user_meta_data = EXCLUDED.raw_user_meta_data,
             updated_at = NOW();
 
-      DELETE FROM auth.identities WHERE user_id = v_auth_uid AND provider = 'email';
       INSERT INTO auth.identities (
         id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at
       ) VALUES (
@@ -791,14 +738,12 @@ BEGIN
         NOW()
       );
 
-      -- 6B. Upsert public.users
       INSERT INTO public.users (id, user_id, email, user_role)
       VALUES (v_auth_uid, v_stu_code, v_stu_email, 'student')
       ON CONFLICT (id) DO UPDATE
         SET email = EXCLUDED.email,
             user_role = 'student';
 
-      -- 6C. Upsert public.students
       INSERT INTO public.students (
         id, user_id, student_id, first_name, middle_name, last_name,
         date_of_birth, gender, contact_number, barangay,
@@ -832,7 +777,6 @@ BEGIN
             current_section_id = EXCLUDED.current_section_id
       RETURNING id INTO v_stu_uid;
 
-      -- 6D. Insert Enrollment Application (Unless randomly designated UNSUBMITTED)
       IF v_status <> 'UNSUBMITTED' THEN
         IF c_idx = 6 THEN
           v_electives := '["ACAD-PHYS1", "ACAD-CHEM1"]'::JSONB;
@@ -913,8 +857,7 @@ BEGIN
           )
         );
 
-        -- Scrambled submission timestamp so grades & statuses mix naturally in the Registrar queue
-        v_random_hours := ((v_stu_num * 73 + c_idx * 19) % 360) + 2;
+        v_random_hours := (((v_stu_num * 73) + (c_idx * 19)) % 360) + 2;
         v_random_mins  := (v_stu_num * 37) % 59;
 
         INSERT INTO public.enrollment_applications (
@@ -952,9 +895,6 @@ BEGIN
   END LOOP;
 END $$;
 
--- =================================================================================
--- SUMMARY VERIFICATION QUERY (Shows Varied, Realistic Classroom Progress Out of 40 Max)
--- =================================================================================
 SELECT
   s.section_name AS "Classroom / Section",
   s.grade_level AS "Grade",
