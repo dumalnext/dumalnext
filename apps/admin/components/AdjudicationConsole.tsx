@@ -731,36 +731,46 @@ export default function AdjudicationConsole() {
 
   return (
     <div className="space-y-6">
-      {/* Title & Real-Time Sync Indicator */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
-        <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            ENROLLMENT ADJUDICATION &bull; REGISTRAR QUEUE
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
-            Basic Education Enrollment Applications Queue
-          </h2>
+      {/* Title & Real-Time Sync Banner */}
+      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/dumalneg-logo.png"
+            alt="Dumalneg NHS Seal"
+            className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+          />
+          <div>
+            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+              Enrollment Adjudication &bull; Registrar Evaluation Queue
+            </span>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
+              Basic Education Enrollment Applications
+            </h2>
+            <p className="text-xs text-blue-100/85 mt-0.5">
+              Review learner profiles, verify PSA birth certificates and SF9 report cards, and assign official class sections.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Live Real-time Status Badge */}
-          <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 border border-emerald-300 text-xs font-mono font-bold text-emerald-950">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="uppercase">Real-Time Live Sync</span>
+          <div className="flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-xs px-3.5 py-2 rounded-lg text-xs font-semibold text-white">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span>Real-Time Queue Sync</span>
           </div>
         </div>
       </div>
 
       {/* Active Academic Period Context Banner */}
-      <div className="p-3.5 bg-white border-2 border-[#002060] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-4 bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-          <span className="font-mono font-bold text-[#002060] text-xs uppercase tracking-wider">
-            ACTIVE ACADEMIC PERIOD QUEUE &bull; S.Y. {activeTerm?.schoolYear || "2026-2027"} &bull; {activeTerm?.termName || "Trimester 1"}
+          <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
+            Active Academic Period &bull; S.Y. {activeTerm?.schoolYear || "2026-2027"} &bull; {activeTerm?.termName || "Trimester 1"}
           </span>
           <span className="text-xs text-slate-600">
             {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE" ? (
-              <span>Queue is automatically organized to display <strong>enrollees for this active term only</strong>.</span>
+              <span>Showing <strong>enrollees for this active term</strong>.</span>
             ) : (
               <span>Custom filter applied: <strong>S.Y. {effectiveSY} &bull; {effectiveTerm}</strong>.</span>
             )}
@@ -774,7 +784,7 @@ export default function AdjudicationConsole() {
               setSelectedSY("ACTIVE");
               setSelectedTerm("ACTIVE");
             }}
-            className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-mono font-bold text-[11px] uppercase transition-colors shrink-0 shadow-xs cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs transition-colors shrink-0 shadow-xs cursor-pointer"
           >
             Reset to Active Term
           </button>

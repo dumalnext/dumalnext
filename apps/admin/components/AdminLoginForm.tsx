@@ -23,6 +23,7 @@ function AdminLoginFormInner() {
   // Standard Login State
   const [adminId, setAdminId] = useState<string>("heartistrichford@gmail.com");
   const [adminPassword, setAdminPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
   const [unconfirmedEmail, setUnconfirmedEmail] = useState<string>("");
   const [isResending, setIsResending] = useState<boolean>(false);
@@ -123,7 +124,7 @@ function AdminLoginFormInner() {
 
       const json = await res.json();
       if (res.ok && json.success) {
-        setActivationSuccess("Administrator account created and activated successfully! Entering Administration Console...");
+        setActivationSuccess("Administrator account created and activated! Entering Administration Console...");
         if (json.cookieName && json.sessionUser) {
           const serialized = encodeURIComponent(JSON.stringify(json.sessionUser));
           document.cookie = `${json.cookieName}=${serialized}; path=/; max-age=604800; SameSite=Lax`;
@@ -201,316 +202,413 @@ function AdminLoginFormInner() {
 
   if (isCheckingToken) {
     return (
-      <div className="max-w-md mx-auto my-20 p-8 bg-white border-2 border-[#002060] text-center font-sans space-y-2 shadow-xs">
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-          AUTHENTICATING ADMINISTRATOR INVITATION
+      <div className="max-w-md mx-auto my-20 p-8 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] text-center font-sans space-y-3 shadow-sm">
+        <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
+        <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+          Verifying Administrator Invitation
         </span>
-        <p className="text-xs text-slate-600">Verifying security token with Dumalneg NHS Registry...</p>
+        <p className="text-xs text-slate-600">
+          Checking security token with Dumalneg NHS Registry...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 space-y-8 font-sans">
-      {/* Notice Banner */}
-      <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200">
-        <span className="text-xs font-bold tracking-widest text-[#002060] uppercase block mb-1">
-          PORTAL 03 &bull; DUMALNEG NATIONAL HIGH SCHOOL &bull; ADMISSIONS
-        </span>
-        <h2 className="text-lg sm:text-xl font-bold text-slate-900 uppercase">
-          {invitation ? "Administrator Onboarding & Password Setup" : "School Administration & Enrollment Adjudication Console"}
-        </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-2xl leading-relaxed">
-          {invitation
-            ? "Your administrator invitation has been verified by IT Support. Create your official password below to activate your administrative clearance."
-            : "Authorized management console for the School Principal, Registrar, and Admissions personnel. Review learner enrollment credentials, inspect submitted PSA documents and report cards, adjudicate application status, manage section quotas, and run schedule deconfliction algorithms."}
-        </p>
-      </section>
-
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 font-sans">
       {/* Invalid Token Alert if token was passed but invalid */}
       {inviteError && (
-        <div className="p-4 bg-red-50 border-2 border-red-500 text-xs text-red-950 space-y-1">
-          <div className="font-bold uppercase tracking-wider text-red-900 font-mono">
-            [ INVITATION VERIFICATION NOTICE ]
+        <div className="p-4 bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg text-xs text-red-950 space-y-1 shadow-xs">
+          <div className="font-bold uppercase tracking-wider text-red-900">
+            Invitation Verification Notice
           </div>
           <p>{inviteError}</p>
         </div>
       )}
 
-      {/* Main Form and Executive Clearance Panel */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */}
-        {invitation ? (
-          <div className="bg-white p-6 sm:p-8 border-2 border-[#002060] shadow-sm space-y-5">
-            <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-                  [ OFFICIAL INVITATION VERIFIED ]
-                </span>
-                <h3 className="text-base font-bold text-slate-900 uppercase">
-                  Create Administrator Password
-                </h3>
-              </div>
-              <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
-                Admin Role
-              </span>
-            </div>
-
-            {loginError && (
-              <div className="p-3 bg-red-50 border-2 border-red-500 text-xs text-red-950 font-bold">
-                [ ERROR ]: {loginError}
-              </div>
-            )}
-
-            {activationSuccess && (
-              <div className="p-3 bg-green-50 border-2 border-green-600 text-xs text-green-950 font-bold font-mono">
-                [ STATUS ]: {activationSuccess}
-              </div>
-            )}
-
-            <form onSubmit={handleActivateAccount} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-800 uppercase mb-1">
-                  Invited Administrator Email
-                </label>
-                <input
-                  type="email"
-                  value={invitation.email}
-                  disabled
-                  className="w-full p-2.5 bg-slate-100 border border-slate-300 font-mono text-slate-700 cursor-not-allowed select-all"
+      {/* 2-Column Split Enrollment System Login Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* LEFT COLUMN (7 Cols): Institutional Hero & Registrar Capabilities */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Hero Welcome Card */}
+          <section className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+            <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-6 sm:p-8 border-b-4 border-amber-400">
+              <div className="flex items-center gap-4">
+                <img
+                  src="/dumalneg-logo.png"
+                  alt="Dumalneg National High School Seal"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover bg-white p-1 shadow-md border-2 border-amber-400 shrink-0"
                 />
-                <p className="text-[10px] font-mono text-slate-500 mt-1">
-                  Locked: Account will be bound to this verified email address.
-                </p>
+                <div className="space-y-1">
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10px] font-bold uppercase tracking-widest">
+                    Office of the School Registrar &amp; Admissions
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-snug">
+                    {invitation
+                      ? "Administrator Account Onboarding"
+                      : "Enrollment Adjudication & Registrar Console"}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-blue-100/90">
+                    Dumalneg National High School &bull; DepEd Division of Ilocos Norte
+                  </p>
+                </div>
               </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 uppercase mb-1">
-                  Full Name / Personnel Label
-                </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Dr. Roberto Mendoza"
-                  className="w-full p-2.5 bg-white border border-slate-300 font-bold text-slate-900 focus:border-[#002060] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 uppercase mb-1">
-                  Administrative Office / Unit
-                </label>
-                <select
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-slate-300 font-bold text-slate-900 focus:border-[#002060] outline-none"
-                >
-                  <option value="Office of the Registrar">Office of the Registrar</option>
-                  <option value="Academic Affairs">Academic Affairs</option>
-                  <option value="Principal's Office">Principal's Office</option>
-                  <option value="Admissions Committee">Admissions Committee</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 uppercase mb-1">
-                  Create Master Password *
-                </label>
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter minimum 6 characters"
-                  className="w-full p-2.5 bg-white border border-slate-300 font-mono text-slate-900 focus:border-[#002060] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 uppercase mb-1">
-                  Confirm Password *
-                </label>
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter your new password"
-                  className="w-full p-2.5 bg-white border border-slate-300 font-mono text-slate-900 focus:border-[#002060] outline-none"
-                />
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isActivating || Boolean(activationSuccess)}
-                  className="w-full py-3.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:opacity-50"
-                >
-                  {isActivating ? "[ ACTIVATING ACCOUNT... ]" : "[ ACTIVATE ADMIN ACCOUNT & LOG IN ]"}
-                </button>
-              </div>
-            </form>
-          </div>
-        ) : (
-          /* CASE 2: NORMAL LOGIN FORM (WHEN NO INVITE TOKEN IS PRESENT) */
-          <div className="bg-white p-6 sm:p-8 border-2 border-[#002060] shadow-sm space-y-5">
-            <div className="border-b border-slate-200 pb-3">
-              <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-                OFFICIAL ADMINISTRATOR AUTHENTICATION
-              </span>
-              <h3 className="text-base font-bold text-slate-900 uppercase">
-                Administrative Personnel Sign-In
-              </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Authorized Account: <strong className="text-slate-900">heartistrichford@gmail.com</strong>
+              <p className="text-xs sm:text-sm text-blue-100/90 mt-5 leading-relaxed">
+                {invitation
+                  ? "Your official Registrar & Administrator invitation has been verified by IT Support. Set up your security password to activate your administrative access."
+                  : "Authorized management workspace for the School Principal, Registrar, and Admissions Committee. Evaluate learner applications, inspect PSA birth certificates and SF9 report cards, manage section capacities, and resolve master timetable conflicts."}
               </p>
             </div>
 
-            {/* Progress Bar */}
-            {isLoggingIn && (
-              <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono font-bold text-[#002060]">
-                  <span>VERIFYING CREDENTIALS</span>
-                  <span>{loginProgress}%</span>
-                </div>
-                <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden">
-                  <div
-                    className="bg-[#002060] h-full transition-all duration-300 ease-out"
-                    style={{ width: `${loginProgress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-slate-800 font-medium">
-                  {loginStatusText || "Authenticating..."}
-                </p>
-              </div>
-            )}
-
-            {unconfirmedEmail && (
-              <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
-                  <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                    GMAIL VERIFICATION REQUIRED
+            {/* 4 Core Registrar Modules Grid */}
+            <div className="p-6 sm:p-8 bg-white space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div>
+                  <span className="text-[11px] font-bold text-[#002060] uppercase tracking-wider block">
+                    Registrar &amp; Admissions Modules
                   </span>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Integrated Enrollment Administration Tools
+                  </h3>
                 </div>
-                <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                  A verification link was sent to: <strong className="font-mono underline">{unconfirmedEmail}</strong>.
-                  Please open your Gmail, check your <strong>Inbox</strong> (or <strong>Spam</strong> folder), and click the confirmation link to activate your administrator account.
-                </p>
-                <div className="pt-1 flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
+                  Audited Access
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      01
+                    </span>
+                    <span>Enrollment Adjudication Queue</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Inspect submitted PSA birth certificates and Form 138 report cards side-by-side, approve applications, or request document revisions.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      02
+                    </span>
+                    <span>Section Quotas &amp; Capacity</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Enforce DepEd standard section ceilings (40 learners per class) across Junior High School and Senior High School tracks.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      03
+                    </span>
+                    <span>3D Schedule Deconfliction</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Automatically detect and prevent teacher double-booking, classroom collisions, and SHS subject overload.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      04
+                    </span>
+                    <span>Enrollment Control Room</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Toggle online student registration windows open or closed, configure active School Year parameters, and broadcast advisories.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-lg bg-amber-50/80 border border-amber-200/80 flex items-start gap-3 text-xs text-amber-950">
+                <svg className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <div className="leading-relaxed">
+                  <strong className="font-bold">Security Audit Notice:</strong> All enrollment approvals, section capacity overrides, and status transitions are logged under your Registrar account.
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* RIGHT COLUMN (5 Cols): Sticky Authentication / Onboarding Card */}
+        <div className="lg:col-span-5 lg:sticky lg:top-6">
+          {invitation ? (
+            /* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */
+            <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
+              <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/dumalneg-logo.png"
+                    alt="Dumalneg NHS"
+                    className="w-10 h-10 rounded-full object-cover border border-amber-400 bg-white p-0.5 shrink-0"
+                  />
+                  <div>
+                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
+                      Official Invitation Verified
+                    </span>
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      Create Registrar Password
+                    </h3>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-blue-100 text-[#002060] border border-blue-200 rounded-full">
+                  Admin Role
+                </span>
+              </div>
+
+              <div className="p-6 sm:p-7 space-y-5">
+                {loginError && (
+                  <div className="p-3.5 bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg text-xs text-red-900 font-medium">
+                    {loginError}
+                  </div>
+                )}
+
+                {activationSuccess && (
+                  <div className="p-3.5 bg-emerald-50 border border-emerald-300 border-l-4 border-l-emerald-600 rounded-lg text-xs text-emerald-950 font-semibold">
+                    {activationSuccess}
+                  </div>
+                )}
+
+                <form onSubmit={handleActivateAccount} className="space-y-4 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Invited Administrator Email
+                    </label>
+                    <input
+                      type="email"
+                      value={invitation.email}
+                      disabled
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-medium cursor-not-allowed select-all"
+                    />
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Account is permanently bound to this verified email address.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Full Name / Personnel Title
+                    </label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="e.g. Dr. Roberto Mendoza"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Administrative Office / Unit
+                    </label>
+                    <select
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    >
+                      <option value="Office of the Registrar">Office of the Registrar</option>
+                      <option value="Academic Affairs">Academic Affairs</option>
+                      <option value="Principal's Office">Principal&apos;s Office</option>
+                      <option value="Admissions Committee">Admissions Committee</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Create Security Password <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter minimum 6 characters"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Confirm Password <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter your new password"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isActivating || Boolean(activationSuccess)}
+                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold tracking-wide transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                    >
+                      {isActivating ? "Activating Account..." : "Activate Admin Account & Sign In"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          ) : (
+            /* CASE 2: NORMAL LOGIN FORM */
+            <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
+              <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center gap-3.5">
+                <img
+                  src="/dumalneg-logo.png"
+                  alt="Dumalneg NHS Seal"
+                  className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 bg-white p-0.5 shadow-2xs shrink-0"
+                />
+                <div>
+                  <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
+                    Registrar &amp; Admissions Sign-In
+                  </span>
+                  <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
+                    Administrator Portal Login
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Sign in with your authorized DepEd Registrar credentials
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-7 space-y-5">
+                {/* Progress Bar */}
+                {isLoggingIn && (
+                  <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-lg space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
+                      <span>Verifying Administrative Credentials...</span>
+                      <span>{loginProgress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
+                        style={{ width: `${loginProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-700 font-medium">
+                      {loginStatusText || "Authenticating..."}
+                    </p>
+                  </div>
+                )}
+
+                {unconfirmedEmail && (
+                  <div className="p-4 bg-amber-50 border border-amber-300 border-l-4 border-l-amber-500 rounded-lg space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                      <span className="text-xs font-bold text-amber-950 uppercase tracking-wide">
+                        Email Verification Required
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-950 leading-relaxed">
+                      A verification link was sent to <strong className="underline">{unconfirmedEmail}</strong>.
+                      Please check your Gmail Inbox or Spam folder and click the confirmation link to activate your account.
+                    </p>
+                    <div className="pt-1 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isResending}
+                        onClick={handleResend}
+                        className="px-3.5 py-2 rounded-md bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold tracking-wide transition-colors disabled:opacity-60 cursor-pointer shadow-2xs"
+                      >
+                        {isResending ? "Resending Link..." : "Resend Verification Email"}
+                      </button>
+                      {resendStatus && (
+                        <span className="text-[11px] font-semibold text-slate-800 block">
+                          {resendStatus}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {loginError && (
+                  <div className="p-3.5 bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg text-xs font-semibold text-red-900 leading-normal">
+                    {loginError}
+                  </div>
+                )}
+
+                <form onSubmit={handleAdminLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Administrator Email Address <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={adminId}
+                      onChange={(e) => setAdminId(e.target.value)}
+                      placeholder="heartistrichford@gmail.com"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none disabled:bg-slate-100 transition-all"
+                      disabled={isLoggingIn}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Security Password <span className="text-red-600">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        placeholder="Enter administrator password"
+                        className="w-full px-3.5 py-2.5 pr-16 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none disabled:bg-slate-100 transition-all"
+                        disabled={isLoggingIn}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-500 hover:text-[#002060] px-2 py-1 rounded cursor-pointer"
+                      >
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isLoggingIn}
+                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold tracking-wide transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <span>{isLoggingIn ? "Signing In to Console..." : "Sign In to Administration Console"}</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+
+                <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                  <span>Authorized Account:</span>
                   <button
                     type="button"
-                    disabled={isResending}
-                    onClick={handleResend}
-                    className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs"
+                    onClick={() => setAdminId("heartistrichford@gmail.com")}
+                    className="font-semibold text-[#002060] hover:underline cursor-pointer"
                   >
-                    {isResending ? "Resending Link..." : "Resend Verification Link to Gmail"}
+                    heartistrichford@gmail.com
                   </button>
-                  {resendStatus && (
-                    <span className="text-[11px] font-bold text-slate-800 block">
-                      {resendStatus}
-                    </span>
-                  )}
                 </div>
               </div>
-            )}
-
-            {loginError && (
-              <div className="p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-900 leading-normal">
-                AUTHENTICATION ERROR: {loginError}
-              </div>
-            )}
-
-            <form onSubmit={handleAdminLogin} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Administrator Email <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="email"
-                  value={adminId}
-                  onChange={(e) => setAdminId(e.target.value)}
-                  placeholder="heartistrichford@gmail.com"
-                  className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100"
-                  disabled={isLoggingIn}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Security Password <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="password"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  placeholder="Enter administrator password"
-                  className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100"
-                  disabled={isLoggingIn}
-                  required
-                />
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className="btn-primary w-full text-xs uppercase tracking-wider font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {isLoggingIn ? "AUTHENTICATING... PLEASE WAIT" : "Sign In to Administration Console"}
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* Executive Security Clearance Notice */}
-        <div className="bg-slate-100 p-6 border border-slate-300 flex flex-col justify-between space-y-4">
-          <div className="space-y-3 text-xs">
-            <span className="font-mono font-bold text-[#002060] uppercase block">
-              DepEd Dumalneg NHS Security Clearance
-            </span>
-            <p className="text-slate-700 leading-relaxed">
-              This portal is strictly restricted to authorized Dumalneg National High School personnel. 
-              All admissions adjudication actions, document evaluations, and section assignments are digitally audited.
-            </p>
-
-            <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">Enrollment Adjudication:</strong>
-              <p className="text-slate-600 text-[11px]">
-                Real-time queue of basic education applications. Approve or request revision on submitted Form 138 report cards and PSA certificates.
-              </p>
             </div>
-
-            <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">Section Quota Enforcement:</strong>
-              <p className="text-slate-600 text-[11px]">
-                Enforces standard DepEd capacity (40 students per section) to eliminate classroom oversubscription.
-              </p>
-            </div>
-
-            <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">Conflict-Free Timetable Scheduling:</strong>
-              <p className="text-slate-600 text-[11px]">
-                Evaluates 3D timetable collisions (Teacher loads, Classroom occupancies, and SHS 5-core limits).
-              </p>
-            </div>
-
-            <div className="p-3 bg-white border border-slate-300 space-y-1">
-              <strong className="text-slate-900 block font-bold uppercase">Enrollment Control Room:</strong>
-              <p className="text-slate-600 text-[11px]">
-                Master switch to toggle online enrollment ON or OFF, configure active School Year, and set institutional advisories.
-              </p>
-            </div>
-          </div>
-
-          <span className="text-[10px] font-mono text-slate-500 uppercase">
-            Dumalneg NHS &bull; CCIS Capstone Project
-          </span>
+          )}
         </div>
       </div>
     </div>
@@ -521,11 +619,11 @@ export default function AdminLoginForm() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-md mx-auto my-20 p-8 bg-white border-2 border-[#002060] text-center font-sans space-y-2 shadow-xs">
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase block mb-1">
-            AUTHENTICATING ADMINISTRATIVE CREDENTIALS
+        <div className="max-w-md mx-auto my-20 p-8 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] text-center font-sans space-y-2 shadow-sm">
+          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
+            Loading Administrator Console
           </span>
-          <p className="text-xs text-slate-600">Loading School Administrator Console...</p>
+          <p className="text-xs text-slate-600">Preparing Registrar authentication workspace...</p>
         </div>
       }
     >

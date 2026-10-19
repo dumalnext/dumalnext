@@ -42,66 +42,76 @@ export default function SystemDiagnosticsMonitor() {
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="p-4 bg-blue-50 border-2 border-[#002060]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ RRL Section 2.1.3: Data Privacy &amp; Platform Integrity Monitor ]
-            </span>
-            <p className="text-xs text-slate-700 mt-1">
-              Verifies system security, database connectivity, and compliance with the Philippine Data Privacy Act of 2012 (RA 10173) for Dumalneg NHS learner data.
-            </p>
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white rounded-xl p-5 sm:p-6 shadow-md border border-[#001744] border-t-4 border-t-amber-400">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Seal"
+              className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+            />
+            <div>
+              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+                Data Privacy &amp; Platform Integrity Monitor
+              </span>
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+                Database Health, Latency &amp; Security Diagnostics
+              </h2>
+              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
+                Verifies system security, database connectivity, and compliance with the Philippine Data Privacy Act of 2012 (RA 10173) for Dumalneg NHS learner data.
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={handleRunDiagnostics}
             disabled={isRunningPing}
-            className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 disabled:opacity-50"
+            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 disabled:opacity-50 shadow-sm cursor-pointer"
           >
-            {isRunningPing ? "[ Testing Latency... ]" : "[ Run System Ping ]"}
+            {isRunningPing ? "Testing Latency..." : "Run System Ping"}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 bg-white border-2 border-slate-300">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
+        <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
             PostgreSQL Database Health
           </span>
           <div className="text-xl font-black text-green-700 mt-1 uppercase">
             {pingResult?.status || "HEALTHY"}
           </div>
-          <span className="text-[10px] font-mono text-slate-600 block mt-1">
+          <span className="text-[10px] font-mono text-slate-500 block mt-1">
             Supabase Project: fvybtqghtuarjzlpbwnr
           </span>
         </div>
 
-        <div className="p-4 bg-white border-2 border-slate-300">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
+        <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
             API Round-Trip Latency
           </span>
           <div className="text-xl font-black text-slate-900 mt-1 font-mono">
             {pingResult ? `${pingResult.latencyMs} ms` : "--"}
           </div>
-          <span className="text-[10px] font-mono text-slate-600 block mt-1">
+          <span className="text-[10px] text-slate-500 block mt-1">
             Acceptable Threshold: &lt; 250 ms
           </span>
         </div>
 
-        <div className="p-4 bg-white border-2 border-slate-300">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
+        <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
             Last Diagnostic Timestamp
           </span>
           <div className="text-xs font-mono font-bold text-[#002060] mt-2">
             {pingResult ? new Date(pingResult.timestamp).toLocaleString() : "--"}
           </div>
-          <span className="text-[10px] font-mono text-slate-600 block mt-1">
+          <span className="text-[10px] text-slate-500 block mt-1">
             UTC Synchronization: Synchronized
           </span>
         </div>
       </div>
 
-      <div className="bg-white border-2 border-slate-300">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3 border-b-2 border-slate-200 bg-slate-50">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
             Data Privacy Act (RA 10173) &amp; Security Compliance Audit

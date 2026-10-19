@@ -943,27 +943,34 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {/* TOP HEADER & ACTION CONTROLS */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 border-2 border-slate-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print print:hidden">
-        <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            AUTOMATED SCHEDULE DECONFLICTION HUB
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
-            Timetable Conflict-Free Evaluation Hub
-          </h2>
-          <p className="text-xs text-slate-600 mt-1">
-            Structured timetable matrix with standard time axis, preventing scheduling collisions across faculty, facilities, and section programs.
-          </p>
+      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 no-print print:hidden">
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/dumalneg-logo.png"
+            alt="Dumalneg NHS Seal"
+            className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+          />
+          <div>
+            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+              Automated Schedule Deconfliction Hub
+            </span>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
+              Timetable Conflict-Free Evaluation Hub
+            </h2>
+            <p className="text-xs text-blue-100/85 mt-0.5">
+              Structured timetable matrix preventing scheduling collisions across faculty loads, classrooms, and section programs.
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto shrink-0">
           <button
             type="button"
             onClick={() => {
               setAutoAuditResult(null);
               setIsAutoModalOpen(true);
             }}
-            className="w-full sm:w-auto px-3.5 sm:px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer border border-emerald-900 text-center"
+            className="w-full sm:w-auto px-3.5 sm:px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold tracking-wide transition-colors shadow-xs cursor-pointer border border-emerald-400/30 text-center"
             title="One-click automated timetable deconfliction engine for JHS and SHS"
           >
             Smart Auto-Generate
@@ -972,7 +979,7 @@ export default function ScheduleDeconflictionConsole() {
             type="button"
             onClick={runAuditScan}
             disabled={isScanning}
-            className="w-full sm:w-auto px-3 sm:px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#002060] border border-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-60 text-center"
+            className="w-full sm:w-auto px-3 sm:px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold tracking-wide transition-colors cursor-pointer disabled:opacity-60 text-center"
             title="Scan database for any schedule collisions"
           >
             {isScanning ? "Scanning..." : "Run Audit Scan"}
@@ -980,7 +987,7 @@ export default function ScheduleDeconflictionConsole() {
           <button
             type="button"
             onClick={() => setIsResetConfirmOpen(true)}
-            className="w-full sm:w-auto px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer text-center"
+            className="w-full sm:w-auto px-3 py-2 rounded-lg bg-red-600/80 hover:bg-red-600 text-white border border-red-400/30 text-xs font-semibold tracking-wide transition-colors cursor-pointer text-center"
             title="Reset and clear all timetables"
           >
             Clear All
@@ -1018,7 +1025,7 @@ export default function ScheduleDeconflictionConsole() {
 
               setIsAddModalOpen(true);
             }}
-            className="w-full sm:w-auto px-3.5 sm:px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer text-center"
+            className="w-full sm:w-auto px-3.5 sm:px-4 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold tracking-wide transition-colors shadow-xs cursor-pointer text-center"
           >
             + Assign Schedule
           </button>

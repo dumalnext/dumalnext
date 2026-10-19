@@ -352,23 +352,33 @@ export default function AcademicCalendarManager() {
   return (
     <div className="space-y-6 font-sans">
       {/* Top Policy Guideline Banner */}
-      <div className="p-4 bg-blue-50 border-2 border-[#002060]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              DEPED POLICY GUIDELINE: DYNAMIC TRISEM CALENDAR CONFIGURATION
-            </span>
-            <p className="text-xs text-slate-700 mt-1">
-              Zero Hardcoded Dates: School year boundaries, instructional periods, summative deadlines, and report card distribution dates are strictly configured dynamically through this IT Support console.
-            </p>
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white rounded-xl p-5 sm:p-6 shadow-md border border-[#001744] border-t-4 border-t-amber-400">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Seal"
+              className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+            />
+            <div>
+              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+                Dynamic Trisemester Calendar Configuration
+              </span>
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+                Academic Year &amp; Trimester Schedule Control
+              </h2>
+              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
+                School year boundaries, instructional periods, summative deadlines, and report card distribution dates are dynamically configured through this IT Support console.
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => setIsAddSYModalOpen(true)}
-              className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+              className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
             >
-              + CONFIGURE NEW TERM
+              + Configure New Term
             </button>
           </div>
         </div>
@@ -377,31 +387,31 @@ export default function AcademicCalendarManager() {
       {/* Status Notice */}
       {statusMessage && (
         <div
-          className={`p-3 border-2 text-xs font-bold ${
+          className={`p-3.5 rounded-lg border text-xs font-bold ${
             statusMessage.type === "success"
-              ? "bg-green-50 border-green-600 text-green-900"
-              : "bg-red-50 border-red-600 text-red-900"
+              ? "bg-green-50 border-green-500 text-green-900"
+              : "bg-red-50 border-red-500 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "STATUS: " : "ERROR: "}
+          {statusMessage.type === "success" ? "Status: " : "Error: "}
           {statusMessage.text}
         </div>
       )}
 
       {/* Currently Active Academic Calendar Spotlight */}
-      <div className="p-5 bg-white border-2 border-slate-300 shadow-xs">
+      <div className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm">
         <div className="border-b border-slate-200 pb-3 mb-4 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 block">
-              CURRENTLY ACTIVE ACADEMIC CALENDAR
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+              Currently Active Academic Calendar
             </span>
             <h3 className="text-lg font-black text-slate-950 uppercase">
               {activeTerm ? `SY ${activeTerm.schoolYear} • ${activeTerm.termName}` : "NO ACTIVE TERM CONFIGURED"}
             </h3>
           </div>
           {activeTerm && (
-            <span className="bg-green-700 text-white font-mono font-bold text-xs px-2.5 py-1 uppercase tracking-widest">
-              ACTIVE
+            <span className="bg-green-700 text-white rounded-full font-bold text-xs px-3 py-1 uppercase tracking-wider">
+              Active
             </span>
           )}
         </div>

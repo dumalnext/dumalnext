@@ -14,23 +14,30 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
-        {/* DepEd & DNHS Institutional Banner (Navy Blue & Pure White, Zero Emojis/Icons) */}
-        <header className="deped-header px-6 py-4 shadow-sm">
+        {/* DepEd & DNHS Institutional Banner */}
+        <header className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] border-t-4 border-t-amber-400 border-b border-[#001744] px-6 py-4 shadow-md text-white">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">
-                Republic of the Philippines | Department of Education | Region I
-              </p>
-              <h1 className="text-xl font-bold tracking-tight text-white mt-1">
-                DUMALNEG NATIONAL HIGH SCHOOL
-              </h1>
-              <p className="text-xs text-slate-300 font-medium">
-                Dumal-NEXT: Web-Based Enrollment & Schedule Deconfliction System
-              </p>
+            <div className="flex items-center gap-3.5">
+              <img
+                src="/dumalneg-logo.png"
+                alt="Dumalneg National High School Seal"
+                className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-md bg-white shrink-0"
+              />
+              <div>
+                <p className="text-[11px] font-bold tracking-widest text-amber-300 uppercase">
+                  Republic of the Philippines &bull; Department of Education &bull; Region I
+                </p>
+                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-white mt-0.5">
+                  DUMALNEG NATIONAL HIGH SCHOOL
+                </h1>
+                <p className="text-xs text-blue-100 font-medium">
+                  Dumal-NEXT: Web-Based Enrollment &amp; Schedule Deconfliction System
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-3 text-xs">
-              <span className="bg-blue-900 border border-blue-400/40 text-white px-3 py-1 font-mono">
-                Official Institutional Portal | Trimester System
+              <span className="bg-white/10 border border-white/20 text-white px-3.5 py-1.5 rounded-full font-semibold tracking-wide">
+                Official Institutional Portal &bull; Trimester System
               </span>
             </div>
           </div>
@@ -41,7 +48,7 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* DepEd Institutional Footer (Zero Emojis/Icons) */}
+        {/* DepEd Institutional Footer */}
         <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 text-xs py-6 px-6 mt-12">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>

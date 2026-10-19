@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import CustomSelect from "@/components/CustomSelect";
 
 export interface Classroom {
   id: string;
@@ -28,8 +27,6 @@ export default function ClassroomFacilityManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Classroom | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Classroom | null>(null);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     classroomId: "",
@@ -41,9 +38,9 @@ export default function ClassroomFacilityManager() {
   const fetchClassrooms = async () => {
     setIsLoading(true);
     try {
-      let res = await fetch(`/api/it-support/classrooms?_t=${Date.now()}`, { cache: "no-store" });
+      let res = await fetch(`/api/classrooms?_t=${Date.now()}`, { cache: "no-store" });
       if (res.status === 404) {
-        res = await fetch(`/api/classrooms?_t=${Date.now()}`, { cache: "no-store" });
+        res = await fetch(`/api/it-support/classrooms?_t=${Date.now()}`, { cache: "no-store" });
       }
       const rawText = await res.text();
       let json: any = {};
@@ -99,13 +96,13 @@ export default function ClassroomFacilityManager() {
         ...formData,
         id: editingRoom ? editingRoom.id : undefined,
       };
-      let res = await fetch("/api/it-support/classrooms", {
+      let res = await fetch("/api/classrooms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       if (res.status === 404) {
-        res = await fetch("/api/classrooms", {
+        res = await fetch("/api/it-support/classrooms", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -139,15 +136,16 @@ export default function ClassroomFacilityManager() {
     }
   };
 
-  const handleConfirmDelete = async () => {
-    if (!deleteTarget) return;
-    setIsDeleting(true);
+  const handleDelete = async (id: string, code: string) => {
+    if (!confirm(`Are you sure you want to delete classroom ${code}? This will remove it from the scheduling directory.`)) {
+      return;
+    }
     try {
-      let res = await fetch(`/api/it-support/classrooms?id=${deleteTarget.id}`, {
+      let res = await fetch(`/api/classrooms?id=${id}`, {
         method: "DELETE",
       });
       if (res.status === 404) {
-        res = await fetch(`/api/classrooms?id=${deleteTarget.id}`, {
+        res = await fetch(`/api/it-support/classrooms?id=${id}`, {
           method: "DELETE",
         });
       }
@@ -159,72 +157,74 @@ export default function ClassroomFacilityManager() {
         throw new Error(rawText ? rawText.slice(0, 150) : "Invalid server response");
       }
       if (res.ok && json.success) {
-        setStatusMessage({ type: "success", text: `Classroom ${deleteTarget.classroomId} removed successfully.` });
-        setDeleteTarget(null);
+        setStatusMessage({ type: "success", text: `Classroom ${code} removed.` });
         fetchClassrooms();
       } else {
         setStatusMessage({ type: "error", text: json.error || "Failed to delete classroom." });
-        setDeleteTarget(null);
       }
     } catch (err: any) {
       setStatusMessage({ type: "error", text: err.message || "Error deleting classroom." });
-      setDeleteTarget(null);
-    } finally {
-      setIsDeleting(false);
     }
   };
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Information Banner */}
-      <div className="p-4 bg-blue-50 border-2 border-[#002060]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              School Facility &amp; Physical Classroom Registry
-            </span>
-            <p className="text-xs text-slate-700 mt-1">
-              Registered classrooms feed directly into the Schedule Deconfliction Engine. Room capacities are validated against section quotas to prevent physical overcrowding.
-            </p>
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white rounded-xl p-5 sm:p-6 shadow-md border border-[#001744] border-t-4 border-t-amber-400">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Seal"
+              className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+            />
+            <div>
+              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+                School Facility &amp; Physical Classroom Registry
+              </span>
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+                Instructional Rooms &amp; Seating Capacities
+              </h2>
+              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
+                Registered classrooms feed directly into the Schedule Deconfliction Engine. Room capacities are validated against section quotas to prevent physical overcrowding.
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={openAddModal}
-            className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0"
+            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 shadow-sm cursor-pointer"
           >
             + Add New Classroom
           </button>
         </div>
       </div>
 
-      {/* Status Notice */}
       {statusMessage && (
         <div
-          className={`p-3 border-2 text-xs font-bold ${
+          className={`p-3.5 rounded-lg border text-xs font-bold ${
             statusMessage.type === "success"
-              ? "bg-green-50 border-green-600 text-green-900"
-              : "bg-red-50 border-red-600 text-red-900"
+              ? "bg-green-50 border-green-500 text-green-900"
+              : "bg-red-50 border-red-500 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "STATUS: " : "ERROR: "}
+          {statusMessage.type === "success" ? "Status: " : "Error: "}
           {statusMessage.text}
         </div>
       )}
 
-      {/* Classrooms Grid / Table */}
-      <div className="bg-white border-2 border-slate-300">
-        <div className="px-5 py-3 border-b-2 border-slate-200 bg-slate-50 flex items-center justify-between">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
             Dumalneg National High School &bull; Instructional Spaces
           </h3>
-          <span className="text-[11px] font-mono font-bold text-slate-600">
-            TOTAL INSTRUCTIONAL ROOMS: {classrooms.length}
+          <span className="text-[11px] font-bold text-[#002060] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+            Total Rooms: {classrooms.length}
           </span>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-mono text-slate-500 uppercase">
-            Loading Facilities Directory from PostgreSQL...
+          <div className="p-8 text-center text-xs font-semibold text-slate-500">
+            Loading facilities directory...
           </div>
         ) : classrooms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
@@ -234,7 +234,7 @@ export default function ClassroomFacilityManager() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-300 font-mono text-[11px] uppercase text-slate-700">
+                <tr className="bg-slate-100 border-b border-slate-200 font-bold text-[11px] uppercase text-slate-700">
                   <th className="p-3">Room Code</th>
                   <th className="p-3">Room Name</th>
                   <th className="p-3">Building Location</th>
@@ -252,10 +252,10 @@ export default function ClassroomFacilityManager() {
                     <td className="p-3 font-mono font-bold text-slate-900">{room.capacity} seats</td>
                     <td className="p-3">
                       <span
-                        className="px-2 py-0.5 bg-blue-100 border border-blue-300 text-[#002060] font-mono font-bold text-[10px] uppercase"
+                        className="px-2 py-0.5 bg-blue-100 border border-blue-300 text-[#002060] rounded font-bold text-[10px] uppercase"
                         title="Monitored by Automated Deconfliction Engine: Active Double-Booking and Room Overcrowding Guard"
                       >
-                        MONITORED
+                        Monitored
                       </span>
                     </td>
                     <td className="p-3 text-right">
@@ -263,15 +263,15 @@ export default function ClassroomFacilityManager() {
                         <button
                           type="button"
                           onClick={() => openEditModal(room)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase transition-colors cursor-pointer"
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded text-[11px] font-bold transition-colors cursor-pointer"
                           title={`Edit ${room.classroomId}`}
                         >
                           Edit
                         </button>
                         <button
                           type="button"
-                          onClick={() => setDeleteTarget(room)}
-                          className="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 text-[11px] font-bold uppercase transition-colors cursor-pointer"
+                          onClick={() => handleDelete(room.id, room.classroomId)}
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-[11px] font-bold transition-colors cursor-pointer"
                         >
                           Delete
                         </button>
@@ -285,16 +285,15 @@ export default function ClassroomFacilityManager() {
         )}
       </div>
 
-      {/* Modal: Add or Edit Classroom */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white border-4 border-[#002060] max-w-md w-full p-6 space-y-4">
-            <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
+          <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                  IT SUPPORT FACILITY DESK
+                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
+                  IT Support Facility Desk
                 </span>
-                <h3 className="text-base font-bold text-slate-900 uppercase">
+                <h3 className="text-base font-bold text-slate-900">
                   {editingRoom ? `Edit Classroom Space: ${editingRoom.classroomId}` : "Register Classroom Space"}
                 </h3>
               </div>
@@ -304,9 +303,9 @@ export default function ClassroomFacilityManager() {
                   setIsModalOpen(false);
                   setEditingRoom(null);
                 }}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded hover:bg-slate-100 cursor-pointer"
               >
-                CLOSE X
+                Close
               </button>
             </div>
 
@@ -321,7 +320,7 @@ export default function ClassroomFacilityManager() {
                   onChange={(e) => setFormData({ ...formData, classroomId: e.target.value })}
                   required
                   placeholder="e.g. RM-103, SCI-LAB-2"
-                  className="w-full p-2 border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 rounded-lg border border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
@@ -335,7 +334,7 @@ export default function ClassroomFacilityManager() {
                   onChange={(e) => setFormData({ ...formData, roomName: e.target.value })}
                   required
                   placeholder="e.g. Room 103 - Grade 7 Rizal"
-                  className="w-full p-2 border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 rounded-lg border border-slate-300 font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
@@ -343,21 +342,20 @@ export default function ClassroomFacilityManager() {
                 <label className="block font-bold uppercase text-slate-800 mb-1">
                   Building Location <span className="text-red-700">*</span>
                 </label>
-                <CustomSelect
-                  fullWidth
-                  placeholder="-- Select Building Location --"
+                <select
                   value={formData.building}
-                  onChange={(val) => setFormData({ ...formData, building: val })}
-                  options={[
-                    ...PRESET_BUILDINGS.map((bldg) => ({
-                      value: bldg,
-                      label: bldg,
-                    })),
-                    ...(formData.building && !PRESET_BUILDINGS.includes(formData.building)
-                      ? [{ value: formData.building, label: formData.building }]
-                      : []),
-                  ]}
-                />
+                  onChange={(e) => setFormData({ ...formData, building: e.target.value })}
+                  className="w-full p-2.5 rounded-lg border border-slate-300 font-bold focus:border-[#002060] outline-none"
+                >
+                  {PRESET_BUILDINGS.map((bldg) => (
+                    <option key={bldg} value={bldg}>
+                      {bldg}
+                    </option>
+                  ))}
+                  {formData.building && !PRESET_BUILDINGS.includes(formData.building) && (
+                    <option value={formData.building}>{formData.building}</option>
+                  )}
+                </select>
               </div>
 
               <div>
@@ -371,7 +369,7 @@ export default function ClassroomFacilityManager() {
                   required
                   min={10}
                   max={80}
-                  className="w-full p-2 border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 rounded-lg border border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
                 />
                 <p className="text-[10px] text-slate-500 mt-1">
                   Standard DepEd classroom capacity is 40-45 students.
@@ -385,89 +383,19 @@ export default function ClassroomFacilityManager() {
                     setIsModalOpen(false);
                     setEditingRoom(null);
                   }}
-                  className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-[#002060] text-white font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-[#002060] text-white font-bold hover:bg-[#001845] disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? "Saving..." : editingRoom ? "Update Classroom" : "Register Classroom"}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modern Confirm Delete Classroom Modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
-            <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
-                  DepEd Facility De-Registration
-                </span>
-                <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
-                  Confirm Classroom Deletion
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(null)}
-                disabled={isDeleting}
-                className="text-slate-400 hover:text-slate-600 font-mono text-xl font-bold px-2 cursor-pointer"
-              >
-                &times;
-              </button>
-            </div>
-
-            <div className="p-3.5 bg-red-50 border border-red-300 text-xs space-y-2 text-red-950">
-              <p className="font-semibold text-slate-800">
-                Are you sure you want to delete classroom <strong className="font-mono text-[#002060]">{deleteTarget.classroomId}</strong>? This will remove it from the scheduling directory.
-              </p>
-              <div className="bg-white p-3 border border-red-200 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-sm text-[#002060]">
-                    {deleteTarget.classroomId}
-                  </span>
-                  <span className="font-mono text-[10px] bg-red-100 text-red-800 px-2 py-0.5 font-bold uppercase">
-                    {deleteTarget.capacity} Seats
-                  </span>
-                </div>
-                <div className="font-bold text-slate-900 text-xs">
-                  {deleteTarget.roomName}
-                </div>
-                <div className="text-[11px] text-slate-600">
-                  Building: <strong className="text-slate-800">{deleteTarget.building}</strong>
-                </div>
-              </div>
-              <p className="text-[11px] text-red-700 font-medium">
-                Warning: Removing this room will make it unavailable for section assignment and the Schedule Deconfliction Engine.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(null)}
-                disabled={isDeleting}
-                className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center order-2 sm:order-1"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-                className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 text-center order-1 sm:order-2"
-              >
-                {isDeleting ? "Deleting..." : "Confirm Delete"}
-              </button>
-            </div>
           </div>
         </div>
       )}

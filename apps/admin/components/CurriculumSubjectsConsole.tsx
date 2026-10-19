@@ -712,36 +712,43 @@ export default function CurriculumSubjectsConsole() {
   return (
     <div className="space-y-8 font-sans pb-12">
       {/* Top Header Card */}
-      <div className="bg-white border-2 border-slate-300 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#002060]">
-              DEPED COURSE CATALOG &amp; SUBJECT OFFERINGS
-            </span>
-            <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 uppercase">
-              Live Subject Catalog
-            </span>
+      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/dumalneg-logo.png"
+            alt="Dumalneg NHS Seal"
+            className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+          />
+          <div>
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
+                DepEd Course Catalog &amp; Subject Offerings
+              </span>
+              <span className="text-[10px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-2 py-0.5 rounded-full uppercase">
+                Live Subject Catalog
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+              Curriculum &amp; Subjects Management Console
+            </h2>
+            <p className="text-xs text-blue-100/85 mt-0.5 max-w-2xl leading-relaxed">
+              Manage official learning areas and subjects across Junior High School (Grades 7–10) and Senior High School (Grades 11–12) at Dumalneg National High School.
+            </p>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-950 uppercase">
-            Subjects Management Console
-          </h2>
-          <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-            Manage official learning areas and subjects across Junior High School (Grades 7–10) and Senior High School (Grades 11–12) at Dumalneg National High School.
-          </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto shrink-0">
           <button
             type="button"
             onClick={fetchSubjects}
-            className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer text-center"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold tracking-wide transition-colors cursor-pointer text-center"
           >
             Refresh Subjects
           </button>
           <button
             type="button"
             onClick={() => handleOpenCreateModal()}
-            className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer text-center"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold tracking-wide transition-colors shadow-sm cursor-pointer text-center"
           >
             + Add New Subject
           </button>

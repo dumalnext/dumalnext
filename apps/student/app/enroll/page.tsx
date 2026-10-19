@@ -142,18 +142,38 @@ export default function StudentEnrollPage() {
   // OPEN ENROLLMENT STATE (MASTER SWITCH IS ON)
   // ===========================================================================
   return (
-    <div className="max-w-4xl mx-auto space-y-6 ">
-      {/* Top Breadcrumb Navigation */}
-      <div className="flex items-center justify-between text-xs text-slate-600 bg-white p-3 border border-slate-300 rounded-[4px]">
-        <div className="flex items-center space-x-2">
-          <Link href="/" className="font-bold text-[#002060] hover:underline">
-            Student Home
-          </Link>
-          <span>/</span>
-          <span className="text-slate-800 font-medium">Online Enrollment Form (S.Y. {schoolYear} &bull; {semester})</span>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Top Institutional Enrollment Header Banner */}
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-full bg-white p-1 border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Official Seal"
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-300">
+              <Link href="/" className="hover:underline text-white font-bold">
+                &larr; Student Dashboard
+              </Link>
+              <span className="text-blue-300">/</span>
+              <span>DepEd Learner Enrollment Form</span>
+            </div>
+            <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight mt-0.5">
+              Official Online Basic Education Enrollment
+            </h1>
+            <p className="text-xs text-blue-100 mt-0.5">
+              School Year {schoolYear} &bull; {semester} &bull; Dumalneg National High School
+            </p>
+          </div>
         </div>
-        <div className="text-[11px] text-slate-500">
-          DEPED FORM &bull; S.Y. {schoolYear} &bull; {semester}
+        <div className="self-start sm:self-center shrink-0">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 border border-emerald-400/50 text-emerald-100 text-xs font-bold rounded-[4px]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            Admissions Open
+          </span>
         </div>
       </div>
 

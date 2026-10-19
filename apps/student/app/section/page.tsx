@@ -673,39 +673,39 @@ function SectionPageContent() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-6 px-4 space-y-6 ">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center gap-2 text-xs text-slate-500 pb-2 border-b border-slate-200">
-        <Link href="/" className="hover:text-[#002060] hover:underline">
-          Home Dashboard
-        </Link>
-        <span>/</span>
-        <span className="text-slate-400">Portal Modules</span>
-        <span>/</span>
-        <span className="font-bold text-[#002060]">
-          Class Section &amp; Advisory
-        </span>
-      </nav>
-
+    <div className="max-w-5xl mx-auto py-6 px-4 space-y-6">
       {/* Institutional Top Banner */}
-      <section className="bg-white border-l-4 border-[#002060] p-6 shadow-xs border border-slate-200 rounded-[4px]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-bold tracking-wide text-[#002060] block mb-1">
-              DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS
-            </span>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Class Section &amp; Advisory Placement
-            </h1>
-            <p className="text-xs text-slate-600 mt-1">
-              Official section roster, classroom advisory assignment, and prescribed schedule console (S.Y. {schoolYear} &bull; Trimester {activeTermNumber}).
-            </p>
+      <section className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 shadow-md rounded-[4px]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-full bg-white p-1 border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs">
+              <img
+                src="/dumalneg-logo.png"
+                alt="Dumalneg NHS Official Seal"
+                className="w-full h-full object-contain rounded-full"
+              />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-300">
+                <Link href="/" className="hover:underline text-white font-bold">
+                  &larr; Home Dashboard
+                </Link>
+                <span className="text-blue-300">/</span>
+                <span>DepEd Region I &bull; Dumalneg NHS</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
+                Class Section &amp; Advisory Placement
+              </h1>
+              <p className="text-xs text-blue-100 mt-0.5">
+                Official section roster, classroom advisory assignment, and prescribed schedule (S.Y. {schoolYear} &bull; Trimester {activeTermNumber}).
+              </p>
+            </div>
           </div>
           {user && (
-            <div className="text-left sm:text-right bg-slate-50 border border-slate-200 p-2.5 text-xs rounded-[4px]">
-              <span className="text-[10px] text-slate-500 block">Active Learner</span>
-              <strong className="text-slate-900 block">{user.firstName} {user.lastName}</strong>
-              <span className="text-[10px] text-[#002060]">LRN: {user.lrn || user.userId}</span>
+            <div className="text-left sm:text-right bg-white/10 border border-white/20 p-3 text-xs rounded-[4px] shrink-0">
+              <span className="text-[10px] text-amber-300 font-semibold block">Active Learner</span>
+              <strong className="text-white block">{user.firstName} {user.lastName}</strong>
+              <span className="text-[11px] text-blue-100">LRN: {user.lrn || user.userId}</span>
             </div>
           )}
         </div>

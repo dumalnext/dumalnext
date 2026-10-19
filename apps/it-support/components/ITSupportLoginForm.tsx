@@ -23,6 +23,7 @@ function ITSupportLoginFormInner() {
   // Standard Login State
   const [identifier, setIdentifier] = useState("dumalnext@gmail.com");
   const [password, setPassword] = useState("dumalNext26.");
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -118,7 +119,7 @@ function ITSupportLoginFormInner() {
 
       const json = await res.json();
       if (res.ok && json.success) {
-        setActivationSuccess("IT Support account created and activated successfully! Entering IT Support Console...");
+        setActivationSuccess("IT Support account created and activated! Entering IT Support Console...");
         if (json.cookieName && json.sessionUser) {
           const serialized = encodeURIComponent(JSON.stringify(json.sessionUser));
           document.cookie = `${json.cookieName}=${serialized}; path=/; max-age=604800; SameSite=Lax`;
@@ -159,190 +160,319 @@ function ITSupportLoginFormInner() {
 
   if (isCheckingToken) {
     return (
-      <div className="max-w-md mx-auto p-8 bg-white border-4 border-[#002060] text-center font-sans space-y-2 shadow-md">
-        <span className="text-[10px] font-mono font-bold tracking-widest text-[#002060] uppercase block">
-          PORTAL 04 &bull; RESTRICTED PERIMETER
+      <div className="max-w-md mx-auto my-20 p-8 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] text-center font-sans space-y-3 shadow-sm">
+        <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
+        <span className="text-xs font-bold tracking-wider text-[#002060] uppercase block">
+          Verifying IT Support Clearance
         </span>
-        <h2 className="text-sm font-bold text-slate-900 uppercase">
-          Verifying IT Support Clearance...
-        </h2>
-        <p className="text-xs text-slate-500">Authenticating invitation token...</p>
+        <p className="text-xs text-slate-500">Authenticating invitation token with Dumalneg NHS Registry...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 sm:p-8 bg-white border-4 border-[#002060] shadow-md font-sans">
-      <div className="border-b-2 border-slate-300 pb-4 mb-6 text-center">
-        <span className="text-[10px] font-mono font-bold tracking-widest text-[#002060] uppercase block">
-          PORTAL 04 &bull; RESTRICTED PERIMETER
-        </span>
-        <h2 className="text-xl font-black uppercase tracking-tight text-slate-900 mt-1">
-          {invitation ? "IT Support Onboarding & Setup" : "IT Support Authentication Desk"}
-        </h2>
-        <p className="text-xs text-slate-600 mt-1">
-          {invitation
-            ? "Your IT Support invitation has been verified. Create your master password below to activate your system clearance."
-            : <>Restricted to authorized system administrator email: <strong className="text-[#002060]">dumalnext@gmail.com</strong></>}
-        </p>
-      </div>
-
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 font-sans">
       {inviteError && (
-        <div className="mb-4 p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-800">
-          [ INVITATION NOTICE ]: {inviteError}
+        <div className="p-4 bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg text-xs text-red-950 space-y-1 shadow-xs">
+          <div className="font-bold uppercase tracking-wider text-red-900">
+            Invitation Verification Notice
+          </div>
+          <p>{inviteError}</p>
         </div>
       )}
 
-      {errorMessage && (
-        <div className="mb-4 p-3 bg-red-50 border-2 border-red-400 text-xs font-bold text-red-800">
-          [ AUTHENTICATION ERROR ]: {errorMessage}
+      {/* 2-Column Split Enrollment System Login Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* LEFT COLUMN (7 Cols): Institutional Hero & IT Governance Capabilities */}
+        <div className="lg:col-span-7 space-y-6">
+          <section className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+            <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-6 sm:p-8 border-b-4 border-amber-400">
+              <div className="flex items-center gap-4">
+                <img
+                  src="/dumalneg-logo.png"
+                  alt="Dumalneg National High School Seal"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover bg-white p-1 shadow-md border-2 border-amber-400 shrink-0"
+                />
+                <div className="space-y-1">
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10px] font-bold uppercase tracking-widest">
+                    IT Support &amp; System Governance
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-snug">
+                    {invitation
+                      ? "IT Support Account Onboarding"
+                      : "System Administration & Identity Desk"}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-blue-100/90">
+                    Dumalneg National High School &bull; DepEd Division of Ilocos Norte
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-blue-100/90 mt-5 leading-relaxed">
+                {invitation
+                  ? "Your IT Support invitation has been verified. Create your security password to activate your system administration clearance."
+                  : "Dedicated infrastructure and identity governance portal for Dumalneg National High School. Manage dynamic trisemester academic calendars, register campus classrooms, audit user role permissions, monitor database health, and issue secure staff onboarding invitations."}
+              </p>
+            </div>
+
+            <div className="p-6 sm:p-8 bg-white space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div>
+                  <span className="text-[11px] font-bold text-[#002060] uppercase tracking-wider block">
+                    System Infrastructure Modules
+                  </span>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Enrollment System Governance &amp; Security Controls
+                  </h3>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
+                  System Admin
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      01
+                    </span>
+                    <span>Dynamic Trisemester Calendar</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Configure active School Years and Trimesters with zero hardcoded dates, broadcasting changes to all portals.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      02
+                    </span>
+                    <span>Classroom &amp; Facility Registry</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Maintain physical room capacities, building assignments, and laboratory classifications for timetable scheduling.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      03
+                    </span>
+                    <span>User Role &amp; Access Auditor</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Audit Student, Teacher, Registrar, and IT Support accounts with Data Privacy Act of 2012 (RA 10173) safeguards.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
+                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      04
+                    </span>
+                    <span>Staff Invitations &amp; Onboarding</span>
+                  </div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    Generate and dispatch single-use cryptographic invitation links for new faculty and administrative personnel.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      )}
 
-      {activationSuccess && (
-        <div className="mb-4 p-3 bg-green-50 border-2 border-green-600 text-xs font-bold text-green-950 font-mono">
-          [ STATUS ]: {activationSuccess}
+        {/* RIGHT COLUMN (5 Cols): Sticky Authentication / Onboarding Card */}
+        <div className="lg:col-span-5 lg:sticky lg:top-6">
+          <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
+            <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center gap-3.5">
+              <img
+                src="/dumalneg-logo.png"
+                alt="Dumalneg NHS Seal"
+                className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 bg-white p-0.5 shadow-2xs shrink-0"
+              />
+              <div>
+                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
+                  IT Support &amp; System Security
+                </span>
+                <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
+                  {invitation ? "IT Support Onboarding Setup" : "IT Support Portal Login"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {invitation
+                    ? "Create your security password to activate access"
+                    : "Sign in with your authorized system administrator credentials"}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-7 space-y-5">
+              {errorMessage && (
+                <div className="p-3.5 bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg text-xs font-semibold text-red-900">
+                  {errorMessage}
+                </div>
+              )}
+
+              {activationSuccess && (
+                <div className="p-3.5 bg-emerald-50 border border-emerald-300 border-l-4 border-l-emerald-600 rounded-lg text-xs font-semibold text-emerald-950">
+                  {activationSuccess}
+                </div>
+              )}
+
+              {/* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */}
+              {invitation ? (
+                <form onSubmit={handleActivateAccount} className="space-y-4 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Authorized IT Email
+                    </label>
+                    <input
+                      type="email"
+                      value={invitation.email}
+                      disabled
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-medium cursor-not-allowed select-all"
+                    />
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      System access is permanently bound to this verified email address.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Full Name / Personnel Title
+                    </label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="e.g. Alex Rivera"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      System Administration Designation
+                    </label>
+                    <select
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    >
+                      <option value="System Administrator">System Administrator</option>
+                      <option value="Database Operations Specialist">Database Operations Specialist</option>
+                      <option value="Network & Security Support">Network &amp; Security Support</option>
+                      <option value="IT Operations Desk">IT Operations Desk</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Create Security Password <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter minimum 6 characters"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      Confirm Security Password <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter your password"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isActivating || Boolean(activationSuccess)}
+                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs tracking-wide transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                    >
+                      {isActivating ? "Activating Clearance..." : "Activate IT Support Account & Sign In"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                /* CASE 2: NORMAL LOGIN FORM */
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Authorized Administrator Email <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      required
+                      placeholder="dumalnext@gmail.com"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      System Security Password <span className="text-red-600">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="Enter security password"
+                        className="w-full px-3.5 py-2.5 pr-16 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-500 hover:text-[#002060] px-2 py-1 rounded cursor-pointer"
+                      >
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs tracking-wide transition-colors shadow-sm disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>{isSubmitting ? "Verifying Credentials..." : "Sign In to IT Support Console"}</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+
+                  <div className="pt-3 border-t border-slate-200">
+                    <button
+                      type="button"
+                      onClick={handleDemoFill}
+                      disabled={isSubmitting}
+                      className="w-full py-2.5 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-semibold text-xs transition-colors cursor-pointer"
+                    >
+                      Quick Demo Sign-In: dumalnext@gmail.com
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
-      )}
-
-      {/* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */}
-      {invitation ? (
-        <form onSubmit={handleActivateAccount} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase text-slate-800 mb-1">
-              Authorized IT Email
-            </label>
-            <input
-              type="email"
-              value={invitation.email}
-              disabled
-              className="w-full p-2.5 bg-slate-100 border-2 border-slate-300 font-mono text-slate-700 cursor-not-allowed select-all"
-            />
-            <p className="text-[10px] font-mono text-slate-500 mt-1">
-              Locked: System access will be bound to this verified email address.
-            </p>
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase text-slate-800 mb-1">
-              Full Name / IT Personnel Label
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Alex Rivera"
-              className="w-full p-2.5 bg-slate-50 border-2 border-slate-300 font-bold text-slate-900 focus:bg-white focus:border-[#002060] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase text-slate-800 mb-1">
-              System Administration Designation
-            </label>
-            <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border-2 border-slate-300 font-bold text-slate-900 focus:bg-white focus:border-[#002060] outline-none"
-            >
-              <option value="System Administrator">System Administrator</option>
-              <option value="Database Operations Specialist">Database Operations Specialist</option>
-              <option value="Network &amp; Security Support">Network &amp; Security Support</option>
-              <option value="IT Operations Desk">IT Operations Desk</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase text-slate-800 mb-1">
-              Create Master Security Password *
-            </label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter minimum 6 characters"
-              className="w-full p-2.5 bg-slate-50 border-2 border-slate-300 font-mono text-slate-900 focus:bg-white focus:border-[#002060] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold uppercase text-slate-800 mb-1">
-              Confirm Security Password *
-            </label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter your password"
-              className="w-full p-2.5 bg-slate-50 border-2 border-slate-300 font-mono text-slate-900 focus:bg-white focus:border-[#002060] outline-none"
-            />
-          </div>
-
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={isActivating || Boolean(activationSuccess)}
-              className="w-full py-3 bg-indigo-900 hover:bg-indigo-950 text-white font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              {isActivating ? "[ ACTIVATING CLEARANCE... ]" : "[ ACTIVATE IT SUPPORT ACCOUNT & LOG IN ]"}
-            </button>
-          </div>
-        </form>
-      ) : (
-        /* CASE 2: NORMAL LOGIN FORM (WHEN NO INVITE TOKEN IS PRESENT) */
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold uppercase text-slate-800 mb-1">
-              Authorized Administrator Email <span className="text-red-700">*</span>
-            </label>
-            <input
-              type="email"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              required
-              placeholder="dumalnext@gmail.com"
-              className="w-full p-2.5 bg-slate-50 border-2 border-slate-300 text-xs font-bold text-slate-900 focus:bg-white focus:border-[#002060] outline-none font-mono"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase text-slate-800 mb-1">
-              System Security Password <span className="text-red-700">*</span>
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter security password"
-              className="w-full p-2.5 bg-slate-50 border-2 border-slate-300 text-xs font-bold text-slate-900 focus:bg-white focus:border-[#002060] outline-none font-mono"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer"
-          >
-            {isSubmitting ? "[ Verifying Credentials... ]" : "[ Authenticate IT Support Session ]"}
-          </button>
-
-          <div className="pt-2 border-t border-slate-200">
-            <button
-              type="button"
-              onClick={handleDemoFill}
-              disabled={isSubmitting}
-              className="w-full py-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-400 text-slate-800 font-bold text-xs uppercase tracking-wider transition-colors font-mono cursor-pointer"
-            >
-              [ Quick Sign-In: dumalnext@gmail.com ]
-            </button>
-          </div>
-        </form>
-      )}
+      </div>
     </div>
   );
 }
@@ -351,9 +481,9 @@ export default function ITSupportLoginForm() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-md mx-auto p-8 bg-white border-4 border-[#002060] text-center font-sans space-y-2 shadow-md">
-          <span className="text-[10px] font-mono font-bold tracking-widest text-[#002060] uppercase block">
-            PORTAL 04 &bull; RESTRICTED PERIMETER
+        <div className="max-w-md mx-auto my-20 p-8 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] text-center font-sans space-y-2 shadow-sm">
+          <span className="text-xs font-bold tracking-wider text-[#002060] uppercase block">
+            IT Support &amp; System Governance
           </span>
           <p className="text-xs text-slate-500">Loading IT Support Authentication Desk...</p>
         </div>

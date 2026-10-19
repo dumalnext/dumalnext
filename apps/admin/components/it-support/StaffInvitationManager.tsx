@@ -140,7 +140,6 @@ export default function StaffInvitationManager() {
           text: `Invitation link generated successfully for ${json.invitation.email}. The recipient can now accept the invite and create their password.`,
         });
 
-        // Clear input form
         if (role === "teacher") setTeacherForm({ email: "", fullName: "", department: "Junior High School (JHS)" });
         if (role === "admin") setAdminForm({ email: "", fullName: "", department: "Office of the Registrar" });
         if (role === "it_support") setItSupportForm({ email: "", fullName: "", department: "System Administrator" });
@@ -163,7 +162,6 @@ export default function StaffInvitationManager() {
       setCopiedToken(token);
       setTimeout(() => setCopiedToken(null), 3000);
     } catch {
-      // Fallback
       prompt("Copy invitation link:", url);
     }
   };
@@ -203,13 +201,21 @@ export default function StaffInvitationManager() {
   return (
     <div className="space-y-6 font-sans">
       {/* DepEd Policy Guideline Banner */}
-      <div className="p-4 bg-blue-50 border-2 border-[#002060]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white rounded-xl p-5 sm:p-6 shadow-md border border-[#001744] border-t-4 border-t-amber-400">
+        <div className="flex items-start gap-3.5">
+          <img
+            src="/dumalneg-logo.png"
+            alt="Dumalneg NHS Seal"
+            className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+          />
           <div>
-            <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-              [ DEPED POLICY GUIDELINE: ROLE-BASED STAFF INVITATION &amp; ONBOARDING DESK ]
+            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+              Role-Based Staff Invitation &amp; Onboarding Desk
             </span>
-            <p className="text-xs text-slate-700 mt-1">
+            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+              Faculty, Registrar &amp; IT Support Invitation Console
+            </h2>
+            <p className="text-xs text-blue-100 mt-1 max-w-3xl leading-relaxed">
               Zero Self-Registration: Faculty, Administrators, and IT Support accounts are strictly provisioned through verified email invitations. When an invitation link is accepted, the authorized recipient sets their own password and is granted direct role-based portal access.
             </p>
           </div>
@@ -219,25 +225,25 @@ export default function StaffInvitationManager() {
       {/* Status Notice */}
       {statusMessage && (
         <div
-          className={`p-3 border-2 text-xs font-bold ${
+          className={`p-3.5 rounded-lg border text-xs font-bold ${
             statusMessage.type === "success"
-              ? "bg-green-50 border-green-600 text-green-900"
-              : "bg-red-50 border-red-600 text-red-900"
+              ? "bg-green-50 border-green-500 text-green-900"
+              : "bg-red-50 border-red-500 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "[ STATUS ]: " : "[ ERROR ]: "}
+          {statusMessage.type === "success" ? "Status: " : "Error: "}
           {statusMessage.text}
         </div>
       )}
 
       {/* Prominent Generated Link Display */}
       {lastGeneratedLink && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-600 space-y-2">
+        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-500 space-y-2 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-emerald-900 uppercase">
-              [ ACTIVE INVITATION LINK READY FOR {lastGeneratedLink.email.toUpperCase()} ]
+            <span className="text-xs font-bold text-emerald-900 uppercase tracking-wide">
+              Active Invitation Link Ready for {lastGeneratedLink.email}
             </span>
-            <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 bg-emerald-200 text-emerald-900">
+            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900">
               Role: {lastGeneratedLink.role}
             </span>
           </div>
@@ -249,22 +255,22 @@ export default function StaffInvitationManager() {
               type="text"
               readOnly
               value={lastGeneratedLink.url}
-              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-none select-all text-slate-900"
+              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-lg select-all text-slate-900"
             />
             <button
               type="button"
               onClick={() => handleCopyLink(lastGeneratedLink.url, "banner")}
-              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
             >
-              {copiedToken === "banner" ? "[ COPIED TO CLIPBOARD ]" : "[ COPY INVITE LINK ]"}
+              {copiedToken === "banner" ? "Copied to Clipboard" : "Copy Invite Link"}
             </button>
             <a
               href={lastGeneratedLink.url}
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2 bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold uppercase tracking-wider text-center shrink-0 transition-colors"
+              className="px-4 py-2 bg-[#002060] hover:bg-[#001744] text-white rounded-lg text-xs font-bold uppercase tracking-wider text-center shrink-0 transition-colors"
             >
-              [ OPEN LINK ]
+              Open Link
             </a>
           </div>
         </div>
@@ -273,13 +279,13 @@ export default function StaffInvitationManager() {
       {/* 3 Separated Role Headers / Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* HEADER 1: TEACHER / FACULTY ONBOARDING */}
-        <div className="bg-white border-2 border-slate-300 flex flex-col justify-between shadow-xs">
+        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden">
           <div>
-            <div className="bg-emerald-800 text-white p-3 border-b-2 border-emerald-950">
-              <span className="text-[10px] font-mono tracking-wider uppercase text-emerald-200 block">
-                [ 01. FACULTY DESK ]
+            <div className="bg-emerald-800 text-white p-4 border-b border-emerald-950">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-200 block">
+                01. Faculty Desk
               </span>
-              <h2 className="text-sm font-bold uppercase tracking-wide">
+              <h2 className="text-sm font-bold tracking-wide mt-0.5">
                 Teacher / Faculty Member
               </h2>
             </div>
@@ -297,7 +303,7 @@ export default function StaffInvitationManager() {
                   placeholder="e.g. teacher.name@dnhs.edu.ph"
                   value={teacherForm.email}
                   onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-emerald-600 focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
@@ -310,7 +316,7 @@ export default function StaffInvitationManager() {
                   placeholder="e.g. Maria Santos"
                   value={teacherForm.fullName}
                   onChange={(e) => setTeacherForm({ ...teacherForm, fullName: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-emerald-600 focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
@@ -321,7 +327,7 @@ export default function StaffInvitationManager() {
                 <select
                   value={teacherForm.department}
                   onChange={(e) => setTeacherForm({ ...teacherForm, department: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-emerald-600 focus:outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-emerald-600 focus:outline-none bg-white"
                 >
                   <option value="Junior High School (JHS)">Junior High School (JHS)</option>
                   <option value="Senior High School (SHS)">Senior High School (SHS)</option>
@@ -337,21 +343,21 @@ export default function StaffInvitationManager() {
               type="button"
               disabled={submittingRole === "teacher"}
               onClick={() => handleSendInvite("teacher")}
-              className="w-full py-2.5 px-4 bg-emerald-800 hover:bg-emerald-900 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-emerald-800 hover:bg-emerald-900 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
-              {submittingRole === "teacher" ? "[ GENERATING INVITE... ]" : "[ + SEND TEACHER INVITE ]"}
+              {submittingRole === "teacher" ? "Generating Invite..." : "+ Send Teacher Invite"}
             </button>
           </div>
         </div>
 
         {/* HEADER 2: SCHOOL ADMINISTRATOR ONBOARDING */}
-        <div className="bg-white border-2 border-slate-300 flex flex-col justify-between shadow-xs">
+        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden">
           <div>
-            <div className="bg-[#002060] text-white p-3 border-b-2 border-[#001744]">
-              <span className="text-[10px] font-mono tracking-wider uppercase text-blue-200 block">
-                [ 02. ADMINISTRATION DESK ]
+            <div className="bg-[#002060] text-white p-4 border-b border-[#001744]">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-amber-300 block">
+                02. Administration Desk
               </span>
-              <h2 className="text-sm font-bold uppercase tracking-wide">
+              <h2 className="text-sm font-bold tracking-wide mt-0.5">
                 School Administrator
               </h2>
             </div>
@@ -369,7 +375,7 @@ export default function StaffInvitationManager() {
                   placeholder="e.g. registrar@dnhs.edu.ph"
                   value={adminForm.email}
                   onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:outline-none"
                 />
               </div>
 
@@ -382,7 +388,7 @@ export default function StaffInvitationManager() {
                   placeholder="e.g. Dr. Roberto Mendoza"
                   value={adminForm.fullName}
                   onChange={(e) => setAdminForm({ ...adminForm, fullName: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:outline-none"
                 />
               </div>
 
@@ -393,7 +399,7 @@ export default function StaffInvitationManager() {
                 <select
                   value={adminForm.department}
                   onChange={(e) => setAdminForm({ ...adminForm, department: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:outline-none bg-white"
                 >
                   <option value="Office of the Registrar">Office of the Registrar</option>
                   <option value="Academic Affairs">Academic Affairs</option>
@@ -409,21 +415,21 @@ export default function StaffInvitationManager() {
               type="button"
               disabled={submittingRole === "admin"}
               onClick={() => handleSendInvite("admin")}
-              className="w-full py-2.5 px-4 bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
-              {submittingRole === "admin" ? "[ GENERATING INVITE... ]" : "[ + SEND ADMIN INVITE ]"}
+              {submittingRole === "admin" ? "Generating Invite..." : "+ Send Admin Invite"}
             </button>
           </div>
         </div>
 
         {/* HEADER 3: IT SUPPORT DESK ONBOARDING */}
-        <div className="bg-white border-2 border-slate-300 flex flex-col justify-between shadow-xs">
+        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden">
           <div>
-            <div className="bg-indigo-900 text-white p-3 border-b-2 border-indigo-950">
-              <span className="text-[10px] font-mono tracking-wider uppercase text-indigo-200 block">
-                [ 03. INFRASTRUCTURE DESK ]
+            <div className="bg-indigo-900 text-white p-4 border-b border-indigo-950">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-indigo-200 block">
+                03. Infrastructure Desk
               </span>
-              <h2 className="text-sm font-bold uppercase tracking-wide">
+              <h2 className="text-sm font-bold tracking-wide mt-0.5">
                 IT Support &amp; Systems Desk
               </h2>
             </div>
@@ -441,7 +447,7 @@ export default function StaffInvitationManager() {
                   placeholder="e.g. itsupport@dnhs.edu.ph"
                   value={itSupportForm.email}
                   onChange={(e) => setItSupportForm({ ...itSupportForm, email: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-indigo-600 focus:outline-none"
                 />
               </div>
 
@@ -454,7 +460,7 @@ export default function StaffInvitationManager() {
                   placeholder="e.g. Alex Rivera"
                   value={itSupportForm.fullName}
                   onChange={(e) => setItSupportForm({ ...itSupportForm, fullName: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-indigo-600 focus:outline-none"
                 />
               </div>
 
@@ -465,7 +471,7 @@ export default function StaffInvitationManager() {
                 <select
                   value={itSupportForm.department}
                   onChange={(e) => setItSupportForm({ ...itSupportForm, department: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-indigo-600 focus:outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-indigo-600 focus:outline-none bg-white"
                 >
                   <option value="System Administrator">System Administrator</option>
                   <option value="Database Operations Specialist">Database Operations Specialist</option>
@@ -481,33 +487,33 @@ export default function StaffInvitationManager() {
               type="button"
               disabled={submittingRole === "it_support"}
               onClick={() => handleSendInvite("it_support")}
-              className="w-full py-2.5 px-4 bg-indigo-900 hover:bg-indigo-950 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-indigo-900 hover:bg-indigo-950 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
-              {submittingRole === "it_support" ? "[ GENERATING INVITE... ]" : "[ + SEND IT SUPPORT INVITE ]"}
+              {submittingRole === "it_support" ? "Generating Invite..." : "+ Send IT Support Invite"}
             </button>
           </div>
         </div>
       </div>
 
       {/* Invitations Audit Registry & Status Table */}
-      <div className="bg-white border-2 border-slate-300 shadow-xs">
-        <div className="p-4 border-b-2 border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wide text-slate-900">
-              [ ISSUED STAFF INVITATIONS &amp; REGISTRY AUDIT ]
+            <h3 className="text-sm font-bold text-slate-900">
+              Issued Staff Invitations &amp; Registry Audit
             </h3>
             <p className="text-xs text-slate-500">
               Active, accepted, and revoked staff onboarding invitation records.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-slate-600 uppercase">
+            <span className="text-xs font-bold text-slate-600 uppercase">
               Filter:
             </span>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-2 py-1 text-xs border border-slate-300 bg-white font-mono"
+              className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold"
             >
               <option value="all">All Roles ({invitations.length})</option>
               <option value="teacher">Teachers ({invitations.filter((i) => i.role === "teacher").length})</option>
@@ -518,11 +524,11 @@ export default function StaffInvitationManager() {
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-mono uppercase text-slate-500">
-            [ Loading staff invitations... ]
+          <div className="p-8 text-center text-xs font-semibold text-slate-500">
+            Loading staff invitations...
           </div>
         ) : filteredInvitations.length === 0 ? (
-          <div className="p-8 text-center text-xs font-mono uppercase text-slate-500">
+          <div className="p-8 text-center text-xs text-slate-500">
             No invitations found. Use the forms above to issue staff invitations.
           </div>
         ) : (

@@ -206,57 +206,67 @@ export default function UserRoleAuditor() {
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="p-4 bg-blue-50 border-2 border-[#002060]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                [ Role-Based Access Control (RBAC) &amp; Credential Directory ]
-              </span>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                Live Cloud Sync Active
-              </span>
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white rounded-xl p-5 sm:p-6 shadow-md border border-[#001744] border-t-4 border-t-amber-400">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Seal"
+              className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+            />
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+                  Role-Based Access Control (RBAC) &amp; Credential Directory
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 rounded-full uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Live Cloud Sync Active
+                </span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+                Institutional Accounts &amp; Role Permissions
+              </h2>
+              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
+                Manages the four institutional actor types (Student, Teacher, School Administrator, IT Support). Synchronized in real-time with Supabase database.
+              </p>
             </div>
-            <p className="text-xs text-slate-700 mt-1">
-              Manages the four institutional actor types (Student, Teacher, School Administrator, IT Support). Synchronized in real-time with Supabase database.
-            </p>
           </div>
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0"
+            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 shadow-sm cursor-pointer"
           >
-            [ + Provision User Account ]
+            + Provision User Account
           </button>
         </div>
       </div>
 
       {statusMessage && (
         <div
-          className={`p-3 border-2 text-xs font-bold ${
+          className={`p-3.5 rounded-lg border text-xs font-bold ${
             statusMessage.type === "success"
-              ? "bg-green-50 border-green-600 text-green-900"
-              : "bg-red-50 border-red-600 text-red-900"
+              ? "bg-green-50 border-green-500 text-green-900"
+              : "bg-red-50 border-red-500 text-red-900"
           }`}
         >
-          {statusMessage.type === "success" ? "[ STATUS ]: " : "[ ERROR ]: "}
+          {statusMessage.type === "success" ? "Status: " : "Error: "}
           {statusMessage.text}
         </div>
       )}
 
       {provisionedLink && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-600 space-y-2">
+        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-500 space-y-2 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-              [ ONBOARDING INVITATION LINK READY FOR {provisionedLink.email.toUpperCase()} ]
+            <span className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
+              Onboarding Invitation Link Ready for {provisionedLink.email}
             </span>
             <button
               type="button"
               onClick={() => setProvisionedLink(null)}
-              className="text-[11px] font-mono font-bold text-emerald-800 hover:text-emerald-950"
+              className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 px-2 py-0.5 rounded hover:bg-emerald-100 cursor-pointer"
             >
-              [ CLOSE X ]
+              Close
             </button>
           </div>
           <p className="text-xs text-emerald-900">
@@ -267,7 +277,7 @@ export default function UserRoleAuditor() {
               type="text"
               readOnly
               value={provisionedLink.url}
-              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-none select-all text-slate-900"
+              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-lg select-all text-slate-900"
             />
             <button
               type="button"
@@ -280,17 +290,17 @@ export default function UserRoleAuditor() {
                   prompt("Copy invite link:", provisionedLink.url);
                 }
               }}
-              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer"
             >
-              {copiedLink ? "[ COPIED TO CLIPBOARD ]" : "[ COPY INVITE LINK ]"}
+              {copiedLink ? "Copied to Clipboard" : "Copy Invite Link"}
             </button>
             <a
               href={provisionedLink.url}
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center shrink-0"
+              className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white rounded-lg text-xs font-bold uppercase tracking-wider text-center shrink-0"
             >
-              [ OPEN LOGIN / CREATE PASSWORD ]
+              Open Login / Create Password
             </a>
           </div>
         </div>
@@ -300,11 +310,11 @@ export default function UserRoleAuditor() {
         <button
           type="button"
           onClick={() => setSelectedRole("all")}
-          className={`p-3 border-2 text-left transition-all ${
-            selectedRole === "all" ? "bg-[#002060] text-white border-[#002060]" : "bg-white border-slate-300 hover:bg-slate-50"
+          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+            selectedRole === "all" ? "bg-[#002060] text-white border-[#002060] shadow-sm" : "bg-white border-slate-200 hover:bg-slate-50 shadow-xs"
           }`}
         >
-          <span className={`text-[10px] font-mono uppercase block ${selectedRole === "all" ? "text-blue-200" : "text-slate-500"}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-wider block ${selectedRole === "all" ? "text-amber-300" : "text-slate-500"}`}>
             All Accounts
           </span>
           <div className="text-lg font-black mt-0.5">{counts.all}</div>
@@ -313,11 +323,11 @@ export default function UserRoleAuditor() {
         <button
           type="button"
           onClick={() => setSelectedRole("student")}
-          className={`p-3 border-2 text-left transition-all ${
-            selectedRole === "student" ? "bg-[#002060] text-white border-[#002060]" : "bg-white border-slate-300 hover:bg-slate-50"
+          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+            selectedRole === "student" ? "bg-[#002060] text-white border-[#002060] shadow-sm" : "bg-white border-slate-200 hover:bg-slate-50 shadow-xs"
           }`}
         >
-          <span className={`text-[10px] font-mono uppercase block ${selectedRole === "student" ? "text-blue-200" : "text-slate-500"}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-wider block ${selectedRole === "student" ? "text-amber-300" : "text-slate-500"}`}>
             Learners (Students)
           </span>
           <div className="text-lg font-black mt-0.5">{counts.student}</div>
@@ -326,11 +336,11 @@ export default function UserRoleAuditor() {
         <button
           type="button"
           onClick={() => setSelectedRole("teacher")}
-          className={`p-3 border-2 text-left transition-all ${
-            selectedRole === "teacher" ? "bg-[#002060] text-white border-[#002060]" : "bg-white border-slate-300 hover:bg-slate-50"
+          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+            selectedRole === "teacher" ? "bg-[#002060] text-white border-[#002060] shadow-sm" : "bg-white border-slate-200 hover:bg-slate-50 shadow-xs"
           }`}
         >
-          <span className={`text-[10px] font-mono uppercase block ${selectedRole === "teacher" ? "text-blue-200" : "text-slate-500"}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-wider block ${selectedRole === "teacher" ? "text-amber-300" : "text-slate-500"}`}>
             Faculty (Teachers)
           </span>
           <div className="text-lg font-black mt-0.5">{counts.teacher}</div>
@@ -339,11 +349,11 @@ export default function UserRoleAuditor() {
         <button
           type="button"
           onClick={() => setSelectedRole("admin")}
-          className={`p-3 border-2 text-left transition-all ${
-            selectedRole === "admin" ? "bg-[#002060] text-white border-[#002060]" : "bg-white border-slate-300 hover:bg-slate-50"
+          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+            selectedRole === "admin" ? "bg-[#002060] text-white border-[#002060] shadow-sm" : "bg-white border-slate-200 hover:bg-slate-50 shadow-xs"
           }`}
         >
-          <span className={`text-[10px] font-mono uppercase block ${selectedRole === "admin" ? "text-blue-200" : "text-slate-500"}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-wider block ${selectedRole === "admin" ? "text-amber-300" : "text-slate-500"}`}>
             Administrators
           </span>
           <div className="text-lg font-black mt-0.5">{counts.admin}</div>
@@ -352,11 +362,11 @@ export default function UserRoleAuditor() {
         <button
           type="button"
           onClick={() => setSelectedRole("it_support")}
-          className={`p-3 border-2 text-left transition-all ${
-            selectedRole === "it_support" ? "bg-[#002060] text-white border-[#002060]" : "bg-white border-slate-300 hover:bg-slate-50"
+          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+            selectedRole === "it_support" ? "bg-[#002060] text-white border-[#002060] shadow-sm" : "bg-white border-slate-200 hover:bg-slate-50 shadow-xs"
           }`}
         >
-          <span className={`text-[10px] font-mono uppercase block ${selectedRole === "it_support" ? "text-blue-200" : "text-slate-500"}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-wider block ${selectedRole === "it_support" ? "text-amber-300" : "text-slate-500"}`}>
             IT Support
           </span>
           <div className="text-lg font-black mt-0.5">{counts.it_support}</div>
@@ -369,23 +379,23 @@ export default function UserRoleAuditor() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Filter by Full Name, User ID (e.g. DNHS-...), or Email Address..."
-          className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+          className="w-full p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none shadow-xs"
         />
       </div>
 
-      <div className="bg-white border-2 border-slate-300">
-        <div className="px-5 py-3 border-b-2 border-slate-200 bg-slate-50 flex items-center justify-between">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
             Registered Users Directory &bull; Dumalneg National High School
           </h3>
-          <span className="text-[11px] font-mono font-bold text-slate-600">
-            DISPLAYING: {filteredUsers.length} OF {users.length}
+          <span className="text-[11px] font-bold text-[#002060] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+            Displaying {filteredUsers.length} of {users.length}
           </span>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-mono text-slate-500 uppercase">
-            [ Loading User Directory from PostgreSQL Database... ]
+          <div className="p-8 text-center text-xs font-semibold text-slate-500">
+            Loading user directory...
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
@@ -395,7 +405,7 @@ export default function UserRoleAuditor() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-300 font-mono text-[11px] uppercase text-slate-700">
+                <tr className="bg-slate-100 border-b border-slate-200 font-bold text-[11px] uppercase text-slate-700">
                   <th className="p-3">DNHS User ID</th>
                   <th className="p-3">Full Name / Account Holder</th>
                   <th className="p-3">Assigned Role</th>
@@ -447,11 +457,11 @@ export default function UserRoleAuditor() {
                         </div>
                       </td>
                       <td className="p-3">
-                        <span className={`px-2 py-0.5 border font-mono font-bold text-[10px] uppercase ${badgeClass}`}>
+                        <span className={`px-2 py-0.5 rounded border font-bold text-[10px] uppercase ${badgeClass}`}>
                           {user.userRole}
                         </span>
                       </td>
-                      <td className="p-3 font-mono text-[11px] text-slate-600 uppercase">
+                      <td className="p-3 text-[11px] text-slate-600">
                         {user.userRole === "admin" && "Adjudication & Timetables"}
                         {user.userRole === "teacher" && "Class Rosters & Schedules"}
                         {user.userRole === "student" && "Remote Enrollment & Status"}
@@ -464,9 +474,9 @@ export default function UserRoleAuditor() {
                         <button
                           type="button"
                           onClick={() => setViewingUser(user)}
-                          className="px-3 py-1 text-[10px] font-mono font-bold uppercase border-2 border-[#002060] bg-blue-50 text-[#002060] hover:bg-[#002060] hover:text-white transition-colors cursor-pointer"
+                          className="px-3 py-1 rounded text-[11px] font-bold border border-[#002060] bg-blue-50 text-[#002060] hover:bg-[#002060] hover:text-white transition-colors cursor-pointer"
                         >
-                          [ View ]
+                          View Dossier
                         </button>
                       </td>
                     </tr>
@@ -481,9 +491,9 @@ export default function UserRoleAuditor() {
       {/* View User Credentials & Profile Dossier Modal */}
       {viewingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
-          <div className="bg-white border-4 border-[#002060] max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8">
+          <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8">
             {/* Header with 2x2 Photo Card */}
-            <div className="border-b-2 border-slate-200 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 {/* 2x2 Photo Box */}
                 <div className="relative group shrink-0">
@@ -496,7 +506,7 @@ export default function UserRoleAuditor() {
                         });
                       }
                     }}
-                    className={`w-20 h-20 sm:w-24 sm:h-24 border-2 border-[#002060] bg-slate-100 overflow-hidden shadow-sm flex items-center justify-center ${
+                    className={`w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 border-[#002060] bg-slate-100 overflow-hidden shadow-sm flex items-center justify-center ${
                       viewingUser.photoUrl ? "cursor-zoom-in hover:brightness-95 ring-2 ring-blue-300" : ""
                     }`}
                     title={viewingUser.photoUrl ? "Click to enlarge 2x2 photo" : "No 2x2 photo on file"}
@@ -512,28 +522,28 @@ export default function UserRoleAuditor() {
                         <svg className="w-8 h-8 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                         </svg>
-                        <span className="text-[8px] font-mono font-bold text-slate-400 uppercase mt-0.5">
+                        <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">
                           No 2x2 Photo
                         </span>
                       </div>
                     )}
                   </div>
                   <div className="text-center mt-1">
-                    <span className="text-[9px] font-mono font-bold text-[#002060] uppercase block">
-                      {viewingUser.photoUrl ? "[ 2x2 ID Photo ]" : "[ Official Avatar ]"}
+                    <span className="text-[9px] font-bold text-[#002060] uppercase block">
+                      {viewingUser.photoUrl ? "2x2 ID Photo" : "Official Avatar"}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                    [ DNHS Credential &amp; Profile Dossier ]
+                  <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
+                    DNHS Credential &amp; Profile Dossier
                   </span>
                   <h3 className="text-lg font-black text-slate-900 uppercase mt-0.5">
                     {viewingUser.fullName || viewingUser.userId}
                   </h3>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <span className="font-mono text-xs text-slate-700 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                    <span className="font-mono text-xs text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
                       {viewingUser.userId}
                     </span>
                     <span className="text-slate-300">&bull;</span>
@@ -545,18 +555,18 @@ export default function UserRoleAuditor() {
               <button
                 type="button"
                 onClick={() => setViewingUser(null)}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 p-1 cursor-pointer self-start sm:self-center"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 px-2.5 py-1 rounded hover:bg-slate-100 cursor-pointer self-start sm:self-center"
               >
-                [ CLOSE X ]
+                Close
               </button>
             </div>
 
             {/* Primary System Credentials */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 p-4 border border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-xl border border-slate-200">
               <div>
-                <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Assigned Role</span>
+                <span className="text-[10px] uppercase text-slate-500 block font-bold">Assigned Role</span>
                 <div className="mt-1">
-                  <span className={`px-2 py-0.5 border font-mono font-bold text-[11px] uppercase ${
+                  <span className={`px-2 py-0.5 rounded border font-bold text-[11px] uppercase ${
                     viewingUser.userRole === "admin" ? "bg-purple-100 text-purple-900 border-purple-300" :
                     viewingUser.userRole === "teacher" ? "bg-blue-100 text-blue-900 border-blue-300" :
                     viewingUser.userRole === "student" ? "bg-green-100 text-green-900 border-green-300" :
@@ -568,22 +578,22 @@ export default function UserRoleAuditor() {
               </div>
 
               <div>
-                <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Registration Timestamp</span>
+                <span className="text-[10px] uppercase text-slate-500 block font-bold">Registration Timestamp</span>
                 <span className="font-mono text-slate-800 font-bold mt-1 block">
                   {new Date(viewingUser.createdAt).toLocaleString()}
                 </span>
               </div>
 
               <div>
-                <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Official Login Email</span>
+                <span className="text-[10px] uppercase text-slate-500 block font-bold">Official Login Email</span>
                 <span className="font-mono text-slate-900 font-bold mt-1 block">
                   {viewingUser.email}
                 </span>
               </div>
 
               <div>
-                <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">System Access Level</span>
-                <span className="font-mono text-slate-800 font-bold mt-1 block">
+                <span className="text-[10px] uppercase text-slate-500 block font-bold">System Access Level</span>
+                <span className="text-slate-800 font-bold mt-1 block">
                   {viewingUser.userRole === "admin" && "Adjudication & Timetables"}
                   {viewingUser.userRole === "teacher" && "Class Rosters & Schedules"}
                   {viewingUser.userRole === "student" && "Remote Enrollment & Status"}
@@ -595,42 +605,42 @@ export default function UserRoleAuditor() {
             {/* Role-Specific Institutional Credentials */}
             {viewingUser.userRole === "student" && (
               <div className="space-y-2">
-                <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
                   Learner Academic &amp; Enrollment Dossier
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Learner Reference Number (LRN)</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Learner Reference Number (LRN)</span>
                     <span className="font-mono font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.lrn || "Not Assigned"}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Grade Level</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Grade Level</span>
                     <span className="font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.gradeLevel || "Unassigned"}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Curriculum Track / Strand</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Curriculum Track / Strand</span>
                     <span className="font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.strand || "Core Curriculum"}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Assigned Section</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Assigned Section</span>
                     <span className="font-bold text-[#002060] mt-1 block">
                       {viewingUser.details?.sectionName || "Unassigned"}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Barangay Residence</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Barangay Residence</span>
                     <span className="font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.barangay || "N/A"}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Contact Number</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Contact Number</span>
                     <span className="font-mono font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.contactNumber || "None Provided"}
                     </span>
@@ -641,18 +651,18 @@ export default function UserRoleAuditor() {
 
             {viewingUser.userRole === "teacher" && (
               <div className="space-y-2">
-                <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
                   Faculty Credentials &amp; Department Dossier
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Faculty Identifier</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Faculty Identifier</span>
                     <span className="font-mono font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.teacherId || viewingUser.userId}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Assigned Department</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Assigned Department</span>
                     <span className="font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.department === "JHS" && "Junior High School Faculty"}
                       {viewingUser.details?.department === "SHS" && "Senior High School Faculty"}
@@ -660,8 +670,8 @@ export default function UserRoleAuditor() {
                       {!["JHS", "SHS", "CROSS_LEVEL"].includes(viewingUser.details?.department || "") && (viewingUser.details?.department || "General Faculty")}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Official Faculty Email</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Official Faculty Email</span>
                     <span className="font-mono font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.facultyEmail || viewingUser.email}
                     </span>
@@ -672,18 +682,18 @@ export default function UserRoleAuditor() {
 
             {viewingUser.userRole === "admin" && (
               <div className="space-y-2">
-                <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
                   Administrative Officer Dossier
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 text-xs">
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Administrator ID</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Administrator ID</span>
                     <span className="font-mono font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.adminId || viewingUser.userId}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Department / Office</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Department / Office</span>
                     <span className="font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.department || "Academic Affairs & Registrar"}
                     </span>
@@ -694,18 +704,18 @@ export default function UserRoleAuditor() {
 
             {viewingUser.userRole === "it_support" && (
               <div className="space-y-2">
-                <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
                   IT Systems Desk Dossier
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 text-xs">
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">IT Personnel Identifier</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">IT Personnel Identifier</span>
                     <span className="font-mono font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.itsupportId || viewingUser.userId}
                     </span>
                   </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200">
-                    <span className="text-[10px] font-mono uppercase text-slate-500 block font-bold">Designated Role</span>
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <span className="text-[10px] uppercase text-slate-500 block font-bold">Designated Role</span>
                     <span className="font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.systemRole || "System Administrator"}
                     </span>
@@ -714,20 +724,20 @@ export default function UserRoleAuditor() {
               </div>
             )}
 
-            {/* Footer with Delete Button (sa baba nito) */}
-            <div className="pt-4 border-t-2 border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Footer with Delete Button */}
+            <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div>
                 {viewingUser.email.toLowerCase() === "dumalnext@gmail.com" ? (
-                  <span className="px-3 py-1.5 bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[10px] font-bold uppercase">
-                    [ MASTER IT ACCOUNT - PROTECTED AGAINST DELETION ]
+                  <span className="px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-300 text-amber-900 text-[10px] font-bold uppercase">
+                    Master IT Account - Protected Against Deletion
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => setUserToDelete(viewingUser)}
-                    className="px-4 py-2 border-2 border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-mono font-bold text-xs uppercase transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-lg border border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-bold text-xs transition-colors cursor-pointer"
                   >
-                    [ Delete Account ]
+                    Delete Account
                   </button>
                 )}
               </div>
@@ -735,9 +745,9 @@ export default function UserRoleAuditor() {
               <button
                 type="button"
                 onClick={() => setViewingUser(null)}
-                className="px-5 py-2 border-2 border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors w-full sm:w-auto text-center cursor-pointer"
+                className="px-5 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors w-full sm:w-auto text-center cursor-pointer"
               >
-                [ Close ]
+                Close
               </button>
             </div>
           </div>
@@ -747,13 +757,13 @@ export default function UserRoleAuditor() {
       {/* Account Deletion Confirmation Modal */}
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white border-4 border-red-600 max-w-md w-full p-6 space-y-4 shadow-xl">
-            <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
+          <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-red-600 max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-red-700 uppercase tracking-widest block">
-                  SECURITY CONFIRMATION &bull; SUPABASE SYNC
+                <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest block">
+                  Security Confirmation &bull; Supabase Sync
                 </span>
-                <h3 className="text-base font-bold text-slate-900 uppercase">
+                <h3 className="text-base font-bold text-slate-900">
                   Confirm Account Deletion
                 </h3>
               </div>
@@ -761,9 +771,9 @@ export default function UserRoleAuditor() {
                 type="button"
                 onClick={() => setUserToDelete(null)}
                 disabled={isDeleting}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded hover:bg-slate-100 cursor-pointer"
               >
-                [ CLOSE X ]
+                Close
               </button>
             </div>
 
@@ -771,7 +781,7 @@ export default function UserRoleAuditor() {
               <p>
                 Are you sure you want to permanently delete the following account from Supabase?
               </p>
-              <div className="p-3 bg-red-50 border border-red-200 space-y-1">
+              <div className="p-3 bg-red-50 rounded-lg border border-red-200 space-y-1">
                 <div>
                   <strong className="text-slate-900">Email:</strong> {userToDelete.email}
                 </div>
@@ -792,17 +802,17 @@ export default function UserRoleAuditor() {
                 type="button"
                 onClick={() => setUserToDelete(null)}
                 disabled={isDeleting}
-                className="px-4 py-2 border border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors"
+                className="px-4 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                [ Cancel ]
+                Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
-                className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+                className="px-5 py-2 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
               >
-                {isDeleting ? "[ Deleting... ]" : "[ Yes, Delete Account ]"}
+                {isDeleting ? "Deleting..." : "Yes, Delete Account"}
               </button>
             </div>
           </div>
@@ -812,22 +822,22 @@ export default function UserRoleAuditor() {
       {/* Provision New User Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white border-4 border-[#002060] max-w-md w-full p-6 space-y-4">
-            <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
+          <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                  IT SUPPORT SECURITY PROVISIONING
+                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
+                  IT Support Security Provisioning
                 </span>
-                <h3 className="text-base font-bold text-slate-900 uppercase">
+                <h3 className="text-base font-bold text-slate-900">
                   Provision New Account
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded hover:bg-slate-100 cursor-pointer"
               >
-                [ CLOSE X ]
+                Close
               </button>
             </div>
 
@@ -850,7 +860,7 @@ export default function UserRoleAuditor() {
                       userId: `${prefix}-${Math.floor(100 + Math.random() * 900)}`,
                     });
                   }}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-bold focus:border-[#002060] outline-none"
                 >
                   <option value="teacher">Teacher (Faculty Member)</option>
                   <option value="admin">School Administrator (Registrar)</option>
@@ -869,7 +879,7 @@ export default function UserRoleAuditor() {
                   placeholder="e.g. DNHS-TCH-004"
                   value={formData.userId}
                   onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
@@ -882,7 +892,7 @@ export default function UserRoleAuditor() {
                   placeholder="e.g. Maria Santos"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
@@ -896,11 +906,11 @@ export default function UserRoleAuditor() {
                   placeholder="e.g. faculty.member@gmail.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
-              <div className="p-3 bg-blue-50 border border-blue-200 text-[11px] text-[#002060]">
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-[11px] text-[#002060]">
                 <strong className="block uppercase font-bold">Zero Initial Password Policy:</strong>
                 <span>IT Support does not set passwords. Saving this account will generate a secure onboarding invitation link for the user to create their own password upon first visit.</span>
               </div>
@@ -913,7 +923,7 @@ export default function UserRoleAuditor() {
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full p-2.5 bg-white border-2 border-slate-300 font-bold focus:border-[#002060] outline-none"
+                    className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-bold focus:border-[#002060] outline-none"
                   >
                     <option value="CROSS_LEVEL">CROSS_LEVEL (JHS &amp; SHS)</option>
                     <option value="JHS">Junior High School</option>
@@ -926,16 +936,16 @@ export default function UserRoleAuditor() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 text-xs font-bold uppercase hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  [ Cancel ]
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+                  className="px-5 py-2 rounded-lg bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
                 >
-                  {isSubmitting ? "[ Provisioning... ]" : "[ + Save & Issue Invitation ]"}
+                  {isSubmitting ? "Provisioning..." : "+ Save & Issue Invitation"}
                 </button>
               </div>
             </form>
@@ -950,38 +960,38 @@ export default function UserRoleAuditor() {
           onClick={() => setEnlargedPhoto(null)}
         >
           <div
-            className="bg-white border-4 border-[#002060] max-w-lg w-full p-5 space-y-4 shadow-2xl"
+            className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] max-w-lg w-full p-5 space-y-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b-2 border-slate-200 pb-2">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                  [ 2x2 Official Learner / Personnel Photo ]
+                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
+                  2x2 Official Learner / Personnel Photo
                 </span>
                 <h4 className="text-sm font-black uppercase text-slate-900">{enlargedPhoto.name}</h4>
               </div>
               <button
                 type="button"
                 onClick={() => setEnlargedPhoto(null)}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 p-1 cursor-pointer"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded hover:bg-slate-100 cursor-pointer"
               >
-                [ CLOSE X ]
+                Close
               </button>
             </div>
-            <div className="flex items-center justify-center bg-slate-900/5 p-3 border-2 border-slate-200">
+            <div className="flex items-center justify-center bg-slate-900/5 p-3 rounded-lg border border-slate-200">
               <img
                 src={enlargedPhoto.src}
                 alt={enlargedPhoto.name}
-                className="max-h-96 max-w-full object-contain shadow-md border-4 border-white"
+                className="max-h-96 max-w-full object-contain shadow-md border-4 border-white rounded"
               />
             </div>
             <div className="text-center pt-1">
               <button
                 type="button"
                 onClick={() => setEnlargedPhoto(null)}
-                className="px-5 py-2 bg-[#002060] text-white text-xs font-bold uppercase cursor-pointer hover:bg-[#001845] transition-colors"
+                className="px-5 py-2 rounded-lg bg-[#002060] text-white text-xs font-bold cursor-pointer hover:bg-[#001845] transition-colors"
               >
-                [ Close Photo Preview ]
+                Close Photo Preview
               </button>
             </div>
           </div>

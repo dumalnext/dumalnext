@@ -78,60 +78,62 @@ export default function TeacherHomePage() {
   }
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Faculty Welcome & Overview Card */}
-      <div className="bg-white p-6 border-2 border-[#002060] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-blue-900 text-white font-mono text-xs font-bold uppercase">
+    <div className="space-y-6">
+      {/* Faculty Welcome & Overview Banner */}
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-6 rounded-[4px] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-0.5 bg-amber-400/20 text-amber-200 border border-amber-300/40 text-xs font-bold rounded-[4px]">
               {user.teacherId}
             </span>
-            <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-xs font-bold uppercase border border-emerald-300">
-              ACTIVE FACULTY
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/20 text-emerald-100 border border-emerald-400/40 text-xs font-bold rounded-[4px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Active Faculty
             </span>
-            <span className="px-2.5 py-0.5 bg-slate-100 text-slate-800 font-mono text-xs font-bold uppercase border border-slate-300">
-              Dept: {user.department}
+            <span className="px-2.5 py-0.5 bg-white/10 text-blue-100 border border-white/20 text-xs font-semibold rounded-[4px]">
+              Department: {user.department}
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
             Welcome, {user.fullName || user.email}
           </h2>
-          <p className="text-xs font-mono text-slate-600">
+          <p className="text-xs text-blue-100">
             Dumalneg National High School &bull; Faculty Workstation &bull; {user.email}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={logout}
-            className="px-4 py-2 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-900 border border-slate-300 hover:border-red-400 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+          <Link
+            href="/schedule"
+            className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors rounded-[4px] shadow-xs"
           >
-            Sign Out
-          </button>
+            View Schedule &rarr;
+          </Link>
         </div>
       </div>
 
       {/* 3 Main Workstation Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Schedule */}
-        <div className="bg-white p-6 border-2 border-slate-300 hover:border-[#002060] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
+        <div className="bg-white p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[4px] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#002060] uppercase">
-                MODULE 01
+              <span className="text-xs font-bold text-[#002060]">
+                Instructional Timetable
               </span>
               {scheduleCount !== null && scheduleCount > 0 ? (
-                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-[10px] font-bold uppercase border border-emerald-400">
-                  {scheduleCount} ACTIVE PERIODS
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  {scheduleCount} Active Periods
                 </span>
               ) : (
-                <span className="px-2 py-0.5 bg-amber-100 text-amber-950 font-mono text-[10px] font-bold uppercase border border-amber-300">
-                  PENDING RELEASE
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-900 text-[11px] font-bold border border-amber-300 rounded-[4px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Pending Release
                 </span>
               )}
             </div>
-            <h3 className="text-base font-bold text-slate-900 uppercase">
+            <h3 className="text-base font-bold text-slate-900">
               Teaching Load &amp; Schedule
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -143,24 +145,25 @@ export default function TeacherHomePage() {
 
           <Link
             href="/schedule"
-            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center block transition-colors shadow-2xs"
+            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
           >
-            Open Teaching Schedule
+            Open Teaching Schedule &rarr;
           </Link>
         </div>
 
         {/* Card 2: Roster */}
-        <div className="bg-white p-6 border-2 border-slate-300 hover:border-[#002060] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
+        <div className="bg-white p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[4px] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#002060] uppercase">
-                MODULE 02
+              <span className="text-xs font-bold text-[#002060]">
+                Class Advisory
               </span>
-              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-[10px] font-bold uppercase border border-emerald-300">
-                LIVE ROSTERS
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                Live Rosters
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 uppercase">
+            <h3 className="text-base font-bold text-slate-900">
               Advisory Section Roster
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -170,24 +173,24 @@ export default function TeacherHomePage() {
 
           <Link
             href="/roster"
-            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center block transition-colors shadow-2xs"
+            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
           >
-            View Advisory Section Roster
+            View Advisory Section Roster &rarr;
           </Link>
         </div>
 
         {/* Card 3: Profile */}
-        <div className="bg-white p-6 border-2 border-slate-300 hover:border-[#002060] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
+        <div className="bg-white p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[4px] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#002060] uppercase">
-                MODULE 03
+              <span className="text-xs font-bold text-[#002060]">
+                Personnel Record
               </span>
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-950 font-mono text-[10px] font-bold uppercase border border-blue-300">
-                VERIFIED
+              <span className="px-2.5 py-0.5 bg-blue-50 text-[#002060] text-[11px] font-bold border border-blue-200 rounded-[4px]">
+                Verified
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 uppercase">
+            <h3 className="text-base font-bold text-slate-900">
               Faculty Profile &amp; Credentials
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -197,9 +200,9 @@ export default function TeacherHomePage() {
 
           <Link
             href="/profile"
-            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider text-center block transition-colors shadow-2xs"
+            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
           >
-            View Faculty Profile
+            View Faculty Profile &rarr;
           </Link>
         </div>
       </div>

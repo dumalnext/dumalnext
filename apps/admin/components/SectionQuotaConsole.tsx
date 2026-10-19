@@ -1233,71 +1233,78 @@ export default function SectionQuotaConsole() {
   return (
     <>
       <div id="admin-sections-dashboard" className="space-y-6 font-sans">
-        {/* Title & Real-Time Sync Indicator */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
-        <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            SECTION QUOTA &bull; CLASSROOM CAPACITY CONTROL
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
-            Class Sections &amp; Quota Limits Management
-          </h2>
-          <p className="text-xs text-slate-600 mt-1">
-            Configure section capacity, add new classes, remove empty sections, and inspect live student rosters.
-          </p>
-        </div>
+        {/* Title & Real-Time Sync Banner */}
+        <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Seal"
+              className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+            />
+            <div>
+              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+                Section Quota &bull; Classroom Capacity Control
+              </span>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
+                Class Sections &amp; Quota Limits Management
+              </h2>
+              <p className="text-xs text-blue-100/85 mt-0.5">
+                Configure section capacity, create new classes, manage advisers, and inspect live student rosters.
+              </p>
+            </div>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-          {/* Add Section Button */}
-          <button
-            type="button"
-            onClick={openAddModal}
-            className="w-full sm:w-auto px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-center"
-          >
-            <span>+</span> Add New Class Section
-          </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto shrink-0">
+            {/* Add Section Button */}
+            <button
+              type="button"
+              onClick={openAddModal}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold tracking-wide transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer text-center"
+            >
+              <span>+ Add New Class Section</span>
+            </button>
 
-          <div className="flex items-center justify-center gap-1.5 bg-emerald-50 px-2.5 py-1.5 border border-emerald-300 text-xs font-mono font-bold text-emerald-950">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="uppercase">Live Capacity Sync</span>
+            <div className="flex items-center justify-center gap-2 bg-white/10 border border-white/20 backdrop-blur-xs px-3 py-2 rounded-lg text-xs font-semibold text-white">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Live Capacity Sync</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Global Status Notice */}
-      {statusNotice && (
-        <div
-          className={`p-3.5 border-2 text-xs font-bold flex items-center justify-between gap-2 ${
-            statusNotice.type === "success"
-              ? "bg-emerald-50 border-emerald-500 text-emerald-950"
-              : "bg-red-50 border-red-500 text-red-950"
-          }`}
-        >
-          <span>{statusNotice.type === "success" ? "Notice" : "Error"}: {statusNotice.text}</span>
-          <button
-            type="button"
-            onClick={() => setStatusNotice(null)}
-            className="text-slate-500 hover:text-slate-900 font-mono text-sm px-2 cursor-pointer"
+        {/* Global Status Notice */}
+        {statusNotice && (
+          <div
+            className={`p-3.5 rounded-lg border border-l-4 text-xs font-bold flex items-center justify-between gap-2 ${
+              statusNotice.type === "success"
+                ? "bg-emerald-50 border-emerald-300 border-l-emerald-600 text-emerald-950"
+                : "bg-red-50 border-red-300 border-l-red-600 text-red-950"
+            }`}
           >
-            &times;
-          </button>
-        </div>
-      )}
+            <span>{statusNotice.type === "success" ? "Notice" : "Error"}: {statusNotice.text}</span>
+            <button
+              type="button"
+              onClick={() => setStatusNotice(null)}
+              className="text-slate-500 hover:text-slate-900 font-bold text-sm px-2 cursor-pointer"
+            >
+              &times;
+            </button>
+          </div>
+        )}
 
-      {/* Active Academic Term Banner */}
-      <div className="bg-[#002060]/5 border border-[#002060]/20 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase tracking-wider">
-            Active Academic Term
-          </span>
-          <span className="text-xs font-bold text-[#002060]">
-            S.Y. {activeTerm.schoolYear} &bull; {activeTerm.termName}
-          </span>
-        </div>
-        <div className="text-[11px] font-mono text-slate-700">
-          {activeTerm.termNumber === 1 ? (
-            <span>Semester 1: Section counts begin at 0. Assign learners as they enroll.</span>
-          ) : (
+        {/* Active Academic Term Banner */}
+        <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold bg-[#002060] text-amber-300 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              Active Academic Term
+            </span>
+            <span className="text-xs font-bold text-[#002060]">
+              S.Y. {activeTerm.schoolYear} &bull; {activeTerm.termName}
+            </span>
+          </div>
+          <div className="text-[11px] text-slate-600">
+            {activeTerm.termNumber === 1 ? (
+              <span>Semester 1: Section counts begin at 0. Assign learners as they enroll.</span>
+            ) : (
             <span>Semester {activeTerm.termNumber}: Section rosters fixed from Sem 1. Active term enrollment automatically tracked.</span>
           )}
         </div>

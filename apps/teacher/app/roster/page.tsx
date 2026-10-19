@@ -275,29 +275,29 @@ export default function ClassSectionRosterPage() {
   return (
     <div className="space-y-6 font-sans">
       {/* Title Bar */}
-      <div className="bg-white p-5 border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print print:hidden">
         <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            PORTAL 02: OFFICIAL ADVISORY CLASS MASTERLIST
+          <span className="text-xs font-bold text-amber-300 tracking-wide block">
+            Official Advisory Class Masterlist &bull; Dumalneg NHS
           </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
             Advisory Section Roster
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-blue-100 mt-1">
             Official advisory class masterlist for designated Class Adviser:{" "}
-            <strong className="text-slate-900 uppercase">
+            <strong className="text-white">
               {user.fullName || user.email}
             </strong>
           </p>
         </div>
 
         {/* Action Controls & Section Selector */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {currentSection && (
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-3 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold border border-blue-400 uppercase cursor-pointer transition-colors shadow-2xs shrink-0"
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold cursor-pointer transition-colors rounded-[4px] shadow-xs shrink-0"
               title="Print official advisory class roster"
             >
               Print Class Roster
@@ -305,7 +305,7 @@ export default function ClassSectionRosterPage() {
           )}
 
           {advisorySections.length > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white text-slate-900 px-2 py-1 rounded-[4px]">
               <CustomSelect
                 label="Advisory:"
                 value={selectedSectionId}

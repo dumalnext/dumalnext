@@ -184,16 +184,16 @@ export default function TeachingSchedulePage() {
       }} />
 
       {/* Title Bar */}
-      <div className="p-5 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print print:hidden">
         <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            PORTAL 02: INSTRUCTIONAL SCHEDULE HUB
+          <span className="text-xs font-bold text-amber-300 tracking-wide block">
+            Instructional Schedule Hub &bull; Dumalneg NHS
           </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
             Teaching Load &amp; Class Schedule
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
-            Official weekly instructional timetable matrix for Faculty Member <strong className="text-slate-900 uppercase">{user.fullName}</strong> ({user.teacherId}).
+          <p className="text-xs text-blue-100 mt-1">
+            Official weekly instructional timetable matrix for Faculty Member <strong className="text-white">{user.fullName}</strong> ({user.teacherId}).
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export default function TeachingSchedulePage() {
             type="button"
             onClick={() => fetchSchedules()}
             disabled={isLoadingSchedules}
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer border border-slate-300 shadow-2xs shrink-0 disabled:opacity-50"
+            className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer border border-white/25 rounded-[4px] shrink-0 disabled:opacity-50"
             title="Synchronize schedule from official database"
           >
             {isLoadingSchedules ? "Synchronizing..." : "Refresh Timetable"}
@@ -212,18 +212,20 @@ export default function TeachingSchedulePage() {
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-3 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer border border-blue-400 shadow-2xs shrink-0"
+                className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors cursor-pointer rounded-[4px] shadow-xs shrink-0"
                 title="Print certified weekly teaching load timetable"
               >
                 Print Weekly Schedule
               </button>
-              <span className="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-mono text-xs font-bold uppercase border border-emerald-400 shrink-0">
-                STATUS: TIMETABLE ACTIVE &bull; {schedules.length} HOURS / WK
+              <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-500/20 text-emerald-100 text-xs font-bold border border-emerald-400/50 rounded-[4px] shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                Timetable Active &bull; {schedules.length} Hrs/Wk
               </span>
             </>
           ) : (
-            <span className="px-3 py-1.5 bg-amber-100 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400 shrink-0">
-              STATUS: AWAITING TIMETABLE RELEASE
+            <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-400/20 text-amber-200 text-xs font-bold border border-amber-300/40 rounded-[4px] shrink-0">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              Awaiting Timetable Release
             </span>
           )}
         </div>

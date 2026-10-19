@@ -142,10 +142,11 @@ function AcceptInviteContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
-        <div className="bg-white border-2 border-slate-300 p-8 text-center space-y-2">
-          <span className="font-mono text-xs uppercase font-bold text-[#002060] block">
-            [ VERIFYING INVITATION TOKEN... ]
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+        <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-3 shadow-sm max-w-md w-full">
+          <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
+          <span className="text-xs uppercase font-bold text-[#002060] tracking-wider block">
+            Verifying Invitation Token
           </span>
           <p className="text-xs text-slate-500">Checking credentials with Dumalneg NHS system registry...</p>
         </div>
@@ -155,29 +156,31 @@ function AcceptInviteContent() {
 
   if (errorMessage && !invitation) {
     return (
-      <div className="min-h-screen bg-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
-        <div className="max-w-md w-full mx-auto bg-white border-2 border-red-600 shadow-md p-6 sm:p-8 space-y-4">
-          <div className="bg-red-800 text-white p-3 text-center">
-            <span className="text-[10px] font-mono tracking-wider uppercase text-red-200 block">
-              [ ACCESS RESTRICTED ]
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="max-w-md w-full mx-auto bg-white rounded-xl border border-slate-200 border-t-4 border-t-red-600 shadow-md overflow-hidden">
+          <div className="bg-red-800 text-white p-5 text-center">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-red-200 block">
+              Access Restricted
             </span>
-            <h1 className="text-sm font-bold uppercase tracking-wide">
+            <h1 className="text-base font-extrabold tracking-wide mt-0.5">
               Invitation Invalid or Expired
             </h1>
           </div>
-          <div className="p-3 bg-red-50 border border-red-300 text-xs text-red-900 leading-relaxed font-sans">
-            {errorMessage}
-          </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Please contact the Dumalneg National High School IT Support Desk to issue a new onboarding link for your official email address.
-          </p>
-          <div className="pt-2 border-t border-slate-200 flex justify-center">
-            <Link
-              href="/"
-              className="text-xs font-mono font-bold text-[#002060] hover:underline uppercase"
-            >
-              &larr; Return to School Portal Home
-            </Link>
+          <div className="p-6 space-y-4">
+            <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-900 leading-relaxed">
+              {errorMessage}
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Please contact the Dumalneg National High School IT Support Desk to issue a new onboarding link for your official email address.
+            </p>
+            <div className="pt-3 border-t border-slate-200 flex justify-center">
+              <Link
+                href="/"
+                className="text-xs font-bold text-[#002060] hover:underline flex items-center gap-1"
+              >
+                <span>&larr; Return to School Portal Home</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -195,72 +198,77 @@ function AcceptInviteContent() {
     invitation?.role === "teacher"
       ? "bg-emerald-100 text-emerald-900 border-emerald-300"
       : invitation?.role === "admin"
-      ? "bg-blue-100 text-[#002060] border-blue-300"
+      ? "bg-amber-400/20 text-amber-200 border-amber-300/40"
       : "bg-indigo-100 text-indigo-900 border-indigo-300";
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-lg w-full mx-auto space-y-6">
-        <div className="text-center space-y-1">
-          <span className="font-mono text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest block">
-            DEPED REGION I &bull; DIVISION OF ILOCOS NORTE &bull; DUMALNEG NHS
+        <div className="text-center space-y-2">
+          <img
+            src="/dumalneg-logo.png"
+            alt="Dumalneg National High School Seal"
+            className="w-16 h-16 rounded-full object-cover bg-white p-1 shadow-md border-2 border-amber-400 mx-auto"
+          />
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block">
+            DepEd Region I &bull; Division of Ilocos Norte &bull; Dumalneg NHS
           </span>
-          <h1 className="text-lg sm:text-xl font-bold uppercase text-[#002060] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#002060] tracking-tight">
             Official Staff Onboarding &amp; Password Setup
           </h1>
         </div>
 
         {successInfo && (
-          <div className="bg-green-50 border-2 border-green-600 p-4 text-xs font-bold text-green-900 space-y-2">
-            <div>[ STATUS: SUCCESS ]</div>
+          <div className="bg-emerald-50 border border-emerald-300 border-l-4 border-l-emerald-600 rounded-lg p-4 text-xs font-semibold text-emerald-950 space-y-1.5 shadow-xs">
+            <div className="font-bold uppercase tracking-wider text-emerald-800">Account Activated</div>
             <div>{successInfo.message}</div>
-            <div className="font-mono text-[11px] text-green-700">
-              Directing to: {successInfo.redirectUrl}
+            <div className="text-[11px] text-emerald-700">
+              Redirecting to: {successInfo.redirectUrl}
             </div>
           </div>
         )}
 
         {errorMessage && (
-          <div className="bg-red-50 border-2 border-red-600 p-3 text-xs font-bold text-red-900">
-            [ ERROR ]: {errorMessage}
+          <div className="bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg p-3.5 text-xs font-semibold text-red-900">
+            {errorMessage}
           </div>
         )}
 
-        <div className="bg-white border-2 border-[#002060] shadow-sm">
-          <div className="bg-[#002060] text-white p-4">
-            <span className="text-[10px] font-mono tracking-wider uppercase text-blue-200 block">
-              [ SECURE ONBOARDING INVITATION VERIFIED ]
+        <div className="bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden">
+          <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-5 border-b-4 border-amber-400">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-amber-300 block">
+              Secure Onboarding Invitation Verified
             </span>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mt-1">
-              <span className="text-sm font-bold uppercase tracking-wide">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-1">
+              <span className="text-base font-extrabold tracking-tight">
                 Setup Credentials: {roleTitle}
               </span>
-              <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border ${roleBadgeColor}`}>
+              <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase border rounded-full ${roleBadgeColor}`}>
                 Role: {invitation?.role}
               </span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Authorized Staff Email (Locked)
               </label>
               <input
                 type="text"
                 readOnly
                 value={invitation?.email || ""}
-                className="w-full px-3 py-2 text-xs font-mono bg-slate-100 border border-slate-300 text-slate-700 select-all cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 text-xs rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-medium select-all cursor-not-allowed"
               />
-              <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
+              <span className="text-[11px] text-slate-500 mt-1 block">
                 This account will be permanently tied to this email address.
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  First Name *
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  First Name <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -268,13 +276,13 @@ function AcceptInviteContent() {
                   placeholder="e.g. Maria"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none uppercase"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Last Name *
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Last Name <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -282,27 +290,27 @@ function AcceptInviteContent() {
                   placeholder="e.g. Santos"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none uppercase"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Department / Academic Office
               </label>
               <input
                 type="text"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none"
+                className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
               />
             </div>
 
-            <div className="space-y-3 pt-2 border-t border-slate-200">
+            <div className="space-y-3.5 pt-3 border-t border-slate-200">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Create Account Password *
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Create Account Password <span className="text-red-600">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -312,12 +320,12 @@ function AcceptInviteContent() {
                     placeholder="Enter at least 6 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none pr-16"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none pr-16"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 hover:text-slate-800 uppercase px-1 py-0.5"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-500 hover:text-[#002060] px-1.5 py-0.5 cursor-pointer"
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -325,8 +333,8 @@ function AcceptInviteContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Confirm Password *
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Confirm Password <span className="text-red-600">*</span>
                 </label>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -335,7 +343,7 @@ function AcceptInviteContent() {
                   placeholder="Re-enter your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 focus:border-[#002060] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
                 />
               </div>
             </div>
@@ -344,18 +352,18 @@ function AcceptInviteContent() {
               <button
                 type="submit"
                 disabled={isSubmitting || !!successInfo}
-                className="w-full py-3 px-4 bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+                className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold tracking-wide transition-colors cursor-pointer shadow-sm"
               >
                 {isSubmitting
-                  ? "[ ACTIVATING ACCOUNT & LOGGING IN... ]"
-                  : "[ CREATE PASSWORD & ACTIVATE PORTAL ACCESS ]"}
+                  ? "Activating Account & Signing In..."
+                  : "Create Password & Activate Portal Access"}
               </button>
             </div>
           </form>
         </div>
 
-        <div className="text-center text-[10px] font-mono uppercase text-slate-500">
-          Dumalneg National High School &bull; IT Support &amp; Identity Onboarding System
+        <div className="text-center text-xs text-slate-500">
+          Dumalneg National High School &bull; Identity &amp; Access Onboarding
         </div>
       </div>
     </div>
@@ -366,8 +374,8 @@ export default function AcceptInvitePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-mono text-xs text-[#002060] uppercase">
-          [ Loading Onboarding Page... ]
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 text-xs font-semibold text-[#002060]">
+          Loading Staff Onboarding Page...
         </div>
       }
     >

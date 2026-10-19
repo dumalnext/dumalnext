@@ -121,53 +121,49 @@ export default function FacultyProfilePage() {
   return (
     <div className="space-y-6 font-sans">
       {/* Title Bar */}
-      <div className="p-5 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            PORTAL 02: FACULTY PROFILE &amp; VERIFICATION RECORD
+          <span className="text-xs font-bold text-amber-300 tracking-wide block">
+            Faculty Profile &amp; Verification Record
           </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
             Faculty Profile &amp; Credentials
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-blue-100 mt-1">
             Official DepEd personnel record for Dumalneg National High School.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={logout}
-          className="px-4 py-2 bg-red-800 hover:bg-red-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer shrink-0"
-        >
-          Sign Out
-        </button>
+        <div className="flex items-center gap-2">
+          {!isEditingName && (
+            <button
+              type="button"
+              onClick={handleStartEdit}
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors shadow-xs cursor-pointer rounded-[4px] shrink-0"
+            >
+              Edit Faculty Name
+            </button>
+          )}
+        </div>
       </div>
 
       {saveSuccess && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 font-bold font-mono">
+        <div className="p-4 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 font-bold rounded-[4px]">
           {saveSuccess}
         </div>
       )}
 
       {/* Credentials Grid */}
-      <div className="bg-white p-6 border-2 border-slate-300 shadow-xs space-y-6">
+      <div className="bg-white p-6 border-2 border-slate-200 rounded-[4px] shadow-xs space-y-6">
         <div className="border-b border-slate-200 pb-3 flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase">
-            ACADEMIC STAFF VERIFICATION DETAILS
+          <span className="text-xs font-bold text-[#002060]">
+            Academic Staff Verification Details
           </span>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-950 font-mono text-xs font-bold uppercase border border-emerald-300">
-              VERIFIED INSTITUTIONAL FACULTY
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-xs font-bold border border-emerald-300 rounded-[4px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+              Verified Institutional Faculty
             </span>
-            {!isEditingName && (
-              <button
-                type="button"
-                onClick={handleStartEdit}
-                className="px-3 py-1 bg-slate-100 hover:bg-[#002060] text-[#002060] hover:text-white border border-slate-300 hover:border-[#002060] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                Edit Faculty Name
-              </button>
-            )}
           </div>
         </div>
 

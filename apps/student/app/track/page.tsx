@@ -614,30 +614,41 @@ function TrackApplicationContent() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 ">
-      {/* Page Title & Navigation */}
-      <div className="border-b-2 border-slate-200 pb-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-          <span className="text-xs font-bold tracking-wide text-[#002060]">
-            Dumalneg National High School &bull; Student Portal
-          </span>
-          <Link
-            href="/"
-            className="text-xs text-[#002060] font-bold hover:underline"
-          >
-            &larr; Back to Portal Home
-          </Link>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Institutional Enrollment System Header Banner */}
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-full bg-white p-1 border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg NHS Official Seal"
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-300">
+              <span>Dumalneg National High School</span>
+              <span className="text-blue-300">&bull;</span>
+              <span>Application Status Tracker</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
+              My Enrollment Application Status
+            </h1>
+            <p className="text-xs text-blue-100 mt-0.5 leading-relaxed">
+              Real-time registrar evaluation updates for{" "}
+              <strong className="text-white">
+                {user.firstName} {user.lastName}
+              </strong>{" "}
+              ({user.email})
+            </p>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-          My Enrollment Application Status
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Real-time registrar evaluation updates for registered learner:{" "}
-          <strong className="text-slate-900">
-            {user.firstName} {user.lastName}
-          </strong>{" "}
-          ({user.email}).
-        </p>
+        <Link
+          href="/"
+          className="self-start sm:self-center px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold rounded-[4px] transition-colors shrink-0"
+        >
+          &larr; Back to Portal Home
+        </Link>
       </div>
 
       {/* Main Content Area */}

@@ -171,27 +171,34 @@ export default function EnrollmentControlRoom() {
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Title & Real-Time Status Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-300 pb-3">
-        <div>
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider block">
-            ENROLLMENT CONTROL ROOM &bull; MASTER SYSTEM OPERATIONS
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight mt-0.5">
-            DepEd Online Enrollment Master Control Room
-          </h2>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Configure the master online enrollment switch, active School Year (S.Y.), and institutional student advisories.
-          </p>
+      {/* Title & Real-Time Status Banner */}
+      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/dumalneg-logo.png"
+            alt="Dumalneg NHS Seal"
+            className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+          />
+          <div>
+            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
+              Enrollment Control Room &bull; Master System Operations
+            </span>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
+              Online Enrollment Master Control Room
+            </h2>
+            <p className="text-xs text-blue-100/85 mt-0.5">
+              Configure the master online enrollment switch, active School Year (S.Y.), and institutional student advisories.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 bg-white/10 border border-white/20 backdrop-blur-xs px-3.5 py-2 rounded-lg shrink-0">
           <span
             className={`w-3 h-3 rounded-full ${
-              settings.isEnrollmentOpen ? "bg-emerald-500 animate-pulse" : "bg-red-600"
+              settings.isEnrollmentOpen ? "bg-emerald-400 animate-pulse" : "bg-red-400"
             }`}
           />
-          <span className="text-xs font-mono font-bold uppercase text-slate-800">
+          <span className="text-xs font-bold uppercase tracking-wide text-white">
             {settings.isEnrollmentOpen ? "System Open (Active)" : "System Closed (Offline)"}
           </span>
         </div>
@@ -199,10 +206,10 @@ export default function EnrollmentControlRoom() {
 
       {/* Success Notification Alert */}
       {saveSuccess && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-950 flex items-center justify-between gap-2 shadow-xs">
+        <div className="p-4 bg-emerald-50 border border-emerald-300 border-l-4 border-l-emerald-600 rounded-lg text-xs text-emerald-950 flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 font-mono font-bold uppercase text-[10px] text-emerald-950 shrink-0">
-              SUCCESS
+            <span className="px-2 py-0.5 bg-emerald-200 border border-emerald-400 rounded font-bold uppercase text-[10px] text-emerald-950 shrink-0">
+              Success
             </span>
             <span className="font-semibold">{saveSuccess}</span>
           </div>
@@ -218,10 +225,10 @@ export default function EnrollmentControlRoom() {
 
       {/* Error Notification Alert */}
       {saveError && (
-        <div className="p-4 bg-red-50 border-2 border-red-500 text-xs text-red-950 flex items-center justify-between gap-2 shadow-xs">
+        <div className="p-4 bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg text-xs text-red-950 flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-red-200 border border-red-400 font-mono font-bold uppercase text-[10px] text-red-950 shrink-0">
-              ERROR
+            <span className="px-2 py-0.5 bg-red-200 border border-red-400 rounded font-bold uppercase text-[10px] text-red-950 shrink-0">
+              Error
             </span>
             <span className="font-semibold">{saveError}</span>
           </div>
@@ -239,7 +246,7 @@ export default function EnrollmentControlRoom() {
           1. MASTER ENROLLMENT ON/OFF TOGGLE CARD
           ===================================================================== */}
       <div
-        className={`p-5 sm:p-6 border-2 transition-all shadow-xs ${
+        className={`p-5 sm:p-6 rounded-xl border-2 transition-all shadow-sm ${
           settings.isEnrollmentOpen
             ? "bg-emerald-50/70 border-emerald-500"
             : "bg-red-50/70 border-red-500"
@@ -247,24 +254,24 @@ export default function EnrollmentControlRoom() {
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span
-                className={`px-2.5 py-1 text-xs font-mono font-bold uppercase border ${
+                className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
                   settings.isEnrollmentOpen
                     ? "bg-emerald-200 text-emerald-950 border-emerald-400"
                     : "bg-red-200 text-red-950 border-red-400"
                 }`}
               >
                 {settings.isEnrollmentOpen
-                  ? "STATUS: ENROLLMENT IS ACTIVE & OPEN"
-                  : "STATUS: ENROLLMENT IS OFFICIALLY CLOSED"}
+                  ? "Status: Enrollment is Active & Open"
+                  : "Status: Enrollment is Officially Closed"}
               </span>
-              <span className="text-xs font-mono text-slate-500">
+              <span className="text-xs font-medium text-slate-600">
                 School Year: <strong>{settings.schoolYear}</strong>
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-slate-950">
+            <h3 className="text-base sm:text-lg font-extrabold text-slate-950">
               {settings.isEnrollmentOpen
                 ? "Dumalneg NHS Online Enrollment System is currently accepting applications"
                 : "Dumalneg NHS Online Enrollment System is currently closed to new applicants"}
@@ -291,22 +298,22 @@ export default function EnrollmentControlRoom() {
               type="button"
               onClick={handleToggleSwitch}
               disabled={isSaving}
-              className={`w-full sm:w-auto px-6 py-3.5 text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-sm border-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed text-center ${
+              className={`w-full sm:w-auto px-6 py-3.5 rounded-lg text-xs font-bold tracking-wide transition-all shadow-sm border cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed text-center ${
                 settings.isEnrollmentOpen
                   ? "bg-red-700 hover:bg-red-800 text-white border-red-900"
                   : "bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-900"
               }`}
             >
               {isSaving ? (
-                "BROADCASTING REALTIME STATUS..."
+                "Broadcasting Real-Time Status..."
               ) : settings.isEnrollmentOpen ? (
-                "TURN OFF / CLOSE ENROLLMENT"
+                "Turn Off / Close Online Enrollment"
               ) : (
-                "TURN ON / OPEN ENROLLMENT"
+                "Turn On / Open Online Enrollment"
               )}
             </button>
-            <span className="text-[10px] font-mono text-slate-500 text-center sm:text-right">
-              Click to toggle &bull; Broadcasts instantly to student portal in real-time
+            <span className="text-[11px] text-slate-500 text-center sm:text-right">
+              Click to toggle &bull; Broadcasts instantly to student portal
             </span>
           </div>
         </div>
@@ -315,7 +322,7 @@ export default function EnrollmentControlRoom() {
       {/* =====================================================================
           2. SCHOOL YEAR & ACADEMIC PARAMETERS CONFIGURATION
           ===================================================================== */}
-      <div className="bg-white border-2 border-slate-300 p-5 sm:p-6 space-y-6 shadow-xs">
+      <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-6 shadow-xs">
         <div className="border-b border-slate-200 pb-2">
           <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
             DepEd Academic Year (S.Y.) &amp; Term Parameters &bull; Synchronized from IT Support
@@ -325,13 +332,13 @@ export default function EnrollmentControlRoom() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Active School Year (Synced from IT Support) */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-900 uppercase block">
+            <label className="text-xs font-bold text-slate-900 block">
               Official DepEd School Year (S.Y.):
             </label>
-            <div className="p-3 bg-slate-100 border-2 border-slate-300 font-mono font-black text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-300 font-extrabold text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2">
               <span>{settings.schoolYear}</span>
-              <span className="px-2 py-0.5 bg-green-700 text-white font-mono font-bold text-[10px] uppercase tracking-wider">
-                SYNCED FROM IT SUPPORT
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-700 text-white font-bold text-[10px] uppercase tracking-wider">
+                Synced from IT Support
               </span>
             </div>
             <span className="text-[11px] text-slate-500 block leading-normal">
@@ -341,13 +348,13 @@ export default function EnrollmentControlRoom() {
 
           {/* Active Academic Term (Synced from IT Support) */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-900 uppercase block">
+            <label className="text-xs font-bold text-slate-900 block">
               Active Trimester / Term:
             </label>
-            <div className="p-3 bg-slate-100 border-2 border-slate-300 font-mono font-black text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-300 font-extrabold text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2">
               <span>{settings.semester}</span>
-              <span className="px-2 py-0.5 bg-[#002060] text-white font-mono font-bold text-[10px] uppercase tracking-wider">
-                ACTIVE TRIMESTER
+              <span className="px-2.5 py-0.5 rounded-full bg-[#002060] text-white font-bold text-[10px] uppercase tracking-wider">
+                Active Trimester
               </span>
             </div>
             <span className="text-[11px] text-slate-500 block leading-normal">
