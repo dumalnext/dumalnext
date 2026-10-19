@@ -13,109 +13,158 @@ interface AccountCreationTutorialProps {
  * Embedded directly from YouTube with 0 MB storage consumption.
  */
 export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationTutorialProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoId = "BrsmQqatC5w";
   const youtubeUrl = `https://youtu.be/${videoId}`;
   const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&autoplay=1`;
 
   return (
-    <section className="bg-white border-2 border-[#002060] shadow-sm rounded-[4px] overflow-hidden my-6">
-      {/* Header Banner */}
-      <div className="bg-[#002060] text-white px-4 py-3 sm:px-6 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-950">
-        <div>
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-200 block">
-            Step-by-Step Video Guide
-          </span>
-          <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
-            Paano Gumawa ng Student Account (Account Registration Guide)
-          </h3>
+    <section className="bg-white border border-slate-200/90 shadow-sm rounded-[4px] overflow-hidden">
+      {/* Compact Interactive Banner Header */}
+      <div className="bg-gradient-to-r from-[#002060] to-[#0d3882] text-white px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-950">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-10 h-10 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+            </svg>
+          </div>
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
+              First-Time Applicant Video Walkthrough
+            </span>
+            <h3 className="text-sm font-bold text-white tracking-tight mt-0.5">
+              Need Help Creating Your Student Account? (Step-by-Step Guide)
+            </h3>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-[2px]">
-            YouTube Stream • 0 MB Storage
-          </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              if (!isExpanded) {
+                setIsExpanded(true);
+                setIsPlaying(true);
+              } else {
+                setIsExpanded(false);
+                setIsPlaying(false);
+              }
+            }}
+            className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors rounded-[4px] cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              {isExpanded ? (
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              ) : (
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+              )}
+            </svg>
+            {isExpanded ? "Hide Video Guide" : "Watch Video Guide"}
+          </button>
+          <a
+            href={youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold transition-colors rounded-[4px]"
+          >
+            YouTube &nearr;
+          </a>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 space-y-4">
+      <div className="p-4 sm:p-5 space-y-4">
         <p className="text-xs text-slate-600 leading-relaxed">
-          Panoorin ang opisyal na video walkthrough ng Dumalneg National High School upang matutunan ang hakbang-hakbang na proseso sa paggawa ng account at pag-verify ng 6-digit security code sa Gmail bago mag-enroll.
+          Panoorin ang opisyal na video walkthrough ng Dumalneg National High School upang matutunan ang hakbang-hakbang na proseso sa paggawa ng student portal account at pag-verify ng 6-digit security code sa Gmail bago mag-enroll.
         </p>
 
-        {/* Responsive Video Container (16:9 Aspect Ratio) */}
-        <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
-          {!isPlaying ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900 text-white">
-              <div className="mb-3 px-3 py-1 bg-[#002060] border border-blue-400 text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
-                Official Video Tutorial
+        {/* Expandable 16:9 Video Container */}
+        {isExpanded && (
+          <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
+            {!isPlaying ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900 text-white">
+                <div className="mb-3 px-3 py-1 bg-[#002060] border border-blue-400 text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+                  Official Video Tutorial
+                </div>
+                <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
+                  Paano Gumawa ng Student Account
+                </h4>
+                <p className="text-[11px] text-slate-300 max-w-sm mb-4">
+                  Pindutin ang Play button upang simulan ang video tutorial nang direkta sa pahinang ito.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsPlaying(true)}
+                    className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer"
+                  >
+                    Play Tutorial Video
+                  </button>
+                  <a
+                    href={youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
+                  >
+                    Open in YouTube &rarr;
+                  </a>
+                </div>
               </div>
-              <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
-                CREATE NEW ACCOUNT | DUMALNEXT SYSTEM
-              </h4>
-              <p className="text-[11px] text-slate-300 max-w-sm mb-4">
-                Pindutin ang Play button upang simulan ang video tutorial nang direkta sa pahinang ito.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsPlaying(true)}
-                  className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer"
-                >
-                  Play Tutorial Video
-                </button>
-                <a
-                  href={youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
-                >
-                  Open in YouTube &rarr;
-                </a>
-              </div>
-            </div>
-          ) : (
-            <iframe
-              src={embedUrl}
-              title="Paano Gumawa ng Account sa Dumalneg NHS Student Portal"
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
-          )}
-        </div>
+            ) : (
+              <iframe
+                src={embedUrl}
+                title="Paano Gumawa ng Account sa Dumalneg NHS Student Portal"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            )}
+          </div>
+        )}
 
-        {/* Quick Steps & Registration Call-to-Action */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1">
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
-            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 1:</strong>
-            <span className="text-slate-600 text-[11px]">Piliin ang <strong>Tab 2: Create Account</strong> sa itaas ng portal.</span>
+        {/* Quick 4 Steps */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+            <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+            <div>
+              <strong className="text-slate-900 block font-bold mb-0.5">Select &ldquo;Create Account&rdquo;</strong>
+              <span className="text-slate-600 text-[11px] leading-snug block">Buksan ang Create Account tab sa portal login card.</span>
+            </div>
           </div>
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
-            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 2:</strong>
-            <span className="text-slate-600 text-[11px]">I-encode ang opisyal na Buong Pangalan ayon sa PSA Birth Certificate.</span>
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+            <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+            <div>
+              <strong className="text-slate-900 block font-bold mb-0.5">Enter Full Legal Name</strong>
+              <span className="text-slate-600 text-[11px] leading-snug block">I-encode ang opisyal na pangalan ayon sa PSA Birth Certificate.</span>
+            </div>
           </div>
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
-            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 3:</strong>
-            <span className="text-slate-600 text-[11px]">Gamitin ang aktibong personal na Gmail address at magtakda ng secure password.</span>
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+            <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+            <div>
+              <strong className="text-slate-900 block font-bold mb-0.5">Provide Active Gmail</strong>
+              <span className="text-slate-600 text-[11px] leading-snug block">Gamitin ang aktibong personal na Gmail address at password.</span>
+            </div>
           </div>
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs">
-            <strong className="text-[#002060] block font-bold mb-0.5">Hakbang 4:</strong>
-            <span className="text-slate-600 text-[11px]">Ilagay ang 6-digit verification code mula sa Gmail upang ma-activate ang account.</span>
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+            <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+            <div>
+              <strong className="text-slate-900 block font-bold mb-0.5">Verify 6-Digit Code</strong>
+              <span className="text-slate-600 text-[11px] leading-snug block">Ilagay ang 6-digit security code mula sa Gmail upang ma-activate.</span>
+            </div>
           </div>
         </div>
 
         {onSwitchToRegister && (
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
-            <p className="text-[11px] text-slate-500 italic">
-              Napanood na ang gabay? Handa ka nang simulan ang paggawa ng iyong student applicant account.
+            <p className="text-[11px] text-slate-500">
+              Wala pang student account? Simulan ang paggawa ng iyong applicant account ngayon.
             </p>
             <button
               type="button"
               onClick={onSwitchToRegister}
               className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-[4px] shrink-0"
             >
-              Simulan ang Pag-register sa Tab 2 &rarr;
+              Create Student Account &rarr;
             </button>
           </div>
         )}
@@ -253,8 +302,8 @@ export function GradeLevelEnrollmentTutorials({
           </h3>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-[2px]">
-            YouTube Stream • 0 MB Storage
+          <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-200 border border-amber-300/40 rounded-[4px]">
+            Official Video Guides
           </span>
         </div>
       </div>

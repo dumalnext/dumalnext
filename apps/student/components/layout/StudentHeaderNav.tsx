@@ -350,12 +350,62 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         {children}
       </div>
 
-      {/* Upper-Right: Quick Status Tag / User Info / Login - Hidden on Android and iOS devices (Laptop/PC only) */}
-      <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0 relative z-10">
+      {/* Upper-Right: Desktop Portal Navigation + Quick Status / Auth */}
+      <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0 relative z-10">
+        {/* Desktop Quick Navigation Links */}
+        <nav aria-label="Primary Portal Navigation" className="hidden xl:flex items-center gap-1 mr-1">
+          <Link
+            href="/"
+            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+              pathname === "/"
+                ? "bg-white/15 text-white border border-white/25"
+                : "text-slate-200 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            href={enrollHref}
+            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+              pathname === "/enroll"
+                ? "bg-white/15 text-white border border-white/25"
+                : "text-slate-200 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            Online Enrollment
+          </Link>
+          <Link
+            href={trackHref}
+            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+              pathname === "/track"
+                ? "bg-white/15 text-white border border-white/25"
+                : "text-slate-200 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            Track Status
+          </Link>
+          <Link
+            href={sectionHref}
+            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+              pathname === "/section"
+                ? "bg-white/15 text-white border border-white/25"
+                : "text-slate-200 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            My Section
+          </Link>
+        </nav>
+
+        {/* Academic Year Badge */}
+        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-blue-950/70 border border-blue-400/30 rounded-[4px] text-[11px] font-bold text-blue-100">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+          <span>S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}</span>
+        </div>
+
         {user ? (
           <Link
             href={appStatus ? trackHref : "/enroll"}
-            className="flex items-center gap-2 px-2 sm:px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
+            className="flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
             title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
           >
             <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
@@ -380,12 +430,20 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             )}
           </Link>
         ) : (
-          <Link
-            href="/?tab=signin"
-            className="inline-block bg-white text-[#002060] font-bold py-1.5 px-3.5 hover:bg-slate-100 transition-colors shadow-xs text-xs rounded-[4px] active:scale-95"
-          >
-            Login
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/?tab=signin"
+              className="inline-block bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-1.5 px-3 transition-colors text-xs rounded-[4px] active:scale-95"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/?tab=register"
+              className="inline-block bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-1.5 px-3.5 transition-colors shadow-xs text-xs rounded-[4px] active:scale-95"
+            >
+              Register Account
+            </Link>
+          </div>
         )}
       </div>
 

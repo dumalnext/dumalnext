@@ -78,6 +78,8 @@ function StudentHomeContent() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginProgress, setLoginProgress] = useState(0);
   const [loginStatusText, setLoginStatusText] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
 
   // Registration Form State (Phase 1: Email First)
   const [regForm, setRegForm] = useState({
@@ -591,71 +593,94 @@ function StudentHomeContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 ">
-      {/* DepEd & DNHS Institutional Banner */}
-      <section className="bg-white border-l-4 border-[#002060] p-6 shadow-sm border border-slate-200 rounded-[4px]">
-        <span className="text-xs font-bold tracking-wide text-[#002060] block mb-1">
-          DepEd Region I &bull; Schools Division of Ilocos Norte &bull; Dumalneg NHS
-        </span>
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-          Basic Education Online Enrollment &amp; Admission Portal
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-          Official admission gateway for Dumalneg National High School (School ID: 300017). 
-          Serving incoming Grade 7, Grade 11 (SHS), Transferees, and Returning Learners across Barangays Cabaritan, Kalabakan, Quibel, and San Isidro.
-        </p>
-      </section>
-
+    <div className="w-full space-y-8">
       {/* Access Restriction Notice (When redirected from protected routes) */}
       {noticeQuery === "auth_required" && (
-        <div className="p-4 bg-amber-50 border-2 border-amber-500 shadow-xs rounded-[4px]">
-          <span className="text-xs font-bold text-amber-900 tracking-wide block mb-1">
-            Access Restricted: Authentication Required
-          </span>
-          <p className="text-xs text-amber-900 leading-relaxed font-medium">
-            You must <strong>Sign In</strong> to your student account or <strong>Create a New Account</strong> below 
-            before you can access the Online Enrollment Form or track an existing application.
-          </p>
+        <div className="p-4 bg-amber-50 border-l-4 border-amber-500 border border-amber-300 shadow-xs rounded-[4px] flex items-start gap-3">
+          <div className="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+            !
+          </div>
+          <div>
+            <span className="text-xs font-bold text-amber-950 tracking-wide block mb-0.5">
+              Student Portal Sign-In Required
+            </span>
+            <p className="text-xs text-amber-900 leading-relaxed">
+              Please <strong>Sign In</strong> to your learner account or <strong>Create a New Account</strong> on the right to access the Online Enrollment Form or track your application status.
+            </p>
+          </div>
         </div>
       )}
 
       {/* =========================================================================
-          VIEW A: AUTHENTICATED USER CONSOLE (ALREADY SIGNED IN)
+          VIEW A: AUTHENTICATED STUDENT PORTAL DASHBOARD (ALREADY SIGNED IN)
           ========================================================================= */}
       {user ? (
         <div className="space-y-6">
-          {/* Welcome User Banner */}
-          <div className="bg-white border-2 border-[#002060] p-6 sm:p-8 space-y-4 rounded-[4px] shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-              <div className="space-y-1.5 min-w-0">
-                <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-                  Authenticated Applicant Account
-                </span>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-                  Welcome back, {user.firstName} {user.lastName}
-                </h2>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-600 pt-0.5">
-                  <span className="inline-flex items-center gap-1.5 min-w-0">
-                    <span className="text-slate-500 font-medium">Registered Email:</span>
-                    <strong className="text-slate-900 break-all">{user.email}</strong>
-                  </span>
-                  <span className="hidden sm:inline text-slate-300" aria-hidden="true">&bull;</span>
-                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span className="text-slate-500 font-medium">Account ID:</span>
-                    <span className="font-semibold text-slate-800">{user.userId}</span>
-                  </span>
-                  {user.lrn && /^\d{12}$/.test(user.lrn) && (
-                    <>
-                      <span className="hidden sm:inline text-slate-300" aria-hidden="true">&bull;</span>
-                      <span className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                        <span className="text-slate-500 font-medium">DepEd LRN:</span>
-                        <span className="font-bold text-[#002060]">{user.lrn}</span>
+          {/* Student Portal Profile Banner */}
+          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-5 sm:px-7 sm:py-6 border-b-4 border-amber-400">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-4 min-w-0">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] bg-white/10 border border-white/25 flex items-center justify-center text-base sm:text-lg font-black text-amber-300 shrink-0 shadow-xs">
+                    {(user.firstName?.[0] || "S")}{(user.lastName?.[0] || "P")}
+                  </div>
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
+                        Official Learner Portal
                       </span>
-                    </>
-                  )}
+                      <span className="text-[11px] font-semibold text-blue-200">
+                        S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
+                      </span>
+                    </div>
+                    <h1 className="text-lg sm:text-2xl font-bold text-white tracking-tight truncate">
+                      Welcome, {user.firstName} {user.lastName}
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-blue-100">
+                      <span>
+                        Email: <strong className="text-white">{user.email}</strong>
+                      </span>
+                      <span className="text-blue-400" aria-hidden="true">&bull;</span>
+                      <span>
+                        Account ID: <strong className="text-white">{user.userId}</strong>
+                      </span>
+                      {user.lrn && /^\d{12}$/.test(user.lrn) && (
+                        <>
+                          <span className="text-blue-400" aria-hidden="true">&bull;</span>
+                          <span className="px-2 py-0.5 bg-white/15 border border-white/25 text-white font-bold rounded-[4px]">
+                            LRN: {user.lrn}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Module Buttons */}
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <Link
+                    href="/enroll"
+                    className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-[4px] transition-colors shadow-xs"
+                  >
+                    Enrollment Form
+                  </Link>
+                  <Link
+                    href={userApplication ? `/track?ref=${userApplication.referenceNumber}` : "/track"}
+                    className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs font-bold rounded-[4px] transition-colors"
+                  >
+                    Track Status
+                  </Link>
+                  <Link
+                    href="/section"
+                    className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs font-bold rounded-[4px] transition-colors"
+                  >
+                    My Section
+                  </Link>
                 </div>
               </div>
             </div>
+
+            <div className="p-5 sm:p-7 space-y-6">
 
             {/* Section Assignment Status Card */}
             {sectionMode === "ASSIGNED" && assignedSection ? (
@@ -1106,423 +1131,730 @@ function StudentHomeContent() {
               semester={semester}
               isEnrollmentOpen={isEnrollmentOpen}
             />
+            </div>
           </div>
         </div>
       ) : (
         /* =========================================================================
-           VIEW B: UNAUTHENTICATED APPLICANT PORTAL (LOGIN OR REGISTER FIRST)
+           VIEW B: UNAUTHENTICATED STUDENT PORTAL (HERO + SPLIT AUTHENTICATION CARD)
            ========================================================================= */
-        <div className="space-y-6">
-          <div className="bg-white border-2 border-[#002060] shadow-sm rounded-[4px] overflow-hidden">
-          {/* Tab Selector: Sign In vs Create Account */}
-          <div className="grid grid-cols-2 border-b-2 border-slate-200 text-center font-bold text-xs">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("signin");
-                setLoginError("");
-              }}
-              className={`py-3.5 sm:py-4 px-2 sm:px-4 text-[11px] sm:text-xs min-h-[44px] transition-colors ${
-                activeTab === "signin"
-                  ? "bg-[#002060] text-white border-b-2 border-[#002060]"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              Tab 1: Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("register");
-                setRegErrors({});
-                setRegSuccessNotice("");
-              }}
-              className={`py-3.5 sm:py-4 px-2 sm:px-4 text-[11px] sm:text-xs min-h-[44px] transition-colors ${
-                activeTab === "register"
-                  ? "bg-[#002060] text-white border-b-2 border-[#002060]"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              Tab 2: Create Account
-            </button>
-          </div>
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* LEFT COLUMN (7 COLS): INSTITUTIONAL HERO, ROADMAP & VIDEO GUIDE */}
+            <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
+              {/* Official DepEd & Dumalneg NHS Hero Card */}
+              <section className="relative bg-gradient-to-br from-[#002060] via-[#002b80] to-[#071739] text-white rounded-[4px] shadow-md border border-blue-900 overflow-hidden">
+                {/* Top Gold Accent Bar */}
+                <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500" />
 
-          <div className="p-4 sm:p-8">
-            {/* -----------------------------------------------------------------
-                TAB 1: SIGN IN FORM (PHASE 1: EMAIL FIRST)
-                ----------------------------------------------------------------- */}
-            {activeTab === "signin" && (
-              <div className="max-w-md mx-auto space-y-6">
-                <div className="border-b border-slate-200 pb-3 text-center">
-                  <span className="text-xs font-bold text-[#002060] block mb-1">
-                    Phase 1: Student Account Authentication
-                  </span>
-                  <h2 className="text-xl font-bold text-slate-900">
-                    Sign In to Student Portal
-                  </h2>
-                  <p className="text-xs text-slate-600 mt-1">
-                    Enter your registered <strong>Email Address</strong> and password to access online enrollment and track records.
-                  </p>
-                </div>
-
-                {regSuccessNotice && (
-                  <div className="p-4 bg-emerald-50 border-2 border-emerald-600 shadow-xs rounded-[4px]">
-                    <span className="text-xs font-bold text-emerald-950 block mb-1">
-                      Registration Successful &bull; Verification Link Sent
-                    </span>
-                    <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                      {regSuccessNotice}
-                    </p>
-                  </div>
-                )}
-
-                {/* Gmail Verification Required Notice with 6-Digit Code Entry */}
-                {unconfirmedEmail && (
-                  <div className="p-4 bg-amber-50 border-2 border-amber-600 shadow-xs space-y-2.5 rounded-[4px]">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
-                      <span className="text-xs font-bold text-amber-950">
-                        6-Digit Gmail Verification Code Required
+                <div className="p-6 sm:p-8 space-y-6">
+                  {/* Top Row: Live Enrollment Status Badge & School ID */}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div
+                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[11px] font-bold uppercase tracking-wider border ${
+                        isEnrollmentOpen
+                          ? "bg-emerald-500/20 text-emerald-200 border-emerald-400/40"
+                          : "bg-red-500/20 text-red-200 border-red-400/40"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          isEnrollmentOpen ? "bg-emerald-400 animate-pulse" : "bg-red-400"
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {isEnrollmentOpen
+                          ? `Enrollment Open • S.Y. ${schoolYear || "2026-2027"} (${semester || "Trimester 1"})`
+                          : `Enrollment Closed • S.Y. ${schoolYear || "2026-2027"}`}
                       </span>
                     </div>
-                    <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                      A 6-digit confirmation code was dispatched to: <strong className="underline">{unconfirmedEmail}</strong>.
-                      Please enter the 6-digit code to activate your account and access enrollment.
-                    </p>
-                    <div className="pt-1 flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOtpEmail(unconfirmedEmail);
-                          setOtpCode("");
-                          setOtpError("");
-                          setOtpSuccess("");
-                          setShowOtpModal(true);
-                        }}
-                        className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs rounded-[4px]"
-                      >
-                        Enter 6-Digit Code
-                      </button>
-                      <button
-                        type="button"
-                        disabled={isResending || resendCooldown > 0}
-                        onClick={handleResendVerification}
-                        className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-400 text-xs font-bold transition-colors disabled:opacity-60 cursor-pointer rounded-[4px]"
-                      >
-                        {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "Resend Code"}
-                      </button>
-                      {resendStatus && (
-                        <span className="text-[11px] font-bold text-slate-800 block">
-                          {resendStatus}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-[11px] font-bold text-blue-200 bg-white/10 border border-white/15 px-2.5 py-1 rounded-[4px]">
+                      DepEd School ID: 300017
+                    </span>
                   </div>
-                )}
 
-                {/* Real-time Authentication Progress Bar & Status */}
-                {isLoggingIn && (
-                  <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-[4px]">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
-                      <span>System Authenticating</span>
-                      <span>{loginProgress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden rounded-full">
-                      <div
-                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
-                        style={{ width: `${loginProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-800 font-medium">
-                      {loginStatusText || "Verifying credentials with Dumalneg NHS learner database..."}
-                    </p>
-                  </div>
-                )}
-
-                {loginError && (
-                  <div className="p-3 bg-red-50 border-2 border-red-400 rounded-[4px]">
-                    <p className="text-xs font-bold text-red-900 leading-normal">
-                      Authentication Error: {loginError}
-                    </p>
-                  </div>
-                )}
-
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 mb-1">
-                      Registered Email Address <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={loginEmail}
-                      onChange={(e) => {
-                        setLoginEmail(e.target.value);
-                        if (loginError) setLoginError("");
-                      }}
-                      placeholder="e.g. student@example.com"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                      disabled={isLoggingIn}
-                      required
+                  {/* School Seal & Headline */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
+                    <img
+                      src="/dumalneg-logo.png"
+                      alt="Dumalneg National High School Seal"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain shrink-0 bg-white/10 p-2 rounded-[4px] border border-white/20 shadow-sm"
                     />
-                    <p className="text-[10px] text-slate-500 mt-1">
-                      Enter the email address registered during account creation.
-                    </p>
+                    <div className="space-y-1.5">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
+                        Republic of the Philippines &bull; DepEd Region I &bull; Ilocos Norte
+                      </p>
+                      <h1 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-white tracking-tight leading-snug">
+                        Dumalneg National High School Online Student Portal
+                      </h1>
+                      <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                        Official Basic Education Admission, Continuing Enrollment, and Academic Records Gateway serving learners across Barangays Cabaritan, Kalabakan, Quibel, and San Isidro.
+                      </p>
+                    </div>
                   </div>
 
+                  {/* 3 Quick Institutional Highlights */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-white/15">
+                    <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                        Junior High School
+                      </span>
+                      <strong className="text-sm font-bold text-white block mt-0.5">
+                        Grades 7 to 10
+                      </strong>
+                      <p className="text-[11px] text-blue-100 mt-1 leading-snug">
+                        Regular Curriculum &amp; Special Program in Sports (SPS)
+                      </p>
+                    </div>
+                    <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                        Senior High School
+                      </span>
+                      <strong className="text-sm font-bold text-white block mt-0.5">
+                        Grades 11 to 12
+                      </strong>
+                      <p className="text-[11px] text-blue-100 mt-1 leading-snug">
+                        Academic &amp; Tech-Pro Tracks with Trimester Electives
+                      </p>
+                    </div>
+                    <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                        Fast Digital Processing
+                      </span>
+                      <strong className="text-sm font-bold text-white block mt-0.5">
+                        Real-Time Status &amp; PDF
+                      </strong>
+                      <p className="text-[11px] text-blue-100 mt-1 leading-snug">
+                        Live Registrar Verification &amp; Official DepEd Form Download
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 4-Step Student Enrollment Journey Roadmap */}
+              <section className="bg-white border border-slate-200/90 p-5 sm:p-6 rounded-[4px] shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 mb-1">
-                      Account Password <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      value={loginPassword}
-                      onChange={(e) => {
-                        setLoginPassword(e.target.value);
-                        if (loginError) setLoginError("");
-                      }}
-                      placeholder="Enter account password"
-                      className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                      disabled={isLoggingIn}
-                      required
-                    />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#002060] block">
+                      Official Admission Workflow
+                    </span>
+                    <h2 className="text-base font-bold text-slate-900">
+                      How to Enroll Online in 4 Easy Steps
+                    </h2>
                   </div>
-
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isLoggingIn}
-                      className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px]"
-                    >
-                      {isLoggingIn ? "Authenticating... Please Wait" : "Sign In & Proceed to Student Portal"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* -----------------------------------------------------------------
-                TAB 2: CREATE ACCOUNT FORM (PHASE 1: EMAIL FIRST)
-                ----------------------------------------------------------------- */}
-            {activeTab === "register" && (
-              <div className="max-w-xl mx-auto space-y-6">
-                <div className="border-b border-slate-200 pb-3 text-center">
-                  <span className="text-xs font-bold text-[#002060] block mb-1">
-                    Phase 1: New Learner Registration
+                  <span className="text-[11px] font-semibold text-slate-500">
+                    For Incoming, Transferee &amp; Continuing Learners
                   </span>
-                  <h2 className="text-xl font-bold text-slate-900">
-                    Create Student Applicant Account
-                  </h2>
-                  <p className="text-xs text-slate-600 mt-1">
-                    Register with your official name and <strong>Email Address</strong>. 
-                    Your account will track your enrollment submission and link your documents.
-                  </p>
                 </div>
 
-                {/* Real-time Registration Progress Bar & Status */}
-                {isRegistering && (
-                  <div className="p-4 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-2 rounded-[4px]">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
-                      <span>System Registering Applicant</span>
-                      <span>{regProgress}%</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-[4px] bg-[#002060] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      01
                     </div>
-                    <div className="w-full bg-slate-200 h-2.5 border border-blue-900/30 overflow-hidden rounded-full">
-                      <div
-                        className="bg-[#002060] h-full transition-all duration-300 ease-out"
-                        style={{ width: `${regProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-800 font-medium">
-                      {regStatusText || "Saving applicant credentials in DepEd Dumalneg NHS registry..."}
-                    </p>
-                  </div>
-                )}
-
-                {regErrors.form && (
-                  <div className="p-3 bg-red-50 border-2 border-red-400 rounded-[4px]">
-                    <p className="text-xs font-bold text-red-900 leading-normal">
-                      Registration Notice: {regErrors.form}
-                    </p>
-                  </div>
-                )}
-
-                <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                  {/* Name Fields */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 mb-1">
-                        Last Name <span className="text-red-700">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={regForm.lastName}
-                        onChange={(e) => setRegForm({ ...regForm, lastName: e.target.value })}
-                        placeholder="e.g. AGCAOILI"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                        disabled={isRegistering}
-                        required
-                      />
-                      {regErrors.lastName && (
-                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.lastName}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-900 mb-1">
-                        First Name <span className="text-red-700">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={regForm.firstName}
-                        onChange={(e) => setRegForm({ ...regForm, firstName: e.target.value })}
-                        placeholder="e.g. MARK ANTHONY"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                        disabled={isRegistering}
-                        required
-                      />
-                      {regErrors.firstName && (
-                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.firstName}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-900 mb-1">
-                        Middle Name
-                      </label>
-                      <input
-                        type="text"
-                        value={regForm.middleName}
-                        onChange={(e) => setRegForm({ ...regForm, middleName: e.target.value })}
-                        placeholder="e.g. CASTRO"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                        disabled={isRegistering}
-                      />
+                      <h3 className="text-xs font-bold text-slate-900">
+                        Register &amp; Verify Email
+                      </h3>
+                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                        Create your student portal account using your full legal name and active Gmail address, then confirm the 6-digit security code.
+                      </p>
                     </div>
                   </div>
 
-                  {/* Email Address */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-900 mb-1">
-                      Account Email Address <span className="text-red-700">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={regForm.email}
-                      onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
-                      placeholder="e.g. mark.agcaoili@example.com"
-                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                      disabled={isRegistering}
-                      required
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-[4px] bg-[#002060] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      02
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-900">
+                        Complete Enrollment Form
+                      </h3>
+                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                        Fill out the guided 5-step DepEd Basic Education Form (or 1-click re-enrollment for continuing JHS/SHS learners).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-[4px] bg-[#002060] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      03
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-900">
+                        Upload School Credentials
+                      </h3>
+                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                        Upload clear photos or scans of your PSA Birth Certificate, SF9 / Form 138 Report Card, and 2x2 ID Picture.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-[4px] bg-emerald-700 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      04
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-900">
+                        Track Approval &amp; Sectioning
+                      </h3>
+                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                        Monitor real-time Registrar evaluation, view your assigned class section &amp; timetable, and download your official DepEd PDF.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Collapsible Video Walkthrough Card */}
+              <AccountCreationTutorial
+                onSwitchToRegister={() => {
+                  setActiveTab("register");
+                  setRegErrors({});
+                  setRegSuccessNotice("");
+                  if (typeof window !== "undefined") {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+              />
+            </div>
+
+            {/* RIGHT COLUMN (5 COLS): STICKY STUDENT PORTAL AUTHENTICATION CARD */}
+            <div className="lg:col-span-5 lg:sticky lg:top-6 order-1 lg:order-2">
+              <div className="bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden">
+                {/* Portal Card Institutional Header */}
+                <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/dumalneg-logo.png"
+                      alt="DNHS Seal"
+                      className="w-9 h-9 object-contain shrink-0"
                     />
-                    <p className="text-[10px] text-slate-500 mt-1">
-                      Official notifications, application reference numbers, and verification updates will be sent to this email.
-                    </p>
-                    {regErrors.email && (
-                      <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.email}</p>
-                    )}
-                  </div>
-
-                  {/* Passwords */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-900 mb-1">
-                        Security Password <span className="text-red-700">*</span>
-                      </label>
-                      <input
-                        type="password"
-                        value={regForm.password}
-                        onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
-                        placeholder="At least 6 characters"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                        disabled={isRegistering}
-                        required
-                      />
-                      {regErrors.password && (
-                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.password}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-900 mb-1">
-                        Confirm Password <span className="text-red-700">*</span>
-                      </label>
-                      <input
-                        type="password"
-                        value={regForm.confirmPassword}
-                        onChange={(e) => setRegForm({ ...regForm, confirmPassword: e.target.value })}
-                        placeholder="Re-type password"
-                        className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                        disabled={isRegistering}
-                        required
-                      />
-                      {regErrors.confirmPassword && (
-                        <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.confirmPassword}</p>
-                      )}
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
+                        Dumalneg NHS &bull; Learner Gateway
+                      </span>
+                      <h2 className="text-base font-bold text-white tracking-tight">
+                        Student Portal Access
+                      </h2>
                     </div>
                   </div>
+                  <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                    S.Y. {schoolYear || "2026-2027"}
+                  </span>
+                </div>
 
-                  <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 rounded-[4px]">
-                    <strong className="text-slate-800 block mb-0.5 tracking-wide">
-                      DepEd Enrollment Notice:
-                    </strong>
-                    Your 12-digit Learner Reference Number (LRN), Dumalneg Elementary School background, and document attachments 
-                    (PSA Birth Certificate, Form 138 / SF9 Report Card) will be encoded inside the 5-step enrollment form after registration.
-                  </div>
+                {/* Clean Segmented Tab Switcher: Sign In vs Create Account */}
+                <div className="p-2 bg-slate-100 border-b border-slate-200 grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("signin");
+                      setLoginError("");
+                    }}
+                    className={`py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer ${
+                      activeTab === "signin"
+                        ? "bg-[#002060] text-white shadow-xs"
+                        : "bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
+                    }`}
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("register");
+                      setRegErrors({});
+                      setRegSuccessNotice("");
+                    }}
+                    className={`py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer ${
+                      activeTab === "register"
+                        ? "bg-[#002060] text-white shadow-xs"
+                        : "bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
+                    }`}
+                  >
+                    Create Account
+                  </button>
+                </div>
 
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isRegistering}
-                      className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px]"
-                    >
-                      {isRegistering ? "Creating Account... Please Wait" : "Create Account & Register"}
-                    </button>
-                  </div>
-                </form>
+                <div className="p-5 sm:p-6">
+                  {/* -----------------------------------------------------------------
+                      SIGN IN FORM
+                      ----------------------------------------------------------------- */}
+                  {activeTab === "signin" && (
+                    <div className="space-y-5">
+                      <div className="border-b border-slate-200 pb-3">
+                        <h3 className="text-base font-bold text-slate-900">
+                          Sign In to Your Learner Account
+                        </h3>
+                        <p className="text-xs text-slate-600 mt-0.5">
+                          Enter your registered email address and password to continue enrollment or check your application status.
+                        </p>
+                      </div>
+
+                      {regSuccessNotice && (
+                        <div className="p-3.5 bg-emerald-50 border-l-4 border-emerald-600 border border-emerald-300 shadow-xs rounded-[4px]">
+                          <span className="text-xs font-bold text-emerald-950 block mb-0.5">
+                            Registration Successful &bull; Verification Sent
+                          </span>
+                          <p className="text-xs text-emerald-900 leading-relaxed">
+                            {regSuccessNotice}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Gmail Verification Required Notice with 6-Digit Code Entry */}
+                      {unconfirmedEmail && (
+                        <div className="p-3.5 bg-amber-50 border-l-4 border-amber-500 border border-amber-300 shadow-xs space-y-2.5 rounded-[4px]">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                            <span className="text-xs font-bold text-amber-950">
+                              6-Digit Email Verification Required
+                            </span>
+                          </div>
+                          <p className="text-xs text-amber-950 leading-relaxed">
+                            A 6-digit confirmation code was sent to <strong className="underline">{unconfirmedEmail}</strong>. Enter the code to activate your student account.
+                          </p>
+                          <div className="pt-1 flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOtpEmail(unconfirmedEmail);
+                                setOtpCode("");
+                                setOtpError("");
+                                setOtpSuccess("");
+                                setShowOtpModal(true);
+                              }}
+                              className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs rounded-[4px]"
+                            >
+                              Enter 6-Digit Code
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isResending || resendCooldown > 0}
+                              onClick={handleResendVerification}
+                              className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold transition-colors disabled:opacity-60 cursor-pointer rounded-[4px]"
+                            >
+                              {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "Resend Code"}
+                            </button>
+                            {resendStatus && (
+                              <span className="text-[11px] font-bold text-slate-800 block">
+                                {resendStatus}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Real-time Authentication Progress Bar & Status */}
+                      {isLoggingIn && (
+                        <div className="p-3.5 bg-blue-50 border border-[#002060] shadow-xs space-y-2 rounded-[4px]">
+                          <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
+                            <span>Signing in to Student Portal...</span>
+                            <span>{loginProgress}%</span>
+                          </div>
+                          <div className="w-full bg-slate-200 h-2 border border-blue-900/20 overflow-hidden rounded-full">
+                            <div
+                              className="bg-[#002060] h-full transition-all duration-300 ease-out"
+                              style={{ width: `${loginProgress}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-slate-700 font-medium">
+                            {loginStatusText || "Verifying credentials with Dumalneg NHS learner database..."}
+                          </p>
+                        </div>
+                      )}
+
+                      {loginError && (
+                        <div className="p-3 bg-red-50 border-l-4 border-red-600 border border-red-300 rounded-[4px]">
+                          <p className="text-xs font-bold text-red-900 leading-normal">
+                            {loginError}
+                          </p>
+                        </div>
+                      )}
+
+                      <form onSubmit={handleLoginSubmit} className="space-y-4">
+                        <div>
+                          <label htmlFor="login-email" className="block text-xs font-bold text-slate-800 mb-1.5">
+                            Registered Email Address <span className="text-red-700">*</span>
+                          </label>
+                          <input
+                            id="login-email"
+                            name="email"
+                            type="email"
+                            autoComplete="username"
+                            spellCheck={false}
+                            enterKeyHint="next"
+                            value={loginEmail}
+                            onChange={(e) => {
+                              setLoginEmail(e.target.value);
+                              if (loginError) setLoginError("");
+                            }}
+                            placeholder="student@gmail.com"
+                            className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                            disabled={isLoggingIn}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label htmlFor="current-password" className="block text-xs font-bold text-slate-800">
+                              Password <span className="text-red-700">*</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowLoginPassword((prev) => !prev)}
+                              className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
+                            >
+                              {showLoginPassword ? "Hide Password" : "Show Password"}
+                            </button>
+                          </div>
+                          <input
+                            id="current-password"
+                            name="password"
+                            type={showLoginPassword ? "text" : "password"}
+                            autoComplete="current-password"
+                            enterKeyHint="done"
+                            value={loginPassword}
+                            onChange={(e) => {
+                              setLoginPassword(e.target.value);
+                              if (loginError) setLoginError("");
+                            }}
+                            placeholder="Enter your account password"
+                            className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                            disabled={isLoggingIn}
+                            required
+                          />
+                        </div>
+
+                        <div className="pt-1">
+                          <button
+                            type="submit"
+                            disabled={isLoggingIn}
+                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs"
+                          >
+                            {isLoggingIn ? "Signing In... Please Wait" : "Sign In to Student Portal"}
+                          </button>
+                        </div>
+                      </form>
+
+                      <div className="pt-3 border-t border-slate-200 text-center">
+                        <p className="text-xs text-slate-600">
+                          New applicant or first time using the online portal?{" "}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveTab("register");
+                              setRegErrors({});
+                              setRegSuccessNotice("");
+                            }}
+                            className="font-bold text-[#002060] hover:underline cursor-pointer"
+                          >
+                            Create a Student Account &rarr;
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* -----------------------------------------------------------------
+                      CREATE ACCOUNT FORM
+                      ----------------------------------------------------------------- */}
+                  {activeTab === "register" && (
+                    <div className="space-y-4">
+                      <div className="border-b border-slate-200 pb-3">
+                        <h3 className="text-base font-bold text-slate-900">
+                          Create Student Applicant Account
+                        </h3>
+                        <p className="text-xs text-slate-600 mt-0.5">
+                          Enter your official PSA name and active Gmail address to start your online enrollment.
+                        </p>
+                      </div>
+
+                      {/* Real-time Registration Progress Bar & Status */}
+                      {isRegistering && (
+                        <div className="p-3.5 bg-blue-50 border border-[#002060] shadow-xs space-y-2 rounded-[4px]">
+                          <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
+                            <span>Registering Student Account...</span>
+                            <span>{regProgress}%</span>
+                          </div>
+                          <div className="w-full bg-slate-200 h-2 border border-blue-900/20 overflow-hidden rounded-full">
+                            <div
+                              className="bg-[#002060] h-full transition-all duration-300 ease-out"
+                              style={{ width: `${regProgress}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-slate-700 font-medium">
+                            {regStatusText || "Saving applicant credentials in DepEd Dumalneg NHS registry..."}
+                          </p>
+                        </div>
+                      )}
+
+                      {regErrors.form && (
+                        <div className="p-3 bg-red-50 border-l-4 border-red-600 border border-red-300 rounded-[4px]">
+                          <p className="text-xs font-bold text-red-900 leading-normal">
+                            {regErrors.form}
+                          </p>
+                        </div>
+                      )}
+
+                      <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+                        {/* Name Fields */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label htmlFor="signup-last-name" className="block text-xs font-bold text-slate-800 mb-1">
+                              Last Name <span className="text-red-700">*</span>
+                            </label>
+                            <input
+                              id="signup-last-name"
+                              name="lastName"
+                              type="text"
+                              autoComplete="family-name"
+                              enterKeyHint="next"
+                              value={regForm.lastName}
+                              onChange={(e) => setRegForm({ ...regForm, lastName: e.target.value })}
+                              placeholder="e.g. AGCAOILI"
+                              className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                              disabled={isRegistering}
+                              required
+                            />
+                            {regErrors.lastName && (
+                              <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.lastName}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label htmlFor="signup-first-name" className="block text-xs font-bold text-slate-800 mb-1">
+                              First Name <span className="text-red-700">*</span>
+                            </label>
+                            <input
+                              id="signup-first-name"
+                              name="firstName"
+                              type="text"
+                              autoComplete="given-name"
+                              enterKeyHint="next"
+                              value={regForm.firstName}
+                              onChange={(e) => setRegForm({ ...regForm, firstName: e.target.value })}
+                              placeholder="e.g. MARK ANTHONY"
+                              className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                              disabled={isRegistering}
+                              required
+                            />
+                            {regErrors.firstName && (
+                              <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.firstName}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="signup-middle-name" className="block text-xs font-bold text-slate-800 mb-1">
+                            Middle Name <span className="text-[10px] font-normal text-slate-500">(Optional)</span>
+                          </label>
+                          <input
+                            id="signup-middle-name"
+                            name="middleName"
+                            type="text"
+                            autoComplete="additional-name"
+                            enterKeyHint="next"
+                            value={regForm.middleName}
+                            onChange={(e) => setRegForm({ ...regForm, middleName: e.target.value })}
+                            placeholder="e.g. CASTRO"
+                            className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                            disabled={isRegistering}
+                          />
+                        </div>
+
+                        {/* Email Address */}
+                        <div>
+                          <label htmlFor="signup-email" className="block text-xs font-bold text-slate-800 mb-1">
+                            Active Gmail Address <span className="text-red-700">*</span>
+                          </label>
+                          <input
+                            id="signup-email"
+                            name="email"
+                            type="email"
+                            autoComplete="username"
+                            spellCheck={false}
+                            enterKeyHint="next"
+                            value={regForm.email}
+                            onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
+                            placeholder="mark.agcaoili@gmail.com"
+                            className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                            disabled={isRegistering}
+                            required
+                          />
+                          <p className="text-[10px] text-slate-500 mt-1">
+                            We will send a 6-digit verification code and application updates to this email.
+                          </p>
+                          {regErrors.email && (
+                            <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.email}</p>
+                          )}
+                        </div>
+
+                        {/* Passwords */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label htmlFor="new-password" className="block text-xs font-bold text-slate-800">
+                              Create Password <span className="text-red-700">*</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowRegPassword((prev) => !prev)}
+                              className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
+                            >
+                              {showRegPassword ? "Hide Password" : "Show Password"}
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                              <input
+                                id="new-password"
+                                name="new-password"
+                                type={showRegPassword ? "text" : "password"}
+                                autoComplete="new-password"
+                                enterKeyHint="next"
+                                value={regForm.password}
+                                onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
+                                placeholder="Min. 6 characters"
+                                className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                                disabled={isRegistering}
+                                required
+                              />
+                              {regErrors.password && (
+                                <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.password}</p>
+                              )}
+                            </div>
+
+                            <div>
+                              <input
+                                id="confirm-password"
+                                name="confirm-password"
+                                aria-label="Confirm Password"
+                                type={showRegPassword ? "text" : "password"}
+                                autoComplete="new-password"
+                                enterKeyHint="done"
+                                value={regForm.confirmPassword}
+                                onChange={(e) => setRegForm({ ...regForm, confirmPassword: e.target.value })}
+                                placeholder="Confirm password"
+                                className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                                disabled={isRegistering}
+                                required
+                              />
+                              {regErrors.confirmPassword && (
+                                <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.confirmPassword}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-blue-50/60 border border-blue-200 text-[11px] text-slate-700 rounded-[4px]">
+                          <strong className="text-[#002060] block mb-0.5">
+                            Note on LRN &amp; School Documents:
+                          </strong>
+                          Your 12-digit LRN, PSA Birth Certificate, and SF9 Report Card will be entered in the 5-step enrollment form right after creating your account.
+                        </div>
+
+                        <div className="pt-1">
+                          <button
+                            type="submit"
+                            disabled={isRegistering}
+                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs"
+                          >
+                            {isRegistering ? "Creating Account... Please Wait" : "Create Student Account"}
+                          </button>
+                        </div>
+                      </form>
+
+                      <div className="pt-3 border-t border-slate-200 text-center">
+                        <p className="text-xs text-slate-600">
+                          Already have a registered student account?{" "}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveTab("signin");
+                              setLoginError("");
+                            }}
+                            className="font-bold text-[#002060] hover:underline cursor-pointer"
+                          >
+                            Sign In here &rarr;
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
           </div>
-        </div>
 
-        {/* Account Creation Video Tutorial (0 MB Storage Stream) */}
-        <AccountCreationTutorial
-          onSwitchToRegister={() => {
-            setActiveTab("register");
-            setRegErrors({});
-            setRegSuccessNotice("");
-            if (typeof window !== "undefined") {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          }}
-        />
-      </div>
-    )}
+          {/* Bottom Institutional Section: Enrollment Classifications & Documentary Requirements */}
+          <section className="bg-white p-6 sm:p-7 border border-slate-200/90 rounded-[4px] shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3.5">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#002060] block">
+                  DepEd Admission Guidelines &amp; Requirements
+                </span>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                  Learner Classifications &amp; Documentary Checklist
+                </h2>
+              </div>
+              <span className="text-xs text-slate-500 font-medium">
+                School Year {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
+              </span>
+            </div>
 
-      {/* Institutional Services Reference Section */}
-      <section className="bg-slate-100 p-6 border border-slate-200 rounded-[4px]">
-        <h3 className="text-xs font-bold tracking-wider text-slate-700 mb-3">
-          Dumalneg National High School Enrollment Services
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="bg-white p-4 border border-slate-300 rounded-[4px] shadow-xs">
-            <strong className="text-slate-900 block mb-1">1. 5-Step Enrollment Stepper:</strong>
-            <p className="text-slate-600">
-              Grade 7 &amp; Grade 11 online enrollment with JHS Regular vs SPS programs, feeder school auto-select, and compressed document uploads.
-            </p>
-          </div>
-          <div className="bg-white p-4 border border-slate-300 rounded-[4px] shadow-xs">
-            <strong className="text-slate-900 block mb-1">2. Live Application Tracking:</strong>
-            <p className="text-slate-600">
-              Real-time colored status badges (Pending, Approved, Needs Revision) with registrar feedback and document re-upload.
-            </p>
-          </div>
-          <div className="bg-white p-4 border border-slate-300 rounded-[4px] shadow-xs">
-            <strong className="text-slate-900 block mb-1">3. Official DepEd PDF Form:</strong>
-            <p className="text-slate-600">
-              Securely generated 2-page DepEd Basic Education Enrollment Form, unlocked automatically upon School Registrar approval.
-            </p>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
+              <div className="p-5 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-[#002060] rounded-[4px] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="px-2 py-0.5 bg-blue-100 text-[#002060] text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
+                    Incoming Grade 7
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-500">Junior High School</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Elementary Completers &amp; JHS Applicants
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  Choose between the Regular JHS Curriculum or the Special Program in Sports (SPS). Prepare your 12-digit LRN, PSA Birth Certificate, and Grade 6 SF9 (Form 138).
+                </p>
+              </div>
+
+              <div className="p-5 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-amber-500 rounded-[4px] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="px-2 py-0.5 bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
+                    Grade 11 &amp; Transferees
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-500">Senior High School</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  SHS Track, Strand &amp; Trimester Electives
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  For Grade 10 completers and transferees. Select your Academic or Tech-Pro pathway, choose trimester electives, and upload your certified SF9 &amp; PSA Birth Certificate.
+                </p>
+              </div>
+
+              <div className="p-5 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-emerald-600 rounded-[4px] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
+                    Grades 8–10 &amp; Grade 12
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-500">Continuing Learners</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  1-Click Re-Enrollment &amp; Official DepEd PDF
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  Continuing Dumalneg NHS learners have verified records on file for fast re-enrollment, automatic section roster placement, and official 2-page DepEd PDF download.
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
+      )}
 
       {/* ========================================================================= */}
       {/* MODAL: 6-DIGIT GMAIL SECURITY CODE VERIFICATION */}
