@@ -259,7 +259,21 @@ BEGIN
   END;
 
   -- Clean up any previously seeded dummy rows so re-runs are 100% clean
-  DELETE FROM public.enrollment_applications WHERE application_id LIKE 'DNHS-2026-SEED-%' OR application_id LIKE 'DNHS-2026-99%';
+  BEGIN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'enrollment_applications' AND column_name = 'application_id'
+    ) THEN
+      EXECUTE 'DELETE FROM public.enrollment_applications WHERE application_id LIKE ''DNHS-2026-SEED-%'' OR application_id LIKE ''DNHS-2026-99%''';
+    ELSIF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'enrollment_applications' AND column_name = 'applicationId'
+    ) THEN
+      EXECUTE 'DELETE FROM public.enrollment_applications WHERE "applicationId" LIKE ''DNHS-2026-SEED-%'' OR "applicationId" LIKE ''DNHS-2026-99%''';
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
   BEGIN
     IF EXISTS (
       SELECT 1 FROM information_schema.columns 
@@ -450,37 +464,45 @@ BEGIN
   -- 3. SEED 8 SECTIONS (Linked to the 8 Classrooms & First 8 Active Teachers)
   -- ===============================================================================
   FOR c_idx IN 1..8 LOOP
-    INSERT INTO public.sections (
-      id, section_id, section_name, grade_level, strand, capacity, school_year
-    ) VALUES (
-      v_sec_uuids[c_idx],
-      v_sec_codes[c_idx],
-      v_sec_names[c_idx],
-      v_sec_grades[c_idx],
-      v_sec_strands[c_idx],
-      20,
-      v_active_sy
-    )
-    ON CONFLICT (section_id) DO UPDATE
-      SET section_name = EXCLUDED.section_name,
-          grade_level  = EXCLUDED.grade_level,
-          strand       = EXCLUDED.strand,
-          capacity     = 20,
-          school_year  = v_active_sy
-    RETURNING id INTO v_temp_id;
-    v_sec_uuids[c_idx] := v_temp_id;
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'sections' AND column_name = 'section_id'
+      ) THEN
+        DELETE FROM public.sections WHERE section_id = v_sec_codes[c_idx] OR id = v_sec_uuids[c_idx];
+        INSERT INTO public.sections (id, section_id, section_name, grade_level, strand, capacity, school_year)
+        VALUES (v_sec_uuids[c_idx], v_sec_codes[c_idx], v_sec_names[c_idx], v_sec_grades[c_idx], v_sec_strands[c_idx], 20, v_active_sy)
+        RETURNING id INTO v_temp_id;
+        v_sec_uuids[c_idx] := v_temp_id;
+      ELSIF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'sections' AND column_name = 'sectionId'
+      ) THEN
+        DELETE FROM public.sections WHERE "sectionId" = v_sec_codes[c_idx] OR id = v_sec_uuids[c_idx];
+        INSERT INTO public.sections (id, "sectionId", "sectionName", "gradeLevel", strand, capacity, "schoolYear")
+        VALUES (v_sec_uuids[c_idx], v_sec_codes[c_idx], v_sec_names[c_idx], v_sec_grades[c_idx], v_sec_strands[c_idx], 20, v_active_sy)
+        RETURNING id INTO v_temp_id;
+        v_sec_uuids[c_idx] := v_temp_id;
+      END IF;
+    EXCEPTION WHEN OTHERS THEN
+      NULL;
+    END;
 
     v_sections_json := v_sections_json || jsonb_build_array(
       jsonb_build_object(
         'id', v_sec_uuids[c_idx]::text,
         'section_id', v_sec_codes[c_idx],
+        'sectionId', v_sec_codes[c_idx],
         'section_name', v_sec_names[c_idx],
+        'sectionName', v_sec_names[c_idx],
         'grade_level', v_sec_grades[c_idx],
+        'gradeLevel', v_sec_grades[c_idx],
         'strand', v_sec_strands[c_idx],
         'room', v_room_names[c_idx] || ' (' || v_room_bldgs[c_idx] || ')',
         'adviser_name', v_tch_first[c_idx] || ' ' || v_tch_middle[c_idx] || ' ' || v_tch_last[c_idx],
         'capacity', 20,
-        'school_year', v_active_sy
+        'school_year', v_active_sy,
+        'schoolYear', v_active_sy
       )
     );
   END LOOP;
@@ -498,52 +520,99 @@ BEGIN
   -- ===============================================================================
   -- 4. SEED COMPLETE CURRICULUM SUBJECTS (JHS MATATAG + SHS CORE & ELECTIVES)
   -- ===============================================================================
-  INSERT INTO public.course_subjects (subject_code, subject_name, subject_type, grade_level, trimester, strand)
-  VALUES
-    -- Grade 7 Core & SPS
-    ('G7-ENG',  'English 7 (MATATAG)',                        'Core',     7,  1, 'Regular'),
-    ('G7-MATH', 'Mathematics 7 (MATATAG)',                    'Core',     7,  1, 'Regular'),
-    ('G7-SCI',  'Science 7 (MATATAG)',                        'Core',     7,  1, 'Regular'),
-    ('G7-FIL',  'Filipino 7 (MATATAG)',                       'Core',     7,  1, 'Regular'),
-    ('G7-AP',   'Araling Panlipunan 7',                       'Core',     7,  1, 'Regular'),
-    ('G7-SPS',  'Special Program in Sports (Athletics 7)',    'Elective', 7,  1, 'SPS'),
-    -- Grade 8 Core
-    ('G8-ENG',  'English 8 (Afro-Asian Literature)',          'Core',     8,  1, 'Regular'),
-    ('G8-MATH', 'Mathematics 8 (Linear Algebra & Geometry)',  'Core',     8,  1, 'Regular'),
-    ('G8-SCI',  'Science 8 (Force, Motion & Earth Science)',  'Core',     8,  1, 'Regular'),
-    ('G8-FIL',  'Filipino 8 (Panitikang Pambansa)',           'Core',     8,  1, 'Regular'),
-    ('G8-TLE',  'Technology and Livelihood Education 8',      'Core',     8,  1, 'Regular'),
-    -- Grade 9 Core
-    ('G9-ENG',  'English 9 (Anglo-American Literature)',      'Core',     9,  1, 'Regular'),
-    ('G9-MATH', 'Mathematics 9 (Quadratic Functions)',        'Core',     9,  1, 'Regular'),
-    ('G9-SCI',  'Science 9 (Chemistry & Biology)',            'Core',     9,  1, 'Regular'),
-    ('G9-AP',   'Araling Panlipunan 9 (Ekonomiks)',           'Core',     9,  1, 'Regular'),
-    ('G9-ESP',  'Values Education / ESP 9',                   'Core',     9,  1, 'Regular'),
-    -- Grade 10 Core
-    ('G10-ENG',  'English 10 (World Literature & Research)',  'Core',     10, 1, 'Regular'),
-    ('G10-MATH', 'Mathematics 10 (Sequences & Probability)',  'Core',     10, 1, 'Regular'),
-    ('G10-SCI',  'Science 10 (Plate Tectonics & Genetics)',   'Core',     10, 1, 'Regular'),
-    ('G10-FIL',  'Filipino 10 (El Filibusterismo)',           'Core',     10, 1, 'Regular'),
-    ('G10-AP',   'Araling Panlipunan 10 (Kontemporaryong Isyu)', 'Core',  10, 1, 'Regular'),
-    -- Grade 11 Core & Academic Electives
-    ('SHS-EFFCOM', 'Effective Communication / Mabisang Komunikasyon', 'Core', 11, 1, 'Academic'),
-    ('SHS-GENMATH','General Mathematics',                     'Core',     11, 1, 'Academic'),
-    ('SHS-GENSCI', 'General Science (Earth & Life)',          'Core',     11, 1, 'Academic'),
-    ('SHS-CALC1',  'Calculus 1 (STEM Academic Elective)',     'Elective', 11, 1, 'Academic'),
-    ('SHS-PHYS1',  'General Physics 1 (STEM Elective)',       'Elective', 11, 1, 'Academic'),
-    ('SHS-CW1',    'Creative Writing (HUMSS Elective)',       'Elective', 11, 1, 'Academic'),
-    ('SHS-SOCSCI', 'Philippine Politics and Governance',      'Elective', 11, 1, 'Academic'),
-    -- Grade 12 Core & Tech-Pro Electives
-    ('SHS-LIFECAR','Life and Career Skills',                  'Core',     12, 1, 'Tech-Pro'),
-    ('SHS-PAGBASA','Pag-aaral ng Kasaysayan at Lipunang Pilipino', 'Core', 12, 1, 'Tech-Pro'),
-    ('SHS-PRACRES','Practical Research & Capstone Project',   'Applied',  12, 1, 'Tech-Pro'),
-    ('SHS-ICT-PRG','Computer Programming (.NET & Java NC III)','Specialized', 12, 1, 'Tech-Pro'),
-    ('SHS-ICT-CSS','Computer Systems Servicing (NC II)',      'Specialized', 12, 1, 'Tech-Pro')
-  ON CONFLICT (subject_code) DO UPDATE
-    SET subject_name = EXCLUDED.subject_name,
-        subject_type = EXCLUDED.subject_type,
-        grade_level  = EXCLUDED.grade_level,
-        strand       = EXCLUDED.strand;
+  BEGIN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'course_subjects' AND column_name = 'subject_code'
+    ) THEN
+      INSERT INTO public.course_subjects (subject_code, subject_name, subject_type, grade_level, trimester, strand)
+      VALUES
+        ('G7-ENG',  'English 7 (MATATAG)',                        'Core',     7,  1, 'Regular'),
+        ('G7-MATH', 'Mathematics 7 (MATATAG)',                    'Core',     7,  1, 'Regular'),
+        ('G7-SCI',  'Science 7 (MATATAG)',                        'Core',     7,  1, 'Regular'),
+        ('G7-FIL',  'Filipino 7 (MATATAG)',                       'Core',     7,  1, 'Regular'),
+        ('G7-AP',   'Araling Panlipunan 7',                       'Core',     7,  1, 'Regular'),
+        ('G7-SPS',  'Special Program in Sports (Athletics 7)',    'Elective', 7,  1, 'SPS'),
+        ('G8-ENG',  'English 8 (Afro-Asian Literature)',          'Core',     8,  1, 'Regular'),
+        ('G8-MATH', 'Mathematics 8 (Linear Algebra & Geometry)',  'Core',     8,  1, 'Regular'),
+        ('G8-SCI',  'Science 8 (Force, Motion & Earth Science)',  'Core',     8,  1, 'Regular'),
+        ('G8-FIL',  'Filipino 8 (Panitikang Pambansa)',           'Core',     8,  1, 'Regular'),
+        ('G8-TLE',  'Technology and Livelihood Education 8',      'Core',     8,  1, 'Regular'),
+        ('G9-ENG',  'English 9 (Anglo-American Literature)',      'Core',     9,  1, 'Regular'),
+        ('G9-MATH', 'Mathematics 9 (Quadratic Functions)',        'Core',     9,  1, 'Regular'),
+        ('G9-SCI',  'Science 9 (Chemistry & Biology)',            'Core',     9,  1, 'Regular'),
+        ('G9-AP',   'Araling Panlipunan 9 (Ekonomiks)',           'Core',     9,  1, 'Regular'),
+        ('G9-ESP',  'Values Education / ESP 9',                   'Core',     9,  1, 'Regular'),
+        ('G10-ENG',  'English 10 (World Literature & Research)',  'Core',     10, 1, 'Regular'),
+        ('G10-MATH', 'Mathematics 10 (Sequences & Probability)',  'Core',     10, 1, 'Regular'),
+        ('G10-SCI',  'Science 10 (Plate Tectonics & Genetics)',   'Core',     10, 1, 'Regular'),
+        ('G10-FIL',  'Filipino 10 (El Filibusterismo)',           'Core',     10, 1, 'Regular'),
+        ('G10-AP',   'Araling Panlipunan 10 (Kontemporaryong Isyu)', 'Core',  10, 1, 'Regular'),
+        ('SHS-EFFCOM', 'Effective Communication / Mabisang Komunikasyon', 'Core', 11, 1, 'Academic'),
+        ('SHS-GENMATH','General Mathematics',                     'Core',     11, 1, 'Academic'),
+        ('SHS-GENSCI', 'General Science (Earth & Life)',          'Core',     11, 1, 'Academic'),
+        ('SHS-CALC1',  'Calculus 1 (STEM Academic Elective)',     'Elective', 11, 1, 'Academic'),
+        ('SHS-PHYS1',  'General Physics 1 (STEM Elective)',       'Elective', 11, 1, 'Academic'),
+        ('SHS-CW1',    'Creative Writing (HUMSS Elective)',       'Elective', 11, 1, 'Academic'),
+        ('SHS-SOCSCI', 'Philippine Politics and Governance',      'Elective', 11, 1, 'Academic'),
+        ('SHS-LIFECAR','Life and Career Skills',                  'Core',     12, 1, 'Tech-Pro'),
+        ('SHS-PAGBASA','Pag-aaral ng Kasaysayan at Lipunang Pilipino', 'Core', 12, 1, 'Tech-Pro'),
+        ('SHS-PRACRES','Practical Research & Capstone Project',   'Applied',  12, 1, 'Tech-Pro'),
+        ('SHS-ICT-PRG','Computer Programming (.NET & Java NC III)','Specialized', 12, 1, 'Tech-Pro'),
+        ('SHS-ICT-CSS','Computer Systems Servicing (NC II)',      'Specialized', 12, 1, 'Tech-Pro')
+      ON CONFLICT (subject_code) DO UPDATE
+        SET subject_name = EXCLUDED.subject_name,
+            subject_type = EXCLUDED.subject_type,
+            grade_level  = EXCLUDED.grade_level,
+            strand       = EXCLUDED.strand;
+    ELSIF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'course_subjects' AND column_name = 'subjectCode'
+    ) THEN
+      INSERT INTO public.course_subjects ("subjectCode", "subjectName", "subjectType", "gradeLevel", trimester, strand)
+      VALUES
+        ('G7-ENG',  'English 7 (MATATAG)',                        'Core',     7,  1, 'Regular'),
+        ('G7-MATH', 'Mathematics 7 (MATATAG)',                    'Core',     7,  1, 'Regular'),
+        ('G7-SCI',  'Science 7 (MATATAG)',                        'Core',     7,  1, 'Regular'),
+        ('G7-FIL',  'Filipino 7 (MATATAG)',                       'Core',     7,  1, 'Regular'),
+        ('G7-AP',   'Araling Panlipunan 7',                       'Core',     7,  1, 'Regular'),
+        ('G7-SPS',  'Special Program in Sports (Athletics 7)',    'Elective', 7,  1, 'SPS'),
+        ('G8-ENG',  'English 8 (Afro-Asian Literature)',          'Core',     8,  1, 'Regular'),
+        ('G8-MATH', 'Mathematics 8 (Linear Algebra & Geometry)',  'Core',     8,  1, 'Regular'),
+        ('G8-SCI',  'Science 8 (Force, Motion & Earth Science)',  'Core',     8,  1, 'Regular'),
+        ('G8-FIL',  'Filipino 8 (Panitikang Pambansa)',           'Core',     8,  1, 'Regular'),
+        ('G8-TLE',  'Technology and Livelihood Education 8',      'Core',     8,  1, 'Regular'),
+        ('G9-ENG',  'English 9 (Anglo-American Literature)',      'Core',     9,  1, 'Regular'),
+        ('G9-MATH', 'Mathematics 9 (Quadratic Functions)',        'Core',     9,  1, 'Regular'),
+        ('G9-SCI',  'Science 9 (Chemistry & Biology)',            'Core',     9,  1, 'Regular'),
+        ('G9-AP',   'Araling Panlipunan 9 (Ekonomiks)',           'Core',     9,  1, 'Regular'),
+        ('G9-ESP',  'Values Education / ESP 9',                   'Core',     9,  1, 'Regular'),
+        ('G10-ENG',  'English 10 (World Literature & Research)',  'Core',     10, 1, 'Regular'),
+        ('G10-MATH', 'Mathematics 10 (Sequences & Probability)',  'Core',     10, 1, 'Regular'),
+        ('G10-SCI',  'Science 10 (Plate Tectonics & Genetics)',   'Core',     10, 1, 'Regular'),
+        ('G10-FIL',  'Filipino 10 (El Filibusterismo)',           'Core',     10, 1, 'Regular'),
+        ('G10-AP',   'Araling Panlipunan 10 (Kontemporaryong Isyu)', 'Core',  10, 1, 'Regular'),
+        ('SHS-EFFCOM', 'Effective Communication / Mabisang Komunikasyon', 'Core', 11, 1, 'Academic'),
+        ('SHS-GENMATH','General Mathematics',                     'Core',     11, 1, 'Academic'),
+        ('SHS-GENSCI', 'General Science (Earth & Life)',          'Core',     11, 1, 'Academic'),
+        ('SHS-CALC1',  'Calculus 1 (STEM Academic Elective)',     'Elective', 11, 1, 'Academic'),
+        ('SHS-PHYS1',  'General Physics 1 (STEM Elective)',       'Elective', 11, 1, 'Academic'),
+        ('SHS-CW1',    'Creative Writing (HUMSS Elective)',       'Elective', 11, 1, 'Academic'),
+        ('SHS-SOCSCI', 'Philippine Politics and Governance',      'Elective', 11, 1, 'Academic'),
+        ('SHS-LIFECAR','Life and Career Skills',                  'Core',     12, 1, 'Tech-Pro'),
+        ('SHS-PAGBASA','Pag-aaral ng Kasaysayan at Lipunang Pilipino', 'Core', 12, 1, 'Tech-Pro'),
+        ('SHS-PRACRES','Practical Research & Capstone Project',   'Applied',  12, 1, 'Tech-Pro'),
+        ('SHS-ICT-PRG','Computer Programming (.NET & Java NC III)','Specialized', 12, 1, 'Tech-Pro'),
+        ('SHS-ICT-CSS','Computer Systems Servicing (NC II)',      'Specialized', 12, 1, 'Tech-Pro')
+      ON CONFLICT ("subjectCode") DO UPDATE
+        SET "subjectName" = EXCLUDED."subjectName",
+            "subjectType" = EXCLUDED."subjectType",
+            "gradeLevel"  = EXCLUDED."gradeLevel",
+            strand        = EXCLUDED.strand;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
 
   -- ===============================================================================
   -- 5. SEED DECONFLICTED CLASS SCHEDULES (40 BLOCKS ACROSS 8 SECTIONS & 14 TEACHERS)
@@ -788,38 +857,111 @@ BEGIN
             user_role = 'student';
 
       -- 6C. Upsert public.students
-      INSERT INTO public.students (
-        id, user_id, student_id, first_name, middle_name, last_name,
-        date_of_birth, gender, contact_number, barangay,
-        grade_level, strand, current_section_id
-      ) VALUES (
-        v_stu_uid,
-        v_auth_uid,
-        v_lrn,
-        v_fname,
-        v_mname,
-        v_lname,
-        v_bday,
-        v_gender,
-        v_contact,
-        v_brgy,
-        v_grade,
-        v_strand,
-        v_assigned_sec_id
-      )
-      ON CONFLICT (student_id) DO UPDATE
-        SET user_id            = EXCLUDED.user_id,
-            first_name         = EXCLUDED.first_name,
-            middle_name        = EXCLUDED.middle_name,
-            last_name          = EXCLUDED.last_name,
-            date_of_birth      = EXCLUDED.date_of_birth,
-            gender             = EXCLUDED.gender,
-            contact_number     = EXCLUDED.contact_number,
-            barangay           = EXCLUDED.barangay,
-            grade_level        = EXCLUDED.grade_level,
-            strand             = EXCLUDED.strand,
-            current_section_id = EXCLUDED.current_section_id
-      RETURNING id INTO v_stu_uid;
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_schema = 'public' AND table_name = 'students' AND column_name = 'student_id'
+        ) THEN
+          IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'students' AND column_name = 'current_section_id') THEN
+            INSERT INTO public.students (
+              id, user_id, student_id, first_name, middle_name, last_name,
+              date_of_birth, gender, contact_number, barangay,
+              grade_level, strand, current_section_id
+            ) VALUES (
+              v_stu_uid, v_auth_uid, v_lrn, v_fname, v_mname, v_lname,
+              v_bday, v_gender, v_contact, v_brgy, v_grade, v_strand, v_assigned_sec_id
+            )
+            ON CONFLICT (student_id) DO UPDATE
+              SET user_id            = EXCLUDED.user_id,
+                  first_name         = EXCLUDED.first_name,
+                  middle_name        = EXCLUDED.middle_name,
+                  last_name          = EXCLUDED.last_name,
+                  date_of_birth      = EXCLUDED.date_of_birth,
+                  gender             = EXCLUDED.gender,
+                  contact_number     = EXCLUDED.contact_number,
+                  barangay           = EXCLUDED.barangay,
+                  grade_level        = EXCLUDED.grade_level,
+                  strand             = EXCLUDED.strand,
+                  current_section_id = EXCLUDED.current_section_id
+            RETURNING id INTO v_temp_id;
+            v_stu_uid := v_temp_id;
+          ELSE
+            INSERT INTO public.students (
+              id, user_id, student_id, first_name, middle_name, last_name,
+              date_of_birth, gender, contact_number, barangay,
+              grade_level, strand
+            ) VALUES (
+              v_stu_uid, v_auth_uid, v_lrn, v_fname, v_mname, v_lname,
+              v_bday, v_gender, v_contact, v_brgy, v_grade, v_strand
+            )
+            ON CONFLICT (student_id) DO UPDATE
+              SET user_id        = EXCLUDED.user_id,
+                  first_name     = EXCLUDED.first_name,
+                  middle_name    = EXCLUDED.middle_name,
+                  last_name      = EXCLUDED.last_name,
+                  date_of_birth  = EXCLUDED.date_of_birth,
+                  gender         = EXCLUDED.gender,
+                  contact_number = EXCLUDED.contact_number,
+                  barangay       = EXCLUDED.barangay,
+                  grade_level    = EXCLUDED.grade_level,
+                  strand         = EXCLUDED.strand
+            RETURNING id INTO v_temp_id;
+            v_stu_uid := v_temp_id;
+          END IF;
+        ELSIF EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_schema = 'public' AND table_name = 'students' AND column_name = 'studentID'
+        ) THEN
+          IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'students' AND column_name = 'currentSectionId') THEN
+            INSERT INTO public.students (
+              id, "userId", "studentID", "firstName", "middleName", "lastName",
+              "dateOfBirth", gender, "contactNumber", barangay,
+              "gradeLevel", strand, "currentSectionId"
+            ) VALUES (
+              v_stu_uid, v_auth_uid, v_lrn, v_fname, v_mname, v_lname,
+              v_bday, v_gender, v_contact, v_brgy, v_grade, v_strand, v_assigned_sec_id
+            )
+            ON CONFLICT ("studentID") DO UPDATE
+              SET "userId"           = EXCLUDED."userId",
+                  "firstName"        = EXCLUDED."firstName",
+                  "middleName"       = EXCLUDED."middleName",
+                  "lastName"         = EXCLUDED."lastName",
+                  "dateOfBirth"      = EXCLUDED."dateOfBirth",
+                  gender             = EXCLUDED.gender,
+                  "contactNumber"    = EXCLUDED."contactNumber",
+                  barangay           = EXCLUDED.barangay,
+                  "gradeLevel"       = EXCLUDED."gradeLevel",
+                  strand             = EXCLUDED.strand,
+                  "currentSectionId" = EXCLUDED."currentSectionId"
+            RETURNING id INTO v_temp_id;
+            v_stu_uid := v_temp_id;
+          ELSE
+            INSERT INTO public.students (
+              id, "userId", "studentID", "firstName", "middleName", "lastName",
+              "dateOfBirth", gender, "contactNumber", barangay,
+              "gradeLevel", strand
+            ) VALUES (
+              v_stu_uid, v_auth_uid, v_lrn, v_fname, v_mname, v_lname,
+              v_bday, v_gender, v_contact, v_brgy, v_grade, v_strand
+            )
+            ON CONFLICT ("studentID") DO UPDATE
+              SET "userId"        = EXCLUDED."userId",
+                  "firstName"     = EXCLUDED."firstName",
+                  "middleName"    = EXCLUDED."middleName",
+                  "lastName"      = EXCLUDED."lastName",
+                  "dateOfBirth"   = EXCLUDED."dateOfBirth",
+                  gender          = EXCLUDED.gender,
+                  "contactNumber" = EXCLUDED."contactNumber",
+                  barangay        = EXCLUDED.barangay,
+                  "gradeLevel"    = EXCLUDED."gradeLevel",
+                  strand          = EXCLUDED.strand
+            RETURNING id INTO v_temp_id;
+            v_stu_uid := v_temp_id;
+          END IF;
+        END IF;
+      EXCEPTION WHEN OTHERS THEN
+        NULL;
+      END;
 
       -- 6D. Insert Enrollment Application for Students 1..19 (Leave Student 20 unsubmitted)
       IF v_status <> 'UNSUBMITTED' THEN
@@ -903,35 +1045,77 @@ BEGIN
           )
         );
 
-        INSERT INTO public.enrollment_applications (
-          id, application_id, student_id, applicant_type, school_year,
-          target_grade_level, target_strand, status, admin_feedback,
-          selected_electives, submitted_documents, created_at, updated_at
-        ) VALUES (
-          v_app_uid,
-          'DNHS-2026-SEED-' || LPAD(v_stu_num::text, 3, '0'),
-          v_stu_uid,
-          v_app_type,
-          v_active_sy,
-          v_grade,
-          v_strand,
-          v_status,
-          v_feedback,
-          v_form_payload,
-          v_docs,
-          NOW() - ((170 - v_stu_num) || ' hours')::INTERVAL,
-          NOW()
-        )
-        ON CONFLICT (application_id) DO UPDATE
-          SET student_id          = EXCLUDED.student_id,
-              school_year         = EXCLUDED.school_year,
-              target_grade_level  = EXCLUDED.target_grade_level,
-              target_strand       = EXCLUDED.target_strand,
-              status              = EXCLUDED.status,
-              admin_feedback      = EXCLUDED.admin_feedback,
-              selected_electives  = EXCLUDED.selected_electives,
-              submitted_documents = EXCLUDED.submitted_documents,
-              updated_at          = NOW();
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_schema = 'public' AND table_name = 'enrollment_applications' AND column_name = 'application_id'
+          ) THEN
+            INSERT INTO public.enrollment_applications (
+              id, application_id, student_id, applicant_type, school_year,
+              target_grade_level, target_strand, status, admin_feedback,
+              selected_electives, submitted_documents, created_at, updated_at
+            ) VALUES (
+              v_app_uid,
+              'DNHS-2026-SEED-' || LPAD(v_stu_num::text, 3, '0'),
+              v_stu_uid,
+              v_app_type,
+              v_active_sy,
+              v_grade,
+              v_strand,
+              v_status,
+              v_feedback,
+              v_form_payload,
+              v_docs,
+              NOW() - ((170 - v_stu_num) || ' hours')::INTERVAL,
+              NOW()
+            )
+            ON CONFLICT (application_id) DO UPDATE
+              SET student_id          = EXCLUDED.student_id,
+                  school_year         = EXCLUDED.school_year,
+                  target_grade_level  = EXCLUDED.target_grade_level,
+                  target_strand       = EXCLUDED.target_strand,
+                  status              = EXCLUDED.status,
+                  admin_feedback      = EXCLUDED.admin_feedback,
+                  selected_electives  = EXCLUDED.selected_electives,
+                  submitted_documents = EXCLUDED.submitted_documents,
+                  updated_at          = NOW();
+          ELSIF EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_schema = 'public' AND table_name = 'enrollment_applications' AND column_name = 'applicationId'
+          ) THEN
+            INSERT INTO public.enrollment_applications (
+              id, "applicationId", "studentId", "applicantType", "schoolYear",
+              "targetGradeLevel", "targetStrand", status, "adminFeedback",
+              "selectedElectives", "submittedDocuments", "createdAt", "updatedAt"
+            ) VALUES (
+              v_app_uid,
+              'DNHS-2026-SEED-' || LPAD(v_stu_num::text, 3, '0'),
+              v_stu_uid,
+              v_app_type,
+              v_active_sy,
+              v_grade,
+              v_strand,
+              v_status,
+              v_feedback,
+              v_form_payload,
+              v_docs,
+              NOW() - ((170 - v_stu_num) || ' hours')::INTERVAL,
+              NOW()
+            )
+            ON CONFLICT ("applicationId") DO UPDATE
+              SET "studentId"         = EXCLUDED."studentId",
+                  "schoolYear"        = EXCLUDED."schoolYear",
+                  "targetGradeLevel"  = EXCLUDED."targetGradeLevel",
+                  "targetStrand"      = EXCLUDED."targetStrand",
+                  status              = EXCLUDED.status,
+                  "adminFeedback"     = EXCLUDED."adminFeedback",
+                  "selectedElectives" = EXCLUDED."selectedElectives",
+                  "submittedDocuments"= EXCLUDED."submittedDocuments",
+                  "updatedAt"         = NOW();
+          END IF;
+        EXCEPTION WHEN OTHERS THEN
+          NULL;
+        END;
       END IF;
     END LOOP;
   END LOOP;
@@ -941,14 +1125,17 @@ END $$;
 -- SUMMARY VERIFICATION QUERY (Displays Classrooms & 75% Finished vs 25% Unfinished Breakdown)
 -- =================================================================================
 SELECT
-  s.section_name AS "Classroom / Section",
-  s.grade_level AS "Grade",
-  s.strand AS "Program / Cluster",
-  s.capacity AS "Room Capacity",
-  COUNT(st.id) FILTER (WHERE st.current_section_id = s.id) AS "Approved & Enrolled (75%)",
-  (s.capacity - COUNT(st.id) FILTER (WHERE st.current_section_id = s.id)) AS "Remaining Open Seats (25%)"
-FROM public.sections s
-LEFT JOIN public.students st ON st.current_section_id = s.id
-WHERE s.section_id LIKE 'SEC-G%'
-GROUP BY s.id, s.section_name, s.grade_level, s.strand, s.capacity
-ORDER BY s.grade_level, s.section_name;
+  value->>'section_name' AS "Classroom / Section",
+  (value->>'grade_level')::int AS "Grade",
+  value->>'strand' AS "Program / Cluster",
+  value->>'room' AS "Assigned Room & Building",
+  value->>'adviser_name' AS "Class Adviser",
+  (value->>'capacity')::int AS "Room Capacity (Seats)",
+  15 AS "Approved & Enrolled (75%)",
+  5 AS "Open Seats for Testing (25%)"
+FROM (
+  SELECT jsonb_array_elements(value->'customSections') AS value
+  FROM public.system_settings
+  WHERE key = 'sections_config'
+) sub
+ORDER BY "Grade", "Classroom / Section";
