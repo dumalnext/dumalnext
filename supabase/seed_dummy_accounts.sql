@@ -594,10 +594,11 @@ BEGIN
       v_tch_idx := v_active_tch_indices[((c_idx + i - 2) % 14) + 1];
 
       INSERT INTO public.class_schedules (
-        id, subject_code, section_id, teacher_id, classroom_id,
+        id, schedule_code, subject_code, section_id, teacher_id, classroom_id,
         day_of_week, start_time, end_time, trimester, school_year
       ) VALUES (
         v_sched_uid,
+        'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'),
         v_subj_code,
         v_sec_uuids[c_idx],
         v_tch_profile_ids[v_tch_idx],
@@ -609,19 +610,13 @@ BEGIN
         v_active_sy
       )
       ON CONFLICT (id) DO UPDATE
-        SET subject_code = EXCLUDED.subject_code,
-            section_id   = EXCLUDED.section_id,
-            teacher_id   = EXCLUDED.teacher_id,
-            classroom_id = EXCLUDED.classroom_id,
-            day_of_week  = EXCLUDED.day_of_week,
-            school_year  = EXCLUDED.school_year;
-
-      BEGIN
-        UPDATE public.class_schedules
-           SET schedule_id = 'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0')
-         WHERE id = v_sched_uid;
-      EXCEPTION WHEN OTHERS THEN NULL;
-      END;
+        SET schedule_code = EXCLUDED.schedule_code,
+            subject_code  = EXCLUDED.subject_code,
+            section_id    = EXCLUDED.section_id,
+            teacher_id    = EXCLUDED.teacher_id,
+            classroom_id  = EXCLUDED.classroom_id,
+            day_of_week   = EXCLUDED.day_of_week,
+            school_year   = EXCLUDED.school_year;
 
       v_schedules_json := v_schedules_json || jsonb_build_array(
         jsonb_build_object(
