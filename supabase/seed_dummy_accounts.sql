@@ -259,7 +259,21 @@ BEGIN
 
   -- Clean up any previously seeded dummy rows so re-runs are 100% clean
   DELETE FROM public.enrollment_applications WHERE application_id LIKE 'DNHS-2026-SEED-%' OR application_id LIKE 'DNHS-2026-99%';
-  DELETE FROM public.class_schedules WHERE schedule_id LIKE 'SCH-SEED-%';
+  BEGIN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'class_schedules' AND column_name = 'schedule_code'
+    ) THEN
+      EXECUTE 'DELETE FROM public.class_schedules WHERE schedule_code LIKE ''SCH-SEED-%''';
+    ELSIF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'class_schedules' AND column_name = 'schedule_id'
+    ) THEN
+      EXECUTE 'DELETE FROM public.class_schedules WHERE schedule_id LIKE ''SCH-SEED-%''';
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
 
   -- ===============================================================================
   -- 1. SEED 8 PHYSICAL CLASSROOMS (Capacity = 20 students per classroom)
@@ -544,29 +558,30 @@ BEGIN
       -- On day i, section c_idx is taught at slot c_idx or by teacher ((c_idx + i - 2) % 14) + 1
       v_tch_idx := ((c_idx + i - 2) % 14) + 1;
 
-      INSERT INTO public.class_schedules (
-        id, schedule_id, subject_code, section_id, teacher_id, classroom_id,
-        day_of_week, start_time, end_time, trimester, school_year
-      ) VALUES (
-        v_sched_uid,
-        'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'),
-        v_subj_code,
-        v_sec_uuids[c_idx],
-        v_tch_profile_uuids[v_tch_idx],
-        v_room_uuids[c_idx],
-        v_day,
-        '08:00:00'::TIME,
-        '09:30:00'::TIME,
-        v_active_term,
-        v_active_sy
-      )
-      ON CONFLICT (schedule_id) DO UPDATE
-        SET subject_code = EXCLUDED.subject_code,
-            section_id   = EXCLUDED.section_id,
-            teacher_id   = EXCLUDED.teacher_id,
-            classroom_id = EXCLUDED.classroom_id,
-            day_of_week  = EXCLUDED.day_of_week,
-            school_year  = EXCLUDED.school_year;
+      -- Insert into public.class_schedules supporting both schedule_code and schedule_id
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_schema = 'public' AND table_name = 'class_schedules' AND column_name = 'schedule_code'
+        ) THEN
+          EXECUTE 'DELETE FROM public.class_schedules WHERE schedule_code = $1 OR id = $2'
+            USING 'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'), v_sched_uid;
+          EXECUTE 'INSERT INTO public.class_schedules (id, schedule_code, subject_code, section_id, teacher_id, classroom_id, day_of_week, start_time, end_time, trimester, school_year)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
+            USING v_sched_uid, 'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'), v_subj_code, v_sec_uuids[c_idx], v_tch_profile_uuids[v_tch_idx], v_room_uuids[c_idx], v_day, '08:00:00'::TIME, '09:30:00'::TIME, v_active_term, v_active_sy;
+        ELSIF EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_schema = 'public' AND table_name = 'class_schedules' AND column_name = 'schedule_id'
+        ) THEN
+          EXECUTE 'DELETE FROM public.class_schedules WHERE schedule_id = $1 OR id = $2'
+            USING 'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'), v_sched_uid;
+          EXECUTE 'INSERT INTO public.class_schedules (id, schedule_id, subject_code, section_id, teacher_id, classroom_id, day_of_week, start_time, end_time, trimester, school_year)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
+            USING v_sched_uid, 'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'), v_subj_code, v_sec_uuids[c_idx], v_tch_profile_uuids[v_tch_idx], v_room_uuids[c_idx], v_day, '08:00:00'::TIME, '09:30:00'::TIME, v_active_term, v_active_sy;
+        END IF;
+      EXCEPTION WHEN OTHERS THEN
+        NULL;
+      END;
 
       v_schedules_json := v_schedules_json || jsonb_build_array(
         jsonb_build_object(
