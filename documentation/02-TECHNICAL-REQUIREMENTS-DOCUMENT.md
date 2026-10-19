@@ -27,11 +27,19 @@
 
 ## 2. System Architecture & Repository Structure
 
-The project is structured as an **NPM Workspaces Monorepo** separating the 4 distinct user workstations into standalone Next.js applications sharing common configuration and utilities.
+The project is structured as an **NPM Workspaces Monorepo** separating the 4 distinct user workstations into standalone Next.js applications sharing common configuration and utilities, alongside a root Next.js gateway.
+
+![Dumal-NEXT Information Architecture](./Dumal-Next-Information-Architecture.svg)
 
 ```
 dumalnext/
-├── apps/
+├── app/                        # Root Next.js App Router (Landing, Global Layout & Gateway)
+│   ├── (portals)/              # Root portal route groups
+│   ├── api/                    # Shared API routes
+│   ├── globals.css             # Tailwind CSS v4 root stylesheet
+│   ├── layout.tsx              # Root HTML wrapper
+│   └── page.tsx                # Public welcome & portal gateway
+├── apps/                       # Monorepo Workspaces Directory (Sub-Projects)
 │   ├── student/                # PORTAL 01: Student Admission & Application Tracker
 │   │   ├── app/                # Next.js App Router (page.tsx, enroll/, track/, section/)
 │   │   ├── components/         # 5-Step Stepper, OTP Input, Video Guides, Custom Select
@@ -57,7 +65,7 @@ dumalnext/
 │       ├── lib/                # IT Auth context & Supabase connectors
 │       └── package.json        # Workspace: @dumalnext/it-support (Port 3003)
 │
-├── docs/                       # Technical & Architectural System Documentation
+├── documentation/              # Technical & Architectural System Documentation Suite
 ├── supabase/
 │   ├── schema.sql              # Consolidated PostgreSQL schema, functions & RLS scripts
 │   └── migrations/             # Incremental migration files

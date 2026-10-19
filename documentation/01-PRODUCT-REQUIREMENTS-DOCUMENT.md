@@ -28,7 +28,15 @@ Dumalneg National High School is located in the Municipality of Dumalneg, Provin
 
 ---
 
-## 3. Feature-by-Feature Specification
+## 3. System Architecture & Portal Mapping
+
+The high-level structure and functional boundary of each portal are depicted in the system Information Architecture diagram below:
+
+![Dumal-NEXT Information Architecture](./Dumal-Next-Information-Architecture.svg)
+
+---
+
+## 4. Feature-by-Feature Specification
 
 ### 3.1. Student Online Portal (`@dumalnext/student`)
 

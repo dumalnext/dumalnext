@@ -26,6 +26,8 @@ Adhering strictly to modern agile engineering principles, the system is engineer
 
 The implementation is structured across **six (6) sequential phases**, spanning sixteen (16) targeted sprints.
 
+![Dumal-NEXT Implementation Roadmap](./dumal-next-implementation-roadmap.svg)
+
 ```mermaid
 flowchart TD
     P1["Phase 1: Foundation & Infrastructure"] --> P2["Phase 2: Learner Admission & Intake Pipeline"]

@@ -8,14 +8,10 @@
 
 ## 1. High-Level System Flow Diagram
 
-```
-[ Visitor / User Enters Portal ]
-              │
-              ├── Role = Student ────────► Student Portal Flow (1)
-              ├── Role = Teacher ────────► Faculty Workstation Flow (2)
-              ├── Role = Admin ──────────► Administrator & Registrar Flow (3)
-              └── Role = IT Support ─────► IT Support Console Flow (4)
-```
+The following high-resolution diagram illustrates the navigation architecture, role-based branches, and page-by-page state transitions across all four workstations.
+
+![Dumal-NEXT Application Navigation Flow](./dumal-next-app-flow.svg)
+
 
 ---
 
