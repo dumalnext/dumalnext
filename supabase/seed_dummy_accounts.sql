@@ -227,6 +227,7 @@ DECLARE
   v_subj_code TEXT;
   v_subj_name TEXT;
   v_tch_idx INT;
+  v_temp_id UUID;
 BEGIN
   -- ===============================================================================
   -- 0. DETECT OR INITIALIZE ACTIVE ACADEMIC TERM
@@ -291,7 +292,8 @@ BEGIN
       SET room_name = EXCLUDED.room_name,
           building  = EXCLUDED.building,
           capacity  = EXCLUDED.capacity
-    RETURNING id INTO v_room_uuids[c_idx];
+    RETURNING id INTO v_temp_id;
+    v_room_uuids[c_idx] := v_temp_id;
   END LOOP;
 
   -- ===============================================================================
@@ -381,7 +383,8 @@ BEGIN
             last_name = EXCLUDED.last_name,
             email = EXCLUDED.email,
             department = EXCLUDED.department
-      RETURNING id INTO v_tch_profile_uuids[i];
+      RETURNING id INTO v_temp_id;
+      v_tch_profile_uuids[i] := v_temp_id;
 
       -- Add as Accepted Invitation in IT Support Staff Invitations list
       v_invitations_json := v_invitations_json || jsonb_build_array(
@@ -445,7 +448,8 @@ BEGIN
           strand       = EXCLUDED.strand,
           capacity     = 20,
           school_year  = v_active_sy
-    RETURNING id INTO v_sec_uuids[c_idx];
+    RETURNING id INTO v_temp_id;
+    v_sec_uuids[c_idx] := v_temp_id;
 
     v_sections_json := v_sections_json || jsonb_build_array(
       jsonb_build_object(
