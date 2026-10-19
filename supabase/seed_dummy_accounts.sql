@@ -227,6 +227,7 @@ DECLARE
   v_subj_name TEXT;
   v_tch_idx INT;
   v_adviser_idx INT;
+  v_tmp_uid UUID;
 BEGIN
   CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
@@ -263,7 +264,8 @@ BEGIN
   -- 1. Clean up previous seed data in strict foreign-key order
   DELETE FROM public.enrollment_applications
    WHERE application_id LIKE 'DNHS-2026-SEED-%'
-      OR application_id LIKE 'DNHS-2026-99%';
+      OR application_id LIKE 'DNHS-2026-99%'
+      OR student_id IN (SELECT id FROM public.students WHERE student_id LIKE '100050260%');
 
   DELETE FROM public.class_schedules;
   DELETE FROM public.course_subjects;
@@ -375,7 +377,8 @@ BEGIN
       SET room_name = EXCLUDED.room_name,
           building  = EXCLUDED.building,
           capacity  = 40
-    RETURNING id INTO v_room_uuids[c_idx];
+    RETURNING id INTO v_tmp_uid;
+    v_room_uuids[c_idx] := v_tmp_uid;
   END LOOP;
 
   -- 3. Seed 22 Teachers (16 Active Onboarded + 6 Pending Invitations interleaved)
@@ -458,7 +461,8 @@ BEGIN
             last_name   = EXCLUDED.last_name,
             email       = EXCLUDED.email,
             department  = EXCLUDED.department
-      RETURNING id INTO v_tch_profile_ids[i];
+      RETURNING id INTO v_tmp_uid;
+      v_tch_profile_ids[i] := v_tmp_uid;
 
       v_invitations_json := v_invitations_json || jsonb_build_array(
         jsonb_build_object(
@@ -519,7 +523,8 @@ BEGIN
           strand       = EXCLUDED.strand,
           capacity     = 40,
           school_year  = v_active_sy
-    RETURNING id INTO v_sec_uuids[c_idx];
+    RETURNING id INTO v_tmp_uid;
+    v_sec_uuids[c_idx] := v_tmp_uid;
 
     v_sections_json := v_sections_json || jsonb_build_array(
       jsonb_build_object(
