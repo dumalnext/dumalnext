@@ -252,6 +252,7 @@ DECLARE
   v_auth_uid UUID;
   v_stu_uid UUID;
   v_app_uid UUID;
+  v_tmp_uuid UUID;
   v_electives JSONB;
   v_docs JSONB;
   v_form_payload JSONB;
@@ -394,7 +395,8 @@ BEGIN
       SET room_name = EXCLUDED.room_name,
           building  = EXCLUDED.building,
           capacity  = 40
-    RETURNING id INTO v_room_uuids[c_idx];
+    RETURNING id INTO v_tmp_uuid;
+    v_room_uuids[c_idx] := v_tmp_uuid;
   END LOOP;
 
   -- ===============================================================================
@@ -484,7 +486,8 @@ BEGIN
             last_name   = EXCLUDED.last_name,
             email       = EXCLUDED.email,
             department  = EXCLUDED.department
-      RETURNING id INTO v_tch_profile_ids[i];
+      RETURNING id INTO v_tmp_uuid;
+      v_tch_profile_ids[i] := v_tmp_uuid;
 
       v_invitations_json := v_invitations_json || jsonb_build_array(
         jsonb_build_object(
@@ -548,7 +551,8 @@ BEGIN
           strand       = EXCLUDED.strand,
           capacity     = 40,
           school_year  = v_active_sy
-    RETURNING id INTO v_sec_uuids[c_idx];
+    RETURNING id INTO v_tmp_uuid;
+    v_sec_uuids[c_idx] := v_tmp_uuid;
 
     v_sections_json := v_sections_json || jsonb_build_array(
       jsonb_build_object(
