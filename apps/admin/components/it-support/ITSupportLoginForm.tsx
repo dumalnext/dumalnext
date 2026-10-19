@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useITSupportAuth } from "@/lib/auth/itSupportAuthContext";
+import CustomSelect from "@/components/CustomSelect";
 
 interface ITSupportInvitation {
   id: string;
@@ -354,16 +355,18 @@ function ITSupportLoginFormInner() {
                     <label className="block font-bold text-slate-700 mb-1.5">
                       System Administration Designation
                     </label>
-                    <select
+                    <CustomSelect
+                      fullWidth
                       value={department}
-                      onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
-                    >
-                      <option value="System Administrator">System Administrator</option>
-                      <option value="Database Operations Specialist">Database Operations Specialist</option>
-                      <option value="Network & Security Support">Network &amp; Security Support</option>
-                      <option value="IT Operations Desk">IT Operations Desk</option>
-                    </select>
+                      onChange={(val) => setDepartment(val)}
+                      options={[
+                        { value: "System Administrator", label: "System Administrator", badge: "SysAdmin" },
+                        { value: "Database Operations Specialist", label: "Database Operations Specialist", badge: "Database" },
+                        { value: "Network & Security Support", label: "Network & Security Support", badge: "Network" },
+                        { value: "IT Operations Desk", label: "IT Operations Desk", badge: "Operations" },
+                      ]}
+                      placeholder="Select System Administration Designation"
+                    />
                   </div>
 
                   <div>

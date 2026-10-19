@@ -213,13 +213,13 @@ export default function CustomSelect({
         onClick={toggleOpen}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`${
+        className={`bg-white hover:bg-slate-50 border border-slate-300 hover:border-[#002060] text-xs font-sans transition-all cursor-pointer select-none ${
           triggerClassName
             ? triggerClassName
             : fullWidth
-            ? "w-full flex items-center justify-between p-2.5 sm:p-3"
-            : "flex items-center gap-1.5 px-2.5 py-1.5"
-        } bg-white hover:bg-slate-50 border border-slate-300 hover:border-[#002060] text-xs font-sans transition-all cursor-pointer select-none rounded-[4px] ${
+            ? "w-full flex items-center justify-between p-2.5 sm:p-3 rounded-lg"
+            : "flex items-center gap-1.5 px-3 py-2 rounded-lg"
+        } ${
           error
             ? "!border-red-600 bg-red-50/50"
             : isOpen
@@ -278,7 +278,7 @@ export default function CustomSelect({
               maxHeight: `${dropdownPosition.maxHeight}px`,
               zIndex: 99999,
             }}
-            className={`bg-white border-2 border-[#002060] shadow-2xl py-1 rounded-[4px] flex flex-col overflow-hidden overscroll-contain animate-in fade-in-0 duration-100 ${dropdownClassName}`}
+            className={`bg-white border-2 border-[#002060] shadow-2xl py-1 rounded-lg flex flex-col overflow-hidden overscroll-contain animate-in fade-in-0 duration-100 ${dropdownClassName}`}
           >
             {/* Subtle Dropdown Title Bar */}
             {label && (

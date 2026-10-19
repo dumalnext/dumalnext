@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CustomSelect from "@/components/CustomSelect";
 
 export interface StaffInvitation {
   id: string;
@@ -324,16 +325,18 @@ export default function StaffInvitationManager() {
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
                   Department / Level
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
                   value={teacherForm.department}
-                  onChange={(e) => setTeacherForm({ ...teacherForm, department: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-emerald-600 focus:outline-none bg-white"
-                >
-                  <option value="Junior High School (JHS)">Junior High School (JHS)</option>
-                  <option value="Senior High School (SHS)">Senior High School (SHS)</option>
-                  <option value="Cross-Level Core">Cross-Level Core</option>
-                  <option value="TVL Faculty">TVL Track Faculty</option>
-                </select>
+                  onChange={(val) => setTeacherForm({ ...teacherForm, department: val })}
+                  options={[
+                    { value: "Junior High School (JHS)", label: "Junior High School (JHS)", badge: "JHS" },
+                    { value: "Senior High School (SHS)", label: "Senior High School (SHS)", badge: "SHS" },
+                    { value: "Cross-Level Core", label: "Cross-Level Core", badge: "Core" },
+                    { value: "TVL Faculty", label: "TVL Track Faculty", badge: "TVL" },
+                  ]}
+                  placeholder="Select Department / Level"
+                />
               </div>
             </div>
           </div>
@@ -396,16 +399,18 @@ export default function StaffInvitationManager() {
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
                   Administrative Office / Unit
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
                   value={adminForm.department}
-                  onChange={(e) => setAdminForm({ ...adminForm, department: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:outline-none bg-white"
-                >
-                  <option value="Office of the Registrar">Office of the Registrar</option>
-                  <option value="Academic Affairs">Academic Affairs</option>
-                  <option value="Principal's Office">Principal's Office</option>
-                  <option value="Admissions Committee">Admissions Committee</option>
-                </select>
+                  onChange={(val) => setAdminForm({ ...adminForm, department: val })}
+                  options={[
+                    { value: "Office of the Registrar", label: "Office of the Registrar", badge: "Registrar" },
+                    { value: "Academic Affairs", label: "Academic Affairs", badge: "Academics" },
+                    { value: "Principal's Office", label: "Principal's Office", badge: "Principal" },
+                    { value: "Admissions Committee", label: "Admissions Committee", badge: "Admissions" },
+                  ]}
+                  placeholder="Select Administrative Office / Unit"
+                />
               </div>
             </div>
           </div>
@@ -468,16 +473,18 @@ export default function StaffInvitationManager() {
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
                   System Administration Designation
                 </label>
-                <select
+                <CustomSelect
+                  fullWidth
                   value={itSupportForm.department}
-                  onChange={(e) => setItSupportForm({ ...itSupportForm, department: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-indigo-600 focus:outline-none bg-white"
-                >
-                  <option value="System Administrator">System Administrator</option>
-                  <option value="Database Operations Specialist">Database Operations Specialist</option>
-                  <option value="Network &amp; Security Support">Network &amp; Security Support</option>
-                  <option value="IT Operations Desk">IT Operations Desk</option>
-                </select>
+                  onChange={(val) => setItSupportForm({ ...itSupportForm, department: val })}
+                  options={[
+                    { value: "System Administrator", label: "System Administrator", badge: "SysAdmin" },
+                    { value: "Database Operations Specialist", label: "Database Operations Specialist", badge: "Database" },
+                    { value: "Network & Security Support", label: "Network & Security Support", badge: "Network" },
+                    { value: "IT Operations Desk", label: "IT Operations Desk", badge: "Operations" },
+                  ]}
+                  placeholder="Select System Administration Designation"
+                />
               </div>
             </div>
           </div>
@@ -507,19 +514,21 @@ export default function StaffInvitationManager() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600 uppercase">
+            <span className="text-xs font-bold text-slate-600 uppercase shrink-0">
               Filter:
             </span>
-            <select
+            <CustomSelect
               value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold"
-            >
-              <option value="all">All Roles ({invitations.length})</option>
-              <option value="teacher">Teachers ({invitations.filter((i) => i.role === "teacher").length})</option>
-              <option value="admin">Administrators ({invitations.filter((i) => i.role === "admin").length})</option>
-              <option value="it_support">IT Support ({invitations.filter((i) => i.role === "it_support").length})</option>
-            </select>
+              onChange={(val) => setRoleFilter(val)}
+              options={[
+                { value: "all", label: `All Roles (${invitations.length})` },
+                { value: "teacher", label: `Teachers (${invitations.filter((i) => i.role === "teacher").length})`, badge: "Faculty" },
+                { value: "admin", label: `Administrators (${invitations.filter((i) => i.role === "admin").length})`, badge: "Admin" },
+                { value: "it_support", label: `IT Support (${invitations.filter((i) => i.role === "it_support").length})`, badge: "IT" },
+              ]}
+              align="right"
+              className="min-w-[170px]"
+            />
           </div>
         </div>
 
