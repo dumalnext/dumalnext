@@ -38,6 +38,11 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
+-- Ensure course_subjects check constraint supports all 5 DepEd subject classifications (including 'Intervention')
+ALTER TABLE public.course_subjects DROP CONSTRAINT IF EXISTS course_subjects_subject_type_check;
+ALTER TABLE public.course_subjects ADD CONSTRAINT course_subjects_subject_type_check
+  CHECK (subject_type IN ('Core', 'Elective', 'Applied', 'Specialized', 'Intervention'));
+
 DO $$
 DECLARE
   v_instance_id UUID := '00000000-0000-0000-0000-000000000000';
