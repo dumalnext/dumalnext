@@ -65,10 +65,17 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
             href={youtubeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold transition-colors rounded-[4px] inline-flex items-center gap-1.5"
+            title="Watch full walkthrough video on YouTube"
+            className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold transition-colors rounded-[4px] inline-flex items-center gap-1.5 shadow-xs"
           >
-            <span>Open in YouTube</span>
-            <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
+            {/* YouTube Red Icon Badge */}
+            <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
+              <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
+                <polygon points="1,1 9,5 1,9" />
+              </svg>
+            </span>
+            <span>YouTube</span>
+            <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7V16" />
             </svg>
           </a>
@@ -106,9 +113,17 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
                     href={youtubeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
                   >
-                    Open in YouTube &rarr;
+                    <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
+                      <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
+                        <polygon points="1,1 9,5 1,9" />
+                      </svg>
+                    </span>
+                    <span>Watch on YouTube</span>
+                    <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7V16" />
+                    </svg>
                   </a>
                 </div>
               </div>
