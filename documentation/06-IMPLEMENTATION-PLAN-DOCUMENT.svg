@@ -1,0 +1,571 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2400" viewBox="0 0 1800 2400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow-subtle" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#002060" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-card" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#002060" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1800" height="2400" fill="#F8FAFC"/>
+  
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="1800" height="8" fill="#002060"/>
+  <rect x="0" y="8" width="1800" height="4" fill="#F59E0B"/>
+
+  <!-- Official Header Banner -->
+  <rect x="50" y="32" width="1700" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" filter="url(#shadow-subtle)"/>
+  <rect x="50" y="32" width="8" height="96" fill="#002060" rx="2"/>
+  
+  <text x="80" y="62" font-size="12" font-weight="700" fill="#64748B" letter-spacing="1.5">REPUBLIC OF THE PHILIPPINES  |  DEPARTMENT OF EDUCATION  |  REGION I  |  SDO ILOCOS NORTE</text>
+  <text x="80" y="92" font-size="24" font-weight="900" fill="#002060" letter-spacing="0.5">06: IMPLEMENTATION PLAN DOCUMENT (IPD)</text>
+  <text x="80" y="114" font-size="13" font-weight="600" fill="#475569">Dumalneg National High School - Phased Delivery Pipeline, 16-Sprint WBS &amp; Risk Matrix</text>
+
+  <g transform="translate(1480, 56)">
+    <rect x="0" y="0" width="240" height="48" rx="6" fill="#002060"/>
+    <rect x="0" y="0" width="240" height="3" fill="#F59E0B" rx="1"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">PRODUCTION RELEASE</text>
+    <text x="120" y="40" font-size="10" font-weight="600" fill="#FDE68A" text-anchor="middle">DepEd School ID: 300017</text>
+  </g>
+
+
+  <!-- SECTION 1: 6-PHASE IMPLEMENTATION PIPELINE -->
+  <g transform="translate(50, 148)">
+    <rect width="1700" height="240" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1. SIX-PHASE AGILE DELIVERY ROADMAP &amp; ARCHITECTURAL PIPELINE</text>
+
+    <!-- 6 Phase Cards in Horizontal Flow -->
+    <g transform="translate(24, 52)">
+      <!-- Phase 1 -->
+      <g transform="translate(0, 0)">
+        <rect width="260" height="165" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+        <rect width="260" height="28" rx="6" fill="#1E3A8A"/>
+        <rect y="22" width="260" height="6" fill="#1E3A8A"/>
+        <text x="14" y="19" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE 1: FOUNDATION</text>
+        <text x="14" y="46" font-size="11" font-weight="700" fill="#002060">Sprints 1.1 - 1.2 (2 Sprints)</text>
+        <text x="14" y="66" font-size="10.5" fill="#334155">• Monorepo 4 sub-apps</text>
+        <text x="14" y="84" font-size="10.5" fill="#334155">• Turborepo &amp; Vercel multi-zone</text>
+        <text x="14" y="102" font-size="10.5" fill="#334155">• DepEd design tokens (Navy/Gold)</text>
+        <text x="14" y="120" font-size="10.5" fill="#334155">• Zero-emoji atomic UI primitives</text>
+        <text x="14" y="138" font-size="10" font-weight="700" fill="#047857">STATUS: COMPLETE (v1.0)</text>
+      </g>
+
+      <!-- Arrow 1 -->
+      <path d="M 264 82 L 276 82" stroke="#002060" stroke-width="2"/>
+      <polygon points="276,77 282,82 276,87" fill="#002060"/>
+
+      <!-- Phase 2 -->
+      <g transform="translate(285, 0)">
+        <rect width="260" height="165" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+        <rect width="260" height="28" rx="6" fill="#1E3A8A"/>
+        <rect y="22" width="260" height="6" fill="#1E3A8A"/>
+        <text x="14" y="19" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE 2: INTAKE PIPELINE</text>
+        <text x="14" y="46" font-size="11" font-weight="700" fill="#002060">Sprints 2.1 - 2.3 (3 Sprints)</text>
+        <text x="14" y="66" font-size="10.5" fill="#334155">• Student auth &amp; 6-box OTP</text>
+        <text x="14" y="84" font-size="10.5" fill="#334155">• 5-step DepEd enrollment form</text>
+        <text x="14" y="102" font-size="10.5" fill="#334155">• Canvas compression &lt; 350KB</text>
+        <text x="14" y="120" font-size="10.5" fill="#334155">• Offline pdf-lib enrollment slip</text>
+        <text x="14" y="138" font-size="10" font-weight="700" fill="#047857">STATUS: COMPLETE (v1.0)</text>
+      </g>
+
+      <!-- Arrow 2 -->
+      <path d="M 549 82 L 561 82" stroke="#002060" stroke-width="2"/>
+      <polygon points="561,77 567,82 561,87" fill="#002060"/>
+
+      <!-- Phase 3 -->
+      <g transform="translate(570, 0)">
+        <rect width="260" height="165" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+        <rect width="260" height="28" rx="6" fill="#1E3A8A"/>
+        <rect y="22" width="260" height="6" fill="#1E3A8A"/>
+        <text x="14" y="19" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE 3: ADJUDICATION</text>
+        <text x="14" y="46" font-size="11" font-weight="700" fill="#002060">Sprints 3.1 - 3.3 (3 Sprints)</text>
+        <text x="14" y="66" font-size="10.5" fill="#334155">• Admin shell &amp; live intake stats</text>
+        <text x="14" y="84" font-size="10.5" fill="#334155">• High-density table &amp; filters</text>
+        <text x="14" y="102" font-size="10.5" fill="#334155">• Split document review modal</text>
+        <text x="14" y="120" font-size="10.5" fill="#334155">• Hard 40-learner section quota</text>
+        <text x="14" y="138" font-size="10" font-weight="700" fill="#047857">STATUS: COMPLETE (v1.0)</text>
+      </g>
+
+      <!-- Arrow 3 -->
+      <path d="M 834 82 L 846 82" stroke="#002060" stroke-width="2"/>
+      <polygon points="846,77 852,82 846,87" fill="#002060"/>
+
+      <!-- Phase 4 -->
+      <g transform="translate(855, 0)">
+        <rect width="260" height="165" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+        <rect width="260" height="28" rx="6" fill="#1E3A8A"/>
+        <rect y="22" width="260" height="6" fill="#1E3A8A"/>
+        <text x="14" y="19" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE 4: SCHEDULING</text>
+        <text x="14" y="46" font-size="11" font-weight="700" fill="#002060">Sprints 4.1 - 4.3 (3 Sprints)</text>
+        <text x="14" y="66" font-size="10.5" fill="#334155">• 5-day x 10-hour timetable matrix</text>
+        <text x="14" y="84" font-size="10.5" fill="#334155">• 3-way clash detection engine</text>
+        <text x="14" y="102" font-size="10.5" fill="#334155">• Teacher personal timetable</text>
+        <text x="14" y="120" font-size="10.5" fill="#334155">• Advisory roster &amp; attendance</text>
+        <text x="14" y="138" font-size="10" font-weight="700" fill="#047857">STATUS: COMPLETE (v1.0)</text>
+      </g>
+
+      <!-- Arrow 4 -->
+      <path d="M 1119 82 L 1131 82" stroke="#002060" stroke-width="2"/>
+      <polygon points="1131,77 1137,82 1131,87" fill="#002060"/>
+
+      <!-- Phase 5 -->
+      <g transform="translate(1140, 0)">
+        <rect width="245" height="165" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+        <rect width="245" height="28" rx="6" fill="#1E3A8A"/>
+        <rect y="22" width="245" height="6" fill="#1E3A8A"/>
+        <text x="14" y="19" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE 5: IT MANAGEMENT</text>
+        <text x="14" y="46" font-size="11" font-weight="700" fill="#002060">Sprints 5.1 - 5.2 (2 Sprints)</text>
+        <text x="14" y="66" font-size="10.5" fill="#334155">• Dynamic calendar / trisem</text>
+        <text x="14" y="84" font-size="10.5" fill="#334155">• Zero hardcoded dates</text>
+        <text x="14" y="102" font-size="10.5" fill="#334155">• RBAC staff invite console</text>
+        <text x="14" y="120" font-size="10.5" fill="#334155">• Telemetry &amp; facility registry</text>
+        <text x="14" y="138" font-size="10" font-weight="700" fill="#047857">STATUS: COMPLETE (v1.0)</text>
+      </g>
+
+      <!-- Arrow 5 -->
+      <path d="M 1389 82 L 1401 82" stroke="#002060" stroke-width="2"/>
+      <polygon points="1401,77 1407,82 1401,87" fill="#002060"/>
+
+      <!-- Phase 6 -->
+      <g transform="translate(1410, 0)">
+        <rect width="242" height="165" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+        <rect width="242" height="28" rx="6" fill="#92400E"/>
+        <rect y="22" width="242" height="6" fill="#92400E"/>
+        <text x="14" y="19" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE 6: QA &amp; DEPLOY</text>
+        <text x="14" y="46" font-size="11" font-weight="700" fill="#92400E">Sprints 6.1 - 6.3 (3 Sprints)</text>
+        <text x="14" y="66" font-size="10.5" fill="#334155">• WCAG 2.1 AA accessibility</text>
+        <text x="14" y="84" font-size="10.5" fill="#334155">• 3G rural throttling tests</text>
+        <text x="14" y="102" font-size="10.5" fill="#334155">• Vercel production deploy</text>
+        <text x="14" y="120" font-size="10.5" fill="#334155">• Stakeholder UAT sign-off</text>
+        <text x="14" y="138" font-size="10" font-weight="700" fill="#047857">STATUS: PRODUCTION READY</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 2: 16-SPRINT WORK BREAKDOWN STRUCTURE (WBS) TABLE -->
+  <g transform="translate(50, 404)">
+    <rect width="1700" height="970" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">2. WORK BREAKDOWN STRUCTURE (WBS) &amp; DELIVERABLES MATRIX (16 SPRINTS)</text>
+
+    <!-- Table Container -->
+    <g transform="translate(24, 52)">
+      <!-- Table Header -->
+      <rect width="1652" height="34" rx="4" fill="#0F172A"/>
+      <text x="20" y="22" font-size="11.5" font-weight="800" fill="#FFFFFF">PHASE</text>
+      <text x="140" y="22" font-size="11.5" font-weight="800" fill="#FFFFFF">SPRINT</text>
+      <text x="270" y="22" font-size="11.5" font-weight="800" fill="#FFFFFF">WORK PACKAGE / DELIVERABLE</text>
+      <text x="760" y="22" font-size="11.5" font-weight="800" fill="#FFFFFF">RESPONSIBLE PORTAL</text>
+      <text x="1100" y="22" font-size="11.5" font-weight="800" fill="#FFFFFF">ACCEPTANCE &amp; SUCCESS CRITERIA</text>
+
+      <!-- Rows 1 to 16 -->
+      <!-- Sprint 1.1 -->
+      <g transform="translate(0, 40)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 1</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 1.1</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Monorepo &amp; Multi-Zone Configuration</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">npm workspaces (student, teacher, admin, it-support) on dedicated ports</text>
+        <text x="760" y="30" font-size="11" fill="#002060">Root Workspace</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">All 4 sub-applications compile in parallel with zero TypeScript errors.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Turborepo build passes cleanly.</text>
+      </g>
+
+      <!-- Sprint 1.2 -->
+      <g transform="translate(0, 95)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 1</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 1.2</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">DepEd Atomic UI Component Library</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Tailwind v4 tokens: Navy #002060, Gold #F59E0B, 4px-6px radius, zero emojis</text>
+        <text x="760" y="30" font-size="11" fill="#002060">packages/ui</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Formal institutional look: buttons, cards, inputs, and modals validated.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Zero-emoji standard enforced across design system.</text>
+      </g>
+
+      <!-- Sprint 2.1 -->
+      <g transform="translate(0, 150)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 2</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 2.1</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Student Auth &amp; 6-Box OTP Verification</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Email/password registration with 60-second cooldown OTP token modal</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/student</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Auto-advance numeric inputs, token resend timer, and 1-account-per-email.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Cross-role collision error trapping verified.</text>
+      </g>
+
+      <!-- Sprint 2.2 -->
+      <g transform="translate(0, 205)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 2</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 2.2</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">5-Step Basic Education Enrollment Stepper</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">DepEd Basic Ed Form (Revised 06/01/2025): LRN, PSA, Isnag, 4Ps, Tracks</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/student</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Draft autosaving to LocalStorage ensures zero data loss during disconnects.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Multi-step state machine fully operational.</text>
+      </g>
+
+      <!-- Sprint 2.3 -->
+      <g transform="translate(0, 260)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 2</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 2.3</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Canvas Image Compressor &amp; PDF Slip Engine</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Client-side 1600px scaling to &lt; 350KB; offline pdf-lib enrollment certificate</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/student</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">8MB mobile camera uploads reduced to 250KB; instant offline PDF generation.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] DepEd seal &amp; School ID 300017 formatted.</text>
+      </g>
+
+      <!-- Sprint 3.1 -->
+      <g transform="translate(0, 315)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 3</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 3.1</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Admin Workstation Shell &amp; KPI Metrics</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Protected layout, live enrollment counters (Pending, Approved, Revision)</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/admin</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Real-time Supabase subscription reflects newly submitted student records.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Live metrics and intake switch active.</text>
+      </g>
+
+      <!-- Sprint 3.2 -->
+      <g transform="translate(0, 370)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 3</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 3.2</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">High-Density Application Data Grid &amp; Filters</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Virtualized scrolling, debounced search across Name/LRN, multi-tier filters</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/admin</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Filter by Grade (7-12), Status, Strand; instantaneous client query execution.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] High-density tabular layout verified.</text>
+      </g>
+
+      <!-- Sprint 3.3 -->
+      <g transform="translate(0, 425)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 3</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 3.3</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Adjudication Review Modal &amp; 40-Student Quota Cap</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Split screen document viewer, structured deficiency notes, section lock</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/admin</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Strict DepEd 40-cap quota enforces lock upon reaching capacity limit.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Over-enrollment hard-blocked at database layer.</text>
+      </g>
+
+      <!-- Sprint 4.1 -->
+      <g transform="translate(0, 480)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 4</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 4.1</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Master Schedule Builder &amp; Timetable Matrix</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">5-day (Mon-Fri) x 10-hour (07:00-17:00) interactive grid with category colors</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/admin</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Interactive slot creation modal assigns section, subject, teacher, and room.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Grid rendering &amp; time block calculation operational.</text>
+      </g>
+
+      <!-- Sprint 4.2 -->
+      <g transform="translate(0, 535)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 4</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 4.2</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Automated Schedule Deconfliction Engine</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Algorithm detects (A_day == B_day) &amp;&amp; (A_start &lt; B_end) &amp;&amp; (A_end &gt; B_start)</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/admin</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Flags Teacher double-booking, Classroom clash, and Section cohort collision.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Red highlight &amp; blocking alert active.</text>
+      </g>
+
+      <!-- Sprint 4.3 -->
+      <g transform="translate(0, 590)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 4</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 4.3</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Teacher Timetable &amp; Advisory Section Roster</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Personal schedule matrix, current class pill, advisory learner directory</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/teacher</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Faculty view own teaching schedule; advisory class attendance sheet export.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Teacher portal views complete.</text>
+      </g>
+
+      <!-- Sprint 5.1 -->
+      <g transform="translate(0, 645)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 5</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 5.1</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Dynamic Academic Calendar &amp; Intake Windows</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Zero hardcoded dates: School Year, Trimesters 1-3, and intake window control</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/it-support</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Modifying dates in IT console instantly updates admission banners globally.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Dynamic trisem state active.</text>
+      </g>
+
+      <!-- Sprint 5.2 -->
+      <g transform="translate(0, 700)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 5</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 5.2</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">User RBAC Invitations &amp; Facilities Registry</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Staff email onboarding tokens, classroom seating capacities, audit viewer</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/it-support</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Staff onboarding invitation links route to designated portals with role gates.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Invitation console verified.</text>
+      </g>
+
+      <!-- Sprint 6.1 -->
+      <g transform="translate(0, 755)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 6</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 6.1</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">WCAG 2.1 AA Accessibility &amp; Visual Audit</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">4.5:1 contrast verification, full keyboard navigation, ARIA tags, system fonts</text>
+        <text x="760" y="30" font-size="11" fill="#002060">All Workspaces</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Lighthouse accessibility score &gt; 95; zero broken color contrasts.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Complete institutional sweep validated.</text>
+      </g>
+
+      <!-- Sprint 6.2 -->
+      <g transform="translate(0, 810)">
+        <rect width="1652" height="50" fill="#F8FAFC"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 6</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 6.2</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Low-Bandwidth 3G Stress Testing &amp; Offline Drafts</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Network throttling (Slow 3G 400Kbps); draft recovery during cellular drops</text>
+        <text x="760" y="30" font-size="11" fill="#002060">apps/student</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Zero lost input fields during simulated disconnects; graceful error toasts.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Rural resilience confirmed.</text>
+      </g>
+
+      <!-- Sprint 6.3 -->
+      <g transform="translate(0, 865)">
+        <rect width="1652" height="50" fill="#FFFFFF"/>
+        <text x="20" y="30" font-size="11" font-weight="700" fill="#002060">Phase 6</text>
+        <text x="140" y="30" font-size="11" font-weight="700" fill="#003399">Sprint 6.3</text>
+        <text x="270" y="22" font-size="11" font-weight="700" fill="#0F172A">Production Multi-Zone Vercel Deployment &amp; UAT</text>
+        <text x="270" y="38" font-size="10" fill="#64748B">Bundle optimization (&lt; 180KB chunks), Vercel production rewrites, Git push</text>
+        <text x="760" y="30" font-size="11" fill="#002060">Root Workspace</text>
+        <text x="1100" y="22" font-size="10.5" fill="#334155">Clean deployment on Vercel; stakeholder sign-off with Dumalneg NHS team.</text>
+        <text x="1100" y="38" font-size="9.5" font-weight="700" fill="#047857">[ DONE ] Production release verified.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 3: SEQUENCE FLOW & RISK MITIGATION MATRIX -->
+  <g transform="translate(50, 1394)">
+    <rect width="1700" height="460" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">3. SYSTEM INTERACTION SEQUENCE &amp; DEPENDENCY CHAIN</text>
+
+    <!-- Visual Sequence Architecture Diagram -->
+    <g transform="translate(24, 52)">
+      <!-- Step 1: Core to DB -->
+      <g transform="translate(0, 0)">
+        <rect width="250" height="70" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.2"/>
+        <text x="125" y="24" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">1. Monorepo Core</text>
+        <text x="125" y="44" font-size="10.5" fill="#475569" text-anchor="middle">Provision Shared Types &amp; Tokens</text>
+        <text x="125" y="60" font-size="10" font-weight="700" fill="#2563EB" text-anchor="middle">→ Supabase Client Initialized</text>
+      </g>
+
+      <!-- Arrow -->
+      <path d="M 250 35 L 280 35" stroke="#002060" stroke-width="2"/>
+      <polygon points="280,30 286,35 280,40" fill="#002060"/>
+
+      <!-- Step 2: Student to DB -->
+      <g transform="translate(286, 0)">
+        <rect width="250" height="70" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.2"/>
+        <text x="125" y="24" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">2. Student Intake</text>
+        <text x="125" y="44" font-size="10.5" fill="#475569" text-anchor="middle">5-Step Form &amp; Compressed Docs</text>
+        <text x="125" y="60" font-size="10" font-weight="700" fill="#2563EB" text-anchor="middle">→ Inserts Application (Pending)</text>
+      </g>
+
+      <!-- Arrow -->
+      <path d="M 536 35 L 566 35" stroke="#002060" stroke-width="2"/>
+      <polygon points="566,30 572,35 566,40" fill="#002060"/>
+
+      <!-- Step 3: Admin to DB -->
+      <g transform="translate(572, 0)">
+        <rect width="260" height="70" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.2"/>
+        <text x="130" y="24" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">3. Registrar Adjudication</text>
+        <text x="130" y="44" font-size="10.5" fill="#475569" text-anchor="middle">Review Docs &amp; Allocate Section</text>
+        <text x="130" y="60" font-size="10" font-weight="700" fill="#2563EB" text-anchor="middle">→ Status Approved (40-Cap Lock)</text>
+      </g>
+
+      <!-- Arrow -->
+      <path d="M 832 35 L 862 35" stroke="#002060" stroke-width="2"/>
+      <polygon points="862,30 868,35 862,40" fill="#002060"/>
+
+      <!-- Step 4: Admin Scheduling -->
+      <g transform="translate(868, 0)">
+        <rect width="250" height="70" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.2"/>
+        <text x="125" y="24" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">4. Schedule Deconfliction</text>
+        <text x="125" y="44" font-size="10.5" fill="#475569" text-anchor="middle">Build Schedule Slots</text>
+        <text x="125" y="60" font-size="10" font-weight="700" fill="#2563EB" text-anchor="middle">→ Check Teacher/Room/Section</text>
+      </g>
+
+      <!-- Arrow -->
+      <path d="M 1118 35 L 1148 35" stroke="#002060" stroke-width="2"/>
+      <polygon points="1148,30 1154,35 1148,40" fill="#002060"/>
+
+      <!-- Step 5: Teacher to DB -->
+      <g transform="translate(1154, 0)">
+        <rect width="240" height="70" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.2"/>
+        <text x="120" y="24" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">5. Faculty Timetable</text>
+        <text x="120" y="44" font-size="10.5" fill="#475569" text-anchor="middle">Read Personal Schedule</text>
+        <text x="120" y="60" font-size="10" font-weight="700" fill="#2563EB" text-anchor="middle">→ Export SF-1 Class Attendance</text>
+      </g>
+
+      <!-- Arrow -->
+      <path d="M 1394 35 L 1424 35" stroke="#002060" stroke-width="2"/>
+      <polygon points="1424,30 1430,35 1424,40" fill="#002060"/>
+
+      <!-- Step 6: IT to DB -->
+      <g transform="translate(1430, 0)">
+        <rect width="222" height="70" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.2"/>
+        <text x="111" y="24" font-size="12" font-weight="800" fill="#92400E" text-anchor="middle">6. IT Support Admin</text>
+        <text x="111" y="44" font-size="10.5" fill="#78350F" text-anchor="middle">Switch Academic Term</text>
+        <text x="111" y="60" font-size="10" font-weight="700" fill="#B45309" text-anchor="middle">→ Global Dynamic State Sync</text>
+      </g>
+    </g>
+
+    <!-- Risk Assessment Matrix Below Sequence -->
+    <g transform="translate(24, 160)">
+      <rect width="1652" height="260" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="1652" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="1652" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">CRITICAL RISK MITIGATION &amp; RESILIENCE STRATEGY (DUMALNEG FIELD CONDITIONS)</text>
+
+      <!-- Table Header -->
+      <rect y="28" width="1652" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">RISK FACTOR</text>
+      <text x="280" y="43" font-size="11" font-weight="700" fill="#475569">IMPACT</text>
+      <text x="400" y="43" font-size="11" font-weight="700" fill="#475569">LIKELIHOOD</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">ARCHITECTURAL MITIGATION STRATEGY</text>
+
+      <!-- Risk 1 -->
+      <text x="14" y="72" font-size="11" font-weight="700" fill="#002060">Rural 3G Cellular Latency in Dumalneg</text>
+      <text x="280" y="72" font-size="10.5" font-weight="700" fill="#DC2626">HIGH</text>
+      <text x="400" y="72" font-size="10.5" font-weight="700" fill="#DC2626">HIGH</text>
+      <text x="560" y="72" font-size="11" fill="#334155">In-browser HTML5 canvas downscaling to &lt; 350KB before transmission; LocalStorage draft persistence</text>
+
+      <line x1="14" y1="84" x2="1638" y2="84" stroke="#E2E8F0"/>
+      <!-- Risk 2 -->
+      <text x="14" y="104" font-size="11" font-weight="700" fill="#002060">Over-Enrollment in High-Demand Sections</text>
+      <text x="280" y="104" font-size="10.5" font-weight="700" fill="#DC2626">HIGH</text>
+      <text x="400" y="104" font-size="10.5" font-weight="700" fill="#F59E0B">MEDIUM</text>
+      <text x="560" y="104" font-size="11" fill="#334155">Strict DepEd maximum cap of 40 learners enforced at database and UI layer; automatic section lock</text>
+
+      <line x1="14" y1="116" x2="1638" y2="116" stroke="#E2E8F0"/>
+      <!-- Risk 3 -->
+      <text x="14" y="136" font-size="11" font-weight="700" fill="#002060">Faculty / Classroom Double Booking</text>
+      <text x="280" y="136" font-size="10.5" font-weight="700" fill="#F59E0B">MEDIUM</text>
+      <text x="400" y="136" font-size="10.5" font-weight="700" fill="#F59E0B">MEDIUM</text>
+      <text x="560" y="136" font-size="11" fill="#334155">Deconfliction engine calculates (A_start &lt; B_end &amp;&amp; A_end &gt; B_start) across Teacher, Room, and Section</text>
+
+      <line x1="14" y1="148" x2="1638" y2="148" stroke="#E2E8F0"/>
+      <!-- Risk 4 -->
+      <text x="14" y="168" font-size="11" font-weight="700" fill="#002060">Accidental Backend / Schema Mutations</text>
+      <text x="280" y="168" font-size="10.5" font-weight="700" fill="#DC2626">CRITICAL</text>
+      <text x="400" y="168" font-size="10.5" font-weight="700" fill="#047857">LOW</text>
+      <text x="560" y="168" font-size="11" fill="#334155">Locked backend architecture; frontend consuming immutable Supabase tables with zero migration risks</text>
+
+      <line x1="14" y1="180" x2="1638" y2="180" stroke="#E2E8F0"/>
+      <!-- Risk 5 -->
+      <text x="14" y="200" font-size="11" font-weight="700" fill="#002060">Multi-Zone Routing Conflicts on Vercel</text>
+      <text x="280" y="200" font-size="10.5" font-weight="700" fill="#F59E0B">MEDIUM</text>
+      <text x="400" y="200" font-size="10.5" font-weight="700" fill="#047857">LOW</text>
+      <text x="560" y="200" font-size="11" fill="#334155">Strict path isolation (/admin, /teacher, /it-support, /) cleanly rewritten in root Next.js reverse-proxy</text>
+    </g>
+  </g>
+
+  <!-- SECTION 4: DEFINITION OF DONE & QUALITY GATES -->
+  <g transform="translate(50, 1864)">
+    <rect width="1700" height="448" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">4. VERIFICATION GATES &amp; DEFINITION OF DONE (DoD)</text>
+
+    <!-- 4 DoD Cards -->
+    <g transform="translate(24, 52)">
+      <!-- Card 1 -->
+      <g transform="translate(0, 0)">
+        <rect width="395" height="370" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="395" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="395" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">1. TYPE SAFETY &amp; COMPILATION</text>
+        <text x="16" y="60" font-size="11.5" font-weight="700" fill="#002060">• Zero TypeScript Compiler Errors</text>
+        <text x="28" y="78" font-size="11" fill="#475569">strict: true across all 4 apps</text>
+        <text x="16" y="106" font-size="11.5" font-weight="700" fill="#002060">• Production Next.js Build</text>
+        <text x="28" y="124" font-size="11" fill="#475569">npm run build succeeds without warnings</text>
+        <text x="16" y="152" font-size="11.5" font-weight="700" fill="#002060">• Clean Lint Execution</text>
+        <text x="28" y="170" font-size="11" fill="#475569">Zero ESLint errors or unhandled promises</text>
+        <text x="16" y="198" font-size="11.5" font-weight="700" fill="#002060">• Bundle Optimization</text>
+        <text x="28" y="216" font-size="11" fill="#475569">First Load JS chunk &lt; 180 KB</text>
+      </g>
+
+      <!-- Card 2 -->
+      <g transform="translate(415, 0)">
+        <rect width="395" height="370" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="395" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="395" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">2. DEPED DESIGN SYSTEM</text>
+        <text x="16" y="60" font-size="11.5" font-weight="700" fill="#002060">• Strict DepEd Color Tokens</text>
+        <text x="28" y="78" font-size="11" fill="#475569">Navy #002060, White #FFFFFF, Gold #F59E0B</text>
+        <text x="16" y="106" font-size="11.5" font-weight="700" fill="#002060">• Zero Decorative Emojis</text>
+        <text x="28" y="124" font-size="11" fill="#475569">Stroke-based SVG icons only</text>
+        <text x="16" y="152" font-size="11.5" font-weight="700" fill="#002060">• Geometric Restraint</text>
+        <text x="28" y="170" font-size="11" fill="#475569">Uniform 4px-6px corner radius tokens</text>
+        <text x="16" y="198" font-size="11.5" font-weight="700" fill="#002060">• System Typography</text>
+        <text x="28" y="216" font-size="11" fill="#475569">Universal system sans-serif hierarchy</text>
+      </g>
+
+      <!-- Card 3 -->
+      <g transform="translate(830, 0)">
+        <rect width="395" height="370" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="395" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="395" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">3. INSTITUTIONAL POLICIES</text>
+        <text x="16" y="60" font-size="11.5" font-weight="700" fill="#002060">• DepEd School ID 300017</text>
+        <text x="28" y="78" font-size="11" fill="#475569">Displayed on all portals &amp; PDF slips</text>
+        <text x="16" y="106" font-size="11.5" font-weight="700" fill="#002060">• 40-Student Section Quota</text>
+        <text x="28" y="124" font-size="11" fill="#475569">Hard cap rejects 41st student admission</text>
+        <text x="16" y="152" font-size="11.5" font-weight="700" fill="#002060">• Dynamic Academic Calendar</text>
+        <text x="28" y="170" font-size="11" fill="#475569">Zero hardcoded dates; IT Support switches</text>
+        <text x="16" y="198" font-size="11.5" font-weight="700" fill="#002060">• 1-Account-Per-Email Gate</text>
+        <text x="28" y="216" font-size="11" fill="#475569">Cross-role collision prevention</text>
+      </g>
+
+      <!-- Card 4 -->
+      <g transform="translate(1245, 0)">
+        <rect width="407" height="370" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="407" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="407" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">4. GIT &amp; REMOTE VERSIONING</text>
+        <text x="16" y="60" font-size="11.5" font-weight="700" fill="#002060">• Automatic GitHub Push</text>
+        <text x="28" y="78" font-size="11" fill="#475569">Synchronized immediately to main branch</text>
+        <text x="16" y="106" font-size="11.5" font-weight="700" fill="#002060">• Atomic Commit Messages</text>
+        <text x="28" y="124" font-size="11" fill="#475569">Structured conventional commit syntax</text>
+        <text x="16" y="152" font-size="11.5" font-weight="700" fill="#002060">• Clean Working Directory</text>
+        <text x="28" y="170" font-size="11" fill="#475569">Zero leftover build artifacts or loose files</text>
+        <text x="16" y="198" font-size="11.5" font-weight="700" fill="#002060">• Clean Documentation Folder</text>
+        <text x="28" y="216" font-size="11" fill="#475569">Only formal SVG specification files</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- Institutional Footer -->
+  <rect x="50" y="2330" width="1700" height="44" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="74" y="2357" font-size="12" font-weight="800" fill="#002060">DUMAL-NEXT</text>
+  <text x="175" y="2357" font-size="12" fill="#64748B">Basic Education Online Admission &amp; Academic Resource Management System</text>
+  <text x="900" y="2357" font-size="11.5" fill="#475569" text-anchor="middle">Proponents: Lozano, Digap, Julian, Magdaong, Tumpap | MMSU CCIS Department of Information Technology</text>
+  <text x="1720" y="2357" font-size="11.5" font-weight="700" fill="#002060" text-anchor="end">IPD-2026-v1.0  |  Implementation Plan Document</text>
+
+</svg>

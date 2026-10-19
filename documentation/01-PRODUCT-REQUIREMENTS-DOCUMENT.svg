@@ -1,0 +1,342 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2400" viewBox="0 0 1800 2400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow-subtle" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#002060" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-card" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#002060" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1800" height="2400" fill="#F8FAFC"/>
+  
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="1800" height="8" fill="#002060"/>
+  <rect x="0" y="8" width="1800" height="4" fill="#F59E0B"/>
+
+  <!-- Official Header Banner -->
+  <rect x="50" y="32" width="1700" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" filter="url(#shadow-subtle)"/>
+  <rect x="50" y="32" width="8" height="96" fill="#002060" rx="2"/>
+  
+  <text x="80" y="62" font-size="12" font-weight="700" fill="#64748B" letter-spacing="1.5">REPUBLIC OF THE PHILIPPINES  |  DEPARTMENT OF EDUCATION  |  REGION I  |  SDO ILOCOS NORTE</text>
+  <text x="80" y="92" font-size="24" font-weight="900" fill="#002060" letter-spacing="0.5">01: PRODUCT REQUIREMENTS DOCUMENT (PRD)</text>
+  <text x="80" y="114" font-size="13" font-weight="600" fill="#475569">Dumalneg National High School - Feature-by-Feature System Specification</text>
+
+  <g transform="translate(1480, 56)">
+    <rect x="0" y="0" width="240" height="48" rx="6" fill="#002060"/>
+    <rect x="0" y="0" width="240" height="3" fill="#F59E0B" rx="1"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">OFFICIAL SPECIFICATION</text>
+    <text x="120" y="40" font-size="10" font-weight="600" fill="#FDE68A" text-anchor="middle">DepEd School ID: 300017</text>
+  </g>
+
+
+  <!-- SECTION 1: EXECUTIVE SUMMARY & USER PERSONAS -->
+  <g transform="translate(50, 148)">
+    <rect width="1700" height="230" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1. EXECUTIVE SUMMARY &amp; TARGET USER PERSONAS</text>
+
+    <text x="24" y="66" font-size="13" font-weight="700" fill="#0F172A">Context &amp; Operational Objectives:</text>
+    <text x="24" y="86" font-size="12" fill="#334155">
+      Dumalneg National High School serves learners across remote barangays (Cabaritan, Kalabakan, Quibel, San Isidro), including Indigenous Peoples (Isnag) and 4Ps beneficiaries.
+    </text>
+    <text x="24" y="104" font-size="12" fill="#334155">
+      Dumal-NEXT eliminates geographic and financial enrollment barriers through a 4-portal system with client-side image compression, real-time tracking, and automated schedule deconfliction.
+    </text>
+
+    <!-- Personas Table Header -->
+    <rect x="24" y="124" width="1652" height="28" fill="#EEF2FF" rx="4"/>
+    <text x="40" y="143" font-size="11.5" font-weight="800" fill="#1E1B4B">ACTOR / PERSONA</text>
+    <text x="260" y="143" font-size="11.5" font-weight="800" fill="#1E1B4B">PORTAL &amp; WORKSPACE</text>
+    <text x="560" y="143" font-size="11.5" font-weight="800" fill="#1E1B4B">CORE RESPONSIBILITIES &amp; MOTIVATIONS</text>
+    <text x="1400" y="143" font-size="11.5" font-weight="800" fill="#1E1B4B">BANDWIDTH PROFILE</text>
+
+    <!-- Row 1: Student -->
+    <text x="40" y="170" font-size="11.5" font-weight="700" fill="#002060">Learner &amp; Parent</text>
+    <text x="260" y="170" font-size="11" fill="#475569">Student Portal (@dumalnext/student)</text>
+    <text x="560" y="170" font-size="11" fill="#1E293B">Complete 5-step basic education intake, upload compressed PSA/Form 138, track review status, download official enrollment PDF.</text>
+    <text x="1400" y="170" font-size="11" font-weight="600" fill="#D97706">Mobile 3G / Intermittent</text>
+
+    <!-- Row 2: Faculty -->
+    <text x="40" y="194" font-size="11.5" font-weight="700" fill="#002060">Faculty / Teacher</text>
+    <text x="260" y="194" font-size="11" fill="#475569">Teacher Workstation (@dumalnext/teacher)</text>
+    <text x="560" y="194" font-size="11" fill="#1E293B">Inspect personal weekly timetable, locate classrooms, manage assigned advisory class roster, access learner emergency contact data.</text>
+    <text x="1400" y="194" font-size="11" font-weight="600" fill="#059669">Desktop / Campus Wi-Fi</text>
+
+    <!-- Row 3: Admin & IT -->
+    <text x="40" y="218" font-size="11.5" font-weight="700" fill="#002060">Registrar &amp; IT Staff</text>
+    <text x="260" y="218" font-size="11" fill="#475569">Admin &amp; IT Consoles (@dumalnext/admin, it-support)</text>
+    <text x="560" y="218" font-size="11" fill="#1E293B">Adjudicate applications, enforce 40-student quota, run 3-way conflict detection, manage dynamic academic calendar terms.</text>
+    <text x="1400" y="218" font-size="11" font-weight="600" fill="#059669">High-Speed Workstation</text>
+  </g>
+
+  <!-- SECTION 2: PORTAL FEATURE SPECIFICATIONS (4 CARDS) -->
+  <g transform="translate(50, 396)">
+    <!-- Column 1: Student Portal -->
+    <g transform="translate(0, 0)">
+      <rect width="410" height="1060" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#EEF2FF"/>
+      <rect y="36" width="410" height="6" fill="#EEF2FF"/>
+      <rect width="6" height="42" fill="#4338CA" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#312E81">PORTAL 01: STUDENT ADMISSION</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">F-STU-01: Authentication &amp; 6-Digit OTP</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• Legal name matching PSA certificate and Gmail.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Supabase Auth SSR with 6-digit confirmation code.</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Auto-focus numeric inputs with 60s resend cooldown.</text>
+
+        <line x1="0" y1="66" x2="374" y2="66" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="86" font-size="12" font-weight="800" fill="#002060">F-STU-02: 5-Step Enrollment Stepper</text>
+        <text x="0" y="104" font-size="11" font-weight="700" fill="#1E293B">Step 1: Classification &amp; Prior Schooling</text>
+        <text x="10" y="120" font-size="10.5" fill="#475569">Grade 7-12, New/Transferee/Returning, School ID &amp; Gen Avg.</text>
+        <text x="0" y="140" font-size="11" font-weight="700" fill="#1E293B">Step 2: Learner Profile &amp; DepEd Demographics</text>
+        <text x="10" y="156" font-size="10.5" fill="#475569">12-digit LRN validation, PSA number, Date of Birth &amp; age calc.</text>
+        <text x="10" y="172" font-size="10.5" fill="#475569">Isnag IP community selection &amp; 4Ps Household ID validation.</text>
+        <text x="0" y="192" font-size="11" font-weight="700" fill="#1E293B">Step 3: Family Background &amp; Guardian Info</text>
+        <text x="10" y="208" font-size="10.5" fill="#475569">Father, Mother (Maiden), Legal Guardian contact details.</text>
+        <text x="10" y="224" font-size="10.5" fill="#475569">Primary Emergency Contact priority selection.</text>
+        <text x="0" y="244" font-size="11" font-weight="700" fill="#1E293B">Step 4: Academic Program &amp; SNEd</text>
+        <text x="10" y="260" font-size="10.5" fill="#475569">JHS Regular vs. SPS; SHS Academic/TVL Track &amp; Strands.</text>
+        <text x="10" y="276" font-size="10.5" fill="#475569">Special Needs Education (SNEd) manifestation &amp; PWD ID.</text>
+        <text x="0" y="296" font-size="11" font-weight="700" fill="#1E293B">Step 5: Documents &amp; Legal Sign-Off</text>
+        <text x="10" y="312" font-size="10.5" fill="#475569">DepEd Data Privacy consent statement &amp; certification.</text>
+
+        <line x1="0" y1="330" x2="374" y2="330" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="350" font-size="12" font-weight="800" fill="#002060">F-STU-03: Canvas Compressor &amp; PDF</text>
+        <text x="0" y="368" font-size="11" fill="#334155">• In-browser HTML5 canvas image downscaling.</text>
+        <text x="0" y="384" font-size="11" fill="#334155">• Reduces 5MB-10MB mobile photos to &lt; 350KB JPEG.</text>
+        <text x="0" y="400" font-size="11" fill="#334155">• Client-side pdf-lib DepEd Enrollment Certificate download.</text>
+
+        <line x1="0" y1="418" x2="374" y2="418" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="438" font-size="12" font-weight="800" fill="#002060">F-STU-04: Real-Time Tracker</text>
+        <text x="0" y="456" font-size="11" fill="#334155">• Lifecycle: Draft &gt; Submitted &gt; Under Review &gt; Approved.</text>
+        <text x="0" y="472" font-size="11" fill="#DC2626">• Revision banner with registrar deficiency remarks.</text>
+
+        <line x1="0" y1="490" x2="374" y2="490" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="510" font-size="12" font-weight="800" fill="#002060">F-STU-05: Continuing Re-Enrollment</text>
+        <text x="0" y="528" font-size="11" fill="#334155">• 1-Click fast-track enrollment for verified continuing learners.</text>
+      </g>
+    </g>
+
+    <!-- Column 2: Teacher Workstation -->
+    <g transform="translate(430, 0)">
+      <rect width="410" height="1060" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#FEF3C7"/>
+      <rect y="36" width="410" height="6" fill="#FEF3C7"/>
+      <rect width="6" height="42" fill="#D97706" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#92400E">PORTAL 02: TEACHER WORKSTATION</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">F-TCH-01: Faculty Dashboard &amp; Load</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• Today's active teaching schedule with time markers.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Aggregate teaching load unit calculations.</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• School calendar &amp; grading period milestones.</text>
+
+        <line x1="0" y1="66" x2="374" y2="66" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="86" font-size="12" font-weight="800" fill="#002060">F-TCH-02: Teaching Timetable Matrix</text>
+        <text x="0" y="104" font-size="11" fill="#334155">• Weekly view: Mon to Fri (7:00 AM - 5:00 PM).</text>
+        <text x="0" y="120" font-size="11" fill="#334155">• Classroom room allocation &amp; building indicator.</text>
+        <text x="0" y="136" font-size="11" fill="#334155">• Subject curriculum syllabus details.</text>
+        <text x="0" y="152" font-size="11" fill="#2563EB">• Print / Export personal weekly teaching assignment.</text>
+
+        <line x1="0" y1="170" x2="374" y2="170" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="190" font-size="12" font-weight="800" fill="#002060">F-TCH-03: Advisory Section Directory</text>
+        <text x="0" y="208" font-size="11" fill="#334155">• Enrolled student roster for designated advisory class.</text>
+        <text x="0" y="224" font-size="11" fill="#334155">• Learner demographic badges (Isnag, 4Ps, SNEd).</text>
+        <text x="0" y="240" font-size="11" fill="#334155">• Emergency parent/guardian contact telephone roster.</text>
+        <text x="0" y="256" font-size="11" font-weight="700" fill="#059669">• One-click attendance sheet export (PDF/Excel).</text>
+
+        <line x1="0" y1="274" x2="374" y2="274" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="294" font-size="12" font-weight="800" fill="#002060">F-TCH-04: Faculty Credentials</text>
+        <text x="0" y="312" font-size="11" fill="#334155">• DepEd Employee ID &amp; Plantilla classification.</text>
+        <text x="0" y="328" font-size="11" fill="#334155">• Teaching specialization &amp; major area.</text>
+      </g>
+    </g>
+
+    <!-- Column 3: Admin & Registrar -->
+    <g transform="translate(860, 0)">
+      <rect width="410" height="1060" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#DCFCE7"/>
+      <rect y="36" width="410" height="6" fill="#DCFCE7"/>
+      <rect width="6" height="42" fill="#16A34A" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#14532D">PORTAL 03: REGISTRAR &amp; ADMIN</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">F-ADM-01: Adjudication Review Queue</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• High-density virtualized table with real-time sync.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Debounced instant search across Name, LRN, Ref No.</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Faceted filters: Grade (7-12), Track, Strand, Status.</text>
+
+        <line x1="0" y1="66" x2="374" y2="66" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="86" font-size="12" font-weight="800" fill="#002060">F-ADM-02: Split-Screen Review Modal</text>
+        <text x="0" y="104" font-size="11" fill="#334155">• Left pane: Complete student demographic dossier.</text>
+        <text x="0" y="120" font-size="11" fill="#334155">• Right pane: Pan-and-zoom inspection for PSA / Form 138.</text>
+        <text x="0" y="136" font-size="11" font-weight="700" fill="#059669">• Approve: Assigns section &amp; releases enrollment slip.</text>
+        <text x="0" y="152" font-size="11" font-weight="700" fill="#DC2626">• Return for Revision: Pre-set checklist + custom remarks.</text>
+
+        <line x1="0" y1="170" x2="374" y2="170" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="190" font-size="12" font-weight="800" fill="#002060">F-ADM-03: Section Quota Console</text>
+        <text x="0" y="208" font-size="11" font-weight="700" fill="#DC2626">• Mandatory DepEd 40-Student Capacity Cap.</text>
+        <text x="0" y="224" font-size="11" fill="#334155">• Visual occupancy meters (Green &lt; 35 | Red = 40 locked).</text>
+        <text x="0" y="240" font-size="11" fill="#334155">• DepEd School Form 1 (SF-1) Masterlist Excel/CSV export.</text>
+
+        <line x1="0" y1="256" x2="374" y2="256" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="276" font-size="12" font-weight="800" fill="#002060">F-ADM-04: Schedule Deconfliction</text>
+        <text x="0" y="294" font-size="11" fill="#334155">• 3-Way Overlap Detection (Teacher, Room, Section).</text>
+        <text x="0" y="310" font-size="11" fill="#334155">• Interactive visual clash markers prevent double-booking.</text>
+
+        <line x1="0" y1="326" x2="374" y2="326" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="346" font-size="12" font-weight="800" fill="#002060">F-ADM-05: Enrollment Window Control</text>
+        <text x="0" y="364" font-size="11" fill="#334155">• Global toggle to open/close admissions intake window.</text>
+        <text x="0" y="380" font-size="11" fill="#334155">• Real-time broadcast banner for maintenance/notices.</text>
+      </g>
+    </g>
+
+    <!-- Column 4: IT Support Console -->
+    <g transform="translate(1290, 0)">
+      <rect width="410" height="1060" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#F3E8FF"/>
+      <rect y="36" width="410" height="6" fill="#F3E8FF"/>
+      <rect width="6" height="42" fill="#7E22CE" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#581C87">PORTAL 04: IT SUPPORT &amp; SECURITY</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">F-IT-01: Dynamic Calendar &amp; Terms</text>
+        <text x="0" y="18" font-size="11" font-weight="700" fill="#7E22CE">• Zero Hardcoding Architecture.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Manage School Years (e.g. 2026-2027) &amp; Quarters (Q1-Q4).</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Enforce single active term constraint via database RPC.</text>
+
+        <line x1="0" y1="66" x2="374" y2="66" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="86" font-size="12" font-weight="800" fill="#002060">F-IT-02: Role-Based User Directory</text>
+        <text x="0" y="104" font-size="11" fill="#334155">• Search &amp; manage accounts across student, teacher, admin.</text>
+        <text x="0" y="120" font-size="11" fill="#334155">• Dispatch email invitations for new faculty and staff.</text>
+        <text x="0" y="136" font-size="11" fill="#334155">• Role switching with privilege escalation guards.</text>
+
+        <line x1="0" y1="152" x2="374" y2="152" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="172" font-size="12" font-weight="800" fill="#002060">F-IT-03: Facilities &amp; Campus Registry</text>
+        <text x="0" y="190" font-size="11" fill="#334155">• Register campus buildings, floor levels, room names.</text>
+        <text x="0" y="206" font-size="11" fill="#334155">• Configure physical desk capacities &amp; specialized labs.</text>
+
+        <line x1="0" y1="222" x2="374" y2="222" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="242" font-size="12" font-weight="800" fill="#002060">F-IT-04: Diagnostics &amp; Audit Logs</text>
+        <text x="0" y="260" font-size="11" fill="#334155">• Real-time Supabase connection health telemetry &amp; ping.</text>
+        <text x="0" y="276" font-size="11" fill="#334155">• System-wide security audit trail (term activations, updates).</text>
+        <text x="0" y="292" font-size="11" fill="#334155">• Supabase storage bucket quota monitoring.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 3: NON-FUNCTIONAL REQUIREMENTS & COMPLIANCE -->
+  <g transform="translate(50, 1476)">
+    <rect width="1700" height="420" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">3. NON-FUNCTIONAL REQUIREMENTS (NFR) &amp; STATUTORY COMPLIANCE</text>
+
+    <!-- NFR Grid (3 Columns) -->
+    <g transform="translate(24, 56)">
+      <!-- Col 1: Low-Bandwidth -->
+      <rect width="520" height="340" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="20" y="30" font-size="13" font-weight="800" fill="#002060">NFR-01: Rural Low-Bandwidth Optimization</text>
+      <text x="20" y="56" font-size="11.5" fill="#334155">• Target: Seamless operation on throttled 3G cellular (1.6 Mbps).</text>
+      <text x="20" y="76" font-size="11.5" fill="#334155">• Client-side HTML5 canvas image scaling ensures uploads &lt; 350KB.</text>
+      <text x="20" y="96" font-size="11.5" fill="#334155">• LocalStorage autosave prevents loss of form data on disconnection.</text>
+      <text x="20" y="116" font-size="11.5" fill="#334155">• Initial JavaScript bundle size &lt; 180KB per portal.</text>
+
+      <!-- Col 2: Security & RLS -->
+      <g transform="translate(550, 0)">
+        <rect width="520" height="340" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+        <text x="20" y="30" font-size="13" font-weight="800" fill="#002060">NFR-02: Security, RBAC &amp; Data Privacy</text>
+        <text x="20" y="56" font-size="11.5" fill="#334155">• Compliance with RA 10173 (Philippine Data Privacy Act of 2012).</text>
+        <text x="20" y="76" font-size="11.5" fill="#334155">• PostgreSQL Row-Level Security (RLS) on all demographic tables.</text>
+        <text x="20" y="96" font-size="11.5" fill="#334155">• Learners strictly isolated: can only view own applications.</text>
+        <text x="20" y="116" font-size="11.5" fill="#334155">• Storage bucket documents accessed exclusively via signed URLs.</text>
+      </g>
+
+      <!-- Col 3: DepEd Rigor & Accessibility -->
+      <g transform="translate(1100, 0)">
+        <rect width="520" height="340" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+        <text x="20" y="30" font-size="13" font-weight="800" fill="#002060">NFR-03: DepEd Institutional Rigor</text>
+        <text x="20" y="56" font-size="11.5" fill="#334155">• DepEd Order No. 03, s. 2018 (Basic Education Enrollment Policy).</text>
+        <text x="20" y="76" font-size="11.5" fill="#334155">• DepEd School ID 300017 embedded on all official certificates.</text>
+        <text x="20" y="96" font-size="11.5" fill="#334155">• DepEd Color Palette (#002060 Navy, #FFFFFF White, #F59E0B Gold).</text>
+        <text x="20" y="116" font-size="11.5" fill="#334155">• Zero-emoji policy with clean stroke-based SVG icons throughout.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 4: TRACEABILITY & VERIFICATION SUMMARY -->
+  <g transform="translate(50, 1916)">
+    <rect width="1700" height="394" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">4. FEATURE TRACEABILITY &amp; ACCEPTANCE CRITERIA MATRIX</text>
+
+    <g transform="translate(24, 52)">
+      <rect width="1652" height="28" fill="#EEF2FF" rx="4"/>
+      <text x="30" y="19" font-size="11" font-weight="800" fill="#1E1B4B">FEATURE ID</text>
+      <text x="180" y="19" font-size="11" font-weight="800" fill="#1E1B4B">NAME</text>
+      <text x="440" y="19" font-size="11" font-weight="800" fill="#1E1B4B">TARGET WORKSPACE</text>
+      <text x="760" y="19" font-size="11" font-weight="800" fill="#1E1B4B">ACCEPTANCE CRITERIA</text>
+      <text x="1460" y="19" font-size="11" font-weight="800" fill="#1E1B4B">VERIFICATION METHOD</text>
+
+      <!-- Row 1 -->
+      <text x="30" y="52" font-size="11" font-weight="700" fill="#002060">F-STU-01</text>
+      <text x="180" y="52" font-size="11" fill="#0F172A">Student Email OTP Auth</text>
+      <text x="440" y="52" font-size="11" fill="#475569">@dumalnext/student</text>
+      <text x="760" y="52" font-size="11" fill="#334155">6-digit code received; 60s cooldown strictly enforced; auto-advance focus.</text>
+      <text x="1460" y="52" font-size="11" font-weight="600" fill="#059669">Automated Test &amp; UAT</text>
+
+      <!-- Row 2 -->
+      <line x1="10" y1="68" x2="1640" y2="68" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="88" font-size="11" font-weight="700" fill="#002060">F-STU-02</text>
+      <text x="180" y="88" font-size="11" fill="#0F172A">5-Step Intake Stepper</text>
+      <text x="440" y="88" font-size="11" fill="#475569">@dumalnext/student</text>
+      <text x="760" y="88" font-size="11" fill="#334155">Zod schema validates 12-digit LRN, PSA number, 4Ps ID; LocalStorage autosave.</text>
+      <text x="1460" y="88" font-size="11" font-weight="600" fill="#059669">E2E Playwright Suite</text>
+
+      <!-- Row 3 -->
+      <line x1="10" y1="104" x2="1640" y2="104" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="124" font-size="11" font-weight="700" fill="#002060">F-STU-03</text>
+      <text x="180" y="124" font-size="11" fill="#0F172A">Canvas Compression</text>
+      <text x="440" y="124" font-size="11" fill="#475569">@dumalnext/student</text>
+      <text x="760" y="124" font-size="11" fill="#334155">Mobile camera image scaled to max 1600px, 0.72 quality, resulting in &lt; 350KB file.</text>
+      <text x="1460" y="124" font-size="11" font-weight="600" fill="#059669">Performance Profile</text>
+
+      <!-- Row 4 -->
+      <line x1="10" y1="140" x2="1640" y2="140" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="160" font-size="11" font-weight="700" fill="#002060">F-ADM-02</text>
+      <text x="180" y="160" font-size="11" fill="#0F172A">40-Learner Section Cap</text>
+      <text x="440" y="160" font-size="11" fill="#475569">@dumalnext/admin</text>
+      <text x="760" y="160" font-size="11" fill="#334155">Hard validation lock blocks assigning 41st student; meter shows red locked bar.</text>
+      <text x="1460" y="160" font-size="11" font-weight="600" fill="#059669">Integration Test</text>
+
+      <!-- Row 5 -->
+      <line x1="10" y1="176" x2="1640" y2="176" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="196" font-size="11" font-weight="700" fill="#002060">F-ADM-03</text>
+      <text x="180" y="196" font-size="11" fill="#0F172A">3-Way Clash Engine</text>
+      <text x="440" y="196" font-size="11" fill="#475569">@dumalnext/admin</text>
+      <text x="760" y="196" font-size="11" fill="#334155">Detects overlapping teacher, room, and section slots in real time under 50ms.</text>
+      <text x="1460" y="196" font-size="11" font-weight="600" fill="#059669">Unit &amp; Benchmarks</text>
+
+      <!-- Row 6 -->
+      <line x1="10" y1="212" x2="1640" y2="212" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="232" font-size="11" font-weight="700" fill="#002060">F-IT-01</text>
+      <text x="180" y="232" font-size="11" fill="#0F172A">Zero-Hardcoded Terms</text>
+      <text x="440" y="232" font-size="11" fill="#475569">@dumalnext/it-support</text>
+      <text x="760" y="232" font-size="11" fill="#334155">Admin can activate new school year and quarters without touching frontend code.</text>
+      <text x="1460" y="232" font-size="11" font-weight="600" fill="#059669">Database RPC Audit</text>
+    </g>
+  </g>
+
+  
+  <!-- Institutional Footer -->
+  <rect x="50" y="2330" width="1700" height="44" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="74" y="2357" font-size="12" font-weight="800" fill="#002060">DUMAL-NEXT</text>
+  <text x="175" y="2357" font-size="12" fill="#64748B">Basic Education Online Admission &amp; Academic Resource Management System</text>
+  <text x="900" y="2357" font-size="11.5" fill="#475569" text-anchor="middle">Proponents: Lozano, Digap, Julian, Magdaong, Tumpap | MMSU CCIS Department of Information Technology</text>
+  <text x="1720" y="2357" font-size="11.5" font-weight="700" fill="#002060" text-anchor="end">DUMAL-NEXT-DOC-01  |  PRD Specification</text>
+
+</svg>

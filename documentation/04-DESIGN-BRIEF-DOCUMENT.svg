@@ -1,0 +1,353 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2400" viewBox="0 0 1800 2400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow-subtle" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#002060" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-card" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#002060" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1800" height="2400" fill="#F8FAFC"/>
+  
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="1800" height="8" fill="#002060"/>
+  <rect x="0" y="8" width="1800" height="4" fill="#F59E0B"/>
+
+  <!-- Official Header Banner -->
+  <rect x="50" y="32" width="1700" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" filter="url(#shadow-subtle)"/>
+  <rect x="50" y="32" width="8" height="96" fill="#002060" rx="2"/>
+  
+  <text x="80" y="62" font-size="12" font-weight="700" fill="#64748B" letter-spacing="1.5">REPUBLIC OF THE PHILIPPINES  |  DEPARTMENT OF EDUCATION  |  REGION I  |  SDO ILOCOS NORTE</text>
+  <text x="80" y="92" font-size="24" font-weight="900" fill="#002060" letter-spacing="0.5">04: DESIGN BRIEF DOCUMENT (DBD)</text>
+  <text x="80" y="114" font-size="13" font-weight="600" fill="#475569">DepEd Institutional Brand Guidelines, Typography, Geometry &amp;amp; Visual Design Tokens</text>
+
+  <g transform="translate(1480, 56)">
+    <rect x="0" y="0" width="240" height="48" rx="6" fill="#002060"/>
+    <rect x="0" y="0" width="240" height="3" fill="#F59E0B" rx="1"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">DESIGN SYSTEM</text>
+    <text x="120" y="40" font-size="10" font-weight="600" fill="#FDE68A" text-anchor="middle">DepEd School ID: 300017</text>
+  </g>
+
+
+  <!-- SECTION 1: OFFICIAL DEPED COLOR PALETTE -->
+  <g transform="translate(50, 148)">
+    <rect width="1700" height="490" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1. OFFICIAL DEPED COLOR PALETTE &amp; DESIGN TOKENS</text>
+
+    <!-- Color Swatches Grid -->
+    <g transform="translate(24, 56)">
+      <!-- Swatch 1: DepEd Navy -->
+      <g transform="translate(0, 0)">
+        <rect width="250" height="180" rx="6" fill="#002060"/>
+        <text x="16" y="110" font-size="16" font-weight="800" fill="#FFFFFF">DepEd Navy</text>
+        <text x="16" y="132" font-size="12" font-weight="600" fill="#FDE68A">#002060</text>
+        <text x="16" y="152" font-size="10.5" fill="#E2E8F0">Primary Institutional Brand</text>
+        <text x="16" y="168" font-size="10" fill="#94A3B8">Headers, primary buttons, hero</text>
+      </g>
+
+      <!-- Swatch 2: Dark Navy -->
+      <g transform="translate(280, 0)">
+        <rect width="250" height="180" rx="6" fill="#001744"/>
+        <text x="16" y="110" font-size="16" font-weight="800" fill="#FFFFFF">Dark Navy</text>
+        <text x="16" y="132" font-size="12" font-weight="600" fill="#FDE68A">#001744</text>
+        <text x="16" y="152" font-size="10.5" fill="#E2E8F0">Deep Baseline &amp; Footers</text>
+        <text x="16" y="168" font-size="10" fill="#94A3B8">High-contrast surface borders</text>
+      </g>
+
+      <!-- Swatch 3: Secondary Navy -->
+      <g transform="translate(560, 0)">
+        <rect width="250" height="180" rx="6" fill="#0D3882"/>
+        <text x="16" y="110" font-size="16" font-weight="800" fill="#FFFFFF">Secondary Navy</text>
+        <text x="16" y="132" font-size="12" font-weight="600" fill="#FDE68A">#0D3882</text>
+        <text x="16" y="152" font-size="10.5" fill="#E2E8F0">Interactive Hover States</text>
+        <text x="16" y="168" font-size="10" fill="#94A3B8">Button hover, active links</text>
+      </g>
+
+      <!-- Swatch 4: DepEd Amber / Gold -->
+      <g transform="translate(840, 0)">
+        <rect width="250" height="180" rx="6" fill="#F59E0B"/>
+        <text x="16" y="110" font-size="16" font-weight="800" fill="#1E1B4B">DepEd Gold / Amber</text>
+        <text x="16" y="132" font-size="12" font-weight="700" fill="#1E1B4B">#F59E0B</text>
+        <text x="16" y="152" font-size="10.5" fill="#451A03">Accent &amp; Status Indicator</text>
+        <text x="16" y="168" font-size="10" fill="#78350F">Badges, step markers, active tabs</text>
+      </g>
+
+      <!-- Swatch 5: Pure White -->
+      <g transform="translate(1120, 0)">
+        <rect width="250" height="180" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+        <text x="16" y="110" font-size="16" font-weight="800" fill="#0F172A">Pure White</text>
+        <text x="16" y="132" font-size="12" font-weight="600" fill="#64748B">#FFFFFF</text>
+        <text x="16" y="152" font-size="10.5" fill="#334155">Card &amp; Input Surfaces</text>
+        <text x="16" y="168" font-size="10" fill="#64748B">Data tables, dialog cards</text>
+      </g>
+
+      <!-- Swatch 6: Surface Canvas -->
+      <g transform="translate(1400, 0)">
+        <rect width="250" height="180" rx="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+        <text x="16" y="110" font-size="16" font-weight="800" fill="#0F172A">Neutral Canvas</text>
+        <text x="16" y="132" font-size="12" font-weight="600" fill="#64748B">#F8FAFC</text>
+        <text x="16" y="152" font-size="10.5" fill="#334155">Background Backdrop</text>
+        <text x="16" y="168" font-size="10" fill="#64748B">Page body background</text>
+      </g>
+    </g>
+
+    <!-- Semantic State Colors Row -->
+    <g transform="translate(24, 260)">
+      <text x="0" y="0" font-size="13" font-weight="800" fill="#002060">Semantic Status Colors:</text>
+      
+      <!-- Approved Green -->
+      <g transform="translate(0, 14)">
+        <rect width="380" height="80" rx="6" fill="#DCFCE7" stroke="#86EFAC"/>
+        <text x="16" y="28" font-size="13" font-weight="800" fill="#14532D">Approved / Verified: #059669</text>
+        <text x="16" y="48" font-size="11" fill="#166534">Used for approved applications, section capacity safe (&lt;35), active terms.</text>
+        <text x="16" y="66" font-size="10" font-weight="600" fill="#14532D">Token: --deped-success</text>
+      </g>
+
+      <!-- Warning Amber -->
+      <g transform="translate(420, 14)">
+        <rect width="380" height="80" rx="6" fill="#FEF3C7" stroke="#FDE68A"/>
+        <text x="16" y="28" font-size="13" font-weight="800" fill="#92400E">Revision Required: #D97706</text>
+        <text x="16" y="48" font-size="11" fill="#78350F">Used for pending registrar review, section capacity warning (35-39 learners).</text>
+        <text x="16" y="66" font-size="10" font-weight="600" fill="#92400E">Token: --deped-warning</text>
+      </g>
+
+      <!-- Danger Red -->
+      <g transform="translate(840, 14)">
+        <rect width="380" height="80" rx="6" fill="#FEE2E2" stroke="#FCA5A5"/>
+        <text x="16" y="28" font-size="13" font-weight="800" fill="#991B1B">Quota Locked / Clash: #DC2626</text>
+        <text x="16" y="48" font-size="11" fill="#991B1B">Used for 40-student quota cap reached, schedule conflicts, invalid inputs.</text>
+        <text x="16" y="66" font-size="10" font-weight="600" fill="#991B1B">Token: --deped-danger</text>
+      </g>
+
+      <!-- Info Blue -->
+      <g transform="translate(1260, 14)">
+        <rect width="390" height="80" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+        <text x="16" y="28" font-size="13" font-weight="800" fill="#1E40AF">Information / Active: #2563EB</text>
+        <text x="16" y="48" font-size="11" fill="#1E40AF">Used for active navigation tabs, stepper progress markers, link actions.</text>
+        <text x="16" y="66" font-size="10" font-weight="600" fill="#1E40AF">Token: --deped-info</text>
+      </g>
+    </g>
+
+    <!-- Contrast Ratio Rule -->
+    <text x="24" y="420" font-size="12" font-weight="700" fill="#002060">Accessibility Standards (WCAG 2.1 AA):</text>
+    <text x="24" y="440" font-size="11.5" fill="#334155">• Contrast ratio between text and surface strictly exceeds 4.5:1 for normal body text and 3:1 for large headers.</text>
+    <text x="24" y="460" font-size="11.5" fill="#334155">• Pure White (#FFFFFF) text on DepEd Navy (#002060) achieves a contrast ratio of 14.8:1 (AAA Compliance).</text>
+  </g>
+
+  <!-- SECTION 2: GEOMETRY & BORDER RADIUS STANDARDS -->
+  <g transform="translate(50, 658)">
+    <rect width="1700" height="380" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">2. GEOMETRY, ELEVATION &amp; BORDER RADIUS TOKENS (4PX STANDARD)</text>
+
+    <g transform="translate(24, 56)">
+      <!-- Box Rule -->
+      <rect width="520" height="290" rx="4" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+      <text x="20" y="32" font-size="14" font-weight="800" fill="#002060">Standardized 4px-6px Border Radius</text>
+      <text x="20" y="58" font-size="11.5" fill="#334155">• All cards, input fields, modals, and buttons use 4px-6px radius.</text>
+      <text x="20" y="78" font-size="11.5" fill="#334155">• Creates an authoritative, professional, government look.</text>
+      <text x="20" y="98" font-size="11.5" font-weight="700" fill="#DC2626">• Strictly prohibited: Rounded-full pill buttons ("rounded-full").</text>
+      <text x="20" y="118" font-size="11.5" fill="#475569">Pill buttons evoke playful consumer apps and degrade institutional trust.</text>
+
+      <g transform="translate(20, 146)">
+        <rect width="180" height="40" rx="4" fill="#002060"/>
+        <text x="90" y="25" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">CORRECT: 4px Radius</text>
+
+        <rect x="220" y="0" width="180" height="40" rx="20" fill="#E2E8F0" stroke="#DC2626" stroke-dasharray="3 3"/>
+        <text x="310" y="25" font-size="12" font-weight="700" fill="#DC2626" text-anchor="middle">PROHIBITED: Pill</text>
+      </g>
+
+      <!-- Elevation Levels -->
+      <g transform="translate(560, 0)">
+        <rect width="520" height="290" rx="4" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+        <text x="20" y="32" font-size="14" font-weight="800" fill="#002060">Layered Navy Elevation System</text>
+        <text x="20" y="58" font-size="11.5" fill="#334155">• Shadows are subtly tinted with navy hue (0, 32, 96).</text>
+        <text x="20" y="80" font-size="11" font-weight="700" fill="#0F172A">1. Subtle Shadow (--shadow-subtle):</text>
+        <text x="30" y="96" font-size="10.5" fill="#475569">0 1px 2px 0 rgba(0, 0, 0, 0.05) - Form inputs, standard cards.</text>
+        <text x="20" y="120" font-size="11" font-weight="700" fill="#0F172A">2. Card Shadow (--shadow-card):</text>
+        <text x="30" y="136" font-size="10.5" fill="#475569">0 1px 3px 0 rgba(0, 32, 96, 0.06) - Dashboard overview cards.</text>
+        <text x="20" y="160" font-size="11" font-weight="700" fill="#0F172A">3. Raised Shadow (--shadow-raised):</text>
+        <text x="30" y="176" font-size="10.5" fill="#475569">0 4px 6px -1px rgba(0, 32, 96, 0.08) - Dropdown menus, tooltips.</text>
+        <text x="20" y="200" font-size="11" font-weight="700" fill="#0F172A">4. Modal Overlay (--shadow-overlay):</text>
+        <text x="30" y="216" font-size="10.5" fill="#475569">0 20px 25px -5px rgba(0, 32, 96, 0.15) - Adjudication review modal.</text>
+      </g>
+
+      <!-- Spacing System -->
+      <g transform="translate(1120, 0)">
+        <rect width="520" height="290" rx="4" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+        <text x="20" y="32" font-size="14" font-weight="800" fill="#002060">4-Pixel Modular Spacing Grid</text>
+        <text x="20" y="58" font-size="11.5" fill="#334155">• All component margins and padding align to multiples of 4px:</text>
+        <text x="20" y="80" font-size="11" fill="#475569">• 4px (p-1): Micro gaps between icon and text.</text>
+        <text x="20" y="100" font-size="11" fill="#475569">• 8px (p-2): Padding for status badges, small buttons.</text>
+        <text x="20" y="120" font-size="11" fill="#475569">• 16px (p-4): Standard padding for form input cells and list items.</text>
+        <text x="20" y="140" font-size="11" fill="#475569">• 24px (p-6): Card body padding across all dashboard panels.</text>
+        <text x="20" y="160" font-size="11" fill="#475569">• 32px (p-8): Top-level page section spacing.</text>
+        <text x="20" y="190" font-size="11.5" font-weight="700" fill="#059669">Ensures visual rhythm and pixel-perfect vertical alignment.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 3: TYPOGRAPHY HIERARCHY & ZERO-EMOJI MANDATE -->
+  <g transform="translate(50, 1058)">
+    <rect width="1700" height="420" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">3. TYPOGRAPHY SYSTEM &amp; STRICT ZERO-EMOJI MANDATE</text>
+
+    <!-- Typography Grid -->
+    <g transform="translate(24, 56)">
+      <!-- Universal Font Stack -->
+      <rect width="800" height="340" rx="4" fill="#F8FAFC" stroke="#CBD5E1"/>
+      <text x="20" y="32" font-size="14" font-weight="800" fill="#002060">Universal System Font Stack</text>
+      <text x="20" y="56" font-size="11.5" fill="#334155">CSS Token: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;</text>
+      
+      <g transform="translate(20, 84)">
+        <text x="0" y="20" font-size="24" font-weight="900" fill="#002060">Page Title (24px Bold / #002060)</text>
+        <text x="0" y="52" font-size="18" font-weight="800" fill="#0F172A">Section Header (18px Bold / #0F172A)</text>
+        <text x="0" y="80" font-size="14" font-weight="700" fill="#1E293B">Subsection Title (14px SemiBold / #1E293B)</text>
+        <text x="0" y="106" font-size="12" font-weight="600" fill="#334155">Card Label &amp; Form Input Header (12px Medium / #334155)</text>
+        <text x="0" y="130" font-size="12" font-weight="400" fill="#475569">Standard Body Text (12px Regular / #475569)</text>
+        <text x="0" y="154" font-size="10.5" font-weight="500" fill="#64748B">Legal Captions &amp; Timestamp Metadata (10.5px / #64748B)</text>
+      </g>
+
+      <!-- Zero-Emoji Policy Card -->
+      <g transform="translate(850, 0)">
+        <rect width="800" height="340" rx="4" fill="#F8FAFC" stroke="#CBD5E1"/>
+        <rect width="800" height="32" rx="4" fill="#DC2626"/>
+        <text x="20" y="21" font-size="12" font-weight="800" fill="#FFFFFF">STRICT INSTITUTIONAL MANDATE: ZERO DECORATIVE EMOJIS</text>
+
+        <g transform="translate(20, 52)" font-size="11.5" fill="#334155">
+          <text x="0" y="0" font-weight="700" fill="#991B1B">Policy Statement:</text>
+          <text x="110" y="0">Decorative emojis are completely barred from all UI views, portals, and official documents.</text>
+          
+          <text x="0" y="24" font-weight="700" fill="#002060">Institutional Rationale:</text>
+          <text x="145" y="24">1. Dumal-NEXT produces legal basic education records (DepEd SF-1, SF-2, Form 138).</text>
+          <text x="145" y="44">2. Operating systems render emojis inconsistently across Windows, iOS, and Android.</text>
+          <text x="145" y="64">3. Emojis break strict screen reader accessibility hierarchies for visually-impaired users.</text>
+
+          <text x="0" y="96" font-weight="700" fill="#002060">Mandated Replacement:</text>
+          <text x="160" y="96">Strictly utilize stroke-based SVG icons from Lucide React:</text>
+          <text x="20" y="120" font-size="11" fill="#475569">• FileText (Documents)  |  • Clock (Schedule)  |  • Users (Roster)  |  • Shield (Security)</text>
+          <text x="20" y="140" font-size="11" fill="#475569">• CheckCircle2 (Approved)  |  • AlertTriangle (Clash)  |  • Lock (Quota Reached)</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 4: UI COMPONENT STANDARDS -->
+  <g transform="translate(50, 1498)">
+    <rect width="1700" height="810" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">4. CORE UI COMPONENT VISUAL SPECIFICATIONS</text>
+
+    <!-- Component 1: Buttons -->
+    <g transform="translate(24, 56)">
+      <rect width="400" height="350" rx="4" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="16" y="28" font-size="13" font-weight="800" fill="#002060">Button Variants &amp; States</text>
+      
+      <g transform="translate(16, 44)">
+        <rect width="170" height="36" rx="4" fill="#002060"/>
+        <text x="85" y="22" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">Primary Action</text>
+        <text x="180" y="22" font-size="11" fill="#475569">DepEd Navy (#002060)</text>
+      </g>
+
+      <g transform="translate(16, 92)">
+        <rect width="170" height="36" rx="4" fill="#FFFFFF" stroke="#002060" stroke-width="1.5"/>
+        <text x="85" y="22" font-size="11.5" font-weight="700" fill="#002060" text-anchor="middle">Secondary Outline</text>
+        <text x="180" y="22" font-size="11" fill="#475569">Navy Stroke on White</text>
+      </g>
+
+      <g transform="translate(16, 140)">
+        <rect width="170" height="36" rx="4" fill="#DC2626"/>
+        <text x="85" y="22" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">Destructive / Return</text>
+        <text x="180" y="22" font-size="11" fill="#475569">Red Danger (#DC2626)</text>
+      </g>
+
+      <text x="16" y="200" font-size="11" font-weight="700" fill="#002060">Touch-Target Standard:</text>
+      <text x="16" y="218" font-size="10.5" fill="#334155">Min height 42px on mobile to guarantee easy tapping without miss-clicks.</text>
+    </g>
+
+    <!-- Component 2: Form Inputs -->
+    <g transform="translate(444, 56)">
+      <rect width="400" height="350" rx="4" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="16" y="28" font-size="13" font-weight="800" fill="#002060">Form Fields &amp; Input Validation</text>
+
+      <g transform="translate(16, 44)">
+        <text x="0" y="12" font-size="11" font-weight="600" fill="#334155">Standard Text Input</text>
+        <rect y="18" width="368" height="36" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+        <text x="12" y="41" font-size="11" fill="#94A3B8">Enter 12-digit Learner Reference Number...</text>
+      </g>
+
+      <g transform="translate(16, 114)">
+        <text x="0" y="12" font-size="11" font-weight="600" fill="#DC2626">Validation Error State</text>
+        <rect y="18" width="368" height="36" rx="4" fill="#FEF2F2" stroke="#DC2626"/>
+        <text x="12" y="41" font-size="11" fill="#DC2626">LRN must contain exactly 12 digits</text>
+      </g>
+
+      <text x="16" y="190" font-size="11" font-weight="700" fill="#002060">Focus Feedback:</text>
+      <text x="16" y="208" font-size="10.5" fill="#334155">Focus ring: 2px solid #002060 with 2px offset; prevents losing cursor position.</text>
+    </g>
+
+    <!-- Component 3: Status Badges -->
+    <g transform="translate(864, 56)">
+      <rect width="400" height="350" rx="4" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="16" y="28" font-size="13" font-weight="800" fill="#002060">Status Badges &amp; Indicators</text>
+
+      <g transform="translate(16, 44)">
+        <rect width="110" height="26" rx="4" fill="#DCFCE7" stroke="#86EFAC"/>
+        <text x="55" y="17" font-size="10.5" font-weight="700" fill="#14532D" text-anchor="middle">APPROVED</text>
+
+        <rect x="130" y="0" width="110" height="26" rx="4" fill="#FEF3C7" stroke="#FDE68A"/>
+        <text x="185" y="17" font-size="10.5" font-weight="700" fill="#92400E" text-anchor="middle">REVIEW</text>
+
+        <rect x="245" y="0" width="120" height="26" rx="4" fill="#FEE2E2" stroke="#FCA5A5"/>
+        <text x="305" y="17" font-size="10.5" font-weight="700" fill="#991B1B" text-anchor="middle">RESUBMIT</text>
+      </g>
+
+      <text x="16" y="100" font-size="11" font-weight="700" fill="#002060">Quota Capacity Progress Bar:</text>
+      <rect x="16" y="112" width="368" height="18" rx="4" fill="#E2E8F0"/>
+      <rect x="16" y="112" width="294" height="18" rx="4" fill="#F59E0B"/>
+      <text x="24" y="125" font-size="10" font-weight="800" fill="#FFFFFF">32 / 40 Enrolled (80%)</text>
+    </g>
+
+    <!-- Component 4: High-Density Data Tables -->
+    <g transform="translate(1284, 56)">
+      <rect width="390" height="350" rx="4" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="16" y="28" font-size="13" font-weight="800" fill="#002060">Data Tables &amp; Split Modals</text>
+
+      <g transform="translate(16, 44)">
+        <rect width="358" height="24" fill="#002060" rx="2"/>
+        <text x="10" y="16" font-size="10" font-weight="800" fill="#FFFFFF">LRN</text>
+        <text x="110" y="16" font-size="10" font-weight="800" fill="#FFFFFF">NAME</text>
+        <text x="260" y="16" font-size="10" font-weight="800" fill="#FFFFFF">STATUS</text>
+
+        <rect y="26" width="358" height="22" fill="#FFFFFF"/>
+        <text x="10" y="41" font-size="9.5" fill="#334155">100345091234</text>
+        <text x="110" y="41" font-size="9.5" fill="#0F172A">Dela Cruz, Juan</text>
+        <text x="260" y="41" font-size="9.5" font-weight="700" fill="#059669">Approved</text>
+
+        <rect y="50" width="358" height="22" fill="#F8FAFC"/>
+        <text x="10" y="65" font-size="9.5" fill="#334155">100345091235</text>
+        <text x="110" y="65" font-size="9.5" fill="#0F172A">Isnag, Maria</text>
+        <text x="260" y="65" font-size="9.5" font-weight="700" fill="#D97706">Pending</text>
+      </g>
+
+      <text x="16" y="150" font-size="11" font-weight="700" fill="#002060">Document Pan &amp; Zoom:</text>
+      <text x="16" y="168" font-size="10.5" fill="#334155">Split modal allows registrar to inspect PSA scan at 200% zoom without leaving queue.</text>
+    </g>
+  </g>
+
+  
+  <!-- Institutional Footer -->
+  <rect x="50" y="2330" width="1700" height="44" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="74" y="2357" font-size="12" font-weight="800" fill="#002060">DUMAL-NEXT</text>
+  <text x="175" y="2357" font-size="12" fill="#64748B">Basic Education Online Admission &amp; Academic Resource Management System</text>
+  <text x="900" y="2357" font-size="11.5" fill="#475569" text-anchor="middle">Proponents: Lozano, Digap, Julian, Magdaong, Tumpap | MMSU CCIS Department of Information Technology</text>
+  <text x="1720" y="2357" font-size="11.5" font-weight="700" fill="#002060" text-anchor="end">DUMAL-NEXT-DOC-04  |  Design System Specification</text>
+
+</svg>

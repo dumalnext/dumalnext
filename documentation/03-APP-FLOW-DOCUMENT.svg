@@ -1,0 +1,272 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2400" viewBox="0 0 1800 2400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow-subtle" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#002060" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-card" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#002060" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arr-navy" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#002060"/>
+    </marker>
+  </defs>
+
+  <rect width="1800" height="2400" fill="#F8FAFC"/>
+  
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="1800" height="8" fill="#002060"/>
+  <rect x="0" y="8" width="1800" height="4" fill="#F59E0B"/>
+
+  <!-- Official Header Banner -->
+  <rect x="50" y="32" width="1700" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" filter="url(#shadow-subtle)"/>
+  <rect x="50" y="32" width="8" height="96" fill="#002060" rx="2"/>
+  
+  <text x="80" y="62" font-size="12" font-weight="700" fill="#64748B" letter-spacing="1.5">REPUBLIC OF THE PHILIPPINES  |  DEPARTMENT OF EDUCATION  |  REGION I  |  SDO ILOCOS NORTE</text>
+  <text x="80" y="92" font-size="24" font-weight="900" fill="#002060" letter-spacing="0.5">03: APPLICATION FLOW DOCUMENT (AFD)</text>
+  <text x="80" y="114" font-size="13" font-weight="600" fill="#475569">Page-by-Page Navigation Architecture, Triggers &amp;amp; State Transitions</text>
+
+  <g transform="translate(1480, 56)">
+    <rect x="0" y="0" width="240" height="48" rx="6" fill="#002060"/>
+    <rect x="0" y="0" width="240" height="3" fill="#F59E0B" rx="1"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">APPLICATION FLOW</text>
+    <text x="120" y="40" font-size="10" font-weight="600" fill="#FDE68A" text-anchor="middle">DepEd School ID: 300017</text>
+  </g>
+
+
+  <!-- SECTION 1: GLOBAL ROUTING & AUTH FLOW -->
+  <g transform="translate(50, 148)">
+    <rect width="1700" height="290" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1. GLOBAL ROUTING GATEWAY &amp; AUTHENTICATION FLOW</text>
+
+    <!-- Flow Diagram Node 1 -->
+    <g transform="translate(40, 60)">
+      <rect width="320" height="84" rx="6" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+      <text x="160" y="32" font-size="13" font-weight="800" fill="#312E81" text-anchor="middle">Visitor Enters Portal (/)</text>
+      <text x="160" y="52" font-size="11" fill="#475569" text-anchor="middle">Hero Banner, School Year Badge,</text>
+      <text x="160" y="68" font-size="11" fill="#475569" text-anchor="middle">Guidance Videos, Sticky Auth Card</text>
+    </g>
+
+    <line x1="360" y1="102" x2="410" y2="102" stroke="#002060" stroke-width="2" marker-end="url(#arr-navy)"/>
+
+    <!-- Flow Diagram Node 2 -->
+    <g transform="translate(420, 60)">
+      <rect width="360" height="84" rx="6" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+      <text x="180" y="32" font-size="13" font-weight="800" fill="#0F172A" text-anchor="middle">Authentication Selection</text>
+      <text x="180" y="52" font-size="11" fill="#475569" text-anchor="middle">Sign In (Email + Password)</text>
+      <text x="180" y="68" font-size="11" fill="#475569" text-anchor="middle">Register (Legal Name matching PSA + Gmail)</text>
+    </g>
+
+    <line x1="780" y1="102" x2="830" y2="102" stroke="#002060" stroke-width="2" marker-end="url(#arr-navy)"/>
+
+    <!-- Flow Diagram Node 3 -->
+    <g transform="translate(840, 60)">
+      <rect width="380" height="84" rx="6" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.5"/>
+      <text x="190" y="32" font-size="13" font-weight="800" fill="#92400E" text-anchor="middle">6-Digit Email OTP Verification</text>
+      <text x="190" y="52" font-size="11" fill="#78350F" text-anchor="middle">Segmented inputs with auto-focus progression</text>
+      <text x="190" y="68" font-size="11" fill="#78350F" text-anchor="middle">60-second cooldown timer prevents spam</text>
+    </g>
+
+    <line x1="1220" y1="102" x2="1270" y2="102" stroke="#002060" stroke-width="2" marker-end="url(#arr-navy)"/>
+
+    <!-- Flow Diagram Node 4 -->
+    <g transform="translate(1280, 60)">
+      <rect width="370" height="84" rx="6" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="1.5"/>
+      <text x="185" y="32" font-size="13" font-weight="800" fill="#14532D" text-anchor="middle">Role-Based Redirection</text>
+      <text x="185" y="52" font-size="11" fill="#166534" text-anchor="middle">Student (/enroll or /track) | Faculty (/schedule)</text>
+      <text x="185" y="68" font-size="11" fill="#166534" text-anchor="middle">Admin (/adjudication) | IT Support (/calendar)</text>
+    </g>
+
+    <text x="40" y="180" font-size="12" font-weight="700" fill="#002060">Session Recovery &amp; State Persistence:</text>
+    <text x="40" y="200" font-size="11.5" fill="#334155">• Authenticated learners who close the browser can resume their drafted application immediately upon signing in.</text>
+    <text x="40" y="220" font-size="11.5" fill="#334155">• Continuing learners with verified past records are automatically offered a 1-click expedited re-enrollment card.</text>
+    <text x="40" y="240" font-size="11.5" fill="#334155">• If the registrar closes the intake window globally, all enrollment forms cleanly redirect to an official announcement banner.</text>
+  </g>
+
+  <!-- SECTION 2: 4-PORTAL DETAILED PAGE WORKFLOWS -->
+  <g transform="translate(50, 456)">
+    <!-- PORTAL 1: STUDENT ADMISSION -->
+    <g transform="translate(0, 0)">
+      <rect width="410" height="1840" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#EEF2FF"/>
+      <rect y="36" width="410" height="6" fill="#EEF2FF"/>
+      <rect width="6" height="42" fill="#4338CA" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#312E81">STUDENT WORKFLOW (/)</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">Page 1: Portal Landing &amp; Auth (/)</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• User opens landing page.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Clicks "Sign In" or "Create Account".</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Enters credentials &gt; OTP modal opens.</text>
+        <text x="0" y="66" font-size="11" fill="#334155">• Enters 6-digit code &gt; Account activated.</text>
+
+        <line x1="0" y1="82" x2="374" y2="82" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="102" font-size="12" font-weight="800" fill="#002060">Page 2: 5-Step Stepper (/enroll)</text>
+        <text x="0" y="120" font-size="11" font-weight="700" fill="#1E293B">Step 1: Classification</text>
+        <text x="10" y="136" font-size="10.5" fill="#475569">Choose Grade 7-12, applicant type, prior school.</text>
+        <text x="10" y="152" font-size="10.5" fill="#2563EB">&gt; Click Proceed &gt; Autosaves draft to LocalStorage.</text>
+
+        <text x="0" y="174" font-size="11" font-weight="700" fill="#1E293B">Step 2: Learner Profile</text>
+        <text x="10" y="190" font-size="10.5" fill="#475569">Enter 12-digit LRN, PSA cert no., DOB, age.</text>
+        <text x="10" y="206" font-size="10.5" fill="#475569">Toggle Isnag community &amp; 4Ps ID validation.</text>
+        <text x="10" y="222" font-size="10.5" fill="#2563EB">&gt; Click Proceed &gt; Zod demographic validation.</text>
+
+        <text x="0" y="244" font-size="11" font-weight="700" fill="#1E293B">Step 3: Family Background</text>
+        <text x="10" y="260" font-size="10.5" fill="#475569">Parents' legal names &amp; emergency phone contact.</text>
+        <text x="10" y="276" font-size="10.5" fill="#2563EB">&gt; Click Proceed &gt; Advances to curriculum.</text>
+
+        <text x="0" y="298" font-size="11" font-weight="700" fill="#1E293B">Step 4: Curriculum &amp; Modality</text>
+        <text x="10" y="314" font-size="10.5" fill="#475569">JHS Regular/SPS; SHS Track &amp; Strand selection.</text>
+        <text x="10" y="330" font-size="10.5" fill="#475569">Select Face-to-Face or Blended modality.</text>
+
+        <text x="0" y="352" font-size="11" font-weight="700" fill="#1E293B">Step 5: Document Upload &amp; Submit</text>
+        <text x="10" y="368" font-size="10.5" fill="#475569">Upload PSA Birth Cert &amp; Form 138 report card.</text>
+        <text x="10" y="384" font-size="10.5" fill="#059669">&gt; In-browser Canvas scales image &lt; 350KB.</text>
+        <text x="10" y="400" font-size="10.5" fill="#475569">Sign DepEd data privacy agreement.</text>
+        <text x="10" y="416" font-size="10.5" fill="#2563EB">&gt; Click Submit &gt; Status set to 'submitted'.</text>
+
+        <line x1="0" y1="434" x2="374" y2="434" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="454" font-size="12" font-weight="800" fill="#002060">Page 3: Application Tracker (/track)</text>
+        <text x="0" y="472" font-size="11" fill="#334155">• Real-time visual timeline across 4 states.</text>
+        <text x="0" y="488" font-size="11" fill="#DC2626">• If 'Revision': Review remarks &amp; re-upload modal.</text>
+        <text x="0" y="504" font-size="11" font-weight="700" fill="#059669">• If 'Approved': Download official PDF Enrollment Slip.</text>
+
+        <line x1="0" y1="522" x2="374" y2="522" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="542" font-size="12" font-weight="800" fill="#002060">Page 4: Section &amp; Schedule (/section)</text>
+        <text x="0" y="560" font-size="11" fill="#334155">• View assigned section name &amp; classroom number.</text>
+        <text x="0" y="576" font-size="11" fill="#334155">• Class adviser contact &amp; classmate directory.</text>
+        <text x="0" y="592" font-size="11" fill="#334155">• Weekly class subject schedule grid.</text>
+      </g>
+    </g>
+
+    <!-- PORTAL 2: TEACHER WORKSTATION -->
+    <g transform="translate(430, 0)">
+      <rect width="410" height="1840" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#FEF3C7"/>
+      <rect y="36" width="410" height="6" fill="#FEF3C7"/>
+      <rect width="6" height="42" fill="#D97706" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#92400E">TEACHER WORKFLOW (/)</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">Page 1: Faculty Dashboard (/)</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• Teacher authenticates via institutional login.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Overview card shows today's scheduled classes.</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Active class banner with room countdown timer.</text>
+        <text x="0" y="66" font-size="11" fill="#334155">• Total student count &amp; teaching unit sum.</text>
+
+        <line x1="0" y1="82" x2="374" y2="82" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="102" font-size="12" font-weight="800" fill="#002060">Page 2: Teaching Schedule (/schedule)</text>
+        <text x="0" y="120" font-size="11" fill="#334155">• 5-Day weekly matrix (Monday to Friday).</text>
+        <text x="0" y="136" font-size="11" fill="#334155">• Time slots: 7:00 AM to 5:00 PM.</text>
+        <text x="0" y="152" font-size="11" fill="#334155">• Click any slot to view detailed subject syllabus,</text>
+        <text x="10" y="168" font-size="10.5" fill="#475569">learning competencies, room, and section size.</text>
+        <text x="0" y="186" font-size="11" font-weight="700" fill="#2563EB">• Click "Print Timetable" &gt; Generates PDF sheet.</text>
+
+        <line x1="0" y1="204" x2="374" y2="204" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="224" font-size="12" font-weight="800" fill="#002060">Page 3: Advisory Roster (/roster)</text>
+        <text x="0" y="242" font-size="11" fill="#334155">• If assigned as Class Adviser: Section roster opens.</text>
+        <text x="0" y="258" font-size="11" fill="#334155">• Displays student list with LRN, Isnag, 4Ps tags.</text>
+        <text x="0" y="274" font-size="11" fill="#334155">• Click student row &gt; Opens demographic dossier</text>
+        <text x="10" y="290" font-size="10.5" fill="#475569">and emergency contact phone dialer.</text>
+        <text x="0" y="308" font-size="11" font-weight="700" fill="#059669">• Click "Export SF-2 Attendance Sheet" &gt; Downloads file.</text>
+
+        <line x1="0" y1="326" x2="374" y2="326" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="346" font-size="12" font-weight="800" fill="#002060">Page 4: Faculty Profile (/profile)</text>
+        <text x="0" y="364" font-size="11" fill="#334155">• View DepEd plantilla item &amp; employee number.</text>
+        <text x="0" y="380" font-size="11" fill="#334155">• Major academic specialization and advisory class.</text>
+      </g>
+    </g>
+
+    <!-- PORTAL 3: REGISTRAR & ADMIN CONSOLE -->
+    <g transform="translate(860, 0)">
+      <rect width="410" height="1840" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#DCFCE7"/>
+      <rect y="36" width="410" height="6" fill="#DCFCE7"/>
+      <rect width="6" height="42" fill="#16A34A" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#14532D">ADMIN &amp; REGISTRAR (/)</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">Page 1: Adjudication Queue (/adjudication)</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• Real-time table of pending applications.</text>
+        <text x="0" y="34" font-size="11" fill="#334155">• Filter by Grade, Track, Status, School Year.</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Search by Learner Reference Number or Name.</text>
+        <text x="0" y="66" font-size="11" font-weight="700" fill="#2563EB">• Click any student row &gt; Opens Split-Screen Modal:</text>
+        <text x="10" y="84" font-size="10.5" fill="#475569">Left: Learner demographics &amp; 4Ps/Isnag data.</text>
+        <text x="10" y="100" font-size="10.5" fill="#475569">Right: High-res pan-and-zoom PSA / Form 138.</text>
+        <text x="0" y="120" font-size="11" font-weight="700" fill="#059669">• Action 1: "Approve Application"</text>
+        <text x="10" y="136" font-size="10.5" fill="#475569">Triggers section assignment selector dropdown.</text>
+        <text x="10" y="152" font-size="10.5" fill="#475569">Updates database status to 'approved'.</text>
+        <text x="0" y="172" font-size="11" font-weight="700" fill="#DC2626">• Action 2: "Return for Revision"</text>
+        <text x="10" y="188" font-size="10.5" fill="#475569">Select deficiency checkboxes (Blurred PSA, etc.).</text>
+        <text x="10" y="204" font-size="10.5" fill="#475569">Enter custom guidance remarks for the student.</text>
+        <text x="10" y="220" font-size="10.5" fill="#475569">Sets status to 'resubmission_required'.</text>
+
+        <line x1="0" y1="238" x2="374" y2="238" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="258" font-size="12" font-weight="800" fill="#002060">Page 2: Section Quota Console (/sections)</text>
+        <text x="0" y="276" font-size="11" font-weight="700" fill="#DC2626">• 40-Student Capacity Enforcement.</text>
+        <text x="0" y="292" font-size="11" fill="#334155">• Progress bars visually display occupancy per section.</text>
+        <text x="0" y="308" font-size="11" fill="#334155">• Create sections, assign advisers and grade levels.</text>
+        <text x="0" y="324" font-size="11" font-weight="700" fill="#059669">• One-click export of DepEd SF-1 Masterlists.</text>
+
+        <line x1="0" y1="342" x2="374" y2="342" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="362" font-size="12" font-weight="800" fill="#002060">Page 3: Deconfliction (/scheduling)</text>
+        <text x="0" y="380" font-size="11" fill="#334155">• Interactive master schedule creation modal.</text>
+        <text x="0" y="396" font-size="11" font-weight="700" fill="#D97706">• 3-Way clash detection runs immediately.</text>
+        <text x="0" y="412" font-size="11" fill="#334155">• Red popover warning blocks double-booking.</text>
+
+        <line x1="0" y1="430" x2="374" y2="430" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="450" font-size="12" font-weight="800" fill="#002060">Page 4: Control Room (/control-room)</text>
+        <text x="0" y="468" font-size="11" fill="#334155">• Intake window toggle (Open / Closed).</text>
+        <text x="0" y="484" font-size="11" fill="#334155">• Post emergency alert notices on student landing.</text>
+      </g>
+    </g>
+
+    <!-- PORTAL 4: IT SUPPORT -->
+    <g transform="translate(1290, 0)">
+      <rect width="410" height="1840" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-card)"/>
+      <rect width="410" height="42" rx="8" fill="#F3E8FF"/>
+      <rect y="36" width="410" height="6" fill="#F3E8FF"/>
+      <rect width="6" height="42" fill="#7E22CE" rx="1"/>
+      <text x="18" y="26" font-size="13" font-weight="800" fill="#581C87">IT SUPPORT WORKFLOW (/)</text>
+
+      <g transform="translate(18, 60)">
+        <text x="0" y="0" font-size="12" font-weight="800" fill="#002060">Page 1: Academic Calendar (/calendar)</text>
+        <text x="0" y="18" font-size="11" fill="#334155">• IT administrator accesses calendar manager.</text>
+        <text x="0" y="34" font-size="11" font-weight="700" fill="#7E22CE">• Dynamic Term Engine (Zero Hardcoded Dates).</text>
+        <text x="0" y="50" font-size="11" fill="#334155">• Create School Year (e.g. 2026-2027) &amp; Quarters.</text>
+        <text x="0" y="66" font-size="11" fill="#334155">• Set Intake Start &amp; End Dates.</text>
+        <text x="0" y="82" font-size="11" font-weight="700" fill="#059669">• Click "Activate Term" &gt; Atomic RPC sets single</text>
+        <text x="10" y="98" font-size="10.5" fill="#475569">active term; deactivates previous term cleanly.</text>
+
+        <line x1="0" y1="116" x2="374" y2="116" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="136" font-size="12" font-weight="800" fill="#002060">Page 2: Facilities Registry (/facilities)</text>
+        <text x="0" y="154" font-size="11" fill="#334155">• Register campus buildings &amp; floor layouts.</text>
+        <text x="0" y="170" font-size="11" fill="#334155">• Add classrooms with seating capacities.</text>
+        <text x="0" y="186" font-size="11" fill="#334155">• Designate specialized science / TVL computer labs.</text>
+
+        <line x1="0" y1="204" x2="374" y2="204" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="224" font-size="12" font-weight="800" fill="#002060">Page 3: User &amp; Role Auditor (/users)</text>
+        <text x="0" y="242" font-size="11" fill="#334155">• View global user table across all 4 roles.</text>
+        <text x="0" y="258" font-size="11" fill="#334155">• Click "Invite Staff Member" &gt; Enters email &amp; role.</text>
+        <text x="0" y="274" font-size="11" fill="#334155">• System dispatches secure invitation token.</text>
+        <text x="0" y="290" font-size="11" fill="#334155">• Role switcher with privilege escalation locks.</text>
+
+        <line x1="0" y1="308" x2="374" y2="308" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="0" y="328" font-size="12" font-weight="800" fill="#002060">Page 4: Diagnostics (/diagnostics)</text>
+        <text x="0" y="346" font-size="11" fill="#334155">• Live database ping &amp; connection telemetry.</text>
+        <text x="0" y="362" font-size="11" fill="#334155">• System security audit log with timestamps.</text>
+        <text x="0" y="378" font-size="11" fill="#334155">• PSA storage bucket quota utilization bar.</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- Institutional Footer -->
+  <rect x="50" y="2330" width="1700" height="44" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="74" y="2357" font-size="12" font-weight="800" fill="#002060">DUMAL-NEXT</text>
+  <text x="175" y="2357" font-size="12" fill="#64748B">Basic Education Online Admission &amp; Academic Resource Management System</text>
+  <text x="900" y="2357" font-size="11.5" fill="#475569" text-anchor="middle">Proponents: Lozano, Digap, Julian, Magdaong, Tumpap | MMSU CCIS Department of Information Technology</text>
+  <text x="1720" y="2357" font-size="11.5" font-weight="700" fill="#002060" text-anchor="end">DUMAL-NEXT-DOC-03  |  App Flow Specification</text>
+
+</svg>

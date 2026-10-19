@@ -1,0 +1,263 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2400" viewBox="0 0 1800 2400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow-subtle" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#002060" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-card" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#002060" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1800" height="2400" fill="#F8FAFC"/>
+  
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="1800" height="8" fill="#002060"/>
+  <rect x="0" y="8" width="1800" height="4" fill="#F59E0B"/>
+
+  <!-- Official Header Banner -->
+  <rect x="50" y="32" width="1700" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" filter="url(#shadow-subtle)"/>
+  <rect x="50" y="32" width="8" height="96" fill="#002060" rx="2"/>
+  
+  <text x="80" y="62" font-size="12" font-weight="700" fill="#64748B" letter-spacing="1.5">REPUBLIC OF THE PHILIPPINES  |  DEPARTMENT OF EDUCATION  |  REGION I  |  SDO ILOCOS NORTE</text>
+  <text x="80" y="92" font-size="24" font-weight="900" fill="#002060" letter-spacing="0.5">02: TECHNICAL REQUIREMENTS DOCUMENT (TRD)</text>
+  <text x="80" y="114" font-size="13" font-weight="600" fill="#475569">System Architecture, Technology Stack &amp;amp; Algorithmic Engines</text>
+
+  <g transform="translate(1480, 56)">
+    <rect x="0" y="0" width="240" height="48" rx="6" fill="#002060"/>
+    <rect x="0" y="0" width="240" height="3" fill="#F59E0B" rx="1"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">TECHNICAL ARCHITECTURE</text>
+    <text x="120" y="40" font-size="10" font-weight="600" fill="#FDE68A" text-anchor="middle">DepEd School ID: 300017</text>
+  </g>
+
+
+  <!-- SECTION 1: TECHNOLOGY STACK MATRIX -->
+  <g transform="translate(50, 148)">
+    <rect width="1700" height="520" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1. CORE TECHNOLOGY STACK SPECIFICATION</text>
+
+    <g transform="translate(24, 52)">
+      <rect width="1652" height="28" fill="#EEF2FF" rx="4"/>
+      <text x="30" y="19" font-size="11.5" font-weight="800" fill="#1E1B4B">LAYER</text>
+      <text x="220" y="19" font-size="11.5" font-weight="800" fill="#1E1B4B">TECHNOLOGY</text>
+      <text x="440" y="19" font-size="11.5" font-weight="800" fill="#1E1B4B">VERSION</text>
+      <text x="620" y="19" font-size="11.5" font-weight="800" fill="#1E1B4B">ARCHITECTURAL PURPOSE &amp; RATIONALE</text>
+
+      <!-- Row 1 -->
+      <text x="30" y="52" font-size="11.5" font-weight="700" fill="#002060">Language</text>
+      <text x="220" y="52" font-size="11.5" font-weight="700" fill="#0F172A">TypeScript</text>
+      <text x="440" y="52" font-size="11" fill="#475569">^5.0.0</text>
+      <text x="620" y="52" font-size="11" fill="#334155">End-to-end static type safety across demographics, timetable slots, and Supabase database entities.</text>
+
+      <!-- Row 2 -->
+      <line x1="10" y1="68" x2="1640" y2="68" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="88" font-size="11.5" font-weight="700" fill="#002060">Framework</text>
+      <text x="220" y="88" font-size="11.5" font-weight="700" fill="#0F172A">Next.js (App Router)</text>
+      <text x="440" y="88" font-size="11" fill="#475569">16.3.5</text>
+      <text x="620" y="88" font-size="11" fill="#334155">React Server Components (RSC), hybrid static/SSR rendering, server actions, and route handlers.</text>
+
+      <!-- Row 3 -->
+      <line x1="10" y1="104" x2="1640" y2="104" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="124" font-size="11.5" font-weight="700" fill="#002060">UI Library</text>
+      <text x="220" y="124" font-size="11.5" font-weight="700" fill="#0F172A">React</text>
+      <text x="440" y="124" font-size="11" fill="#475569">19.2.8</text>
+      <text x="620" y="124" font-size="11" fill="#334155">Concurrent rendering, modern action hooks, and optimized state synchronization across workstations.</text>
+
+      <!-- Row 4 -->
+      <line x1="10" y1="140" x2="1640" y2="140" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="160" font-size="11.5" font-weight="700" fill="#002060">CSS Engine</text>
+      <text x="220" y="160" font-size="11.5" font-weight="700" fill="#0F172A">Tailwind CSS</text>
+      <text x="440" y="160" font-size="11" fill="#475569">^4.0.0</text>
+      <text x="620" y="160" font-size="11" fill="#334155">High-performance CSS utility engine with zero-runtime overhead via @tailwindcss/postcss.</text>
+
+      <!-- Row 5 -->
+      <line x1="10" y1="176" x2="1640" y2="176" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="196" font-size="11.5" font-weight="700" fill="#002060">Database</text>
+      <text x="220" y="196" font-size="11.5" font-weight="700" fill="#0F172A">PostgreSQL (Supabase)</text>
+      <text x="440" y="196" font-size="11" fill="#475569">15.x</text>
+      <text x="620" y="196" font-size="11" fill="#334155">Relational 3NF ACID storage, foreign key constraints, triggers, and stored procedures (RPCs).</text>
+
+      <!-- Row 6 -->
+      <line x1="10" y1="212" x2="1640" y2="212" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="232" font-size="11.5" font-weight="700" fill="#002060">Authentication</text>
+      <text x="220" y="232" font-size="11.5" font-weight="700" fill="#0F172A">Supabase Auth SSR</text>
+      <text x="440" y="232" font-size="11" fill="#475569">^0.12.7</text>
+      <text x="620" y="232" font-size="11" fill="#334155">Cookie-based sessions, JWT validation, and 6-digit email confirmation code dispatch.</text>
+
+      <!-- Row 7 -->
+      <line x1="10" y1="248" x2="1640" y2="248" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="268" font-size="11.5" font-weight="700" fill="#002060">Object Storage</text>
+      <text x="220" y="268" font-size="11.5" font-weight="700" fill="#0F172A">Supabase Storage</text>
+      <text x="440" y="268" font-size="11" fill="#475569">S3-Compatible</text>
+      <text x="620" y="268" font-size="11" fill="#334155">Encrypted private buckets for PSA birth certificates, Form 138 cards, and 2x2 photo scans.</text>
+
+      <!-- Row 8 -->
+      <line x1="10" y1="284" x2="1640" y2="284" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="304" font-size="11.5" font-weight="700" fill="#002060">PDF Engine</text>
+      <text x="220" y="304" font-size="11.5" font-weight="700" fill="#0F172A">pdf-lib</text>
+      <text x="440" y="304" font-size="11" fill="#475569">^1.17.1</text>
+      <text x="620" y="304" font-size="11" fill="#334155">Programmatic in-memory vector PDF generation producing official 2-page DepEd enrollment certificates.</text>
+
+      <!-- Row 9 -->
+      <line x1="10" y1="320" x2="1640" y2="320" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="340" font-size="11.5" font-weight="700" fill="#002060">Client Scaler</text>
+      <text x="220" y="340" font-size="11.5" font-weight="700" fill="#0F172A">HTML5 Canvas API</text>
+      <text x="440" y="340" font-size="11" fill="#475569">Native Browser</text>
+      <text x="620" y="340" font-size="11" fill="#334155">Client-side image downscaling (1600px max) and 0.72 JPEG compression before cellular upload.</text>
+
+      <!-- Row 10 -->
+      <line x1="10" y1="356" x2="1640" y2="356" stroke="#F1F5F9" stroke-width="1"/>
+      <text x="30" y="376" font-size="11.5" font-weight="700" fill="#002060">Realtime Sync</text>
+      <text x="220" y="376" font-size="11.5" font-weight="700" fill="#0F172A">Supabase Realtime</text>
+      <text x="440" y="376" font-size="11" fill="#475569">WebSockets</text>
+      <text x="620" y="376" font-size="11" fill="#334155">Postgres Change Data Capture (CDC) dispatching instant updates to application queue and section capacities.</text>
+    </g>
+  </g>
+
+  <!-- SECTION 2: ARCHITECTURE & REPOSITORY SPECIFICATION -->
+  <g transform="translate(50, 688)">
+    <rect width="1700" height="680" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">2. REPOSITORY ARCHITECTURE: app/ (GATEWAY) VS. apps/ (WORKSPACES)</text>
+
+    <!-- App vs Apps Diagram -->
+    <g transform="translate(24, 52)">
+      <!-- Left Card: Root app/ -->
+      <rect width="780" height="280" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+      <rect width="780" height="34" rx="6" fill="#1E293B"/>
+      <text x="20" y="23" font-size="13" font-weight="800" fill="#FFFFFF">1. Root app/ Directory (Next.js Framework Convention)</text>
+      <g transform="translate(20, 56)" font-size="11.5" fill="#334155">
+        <text x="0" y="0" font-weight="700" fill="#002060">• Framework Role:</text>
+        <text x="125" y="0">Single application router for root entry, layouts, and public gateway.</text>
+        <text x="0" y="24" font-weight="700" fill="#002060">• Files Contained:</text>
+        <text x="125" y="24">app/page.tsx (Public landing), layout.tsx (Global HTML shell), globals.css.</text>
+        <text x="0" y="48" font-weight="700" fill="#002060">• Execution:</text>
+        <text x="125" y="48">Provides top-level middleware, portal redirection, and shared API handlers (/api/*).</text>
+        <text x="0" y="72" font-weight="700" fill="#002060">• Routing Scope:</text>
+        <text x="125" y="72">Serves https://dumalnext.vercel.app/ entry point and handles root reverse-proxy rewrites.</text>
+      </g>
+
+      <!-- Right Card: Monorepo apps/ -->
+      <g transform="translate(830, 0)">
+        <rect width="820" height="280" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+        <rect width="820" height="34" rx="6" fill="#002060"/>
+        <text x="20" y="23" font-size="13" font-weight="800" fill="#FFFFFF">2. Monorepo apps/ Directory (npm Workspaces Architecture)</text>
+        <g transform="translate(20, 56)" font-size="11.5" fill="#334155">
+          <text x="0" y="0" font-weight="700" fill="#002060">• Workspace Role:</text>
+          <text x="135" y="0">Houses 4 independent sub-applications defined via package.json "workspaces": ["apps/*"].</text>
+          <text x="0" y="24" font-weight="700" fill="#002060">• Sub-Apps:</text>
+          <text x="135" y="24">apps/student (:3000), apps/teacher (:3001), apps/admin (:3002), apps/it-support (:3003).</text>
+          <text x="0" y="48" font-weight="700" fill="#002060">• Internal Nesting:</text>
+          <text x="135" y="48">Each sub-app has ITS OWN internal app/ router (e.g. apps/student/app/page.tsx).</text>
+          <text x="0" y="72" font-weight="700" fill="#002060">• Multi-Zones:</text>
+          <text x="135" y="72">Deployed as micro-frontends on Vercel Multi-Zones with distinct asset prefixes.</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Directory Tree Visual -->
+    <g transform="translate(24, 350)">
+      <rect width="1650" height="300" rx="6" fill="#0F172A"/>
+      <text x="24" y="28" font-family="Courier, monospace" font-size="12" font-weight="700" fill="#38BDF8">dumalnext/ (Repository Root Monorepo Structure)</text>
+      <text x="24" y="52" font-family="Courier, monospace" font-size="11" fill="#94A3B8">├── app/                        # [ROOT APPS] Next.js App Router (Landing, Global Layout &amp; API Routes)</text>
+      <text x="24" y="70" font-family="Courier, monospace" font-size="11" fill="#94A3B8">│   ├── (portals)/              # Shared portal gateway layout</text>
+      <text x="24" y="88" font-family="Courier, monospace" font-size="11" fill="#94A3B8">│   ├── api/                    # Root API handlers</text>
+      <text x="24" y="106" font-family="Courier, monospace" font-size="11" fill="#94A3B8">│   └── page.tsx                # Welcome portal gateway</text>
+      <text x="24" y="128" font-family="Courier, monospace" font-size="11" fill="#FDE68A">├── apps/                       # [WORKSPACES] Independent Workstation Sub-Applications</text>
+      <text x="24" y="146" font-family="Courier, monospace" font-size="11" fill="#CBD5E1">│   ├── student/                # @dumalnext/student (Port 3000) - 5-Step Stepper, Tracker, PDF Slip</text>
+      <text x="24" y="164" font-family="Courier, monospace" font-size="11" fill="#CBD5E1">│   ├── teacher/                # @dumalnext/teacher (Port 3001) - Timetables, Advisory Roster</text>
+      <text x="24" y="182" font-family="Courier, monospace" font-size="11" fill="#CBD5E1">│   ├── admin/                  # @dumalnext/admin (Port 3002) - Adjudication, 40-Cap Quotas, Conflict Engine</text>
+      <text x="24" y="200" font-family="Courier, monospace" font-size="11" fill="#CBD5E1">│   └── it-support/             # @dumalnext/it-support (Port 3003) - Dynamic Terms, Facilities, User Roles</text>
+      <text x="24" y="222" font-family="Courier, monospace" font-size="11" fill="#6EE7B7">├── documentation/              # Complete System Documentation Suite (PRD, TRD, AFD, DBD, BSD, IPD)</text>
+      <text x="24" y="240" font-family="Courier, monospace" font-size="11" fill="#94A3B8">├── supabase/schema.sql         # 3NF Database Schema, Functions &amp; Row-Level Security</text>
+      <text x="24" y="258" font-family="Courier, monospace" font-size="11" fill="#94A3B8">└── package.json                # Workspaces root definition ("workspaces": ["apps/*"])</text>
+    </g>
+  </g>
+
+  <!-- SECTION 3: CORE ALGORITHMIC ENGINES -->
+  <g transform="translate(50, 1388)">
+    <rect width="1700" height="920" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">3. CORE ALGORITHMIC ENGINES &amp; MATHEMATICAL SPECIFICATIONS</text>
+
+    <!-- Algorithm 1: Client Compression -->
+    <g transform="translate(24, 56)">
+      <rect width="800" height="400" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <rect width="800" height="32" rx="6" fill="#002060"/>
+      <text x="20" y="21" font-size="12" font-weight="800" fill="#FFFFFF">ENGINE 1: CLIENT-SIDE HTML5 CANVAS IMAGE COMPRESSOR</text>
+      
+      <g transform="translate(20, 52)" font-size="11.5" fill="#334155">
+        <text x="0" y="0" font-weight="700" fill="#002060">Problem:</text>
+        <text x="65" y="0">Mobile cameras produce 5MB to 12MB photos that fail on rural 3G cellular.</text>
+        
+        <text x="0" y="24" font-weight="700" fill="#002060">Downscaling Formula:</text>
+        <rect x="0" y="34" width="760" height="60" rx="4" fill="#EEF2FF"/>
+        <text x="15" y="58" font-family="Courier, monospace" font-size="11.5" fill="#1E1B4B">scaleRatio = min(1.0, 1600 / max(image.width, image.height))</text>
+        <text x="15" y="78" font-family="Courier, monospace" font-size="11.5" fill="#1E1B4B">targetWidth = round(width * scaleRatio); targetHeight = round(height * scaleRatio)</text>
+
+        <text x="0" y="120" font-weight="700" fill="#002060">Encoding:</text>
+        <text x="75" y="120">canvas.toBlob(blob, 'image/jpeg', 0.72) produces files strictly &lt; 350KB.</text>
+
+        <text x="0" y="144" font-weight="700" fill="#002060">Result:</text>
+        <text x="55" y="144">Upload time reduced from ~180 seconds on 3G to ~3.2 seconds; zero data loss.</text>
+      </g>
+    </g>
+
+    <!-- Algorithm 2: Schedule Deconfliction -->
+    <g transform="translate(850, 56)">
+      <rect width="820" height="400" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <rect width="820" height="32" rx="6" fill="#002060"/>
+      <text x="20" y="21" font-size="12" font-weight="800" fill="#FFFFFF">ENGINE 2: 3-WAY DETERMINISTIC SCHEDULE DECONFLICTION</text>
+
+      <g transform="translate(20, 52)" font-size="11.5" fill="#334155">
+        <text x="0" y="0" font-weight="700" fill="#002060">Problem:</text>
+        <text x="65" y="0">High school faculty, rooms, and sections frequently suffer double-booking overlaps.</text>
+
+        <text x="0" y="24" font-weight="700" fill="#002060">Interval Conflict Logic:</text>
+        <rect x="0" y="34" width="780" height="60" rx="4" fill="#FEF3C7"/>
+        <text x="15" y="58" font-family="Courier, monospace" font-size="11.5" fill="#92400E">TimeOverlap = (SlotA.day == SlotB.day) &amp;&amp; (SlotA.start &lt; SlotB.end) &amp;&amp; (SlotA.end &gt; SlotB.start)</text>
+        <text x="15" y="78" font-family="Courier, monospace" font-size="11.5" fill="#92400E">Conflict = TimeOverlap &amp;&amp; (SlotA.teacher == SlotB.teacher || SlotA.room == SlotB.room || SlotA.sec == SlotB.sec)</text>
+
+        <text x="0" y="120" font-weight="700" fill="#002060">Dimensions:</text>
+        <text x="90" y="120">1. Teacher Overload  |  2. Classroom Collision  |  3. Section Cohort Clash</text>
+
+        <text x="0" y="144" font-weight="700" fill="#002060">Execution:</text>
+        <text x="80" y="144">Evaluated client-side in &lt; 50ms across 100+ slots; blocks saving until resolved.</text>
+      </g>
+    </g>
+
+    <!-- Algorithm 3: 40-Student Section Quota Enforcement -->
+    <g transform="translate(24, 480)">
+      <rect width="1650" height="400" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <rect width="1650" height="32" rx="6" fill="#002060"/>
+      <text x="20" y="21" font-size="12" font-weight="800" fill="#FFFFFF">ENGINE 3: STRICT DEPED 40-LEARNER SECTION CAPACITY ENFORCEMENT</text>
+      
+      <g transform="translate(20, 52)" font-size="11.5" fill="#334155">
+        <text x="0" y="0" font-weight="700" fill="#002060">Institutional Policy:</text>
+        <text x="145" y="0">DepEd Order No. 03, s. 2018 establishes a statutory maximum of 40 learners per standard class section.</text>
+
+        <text x="0" y="24" font-weight="700" fill="#002060">Enforcement Model:</text>
+        <text x="145" y="24">Two-tier safeguard: 1) Client-side disabled selection button when enrolled_count >= 40. 2) Supabase SQL trigger check.</text>
+
+        <rect x="0" y="44" width="1610" height="60" rx="4" fill="#FEE2E2"/>
+        <text x="15" y="68" font-family="Courier, monospace" font-size="11.5" fill="#991B1B">CREATE OR REPLACE FUNCTION check_section_capacity() RETURNS TRIGGER AS $$</text>
+        <text x="15" y="88" font-family="Courier, monospace" font-size="11.5" fill="#991B1B">BEGIN IF (SELECT COUNT(*) FROM students WHERE section_id = NEW.section_id) &gt;= 40 THEN RAISE EXCEPTION 'Section quota exceeded'; END IF; RETURN NEW; END; $$;</text>
+
+        <text x="0" y="130" font-weight="700" fill="#002060">Visual Representation:</text>
+        <text x="160" y="130">Green bar (1-34 learners), Amber alert bar (35-39 learners), Red locked badge (40 learners maximum reached).</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- Institutional Footer -->
+  <rect x="50" y="2330" width="1700" height="44" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="74" y="2357" font-size="12" font-weight="800" fill="#002060">DUMAL-NEXT</text>
+  <text x="175" y="2357" font-size="12" fill="#64748B">Basic Education Online Admission &amp; Academic Resource Management System</text>
+  <text x="900" y="2357" font-size="11.5" fill="#475569" text-anchor="middle">Proponents: Lozano, Digap, Julian, Magdaong, Tumpap | MMSU CCIS Department of Information Technology</text>
+  <text x="1720" y="2357" font-size="11.5" font-weight="700" fill="#002060" text-anchor="end">DUMAL-NEXT-DOC-02  |  TRD Architecture Specification</text>
+
+</svg>

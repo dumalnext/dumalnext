@@ -1,0 +1,584 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2400" viewBox="0 0 1800 2400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow-subtle" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#002060" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-card" x="-2%" y="-2%" width="104%" height="106%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#002060" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1800" height="2400" fill="#F8FAFC"/>
+  
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="1800" height="8" fill="#002060"/>
+  <rect x="0" y="8" width="1800" height="4" fill="#F59E0B"/>
+
+  <!-- Official Header Banner -->
+  <rect x="50" y="32" width="1700" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" filter="url(#shadow-subtle)"/>
+  <rect x="50" y="32" width="8" height="96" fill="#002060" rx="2"/>
+  
+  <text x="80" y="62" font-size="12" font-weight="700" fill="#64748B" letter-spacing="1.5">REPUBLIC OF THE PHILIPPINES  |  DEPARTMENT OF EDUCATION  |  REGION I  |  SDO ILOCOS NORTE</text>
+  <text x="80" y="92" font-size="24" font-weight="900" fill="#002060" letter-spacing="0.5">05: BACKEND SCHEMA &amp; ACCESS CONTROL SPECIFICATION (BSD)</text>
+  <text x="80" y="114" font-size="13" font-weight="600" fill="#475569">Dumalneg National High School - PostgreSQL 15.x 3NF Schema &amp; Row-Level Security</text>
+
+  <g transform="translate(1480, 56)">
+    <rect x="0" y="0" width="240" height="48" rx="6" fill="#002060"/>
+    <rect x="0" y="0" width="240" height="3" fill="#F59E0B" rx="1"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">PRODUCTION SPEC</text>
+    <text x="120" y="40" font-size="10" font-weight="600" fill="#FDE68A" text-anchor="middle">DepEd School ID: 300017</text>
+  </g>
+
+
+  <!-- SECTION 1: ARCHITECTURE & ENTITY RELATIONSHIPS -->
+  <g transform="translate(50, 148)">
+    <rect width="1700" height="340" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1. RELATIONAL DATABASE ARCHITECTURE &amp; OBJECT INHERITANCE MODEL (3NF)</text>
+
+    <!-- Overview Text -->
+    <text x="24" y="66" font-size="12" fill="#334155">
+      The backend is engineered on PostgreSQL 15 via Supabase Cloud. It utilizes an <tspan font-weight="700">Object-Relational Inheritance Model</tspan> where the base <tspan font-family="monospace" fill="#002060">users</tspan> table handles authentication &amp; RBAC,
+    </text>
+    <text x="24" y="84" font-size="12" fill="#334155">
+      while specialized sub-tables manage role-specific domains. Schedule slots, sections, and intake cycles are dynamically bound to active <tspan font-family="monospace" fill="#002060">academic_terms</tspan> (zero hardcoded dates).
+    </text>
+
+    <!-- Visual ER / Class Diagram -->
+    <g transform="translate(24, 102)">
+      <!-- Base Users Table -->
+      <rect x="680" y="0" width="300" height="64" rx="6" fill="#002060" stroke="#003399" stroke-width="1.5"/>
+      <text x="830" y="26" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">users (Base Authentication)</text>
+      <text x="830" y="46" font-size="11" fill="#FDE68A" text-anchor="middle">PK: id (UUID) | user_id | email | user_role</text>
+
+      <!-- Connectors from users to roles -->
+      <path d="M 830 64 L 830 84 L 140 84 L 140 104" fill="none" stroke="#002060" stroke-width="1.8"/>
+      <path d="M 830 84 L 600 84 L 600 104" fill="none" stroke="#002060" stroke-width="1.8"/>
+      <path d="M 830 84 L 1060 84 L 1060 104" fill="none" stroke="#002060" stroke-width="1.8"/>
+      <path d="M 830 84 L 1510 84 L 1510 104" fill="none" stroke="#002060" stroke-width="1.8"/>
+
+      <!-- Role Table 1: students -->
+      <rect x="0" y="104" width="280" height="58" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="140" y="128" font-size="13" font-weight="800" fill="#1E3A8A" text-anchor="middle">students (Learner Profile)</text>
+      <text x="140" y="146" font-size="10.5" fill="#475569" text-anchor="middle">FK: user_id | LRN, PSA, Isnag, 4Ps, SNEd</text>
+
+      <!-- Role Table 2: teachers -->
+      <rect x="460" y="104" width="280" height="58" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="600" y="128" font-size="13" font-weight="800" fill="#1E3A8A" text-anchor="middle">teachers (Faculty Registry)</text>
+      <text x="600" y="146" font-size="10.5" fill="#475569" text-anchor="middle">FK: user_id | dept, specialization, advisory</text>
+
+      <!-- Role Table 3: school_administrators -->
+      <rect x="920" y="104" width="280" height="58" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="1060" y="128" font-size="13" font-weight="800" fill="#1E3A8A" text-anchor="middle">school_administrators (Registrar)</text>
+      <text x="1060" y="146" font-size="10.5" fill="#475569" text-anchor="middle">FK: user_id | Adjudication, section quotas</text>
+
+      <!-- Role Table 4: it_support_staff -->
+      <rect x="1370" y="104" width="280" height="58" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="1510" y="128" font-size="13" font-weight="800" fill="#1E3A8A" text-anchor="middle">it_support_staff (SysAdmin)</text>
+      <text x="1510" y="146" font-size="10.5" fill="#475569" text-anchor="middle">FK: user_id | Dynamic calendar, telemetry</text>
+
+      <!-- Connectors to Downstream Tables -->
+      <path d="M 140 162 L 140 182" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+      <path d="M 600 162 L 600 182" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+      <path d="M 1060 162 L 1060 182" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+      <path d="M 1510 162 L 1510 182" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+
+      <!-- Downstream 1: applications & documents -->
+      <rect x="0" y="182" width="280" height="42" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.2"/>
+      <text x="140" y="202" font-size="11.5" font-weight="800" fill="#92400E" text-anchor="middle">enrollment_applications</text>
+      <text x="140" y="216" font-size="10" fill="#78350F" text-anchor="middle">status (Pending, Approved, Revision) | S3 docs</text>
+
+      <!-- Downstream 2: schedule_slots -->
+      <rect x="460" y="182" width="280" height="42" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.2"/>
+      <text x="600" y="202" font-size="11.5" font-weight="800" fill="#92400E" text-anchor="middle">schedule_slots (Timetable Matrix)</text>
+      <text x="600" y="216" font-size="10" fill="#78350F" text-anchor="middle">FK: section_id, subject_id, room_id, teacher_id</text>
+
+      <!-- Downstream 3: sections -->
+      <rect x="920" y="182" width="280" height="42" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.2"/>
+      <text x="1060" y="202" font-size="11.5" font-weight="800" fill="#92400E" text-anchor="middle">sections (DepEd 40-Cap Quota)</text>
+      <text x="1060" y="216" font-size="10" fill="#78350F" text-anchor="middle">current_count / max_capacity (40) | adviser_id</text>
+
+      <!-- Downstream 4: academic_terms -->
+      <rect x="1370" y="182" width="280" height="42" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.2"/>
+      <text x="1510" y="202" font-size="11.5" font-weight="800" fill="#92400E" text-anchor="middle">academic_terms (Dynamic Trisem)</text>
+      <text x="1510" y="216" font-size="10" fill="#78350F" text-anchor="middle">school_year, term_number, is_active, window</text>
+    </g>
+  </g>
+
+  <!-- SECTION 2: 3NF RELATIONAL TABLE SCHEMAS -->
+  <g transform="translate(50, 506)">
+    <rect width="1700" height="850" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">2. CORE RELATIONAL TABLE DEFINITIONS &amp; DATA DICTIONARY</text>
+
+    <!-- Grid of 6 Tables (2 columns x 3 rows) -->
+    
+    <!-- Table 1: users -->
+    <g transform="translate(24, 52)">
+      <rect width="810" height="240" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="810" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="810" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">TABLE: public.users (Central Authentication &amp; RBAC Directory)</text>
+      
+      <!-- Table Header -->
+      <rect y="28" width="810" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">COLUMN</text>
+      <text x="210" y="43" font-size="11" font-weight="700" fill="#475569">DATA TYPE</text>
+      <text x="360" y="43" font-size="11" font-weight="700" fill="#475569">CONSTRAINTS</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">DESCRIPTION</text>
+
+      <!-- Rows -->
+      <text x="14" y="70" font-size="11" font-weight="700" fill="#002060">id</text>
+      <text x="210" y="70" font-size="11" fill="#0F172A">UUID</text>
+      <text x="360" y="70" font-size="10.5" fill="#B45309">PRIMARY KEY, gen_random_uuid()</text>
+      <text x="560" y="70" font-size="10.5" fill="#334155">Immutable user identity UUID</text>
+
+      <line x1="14" y1="80" x2="796" y2="80" stroke="#E2E8F0"/>
+      <text x="14" y="98" font-size="11" font-weight="700" fill="#002060">user_id</text>
+      <text x="210" y="98" font-size="11" fill="#0F172A">VARCHAR(20)</text>
+      <text x="360" y="98" font-size="10.5" fill="#047857">UNIQUE, NOT NULL</text>
+      <text x="560" y="98" font-size="10.5" fill="#334155">DNHS ID (e.g. DNHS-ADM-001)</text>
+
+      <line x1="14" y1="108" x2="796" y2="108" stroke="#E2E8F0"/>
+      <text x="14" y="126" font-size="11" font-weight="700" fill="#002060">email</text>
+      <text x="210" y="126" font-size="11" fill="#0F172A">VARCHAR(100)</text>
+      <text x="360" y="126" font-size="10.5" fill="#047857">UNIQUE, NOT NULL</text>
+      <text x="560" y="126" font-size="10.5" fill="#334155">Single account per email enforced</text>
+
+      <line x1="14" y1="136" x2="796" y2="136" stroke="#E2E8F0"/>
+      <text x="14" y="154" font-size="11" font-weight="700" fill="#002060">user_role</text>
+      <text x="210" y="154" font-size="11" fill="#0F172A">VARCHAR(20)</text>
+      <text x="360" y="154" font-size="10.5" fill="#B45309">CHECK (student, teacher, admin, it)</text>
+      <text x="560" y="154" font-size="10.5" fill="#334155">RBAC role for routing &amp; permissions</text>
+
+      <line x1="14" y1="164" x2="796" y2="164" stroke="#E2E8F0"/>
+      <text x="14" y="182" font-size="11" font-weight="700" fill="#002060">created_at / updated_at</text>
+      <text x="210" y="182" font-size="11" fill="#0F172A">TIMESTAMPTZ</text>
+      <text x="360" y="182" font-size="10.5" fill="#64748B">NOT NULL, DEFAULT NOW()</text>
+      <text x="560" y="182" font-size="10.5" fill="#334155">Audit creation &amp; modification stamps</text>
+    </g>
+
+    <!-- Table 2: students -->
+    <g transform="translate(866, 52)">
+      <rect width="810" height="240" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="810" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="810" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">TABLE: public.students (DepEd Basic Education Learner Profile)</text>
+
+      <!-- Table Header -->
+      <rect y="28" width="810" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">COLUMN</text>
+      <text x="210" y="43" font-size="11" font-weight="700" fill="#475569">DATA TYPE</text>
+      <text x="360" y="43" font-size="11" font-weight="700" fill="#475569">CONSTRAINTS</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">DESCRIPTION</text>
+
+      <!-- Rows -->
+      <text x="14" y="70" font-size="11" font-weight="700" fill="#002060">user_id / student_id</text>
+      <text x="210" y="70" font-size="11" fill="#0F172A">UUID / VARCHAR</text>
+      <text x="360" y="70" font-size="10.5" fill="#B45309">FK (users.id) CASCADE, UNIQUE</text>
+      <text x="560" y="70" font-size="10.5" fill="#334155">Associated auth record &amp; institutional ID</text>
+
+      <line x1="14" y1="80" x2="796" y2="80" stroke="#E2E8F0"/>
+      <text x="14" y="98" font-size="11" font-weight="700" fill="#002060">lrn / psa_birth_cert_no</text>
+      <text x="210" y="98" font-size="11" fill="#0F172A">VARCHAR(12 / 50)</text>
+      <text x="360" y="98" font-size="10.5" fill="#047857">UNIQUE (LRN), NULLABLE</text>
+      <text x="560" y="98" font-size="10.5" fill="#334155">12-digit DepEd LRN &amp; PSA Registry #</text>
+
+      <line x1="14" y1="108" x2="796" y2="108" stroke="#E2E8F0"/>
+      <text x="14" y="126" font-size="11" font-weight="700" fill="#002060">first / middle / last_name</text>
+      <text x="210" y="126" font-size="11" fill="#0F172A">VARCHAR(50)</text>
+      <text x="360" y="126" font-size="10.5" fill="#047857">NOT NULL (First/Last)</text>
+      <text x="560" y="126" font-size="10.5" fill="#334155">Learner legal demographic name fields</text>
+
+      <line x1="14" y1="136" x2="796" y2="136" stroke="#E2E8F0"/>
+      <text x="14" y="154" font-size="11" font-weight="700" fill="#002060">is_ip_community / is_4ps</text>
+      <text x="210" y="154" font-size="11" fill="#0F172A">BOOLEAN / VARCHAR</text>
+      <text x="360" y="154" font-size="10.5" fill="#64748B">DEFAULT FALSE, NULLABLE</text>
+      <text x="560" y="154" font-size="10.5" fill="#334155">Isnag community flag &amp; 16-digit 4Ps ID</text>
+
+      <line x1="14" y1="164" x2="796" y2="164" stroke="#E2E8F0"/>
+      <text x="14" y="182" font-size="11" font-weight="700" fill="#002060">current_barangay</text>
+      <text x="210" y="182" font-size="11" fill="#0F172A">VARCHAR(100)</text>
+      <text x="360" y="182" font-size="10.5" fill="#047857">NOT NULL, DEFAULT Cabaritan</text>
+      <text x="560" y="182" font-size="10.5" fill="#334155">Dumalneg: Cabaritan, Kalabakan, Quibel, San Isidro</text>
+    </g>
+
+    <!-- Table 3: enrollment_applications -->
+    <g transform="translate(24, 314)">
+      <rect width="810" height="240" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="810" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="810" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">TABLE: public.enrollment_applications (Intake Lifecycle &amp; Adjudication)</text>
+
+      <!-- Table Header -->
+      <rect y="28" width="810" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">COLUMN</text>
+      <text x="210" y="43" font-size="11" font-weight="700" fill="#475569">DATA TYPE</text>
+      <text x="360" y="43" font-size="11" font-weight="700" fill="#475569">CONSTRAINTS</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">DESCRIPTION</text>
+
+      <!-- Rows -->
+      <text x="14" y="70" font-size="11" font-weight="700" fill="#002060">application_id</text>
+      <text x="210" y="70" font-size="11" fill="#0F172A">VARCHAR(30)</text>
+      <text x="360" y="70" font-size="10.5" fill="#047857">UNIQUE, NOT NULL</text>
+      <text x="560" y="70" font-size="10.5" fill="#334155">Human-readable reference (APP-2026-001)</text>
+
+      <line x1="14" y1="80" x2="796" y2="80" stroke="#E2E8F0"/>
+      <text x="14" y="98" font-size="11" font-weight="700" fill="#002060">student_id / school_year</text>
+      <text x="210" y="98" font-size="11" fill="#0F172A">UUID / VARCHAR(20)</text>
+      <text x="360" y="98" font-size="10.5" fill="#B45309">FK (students.id) CASCADE</text>
+      <text x="560" y="98" font-size="10.5" fill="#334155">Applicant student &amp; target academic cycle</text>
+
+      <line x1="14" y1="108" x2="796" y2="108" stroke="#E2E8F0"/>
+      <text x="14" y="126" font-size="11" font-weight="700" fill="#002060">status</text>
+      <text x="210" y="126" font-size="11" fill="#0F172A">VARCHAR(20)</text>
+      <text x="360" y="126" font-size="10.5" fill="#B45309">CHECK (Pending, Approved, Revision)</text>
+      <text x="560" y="126" font-size="10.5" fill="#334155">Adjudication lifecycle state</text>
+
+      <line x1="14" y1="136" x2="796" y2="136" stroke="#E2E8F0"/>
+      <text x="14" y="154" font-size="11" font-weight="700" fill="#002060">admin_feedback</text>
+      <text x="210" y="154" font-size="11" fill="#0F172A">TEXT</text>
+      <text x="360" y="154" font-size="10.5" fill="#64748B">NULLABLE</text>
+      <text x="560" y="154" font-size="10.5" fill="#334155">Registrar remarks &amp; resubmission notes</text>
+
+      <line x1="14" y1="164" x2="796" y2="164" stroke="#E2E8F0"/>
+      <text x="14" y="182" font-size="11" font-weight="700" fill="#002060">selected_electives</text>
+      <text x="210" y="182" font-size="11" fill="#0F172A">JSONB</text>
+      <text x="360" y="182" font-size="10.5" fill="#64748B">DEFAULT '[]'::jsonb</text>
+      <text x="560" y="182" font-size="10.5" fill="#334155">Trimester electives &amp; snapshot form fields</text>
+    </g>
+
+    <!-- Table 4: sections -->
+    <g transform="translate(866, 314)">
+      <rect width="810" height="240" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="810" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="810" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">TABLE: public.sections (DepEd Class Capacity &amp; Section Allocations)</text>
+
+      <!-- Table Header -->
+      <rect y="28" width="810" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">COLUMN</text>
+      <text x="210" y="43" font-size="11" font-weight="700" fill="#475569">DATA TYPE</text>
+      <text x="360" y="43" font-size="11" font-weight="700" fill="#475569">CONSTRAINTS</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">DESCRIPTION</text>
+
+      <!-- Rows -->
+      <text x="14" y="70" font-size="11" font-weight="700" fill="#002060">section_name / grade_level</text>
+      <text x="210" y="70" font-size="11" fill="#0F172A">VARCHAR(50) / INT</text>
+      <text x="360" y="70" font-size="10.5" fill="#B45309">CHECK (grade_level BETWEEN 7 AND 12)</text>
+      <text x="560" y="70" font-size="10.5" fill="#334155">Section label (e.g. Grade 7 - Mabini)</text>
+
+      <line x1="14" y1="80" x2="796" y2="80" stroke="#E2E8F0"/>
+      <text x="14" y="98" font-size="11" font-weight="700" fill="#002060">max_capacity</text>
+      <text x="210" y="98" font-size="11" fill="#0F172A">INT</text>
+      <text x="360" y="98" font-size="10.5" fill="#DC2626">NOT NULL, DEFAULT 40</text>
+      <text x="560" y="98" font-size="10.5" fill="#334155">Hard DepEd 40-learner class size ceiling</text>
+
+      <line x1="14" y1="108" x2="796" y2="108" stroke="#E2E8F0"/>
+      <text x="14" y="126" font-size="11" font-weight="700" fill="#002060">current_count</text>
+      <text x="210" y="126" font-size="11" fill="#0F172A">INT</text>
+      <text x="360" y="126" font-size="10.5" fill="#047857">NOT NULL, DEFAULT 0</text>
+      <text x="560" y="126" font-size="10.5" fill="#334155">Live enrolled student tally (auto-incremented)</text>
+
+      <line x1="14" y1="136" x2="796" y2="136" stroke="#E2E8F0"/>
+      <text x="14" y="154" font-size="11" font-weight="700" fill="#002060">adviser_id / room_id</text>
+      <text x="210" y="154" font-size="11" fill="#0F172A">UUID</text>
+      <text x="360" y="154" font-size="10.5" fill="#B45309">FK (teachers.id), FK (classrooms.id)</text>
+      <text x="560" y="154" font-size="10.5" fill="#334155">Assigned faculty adviser &amp; home room</text>
+
+      <line x1="14" y1="164" x2="796" y2="164" stroke="#E2E8F0"/>
+      <text x="14" y="182" font-size="11" font-weight="700" fill="#002060">strand</text>
+      <text x="210" y="182" font-size="11" fill="#0F172A">VARCHAR(50)</text>
+      <text x="360" y="182" font-size="10.5" fill="#64748B">NULLABLE</text>
+      <text x="560" y="182" font-size="10.5" fill="#334155">STEM, HUMSS, TVL-ICT (for Grades 11-12)</text>
+    </g>
+
+    <!-- Table 5: schedule_slots -->
+    <g transform="translate(24, 576)">
+      <rect width="810" height="240" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="810" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="810" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">TABLE: public.schedule_slots (Academic Timetable &amp; Deconfliction Target)</text>
+
+      <!-- Table Header -->
+      <rect y="28" width="810" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">COLUMN</text>
+      <text x="210" y="43" font-size="11" font-weight="700" fill="#475569">DATA TYPE</text>
+      <text x="360" y="43" font-size="11" font-weight="700" fill="#475569">CONSTRAINTS</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">DESCRIPTION</text>
+
+      <!-- Rows -->
+      <text x="14" y="70" font-size="11" font-weight="700" fill="#002060">section_id / subject_id</text>
+      <text x="210" y="70" font-size="11" fill="#0F172A">UUID</text>
+      <text x="360" y="70" font-size="10.5" fill="#B45309">FK (sections.id), FK (subjects.id)</text>
+      <text x="560" y="70" font-size="10.5" fill="#334155">Assigned cohort &amp; learning area</text>
+
+      <line x1="14" y1="80" x2="796" y2="80" stroke="#E2E8F0"/>
+      <text x="14" y="98" font-size="11" font-weight="700" fill="#002060">teacher_id / classroom_id</text>
+      <text x="210" y="98" font-size="11" fill="#0F172A">UUID</text>
+      <text x="360" y="98" font-size="10.5" fill="#B45309">FK (teachers.id), FK (classrooms.id)</text>
+      <text x="560" y="98" font-size="10.5" fill="#334155">Assigned faculty instructor &amp; room</text>
+
+      <line x1="14" y1="108" x2="796" y2="108" stroke="#E2E8F0"/>
+      <text x="14" y="126" font-size="11" font-weight="700" fill="#002060">day_of_week</text>
+      <text x="210" y="126" font-size="11" fill="#0F172A">VARCHAR(15)</text>
+      <text x="360" y="126" font-size="10.5" fill="#B45309">CHECK (Mon, Tue, Wed, Thu, Fri)</text>
+      <text x="560" y="126" font-size="10.5" fill="#334155">Class day of the week</text>
+
+      <line x1="14" y1="136" x2="796" y2="136" stroke="#E2E8F0"/>
+      <text x="14" y="154" font-size="11" font-weight="700" fill="#002060">start_time / end_time</text>
+      <text x="210" y="154" font-size="11" fill="#0F172A">TIME</text>
+      <text x="360" y="154" font-size="10.5" fill="#047857">NOT NULL, CHECK (start &lt; end)</text>
+      <text x="560" y="154" font-size="10.5" fill="#334155">Class interval (07:00 to 17:00 range)</text>
+
+      <line x1="14" y1="164" x2="796" y2="164" stroke="#E2E8F0"/>
+      <text x="14" y="182" font-size="11" font-weight="700" fill="#002060">Deconfliction Rule</text>
+      <text x="210" y="182" font-size="11" fill="#DC2626">Client Guard</text>
+      <text x="360" y="182" font-size="10.5" fill="#DC2626">3-Way Collision Check</text>
+      <text x="560" y="182" font-size="10.5" fill="#334155">Prevents Teacher, Room &amp; Section overlaps</text>
+    </g>
+
+    <!-- Table 6: academic_terms -->
+    <g transform="translate(866, 576)">
+      <rect width="810" height="240" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect width="810" height="28" rx="6" fill="#1E293B"/>
+      <rect y="22" width="810" height="6" fill="#1E293B"/>
+      <text x="14" y="19" font-size="12" font-weight="800" fill="#FFFFFF">TABLE: public.academic_terms (Dynamic Academic Calendar &amp; Trimester State)</text>
+
+      <!-- Table Header -->
+      <rect y="28" width="810" height="22" fill="#E2E8F0"/>
+      <text x="14" y="43" font-size="11" font-weight="700" fill="#475569">COLUMN</text>
+      <text x="210" y="43" font-size="11" font-weight="700" fill="#475569">DATA TYPE</text>
+      <text x="360" y="43" font-size="11" font-weight="700" fill="#475569">CONSTRAINTS</text>
+      <text x="560" y="43" font-size="11" font-weight="700" fill="#475569">DESCRIPTION</text>
+
+      <!-- Rows -->
+      <text x="14" y="70" font-size="11" font-weight="700" fill="#002060">school_year / term_name</text>
+      <text x="210" y="70" font-size="11" fill="#0F172A">VARCHAR(20) / VARCHAR(50)</text>
+      <text x="360" y="70" font-size="10.5" fill="#047857">NOT NULL</text>
+      <text x="560" y="70" font-size="10.5" fill="#334155">e.g. '2026-2027', 'Trimester 1'</text>
+
+      <line x1="14" y1="80" x2="796" y2="80" stroke="#E2E8F0"/>
+      <text x="14" y="98" font-size="11" font-weight="700" fill="#002060">term_number</text>
+      <text x="210" y="98" font-size="11" fill="#0F172A">INT</text>
+      <text x="360" y="98" font-size="10.5" fill="#B45309">CHECK (term_number IN (1, 2, 3))</text>
+      <text x="560" y="98" font-size="10.5" fill="#334155">Trimester index (1, 2, or 3)</text>
+
+      <line x1="14" y1="108" x2="796" y2="108" stroke="#E2E8F0"/>
+      <text x="14" y="126" font-size="11" font-weight="700" fill="#002060">is_active</text>
+      <text x="210" y="126" font-size="11" fill="#0F172A">BOOLEAN</text>
+      <text x="360" y="126" font-size="10.5" fill="#047857">NOT NULL, DEFAULT FALSE</text>
+      <text x="560" y="126" font-size="10.5" fill="#334155">Exactly one active term enforced across system</text>
+
+      <line x1="14" y1="136" x2="796" y2="136" stroke="#E2E8F0"/>
+      <text x="14" y="154" font-size="11" font-weight="700" fill="#002060">is_enrollment_open</text>
+      <text x="210" y="154" font-size="11" fill="#0F172A">BOOLEAN</text>
+      <text x="360" y="154" font-size="10.5" fill="#047857">NOT NULL, DEFAULT TRUE</text>
+      <text x="560" y="154" font-size="10.5" fill="#334155">Global intake gate switch</text>
+
+      <line x1="14" y1="164" x2="796" y2="164" stroke="#E2E8F0"/>
+      <text x="14" y="182" font-size="11" font-weight="700" fill="#002060">start_date / end_date</text>
+      <text x="210" y="182" font-size="11" fill="#0F172A">DATE</text>
+      <text x="360" y="182" font-size="10.5" fill="#047857">NOT NULL</text>
+      <text x="560" y="182" font-size="10.5" fill="#334155">Dynamic term start &amp; concluding dates</text>
+    </g>
+  </g>
+
+  <!-- SECTION 3: KERNEL-LEVEL ROW-LEVEL SECURITY (RLS) MATRIX -->
+  <g transform="translate(50, 1376)">
+    <rect width="1700" height="490" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">3. KERNEL ROW-LEVEL SECURITY (RLS) &amp; ROLE ACCESS CONTROL MATRIX</text>
+
+    <!-- Matrix Table -->
+    <g transform="translate(24, 52)">
+      <!-- Table Header -->
+      <rect width="1652" height="36" rx="4" fill="#0F172A"/>
+      <text x="20" y="23" font-size="12" font-weight="800" fill="#FFFFFF">TARGET TABLE</text>
+      <text x="260" y="23" font-size="12" font-weight="800" fill="#94A3B8">ANON / PUBLIC</text>
+      <text x="520" y="23" font-size="12" font-weight="800" fill="#60A5FA">STUDENT ROLE</text>
+      <text x="820" y="23" font-size="12" font-weight="800" fill="#34D399">TEACHER ROLE</text>
+      <text x="1120" y="23" font-size="12" font-weight="800" fill="#FBBF24">ADMIN / REGISTRAR</text>
+      <text x="1420" y="23" font-size="12" font-weight="800" fill="#F87171">IT SUPPORT</text>
+
+      <!-- Row 1: users -->
+      <g transform="translate(0, 44)">
+        <rect width="1652" height="40" fill="#F8FAFC"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">users</text>
+        <rect x="250" y="10" width="80" height="22" rx="4" fill="#FEE2E2"/><text x="290" y="25" font-size="10.5" font-weight="700" fill="#991B1B" text-anchor="middle">DENIED</text>
+        <rect x="510" y="10" width="140" height="22" rx="4" fill="#EFF6FF"/><text x="580" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read/Update Own</text>
+        <rect x="810" y="10" width="120" height="22" rx="4" fill="#EFF6FF"/><text x="870" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read Own Record</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#FEF3C7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#92400E" text-anchor="middle">Read All / Create Staff</text>
+        <rect x="1410" y="10" width="100" height="22" rx="4" fill="#DCFCE7"/><text x="1460" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD</text>
+      </g>
+
+      <!-- Row 2: students -->
+      <g transform="translate(0, 90)">
+        <rect width="1652" height="40" fill="#FFFFFF"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">students</text>
+        <rect x="250" y="10" width="80" height="22" rx="4" fill="#FEE2E2"/><text x="290" y="25" font-size="10.5" font-weight="700" fill="#991B1B" text-anchor="middle">DENIED</text>
+        <rect x="510" y="10" width="140" height="22" rx="4" fill="#EFF6FF"/><text x="580" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read/Update Own</text>
+        <rect x="810" y="10" width="160" height="22" rx="4" fill="#ECFDF5"/><text x="890" y="25" font-size="10.5" font-weight="700" fill="#065F46" text-anchor="middle">Read Advisory / Teaching</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#FEF3C7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#92400E" text-anchor="middle">Adjudication Full Read</text>
+        <rect x="1410" y="10" width="100" height="22" rx="4" fill="#F1F5F9"/><text x="1460" y="25" font-size="10.5" font-weight="700" fill="#475569" text-anchor="middle">AUDIT ONLY</text>
+      </g>
+
+      <!-- Row 3: enrollment_applications -->
+      <g transform="translate(0, 136)">
+        <rect width="1652" height="40" fill="#F8FAFC"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">enrollment_applications</text>
+        <rect x="250" y="10" width="80" height="22" rx="4" fill="#FEE2E2"/><text x="290" y="25" font-size="10.5" font-weight="700" fill="#991B1B" text-anchor="middle">DENIED</text>
+        <rect x="510" y="10" width="150" height="22" rx="4" fill="#EFF6FF"/><text x="585" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Create / Read / Draft</text>
+        <rect x="810" y="10" width="160" height="22" rx="4" fill="#ECFDF5"/><text x="890" y="25" font-size="10.5" font-weight="700" fill="#065F46" text-anchor="middle">Read Assigned Section</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#FEF3C7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#92400E" text-anchor="middle">Full Adjudication CRUD</text>
+        <rect x="1410" y="10" width="100" height="22" rx="4" fill="#F1F5F9"/><text x="1460" y="25" font-size="10.5" font-weight="700" fill="#475569" text-anchor="middle">AUDIT ONLY</text>
+      </g>
+
+      <!-- Row 4: sections -->
+      <g transform="translate(0, 182)">
+        <rect width="1652" height="40" fill="#FFFFFF"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">sections</text>
+        <rect x="250" y="10" width="100" height="22" rx="4" fill="#F1F5F9"/><text x="300" y="25" font-size="10.5" font-weight="700" fill="#475569" text-anchor="middle">READ ACTIVE</text>
+        <rect x="510" y="10" width="140" height="22" rx="4" fill="#EFF6FF"/><text x="580" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read Assigned Sec</text>
+        <rect x="810" y="10" width="140" height="22" rx="4" fill="#ECFDF5"/><text x="880" y="25" font-size="10.5" font-weight="700" fill="#065F46" text-anchor="middle">Read Advisory Sec</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#DCFCE7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD (40 Cap)</text>
+        <rect x="1410" y="10" width="100" height="22" rx="4" fill="#DCFCE7"/><text x="1460" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD</text>
+      </g>
+
+      <!-- Row 5: schedule_slots -->
+      <g transform="translate(0, 228)">
+        <rect width="1652" height="40" fill="#F8FAFC"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">schedule_slots</text>
+        <rect x="250" y="10" width="100" height="22" rx="4" fill="#F1F5F9"/><text x="300" y="25" font-size="10.5" font-weight="700" fill="#475569" text-anchor="middle">READ ACTIVE</text>
+        <rect x="510" y="10" width="140" height="22" rx="4" fill="#EFF6FF"/><text x="580" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read Section Roster</text>
+        <rect x="810" y="10" width="140" height="22" rx="4" fill="#ECFDF5"/><text x="880" y="25" font-size="10.5" font-weight="700" fill="#065F46" text-anchor="middle">Read Own Timetable</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#DCFCE7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD (Conflict)</text>
+        <rect x="1410" y="10" width="100" height="22" rx="4" fill="#DCFCE7"/><text x="1460" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD</text>
+      </g>
+
+      <!-- Row 6: academic_terms -->
+      <g transform="translate(0, 274)">
+        <rect width="1652" height="40" fill="#FFFFFF"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">academic_terms</text>
+        <rect x="250" y="10" width="100" height="22" rx="4" fill="#F1F5F9"/><text x="300" y="25" font-size="10.5" font-weight="700" fill="#475569" text-anchor="middle">READ ACTIVE</text>
+        <rect x="510" y="10" width="140" height="22" rx="4" fill="#EFF6FF"/><text x="580" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read Active Term</text>
+        <rect x="810" y="10" width="140" height="22" rx="4" fill="#ECFDF5"/><text x="880" y="25" font-size="10.5" font-weight="700" fill="#065F46" text-anchor="middle">Read Active Term</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#FEF3C7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#92400E" text-anchor="middle">Read Active Term</text>
+        <rect x="1410" y="10" width="120" height="22" rx="4" fill="#DCFCE7"/><text x="1470" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD (Switch)</text>
+      </g>
+
+      <!-- Row 7: classrooms & audit_logs -->
+      <g transform="translate(0, 320)">
+        <rect width="1652" height="40" fill="#F8FAFC"/>
+        <text x="20" y="25" font-size="12" font-weight="700" fill="#002060">classrooms &amp; facilities</text>
+        <rect x="250" y="10" width="80" height="22" rx="4" fill="#FEE2E2"/><text x="290" y="25" font-size="10.5" font-weight="700" fill="#991B1B" text-anchor="middle">DENIED</text>
+        <rect x="510" y="10" width="140" height="22" rx="4" fill="#EFF6FF"/><text x="580" y="25" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">Read Assigned Room</text>
+        <rect x="810" y="10" width="140" height="22" rx="4" fill="#ECFDF5"/><text x="880" y="25" font-size="10.5" font-weight="700" fill="#065F46" text-anchor="middle">Read Assigned Room</text>
+        <rect x="1110" y="10" width="150" height="22" rx="4" fill="#FEF3C7"/><text x="1185" y="25" font-size="10.5" font-weight="700" fill="#92400E" text-anchor="middle">Read All Facilities</text>
+        <rect x="1410" y="10" width="100" height="22" rx="4" fill="#DCFCE7"/><text x="1460" y="25" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">FULL CRUD</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 4: DOCUMENT STORAGE SECURITY & PRIVACY SPECIFICATION -->
+  <g transform="translate(50, 1884)">
+    <rect width="1700" height="428" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#shadow-subtle)"/>
+    <rect width="1700" height="38" rx="8" fill="#002060"/>
+    <rect y="30" width="1700" height="8" fill="#002060"/>
+    <text x="24" y="25" font-size="14" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">4. STORAGE SECURITY (ENROLLMENT-DOCUMENTS) &amp; RA 10173 DATA PRIVACY COMPLIANCE</text>
+
+    <!-- 3 Cards: Storage Architecture, Storage RLS Policy, Encryption & Retention -->
+    <g transform="translate(24, 52)">
+      <!-- Card 1: Bucket Config -->
+      <g transform="translate(0, 0)">
+        <rect width="520" height="350" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="520" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="520" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">STORAGE BUCKET INFRASTRUCTURE</text>
+
+        <text x="16" y="56" font-size="12" font-weight="700" fill="#002060">Target Bucket:</text>
+        <text x="16" y="74" font-size="11.5" font-family="monospace" fill="#047857">supabase.storage('enrollment-documents')</text>
+
+        <text x="16" y="104" font-size="12" font-weight="700" fill="#002060">Allowed File Formats:</text>
+        <text x="16" y="122" font-size="11.5" fill="#334155">image/jpeg, image/png, image/webp, application/pdf</text>
+
+        <text x="16" y="152" font-size="12" font-weight="700" fill="#002060">Maximum File Size Ceiling:</text>
+        <text x="16" y="170" font-size="11.5" fill="#334155">10 MB server ceiling (Enforced &lt; 350 KB client canvas)</text>
+
+        <text x="16" y="200" font-size="12" font-weight="700" fill="#002060">Folder Partitioning Architecture:</text>
+        <text x="16" y="218" font-size="11" font-family="monospace" fill="#002060">/{student_clean_id}/{docType}_{timestamp}.jpg</text>
+
+        <text x="16" y="250" font-size="12" font-weight="700" fill="#002060">Supported Document Types:</text>
+        <text x="16" y="268" font-size="11" fill="#334155">1. PSA Birth Certificate (psa)</text>
+        <text x="16" y="286" font-size="11" fill="#334155">2. DepEd Form 138 / Report Card (form138)</text>
+        <text x="16" y="304" font-size="11" fill="#334155">3. Certificate of Good Moral Character (good_moral)</text>
+        <text x="16" y="322" font-size="11" fill="#334155">4. 2x2 ID Photo with White Background (id_photo)</text>
+      </g>
+
+      <!-- Card 2: Storage RLS Policy -->
+      <g transform="translate(546, 0)">
+        <rect width="536" height="350" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="536" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="536" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">STORAGE ACCESS POLICIES (RLS)</text>
+
+        <text x="16" y="56" font-size="12" font-weight="700" fill="#002060">Upload Restriction (INSERT):</text>
+        <rect x="16" y="66" width="504" height="64" rx="4" fill="#0F172A"/>
+        <text x="24" y="86" font-size="9.5" font-family="monospace" fill="#38BDF8">CREATE POLICY "Learner folder upload"</text>
+        <text x="24" y="102" font-size="9.5" font-family="monospace" fill="#FDE68A">ON storage.objects FOR INSERT TO authenticated</text>
+        <text x="24" y="118" font-size="9.5" font-family="monospace" fill="#A7F3D0">WITH CHECK ((storage.foldername(name))[1] = auth.uid()::text);</text>
+
+        <text x="16" y="152" font-size="12" font-weight="700" fill="#002060">Read Restriction (SELECT):</text>
+        <rect x="16" y="162" width="504" height="64" rx="4" fill="#0F172A"/>
+        <text x="24" y="182" font-size="9.5" font-family="monospace" fill="#38BDF8">CREATE POLICY "Owner and Admin Read"</text>
+        <text x="24" y="198" font-size="9.5" font-family="monospace" fill="#FDE68A">ON storage.objects FOR SELECT TO authenticated</text>
+        <text x="24" y="214" font-size="9.5" font-family="monospace" fill="#A7F3D0">USING ((storage.foldername(name))[1] = auth.uid()::text OR is_admin());</text>
+
+        <text x="16" y="248" font-size="12" font-weight="700" fill="#002060">Public Anon Access:</text>
+        <text x="16" y="266" font-size="11.5" font-weight="700" fill="#DC2626">STRICTLY BLOCKED</text>
+        <text x="16" y="284" font-size="11" fill="#334155">No direct unauthenticated URLs permitted. Documents are signed.</text>
+
+        <text x="16" y="312" font-size="12" font-weight="700" fill="#002060">Ephemeral Signed URLs:</text>
+        <text x="16" y="330" font-size="11" fill="#334155">In-browser preview tokens expire automatically after <tspan font-weight="700">300 seconds</tspan>.</text>
+      </g>
+
+      <!-- Card 3: Privacy Compliance -->
+      <g transform="translate(1108, 0)">
+        <rect width="544" height="350" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect width="544" height="32" rx="6" fill="#1E293B"/>
+        <rect y="26" width="544" height="6" fill="#1E293B"/>
+        <text x="16" y="21" font-size="12" font-weight="800" fill="#FFFFFF">DATA PRIVACY ACT (RA 10173) COMPLIANCE</text>
+
+        <text x="16" y="56" font-size="12" font-weight="700" fill="#002060">Encryption at Rest:</text>
+        <text x="16" y="74" font-size="11.5" fill="#334155">All database volumes and file objects encrypted using <tspan font-weight="700">AES-256</tspan>.</text>
+
+        <text x="16" y="104" font-size="12" font-weight="700" fill="#002060">Transport Layer Security:</text>
+        <text x="16" y="122" font-size="11.5" fill="#334155">Strict <tspan font-weight="700">TLS 1.3</tspan> cipher suites across all client-to-Supabase streams.</text>
+
+        <text x="16" y="152" font-size="12" font-weight="700" fill="#002060">Minor &amp; Vulnerable Learner Safeguards:</text>
+        <text x="16" y="170" font-size="11" fill="#334155">Explicit parental consent collected at Step 5 of enrollment stepper.</text>
+        <text x="16" y="188" font-size="11" fill="#334155">Birth certificate &amp; 4Ps household identifiers isolated from public query.</text>
+
+        <text x="16" y="218" font-size="12" font-weight="700" fill="#002060">Audit Trail Logging:</text>
+        <text x="16" y="236" font-size="11" fill="#334155">Registrar adjudication actions, status modifications, and document</text>
+        <text x="16" y="254" font-size="11" fill="#334155">inspections are timestamped with staff user identity keys.</text>
+
+        <text x="16" y="284" font-size="12" font-weight="700" fill="#002060">Data Minimization Principle:</text>
+        <text x="16" y="302" font-size="11" fill="#334155">Only fields officially required by the DepEd Basic Education</text>
+        <text x="16" y="320" font-size="11" fill="#334155">Enrollment Form (Revised 06/01/2025) are persisted in the database.</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <!-- Institutional Footer -->
+  <rect x="50" y="2330" width="1700" height="44" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="74" y="2357" font-size="12" font-weight="800" fill="#002060">DUMAL-NEXT</text>
+  <text x="175" y="2357" font-size="12" fill="#64748B">Basic Education Online Admission &amp; Academic Resource Management System</text>
+  <text x="900" y="2357" font-size="11.5" fill="#475569" text-anchor="middle">Proponents: Lozano, Digap, Julian, Magdaong, Tumpap | MMSU CCIS Department of Information Technology</text>
+  <text x="1720" y="2357" font-size="11.5" font-weight="700" fill="#002060" text-anchor="end">BSD-2026-v1.0  |  Backend Schema &amp; Access Control Specification</text>
+
+</svg>
