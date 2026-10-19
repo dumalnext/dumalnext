@@ -503,21 +503,25 @@ BEGIN
         updated_at = NOW();
 
   -- 4. Seed 8 Sections (Capacity = 40 Max per Classroom)
+  BEGIN
+    ALTER TABLE public.sections ADD COLUMN IF NOT EXISTS section_id VARCHAR(50);
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
   FOR c_idx IN 1..8 LOOP
     v_adviser_idx := v_active_tch_indices[c_idx];
 
     INSERT INTO public.sections (
-      id, section_id, section_name, grade_level, strand, capacity, school_year
+      id, section_name, grade_level, strand, capacity, school_year
     ) VALUES (
       v_sec_uuids[c_idx],
-      v_sec_codes[c_idx],
       v_sec_names[c_idx],
       v_sec_grades[c_idx],
       v_sec_strands[c_idx],
       40,
       v_active_sy
     )
-    ON CONFLICT (section_id) DO UPDATE
+    ON CONFLICT (id) DO UPDATE
       SET section_name = EXCLUDED.section_name,
           grade_level  = EXCLUDED.grade_level,
           strand       = EXCLUDED.strand,
@@ -525,6 +529,11 @@ BEGIN
           school_year  = v_active_sy
     RETURNING id INTO v_tmp_uid;
     v_sec_uuids[c_idx] := v_tmp_uid;
+
+    BEGIN
+      UPDATE public.sections SET section_id = v_sec_codes[c_idx] WHERE id = v_sec_uuids[c_idx];
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
 
     v_sections_json := v_sections_json || jsonb_build_array(
       jsonb_build_object(
@@ -552,6 +561,11 @@ BEGIN
         updated_at = NOW();
 
   -- 5. Seed Deconflicted Class Schedules (31 of 40 slots filled = 77.5% complete)
+  BEGIN
+    ALTER TABLE public.class_schedules ADD COLUMN IF NOT EXISTS schedule_id VARCHAR(50);
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
   FOR c_idx IN 1..8 LOOP
     FOR i IN 1..v_sec_sched_days[c_idx] LOOP
       v_day := v_days[i];
@@ -580,11 +594,10 @@ BEGIN
       v_tch_idx := v_active_tch_indices[((c_idx + i - 2) % 14) + 1];
 
       INSERT INTO public.class_schedules (
-        id, schedule_id, subject_code, section_id, teacher_id, classroom_id,
+        id, subject_code, section_id, teacher_id, classroom_id,
         day_of_week, start_time, end_time, trimester, school_year
       ) VALUES (
         v_sched_uid,
-        'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0'),
         v_subj_code,
         v_sec_uuids[c_idx],
         v_tch_profile_ids[v_tch_idx],
@@ -595,13 +608,20 @@ BEGIN
         v_active_term,
         v_active_sy
       )
-      ON CONFLICT (schedule_id) DO UPDATE
+      ON CONFLICT (id) DO UPDATE
         SET subject_code = EXCLUDED.subject_code,
             section_id   = EXCLUDED.section_id,
             teacher_id   = EXCLUDED.teacher_id,
             classroom_id = EXCLUDED.classroom_id,
             day_of_week  = EXCLUDED.day_of_week,
             school_year  = EXCLUDED.school_year;
+
+      BEGIN
+        UPDATE public.class_schedules
+           SET schedule_id = 'SCH-SEED-' || LPAD(((c_idx - 1) * 5 + i)::text, 3, '0')
+         WHERE id = v_sched_uid;
+      EXCEPTION WHEN OTHERS THEN NULL;
+      END;
 
       v_schedules_json := v_schedules_json || jsonb_build_array(
         jsonb_build_object(
@@ -910,6 +930,15 @@ SELECT
   (s.capacity - COUNT(st.id) FILTER (WHERE st.current_section_id = s.id)) AS "Open Seats Remaining"
 FROM public.sections s
 LEFT JOIN public.students st ON st.current_section_id = s.id
-WHERE s.section_id LIKE 'SEC-G%'
+WHERE s.id IN (
+  'd0000000-0000-4000-8000-000000000001'::UUID,
+  'd0000000-0000-4000-8000-000000000002'::UUID,
+  'd0000000-0000-4000-8000-000000000003'::UUID,
+  'd0000000-0000-4000-8000-000000000004'::UUID,
+  'd0000000-0000-4000-8000-000000000005'::UUID,
+  'd0000000-0000-4000-8000-000000000006'::UUID,
+  'd0000000-0000-4000-8000-000000000007'::UUID,
+  'd0000000-0000-4000-8000-000000000008'::UUID
+)
 GROUP BY s.id, s.section_name, s.grade_level, s.strand, s.capacity
 ORDER BY s.grade_level, s.section_name;
