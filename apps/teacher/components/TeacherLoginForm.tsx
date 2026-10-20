@@ -386,9 +386,18 @@ function TeacherLoginFormInner() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-800 mb-1">
-                    Create New Password <span className="text-red-600">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-slate-800">
+                      Create New Password <span className="text-red-700">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
+                    >
+                      {showPassword ? "Hide Password" : "Show Password"}
+                    </button>
+                  </div>
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -396,13 +405,13 @@ function TeacherLoginFormInner() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter minimum 6 characters"
-                    className="w-full p-2.5 bg-white border border-slate-300 text-slate-900 focus:border-[#002060] outline-none rounded-[4px]"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px] transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-800 mb-1">
-                    Confirm Password <span className="text-red-600">*</span>
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                    Confirm Password <span className="text-red-700">*</span>
                   </label>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -411,7 +420,7 @@ function TeacherLoginFormInner() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter your new password"
-                    className="w-full p-2.5 bg-white border border-slate-300 text-slate-900 focus:border-[#002060] outline-none rounded-[4px]"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px] transition-colors"
                   />
                 </div>
 
@@ -480,9 +489,9 @@ function TeacherLoginFormInner() {
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="e.g. layttsix@gmail.com or DNHS-TCH-001"
+                    placeholder="e.g. faculty@dnhs.edu.ph or DepEd ID"
                     required
-                    className="w-full p-2.5 bg-slate-50 focus:bg-white border border-slate-300 text-xs sm:text-sm text-slate-900 focus:border-[#002060] outline-none transition-colors rounded-[4px]"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
                   />
                   <p className="text-[11px] text-slate-500 mt-1">
                     Enter your registered institutional email or assigned Faculty ID.
@@ -492,12 +501,12 @@ function TeacherLoginFormInner() {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-bold text-slate-800">
-                      Account Password <span className="text-red-600">*</span>
+                      Account Password <span className="text-red-700">*</span>
                     </label>
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
+                      className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
                     >
                       {showPassword ? "Hide Password" : "Show Password"}
                     </button>
@@ -508,7 +517,7 @@ function TeacherLoginFormInner() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your account password"
                     required
-                    className="w-full p-2.5 bg-slate-50 focus:bg-white border border-slate-300 text-xs sm:text-sm text-slate-900 focus:border-[#002060] outline-none transition-colors rounded-[4px]"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
                   />
                 </div>
 

@@ -15,6 +15,7 @@ export default function LoginPage() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -95,18 +96,27 @@ export default function LoginPage() {
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 mb-1">
-              Account Password <span className="text-red-700">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-800">
+                Account Password <span className="text-red-700">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
+              >
+                {showPassword ? "Hide Password" : "Show Password"}
+              </button>
+            </div>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (error) setError("");
               }}
               placeholder="Enter your account password"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none rounded-[4px]"
+              className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none rounded-[4px] transition-colors"
               required
             />
           </div>
@@ -123,34 +133,7 @@ export default function LoginPage() {
           </div>
         </form>
 
-        {/* Capstone Defense Testing Quick Buttons */}
-        <div className="p-3 bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] rounded-[4px]">
-          <span className="font-bold text-slate-600 block text-[10px] uppercase tracking-wider">
-            Capstone Defense Demo Shortcuts:
-          </span>
-          <div className="flex flex-col gap-1">
-            <button
-              type="button"
-              onClick={() => {
-                setIdentifier("100050123456");
-                setPassword("password123");
-              }}
-              className="text-left text-[#002060] hover:underline truncate cursor-pointer"
-            >
-              &bull; Login as Mark Agcaoili (LRN: 100050123456)
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIdentifier("john.lozano@example.com");
-                setPassword("password123");
-              }}
-              className="text-left text-[#002060] hover:underline truncate cursor-pointer"
-            >
-              &bull; Login as John Lozano (Email: john.lozano@example.com)
-            </button>
-          </div>
-        </div>
+
 
         {/* Register Account Link */}
         <div className="text-center pt-2 border-t border-slate-200 text-xs text-slate-600">
