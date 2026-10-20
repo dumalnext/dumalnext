@@ -1331,20 +1331,13 @@ function StudentHomeContent() {
               <div className="bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden">
                 {/* Portal Card Institutional Header */}
                 <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src="/dumalneg-logo.png"
-                      alt="DNHS Seal"
-                      className="w-9 h-9 object-contain shrink-0"
-                    />
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-                        Dumalneg NHS &bull; Learner Gateway
-                      </span>
-                      <h2 className="text-base font-bold text-white tracking-tight">
-                        Student Portal Access
-                      </h2>
-                    </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
+                      Learner Gateway
+                    </span>
+                    <h2 className="text-base font-bold text-white tracking-tight">
+                      Student Portal Access
+                    </h2>
                   </div>
                   <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
                     S.Y. {schoolYear || "2026-2027"}

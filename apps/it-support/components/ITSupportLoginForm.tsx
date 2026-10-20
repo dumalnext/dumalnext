@@ -286,12 +286,7 @@ function ITSupportLoginFormInner() {
         {/* RIGHT COLUMN (5 Cols): Sticky Authentication / Onboarding Card */}
         <div className="lg:col-span-5 lg:sticky lg:top-6">
           <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
-            <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center gap-3.5">
-              <img
-                src="/dumalneg-logo.png"
-                alt="Dumalneg NHS Seal"
-                className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 bg-white p-0.5 shadow-2xs shrink-0"
-              />
+            <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3.5">
               <div>
                 <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
                   IT Support &amp; System Security

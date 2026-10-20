@@ -313,15 +313,7 @@ function TeacherLoginFormInner() {
         {invitation ? (
           <div className="bg-white border-2 border-emerald-700 border-t-4 border-t-amber-400 rounded-[4px] shadow-md overflow-hidden">
             <div className="bg-[#002060] text-white p-5 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white p-1 border border-amber-400 shrink-0">
-                  <img
-                    src="/dumalneg-logo.png"
-                    alt="Dumalneg NHS Seal"
-                    className="w-full h-full object-contain rounded-full"
-                  />
-                </div>
-                <div>
+              <div>
                   <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
                     Official Invitation Verified
                   </span>
@@ -439,14 +431,7 @@ function TeacherLoginFormInner() {
           /* CASE 2: NORMAL LOGIN FORM */
           <div className="bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 rounded-[4px] shadow-md overflow-hidden">
             {/* Top Card Header */}
-            <div className="bg-[#002060] text-white px-6 py-4 flex items-center gap-3 border-b border-blue-950">
-              <div className="w-10 h-10 rounded-full bg-white p-1 border border-amber-400 shrink-0 flex items-center justify-center">
-                <img
-                  src="/dumalneg-logo.png"
-                  alt="Dumalneg NHS Seal"
-                  className="w-full h-full object-contain rounded-full"
-                />
-              </div>
+            <div className="bg-[#002060] text-white px-6 py-4 flex items-center justify-between gap-3 border-b border-blue-950">
               <div>
                 <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
                   Faculty Portal Authentication

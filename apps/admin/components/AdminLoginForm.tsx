@@ -344,13 +344,7 @@ function AdminLoginFormInner() {
             /* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */
             <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
               <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <img
-                    src="/dumalneg-logo.png"
-                    alt="Dumalneg NHS"
-                    className="w-10 h-10 rounded-full object-cover border border-amber-400 bg-white p-0.5 shrink-0"
-                  />
-                  <div>
+                <div>
                     <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
                       Official Invitation Verified
                     </span>
@@ -467,12 +461,7 @@ function AdminLoginFormInner() {
           ) : (
             /* CASE 2: NORMAL LOGIN FORM */
             <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
-              <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center gap-3.5">
-                <img
-                  src="/dumalneg-logo.png"
-                  alt="Dumalneg NHS Seal"
-                  className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 bg-white p-0.5 shadow-2xs shrink-0"
-                />
+              <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3.5">
                 <div>
                   <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
                     Registrar &amp; Admissions Sign-In
