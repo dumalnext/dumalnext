@@ -149,6 +149,27 @@ export default function ScheduleDeconflictionConsole() {
   // Notice Message
   const [actionNotice, setActionNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Styled Conflict Alert Modal State
+  const [conflictModal, setConflictModal] = useState<{
+    title: string;
+    actionDescription: string;
+    conflictDetail: string;
+    conflictType: "faculty" | "room" | "section" | "error";
+  } | null>(null);
+
+  // Dismiss conflict modal via ESC or ENTER
+  useEffect(() => {
+    if (!conflictModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Enter") {
+        e.preventDefault();
+        setConflictModal(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [conflictModal]);
+
   // Delete Target Modal State
   const [deleteTargetItem, setDeleteTargetItem] = useState<ScheduleItem | null>(null);
   const [isDeletingSchedule, setIsDeletingSchedule] = useState<boolean>(false);
@@ -441,14 +462,38 @@ export default function ScheduleDeconflictionConsole() {
     setIsAddModalOpen(true);
   };
 
-  // Helper to trigger an immediate browser alert pop-up for schedule conflicts & collisions
+  // Helper to trigger an immediate, high-fidelity styled modal alert for schedule conflicts & collisions
   const showConflictAlert = (title: string, message: string) => {
     setActionNotice({ type: "error", text: `${title}: ${message}` });
-    if (typeof window !== "undefined") {
-      setTimeout(() => {
-        window.alert(`⚠️ ${title.toUpperCase()}\n\n${message}\n\nPlease choose a different time slot, teacher, or classroom.`);
-      }, 50);
+
+    let conflictType: "faculty" | "room" | "section" | "error" = "error";
+    if (message.includes("Faculty Collision")) {
+      conflictType = "faculty";
+    } else if (message.includes("Room Collision")) {
+      conflictType = "room";
+    } else if (message.includes("Section Collision")) {
+      conflictType = "section";
     }
+
+    let actionDescription = "";
+    let conflictDetail = message;
+
+    if (message.includes("\n\n")) {
+      const parts = message.split("\n\n");
+      actionDescription = parts[0].trim();
+      conflictDetail = parts.slice(1).join("\n\n").trim();
+    } else if (message.includes(":\n")) {
+      const parts = message.split(":\n");
+      actionDescription = parts[0].trim();
+      conflictDetail = parts.slice(1).join(":\n").trim();
+    }
+
+    setConflictModal({
+      title,
+      actionDescription,
+      conflictDetail,
+      conflictType,
+    });
   };
 
   // 3. Handle Add Schedule Submit
@@ -2687,6 +2732,126 @@ export default function ScheduleDeconflictionConsole() {
                 className="w-full sm:w-auto px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
               >
                 {isDropping ? "Saving..." : "Apply Rescheduling"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* High-Fidelity Styled Conflict Alert Modal */}
+      {conflictModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="conflict-modal-title"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs font-sans animate-in fade-in duration-150"
+          onClick={() => setConflictModal(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white border-2 border-red-700 w-full max-w-lg shadow-2xl overflow-hidden rounded-[4px] animate-in zoom-in-95 duration-150 flex flex-col"
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-red-800 via-rose-700 to-red-800 px-4 sm:px-5 py-3 text-white flex items-center justify-between shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-sm shadow-xs shrink-0">
+                  ⚠️
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-200 block">
+                    Deconfliction Guard &bull; Collision Alert
+                  </span>
+                  <h3 id="conflict-modal-title" className="text-sm sm:text-base font-bold uppercase tracking-tight text-white leading-tight">
+                    {conflictModal.title}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setConflictModal(null)}
+                className="text-white/80 hover:text-white font-mono text-2xl font-bold px-2 py-0.5 hover:bg-white/10 rounded-xs transition-colors cursor-pointer"
+                title="Close dialog (Esc)"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-4 sm:p-5 space-y-3.5 bg-slate-50/50">
+              {/* Collision Type Badge */}
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                {conflictModal.conflictType === "room" && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 text-red-900 border border-red-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                    <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                    Room / Facility Collision
+                  </span>
+                )}
+                {conflictModal.conflictType === "faculty" && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-950 border border-amber-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                    <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                    Faculty / Teacher Collision
+                  </span>
+                )}
+                {conflictModal.conflictType === "section" && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-[#002060] border border-blue-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                    <span className="w-2 h-2 rounded-full bg-[#002060] animate-pulse"></span>
+                    Section Timetable Collision
+                  </span>
+                )}
+                {conflictModal.conflictType === "error" && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-100 text-rose-950 border border-rose-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                    <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+                    Scheduling Rule Violation
+                  </span>
+                )}
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-[2px]">
+                  Operation Blocked
+                </span>
+              </div>
+
+              {/* Action Description */}
+              {conflictModal.actionDescription && (
+                <div className="p-3 bg-white border border-slate-300 text-slate-800 text-xs font-semibold leading-relaxed shadow-xs rounded-[3px]">
+                  <span className="text-slate-500 font-mono text-[10px] uppercase block mb-0.5">Attempted Action:</span>
+                  {conflictModal.actionDescription}
+                </div>
+              )}
+
+              {/* Collision Details Box */}
+              <div className="p-3.5 bg-rose-50 border-l-4 border-l-rose-600 border border-rose-200 rounded-[3px] space-y-1.5">
+                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1">
+                  <span>⚠️</span> Collision Diagnostic:
+                </div>
+                <p className="text-xs text-rose-950 font-medium leading-relaxed">
+                  {conflictModal.conflictDetail}
+                </p>
+              </div>
+
+              {/* Helpful Recommendation Card */}
+              <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-[3px] flex items-start gap-2.5 text-xs text-amber-950">
+                <span className="text-amber-700 text-base leading-none mt-0.5">💡</span>
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[11px] uppercase tracking-wide text-amber-900">
+                    Recommended Resolution:
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-amber-800">
+                    Please choose a different time slot, assign another available classroom, or select another faculty member to resolve this scheduling collision.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-4 sm:px-5 py-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+              <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
+                Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded-xs text-[10px] font-bold">ESC</kbd> or <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded-xs text-[10px] font-bold">ENTER</kbd> to close
+              </span>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setConflictModal(null)}
+                className="w-full sm:w-auto px-6 py-2.5 bg-[#002060] hover:bg-blue-950 active:scale-95 text-white text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer shadow-sm rounded-[3px] text-center"
+              >
+                OK &bull; Understood
               </button>
             </div>
           </div>
