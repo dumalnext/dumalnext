@@ -490,14 +490,14 @@ function TeacherLoginFormInner() {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-bold text-slate-800">
                       Account Password <span className="text-red-600">*</span>
                     </label>
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-[11px] font-semibold text-[#002060] hover:underline cursor-pointer"
+                      className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
                     >
                       {showPassword ? "Hide Password" : "Show Password"}
                     </button>
@@ -523,41 +523,7 @@ function TeacherLoginFormInner() {
                 </div>
               </form>
 
-              {/* Quick Demo Account Selector */}
-              <div className="pt-4 border-t border-slate-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-700">
-                    Authorized Faculty Accounts (Quick Fill)
-                  </span>
-                  <span className="text-[10px] text-slate-500">
-                    Click to autofill
-                  </span>
-                </div>
-                <div className="space-y-1.5 text-xs bg-slate-50 p-3 border border-slate-200 rounded-[4px]">
-                  {[
-                    { email: "layttsix@gmail.com", label: "DNHS-TCH-001 (JHS)" },
-                    { email: "laytteight@gmail.com", label: "DNHS-TCH-002 (SHS)" },
-                    { email: "layttnine@gmail.com", label: "DNHS-TCH-003 (Cross-Level)" },
-                  ].map((acct) => (
-                    <button
-                      key={acct.email}
-                      type="button"
-                      onClick={() => {
-                        setIdentifier(acct.email);
-                        setPassword("Teacher@2026");
-                        setErrorMsg("");
-                      }}
-                      className="w-full flex justify-between items-center py-1.5 px-2 hover:bg-blue-50 rounded-[4px] transition-colors text-left cursor-pointer border-b last:border-b-0 border-slate-200/80"
-                    >
-                      <span className="text-slate-700 font-medium">{acct.email}</span>
-                      <span className="font-bold text-[#002060] text-[11px]">{acct.label}</span>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  Default onboarding password: <code className="font-bold text-slate-700">Teacher@2026</code>
-                </p>
-              </div>
+
             </div>
           </div>
         )}

@@ -19,7 +19,7 @@ function ITSupportLoginFormInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const { login, demoLogin, refreshSession } = useITSupportAuth();
+  const { login, refreshSession } = useITSupportAuth();
 
   // Standard Login State
   const [identifier, setIdentifier] = useState("dumalnext@gmail.com");
@@ -152,12 +152,7 @@ function ITSupportLoginFormInner() {
     }
   };
 
-  const handleDemoFill = async () => {
-    setIdentifier("dumalnext@gmail.com");
-    setPassword("dumalNext26.");
-    setIsSubmitting(true);
-    await demoLogin();
-  };
+
 
   if (isCheckingToken) {
     return (
@@ -422,26 +417,26 @@ function ITSupportLoginFormInner() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      System Security Password <span className="text-red-600">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        placeholder="Enter security password"
-                        className="w-full px-3.5 py-2.5 pr-16 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
-                      />
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700">
+                        System Security Password <span className="text-red-600">*</span>
+                      </label>
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-500 hover:text-[#002060] px-2 py-1 rounded cursor-pointer"
+                        className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
                       >
-                        {showPassword ? "Hide" : "Show"}
+                        {showPassword ? "Hide Password" : "Show Password"}
                       </button>
                     </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      placeholder="Enter security password"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-xs text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
+                    />
                   </div>
 
                   <button
@@ -455,16 +450,7 @@ function ITSupportLoginFormInner() {
                     </svg>
                   </button>
 
-                  <div className="pt-3 border-t border-slate-200">
-                    <button
-                      type="button"
-                      onClick={handleDemoFill}
-                      disabled={isSubmitting}
-                      className="w-full py-2.5 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-semibold text-xs transition-colors cursor-pointer"
-                    >
-                      Quick Demo Sign-In: dumalnext@gmail.com
-                    </button>
-                  </div>
+
                 </form>
               )}
             </div>
