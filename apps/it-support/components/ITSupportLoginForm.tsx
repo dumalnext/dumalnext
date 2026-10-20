@@ -23,7 +23,7 @@ function ITSupportLoginFormInner() {
 
   // Standard Login State
   const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("dumalNext26.");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
