@@ -13,6 +13,7 @@ export default function RegisterPage() {
     router.replace("/?tab=register");
   }, [router]);
 
+  const [noMiddleName, setNoMiddleName] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -35,6 +36,9 @@ export default function RegisterPage() {
     }
     if (!formData.firstName.trim()) {
       newErrors.firstName = "Official First Name is required.";
+    }
+    if (!noMiddleName && !formData.middleName.trim()) {
+      newErrors.middleName = "Middle Name is required, or check 'No Middle Name'.";
     }
     if (!formData.email.trim() || !formData.email.includes("@")) {
       newErrors.email = "A valid email address is required.";
@@ -59,7 +63,7 @@ export default function RegisterPage() {
     try {
       const res = await register({
         firstName: formData.firstName,
-        middleName: formData.middleName,
+        middleName: noMiddleName ? "N/A" : formData.middleName,
         lastName: formData.lastName,
         lrn: formData.lrn,
         email: formData.email,
@@ -158,18 +162,57 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Middle Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 mb-1">
-                Middle Name (Optional)
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-slate-900">
+                  Middle Name {!noMiddleName && <span className="text-red-700">*</span>}
+                </label>
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={noMiddleName}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setNoMiddleName(checked);
+                      if (checked) {
+                        setFormData({ ...formData, middleName: "" });
+                        if (errors.middleName) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next.middleName;
+                            return next;
+                          });
+                        }
+                      }
+                    }}
+                    className="accent-[#002060] rounded cursor-pointer"
+                  />
+                  <span>No Middle Name</span>
+                </label>
+              </div>
               <input
                 type="text"
-                value={formData.middleName}
-                onChange={(e) =>
-                  setFormData({ ...formData, middleName: e.target.value.toUpperCase() })
-                }
-                placeholder="e.g. DELA CRUZ"
-                className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                value={noMiddleName ? "N/A" : formData.middleName}
+                onChange={(e) => {
+                  setFormData({ ...formData, middleName: e.target.value.toUpperCase() });
+                  if (errors.middleName) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.middleName;
+                      return next;
+                    });
+                  }
+                }}
+                placeholder={noMiddleName ? "N/A" : "e.g. DELA CRUZ"}
+                disabled={noMiddleName}
+                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                  noMiddleName
+                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                    : "bg-white border-slate-300 focus:border-[#002060]"
+                }`}
               />
+              {errors.middleName && (
+                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.middleName}</p>
+              )}
             </div>
 
             {/* 12-Digit LRN */}

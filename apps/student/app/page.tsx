@@ -90,6 +90,7 @@ function StudentHomeContent() {
     password: "",
     confirmPassword: "",
   });
+  const [noMiddleName, setNoMiddleName] = useState(false);
   const [regErrors, setRegErrors] = useState<Record<string, string>>({});
   const [isRegistering, setIsRegistering] = useState(false);
   const [regProgress, setRegProgress] = useState(0);
@@ -467,6 +468,9 @@ function StudentHomeContent() {
 
     if (!regForm.lastName.trim()) newErrors.lastName = "Official Last Name is required.";
     if (!regForm.firstName.trim()) newErrors.firstName = "Official First Name is required.";
+    if (!noMiddleName && !regForm.middleName.trim()) {
+      newErrors.middleName = "Middle Name is required, or check 'No Middle Name'.";
+    }
     if (!regForm.email.trim() || !regForm.email.includes("@")) {
       newErrors.email = "A valid Gmail address is required.";
     }
@@ -494,7 +498,7 @@ function StudentHomeContent() {
         {
           lastName: regForm.lastName.trim().toUpperCase(),
           firstName: regForm.firstName.trim().toUpperCase(),
-          middleName: regForm.middleName.trim().toUpperCase(),
+          middleName: noMiddleName ? "N/A" : regForm.middleName.trim().toUpperCase(),
           email: regForm.email.trim().toLowerCase(),
           password: regForm.password,
         },
@@ -530,6 +534,7 @@ function StudentHomeContent() {
         password: "",
         confirmPassword: "",
       });
+      setNoMiddleName(false);
 
       // Launch 6-Digit OTP Verification Screen
       setOtpEmail(registeredEmail);
@@ -1650,21 +1655,62 @@ function StudentHomeContent() {
                         </div>
 
                         <div>
-                          <label htmlFor="signup-middle-name" className="block text-xs font-bold text-slate-800 mb-1">
-                            Middle Name <span className="text-[10px] font-normal text-slate-500">(Optional)</span>
-                          </label>
+                          <div className="flex items-center justify-between mb-1">
+                            <label htmlFor="signup-middle-name" className="block text-xs font-bold text-slate-800">
+                              Middle Name {!noMiddleName && <span className="text-red-700">*</span>}
+                            </label>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={noMiddleName}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setNoMiddleName(checked);
+                                  if (checked) {
+                                    setRegForm({ ...regForm, middleName: "" });
+                                    if (regErrors.middleName) {
+                                      setRegErrors((prev) => {
+                                        const next = { ...prev };
+                                        delete next.middleName;
+                                        return next;
+                                      });
+                                    }
+                                  }
+                                }}
+                                className="accent-[#002060] rounded cursor-pointer"
+                                disabled={isRegistering}
+                              />
+                              <span>No Middle Name</span>
+                            </label>
+                          </div>
                           <input
                             id="signup-middle-name"
                             name="middleName"
                             type="text"
                             autoComplete="additional-name"
                             enterKeyHint="next"
-                            value={regForm.middleName}
-                            onChange={(e) => setRegForm({ ...regForm, middleName: e.target.value })}
-                            placeholder="e.g. CASTRO"
-                            className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
-                            disabled={isRegistering}
+                            value={noMiddleName ? "N/A" : regForm.middleName}
+                            onChange={(e) => {
+                              setRegForm({ ...regForm, middleName: e.target.value });
+                              if (regErrors.middleName) {
+                                setRegErrors((prev) => {
+                                  const next = { ...prev };
+                                  delete next.middleName;
+                                  return next;
+                                });
+                              }
+                            }}
+                            placeholder={noMiddleName ? "N/A" : "e.g. CASTRO"}
+                            className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                              noMiddleName
+                                ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                : "bg-slate-50/70 focus:bg-white border-slate-300 focus:border-[#002060]"
+                            }`}
+                            disabled={isRegistering || noMiddleName}
                           />
+                          {regErrors.middleName && (
+                            <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.middleName}</p>
+                          )}
                         </div>
 
                         {/* Email Address */}

@@ -429,22 +429,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               </span>
             )}
           </Link>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Link
-              href="/?tab=signin"
-              className="inline-block bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-1.5 px-3 transition-colors text-xs rounded-[4px] active:scale-95"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/?tab=register"
-              className="inline-block bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-1.5 px-3.5 transition-colors shadow-xs text-xs rounded-[4px] active:scale-95"
-            >
-              Register Account
-            </Link>
-          </div>
-        )}
+        ) : null}
       </div>
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
