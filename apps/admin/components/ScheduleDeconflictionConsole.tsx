@@ -441,6 +441,16 @@ export default function ScheduleDeconflictionConsole() {
     setIsAddModalOpen(true);
   };
 
+  // Helper to trigger an immediate browser alert pop-up for schedule conflicts & collisions
+  const showConflictAlert = (title: string, message: string) => {
+    setActionNotice({ type: "error", text: `${title}: ${message}` });
+    if (typeof window !== "undefined") {
+      setTimeout(() => {
+        window.alert(`⚠️ ${title.toUpperCase()}\n\n${message}\n\nPlease choose a different time slot, teacher, or classroom.`);
+      }, 50);
+    }
+  };
+
   // 3. Handle Add Schedule Submit
   const handleAddSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -458,6 +468,7 @@ export default function ScheduleDeconflictionConsole() {
 
     if (preFlightConflict) {
       setAddError(preFlightConflict.message);
+      showConflictAlert("Schedule Collision Detected", preFlightConflict.message);
       return;
     }
 
@@ -488,7 +499,9 @@ export default function ScheduleDeconflictionConsole() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setAddError(data.message || data.error || "Failed to assign schedule.");
+        const errMsg = data.message || data.error || "Failed to assign schedule.";
+        setAddError(errMsg);
+        showConflictAlert("Schedule Assignment Collision", errMsg);
         return;
       }
 
@@ -595,10 +608,13 @@ export default function ScheduleDeconflictionConsole() {
         [activeItem.id, occupantItem.id]
       );
       if (conflictA) {
-        setActionNotice({ type: "error", text: `Cannot swap: ${conflictA}` });
         draggedScheduleRef.current = null;
         setDraggedSchedule(null);
         setDragOverSlot(null);
+        showConflictAlert(
+          "Schedule Conflict (Cannot Swap)",
+          `Cannot place "${activeItem.subject_name}" at ${targetDay} ${cleanStart}–${cleanEnd}:\n\n${conflictA}`
+        );
         return;
       }
 
@@ -610,10 +626,13 @@ export default function ScheduleDeconflictionConsole() {
         [activeItem.id, occupantItem.id]
       );
       if (conflictB) {
-        setActionNotice({ type: "error", text: `Cannot swap: ${conflictB}` });
         draggedScheduleRef.current = null;
         setDraggedSchedule(null);
         setDragOverSlot(null);
+        showConflictAlert(
+          "Schedule Conflict (Cannot Swap)",
+          `Cannot swap "${occupantItem.subject_name}" into ${activeItem.day_of_week} ${activeItem.start_time.slice(0, 5)}–${activeItem.end_time.slice(0, 5)}:\n\n${conflictB}`
+        );
         return;
       }
 
@@ -653,10 +672,8 @@ export default function ScheduleDeconflictionConsole() {
         const data = await res.json();
         if (!res.ok || !data.success) {
           setSchedules(prevSchedules);
-          setActionNotice({
-            type: "error",
-            text: data.message || data.error || "Failed to swap class periods.",
-          });
+          const errText = data.message || data.error || "Failed to swap class periods.";
+          showConflictAlert("Schedule Swap Collision Error", errText);
         } else {
           setActionNotice({
             type: "success",
@@ -665,10 +682,8 @@ export default function ScheduleDeconflictionConsole() {
         }
       } catch (err: any) {
         setSchedules(prevSchedules);
-        setActionNotice({
-          type: "error",
-          text: err?.message || "Network error while swapping class periods.",
-        });
+        const errText = err?.message || "Network error while swapping class periods.";
+        showConflictAlert("Schedule Swap Network Error", errText);
       } finally {
         setIsDropping(false);
       }
@@ -678,10 +693,13 @@ export default function ScheduleDeconflictionConsole() {
     // CASE 2: MOVE to vacant / empty slot
     const conflict = checkItemConflict(activeItem, targetDay, cleanStart, cleanEnd, [activeItem.id]);
     if (conflict) {
-      setActionNotice({ type: "error", text: `Cannot move: ${conflict}` });
       draggedScheduleRef.current = null;
       setDraggedSchedule(null);
       setDragOverSlot(null);
+      showConflictAlert(
+        "Schedule Conflict (Cannot Move)",
+        `Cannot move "${activeItem.subject_name}" to ${targetDay} ${cleanStart}–${cleanEnd}:\n\n${conflict}`
+      );
       return;
     }
 
@@ -715,10 +733,8 @@ export default function ScheduleDeconflictionConsole() {
       const data = await res.json();
       if (!res.ok || !data.success) {
         setSchedules(prevSchedules);
-        setActionNotice({
-          type: "error",
-          text: data.message || data.error || "Failed to move class period.",
-        });
+        const errText = data.message || data.error || "Failed to move class period.";
+        showConflictAlert("Schedule Move Collision Error", errText);
       } else {
         setActionNotice({
           type: "success",
@@ -727,10 +743,8 @@ export default function ScheduleDeconflictionConsole() {
       }
     } catch (err: any) {
       setSchedules(prevSchedules);
-      setActionNotice({
-        type: "error",
-        text: err?.message || "Network error while moving class period.",
-      });
+      const errText = err?.message || "Network error while moving class period.";
+      showConflictAlert("Schedule Move Network Error", errText);
     } finally {
       setIsDropping(false);
     }
