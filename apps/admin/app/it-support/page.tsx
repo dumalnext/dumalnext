@@ -9,6 +9,7 @@ import ClassroomFacilityManager from "@/components/it-support/ClassroomFacilityM
 import UserRoleAuditor from "@/components/it-support/UserRoleAuditor";
 import SystemDiagnosticsMonitor from "@/components/it-support/SystemDiagnosticsMonitor";
 import StaffInvitationManager from "@/components/it-support/StaffInvitationManager";
+import SessionTimeoutModal from "@/components/it-support/SessionTimeoutModal";
 
 function ITSupportPortalContent() {
   const { user, isLoading } = useITSupportAuth();
@@ -61,6 +62,7 @@ export default function ITSupportPage() {
   return (
     <ITSupportAuthProvider>
       <ITSupportPortalContent />
+      <SessionTimeoutModal />
     </ITSupportAuthProvider>
   );
 }

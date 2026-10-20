@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TeacherAuthProvider } from "@/lib/auth/authContext";
 import TeacherHeaderNav from "@/components/TeacherHeaderNav";
+import SessionTimeoutModal from "@/components/SessionTimeoutModal";
 
 export const metadata: Metadata = {
   title: "Faculty Portal | Dumalneg National High School",
@@ -23,6 +24,8 @@ export default function TeacherLayout({
           <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
             {children}
           </main>
+
+          <SessionTimeoutModal />
         </TeacherAuthProvider>
 
         {/* Footer */}

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AdminAuthProvider } from "@/lib/auth/authContext";
+import SessionTimeoutModal from "@/components/SessionTimeoutModal";
 
 export const metadata: Metadata = {
   title: "School Administrator Portal | Dumalneg National High School",
@@ -25,6 +26,7 @@ export default function AdminLayout({
           <div className="flex-1 flex flex-col">
             {children}
           </div>
+          <SessionTimeoutModal />
 
           {/* Institutional DepEd Footer */}
           <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 text-xs py-6 px-6 mt-12">
