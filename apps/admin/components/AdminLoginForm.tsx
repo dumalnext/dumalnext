@@ -418,7 +418,7 @@ function AdminLoginFormInner() {
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold text-slate-800">
-                        Create Security Password <span className="text-red-700">*</span>
+                        Create Password <span className="text-red-700">*</span>
                       </label>
                       <button
                         type="button"
@@ -558,7 +558,7 @@ function AdminLoginFormInner() {
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold text-slate-800">
-                        Security Password <span className="text-red-700">*</span>
+                        Password <span className="text-red-700">*</span>
                       </label>
                       <button
                         type="button"

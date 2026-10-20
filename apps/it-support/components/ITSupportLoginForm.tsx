@@ -428,7 +428,7 @@ function ITSupportLoginFormInner() {
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold text-slate-800">
-                        System Security Password <span className="text-red-700">*</span>
+                        Password <span className="text-red-700">*</span>
                       </label>
                       <button
                         type="button"
