@@ -321,7 +321,6 @@ function TeacherLoginFormInner() {
                     Activate Faculty Account
                   </h3>
                 </div>
-              </div>
               <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 rounded-[4px]">
                 Teacher Role
               </span>

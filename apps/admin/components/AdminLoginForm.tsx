@@ -352,7 +352,6 @@ function AdminLoginFormInner() {
                       Create Registrar Password
                     </h3>
                   </div>
-                </div>
                 <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-blue-100 text-[#002060] border border-blue-200 rounded-full">
                   Admin Role
                 </span>

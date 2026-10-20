@@ -1490,7 +1490,7 @@ function StudentHomeContent() {
                               setLoginEmail(e.target.value);
                               if (loginError) setLoginError("");
                             }}
-                            placeholder="student@gmail.com"
+                            placeholder="e.g. learner@gmail.com or 12-digit LRN"
                             className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
                             disabled={isLoggingIn}
                             required
@@ -1500,12 +1500,12 @@ function StudentHomeContent() {
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
                             <label htmlFor="current-password" className="block text-xs font-bold text-slate-800">
-                              Password <span className="text-red-700">*</span>
+                              Account Password <span className="text-red-700">*</span>
                             </label>
                             <button
                               type="button"
                               onClick={() => setShowLoginPassword((prev) => !prev)}
-                              className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
+                              className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
                             >
                               {showLoginPassword ? "Hide Password" : "Show Password"}
                             </button>
@@ -1742,7 +1742,7 @@ function StudentHomeContent() {
                             <button
                               type="button"
                               onClick={() => setShowRegPassword((prev) => !prev)}
-                              className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
+                              className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
                             >
                               {showRegPassword ? "Hide Password" : "Show Password"}
                             </button>
