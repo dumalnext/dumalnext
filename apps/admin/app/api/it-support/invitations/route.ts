@@ -306,7 +306,7 @@ export async function POST(req: NextRequest) {
     } else if (role === "admin") {
       portalBaseUrl = isLocal ? "http://localhost:3000" : (process.env.NEXT_PUBLIC_ADMIN_URL || "https://dumalnext-admin.vercel.app");
     } else {
-      portalBaseUrl = isLocal ? "http://localhost:3003" : (process.env.NEXT_PUBLIC_ITSUPPORT_URL || "https://dumalnext-it-support.vercel.app");
+      portalBaseUrl = isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app";
     }
 
     const inviteUrl = `${portalBaseUrl}/accept-invite?token=${token}`;
