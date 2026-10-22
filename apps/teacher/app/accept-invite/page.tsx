@@ -84,9 +84,9 @@ function AcceptInviteContent() {
 
     const verifyAccess = async () => {
       try {
-        // Check for error description in hash (e.g. Supabase link expired or invalid)
+        // 1. Check for error description in hash (e.g. Supabase link expired or invalid)
         if (typeof window !== "undefined" && window.location.hash.includes("error_description")) {
-          const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, "?"));
+          const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
           const errDesc = hashParams.get("error_description");
           if (errDesc) {
             if (isMounted) {
@@ -97,7 +97,7 @@ function AcceptInviteContent() {
           }
         }
 
-        // 1. If PKCE code is present in query parameters, exchange it for session
+        // 2. If PKCE code is present in query parameters, exchange it for session
         if (code) {
           try {
             await supabase.auth.exchangeCodeForSession(code);
@@ -106,16 +106,77 @@ function AcceptInviteContent() {
           }
         }
 
-        // 2. Check Supabase Auth Session (user clicked "Accept invitation" in Supabase email)
-        const { data: sessionData } = await supabase.auth.getSession();
-        let sessionUser: any = sessionData?.session?.user;
+        let sessionUser: any = null;
 
-        // If not in session, check if URL has hash fragments (#access_token=...)
-        if (!sessionUser && typeof window !== "undefined" && window.location.hash.includes("access_token")) {
-          const { data: authData } = await supabase.auth.getUser();
-          sessionUser = authData?.user;
+        // 3. Check for access_token in URL hash (#access_token=...&refresh_token=...)
+        if (typeof window !== "undefined" && window.location.hash.includes("access_token")) {
+          try {
+            const hashStr = window.location.hash.replace(/^#/, "");
+            const hashParams = new URLSearchParams(hashStr);
+            const accessToken = hashParams.get("access_token");
+            const refreshToken = hashParams.get("refresh_token");
+
+            if (accessToken) {
+              // A. Explicitly establish session in Supabase Auth client
+              try {
+                const { data: setRes } = await supabase.auth.setSession({
+                  access_token: accessToken,
+                  refresh_token: refreshToken || "",
+                });
+                if (setRes?.user) {
+                  sessionUser = setRes.user;
+                } else if (setRes?.session?.user) {
+                  sessionUser = setRes.session.user;
+                }
+              } catch (setErr) {
+                console.warn("setSession error:", setErr);
+              }
+
+              // B. Fallback: Decode JWT directly to guarantee user info is extracted immediately
+              if (!sessionUser && accessToken.includes(".")) {
+                try {
+                  const base64Url = accessToken.split(".")[1];
+                  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+                  const jsonPayload = decodeURIComponent(
+                    atob(base64)
+                      .split("")
+                      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                      .join("")
+                  );
+                  const payload = JSON.parse(jsonPayload);
+                  if (payload && payload.email) {
+                    sessionUser = {
+                      id: payload.sub,
+                      email: payload.email,
+                      user_metadata: payload.user_metadata || {},
+                      app_metadata: payload.app_metadata || {},
+                    };
+                  }
+                } catch (decodeErr) {
+                  console.warn("JWT parse notice:", decodeErr);
+                }
+              }
+            }
+          } catch (hashErr) {
+            console.warn("hash parsing error:", hashErr);
+          }
         }
 
+        // 4. If not populated from hash, check existing Supabase Auth Session
+        if (!sessionUser) {
+          const { data: sessionData } = await supabase.auth.getSession();
+          sessionUser = sessionData?.session?.user;
+        }
+
+        // 5. Fallback check for auth.getUser()
+        if (!sessionUser) {
+          try {
+            const { data: authData } = await supabase.auth.getUser();
+            sessionUser = authData?.user;
+          } catch {}
+        }
+
+        // SCENARIO 1: We have an authenticated sessionUser (from Email Click or Active Session)
         if (sessionUser) {
           let metaRole = (
             sessionUser.user_metadata?.role ||
@@ -184,7 +245,7 @@ function AcceptInviteContent() {
           return;
         }
 
-        // 3. If no active session, check if a token query parameter was supplied (?token=...)
+        // SCENARIO 2: If no active session, check if a token query parameter was supplied (?token=...)
         if (token) {
           let res = await fetch(`/api/it-support/invitations?token=${encodeURIComponent(token)}`);
           if (res.status === 404) {
