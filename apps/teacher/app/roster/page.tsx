@@ -15,6 +15,8 @@ interface SectionSummary {
   capacity: number;
   adviser_name?: string;
   school_year?: string;
+  isElective?: boolean;
+  electiveCode?: string;
 }
 
 interface StudentItem {
@@ -93,6 +95,24 @@ export default function ClassSectionRosterPage() {
         }
       } catch {}
 
+      // Fetch classroom capacities from classrooms_config (synced with IT Support updates)
+      const roomCapacityMap = new Map<string, number>();
+      try {
+        const { data: sysRooms } = await supabase
+          .from("system_settings")
+          .select("value")
+          .eq("key", "classrooms_config")
+          .maybeSingle();
+
+        if (sysRooms?.value?.classrooms && Array.isArray(sysRooms.value.classrooms)) {
+          sysRooms.value.classrooms.forEach((r: any) => {
+            if (r.roomNumber) {
+              roomCapacityMap.set(r.roomNumber.trim().toLowerCase(), Number(r.capacity) || 40);
+            }
+          });
+        }
+      } catch {}
+
       // Merge base DB sections + system_settings custom overrides
       const secMap = new Map<string, any>();
       (secData || []).forEach((s: any) => {
@@ -107,16 +127,42 @@ export default function ClassSectionRosterPage() {
         }
       });
 
-      const allMergedSections: SectionSummary[] = Array.from(secMap.values()).map((s: any) => ({
-        id: s.id,
-        section_name: s.section_name,
-        grade_level: Number(s.grade_level),
-        strand: s.strand || undefined,
-        room: s.room || undefined,
-        capacity: Number(s.capacity) || 40,
-        adviser_name: s.adviser_name || undefined,
-        school_year: s.school_year || "2025-2026",
-      }));
+      const allMergedSections: SectionSummary[] = Array.from(secMap.values()).map((s: any) => {
+        let capacity = Number(s.capacity) || 40;
+        if (s.room) {
+          const cleanRoom = s.room.trim().toLowerCase();
+          for (const [key, cap] of roomCapacityMap.entries()) {
+            if (cleanRoom === key || cleanRoom.includes(key) || key.includes(cleanRoom)) {
+              capacity = cap;
+              break;
+            }
+          }
+        }
+
+        const isElective = Boolean(
+          s.strand === "Elective" ||
+          s.isElective ||
+          String(s.id).startsWith("elec-")
+        );
+        const electiveCode =
+          s.electiveCode ||
+          (isElective && String(s.id).startsWith("elec-")
+            ? String(s.id).split("-").slice(2).join("-")
+            : undefined);
+
+        return {
+          id: s.id,
+          section_name: s.section_name,
+          grade_level: Number(s.grade_level),
+          strand: s.strand || undefined,
+          room: s.room || undefined,
+          capacity,
+          adviser_name: s.adviser_name || undefined,
+          school_year: s.school_year || "2025-2026",
+          isElective,
+          electiveCode,
+        };
+      });
 
       // 4. Filter sections where the logged-in teacher is specifically assigned as Class Adviser
       const mySections = allMergedSections.filter((s) => {
@@ -182,6 +228,11 @@ export default function ClassSectionRosterPage() {
           fetchAdvisorySections(true);
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "enrollment_applications" },
+        () => fetchAdvisorySections(true)
+      )
       .subscribe();
 
     const handleCustomEvent = () => fetchAdvisorySections(true);
@@ -208,16 +259,109 @@ export default function ClassSectionRosterPage() {
     const fetchRoster = async () => {
       setIsLoadingRoster(true);
       try {
-        const { data, error } = await supabase
+        const currentSec = advisorySections.find((s) => s.id === selectedSectionId);
+        const isElective = Boolean(
+          selectedSectionId.startsWith("elec-") ||
+          currentSec?.isElective ||
+          currentSec?.strand === "Elective"
+        );
+        const electiveCode =
+          currentSec?.electiveCode ||
+          (selectedSectionId.startsWith("elec-") ? selectedSectionId.split("-").slice(2).join("-") : "");
+        const gradeLevel = currentSec?.grade_level;
+
+        const studentMap = new Map<string, StudentItem>();
+
+        // 1. Direct query from students table (regular track sections)
+        const { data: directStudents } = await supabase
           .from("students")
           .select("id, student_id, first_name, middle_name, last_name, gender, barangay, contact_number, grade_level")
           .eq("current_section_id", selectedSectionId)
           .order("last_name", { ascending: true });
 
-        if (!error && data && isMounted) {
-          setRosterStudents(data);
-        } else if (isMounted) {
-          setRosterStudents([]);
+        if (directStudents) {
+          directStudents.forEach((st: any) => studentMap.set(st.id, st));
+        }
+
+        // 2. For elective sections (or as comprehensive fallback for any section), query enrollment_applications
+        if (isElective || studentMap.size === 0) {
+          const { data: appsData } = await supabase
+            .from("enrollment_applications")
+            .select("id, student_id, selected_electives, status, target_grade_level")
+            .in("status", ["Approved", "approved"]);
+
+          const matchedStudentIds = new Set<string>();
+          const matchedLrns = new Set<string>();
+
+          (appsData || []).forEach((app: any) => {
+            if (gradeLevel && app.target_grade_level && Number(app.target_grade_level) !== Number(gradeLevel)) {
+              return;
+            }
+
+            const raw = app.selected_electives;
+            if (!raw) return;
+
+            let isMatch = false;
+            const rawStr = typeof raw === "string" ? raw : JSON.stringify(raw);
+
+            if (rawStr.includes(selectedSectionId)) {
+              isMatch = true;
+            } else if (isElective && electiveCode && rawStr.toUpperCase().includes(electiveCode.toUpperCase())) {
+              isMatch = true;
+            }
+
+            if (!isMatch && isElective) {
+              const fd = Array.isArray(raw) && raw.length > 0 ? raw[0] : (typeof raw === "object" ? raw : {});
+              if (fd.assigned_elective_section_id === selectedSectionId) {
+                isMatch = true;
+              } else if (electiveCode && (
+                fd.assigned_elective_code?.toUpperCase() === electiveCode.toUpperCase() ||
+                (Array.isArray(fd.selectedElectives) && fd.selectedElectives.some((e: any) => String(e).toUpperCase() === electiveCode.toUpperCase()))
+              )) {
+                isMatch = true;
+              }
+            }
+
+            if (isMatch) {
+              if (app.student_id) matchedStudentIds.add(app.student_id);
+              const fd = Array.isArray(raw) && raw.length > 0 ? raw[0] : (typeof raw === "object" ? raw : {});
+              if (fd?.lrn) matchedLrns.add(String(fd.lrn));
+            }
+          });
+
+          // Fetch student records from students table for matched IDs
+          if (matchedStudentIds.size > 0) {
+            const { data: appStudents } = await supabase
+              .from("students")
+              .select("id, student_id, first_name, middle_name, last_name, gender, barangay, contact_number, grade_level")
+              .in("id", Array.from(matchedStudentIds));
+
+            if (appStudents) {
+              appStudents.forEach((st: any) => studentMap.set(st.id, st));
+            }
+          }
+
+          // Fetch any remaining students by LRN if not matched by ID
+          if (matchedLrns.size > 0 && studentMap.size < matchedStudentIds.size) {
+            const { data: lrnStudents } = await supabase
+              .from("students")
+              .select("id, student_id, first_name, middle_name, last_name, gender, barangay, contact_number, grade_level")
+              .in("student_id", Array.from(matchedLrns));
+
+            if (lrnStudents) {
+              lrnStudents.forEach((st: any) => studentMap.set(st.id, st));
+            }
+          }
+        }
+
+        const sortedStudents = Array.from(studentMap.values()).sort((a, b) => {
+          const lComp = (a.last_name || "").localeCompare(b.last_name || "");
+          if (lComp !== 0) return lComp;
+          return (a.first_name || "").localeCompare(b.first_name || "");
+        });
+
+        if (isMounted) {
+          setRosterStudents(sortedStudents);
         }
       } catch (err) {
         console.warn("Notice loading section roster:", err);
@@ -229,7 +373,7 @@ export default function ClassSectionRosterPage() {
 
     fetchRoster();
 
-    // Listen to changes in students table specifically for this section
+    // Listen to changes in students and enrollment_applications tables
     const studentChannel = supabase
       .channel(`advisory-students-${selectedSectionId}`)
       .on(
@@ -237,13 +381,26 @@ export default function ClassSectionRosterPage() {
         { event: "*", schema: "public", table: "students" },
         () => fetchRoster()
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "enrollment_applications" },
+        () => fetchRoster()
+      )
       .subscribe();
+
+    const handleDataChanged = () => fetchRoster();
+    window.addEventListener("dumalnext:data-changed", handleDataChanged);
+    window.addEventListener("dumalnext:teacher-data-changed", handleDataChanged);
+    window.addEventListener("dumalnext:admin-data-changed", handleDataChanged);
 
     return () => {
       isMounted = false;
       supabase.removeChannel(studentChannel);
+      window.removeEventListener("dumalnext:data-changed", handleDataChanged);
+      window.removeEventListener("dumalnext:teacher-data-changed", handleDataChanged);
+      window.removeEventListener("dumalnext:admin-data-changed", handleDataChanged);
     };
-  }, [selectedSectionId]);
+  }, [selectedSectionId, advisorySections]);
 
   if (isAuthLoading) {
     return (
