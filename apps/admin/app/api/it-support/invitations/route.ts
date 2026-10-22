@@ -78,12 +78,19 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
+    const emailParam = searchParams.get("email");
 
     const invitations = await getStoredInvitations(supabase);
 
-    // Token Validation Mode
-    if (token) {
-      const found = invitations.find((i) => i.token === token.trim());
+    // Token or Email Validation Mode
+    if (token || emailParam) {
+      let found: StaffInvitation | undefined;
+      if (token) {
+        found = invitations.find((i) => i.token === token.trim());
+      } else if (emailParam) {
+        const clean = emailParam.trim().toLowerCase();
+        found = invitations.find((i) => i.email.toLowerCase() === clean && i.status !== "revoked");
+      }
       if (!found) {
         return NextResponse.json(
           { valid: false, error: "Invitation not found or link has expired." },
@@ -302,14 +309,56 @@ export async function POST(req: NextRequest) {
       portalBaseUrl = isLocal ? "http://localhost:3003" : (process.env.NEXT_PUBLIC_ITSUPPORT_URL || "https://dumalnext-it-support.vercel.app");
     }
 
-    const inviteUrl = `${portalBaseUrl}/?token=${token}`;
+    const inviteUrl = `${portalBaseUrl}/accept-invite?token=${token}`;
+    const redirectTo = `${portalBaseUrl}/accept-invite`;
+
+    // Send official invitation email via Supabase Auth Admin API (triggers Supabase's 'Invite user' email template)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    let emailSent = false;
+    let emailError: string | null = null;
+
+    if (serviceRoleKey && supabaseUrl) {
+      try {
+        const adminAuthClient = createSupabaseJsClient(supabaseUrl, serviceRoleKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+
+        const { data: inviteData, error: inviteErr } = await adminAuthClient.auth.admin.inviteUserByEmail(
+          cleanEmail,
+          {
+            data: {
+              role,
+              user_role: role,
+              full_name: fullName ? String(fullName).trim() : "",
+              department: department ? String(department).trim() : "",
+            },
+            redirectTo,
+          }
+        );
+
+        if (!inviteErr && inviteData?.user) {
+          emailSent = true;
+        } else if (inviteErr) {
+          console.warn("Supabase auth.admin.inviteUserByEmail notice:", inviteErr.message);
+          emailError = inviteErr.message;
+        }
+      } catch (err: any) {
+        console.warn("Supabase auth admin error:", err?.message);
+        emailError = err?.message;
+      }
+    }
 
     return NextResponse.json(
       {
         success: true,
         invitation: newInvitation,
         inviteUrl,
-        message: `Invitation generated successfully for ${cleanEmail}.`,
+        emailSent,
+        emailError,
+        message: emailSent
+          ? `Official invitation email successfully sent via Supabase to ${cleanEmail}.`
+          : `Invitation registered for ${cleanEmail}.`,
       },
       { headers: NO_CACHE_HEADERS }
     );

@@ -3,24 +3,70 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 interface InvitationData {
-  id: string;
+  id?: string;
   email: string;
   role: "teacher" | "admin" | "it_support";
   fullName?: string;
   department?: string;
-  status: string;
-  expiresAt: string;
+  status?: string;
+}
+
+const CURRENT_PORTAL_ROLE: string = "it_support";
+const CURRENT_PORTAL_NAME: string = "IT Support & Systems Desk";
+const CURRENT_PORTAL_TITLE: string = "Infrastructure Workstation";
+const CURRENT_PORTAL_THEME_FROM: string = "from-indigo-900";
+const CURRENT_PORTAL_THEME_TO: string = "to-slate-950";
+const DEFAULT_REDIRECT_PATH: string = "/";
+
+function getRoleMeta(role: string) {
+  const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+  switch (role) {
+    case "teacher":
+      return {
+        role: "teacher",
+        name: "Teacher / Faculty Member",
+        portalName: "Teacher Portal",
+        url: isLocal ? "http://localhost:3001" : "https://dumalnext-teacher.vercel.app",
+        badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
+        redirectUrl: "/roster",
+      };
+    case "admin":
+      return {
+        role: "admin",
+        name: "School Administrator",
+        portalName: "Admin Portal",
+        url: isLocal ? "http://localhost:3000" : "https://dumalnext-admin.vercel.app",
+        badgeColor: "bg-blue-100 text-[#002060] border-blue-300",
+        redirectUrl: "/adjudication",
+      };
+    case "it_support":
+    default:
+      return {
+        role: "it_support",
+        name: "IT Support & Systems Desk",
+        portalName: "IT Support Portal",
+        url: isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app",
+        badgeColor: "bg-indigo-100 text-indigo-900 border-indigo-300",
+        redirectUrl: "/",
+      };
+  }
 }
 
 function AcceptInviteContent() {
+  const supabase = createClient();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const code = searchParams.get("code");
 
   const [isLoading, setIsLoading] = useState(true);
   const [invitation, setInvitation] = useState<InvitationData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Cross-portal error trapping state
+  const [wrongPortalMeta, setWrongPortalMeta] = useState<ReturnType<typeof getRoleMeta> | null>(null);
 
   // Form states
   const [firstName, setFirstName] = useState("");
@@ -31,52 +77,183 @@ function AcceptInviteContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{ message: string; redirectUrl: string } | null>(null);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setIsLoading(false);
-      setErrorMessage("No invitation token provided. Please open the link sent by your IT Support administrator.");
-      return;
-    }
+    let isMounted = true;
 
-    const validateToken = async () => {
+    const verifyAccess = async () => {
       try {
-        let res = await fetch(`/api/it-support/invitations?token=${encodeURIComponent(token)}`);
-        if (res.status === 404) {
-          res = await fetch(`/api/invitations?token=${encodeURIComponent(token)}`);
+        // Check for error description in hash (e.g. Supabase link expired or invalid)
+        if (typeof window !== "undefined" && window.location.hash.includes("error_description")) {
+          const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, "?"));
+          const errDesc = hashParams.get("error_description");
+          if (errDesc) {
+            if (isMounted) {
+              setErrorMessage(decodeURIComponent(errDesc.replace(/\+/g, " ")));
+              setIsLoading(false);
+            }
+            return;
+          }
         }
 
-        const json = await res.json();
-        if (json.valid && json.invitation) {
-          setInvitation(json.invitation);
-          if (json.invitation.fullName) {
-            const parts = json.invitation.fullName.split(" ");
-            setFirstName(parts[0] || "");
-            setLastName(parts.slice(1).join(" ") || "");
+        // 1. If PKCE code is present in query parameters, exchange it for session
+        if (code) {
+          try {
+            await supabase.auth.exchangeCodeForSession(code);
+          } catch (codeErr) {
+            console.warn("exchangeCodeForSession notice:", codeErr);
           }
-          if (json.invitation.department) {
-            setDepartment(json.invitation.department);
+        }
+
+        // 2. Check Supabase Auth Session (user clicked "Accept invitation" in Supabase email)
+        const { data: sessionData } = await supabase.auth.getSession();
+        let sessionUser: any = sessionData?.session?.user;
+
+        // If not in session, check if URL has hash fragments (#access_token=...)
+        if (!sessionUser && typeof window !== "undefined" && window.location.hash.includes("access_token")) {
+          const { data: authData } = await supabase.auth.getUser();
+          sessionUser = authData?.user;
+        }
+
+        if (sessionUser) {
+          let metaRole = (
+            sessionUser.user_metadata?.role ||
+            sessionUser.user_metadata?.user_role ||
+            sessionUser.app_metadata?.role ||
+            ""
+          ).toLowerCase();
+
+          const userEmail = sessionUser.email || "";
+
+          // Fetch stored invitation by email if needed for role or department
+          let dbInvitation: InvitationData | null = null;
+          if (userEmail) {
+            try {
+              let res = await fetch(`/api/it-support/invitations?email=${encodeURIComponent(userEmail)}`);
+              if (res.status === 404) {
+                res = await fetch(`/api/invitations?email=${encodeURIComponent(userEmail)}`);
+              }
+              const json = await res.json();
+              if (json.valid && json.invitation) {
+                dbInvitation = json.invitation;
+                if (!metaRole) {
+                  metaRole = (json.invitation.role || "").toLowerCase();
+                }
+              }
+            } catch {}
+          }
+
+          // ERROR TRAPPING: If the user role does not belong to this portal, route them!
+          if (metaRole && metaRole !== CURRENT_PORTAL_ROLE) {
+            const targetMeta = getRoleMeta(metaRole);
+            if (isMounted) {
+              setWrongPortalMeta(targetMeta);
+              setIsLoading(false);
+            }
+            // Auto redirect after 2.5 seconds
+            setTimeout(() => {
+              if (typeof window !== "undefined") {
+                window.location.href = `${targetMeta.url}/accept-invite${window.location.hash || window.location.search}`;
+              }
+            }, 2500);
+            return;
+          }
+
+          // User is on the correct portal!
+          if (isMounted) {
+            setAuthUserId(sessionUser.id);
+            const rawName = dbInvitation?.fullName || sessionUser.user_metadata?.full_name || sessionUser.user_metadata?.fullName || "";
+            const parts = rawName.split(" ");
+            const fName = parts[0] || "";
+            const lName = parts.slice(1).join(" ") || "";
+            const defaultDept = CURRENT_PORTAL_ROLE === "teacher" ? "Junior High School (JHS)" : CURRENT_PORTAL_ROLE === "admin" ? "Administrator" : "IT-support";
+            const dept = dbInvitation?.department || sessionUser.user_metadata?.department || defaultDept;
+
+            setInvitation({
+              email: userEmail,
+              role: CURRENT_PORTAL_ROLE as any,
+              fullName: rawName,
+              department: dept,
+            });
+            setFirstName(fName);
+            setLastName(lName);
+            setDepartment(dept);
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        // 3. If no active session, check if a token query parameter was supplied (?token=...)
+        if (token) {
+          let res = await fetch(`/api/it-support/invitations?token=${encodeURIComponent(token)}`);
+          if (res.status === 404) {
+            res = await fetch(`/api/invitations?token=${encodeURIComponent(token)}`);
+          }
+
+          const json = await res.json();
+          if (json.valid && json.invitation) {
+            const tokenRole = (json.invitation.role || "").toLowerCase();
+
+            // ERROR TRAPPING: If token role does not match current portal, redirect to correct portal
+            if (tokenRole && tokenRole !== CURRENT_PORTAL_ROLE) {
+              const targetMeta = getRoleMeta(tokenRole);
+              if (isMounted) {
+                setWrongPortalMeta(targetMeta);
+                setIsLoading(false);
+              }
+              setTimeout(() => {
+                if (typeof window !== "undefined") {
+                  window.location.href = `${targetMeta.url}/accept-invite?token=${encodeURIComponent(token)}`;
+                }
+              }, 2500);
+              return;
+            }
+
+            if (isMounted) {
+              setInvitation(json.invitation);
+              if (json.invitation.fullName) {
+                const parts = json.invitation.fullName.split(" ");
+                setFirstName(parts[0] || "");
+                setLastName(parts.slice(1).join(" ") || "");
+              }
+              const defaultDept = CURRENT_PORTAL_ROLE === "teacher" ? "Junior High School (JHS)" : CURRENT_PORTAL_ROLE === "admin" ? "Administrator" : "IT-support";
+              setDepartment(json.invitation.department || defaultDept);
+              setIsLoading(false);
+            }
+            return;
           } else {
-            if (json.invitation.role === "teacher") setDepartment("Junior High School (JHS)");
-            else if (json.invitation.role === "admin") setDepartment("Administrator");
-            else setDepartment("IT-support");
+            if (isMounted) {
+              setErrorMessage(json.error || "This invitation link is invalid or has expired.");
+              setIsLoading(false);
+            }
+            return;
           }
-        } else {
-          setErrorMessage(json.error || "This invitation link is invalid or has expired.");
+        }
+
+        // Neither session nor token found
+        if (isMounted) {
+          setErrorMessage("No invitation session or token found. Please open the 'Accept invitation' link sent to your email by Dumalneg National High School.");
+          setIsLoading(false);
         }
       } catch (err: any) {
-        setErrorMessage("Network error validating your invitation link.");
-      } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setErrorMessage("Network error verifying your invitation credentials.");
+          setIsLoading(false);
+        }
       }
     };
 
-    validateToken();
-  }, [token]);
+    verifyAccess();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, code]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token || !invitation) return;
+    if (!invitation) return;
 
     if (!password || password.length < 6) {
       setErrorMessage("Password must be at least 6 characters in length.");
@@ -92,8 +269,17 @@ function AcceptInviteContent() {
     setErrorMessage(null);
 
     try {
+      // 1. Update password in Supabase Auth if session exists
+      try {
+        await supabase.auth.updateUser({ password });
+      } catch {}
+
+      // 2. Call backend accept API to ensure public tables are updated
       const payload = {
-        token,
+        token: token || undefined,
+        email: invitation.email,
+        userId: authUserId || undefined,
+        role: CURRENT_PORTAL_ROLE,
         password,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
@@ -122,16 +308,17 @@ function AcceptInviteContent() {
           document.cookie = `${json.cookieName}=${serialized}; path=/; max-age=604800; SameSite=Lax`;
         }
 
+        const targetUrl = json.redirectUrl || DEFAULT_REDIRECT_PATH;
         setSuccessInfo({
-          message: "Account created and activated successfully! Redirecting you to your portal...",
-          redirectUrl: json.redirectUrl,
+          message: "Account created and activated successfully! Redirecting you to your workstation...",
+          redirectUrl: targetUrl,
         });
 
         setTimeout(() => {
-          window.location.href = json.redirectUrl;
+          window.location.href = targetUrl;
         }, 1500);
       } else {
-        setErrorMessage(json.error || "Failed to activate your account.");
+        setErrorMessage(json.error || "Failed to activate your account. Please try again or contact IT Support.");
       }
     } catch (err: any) {
       setErrorMessage(err.message || "Network error activating account.");
@@ -146,14 +333,50 @@ function AcceptInviteContent() {
         <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-3 shadow-sm max-w-md w-full">
           <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
           <span className="text-xs uppercase font-bold text-[#002060] tracking-wider block">
-            Verifying Invitation Token
+            Verifying Invitation Credentials
           </span>
-          <p className="text-xs text-slate-500">Checking credentials with Dumalneg NHS system registry...</p>
+          <p className="text-xs text-slate-500">Connecting to Dumalneg NHS Identity Service...</p>
         </div>
       </div>
     );
   }
 
+  // SCENARIO A: CROSS-PORTAL ERROR TRAPPING ACTIVATED
+  if (wrongPortalMeta) {
+    const targetUrl = `${wrongPortalMeta.url}/accept-invite${typeof window !== "undefined" ? (window.location.hash || window.location.search) : ""}`;
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="max-w-md w-full mx-auto bg-white rounded-xl border-2 border-amber-400 p-8 shadow-md text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto text-xl font-bold font-mono">
+            !
+          </div>
+          <div>
+            <span className="text-[10px] font-mono font-bold uppercase text-amber-800 tracking-wider block">
+              CROSS-PORTAL ROLE GUARD &bull; ERROR TRAPPING
+            </span>
+            <h2 className="text-base font-bold text-slate-900 mt-1">
+              Designated Role: {wrongPortalMeta.name}
+            </h2>
+          </div>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Your invitation is officially designated for the <strong>{wrongPortalMeta.portalName}</strong>. 
+            You are currently accessing the {CURRENT_PORTAL_NAME} portal.
+          </p>
+          <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 font-semibold rounded-lg">
+            Automatically redirecting to {wrongPortalMeta.portalName}...
+          </div>
+          <a
+            href={targetUrl}
+            className="inline-block w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-xs transition-colors"
+          >
+            Proceed to {wrongPortalMeta.portalName} &rarr;
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // SCENARIO B: ERROR OR INVALID TOKEN
   if (errorMessage && !invitation) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
@@ -171,14 +394,14 @@ function AcceptInviteContent() {
               {errorMessage}
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Please contact the Dumalneg National High School IT Support Desk to issue a new onboarding link for your official email address.
+              Please check your email and click the official <strong>Accept invitation</strong> button, or contact Dumalneg NHS IT Support to issue a new invitation.
             </p>
             <div className="pt-3 border-t border-slate-200 flex justify-center">
               <Link
                 href="/"
                 className="text-xs font-bold text-[#002060] hover:underline flex items-center gap-1"
               >
-                <span>&larr; Return to School Portal Home</span>
+                <span>&larr; Return to Portal Home</span>
               </Link>
             </div>
           </div>
@@ -187,23 +410,13 @@ function AcceptInviteContent() {
     );
   }
 
-  const roleTitle =
-    invitation?.role === "teacher"
-      ? "Teacher / Faculty Member"
-      : invitation?.role === "admin"
-      ? "School Administrator"
-      : "IT Support Desk";
+  const roleMeta = getRoleMeta(CURRENT_PORTAL_ROLE);
 
-  const roleBadgeColor =
-    invitation?.role === "teacher"
-      ? "bg-emerald-100 text-emerald-900 border-emerald-300"
-      : invitation?.role === "admin"
-      ? "bg-amber-400/20 text-amber-200 border-amber-300/40"
-      : "bg-indigo-100 text-indigo-900 border-indigo-300";
-
+  // SCENARIO C: REGISTRATION FORM ON CORRECT PORTAL
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-lg w-full mx-auto space-y-6">
+        {/* DepEd Official Strip */}
         <div className="text-center space-y-2">
           <img
             src="/dumalneg-logo.png"
@@ -211,13 +424,14 @@ function AcceptInviteContent() {
             className="w-16 h-16 rounded-full object-cover bg-white p-1 shadow-md border-2 border-amber-400 mx-auto"
           />
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block">
-            DepEd Region I &bull; Division of Ilocos Norte &bull; Dumalneg NHS
+            DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS
           </span>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#002060] tracking-tight">
             Official Staff Onboarding &amp; Password Setup
           </h1>
         </div>
 
+        {/* Success Banner */}
         {successInfo && (
           <div className="bg-emerald-50 border border-emerald-300 border-l-4 border-l-emerald-600 rounded-lg p-4 text-xs font-semibold text-emerald-950 space-y-1.5 shadow-xs">
             <div className="font-bold uppercase tracking-wider text-emerald-800">Account Activated</div>
@@ -228,28 +442,32 @@ function AcceptInviteContent() {
           </div>
         )}
 
+        {/* Error Notice */}
         {errorMessage && (
           <div className="bg-red-50 border border-red-300 border-l-4 border-l-red-600 rounded-lg p-3.5 text-xs font-semibold text-red-900">
             {errorMessage}
           </div>
         )}
 
+        {/* Onboarding Form Card */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden">
-          <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-5 border-b-4 border-amber-400">
+          {/* Card Header */}
+          <div className={`bg-gradient-to-r ${CURRENT_PORTAL_THEME_FROM} ${CURRENT_PORTAL_THEME_TO} text-white p-5 border-b-4 border-amber-400`}>
             <span className="text-[10px] font-bold tracking-widest uppercase text-amber-300 block">
-              Secure Onboarding Invitation Verified
+              Official Invitation Verified &bull; {CURRENT_PORTAL_TITLE}
             </span>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-1">
               <span className="text-base font-extrabold tracking-tight">
-                Setup Credentials: {roleTitle}
+                Setup Credentials: {CURRENT_PORTAL_NAME}
               </span>
-              <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase border rounded-full ${roleBadgeColor}`}>
-                Role: {invitation?.role}
+              <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase border rounded-full ${roleMeta.badgeColor}`}>
+                Role: {CURRENT_PORTAL_ROLE}
               </span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-4">
+            {/* Email Address (Read-only) */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Authorized Staff Email (Locked)
@@ -261,10 +479,11 @@ function AcceptInviteContent() {
                 className="w-full px-3.5 py-2.5 text-xs rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-medium select-all cursor-not-allowed"
               />
               <span className="text-[11px] text-slate-500 mt-1 block">
-                This account will be permanently tied to this email address.
+                This account is permanently tied to this verified email address.
               </span>
             </div>
 
+            {/* Name Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
@@ -295,9 +514,10 @@ function AcceptInviteContent() {
               </div>
             </div>
 
+            {/* Department / Position */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Department / Academic Office
+                Department / Position
               </label>
               <input
                 type="text"
@@ -307,6 +527,7 @@ function AcceptInviteContent() {
               />
             </div>
 
+            {/* Password Fields */}
             <div className="space-y-3.5 pt-3 border-t border-slate-200">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
@@ -348,6 +569,7 @@ function AcceptInviteContent() {
               </div>
             </div>
 
+            {/* Submit Button */}
             <div className="pt-3">
               <button
                 type="submit"
@@ -355,15 +577,16 @@ function AcceptInviteContent() {
                 className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold tracking-wide transition-colors cursor-pointer shadow-sm"
               >
                 {isSubmitting
-                  ? "Activating Account & Signing In..."
-                  : "Create Password & Activate Portal Access"}
+                  ? "Activating Account & Setting Password..."
+                  : "Create Password & Activate Account Access"}
               </button>
             </div>
           </form>
         </div>
 
+        {/* Footer info */}
         <div className="text-center text-xs text-slate-500">
-          Dumalneg National High School &bull; Identity &amp; Access Onboarding
+          Dumalneg National High School &bull; Staff Identity &amp; Access Onboarding
         </div>
       </div>
     </div>

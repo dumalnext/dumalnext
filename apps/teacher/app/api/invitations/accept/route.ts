@@ -64,14 +64,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { token, password, firstName, lastName, department } = body;
-
-    if (!token) {
-      return NextResponse.json(
-        { error: "Invitation token is required." },
-        { status: 400, headers: NO_CACHE_HEADERS }
-      );
-    }
+    const { token, password, firstName, lastName, department, email: bodyEmail, userId: bodyUserId } = body;
 
     const cleanPass = String(password || "").trim();
     if (!cleanPass || cleanPass.length < 6) {
@@ -82,16 +75,32 @@ export async function POST(req: NextRequest) {
     }
 
     const invitations = await getStoredInvitations(supabase);
-    const invitationIndex = invitations.findIndex((i) => i.token === token.trim());
+    let invitation: StaffInvitation | null = null;
+    let invitationIndex = -1;
 
-    if (invitationIndex === -1) {
+    if (token) {
+      invitationIndex = invitations.findIndex((i) => i.token === token.trim());
+      if (invitationIndex !== -1) invitation = invitations[invitationIndex];
+    } else if (bodyEmail) {
+      const cleanEmail = bodyEmail.trim().toLowerCase();
+      invitationIndex = invitations.findIndex(
+        (i) => i.email.toLowerCase() === cleanEmail && i.status === "pending"
+      );
+      if (invitationIndex !== -1) invitation = invitations[invitationIndex];
+    }
+
+    if (!invitation) {
+      if (token) {
+        return NextResponse.json(
+          { error: "Invalid invitation token or link has expired." },
+          { status: 404, headers: NO_CACHE_HEADERS }
+        );
+      }
       return NextResponse.json(
-        { error: "Invalid invitation token or link has expired." },
+        { error: "No pending invitation found for this email address." },
         { status: 404, headers: NO_CACHE_HEADERS }
       );
     }
-
-    const invitation = invitations[invitationIndex];
 
     if (invitation.status === "accepted") {
       return NextResponse.json(
@@ -114,14 +123,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const email = invitation.email.toLowerCase().trim();
+    const email = (invitation ? invitation.email : (bodyEmail || "")).toLowerCase().trim();
     const fName = String(firstName || invitation.fullName?.split(" ")[0] || "Faculty").trim().toUpperCase();
     const lName = String(lastName || invitation.fullName?.split(" ").slice(1).join(" ") || "Member").trim().toUpperCase();
     const fullName = `${fName} ${lName}`.trim();
     const dept = String(department || invitation.department || "Junior High School (JHS)").trim();
 
     // 1. Supabase Auth Registration / Activation
-    let authUserId: string | null = null;
+    let authUserId: string | null = bodyUserId || null;
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    if (serviceRoleKey && supabaseUrl) {
+      try {
+        const adminAuthClient = createSupabaseJsClient(supabaseUrl, serviceRoleKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+
+        if (authUserId) {
+          await adminAuthClient.auth.admin.updateUserById(authUserId, {
+            password: cleanPass,
+            email_confirm: true,
+            user_metadata: { role: "teacher", user_role: "teacher", full_name: fullName, department: dept },
+          });
+        }
+      } catch (adminErr: any) {
+        console.warn("admin auth update notice:", adminErr?.message);
+      }
+    }
 
     try {
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({

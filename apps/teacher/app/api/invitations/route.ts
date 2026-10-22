@@ -63,11 +63,19 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
+    const emailParam = searchParams.get("email");
 
     const invitations = await getStoredInvitations(supabase);
 
-    if (token) {
-      const found = invitations.find((i) => i.token === token.trim());
+    // Token or Email Validation Mode
+    if (token || emailParam) {
+      let found: StaffInvitation | undefined;
+      if (token) {
+        found = invitations.find((i) => i.token === token.trim());
+      } else if (emailParam) {
+        const clean = emailParam.trim().toLowerCase();
+        found = invitations.find((i) => i.email.toLowerCase() === clean && i.status !== "revoked");
+      }
       if (!found) {
         return NextResponse.json(
           { valid: false, error: "Invitation not found or link has expired." },

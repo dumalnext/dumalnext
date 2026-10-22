@@ -41,7 +41,13 @@ export default function StaffInvitationManager() {
   });
 
   const [submittingRole, setSubmittingRole] = useState<string | null>(null);
-  const [lastGeneratedLink, setLastGeneratedLink] = useState<{ email: string; role: string; url: string } | null>(null);
+  const [lastGeneratedLink, setLastGeneratedLink] = useState<{
+    email: string;
+    role: string;
+    url: string;
+    emailSent?: boolean;
+    emailError?: string | null;
+  } | null>(null);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
 
@@ -129,17 +135,35 @@ export default function StaffInvitationManager() {
         } else {
           defaultBase = isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app";
         }
-        const fullUrl = json.inviteUrl || `${defaultBase}/?token=${json.invitation.token}`;
+        const fullUrl = json.inviteUrl || `${defaultBase}/accept-invite?token=${json.invitation.token}`;
+        const isEmailSent = !!json.emailSent;
 
         setLastGeneratedLink({
           email: json.invitation.email,
           role: json.invitation.role,
           url: fullUrl,
+          emailSent: isEmailSent,
+          emailError: json.emailError || null,
         });
-        setStatusMessage({
-          type: "success",
-          text: `Invitation link generated successfully for ${json.invitation.email}. The recipient can now accept the invite and create their password.`,
-        });
+
+        const targetPortalName =
+          json.invitation.role === "teacher"
+            ? "Teacher Portal"
+            : json.invitation.role === "admin"
+            ? "Admin Portal"
+            : "IT Support Portal";
+
+        if (isEmailSent) {
+          setStatusMessage({
+            type: "success",
+            text: `Opisyal na Supabase invitation email ay matagumpay na naipadala sa ${json.invitation.email}. Kailangan lamang i-click ng kawani ang "Accept invitation" button sa kanilang email upang makapasok sa ${targetPortalName} at mag-setup ng password.`,
+          });
+        } else {
+          setStatusMessage({
+            type: "success",
+            text: `Nai-register ang imbitasyon para sa ${json.invitation.email} (${targetPortalName}). Paunawa: Upang magpadala ng live email ang Supabase, siguraduhing naka-set ang SUPABASE_SERVICE_ROLE_KEY. Maaari ding gamitin ang backup link sa ibaba.`,
+          });
+        }
 
         if (role === "teacher") setTeacherForm({ email: "", fullName: "", department: "Junior High School (JHS)" });
         if (role === "admin") setAdminForm({ email: "", fullName: "", department: "Administrator" });
@@ -237,43 +261,106 @@ export default function StaffInvitationManager() {
         </div>
       )}
 
-      {/* Prominent Generated Link Display */}
+      {/* Prominent Generated Link / Email Dispatch Display */}
       {lastGeneratedLink && (
-        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-500 space-y-2 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-900 uppercase tracking-wide">
-              Active Invitation Link Ready for {lastGeneratedLink.email}
-            </span>
-            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900">
-              Role: {lastGeneratedLink.role}
+        <div
+          className={`p-5 rounded-xl border space-y-3 shadow-sm ${
+            lastGeneratedLink.emailSent
+              ? "bg-emerald-50 border-emerald-500"
+              : "bg-blue-50 border-blue-400"
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span
+                className={`text-[10px] font-mono font-bold uppercase tracking-wider block ${
+                  lastGeneratedLink.emailSent ? "text-emerald-800" : "text-blue-900"
+                }`}
+              >
+                {lastGeneratedLink.emailSent
+                  ? "Opisyal na Imbitasyon Naipadala via Supabase Email"
+                  : "Imbitasyon Naitala sa Sistema"}
+              </span>
+              <h3
+                className={`text-sm font-bold mt-0.5 ${
+                  lastGeneratedLink.emailSent ? "text-emerald-950" : "text-blue-950"
+                }`}
+              >
+                Kawani: {lastGeneratedLink.email}
+              </h3>
+            </div>
+            <span
+              className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border self-start sm:self-auto ${
+                lastGeneratedLink.role === "teacher"
+                  ? "bg-emerald-100 text-emerald-900 border-emerald-300"
+                  : lastGeneratedLink.role === "admin"
+                  ? "bg-blue-100 text-[#002060] border-blue-300"
+                  : "bg-indigo-100 text-indigo-900 border-indigo-300"
+              }`}
+            >
+              Itinalagang Portal: {lastGeneratedLink.role === "teacher" ? "Teacher" : lastGeneratedLink.role === "admin" ? "Admin" : "IT Support"}
             </span>
           </div>
-          <p className="text-xs text-emerald-800">
-            Share this secure link with the recipient. They will be directed to create their password and activate their account:
-          </p>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-            <input
-              type="text"
-              readOnly
-              value={lastGeneratedLink.url}
-              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-lg select-all text-slate-900"
-            />
-            <button
-              type="button"
-              onClick={() => handleCopyLink(lastGeneratedLink.url, "banner")}
-              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
-            >
-              {copiedToken === "banner" ? "Copied to Clipboard" : "Copy Invite Link"}
-            </button>
-            <a
-              href={lastGeneratedLink.url}
-              target="_blank"
-              rel="noreferrer"
-              className="px-4 py-2 bg-[#002060] hover:bg-[#001744] text-white rounded-lg text-xs font-bold uppercase tracking-wider text-center shrink-0 transition-colors"
-            >
-              Open Link
-            </a>
-          </div>
+
+          {lastGeneratedLink.emailSent ? (
+            <div className="p-3 bg-white/90 border border-emerald-200 rounded-lg text-xs text-emerald-950 space-y-1.5 leading-relaxed">
+              <p className="font-semibold text-emerald-900">
+                Ang imbitasyon ay direktang naipadala sa email inbox ng kawani na may opisyal na <strong>[ Accept invitation ]</strong> button mula sa Dumalneg National High School Identity Service.
+              </p>
+              <p className="text-[11px] text-emerald-800">
+                Hindi na kailangan kopyahin at ipadala nang manu-mano ang link. Pag-click ng kawani sa link sa kanilang email, awtomatiko silang mapupunta sa <strong>{lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"}</strong> upang magtakda ng kanilang password.
+              </p>
+            </div>
+          ) : (
+            <div className="p-3 bg-white/90 border border-blue-200 rounded-lg text-xs text-blue-950 space-y-1.5 leading-relaxed">
+              <p className="font-semibold text-blue-900">
+                Naihanda na ang rekord ng imbitasyon para sa kawani.
+              </p>
+              <p className="text-[11px] text-blue-800">
+                Paunawa ukol sa automated email: Kung nais na awtomatikong mag-dispatch si Supabase ng opisyal na verification email, tiyaking nakalagay ang <code>SUPABASE_SERVICE_ROLE_KEY</code> sa Vercel Environment Variables. Maaari ding kopyahin ang link sa ibaba kung nais itong ibigay nang direkta:
+              </p>
+            </div>
+          )}
+
+          {/* Collapsible / Direct Link Section */}
+          <details
+            open={!lastGeneratedLink.emailSent}
+            className="text-xs text-slate-700 pt-1"
+          >
+            <summary className="cursor-pointer font-bold text-[#002060] hover:underline select-none">
+              {lastGeneratedLink.emailSent
+                ? "Ipakita ang Backup Direct Activation Link (Opsiyonal)"
+                : "Direct Activation Link para sa Kawani"}
+            </summary>
+            <div className="mt-2 space-y-1.5">
+              <p className="text-[11px] text-slate-500">
+                Maaari ding buksan o kopyahin ang link na ito bilang alternatibong paraan:
+              </p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={lastGeneratedLink.url}
+                  className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-slate-300 rounded-lg select-all text-slate-900"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleCopyLink(lastGeneratedLink.url, "banner")}
+                  className="px-4 py-2 bg-[#002060] hover:bg-[#001744] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+                >
+                  {copiedToken === "banner" ? "Nakopya sa Clipboard" : "Kopyahin ang Link"}
+                </button>
+                <a
+                  href={lastGeneratedLink.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider text-center shrink-0 transition-colors"
+                >
+                  Buksan
+                </a>
+              </div>
+            </div>
+          </details>
         </div>
       )}
 
@@ -558,7 +645,7 @@ export default function StaffInvitationManager() {
                   } else {
                     portalBase = isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app";
                   }
-                  const inviteUrl = `${portalBase}/?token=${inv.token}`;
+                  const inviteUrl = `${portalBase}/accept-invite?token=${inv.token}`;
                   const isPending = inv.status === "pending";
 
                   return (
