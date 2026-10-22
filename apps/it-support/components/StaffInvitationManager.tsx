@@ -156,12 +156,12 @@ export default function StaffInvitationManager() {
         if (isEmailSent) {
           setStatusMessage({
             type: "success",
-            text: `Opisyal na Supabase invitation email ay matagumpay na naipadala sa ${json.invitation.email}. Kailangan lamang i-click ng kawani ang "Accept invitation" button sa kanilang email upang makapasok sa ${targetPortalName} at mag-setup ng password.`,
+            text: `Official Supabase invitation email successfully dispatched to ${json.invitation.email}. The recipient can now click "Accept invitation" in their email to access the ${targetPortalName} and set up their password.`,
           });
         } else {
           setStatusMessage({
             type: "success",
-            text: `Nai-register ang imbitasyon para sa ${json.invitation.email} (${targetPortalName}). Paunawa: Upang magpadala ng live email ang Supabase, siguraduhing naka-set ang SUPABASE_SERVICE_ROLE_KEY. Maaari ding gamitin ang backup link sa ibaba.`,
+            text: `Invitation registered for ${json.invitation.email} (${targetPortalName}). Notice: For automated live email dispatch, ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel Environment Variables. A backup direct link is also available below.`,
           });
         }
 
@@ -278,15 +278,15 @@ export default function StaffInvitationManager() {
                 }`}
               >
                 {lastGeneratedLink.emailSent
-                  ? "Opisyal na Imbitasyon Naipadala via Supabase Email"
-                  : "Imbitasyon Naitala sa Sistema"}
+                  ? "Official Invitation Dispatched via Supabase Email"
+                  : "Staff Invitation Registered in System"}
               </span>
               <h3
                 className={`text-sm font-bold mt-0.5 ${
                   lastGeneratedLink.emailSent ? "text-emerald-950" : "text-blue-950"
                 }`}
               >
-                Kawani: {lastGeneratedLink.email}
+                Recipient: {lastGeneratedLink.email}
               </h3>
             </div>
             <span
@@ -298,26 +298,26 @@ export default function StaffInvitationManager() {
                   : "bg-indigo-100 text-indigo-900 border-indigo-300"
               }`}
             >
-              Itinalagang Portal: {lastGeneratedLink.role === "teacher" ? "Teacher" : lastGeneratedLink.role === "admin" ? "Admin" : "IT Support"}
+              Designated Portal: {lastGeneratedLink.role === "teacher" ? "Teacher" : lastGeneratedLink.role === "admin" ? "Admin" : "IT Support"}
             </span>
           </div>
 
           {lastGeneratedLink.emailSent ? (
             <div className="p-3 bg-white/90 border border-emerald-200 rounded-lg text-xs text-emerald-950 space-y-1.5 leading-relaxed">
               <p className="font-semibold text-emerald-900">
-                Ang imbitasyon ay direktang naipadala sa email inbox ng kawani na may opisyal na <strong>[ Accept invitation ]</strong> button mula sa Dumalneg National High School Identity Service.
+                The invitation has been dispatched directly to the staff member's email inbox with an official <strong>[ Accept invitation ]</strong> button from Dumalneg National High School Identity Service.
               </p>
               <p className="text-[11px] text-emerald-800">
-                Hindi na kailangan kopyahin at ipadala nang manu-mano ang link. Pag-click ng kawani sa link sa kanilang email, awtomatiko silang mapupunta sa <strong>{lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"}</strong> upang magtakda ng kanilang password.
+                Manual link copying is not required. When the recipient clicks the button in their email, they will be automatically routed to the <strong>{lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"}</strong> to create their password and activate access.
               </p>
             </div>
           ) : (
             <div className="p-3 bg-white/90 border border-blue-200 rounded-lg text-xs text-blue-950 space-y-1.5 leading-relaxed">
               <p className="font-semibold text-blue-900">
-                Naihanda na ang rekord ng imbitasyon para sa kawani.
+                Staff invitation record has been created and registered.
               </p>
               <p className="text-[11px] text-blue-800">
-                Paunawa ukol sa automated email: Kung nais na awtomatikong mag-dispatch si Supabase ng opisyal na verification email, tiyaking nakalagay ang <code>SUPABASE_SERVICE_ROLE_KEY</code> sa Vercel Environment Variables. Maaari ding kopyahin ang link sa ibaba kung nais itong ibigay nang direkta:
+                Notice regarding automated email dispatch: Ensure <code>SUPABASE_SERVICE_ROLE_KEY</code> is configured in Vercel Environment Variables. You may also provide the direct activation link below:
               </p>
             </div>
           )}
@@ -329,12 +329,12 @@ export default function StaffInvitationManager() {
           >
             <summary className="cursor-pointer font-bold text-[#002060] hover:underline select-none">
               {lastGeneratedLink.emailSent
-                ? "Ipakita ang Backup Direct Activation Link (Opsiyonal)"
-                : "Direct Activation Link para sa Kawani"}
+                ? "View Backup Direct Activation Link (Optional)"
+                : "Direct Staff Activation Link"}
             </summary>
             <div className="mt-2 space-y-1.5">
               <p className="text-[11px] text-slate-500">
-                Maaari ding buksan o kopyahin ang link na ito bilang alternatibong paraan:
+                This secure direct link can be opened or shared as a backup alternative:
               </p>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <input
@@ -348,7 +348,7 @@ export default function StaffInvitationManager() {
                   onClick={() => handleCopyLink(lastGeneratedLink.url, "banner")}
                   className="px-4 py-2 bg-[#002060] hover:bg-[#001744] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
                 >
-                  {copiedToken === "banner" ? "Nakopya sa Clipboard" : "Kopyahin ang Link"}
+                  {copiedToken === "banner" ? "Copied to Clipboard" : "Copy Link"}
                 </button>
                 <a
                   href={lastGeneratedLink.url}
@@ -356,7 +356,7 @@ export default function StaffInvitationManager() {
                   rel="noreferrer"
                   className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider text-center shrink-0 transition-colors"
                 >
-                  Buksan
+                  Open
                 </a>
               </div>
             </div>
