@@ -31,13 +31,13 @@ export default function StaffInvitationManager() {
   const [adminForm, setAdminForm] = useState({
     email: "",
     fullName: "",
-    department: "Office of the Registrar",
+    department: "Administrator",
   });
 
   const [itSupportForm, setItSupportForm] = useState({
     email: "",
     fullName: "",
-    department: "System Administrator",
+    department: "IT-support",
   });
 
   const [submittingRole, setSubmittingRole] = useState<string | null>(null);
@@ -142,8 +142,8 @@ export default function StaffInvitationManager() {
         });
 
         if (role === "teacher") setTeacherForm({ email: "", fullName: "", department: "Junior High School (JHS)" });
-        if (role === "admin") setAdminForm({ email: "", fullName: "", department: "Office of the Registrar" });
-        if (role === "it_support") setItSupportForm({ email: "", fullName: "", department: "System Administrator" });
+        if (role === "admin") setAdminForm({ email: "", fullName: "", department: "Administrator" });
+        if (role === "it_support") setItSupportForm({ email: "", fullName: "", department: "IT-support" });
 
         fetchInvitations();
       } else {
@@ -404,12 +404,9 @@ export default function StaffInvitationManager() {
                   value={adminForm.department}
                   onChange={(val) => setAdminForm({ ...adminForm, department: val })}
                   options={[
-                    { value: "Office of the Registrar", label: "Office of the Registrar", badge: "Registrar" },
-                    { value: "Academic Affairs", label: "Academic Affairs", badge: "Academics" },
-                    { value: "Principal's Office", label: "Principal's Office", badge: "Principal" },
-                    { value: "Admissions Committee", label: "Admissions Committee", badge: "Admissions" },
+                    { value: "Administrator", label: "Administrator", badge: "Admin" },
                   ]}
-                  placeholder="Select Administrative Office / Unit"
+                  placeholder="Select Administrator"
                 />
               </div>
             </div>
@@ -471,19 +468,16 @@ export default function StaffInvitationManager() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
-                  System Administration Designation
+                  Position
                 </label>
                 <CustomSelect
                   fullWidth
                   value={itSupportForm.department}
                   onChange={(val) => setItSupportForm({ ...itSupportForm, department: val })}
                   options={[
-                    { value: "System Administrator", label: "System Administrator", badge: "SysAdmin" },
-                    { value: "Database Operations Specialist", label: "Database Operations Specialist", badge: "Database" },
-                    { value: "Network & Security Support", label: "Network & Security Support", badge: "Network" },
-                    { value: "IT Operations Desk", label: "IT Operations Desk", badge: "Operations" },
+                    { value: "IT-support", label: "IT-support", badge: "IT Support" },
                   ]}
-                  placeholder="Select System Administration Designation"
+                  placeholder="Select Position"
                 />
               </div>
             </div>

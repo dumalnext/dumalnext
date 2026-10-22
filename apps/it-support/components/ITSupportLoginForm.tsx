@@ -343,19 +343,16 @@ function ITSupportLoginFormInner() {
 
                   <div>
                     <label className="block font-bold text-slate-700 mb-1.5">
-                      System Administration Designation
+                      Position
                     </label>
                     <CustomSelect
                       fullWidth
                       value={department}
                       onChange={(val) => setDepartment(val)}
                       options={[
-                        { value: "System Administrator", label: "System Administrator", badge: "SysAdmin" },
-                        { value: "Database Operations Specialist", label: "Database Operations Specialist", badge: "Database" },
-                        { value: "Network & Security Support", label: "Network & Security Support", badge: "Network" },
-                        { value: "IT Operations Desk", label: "IT Operations Desk", badge: "Operations" },
+                        { value: "IT-support", label: "IT-support", badge: "IT Support" },
                       ]}
-                      placeholder="Select System Administration Designation"
+                      placeholder="Select Position"
                     />
                   </div>
 

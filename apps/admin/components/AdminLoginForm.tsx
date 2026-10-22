@@ -408,10 +408,7 @@ function AdminLoginFormInner() {
                       onChange={(e) => setDepartment(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 outline-none transition-all"
                     >
-                      <option value="Office of the Registrar">Office of the Registrar</option>
-                      <option value="Academic Affairs">Academic Affairs</option>
-                      <option value="Principal's Office">Principal&apos;s Office</option>
-                      <option value="Admissions Committee">Admissions Committee</option>
+                      <option value="Administrator">Administrator</option>
                     </select>
                   </div>
 

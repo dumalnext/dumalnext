@@ -58,8 +58,8 @@ function AcceptInviteContent() {
             setDepartment(json.invitation.department);
           } else {
             if (json.invitation.role === "teacher") setDepartment("Junior High School (JHS)");
-            else if (json.invitation.role === "admin") setDepartment("Office of the Registrar");
-            else setDepartment("System Administrator");
+            else if (json.invitation.role === "admin") setDepartment("Administrator");
+            else setDepartment("IT-support");
           }
         } else {
           setErrorMessage(json.error || "This invitation link is invalid or has expired.");
