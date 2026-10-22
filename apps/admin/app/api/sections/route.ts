@@ -73,6 +73,45 @@ function isApplicationInActiveTerm(
   return appTermNum === activeTermNumber;
 }
 
+async function getClassroomsCapacityMap(supabase: any): Promise<Map<string, number>> {
+  const { data: classroomsData } = await supabase
+    .from("classrooms")
+    .select("classroom_id, room_name, building, capacity");
+
+  const roomCapacityMap = new Map<string, number>();
+  (classroomsData || []).forEach((c: any) => {
+    const cap = Number(c.capacity) || 40;
+    if (c.classroom_id) roomCapacityMap.set(c.classroom_id.toLowerCase(), cap);
+    if (c.room_name) roomCapacityMap.set(c.room_name.toLowerCase(), cap);
+    if (c.room_name && c.building) {
+      roomCapacityMap.set(`${c.room_name} (${c.building})`.toLowerCase(), cap);
+    }
+  });
+
+  try {
+    const { data: rmConf } = await supabase
+      .from("system_settings")
+      .select("value")
+      .eq("key", "classrooms_config")
+      .maybeSingle();
+
+    if (rmConf?.value?.customClassrooms) {
+      rmConf.value.customClassrooms.forEach((c: any) => {
+        const cap = Number(c.capacity) || 40;
+        const code = c.classroom_id || c.classroomId;
+        const name = c.room_name || c.roomName;
+        if (code) roomCapacityMap.set(code.toLowerCase(), cap);
+        if (name) roomCapacityMap.set(name.toLowerCase(), cap);
+        if (name && c.building) {
+          roomCapacityMap.set(`${name} (${c.building})`.toLowerCase(), cap);
+        }
+      });
+    }
+  } catch {}
+
+  return roomCapacityMap;
+}
+
 // GET /api/sections - List sections with live enrolled counts (and optionally students)
 export async function GET(req: Request) {
   try {
@@ -191,19 +230,7 @@ export async function GET(req: Request) {
     }
 
     // Query classrooms to ensure section capacity is synced with IT Support physical room capacity
-    const { data: classroomsData } = await supabase
-      .from("classrooms")
-      .select("classroom_id, room_name, building, capacity");
-
-    const roomCapacityMap = new Map<string, number>();
-    (classroomsData || []).forEach((c: any) => {
-      const cap = Number(c.capacity) || 40;
-      if (c.classroom_id) roomCapacityMap.set(c.classroom_id.toLowerCase(), cap);
-      if (c.room_name) roomCapacityMap.set(c.room_name.toLowerCase(), cap);
-      if (c.room_name && c.building) {
-        roomCapacityMap.set(`${c.room_name} (${c.building})`.toLowerCase(), cap);
-      }
-    });
+    const roomCapacityMap = await getClassroomsCapacityMap(supabase);
 
     const sectionsList = Array.from(sectionMap.values())
       .filter((s) => s.strand !== "Elective" && !s.isElective && !String(s.id).startsWith("elec-"))
@@ -477,17 +504,12 @@ export async function POST(req: Request) {
 
     let parsedCapacity = Number(capacity) > 0 ? Number(capacity) : 40;
     if (room) {
-      const { data: rmData } = await supabase
-        .from("classrooms")
-        .select("classroom_id, room_name, building, capacity");
-      if (rmData) {
-        const cleanRoom = room.trim().toLowerCase();
-        const found = rmData.find((c: any) => {
-          const full = `${c.room_name} (${c.building})`.toLowerCase();
-          return full === cleanRoom || c.room_name?.toLowerCase() === cleanRoom || c.classroom_id?.toLowerCase() === cleanRoom;
-        });
-        if (found && found.capacity) {
-          parsedCapacity = Number(found.capacity);
+      const roomCapacityMap = await getClassroomsCapacityMap(supabase);
+      const cleanRoom = room.trim().toLowerCase();
+      for (const [key, cap] of roomCapacityMap.entries()) {
+        if (cleanRoom === key || cleanRoom.includes(key) || key.includes(cleanRoom)) {
+          parsedCapacity = cap;
+          break;
         }
       }
     }
@@ -609,17 +631,12 @@ export async function PUT(req: Request) {
     if (room !== undefined) {
       updatePayload.room = room ? room.trim() : null;
       if (room) {
-        const { data: rmData } = await supabase
-          .from("classrooms")
-          .select("classroom_id, room_name, building, capacity");
-        if (rmData) {
-          const cleanRoom = room.trim().toLowerCase();
-          const found = rmData.find((c: any) => {
-            const full = `${c.room_name} (${c.building})`.toLowerCase();
-            return full === cleanRoom || c.room_name?.toLowerCase() === cleanRoom || c.classroom_id?.toLowerCase() === cleanRoom;
-          });
-          if (found && found.capacity) {
-            updatePayload.capacity = Number(found.capacity);
+        const roomCapacityMap = await getClassroomsCapacityMap(supabase);
+        const cleanRoom = room.trim().toLowerCase();
+        for (const [key, cap] of roomCapacityMap.entries()) {
+          if (cleanRoom === key || cleanRoom.includes(key) || key.includes(cleanRoom)) {
+            updatePayload.capacity = cap;
+            break;
           }
         }
       }
