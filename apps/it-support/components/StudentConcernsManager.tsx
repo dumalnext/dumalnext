@@ -133,7 +133,7 @@ export default function StudentConcernsManager() {
   const handleIngestEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ingestEmailFrom.trim() || !ingestEmailFrom.includes("@")) {
-      setIngestFeedback({ type: "error", text: "Pakilagay po ang email address ng nag-send mula sa Gmail." });
+      setIngestFeedback({ type: "error", text: "Please enter the student's sender email address." });
       return;
     }
     setIsIngestingEmail(true);
@@ -151,17 +151,17 @@ export default function StudentConcernsManager() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Nabigong i-load ang email.");
+        throw new Error(data.error || "Failed to ingest inbound email.");
       }
       setIngestFeedback({
         type: "success",
-        text: `Matagumpay na na-ingest ang email bilang ticket #${data.ticketNumber}! Kasalukuyan itong nakalagay sa listahan ng concerns.`,
+        text: `Email successfully ingested as Ticket #${data.ticketNumber} and added to the concerns queue.`,
       });
       setIngestEmailFrom("");
       setIngestEmailBody("");
       await fetchConcerns(true);
     } catch (err: any) {
-      setIngestFeedback({ type: "error", text: err.message || "Error habang nag-iingest ng email." });
+      setIngestFeedback({ type: "error", text: err.message || "Error while ingesting email." });
     } finally {
       setIsIngestingEmail(false);
     }
@@ -204,8 +204,8 @@ export default function StudentConcernsManager() {
       setStatusMessage({
         type: "success",
         text: data.emailDispatched
-          ? `Mensahe matagumpay na na-save at naipadala sa email ni ${activeConcern.studentName} (${activeConcern.email})!`
-          : `Reply na-save sa system (Ticket #${activeConcern.ticketNumber}). Maaari ring i-click ang pulang "Mag-reply sa Gmail" para siguradong maihatid sa inbox ng estudyante.`,
+          ? `Official response saved and dispatched to ${activeConcern.studentName}'s email (${activeConcern.email})!`
+          : `Response saved in system (Ticket #${activeConcern.ticketNumber}). You can also click "Reply via Gmail" to deliver directly to their inbox.`,
       });
 
       setReplyText("");
@@ -223,7 +223,7 @@ export default function StudentConcernsManager() {
     const su = encodeURIComponent(`Re: [Ticket #${activeConcern.ticketNumber}] ${activeConcern.subject || "Dumalneg NHS Student Concern"}`);
     const draftText = replyText.trim()
       ? replyText.trim()
-      : `Magandang araw po ${activeConcern.studentName},\n\nIto po ang opisyal na tugon mula sa Dumalneg NHS IT Support Desk hinggil sa iyong inquiry (Ticket #${activeConcern.ticketNumber}).\n\n`;
+      : `Hello ${activeConcern.studentName},\n\nHere is the official response from Dumalneg NHS IT Support Desk regarding your inquiry (Ticket #${activeConcern.ticketNumber}).\n\n`;
     const fullDraft = [
       draftText,
       "",
@@ -688,12 +688,12 @@ export default function StudentConcernsManager() {
                     type="button"
                     onClick={handleOpenGmailReply}
                     className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded shadow-xs cursor-pointer transition-colors"
-                    title="Magbukas ng Gmail compose window"
+                    title="Open Gmail compose window"
                   >
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                     </svg>
-                    <span>Mag-reply sa Gmail</span>
+                    <span>Reply via Gmail</span>
                   </button>
                 )}
                 {activeConcern.lrn && (
@@ -830,10 +830,10 @@ export default function StudentConcernsManager() {
                     </div>
                     <div>
                       <span className="font-bold text-red-950 block">
-                        Gusto mo bang dumating agad ang tugon sa Gmail ni {activeConcern.studentName}?
+                        Deliver the response directly to {activeConcern.studentName}'s Gmail inbox?
                       </span>
                       <span className="text-[11px] text-red-800">
-                        Pindutin ang <strong>Mag-reply sa Gmail</strong> para buksan ang prefilled draft sa Gmail patungo sa <strong>{activeConcern.email}</strong>.
+                        Click <strong>Reply via Gmail</strong> to open a pre-filled draft in Google Mail to <strong>{activeConcern.email}</strong>.
                       </span>
                     </div>
                   </div>
@@ -842,12 +842,12 @@ export default function StudentConcernsManager() {
                       type="button"
                       onClick={handleOpenGmailReply}
                       className="px-3 py-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-md shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 transition-colors"
-                      title="Buksan ang Gmail Compose kasama ang draft reply"
+                      title="Open Gmail Compose with pre-filled draft reply"
                     >
                       <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                       </svg>
-                      <span>Buksan sa Gmail</span>
+                      <span>Open in Gmail</span>
                     </button>
                   )}
                 </div>
@@ -887,12 +887,12 @@ export default function StudentConcernsManager() {
                         type="button"
                         onClick={handleOpenGmailReply}
                         className="px-3.5 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer flex items-center gap-1.5 transition-colors"
-                        title="Mag-reply nang direkta gamit ang Gmail"
+                        title="Send reply directly via Google Mail"
                       >
                         <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                         </svg>
-                        <span>Mag-reply sa Gmail</span>
+                        <span>Reply via Gmail</span>
                       </button>
                     )}
                     <button
@@ -910,7 +910,7 @@ export default function StudentConcernsManager() {
                           <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                           </svg>
-                          <span>I-save Reply sa System</span>
+                          <span>Save Reply in System</span>
                         </>
                       )}
                     </button>
@@ -968,7 +968,7 @@ export default function StudentConcernsManager() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>I-paste ang Email (Quick Ingest)</span>
+                <span>Paste Email (Quick Ingest)</span>
               </button>
               <button
                 type="button"
@@ -991,7 +991,7 @@ export default function StudentConcernsManager() {
               {gmailSyncTab === "manual" ? (
                 <form onSubmit={handleIngestEmail} className="space-y-3.5">
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 leading-relaxed">
-                    Kung may natanggap kang bagong email sa <span className="font-bold text-[#002060]">dumalnext@gmail.com</span>, kopyahin at i-paste ito rito upang agad na maging opisyal na ticket sa Dumalneg NHS system!
+                    If you received an email at <span className="font-bold text-[#002060]">dumalnext@gmail.com</span>, paste its details here to immediately log it as an official ticket in the Dumalneg NHS system.
                   </div>
 
                   {ingestFeedback && (
@@ -1011,14 +1011,14 @@ export default function StudentConcernsManager() {
 
                   <div>
                     <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Sender Email (Email ng Mag-aaral) *
+                      Student Sender Email *
                     </label>
                     <input
                       type="email"
                       required
                       value={ingestEmailFrom}
                       onChange={(e) => setIngestEmailFrom(e.target.value)}
-                      placeholder="Halimbawa: student@gmail.com"
+                      placeholder="e.g. student@gmail.com"
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-[#002060] outline-none"
                     />
                   </div>
@@ -1031,20 +1031,20 @@ export default function StudentConcernsManager() {
                       type="text"
                       value={ingestEmailSubject}
                       onChange={(e) => setIngestEmailSubject(e.target.value)}
-                      placeholder="Subject ng email"
+                      placeholder="Subject of inbound email"
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-[#002060] outline-none"
                     />
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Nilalaman ng Email (Message Body)
+                      Email Message Body
                     </label>
                     <textarea
                       rows={5}
                       value={ingestEmailBody}
                       onChange={(e) => setIngestEmailBody(e.target.value)}
-                      placeholder="I-paste dito ang mensahe na natanggap mula sa student..."
+                      placeholder="Paste the message received from the student here..."
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#002060] outline-none leading-relaxed"
                     />
                   </div>
@@ -1055,7 +1055,7 @@ export default function StudentConcernsManager() {
                       onClick={() => setShowGmailSyncModal(false)}
                       className="py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg cursor-pointer"
                     >
-                      Kanselahin
+                      Cancel
                     </button>
                     <button
                       type="submit"
@@ -1065,14 +1065,14 @@ export default function StudentConcernsManager() {
                       {isIngestingEmail ? (
                         <>
                           <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
-                          <span>Nag-iingest...</span>
+                          <span>Ingesting...</span>
                         </>
                       ) : (
                         <>
                           <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span>I-proseso at I-load sa Concerns</span>
+                          <span>Process & Add to Concerns</span>
                         </>
                       )}
                     </button>
@@ -1081,21 +1081,21 @@ export default function StudentConcernsManager() {
               ) : (
                 <div className="space-y-3.5 text-xs text-slate-700 leading-relaxed">
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-950 font-medium">
-                    Nais mo bang <strong>awtomatikong</strong> pumasok sa Concerns desk ang bawat email na matanggap sa <span className="font-bold text-[#002060]">dumalnext@gmail.com</span> nang hindi na kailangang mag-copy-paste?
+                    Want every email received at <span className="font-bold text-[#002060]">dumalnext@gmail.com</span> to automatically flow into the Concerns Desk without manual copy-pasting?
                   </div>
 
                   <div className="space-y-2">
                     <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                      Mabilisang 3-Step Setup sa Google Apps Script:
+                      Quick 3-Step Google Apps Script Automation Setup:
                     </h4>
                     <ol className="list-decimal pl-5 space-y-1.5 text-[11px] text-slate-700">
                       <li>
-                        Mag-log in sa account ng <strong>dumalnext@gmail.com</strong> at buksan ang{" "}
+                        Log in to <strong>dumalnext@gmail.com</strong> and open{" "}
                         <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-blue-700 font-bold underline">
                           script.google.com
                         </a>.
                       </li>
-                      <li>I-click ang <strong>New Project</strong> at i-paste ang code sa ibaba:</li>
+                      <li>Click <strong>New Project</strong> and paste the code below:</li>
                     </ol>
                   </div>
 
@@ -1161,13 +1161,13 @@ export default function StudentConcernsManager() {
                       }}
                       className="absolute top-2 right-2 py-1 px-2.5 bg-white/20 hover:bg-white/30 text-white rounded text-[10px] font-bold cursor-pointer transition-colors"
                     >
-                      {scriptCopied ? "Nakopya na!" : "Kopyahin ang Script"}
+                      {scriptCopied ? "Copied!" : "Copy Script"}
                     </button>
                   </div>
 
                   <div className="space-y-1.5 text-[11px] text-slate-700">
                     <p>
-                      3. Sa kaliwang menu ng Google Apps Script, i-click ang <strong>Triggers (hugis orasan)</strong> &rarr; <strong>Add Trigger</strong>.
+                      3. In the left sidebar of Google Apps Script, click <strong>Triggers (clock icon)</strong> &rarr; <strong>Add Trigger</strong>.
                     </p>
                     <ul className="list-disc pl-5 space-y-1 text-slate-600">
                       <li>Choose function: <strong>forwardDumalnegEmails</strong></li>
@@ -1175,7 +1175,7 @@ export default function StudentConcernsManager() {
                       <li>Type of time based trigger: <strong>Minutes timer</strong> &rarr; <strong>Every 1 minute</strong></li>
                     </ul>
                     <p className="text-emerald-700 font-bold pt-1">
-                      Awtomatiko nang papasok sa Concerns Desk ang bawat matatanggap na email sa loob ng 60 segundo!
+                      All inbound emails sent to dumalnext@gmail.com will now automatically synchronize to the Concerns Desk within 60 seconds!
                     </p>
                   </div>
                 </div>

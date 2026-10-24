@@ -69,17 +69,17 @@ export async function sendEmailReplyToStudent(
         </div>
 
         <p style="font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
-          Kumusta, <strong>${studentName || "Mag-aaral"}</strong>,
+          Hello, <strong>${studentName || "Student"}</strong>,
         </p>
 
         <p style="font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
-          Narito ang opisyal na tugon mula sa aming IT Support Desk ukol sa iyong inilapit na concern o kahilingan sa password:
+          Here is the official response from our IT Support Desk regarding your account inquiry or password request:
         </p>
 
         <!-- Officer Reply Box -->
         <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 18px; margin: 20px 0;">
           <div style="font-size: 11px; font-weight: bold; color: #1e40af; margin-bottom: 8px;">
-            Mensahe mula kay ${senderName}:
+            Message from ${senderName}:
           </div>
           <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #1e3a8a; white-space: pre-wrap;">
 ${replyMessage}
@@ -87,7 +87,7 @@ ${replyMessage}
         </div>
 
         <p style="font-size: 13px; line-height: 1.6; color: #475569; margin: 20px 0 0 0;">
-          Kung mayroon ka pang karagdagang tanong o paglilinaw, maaari kang <strong>direktang mag-reply sa email na ito</strong> (patungo sa <code>dumalnext@gmail.com</code>) o bisitahin ang <strong>Student Portal</strong> upang subaybayan ang estado ng iyong account.
+          If you have further questions or need additional assistance, you may <strong>reply directly to this email</strong> (sent to <code>dumalnext@gmail.com</code>) or log in to the <strong>Student Portal</strong>.
         </p>
       </td>
     </tr>
@@ -225,13 +225,13 @@ export async function sendReceiptToStudent(
 <html>
 <body style="font-family: sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
   <div style="max-width: 550px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px;">
-    <h2 style="color: #002060; margin-top: 0;">Natanggap ang Iyong Mensahe</h2>
+    <h2 style="color: #002060; margin-top: 0;">Inquiry Received</h2>
     <p>Kumusta, <strong>${studentName || "Mag-aaral"}</strong>,</p>
-    <p>Matagumpay na natanggap ng aming IT Support Desk ang iyong mensahe ukol sa <strong>${subject}</strong>.</p>
+    <p>Our IT Support Desk has successfully received your inquiry regarding <strong>${subject}</strong>.</p>
     <div style="background-color: #f1f5f9; padding: 12px; border-radius: 4px; margin: 16px 0;">
       <strong>Ticket Number: #${ticketNumber}</strong>
     </div>
-    <p>Kasalukuyan na itong sinusuri ng aming IT personnel. Makatatanggap ka ng aming opisyal na tugon dito sa iyong email.</p>
+    <p>Our IT personnel are currently evaluating your request. You will receive an official response here in your email.</p>
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
     <p style="font-size: 11px; color: #64748b; margin: 0;">Dumalneg National High School IT Support &bull; dumalnext@gmail.com</p>
   </div>

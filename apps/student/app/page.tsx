@@ -11,7 +11,6 @@ import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm
 import SeparatedOtpInput from "@/components/SeparatedOtpInput";
 import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/components/StudentVideoTutorials";
 import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConcernModal";
-import StudentPasswordResetContactModal from "@/components/StudentPasswordResetContactModal";
 import { PasswordResetModal, IdentityRecoveryModal } from "@/components/CredentialRecoveryModals";
 import EmailSetupGuard from "@/components/EmailSetupGuard";
 
@@ -27,8 +26,7 @@ function StudentHomeContent() {
   const [showConcernModal, setShowConcernModal] = useState(false);
   const [concernModalMode, setConcernModalMode] = useState<ConcernModalMode>("submit");
   const [concernCategory, setConcernCategory] = useState("password_reset");
-  const [showPasswordResetContactModal, setShowPasswordResetContactModal] = useState(false);
-
+  
   // IT Support Credential Recovery States (Password Reset & Identity Recovery)
   const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
   const [resetIdentifier, setResetIdentifier] = useState("");
@@ -93,6 +91,31 @@ function StudentHomeContent() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  // 1-Click Direct Gmail Forgot Password
+  const handleDirectGmailForgotPassword = () => {
+    const to = "dumalnext@gmail.com";
+    const subject = "Password Reset Request - Dumalneg NHS Student Account";
+    const bodyText = [
+      "Good day Dumalneg NHS IT Support Desk,",
+      "",
+      "I would like to request a password reset for my student account at Dumalneg National High School.",
+      "",
+      "My Account Details:",
+      "- Full Name: [Please enter your full name]",
+      `- 12-Digit LRN: ${loginEmail && loginEmail.match(/^\d{12}$/) ? loginEmail : "[Please enter your 12-digit LRN]"}`,
+      `- Registered Gmail / Email: ${loginEmail && loginEmail.includes("@") ? loginEmail : "[Please enter your registered Gmail]"}`,
+      "- Reason / Inquiry: I forgot my password and would like to request an official reset to access the student portal.",
+      "",
+      "Thank you very much for your assistance!"
+    ].join("\r\n");
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    const win = window.open(gmailUrl, "_blank");
+    if (!win || win.closed || typeof win.closed === "undefined") {
+      window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    }
+  };
+
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginProgress, setLoginProgress] = useState(0);
   const [loginStatusText, setLoginStatusText] = useState("");
@@ -1608,7 +1631,7 @@ function StudentHomeContent() {
                         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs border-t border-slate-100">
                           <button
                             type="button"
-                            onClick={() => setShowPasswordResetContactModal(true)}
+                            onClick={handleDirectGmailForgotPassword}
                             className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
                           >
                             <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2152,17 +2175,7 @@ function StudentHomeContent() {
         </div>
       )}
 
-      {showPasswordResetContactModal && (
-        <StudentPasswordResetContactModal
-          isOpen={showPasswordResetContactModal}
-          onClose={() => setShowPasswordResetContactModal(false)}
-          initialEmailOrLrn={loginEmail}
-          onTrackTicket={(ticketNum) => {
-            setConcernModalMode("track");
-            setShowConcernModal(true);
-          }}
-        />
-      )}
+
 
       {showConcernModal && (
         <StudentConcernModal
