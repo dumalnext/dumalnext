@@ -50,6 +50,13 @@ export interface StudentConcern {
   resolvedBy?: string | null;
   resolutionNotes?: string | null;
   newTemporaryPassword?: string | null;
+  replies?: Array<{
+    id: string;
+    sender: "it_support" | "student";
+    senderName: string;
+    message: string;
+    createdAt: string;
+  }>;
 }
 
 async function getStoredConcerns(supabase: any): Promise<StudentConcern[]> {
@@ -247,7 +254,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, status, resolutionNotes, resolvedBy, priority } = body;
+    const { id, status, resolutionNotes, resolvedBy, priority, replyMessage, senderName } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -270,6 +277,18 @@ export async function PATCH(req: NextRequest) {
     const newStatus = (status as ConcernStatus) || current.status;
     const isResolved = newStatus === "resolved" && current.status !== "resolved";
 
+    const existingReplies = Array.isArray(current.replies) ? current.replies : [];
+    let updatedReplies = [...existingReplies];
+    if (replyMessage && String(replyMessage).trim()) {
+      updatedReplies.push({
+        id: `rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        sender: "it_support",
+        senderName: resolvedBy || senderName || "IT Support Officer",
+        message: String(replyMessage).trim(),
+        createdAt: new Date().toISOString(),
+      });
+    }
+
     concerns[index] = {
       ...current,
       status: newStatus,
@@ -277,6 +296,7 @@ export async function PATCH(req: NextRequest) {
       resolutionNotes: resolutionNotes !== undefined ? String(resolutionNotes).trim() : current.resolutionNotes,
       resolvedBy: resolvedBy || current.resolvedBy,
       resolvedAt: isResolved ? new Date().toISOString() : (newStatus !== "resolved" ? null : current.resolvedAt),
+      replies: updatedReplies,
       updatedAt: new Date().toISOString(),
     };
 

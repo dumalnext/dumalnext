@@ -431,3 +431,246 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: err.message || "Failed to delete user" }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const supabase = getAdminClient() || (await createClient());
+    const body = await req.json();
+    const { id, userId, email, action, newEmail, newLrn, newFullName } = body;
+
+    const targetId = id || null;
+    const targetUserId = userId || null;
+    const targetEmail = email ? String(email).trim().toLowerCase() : null;
+
+    if (!targetId && !targetUserId && !targetEmail) {
+      return NextResponse.json(
+        { error: "User identifier (id, userId, or email) is required." },
+        { status: 400 }
+      );
+    }
+
+    // Locate target user
+    let query = supabase.from("users").select("*");
+    if (targetId) query = query.eq("id", targetId);
+    else if (targetUserId) query = query.eq("user_id", targetUserId.trim().toUpperCase());
+    else if (targetEmail) query = query.eq("email", targetEmail);
+
+    const { data: existing, error: findError } = await query.limit(1);
+    if (findError || !existing || existing.length === 0) {
+      return NextResponse.json(
+        { error: "User record not found." },
+        { status: 404 }
+      );
+    }
+
+    const targetUser = existing[0];
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    let serviceClient: any = null;
+    if (serviceKey && projectUrl) {
+      serviceClient = createSupabaseJsClient(projectUrl, serviceKey, {
+        auth: { autoRefreshToken: false, persistSession: false },
+      });
+    }
+
+    // ACTION 1: Remove Password
+    // In accordance with security policy, IT Support CANNOT see the password.
+    // The current password is removed/invalidated by setting a randomized non-reusable entropy string
+    // and invalidating all active sessions so the account cannot be logged into with the old password.
+    if (action === "remove_password") {
+      if (serviceClient && targetUser.id) {
+        try {
+          const randomEntropy = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          await serviceClient.auth.admin.updateUserById(targetUser.id, {
+            password: `Revoked_${randomEntropy}!`,
+            email_confirm: true,
+          });
+          try {
+            await serviceClient.auth.admin.signOut(targetUser.id);
+          } catch {}
+        } catch (authErr: any) {
+          console.warn("Could not invalidate password in Supabase Auth:", authErr);
+        }
+      }
+
+      await supabase
+        .from("users")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", targetUser.id);
+
+      return NextResponse.json({
+        success: true,
+        message: "Password has been successfully removed and invalidated. For security and student privacy, passwords are never shown. The previous password will no longer work.",
+        action: "remove_password",
+      });
+    }
+
+    // ACTION 2: Remove LRN
+    if (action === "remove_lrn") {
+      await supabase
+        .from("students")
+        .update({ student_id: null, updated_at: new Date().toISOString() })
+        .eq("user_id", targetUser.id);
+
+      if (targetUser.user_role === "student" && targetUser.user_id && /^\d{12}$/.test(targetUser.user_id)) {
+        await supabase
+          .from("users")
+          .update({
+            user_id: `STU-${targetUser.id.substring(0, 8).toUpperCase()}`,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", targetUser.id);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Learner Reference Number (LRN) has been removed from this account.",
+        action: "remove_lrn",
+      });
+    }
+
+    // ACTION 3: Remove Email
+    if (action === "remove_email") {
+      await supabase
+        .from("users")
+        .update({
+          email: "",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", targetUser.id);
+
+      if (targetUser.user_role === "teacher") {
+        await supabase
+          .from("teachers")
+          .update({ email: "" })
+          .eq("user_id", targetUser.id);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Email address has been removed from this user record.",
+        action: "remove_email",
+      });
+    }
+
+    // ACTION 4: Modify Details (Email, LRN, Full Name)
+    if (action === "modify_details" || !action) {
+      const updates: Record<string, any> = {
+        updated_at: new Date().toISOString(),
+      };
+
+      let cleanNewEmail = newEmail !== undefined && newEmail !== null ? String(newEmail).trim().toLowerCase() : null;
+      let cleanNewLrn = newLrn !== undefined && newLrn !== null ? String(newLrn).replace(/\D/g, "").slice(0, 12) : null;
+
+      if (cleanNewEmail !== null && cleanNewEmail !== targetUser.email) {
+        if (cleanNewEmail) {
+          const { data: duplicate } = await supabase
+            .from("users")
+            .select("id")
+            .eq("email", cleanNewEmail)
+            .neq("id", targetUser.id)
+            .limit(1);
+
+          if (duplicate && duplicate.length > 0) {
+            return NextResponse.json(
+              { error: `The email address "${cleanNewEmail}" is already registered to another account.` },
+              { status: 400 }
+            );
+          }
+        }
+
+        updates.email = cleanNewEmail;
+
+        if (serviceClient && targetUser.id && cleanNewEmail) {
+          try {
+            await serviceClient.auth.admin.updateUserById(targetUser.id, {
+              email: cleanNewEmail,
+              email_confirm: true,
+            });
+          } catch (authErr: any) {
+            console.warn("Could not sync email with Supabase Auth:", authErr);
+          }
+        }
+
+        if (targetUser.user_role === "teacher") {
+          await supabase
+            .from("teachers")
+            .update({ email: cleanNewEmail })
+            .eq("user_id", targetUser.id);
+        }
+      }
+
+      if (cleanNewLrn !== null) {
+        const { data: stRec } = await supabase
+          .from("students")
+          .select("id")
+          .eq("user_id", targetUser.id)
+          .limit(1);
+
+        if (stRec && stRec.length > 0) {
+          await supabase
+            .from("students")
+            .update({ student_id: cleanNewLrn || null, updated_at: new Date().toISOString() })
+            .eq("user_id", targetUser.id);
+        }
+
+        if (targetUser.user_role === "student" && cleanNewLrn) {
+          updates.user_id = cleanNewLrn;
+        }
+      }
+
+      if (newFullName && String(newFullName).trim()) {
+        const parts = String(newFullName).trim().split(" ");
+        const firstName = parts[0] || "";
+        const lastName = parts.slice(1).join(" ") || "";
+
+        if (targetUser.user_role === "student") {
+          await supabase
+            .from("students")
+            .update({ first_name: firstName, last_name: lastName })
+            .eq("user_id", targetUser.id);
+        } else if (targetUser.user_role === "teacher") {
+          await supabase
+            .from("teachers")
+            .update({ first_name: firstName, last_name: lastName })
+            .eq("user_id", targetUser.id);
+        } else if (targetUser.user_role === "admin") {
+          await supabase
+            .from("school_administrators")
+            .update({ first_name: firstName, last_name: lastName })
+            .eq("user_id", targetUser.id);
+        }
+      }
+
+      if (Object.keys(updates).length > 1) {
+        const { error: updErr } = await supabase
+          .from("users")
+          .update(updates)
+          .eq("id", targetUser.id);
+
+        if (updErr) {
+          return NextResponse.json({ error: updErr.message }, { status: 500 });
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "User account credentials and identity records successfully updated.",
+        action: "modify_details",
+        updated: {
+          email: updates.email !== undefined ? updates.email : targetUser.email,
+          userId: updates.user_id || targetUser.user_id,
+          lrn: cleanNewLrn || undefined,
+        },
+      });
+    }
+
+    return NextResponse.json({ error: "Invalid action specified." }, { status: 400 });
+  } catch (err: any) {
+    console.error("PATCH /api/users error:", err);
+    return NextResponse.json({ error: err.message || "Failed to update user" }, { status: 500 });
+  }
+}
+

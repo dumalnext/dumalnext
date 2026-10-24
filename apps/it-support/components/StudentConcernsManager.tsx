@@ -3,6 +3,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useITSupportAuth } from "@/lib/auth/itSupportAuthContext";
 
+export interface ConcernReply {
+  id: string;
+  sender: "it_support" | "student";
+  senderName: string;
+  message: string;
+  createdAt: string;
+}
+
 export interface StudentConcern {
   id: string;
   ticketNumber: string;
@@ -15,13 +23,12 @@ export interface StudentConcern {
   subject: string;
   message: string;
   status: "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
-  source?: "online" | "walk_in";
+  replies?: ConcernReply[];
   createdAt: string;
   updatedAt?: string;
   resolvedAt?: string | null;
   resolvedBy?: string | null;
   resolutionNotes?: string | null;
-  newTemporaryPassword?: string | null;
 }
 
 export default function StudentConcernsManager() {
@@ -36,44 +43,14 @@ export default function StudentConcernsManager() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
 
-  // Selected Ticket for Details / Modals
-  const [selectedConcern, setSelectedConcern] = useState<StudentConcern | null>(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-
-  // Password Reset Modal State
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordTarget, setPasswordTarget] = useState<StudentConcern | null>(null);
-  const [newPassword, setNewPassword] = useState("");
-  const [passwordNotes, setPasswordNotes] = useState("");
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
-  const [passwordResetSuccess, setPasswordResetSuccess] = useState<{
-    email: string;
-    newPass: string;
-  } | null>(null);
-  const [copiedPass, setCopiedPass] = useState(false);
-
-  // Status & Resolution Modal State
-  const [showStatusModal, setShowStatusModal] = useState(false);
-  const [statusTarget, setStatusTarget] = useState<StudentConcern | null>(null);
-  const [newStatus, setNewStatus] = useState<StudentConcern["status"]>("IN_PROGRESS");
-  const [resolutionNotes, setResolutionNotes] = useState("");
+  // Selected Ticket for Viewing & Replying
+  const [activeConcern, setActiveConcern] = useState<StudentConcern | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [modalStatus, setModalStatus] = useState<StudentConcern["status"]>("IN_PROGRESS");
+  const [isSendingReply, setIsSendingReply] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  // Walk-In / Manual Logging Modal State
-  const [showWalkInModal, setShowWalkInModal] = useState(false);
-  const [walkInForm, setWalkInForm] = useState({
-    studentName: "",
-    email: "",
-    lrn: "",
-    gradeLevel: "Grade 7",
-    contactNumber: "",
-    category: "password_reset",
-    subject: "Walk-in Password Reset",
-    message: "",
-  });
-  const [isLoggingWalkIn, setIsLoggingWalkIn] = useState(false);
-
-  // Auto-dismiss status message
+  // Auto-dismiss status banner
   useEffect(() => {
     if (statusMessage) {
       const timer = setTimeout(() => setStatusMessage(null), 5000);
@@ -81,18 +58,18 @@ export default function StudentConcernsManager() {
     }
   }, [statusMessage]);
 
-  // Load Concerns
-  const fetchConcerns = async () => {
-    setIsLoading(true);
+  // Fetch Concerns from Database
+  const fetchConcerns = async (silent: boolean = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch("/api/it-support/concerns", { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load concerns.");
       setConcerns(data.concerns || []);
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: err.message || "Failed to fetch concerns." });
+      setStatusMessage({ type: "error", text: err.message || "Failed to load student concerns." });
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   };
 
@@ -100,14 +77,22 @@ export default function StudentConcernsManager() {
     fetchConcerns();
   }, []);
 
+  // Sync activeConcern when concerns update
+  useEffect(() => {
+    if (activeConcern) {
+      const fresh = concerns.find((c) => c.id === activeConcern.id);
+      if (fresh) {
+        setActiveConcern(fresh);
+        setModalStatus(fresh.status);
+      }
+    }
+  }, [concerns]);
+
   // Filtered & Searched Concerns
   const filteredConcerns = useMemo(() => {
     return concerns.filter((c) => {
-      // Status Filter
       if (statusFilter !== "ALL" && c.status !== statusFilter) return false;
-      // Category Filter
       if (categoryFilter !== "ALL" && c.category !== categoryFilter) return false;
-      // Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchName = c.studentName?.toLowerCase().includes(q);
@@ -115,8 +100,8 @@ export default function StudentConcernsManager() {
         const matchLrn = c.lrn?.toLowerCase().includes(q);
         const matchTicket = c.ticketNumber?.toLowerCase().includes(q);
         const matchSubject = c.subject?.toLowerCase().includes(q);
-        const matchNotes = c.resolutionNotes?.toLowerCase().includes(q);
-        if (!matchName && !matchEmail && !matchLrn && !matchTicket && !matchSubject && !matchNotes) {
+        const matchMessage = c.message?.toLowerCase().includes(q);
+        if (!matchName && !matchEmail && !matchLrn && !matchTicket && !matchSubject && !matchMessage) {
           return false;
         }
       }
@@ -124,123 +109,86 @@ export default function StudentConcernsManager() {
     });
   }, [concerns, statusFilter, categoryFilter, searchQuery]);
 
-  // Metrics summary
+  // Metrics Summary
   const metrics = useMemo(() => {
     const total = concerns.length;
     const pending = concerns.filter((c) => c.status === "PENDING").length;
     const inProgress = concerns.filter((c) => c.status === "IN_PROGRESS").length;
     const resolved = concerns.filter((c) => c.status === "RESOLVED").length;
-    const passwordResets = concerns.filter((c) => c.category === "password_reset").length;
-    return { total, pending, inProgress, resolved, passwordResets };
+    const withReplies = concerns.filter((c) => (c.replies?.length || 0) > 0).length;
+    return { total, pending, inProgress, resolved, withReplies };
   }, [concerns]);
 
-  // Generate Random Secure Password helper
-  const handleGenerateRandomPassword = () => {
-    const year = new Date().getFullYear();
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let rand = "";
-    for (let i = 0; i < 4; i++) {
-      rand += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    const generated = `Dumalneg-${year}-${rand}`;
-    setNewPassword(generated);
+  // Open Conversation Modal
+  const handleOpenConcern = (concern: StudentConcern) => {
+    setActiveConcern(concern);
+    setModalStatus(concern.status);
+    setReplyText("");
   };
 
-  // Open Password Reset Modal
-  const handleOpenPasswordModal = (concern: StudentConcern) => {
-    setPasswordTarget(concern);
-    setPasswordResetSuccess(null);
-    setCopiedPass(false);
-    handleGenerateRandomPassword();
-    setPasswordNotes(
-      `Password reset performed by IT Support (${user?.fullName || "Officer"}). Account restored and verified.`
-    );
-    setShowPasswordModal(true);
-  };
-
-  // Execute Direct Password Reset
-  const handleExecutePasswordReset = async (e: React.FormEvent) => {
+  // Send Reply to Student
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!passwordTarget) return;
+    if (!activeConcern || !replyText.trim()) return;
 
-    setIsResettingPassword(true);
+    setIsSendingReply(true);
     setStatusMessage(null);
 
     try {
-      const res = await fetch("/api/it-support/concerns/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ticketId: passwordTarget.id,
-          email: passwordTarget.email,
-          newPassword: newPassword.trim(),
-          resolvedBy: user?.fullName || "IT Support Officer",
-          resolutionNotes: passwordNotes.trim(),
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to reset password in Supabase Auth.");
-      }
-
-      setPasswordResetSuccess({
-        email: passwordTarget.email,
-        newPass: newPassword.trim(),
-      });
-
-      setStatusMessage({
-        type: "success",
-        text: `Student password successfully reset for ${passwordTarget.studentName} (${passwordTarget.email}). Ticket marked as RESOLVED.`,
-      });
-
-      fetchConcerns();
-    } catch (err: any) {
-      setStatusMessage({ type: "error", text: err.message || "Failed to execute password reset." });
-    } finally {
-      setIsResettingPassword(false);
-    }
-  };
-
-  // Open Status Update Modal
-  const handleOpenStatusModal = (concern: StudentConcern) => {
-    setStatusTarget(concern);
-    setNewStatus(concern.status);
-    setResolutionNotes(concern.resolutionNotes || "");
-    setShowStatusModal(true);
-  };
-
-  // Execute Status Update
-  const handleExecuteStatusUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!statusTarget) return;
-
-    setIsUpdatingStatus(true);
-    try {
+      const officerName = user?.fullName || "IT Support Officer";
       const res = await fetch("/api/it-support/concerns", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: statusTarget.id,
-          status: newStatus,
-          resolutionNotes: resolutionNotes.trim(),
-          resolvedBy: user?.fullName || "IT Support Officer",
+          id: activeConcern.id,
+          status: modalStatus,
+          replyMessage: replyText.trim(),
+          resolvedBy: officerName,
+          senderName: officerName,
         }),
       });
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to update ticket status.");
+        throw new Error(data.error || "Failed to send reply to student.");
       }
 
       setStatusMessage({
         type: "success",
-        text: `Ticket ${statusTarget.ticketNumber} updated to ${newStatus}.`,
+        text: `Reply dispatched to ticket ${activeConcern.ticketNumber} (${activeConcern.studentName}).`,
       });
-      setShowStatusModal(false);
-      fetchConcerns();
+
+      setReplyText("");
+      await fetchConcerns(true);
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: err.message || "Failed to update ticket." });
+      setStatusMessage({ type: "error", text: err.message || "Failed to dispatch reply." });
+    } finally {
+      setIsSendingReply(false);
+    }
+  };
+
+  // Quick Status Change from Modal
+  const handleQuickStatusChange = async (newStatus: StudentConcern["status"]) => {
+    if (!activeConcern) return;
+    setIsUpdatingStatus(true);
+    try {
+      const officerName = user?.fullName || "IT Support Officer";
+      const res = await fetch("/api/it-support/concerns", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: activeConcern.id,
+          status: newStatus,
+          resolvedBy: officerName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to update status.");
+      setModalStatus(newStatus);
+      setStatusMessage({ type: "success", text: `Ticket ${activeConcern.ticketNumber} marked as ${newStatus}.` });
+      await fetchConcerns(true);
+    } catch (err: any) {
+      setStatusMessage({ type: "error", text: err.message || "Failed to update status." });
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -248,71 +196,28 @@ export default function StudentConcernsManager() {
 
   // Delete / Archive Concern
   const handleDeleteConcern = async (concern: StudentConcern) => {
-    const confirmDelete = window.confirm(
+    const confirm = window.confirm(
       `Are you sure you want to delete ticket ${concern.ticketNumber} filed by ${concern.studentName}?`
     );
-    if (!confirmDelete) return;
+    if (!confirm) return;
 
     try {
       const res = await fetch(`/api/it-support/concerns?id=${concern.id}`, { method: "DELETE" });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to delete ticket.");
-      }
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to delete ticket.");
       setStatusMessage({ type: "success", text: `Ticket ${concern.ticketNumber} has been removed.` });
-      fetchConcerns();
+      if (activeConcern?.id === concern.id) {
+        setActiveConcern(null);
+      }
+      fetchConcerns(true);
     } catch (err: any) {
       setStatusMessage({ type: "error", text: err.message || "Failed to remove ticket." });
     }
   };
 
-  // Log Walk-in Concern
-  const handleLogWalkIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoggingWalkIn(true);
-
-    try {
-      const res = await fetch("/api/it-support/concerns", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...walkInForm,
-          source: "walk_in",
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to log walk-in concern.");
-      }
-
-      setStatusMessage({
-        type: "success",
-        text: `Walk-in concern ticket ${data.ticketNumber} logged successfully.`,
-      });
-      setShowWalkInModal(false);
-      setWalkInForm({
-        studentName: "",
-        email: "",
-        lrn: "",
-        gradeLevel: "Grade 7",
-        contactNumber: "",
-        category: "password_reset",
-        subject: "Walk-in Password Reset",
-        message: "",
-      });
-      fetchConcerns();
-    } catch (err: any) {
-      setStatusMessage({ type: "error", text: err.message || "Failed to record walk-in concern." });
-    } finally {
-      setIsLoggingWalkIn(false);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedPass(true);
-    setTimeout(() => setCopiedPass(false), 2500);
+  // Quick Preset Replies
+  const insertPresetReply = (text: string) => {
+    setReplyText((prev) => (prev ? `${prev}\n${text}` : text));
   };
 
   return (
@@ -325,33 +230,22 @@ export default function StudentConcernsManager() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
                 <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
-                  Dumalneg NHS &bull; Learner Identity Governance &amp; Support Desk
+                  Dumalneg NHS &bull; Learner Messages &amp; Support Inquiries Desk
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Student Concerns &amp; Password Reset Center
+                Student Messages &amp; Concerns
               </h2>
               <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed max-w-3xl">
-                Review and resolve incoming student inquiries. Under DepEd identity security guidelines, students cannot self-reset passwords directly. IT Support verifies learner identity and resets credentials with a single click.
+                Review student inquiries, track support messages, and reply directly to learner concerns. Note: Account modifications, password removal, and credential edits are managed in <strong>User Accounts &amp; Roles</strong>.
               </p>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Refresh Action */}
+            <div className="flex items-center gap-2.5 shrink-0">
               <button
                 type="button"
-                onClick={() => setShowWalkInModal(true)}
-                className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-bold text-xs rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-2"
-              >
-                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Log Walk-in Concern</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={fetchConcerns}
+                onClick={() => fetchConcerns(false)}
                 disabled={isLoading}
                 className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-2"
               >
@@ -369,7 +263,7 @@ export default function StudentConcernsManager() {
           </div>
         </div>
 
-        {/* Global Notification Banner */}
+        {/* Status Notification Banner */}
         {statusMessage && (
           <div
             className={`p-4 border-b flex items-center justify-between text-xs font-bold ${
@@ -393,35 +287,25 @@ export default function StudentConcernsManager() {
         )}
 
         {/* Key Metrics Dashboard */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-4 sm:p-6 bg-slate-50/70 border-b border-slate-200">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 sm:p-6 bg-slate-50/70 border-b border-slate-200">
           <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-              Total Concerns
+              Total Messages
             </span>
             <span className="text-xl font-extrabold text-[#002060] mt-0.5 block">
               {metrics.total}
             </span>
-            <span className="text-[10px] text-slate-400 block mt-0.5">All tickets recorded</span>
+            <span className="text-[10px] text-slate-400 block mt-0.5">All tickets logged</span>
           </div>
 
           <div className="bg-white p-3.5 rounded-lg border border-amber-300 bg-amber-50/30 shadow-2xs">
             <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
-              Pending IT Review
+              Pending IT Reply
             </span>
             <span className="text-xl font-extrabold text-amber-700 mt-0.5 block">
               {metrics.pending}
             </span>
-            <span className="text-[10px] text-amber-700 block mt-0.5">Action required</span>
-          </div>
-
-          <div className="bg-white p-3.5 rounded-lg border border-purple-200 bg-purple-50/30 shadow-2xs">
-            <span className="text-[10px] font-bold text-purple-800 uppercase tracking-wider block">
-              Password Resets
-            </span>
-            <span className="text-xl font-extrabold text-purple-700 mt-0.5 block">
-              {metrics.passwordResets}
-            </span>
-            <span className="text-[10px] text-purple-700 block mt-0.5">Account lockouts</span>
+            <span className="text-[10px] text-amber-700 block mt-0.5">Needs reply</span>
           </div>
 
           <div className="bg-white p-3.5 rounded-lg border border-blue-200 bg-blue-50/30 shadow-2xs">
@@ -431,17 +315,17 @@ export default function StudentConcernsManager() {
             <span className="text-xl font-extrabold text-blue-700 mt-0.5 block">
               {metrics.inProgress}
             </span>
-            <span className="text-[10px] text-blue-600 block mt-0.5">Being processed</span>
+            <span className="text-[10px] text-blue-600 block mt-0.5">Active conversation</span>
           </div>
 
           <div className="bg-white p-3.5 rounded-lg border border-emerald-200 bg-emerald-50/30 shadow-2xs">
             <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
-              Resolved Tickets
+              Resolved
             </span>
             <span className="text-xl font-extrabold text-emerald-700 mt-0.5 block">
               {metrics.resolved}
             </span>
-            <span className="text-[10px] text-emerald-700 block mt-0.5">Completed tickets</span>
+            <span className="text-[10px] text-emerald-700 block mt-0.5">Completed inquiries</span>
           </div>
         </div>
 
@@ -457,7 +341,7 @@ export default function StudentConcernsManager() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by student name, email, LRN, ticket number, or subject..."
+              placeholder="Search by student name, email, LRN, ticket number, or message text..."
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:bg-white focus:border-[#002060] outline-none"
             />
           </div>
@@ -483,7 +367,7 @@ export default function StudentConcernsManager() {
               className="py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:bg-white focus:border-[#002060] outline-none"
             >
               <option value="ALL">All Categories</option>
-              <option value="password_reset">Password Resets</option>
+              <option value="password_reset">Password Inquiries</option>
               <option value="account_access">Account Access</option>
               <option value="lrn_profile">LRN / Profile</option>
               <option value="enrollment">Enrollment &amp; Sectioning</option>
@@ -507,23 +391,23 @@ export default function StudentConcernsManager() {
           </div>
         </div>
 
-        {/* Table of Concerns */}
+        {/* Concerns Table */}
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="py-16 text-center space-y-3">
               <div className="w-8 h-8 rounded-full border-2 border-[#002060] border-t-transparent animate-spin mx-auto" />
-              <p className="text-xs text-slate-500 font-medium">Loading student concerns registry...</p>
+              <p className="text-xs text-slate-500 font-medium">Loading student messages and inquiries...</p>
             </div>
           ) : filteredConcerns.length === 0 ? (
             <div className="py-16 text-center space-y-2">
               <svg className="w-12 h-12 text-slate-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              <h3 className="text-sm font-bold text-slate-800">No Student Concerns Found</h3>
+              <h3 className="text-sm font-bold text-slate-800">No Student Messages Found</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 {concerns.length === 0
-                  ? "There are currently no student inquiries or password reset requests recorded."
-                  : "No concerns match your active filter and search criteria."}
+                  ? "There are currently no student inquiries or messages recorded."
+                  : "No messages match your active filter and search criteria."}
               </p>
             </div>
           ) : (
@@ -532,25 +416,26 @@ export default function StudentConcernsManager() {
                 <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Ticket &amp; Date</th>
                   <th className="py-3 px-4">Student Details</th>
-                  <th className="py-3 px-4">Category &amp; Subject</th>
+                  <th className="py-3 px-4">Inquiry / Subject</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Resolution Info</th>
+                  <th className="py-3 px-4">Conversation</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {filteredConcerns.map((c) => {
-                  const isPasswordReset = c.category === "password_reset";
                   const isPending = c.status === "PENDING";
                   const isResolved = c.status === "RESOLVED";
                   const isInProgress = c.status === "IN_PROGRESS";
+                  const replyCount = c.replies?.length || 0;
 
                   return (
                     <tr
                       key={c.id}
-                      className={`hover:bg-blue-50/40 transition-colors ${
+                      className={`hover:bg-blue-50/40 transition-colors cursor-pointer ${
                         isPending ? "bg-amber-50/20" : ""
                       }`}
+                      onClick={() => handleOpenConcern(c)}
                     >
                       {/* Ticket & Date */}
                       <td className="py-3.5 px-4 align-top whitespace-nowrap">
@@ -564,11 +449,6 @@ export default function StudentConcernsManager() {
                             year: "numeric",
                           })}
                         </span>
-                        {c.source === "walk_in" && (
-                          <span className="inline-block mt-1 px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-slate-200 text-slate-700">
-                            Walk-In
-                          </span>
-                        )}
                       </td>
 
                       {/* Student Details */}
@@ -587,34 +467,17 @@ export default function StudentConcernsManager() {
                               <span className="font-mono">LRN: {c.lrn}</span>
                             </>
                           )}
-                          {c.contactNumber && (
-                            <>
-                              <span>&bull;</span>
-                              <span>{c.contactNumber}</span>
-                            </>
-                          )}
                         </div>
                       </td>
 
-                      {/* Category & Subject */}
-                      <td className="py-3.5 px-4 align-top max-w-xs">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          {isPasswordReset ? (
-                            <span className="px-2 py-0.5 bg-purple-100 text-purple-900 border border-purple-300 font-bold text-[9px] uppercase tracking-wider rounded">
-                              Password Reset
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 bg-slate-200 text-slate-800 font-bold text-[9px] uppercase tracking-wider rounded">
-                              {c.category.replace("_", " ")}
-                            </span>
-                          )}
-                        </div>
-                        <div className="font-semibold text-slate-800 line-clamp-1">
+                      {/* Subject & Message */}
+                      <td className="py-3.5 px-4 align-top max-w-sm">
+                        <span className="font-bold text-slate-900 block truncate">
                           {c.subject}
-                        </div>
-                        <div className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
+                        </span>
+                        <p className="text-slate-600 line-clamp-2 mt-0.5 leading-relaxed text-[11px]">
                           {c.message}
-                        </div>
+                        </p>
                       </td>
 
                       {/* Status */}
@@ -622,7 +485,7 @@ export default function StudentConcernsManager() {
                         {isPending && (
                           <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-[10px] uppercase inline-flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-                            Pending
+                            Pending Reply
                           </span>
                         )}
                         {isInProgress && (
@@ -644,79 +507,34 @@ export default function StudentConcernsManager() {
                         )}
                       </td>
 
-                      {/* Resolution Details */}
-                      <td className="py-3.5 px-4 align-top text-[11px] max-w-xs">
-                        {c.resolvedBy ? (
-                          <div className="space-y-0.5">
-                            <span className="font-bold text-slate-800 block">
-                              {c.resolvedBy}
-                            </span>
-                            {c.resolvedAt && (
-                              <span className="text-[10px] text-slate-500 block">
-                                {new Date(c.resolvedAt).toLocaleDateString("en-PH")}
-                              </span>
-                            )}
-                            {c.resolutionNotes && (
-                              <p className="text-slate-600 line-clamp-2 italic">
-                                &quot;{c.resolutionNotes}&quot;
-                              </p>
-                            )}
-                            {c.newTemporaryPassword && (
-                              <span className="inline-block mt-1 font-mono text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">
-                                Password Issued
-                              </span>
-                            )}
+                      {/* Conversation Summary */}
+                      <td className="py-3.5 px-4 align-top text-[11px]">
+                        {replyCount > 0 ? (
+                          <div className="flex items-center gap-1.5 text-blue-900 font-semibold">
+                            <svg className="w-3.5 h-3.5 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <span>{replyCount} {replyCount === 1 ? "reply" : "replies"}</span>
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic">No resolution notes yet</span>
+                          <span className="text-slate-400 italic">No replies yet</span>
                         )}
                       </td>
 
                       {/* Actions */}
-                      <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
+                      <td className="py-3.5 px-4 align-top text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1.5">
-                          {/* Direct Password Reset Button */}
                           <button
                             type="button"
-                            onClick={() => handleOpenPasswordModal(c)}
-                            title="Reset student password directly in Supabase"
-                            className="px-2.5 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white font-bold rounded text-[11px] cursor-pointer flex items-center gap-1 transition-colors"
+                            onClick={() => handleOpenConcern(c)}
+                            className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white font-bold rounded text-[11px] cursor-pointer flex items-center gap-1.5 transition-colors shadow-2xs"
                           >
                             <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                             </svg>
-                            <span>Reset Password</span>
+                            <span>View &amp; Reply</span>
                           </button>
 
-                          {/* Status / Notes Button */}
-                          <button
-                            type="button"
-                            onClick={() => handleOpenStatusModal(c)}
-                            title="Update ticket status & notes"
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded cursor-pointer transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-
-                          {/* Details Button */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedConcern(c);
-                              setShowDetailsModal(true);
-                            }}
-                            title="View full ticket details"
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded cursor-pointer transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                          </button>
-
-                          {/* Delete Button */}
                           <button
                             type="button"
                             onClick={() => handleDeleteConcern(c)}
@@ -738,507 +556,225 @@ export default function StudentConcernsManager() {
         </div>
       </div>
 
-      {/* MODAL 1: DIRECT STUDENT PASSWORD RESET */}
-      {showPasswordModal && passwordTarget && (
+      {/* CONVERSATION & REPLY MODAL */}
+      {activeConcern && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden font-sans animate-in fade-in zoom-in-95 duration-150">
-            <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between border-b-2 border-amber-400">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden font-sans animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between border-b-2 border-amber-400 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                  <svg className="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
-                    IT Support Administrative Override
-                  </span>
-                  <h3 className="text-base font-bold text-white">Direct Student Password Reset</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-black text-amber-300">
+                      {activeConcern.ticketNumber}
+                    </span>
+                    <span className="text-[10px] text-blue-200 uppercase tracking-wider">
+                      &bull; {activeConcern.studentName}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-white truncate max-w-md">
+                    {activeConcern.subject}
+                  </h3>
                 </div>
               </div>
+
               <button
                 type="button"
-                onClick={() => setShowPasswordModal(false)}
-                className="text-white/70 hover:text-white cursor-pointer"
+                onClick={() => setActiveConcern(null)}
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
+                aria-label="Close dialog"
               >
                 &times;
               </button>
             </div>
 
-            <div className="p-4 sm:p-6 space-y-4">
-              {/* Target Student Summary Card */}
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Learner Name:</span>
-                  <span className="font-bold text-slate-900">{passwordTarget.studentName}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Registered Email:</span>
-                  <span className="font-mono text-[#002060] font-bold">{passwordTarget.email}</span>
-                </div>
-                {passwordTarget.lrn && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">DepEd LRN:</span>
-                    <span className="font-mono text-slate-800">{passwordTarget.lrn}</span>
-                  </div>
+            {/* Modal Subheader & Status Switcher */}
+            <div className="bg-slate-50 border-b border-slate-200 p-3 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
+                <span>Email: <strong className="text-slate-800">{activeConcern.email}</strong></span>
+                {activeConcern.lrn && (
+                  <span>LRN: <strong className="text-slate-800 font-mono">{activeConcern.lrn}</strong></span>
                 )}
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Reference Ticket:</span>
-                  <span className="font-mono text-slate-700">{passwordTarget.ticketNumber}</span>
-                </div>
+                {activeConcern.gradeLevel && (
+                  <span>Grade: <strong className="text-slate-800">{activeConcern.gradeLevel}</strong></span>
+                )}
               </div>
 
-              {passwordResetSuccess ? (
-                <div className="space-y-4 py-2">
-                  <div className="p-4 bg-emerald-50 border-2 border-emerald-400 rounded-lg text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-sm font-bold text-emerald-950 block">
-                      Password Successfully Updated in Supabase
-                    </span>
-                    <p className="text-xs text-emerald-900">
-                      The learner can now sign in using the new temporary password below:
-                    </p>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-slate-500 uppercase">Status:</span>
+                <select
+                  value={modalStatus}
+                  onChange={(e) => handleQuickStatusChange(e.target.value as any)}
+                  disabled={isUpdatingStatus}
+                  className="py-1 px-2.5 bg-white border border-slate-300 rounded font-bold text-xs text-[#002060] outline-none"
+                >
+                  <option value="PENDING">PENDING</option>
+                  <option value="IN_PROGRESS">IN_PROGRESS</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                  <option value="CLOSED">CLOSED</option>
+                </select>
+              </div>
+            </div>
 
-                    <div className="flex items-center justify-between gap-2 bg-white border border-emerald-300 p-2.5 rounded max-w-sm mx-auto">
-                      <span className="font-mono text-base font-extrabold text-emerald-900 tracking-wider">
-                        {passwordResetSuccess.newPass}
+            {/* Scrollable Conversation Stream */}
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 bg-slate-100/60">
+              {/* Original Student Inquiry Card */}
+              <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs">
+                      {activeConcern.studentName.charAt(0)}
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-xs leading-none">
+                        {activeConcern.studentName}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(passwordResetSuccess.newPass)}
-                        className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded cursor-pointer transition-colors"
-                      >
-                        {copiedPass ? "Copied!" : "Copy"}
-                      </button>
+                      <span className="text-[10px] text-slate-400 mt-0.5 block">
+                        Initial Concern &bull; {new Date(activeConcern.createdAt).toLocaleString("en-PH")}
+                      </span>
                     </div>
                   </div>
+                  <span className="px-2 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-bold uppercase rounded">
+                    {activeConcern.category.replace("_", " ")}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-wrap">
+                  {activeConcern.message}
+                </p>
+              </div>
 
-                  <div className="text-xs text-slate-500 text-center leading-relaxed">
-                    Ticket <strong className="font-mono text-slate-800">{passwordTarget.ticketNumber}</strong> has been automatically updated with the resolution notes and marked as <strong>RESOLVED</strong>.
+              {/* Replies Stream */}
+              {activeConcern.replies && activeConcern.replies.length > 0 ? (
+                <div className="space-y-3 pt-2">
+                  <div className="text-center">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-200/60 px-3 py-1 rounded-full">
+                      Conversation Thread
+                    </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowPasswordModal(false)}
-                    className="w-full py-2.5 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg cursor-pointer"
-                  >
-                    Done / Close Window
-                  </button>
+                  {activeConcern.replies.map((reply) => {
+                    const isIt = reply.sender === "it_support";
+                    return (
+                      <div
+                        key={reply.id}
+                        className={`flex flex-col ${isIt ? "items-end" : "items-start"}`}
+                      >
+                        <div className="flex items-center gap-1.5 mb-1 px-1">
+                          <span className={`text-[10px] font-bold ${isIt ? "text-[#002060]" : "text-slate-600"}`}>
+                            {reply.senderName}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            &bull; {new Date(reply.createdAt).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit", hour12: true })}
+                          </span>
+                        </div>
+                        <div
+                          className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed whitespace-pre-wrap shadow-2xs ${
+                            isIt
+                              ? "bg-[#002060] text-white rounded-br-xs"
+                              : "bg-white text-slate-800 border border-slate-200 rounded-bl-xs"
+                          }`}
+                        >
+                          {reply.message}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
-                <form onSubmit={handleExecutePasswordReset} className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-bold text-slate-800">
-                        New Temporary Password <span className="text-red-600">*</span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleGenerateRandomPassword}
-                        className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer"
-                      >
-                        Generate Random
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="e.g. Dumalneg-2026-X8k9"
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 font-mono text-xs font-bold text-slate-900 rounded-md focus:border-[#002060] focus:bg-white outline-none"
-                      required
-                      minLength={6}
-                    />
-                  </div>
+                <div className="text-center py-6 text-slate-400 text-xs italic">
+                  No replies sent yet. Use the composer below to send an official response to the student.
+                </div>
+              )}
+            </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Official Resolution Notes
+            {/* Quick Reply Presets & Input Composer */}
+            <div className="p-4 bg-white border-t border-slate-200 shrink-0 space-y-2.5">
+              {/* Presets */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Presets:</span>
+                <button
+                  type="button"
+                  onClick={() => insertPresetReply("Good day! We have reviewed your account in User Accounts & Roles. Your credentials have been successfully updated.")}
+                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Credentials Updated
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertPresetReply("Good day! Your previous password has been removed for security. Please log in using the 6-digit OTP code sent to your email to create a new password.")}
+                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Password Removed
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertPresetReply("Your inquiry is currently being evaluated with the School Registrar. We will provide updates once verified.")}
+                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Under Review
+                </button>
+              </div>
+
+              {/* Reply Form */}
+              <form onSubmit={handleSendReply} className="space-y-2">
+                <textarea
+                  rows={3}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Type official response to the student..."
+                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:bg-white focus:border-[#002060] outline-none resize-none leading-relaxed"
+                  required
+                />
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <label className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={modalStatus === "RESOLVED"}
+                        onChange={(e) => setModalStatus(e.target.checked ? "RESOLVED" : "IN_PROGRESS")}
+                        className="rounded text-[#002060] focus:ring-0"
+                      />
+                      <span>Mark ticket as RESOLVED with this reply</span>
                     </label>
-                    <textarea
-                      rows={3}
-                      value={passwordNotes}
-                      onChange={(e) => setPasswordNotes(e.target.value)}
-                      placeholder="Notes on identity verification and password dispatch..."
-                      className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs font-medium rounded-md focus:border-[#002060] focus:bg-white outline-none resize-none leading-relaxed"
-                    />
                   </div>
 
-                  <div className="p-3 bg-amber-50 border-l-4 border-amber-500 text-[11px] text-amber-950 rounded leading-relaxed">
-                    <strong>Admin Notice:</strong> This directly overwrites the student password in Supabase Auth via Service Role. The student email will also be marked as confirmed if unverified.
-                  </div>
-
-                  <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-200">
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setShowPasswordModal(false)}
-                      className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-50 cursor-pointer"
+                      onClick={() => setActiveConcern(null)}
+                      className="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-lg hover:bg-slate-50 cursor-pointer"
                     >
-                      Cancel
+                      Close
                     </button>
                     <button
                       type="submit"
-                      disabled={isResettingPassword}
-                      className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-2"
+                      disabled={isSendingReply || !replyText.trim()}
+                      className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white font-bold text-xs rounded-lg shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-2"
                     >
-                      {isResettingPassword ? (
+                      {isSendingReply ? (
                         <>
                           <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
-                          <span>Resetting Password...</span>
+                          <span>Sending Reply...</span>
                         </>
                       ) : (
-                        <span>Confirm &amp; Reset Password</span>
+                        <>
+                          <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          <span>Send Reply to Student</span>
+                        </>
                       )}
                     </button>
                   </div>
-                </form>
-              )}
+                </div>
+              </form>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 2: TICKET STATUS & NOTES UPDATE */}
-      {showStatusModal && statusTarget && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden font-sans">
-            <div className="bg-[#002060] text-white p-4 flex items-center justify-between border-b-2 border-amber-400">
-              <h3 className="text-sm font-bold">Update Ticket Status &amp; Notes</h3>
-              <button
-                type="button"
-                onClick={() => setShowStatusModal(false)}
-                className="text-white/70 hover:text-white cursor-pointer"
-              >
-                &times;
-              </button>
-            </div>
-
-            <form onSubmit={handleExecuteStatusUpdate} className="p-4 sm:p-5 space-y-4">
-              <div>
-                <span className="text-xs font-bold text-slate-500 block">Ticket Number:</span>
-                <span className="font-mono font-extrabold text-[#002060]">{statusTarget.ticketNumber}</span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
-                  Ticket Status <span className="text-red-600">*</span>
-                </label>
-                <select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value as any)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs font-semibold rounded-md focus:border-[#002060] outline-none"
-                >
-                  <option value="PENDING">PENDING (Awaiting Review)</option>
-                  <option value="IN_PROGRESS">IN_PROGRESS (Under Investigation)</option>
-                  <option value="RESOLVED">RESOLVED (Action Complete)</option>
-                  <option value="CLOSED">CLOSED (Completed &amp; Closed)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
-                  Resolution / Investigation Notes
-                </label>
-                <textarea
-                  rows={4}
-                  value={resolutionNotes}
-                  onChange={(e) => setResolutionNotes(e.target.value)}
-                  placeholder="State the resolution steps taken or instructions given to the learner..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs font-medium rounded-md focus:border-[#002060] outline-none resize-none leading-relaxed"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setShowStatusModal(false)}
-                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isUpdatingStatus}
-                  className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg disabled:opacity-60 cursor-pointer"
-                >
-                  {isUpdatingStatus ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 3: TICKET DETAILS VIEW */}
-      {showDetailsModal && selectedConcern && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden font-sans">
-            <div className="bg-[#002060] text-white p-4 flex items-center justify-between border-b-2 border-amber-400">
-              <h3 className="text-sm font-bold">Ticket Details: {selectedConcern.ticketNumber}</h3>
-              <button
-                type="button"
-                onClick={() => setShowDetailsModal(false)}
-                className="text-white/70 hover:text-white cursor-pointer"
-              >
-                &times;
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
-              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <div>
-                  <span className="text-slate-500 font-medium block">Student Name:</span>
-                  <span className="font-bold text-slate-900 block">{selectedConcern.studentName}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-medium block">Email:</span>
-                  <span className="font-mono text-[#002060] font-bold block">{selectedConcern.email}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-medium block">Grade Level:</span>
-                  <span className="text-slate-800 block">{selectedConcern.gradeLevel || "Not provided"}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-medium block">DepEd LRN:</span>
-                  <span className="font-mono text-slate-800 block">{selectedConcern.lrn || "None"}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-medium block">Contact Number:</span>
-                  <span className="text-slate-800 block">{selectedConcern.contactNumber || "None"}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 font-medium block">Status:</span>
-                  <span className="font-bold text-slate-900 block">{selectedConcern.status}</span>
-                </div>
-              </div>
-
-              <div>
-                <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px] block mb-1">
-                  Subject:
-                </span>
-                <p className="font-bold text-slate-900 text-sm">{selectedConcern.subject}</p>
-              </div>
-
-              <div>
-                <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px] block mb-1">
-                  Message / Description:
-                </span>
-                <div className="bg-slate-50 border border-slate-200 rounded p-3 text-slate-700 whitespace-pre-wrap leading-relaxed">
-                  {selectedConcern.message}
-                </div>
-              </div>
-
-              {selectedConcern.resolutionNotes && (
-                <div>
-                  <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px] block mb-1">
-                    IT Support Resolution:
-                  </span>
-                  <div className="bg-emerald-50 border border-emerald-300 rounded p-3 text-emerald-950 whitespace-pre-wrap leading-relaxed">
-                    <div className="font-bold text-emerald-900 mb-1">
-                      Resolved by: {selectedConcern.resolvedBy || "IT Support"} on{" "}
-                      {selectedConcern.resolvedAt ? new Date(selectedConcern.resolvedAt).toLocaleString("en-PH") : "N/A"}
-                    </div>
-                    {selectedConcern.resolutionNotes}
-                  </div>
-                </div>
-              )}
-
-              {selectedConcern.newTemporaryPassword && (
-                <div className="bg-emerald-50 border border-emerald-400 rounded p-3">
-                  <span className="text-[10px] font-bold text-emerald-900 uppercase block mb-1">
-                    Generated Password:
-                  </span>
-                  <div className="flex items-center justify-between font-mono font-extrabold text-emerald-900">
-                    <span>{selectedConcern.newTemporaryPassword}</span>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(selectedConcern.newTemporaryPassword!)}
-                      className="text-xs text-emerald-700 underline cursor-pointer"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-2 flex justify-end gap-2 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowDetailsModal(false);
-                    handleOpenPasswordModal(selectedConcern);
-                  }}
-                  className="px-4 py-2 bg-[#002060] text-white font-bold rounded-lg text-xs"
-                >
-                  Reset Password
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDetailsModal(false)}
-                  className="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-lg text-xs"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 4: LOG WALK-IN / IN-PERSON CONCERN */}
-      {showWalkInModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden font-sans">
-            <div className="bg-[#002060] text-white p-4 flex items-center justify-between border-b-2 border-amber-400">
-              <h3 className="text-sm font-bold">Log Walk-In Student Concern</h3>
-              <button
-                type="button"
-                onClick={() => setShowWalkInModal(false)}
-                className="text-white/70 hover:text-white cursor-pointer"
-              >
-                &times;
-              </button>
-            </div>
-
-            <form onSubmit={handleLogWalkIn} className="p-4 sm:p-5 space-y-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">
-                    Category <span className="text-red-600">*</span>
-                  </label>
-                  <select
-                    value={walkInForm.category}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, category: e.target.value })}
-                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none"
-                  >
-                    <option value="password_reset">Password Reset</option>
-                    <option value="account_access">Account Access</option>
-                    <option value="lrn_profile">LRN / Profile</option>
-                    <option value="enrollment">Enrollment</option>
-                    <option value="grades_schedule">Grades / Schedule</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">Grade Level</label>
-                  <select
-                    value={walkInForm.gradeLevel}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, gradeLevel: e.target.value })}
-                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none"
-                  >
-                    <option value="Grade 7">Grade 7</option>
-                    <option value="Grade 8">Grade 8</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 10">Grade 10</option>
-                    <option value="Grade 11">Grade 11</option>
-                    <option value="Grade 12">Grade 12</option>
-                    <option value="Transferee">Transferee</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">
-                    Student Full Name <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={walkInForm.studentName}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, studentName: e.target.value })}
-                    placeholder="e.g. Maria Santos"
-                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">
-                    Email Address <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={walkInForm.email}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, email: e.target.value })}
-                    placeholder="e.g. learner@gmail.com"
-                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">12-Digit LRN</label>
-                  <input
-                    type="text"
-                    maxLength={12}
-                    value={walkInForm.lrn}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, lrn: e.target.value.replace(/\D/g, "") })}
-                    placeholder="e.g. 101234567890"
-                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-mono outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">Contact Number</label>
-                  <input
-                    type="tel"
-                    value={walkInForm.contactNumber}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, contactNumber: e.target.value })}
-                    placeholder="e.g. 09171234567"
-                    className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Subject</label>
-                <input
-                  type="text"
-                  value={walkInForm.subject}
-                  onChange={(e) => setWalkInForm({ ...walkInForm, subject: e.target.value })}
-                  className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">
-                  Concern Description <span className="text-red-600">*</span>
-                </label>
-                <textarea
-                  rows={3}
-                  value={walkInForm.message}
-                  onChange={(e) => setWalkInForm({ ...walkInForm, message: e.target.value })}
-                  placeholder="Details of student inquiry or issue presented at the IT office..."
-                  className="w-full p-2 bg-slate-50 border border-slate-300 rounded font-medium outline-none resize-none leading-relaxed"
-                  required
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setShowWalkInModal(false)}
-                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoggingWalkIn}
-                  className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg disabled:opacity-60 cursor-pointer"
-                >
-                  {isLoggingWalkIn ? "Recording..." : "Record Walk-in Ticket"}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

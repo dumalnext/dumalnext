@@ -35,6 +35,183 @@ export default function UserRoleAuditor() {
   const [counts, setCounts] = useState({ all: 0, student: 0, teacher: 0, admin: 0, it_support: 0 });
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
+
+  // Dossier Credential Editing State
+  const [isEditingCredentials, setIsEditingCredentials] = useState(false);
+  const [editEmail, setEditEmail] = useState("");
+  const [editLrn, setEditLrn] = useState("");
+  const [editFullName, setEditFullName] = useState("");
+  const [isSavingCredentials, setIsSavingCredentials] = useState(false);
+
+  // Dossier Password Removal State
+  const [confirmPasswordRemoval, setConfirmPasswordRemoval] = useState(false);
+  const [isRemovingPassword, setIsRemovingPassword] = useState(false);
+
+  // Dossier Field Actions State
+  const [isRemovingLrn, setIsRemovingLrn] = useState(false);
+  const [isRemovingEmail, setIsRemovingEmail] = useState(false);
+  const [dossierNotice, setDossierNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handleOpenDossier = (target: SystemUser) => {
+    setViewingUser(target);
+    setIsEditingCredentials(false);
+    setConfirmPasswordRemoval(false);
+    setDossierNotice(null);
+    setEditEmail(target.email || "");
+    setEditLrn(target.details?.lrn && target.details.lrn !== "Not assigned" ? target.details.lrn : "");
+    setEditFullName(target.fullName || "");
+  };
+
+  const handleSaveCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!viewingUser) return;
+    setIsSavingCredentials(true);
+    setDossierNotice(null);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: viewingUser.id,
+          action: "modify_details",
+          newEmail: editEmail.trim(),
+          newLrn: editLrn.trim(),
+          newFullName: editFullName.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to update user credentials.");
+      }
+      setDossierNotice({ type: "success", text: "Credentials updated successfully." });
+      setIsEditingCredentials(false);
+      setViewingUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              email: editEmail.trim(),
+              fullName: editFullName.trim() || prev.fullName,
+              details: {
+                ...prev.details,
+                lrn: editLrn.trim() || "Not assigned",
+              },
+            }
+          : null
+      );
+      fetchUsers(true);
+    } catch (err: any) {
+      setDossierNotice({ type: "error", text: err.message || "Failed to save changes." });
+    } finally {
+      setIsSavingCredentials(false);
+    }
+  };
+
+  const handleRemovePassword = async () => {
+    if (!viewingUser) return;
+    setIsRemovingPassword(true);
+    setDossierNotice(null);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: viewingUser.id,
+          action: "remove_password",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to remove password.");
+      }
+      setDossierNotice({
+        type: "success",
+        text: "Password successfully removed & invalidated. For security, no password is displayed. The student must verify via OTP to set a new password.",
+      });
+      setConfirmPasswordRemoval(false);
+    } catch (err: any) {
+      setDossierNotice({ type: "error", text: err.message || "Failed to remove password." });
+    } finally {
+      setIsRemovingPassword(false);
+    }
+  };
+
+  const handleRemoveLrn = async () => {
+    if (!viewingUser) return;
+    const confirm = window.confirm(`Are you sure you want to remove the LRN from ${viewingUser.fullName}'s account?`);
+    if (!confirm) return;
+    setIsRemovingLrn(true);
+    setDossierNotice(null);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: viewingUser.id,
+          action: "remove_lrn",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to remove LRN.");
+      }
+      setDossierNotice({ type: "success", text: "LRN removed successfully." });
+      setEditLrn("");
+      setViewingUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              details: {
+                ...prev.details,
+                lrn: "Not assigned",
+              },
+            }
+          : null
+      );
+      fetchUsers(true);
+    } catch (err: any) {
+      setDossierNotice({ type: "error", text: err.message || "Failed to remove LRN." });
+    } finally {
+      setIsRemovingLrn(false);
+    }
+  };
+
+  const handleRemoveEmail = async () => {
+    if (!viewingUser) return;
+    const confirm = window.confirm(`Are you sure you want to remove the email address (${viewingUser.email}) from this account?`);
+    if (!confirm) return;
+    setIsRemovingEmail(true);
+    setDossierNotice(null);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: viewingUser.id,
+          action: "remove_email",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to remove email.");
+      }
+      setDossierNotice({ type: "success", text: "Email removed successfully." });
+      setEditEmail("");
+      setViewingUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              email: "",
+            }
+          : null
+      );
+      fetchUsers(true);
+    } catch (err: any) {
+      setDossierNotice({ type: "error", text: err.message || "Failed to remove email." });
+    } finally {
+      setIsRemovingEmail(false);
+    }
+  };
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -198,10 +375,14 @@ export default function UserRoleAuditor() {
 
   const filteredUsers = users.filter((u) => {
     const matchesRole = selectedRole === "all" || u.userRole === selectedRole;
+    const effectiveQuery = (activeSearch || searchQuery).trim().toLowerCase();
     const matchesSearch =
-      u.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.fullName && u.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+      !effectiveQuery ||
+      u.userId.toLowerCase().includes(effectiveQuery) ||
+      u.email.toLowerCase().includes(effectiveQuery) ||
+      (u.fullName && u.fullName.toLowerCase().includes(effectiveQuery)) ||
+      (u.details?.lrn && u.details.lrn.toLowerCase().includes(effectiveQuery)) ||
+      (u.details?.facultyEmail && u.details.facultyEmail.toLowerCase().includes(effectiveQuery));
     return matchesRole && matchesSearch;
   });
 
@@ -374,14 +555,46 @@ export default function UserRoleAuditor() {
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Filter by Full Name, User ID (e.g. DNHS-...), or Email Address..."
-          className="w-full p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none shadow-xs"
-        />
+      <div className="flex flex-col sm:flex-row items-center gap-2">
+        <div className="relative flex-1 w-full">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setActiveSearch(searchQuery.trim());
+              }
+            }}
+            placeholder="Search by 12-Digit LRN, Student / Staff Name, or Gmail Address..."
+            className="w-full p-2.5 pl-9 bg-white rounded-xl border border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none shadow-xs"
+          />
+          <svg className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <button
+          type="button"
+          onClick={() => setActiveSearch(searchQuery.trim())}
+          className="w-full sm:w-auto px-5 py-2.5 bg-[#002060] hover:bg-[#002b80] active:bg-[#001744] text-white text-xs font-bold rounded-xl transition-colors shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span>Search</span>
+        </button>
+        {(searchQuery || activeSearch) && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery("");
+              setActiveSearch("");
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -474,7 +687,7 @@ export default function UserRoleAuditor() {
                       <td className="p-3 text-right">
                         <button
                           type="button"
-                          onClick={() => setViewingUser(user)}
+                          onClick={() => handleOpenDossier(user)}
                           className="px-3 py-1 rounded text-[11px] font-bold border border-[#002060] bg-blue-50 text-[#002060] hover:bg-[#002060] hover:text-white transition-colors cursor-pointer"
                         >
                           View Dossier
@@ -725,28 +938,209 @@ export default function UserRoleAuditor() {
               </div>
             )}
 
-            {/* Footer with Delete Button */}
-            <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div>
+            {/* In-Modal Notification Notice */}
+            {dossierNotice && (
+              <div
+                className={`p-3 rounded-lg text-xs font-bold flex items-center justify-between ${
+                  dossierNotice.type === "success"
+                    ? "bg-emerald-50 text-emerald-950 border border-emerald-300"
+                    : "bg-red-50 text-red-950 border border-red-300"
+                }`}
+              >
+                <span>{dossierNotice.text}</span>
+                <button
+                  type="button"
+                  onClick={() => setDossierNotice(null)}
+                  className="text-slate-500 hover:text-slate-800 cursor-pointer ml-2"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+
+            {/* Password Removal Confirmation Dialog */}
+            {confirmPasswordRemoval && (
+              <div className="p-4 bg-amber-50 border-2 border-amber-400 rounded-lg space-y-2.5 animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+                    Remove Account Password
+                  </span>
+                </div>
+                <p className="text-xs text-amber-900 leading-relaxed">
+                  Are you sure you want to remove the password for <strong>{viewingUser.fullName}</strong>?
+                  <br />
+                  <span className="font-semibold text-amber-950 mt-1 block">
+                    Security Notice: IT Support will NEVER see the student&apos;s password. The current password will be immediately wiped from Supabase Auth and active sessions terminated. The student must verify via OTP to set a new password.
+                  </span>
+                </p>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleRemovePassword}
+                    disabled={isRemovingPassword}
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs cursor-pointer disabled:opacity-60"
+                  >
+                    {isRemovingPassword ? "Removing..." : "Yes, Remove Password"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmPasswordRemoval(false)}
+                    className="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-md cursor-pointer hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Credential Editing Form */}
+            {isEditingCredentials && (
+              <form onSubmit={handleSaveCredentials} className="p-4 bg-blue-50/70 border-2 border-[#002060]/30 rounded-lg space-y-3 animate-in fade-in">
+                <div className="flex items-center justify-between border-b border-blue-200 pb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#002060]">
+                    Modify Account Credentials &amp; Identity
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">
+                    IT Support Override
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
+                      Registered Email / Gmail Address
+                    </label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      placeholder="e.g. learner@gmail.com"
+                      className="w-full p-2.5 bg-white border border-slate-300 rounded text-xs font-medium focus:border-[#002060] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
+                      12-Digit LRN (Learner Reference Number)
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={12}
+                      value={editLrn}
+                      onChange={(e) => setEditLrn(e.target.value.replace(/\D/g, ""))}
+                      placeholder="e.g. 101234567890"
+                      className="w-full p-2.5 bg-white border border-slate-300 rounded text-xs font-mono font-medium focus:border-[#002060] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Full Legal Name (PSA / School Record)
+                  </label>
+                  <input
+                    type="text"
+                    value={editFullName}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    placeholder="e.g. Maria Clara Santos"
+                    className="w-full p-2.5 bg-white border border-slate-300 rounded text-xs font-medium focus:border-[#002060] outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingCredentials(false)}
+                    className="px-3.5 py-1.5 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingCredentials}
+                    className="px-4 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white font-bold text-xs rounded shadow-xs cursor-pointer disabled:opacity-60"
+                  >
+                    {isSavingCredentials ? "Saving..." : "Save Credentials"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Footer with Modify, Remove Password, Remove LRN, Remove Email, and Delete Account Buttons */}
+            <div className="pt-4 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                {/* 1. Modify Email & LRN */}
+                <button
+                  type="button"
+                  onClick={() => setIsEditingCredentials((prev) => !prev)}
+                  className="px-3 py-2 rounded-lg border border-[#002060] bg-blue-50 hover:bg-[#002060] text-[#002060] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>{isEditingCredentials ? "Cancel Edit" : "Modify Email / LRN"}</span>
+                </button>
+
+                {/* 2. Remove Password Button (Student privacy & security) */}
+                <button
+                  type="button"
+                  onClick={() => setConfirmPasswordRemoval(true)}
+                  className="px-3 py-2 rounded-lg border border-amber-600 bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Remove Password</span>
+                </button>
+
+                {/* 3. Remove LRN Button */}
+                {viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned" && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveLrn}
+                    disabled={isRemovingLrn}
+                    className="px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    <span>{isRemovingLrn ? "Removing LRN..." : "Remove LRN"}</span>
+                  </button>
+                )}
+
+                {/* 4. Remove Email Button */}
+                {viewingUser.email && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveEmail}
+                    disabled={isRemovingEmail}
+                    className="px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    <span>{isRemovingEmail ? "Removing Email..." : "Remove Email"}</span>
+                  </button>
+                )}
+
+                {/* 5. Delete Account */}
                 {viewingUser.email.toLowerCase() === "dumalnext@gmail.com" ? (
                   <span className="px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-300 text-amber-900 text-[10px] font-bold uppercase">
-                    Master IT Account - Protected Against Deletion
+                    Master IT Account - Protected
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => setUserToDelete(viewingUser)}
-                    className="px-4 py-2 rounded-lg border border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-bold text-xs transition-colors cursor-pointer"
+                    className="px-3 py-2 rounded-lg border border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-bold text-xs transition-colors cursor-pointer"
                   >
                     Delete Account
                   </button>
                 )}
               </div>
 
+              {/* Close Button */}
               <button
                 type="button"
                 onClick={() => setViewingUser(null)}
-                className="px-5 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors w-full sm:w-auto text-center cursor-pointer"
+                className="px-5 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors w-full md:w-auto text-center cursor-pointer"
               >
                 Close
               </button>

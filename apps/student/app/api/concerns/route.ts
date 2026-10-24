@@ -108,6 +108,7 @@ export async function GET(req: NextRequest) {
       resolvedBy: c.resolvedBy,
       resolutionNotes: c.resolutionNotes,
       newTemporaryPassword: c.newTemporaryPassword,
+      replies: Array.isArray(c.replies) ? c.replies : [],
     }));
 
     return NextResponse.json(
@@ -229,3 +230,74 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+// PATCH: Student or public submit a reply to an existing ticket
+export async function PATCH(req: NextRequest) {
+  try {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Database client initialization failed." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    const body = await req.json();
+    const { ticketNumber, replyMessage, studentName } = body;
+
+    if (!ticketNumber || !replyMessage || !String(replyMessage).trim()) {
+      return NextResponse.json(
+        { error: "Ticket number and reply message are required." },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    const concerns = await getStoredConcerns(supabase);
+    const index = concerns.findIndex(
+      (c) => c.ticketNumber?.toUpperCase() === String(ticketNumber).trim().toUpperCase()
+    );
+
+    if (index === -1) {
+      return NextResponse.json(
+        { error: "Ticket record not found." },
+        { status: 404, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    const current = concerns[index];
+    const existingReplies = Array.isArray(current.replies) ? current.replies : [];
+    const newReply = {
+      id: `rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      sender: "student",
+      senderName: studentName || current.studentName || "Student",
+      message: String(replyMessage).trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    concerns[index] = {
+      ...current,
+      replies: [...existingReplies, newReply],
+      updatedAt: new Date().toISOString(),
+    };
+
+    const saved = await saveStoredConcerns(supabase, concerns);
+    if (!saved) {
+      return NextResponse.json(
+        { error: "Failed to save reply." },
+        { status: 500, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, message: "Reply sent successfully.", reply: newReply },
+      { headers: NO_CACHE_HEADERS }
+    );
+  } catch (err: any) {
+    console.error("PATCH student concern reply error:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to send reply." },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
+  }
+}
+
