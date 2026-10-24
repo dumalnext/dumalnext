@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
+import { sendEmailReplyToStudent, sendReceiptToStudent } from "@/lib/emailDispatcher";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

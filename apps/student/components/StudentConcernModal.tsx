@@ -286,6 +286,38 @@ export default function StudentConcernModal({
                   </div>
                 </div>
               ) : (
+                <>
+                {/* Direct Email Helpdesk Card */}
+                <div className="mb-4 p-3.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                      <span className="text-xs font-bold text-[#002060]">
+                        Maaari ka ring direktang mag-email sa IT Support:
+                      </span>
+                    </div>
+                    <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded border border-blue-300">
+                      Official Helpdesk Email
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    Kung hindi ka makapag-login o nais mong mag-email mula sa iyong Gmail, i-click ang pindutan sa ibaba upang mag-compose ng email sa <strong>dumalnext@gmail.com</strong>. Awtomatiko itong papasok sa aming IT Support Desk.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <a
+                      href="mailto:dumalnext@gmail.com?subject=Password%20Reset%20Request%20-%20Dumalneg%20NHS&body=Pangalan%20ng%20Mag-aaral%3A%0ALRN%20(12-Digit)%3A%0AApelyido%2FRecord%3A%0AMensahe%20ukol%20sa%20Password%20o%20Account%3A%0A"
+                      className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <span>Mag-email sa dumalnext@gmail.com</span>
+                    </a>
+                  </div>
+                </div>
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Institutional Policy Notice */}
                   <div className="p-3 bg-blue-50 border-l-4 border-[#002060] border border-blue-200 rounded-md text-xs text-slate-700 leading-relaxed space-y-1">
@@ -452,6 +484,7 @@ export default function StudentConcernModal({
                     </button>
                   </div>
                 </form>
+                </>
               )}
             </div>
           )}
