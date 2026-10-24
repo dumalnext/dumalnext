@@ -1383,63 +1383,72 @@ function StudentHomeContent() {
               />
             </div>
 
-            {/* RIGHT COLUMN (5 COLS): STUDENT PORTAL AUTHENTICATION CARD */}
-            <div className="lg:col-span-5 order-1 lg:order-2">
-              <div className="bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden">
-                {/* Portal Card Institutional Header */}
-                <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
+            {/* RIGHT COLUMN (5 COLS): STUDENT PORTAL AUTHENTICATION CARD (3D CARD FLIP) */}
+            <div className="lg:col-span-5 order-1 lg:order-2" style={{ perspective: "1400px" }}>
+              <div
+                className="grid grid-cols-1 transition-transform duration-700 ease-in-out"
+                style={{
+                  transformStyle: "preserve-3d",
+                  transform: activeTab === "register" ? "rotateY(180deg)" : "rotateY(0deg)",
+                }}
+              >
+                {/* -------------------------------------------------------------
+                    FRONT FACE: SIGN IN (0deg)
+                    ------------------------------------------------------------- */}
+                <div
+                  className={`col-start-1 row-start-1 bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden flex flex-col justify-between ${
+                    activeTab === "signin" ? "pointer-events-auto" : "pointer-events-none select-none"
+                  }`}
+                  style={{
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(0deg)",
+                  }}
+                  inert={activeTab !== "signin" ? true : undefined}
+                >
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-                      Learner Gateway
-                    </span>
-                    <h2 className="text-base font-bold text-white tracking-tight">
-                      Student Portal Access
-                    </h2>
-                  </div>
-                  <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
-                    S.Y. {schoolYear || "2026-2027"}
-                  </span>
-                </div>
+                    {/* Portal Card Institutional Header */}
+                    <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
+                          Learner Gateway
+                        </span>
+                        <h2 className="text-base font-bold text-white tracking-tight">
+                          Student Portal Access
+                        </h2>
+                      </div>
+                      <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                        S.Y. {schoolYear || "2026-2027"}
+                      </span>
+                    </div>
 
-                {/* Clean Segmented Tab Switcher: Sign In vs Create Account */}
-                <div className="p-2 bg-slate-100 border-b border-slate-200 grid grid-cols-2 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab("signin");
-                      setLoginError("");
-                    }}
-                    className={`py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer ${
-                      activeTab === "signin"
-                        ? "bg-[#002060] text-white shadow-xs"
-                        : "bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
-                    }`}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab("register");
-                      setRegErrors({});
-                      setRegSuccessNotice("");
-                    }}
-                    className={`py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer ${
-                      activeTab === "register"
-                        ? "bg-[#002060] text-white shadow-xs"
-                        : "bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
-                    }`}
-                  >
-                    Create Account
-                  </button>
-                </div>
+                    {/* Clean Segmented Tab Switcher: Sign In vs Create Account */}
+                    <div className="p-2 bg-slate-100 border-b border-slate-200 grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab("signin");
+                          setLoginError("");
+                        }}
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab("register");
+                          setRegErrors({});
+                          setRegSuccessNotice("");
+                        }}
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
+                      >
+                        Create Account
+                      </button>
+                    </div>
 
-                <div className="p-5 sm:p-6">
-                  {/* -----------------------------------------------------------------
-                      SIGN IN FORM
-                      ----------------------------------------------------------------- */}
-                  {activeTab === "signin" && (
-                    <div className="space-y-5">
+                    <div className="p-5 sm:p-6">
+                      <div className="space-y-5">
                       <div className="border-b border-slate-200 pb-3">
                         <h3 className="text-base font-bold text-slate-900">
                           Sign In to Your Learner Account
@@ -1667,13 +1676,67 @@ function StudentHomeContent() {
                         </p>
                       </div>
                     </div>
-                  )}
+                    </div>
+                  </div>
+                </div>
 
-                  {/* -----------------------------------------------------------------
-                      CREATE ACCOUNT FORM
-                      ----------------------------------------------------------------- */}
-                  {activeTab === "register" && (
-                    <div className="space-y-4">
+                {/* -------------------------------------------------------------
+                    BACK FACE: CREATE ACCOUNT (180deg)
+                    ------------------------------------------------------------- */}
+                <div
+                  className={`col-start-1 row-start-1 bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden flex flex-col justify-between ${
+                    activeTab === "register" ? "pointer-events-auto" : "pointer-events-none select-none"
+                  }`}
+                  style={{
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                  }}
+                  inert={activeTab !== "register" ? true : undefined}
+                >
+                  <div>
+                    {/* Portal Card Institutional Header */}
+                    <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
+                          Learner Gateway
+                        </span>
+                        <h2 className="text-base font-bold text-white tracking-tight">
+                          Student Portal Access
+                        </h2>
+                      </div>
+                      <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                        S.Y. {schoolYear || "2026-2027"}
+                      </span>
+                    </div>
+
+                    {/* Clean Segmented Tab Switcher: Sign In vs Create Account */}
+                    <div className="p-2 bg-slate-100 border-b border-slate-200 grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab("signin");
+                          setLoginError("");
+                        }}
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab("register");
+                          setRegErrors({});
+                          setRegSuccessNotice("");
+                        }}
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs"
+                      >
+                        Create Account
+                      </button>
+                    </div>
+
+                    <div className="p-5 sm:p-6">
+                      <div className="space-y-4">
                       <div className="border-b border-slate-200 pb-3">
                         <h3 className="text-base font-bold text-slate-900">
                           Create Student Applicant Account
@@ -1934,7 +1997,8 @@ function StudentHomeContent() {
                         </p>
                       </div>
                     </div>
-                  )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
