@@ -17,7 +17,7 @@ interface ITSupportAuthContextType {
   isLoading: boolean;
   login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
   demoLogin: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
 }
 
@@ -47,7 +47,10 @@ function getSessionCookie(): ITSupportUser | null {
 
 function clearSessionCookie() {
   if (typeof document !== "undefined") {
-    document.cookie = `${IT_SESSION_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+    const expireStr = "expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; path=/";
+    document.cookie = `${IT_SESSION_COOKIE_NAME}=; ${expireStr}; SameSite=Lax`;
+    document.cookie = `${IT_SESSION_COOKIE_NAME}=; ${expireStr}`;
+    document.cookie = `${IT_SESSION_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; path=/it-support`;
   }
 }
 
@@ -275,10 +278,31 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
     await login(AUTHORIZED_IT_EMAIL, AUTHORIZED_IT_PASS);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch (e) {
+      console.warn("Supabase auth signout error:", e);
+    }
+
+    try {
+      await fetch("/api/it-support/logout", { method: "POST" });
+    } catch {}
+
     clearSessionCookie();
     setUser(null);
+
     if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem(IT_SESSION_COOKIE_NAME);
+        sessionStorage.removeItem(IT_SESSION_COOKIE_NAME);
+        localStorage.removeItem("dumalnext_last_active_itsupport");
+        sessionStorage.removeItem("dumalnext_session_timeout_msg");
+      } catch {}
+
+      window.dispatchEvent(new CustomEvent("dumalnext:itsupport-logout"));
+      window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+
       window.location.href = "/";
     }
   };

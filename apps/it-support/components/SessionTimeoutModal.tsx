@@ -86,7 +86,7 @@ export default function SessionTimeoutModal() {
             "You were automatically signed out after 30 minutes of inactivity for security."
           );
         } catch {}
-        logout();
+        logout().catch(() => {});
       } else if (idleMs >= WARNING_MS) {
         setShowWarning(true);
         const msLeft = Math.max(0, LOGOUT_MS - idleMs);
@@ -139,9 +139,9 @@ export default function SessionTimeoutModal() {
     setShowWarning(false);
   };
 
-  const handleSignOutNow = () => {
+  const handleSignOutNow = async () => {
     setShowWarning(false);
-    logout();
+    await logout();
   };
 
   const mins = Math.floor(remainingSeconds / 60);

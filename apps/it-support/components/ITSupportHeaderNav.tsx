@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useITSupportAuth } from "@/lib/auth/itSupportAuthContext";
 
@@ -16,6 +16,16 @@ export default function ITSupportHeaderNav({
   onSelectTab,
 }: ITSupportHeaderNavProps) {
   const { user, logout } = useITSupportAuth();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await logout();
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   return (
     <header className="border-t-4 border-t-amber-400 border-b border-[#001744] bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white shadow-md font-sans">
@@ -78,13 +88,23 @@ export default function ITSupportHeaderNav({
 
             <button
               type="button"
-              onClick={logout}
-              className="px-4 py-2.5 min-h-[40px] shrink-0 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold tracking-wide transition-colors shadow-sm rounded-lg cursor-pointer flex items-center justify-center gap-1.5"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className="px-4 py-2.5 min-h-[40px] shrink-0 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold tracking-wide transition-colors shadow-sm rounded-lg cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Sign Out</span>
+              {isSigningOut ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                  <span>Signing Out...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Sign Out</span>
+                </>
+              )}
             </button>
           </div>
         )}
