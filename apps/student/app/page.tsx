@@ -1604,20 +1604,28 @@ function StudentHomeContent() {
                           </button>
                         </div>
                         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs border-t border-slate-100">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setConcernModalMode("submit");
-                              setConcernCategory("password_reset");
-                              setShowConcernModal(true);
-                            }}
-                            className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
-                          >
-                            <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                            </svg>
-                            <span>Forgot password? Contact / Email dumalnext@gmail.com</span>
-                          </button>
+                          {(() => {
+                            const emailSubject = encodeURIComponent("Password Reset Request - Dumalneg NHS Student Account");
+                            const userParam = loginEmail.trim();
+                            const isLrn = /^\d{12}$/.test(userParam);
+                            const isEmail = userParam.includes("@");
+                            const emailBody = encodeURIComponent(
+                              `Magandang araw po Dumalneg NHS IT Support Desk,\n\nNais ko po sanang mag-request ng password reset para sa aking student account sa Dumalneg National High School.\n\nMga Detalye ng Aking Account:\n- Buong Pangalan: \n- 12-Digit LRN: ${isLrn ? userParam : ""}\n- Rehistradong Email / Gmail: ${isEmail ? userParam : ""}\n- Dahilan / Concern: Nakalimutan ko po ang aking password at nais ko po itong ma-reset.\n\nMaraming salamat po!`
+                            );
+                            const mailtoLink = `mailto:dumalnext@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+
+                            return (
+                              <a
+                                href={mailtoLink}
+                                className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
+                              >
+                                <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                                <span>Forgot password? Contact / Email dumalnext@gmail.com</span>
+                              </a>
+                            );
+                          })()}
 
                           <button
                             type="button"
@@ -1631,30 +1639,6 @@ function StudentHomeContent() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             <span>Track Concern Status</span>
-                          </button>
-                        </div>
-
-                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] border-t border-slate-100 text-slate-600">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setResetIdentifier(loginEmail);
-                              setShowPasswordResetModal(true);
-                            }}
-                            className="text-[#002060] font-bold hover:underline cursor-pointer text-left"
-                          >
-                            Na-reset ng IT ang Password? Magtakda ng bago
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setRecoveryLrn(loginEmail.replace(/\D/g, "").slice(0, 12));
-                              setShowIdentityRecoveryModal(true);
-                            }}
-                            className="text-red-700 font-bold hover:underline cursor-pointer text-left sm:text-right"
-                          >
-                            Walang Email at Password? I-recover gamit ang LRN
                           </button>
                         </div>
                       </form>
