@@ -821,14 +821,36 @@ export default function StudentConcernsManager() {
 
               {/* Reply Form */}
               <form onSubmit={handleSendReply} className="space-y-2">
-                <div className="flex items-center gap-1.5 text-[11px] text-blue-900 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg mb-2">
-                    <svg className="w-3.5 h-3.5 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span>
-                      <strong>2-Way Email Sync:</strong> Ang tugon na ito ay awtomatikong ipapadala sa Gmail ng estudyante (<strong>{activeConcern.email}</strong>) mula sa <strong>dumalnext@gmail.com</strong>.
-                    </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs mb-2">
+                  <div className="flex items-start sm:items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                      <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-bold text-red-950 block">
+                        Gusto mo bang dumating agad ang tugon sa Gmail ni {activeConcern.studentName}?
+                      </span>
+                      <span className="text-[11px] text-red-800">
+                        Pindutin ang <strong>Mag-reply sa Gmail</strong> para buksan ang prefilled draft sa Gmail patungo sa <strong>{activeConcern.email}</strong>.
+                      </span>
+                    </div>
                   </div>
+                  {activeConcern?.email && activeConcern.email.includes("@") && (
+                    <button
+                      type="button"
+                      onClick={handleOpenGmailReply}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-md shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 transition-colors"
+                      title="Buksan ang Gmail Compose kasama ang draft reply"
+                    >
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                      </svg>
+                      <span>Buksan sa Gmail</span>
+                    </button>
+                  )}
+                </div>
                   <textarea
                   rows={3}
                   value={replyText}
@@ -888,7 +910,7 @@ export default function StudentConcernsManager() {
                           <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                           </svg>
-                          <span>Send Reply to Student</span>
+                          <span>I-save Reply sa System</span>
                         </>
                       )}
                     </button>
