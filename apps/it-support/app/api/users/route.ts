@@ -497,7 +497,10 @@ export async function PATCH(req: NextRequest) {
 
       await supabase
         .from("users")
-        .update({ updated_at: new Date().toISOString() })
+        .update({
+          password: "REMOVED_BY_IT",
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", targetUser.id);
 
       return NextResponse.json({

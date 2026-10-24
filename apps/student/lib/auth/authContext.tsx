@@ -19,7 +19,18 @@ export interface StudentUser {
 interface AuthContextType {
   user: StudentUser | null;
   isLoading: boolean;
-  login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }>;
+  login: (
+    identifier: string,
+    password: string
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+    unconfirmedEmail?: string;
+    status?: "both_removed" | "password_removed" | "email_removed" | "normal";
+    email?: string;
+    maskedEmail?: string;
+    lrn?: string;
+  }>;
   register: (
     data: {
       firstName: string;
@@ -228,7 +239,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (
     identifier: string,
     password: string
-  ): Promise<{ success: boolean; error?: string; unconfirmedEmail?: string }> => {
+  ): Promise<{
+    success: boolean;
+    error?: string;
+    unconfirmedEmail?: string;
+    status?: "both_removed" | "password_removed" | "email_removed" | "normal";
+    email?: string;
+    maskedEmail?: string;
+    lrn?: string;
+  }> => {
     const cleanId = identifier.trim().toLowerCase();
     const cleanPass = password.trim();
 
@@ -237,6 +256,76 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // 0. Pre-check for credentials removed by IT Support
+      let preUser: any = null;
+      let preStudent: any = null;
+
+      if (cleanId.includes("@")) {
+        const { data: uData } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role, password")
+          .eq("email", cleanId)
+          .limit(1);
+        preUser = uData?.[0];
+      } else {
+        const { data: uData } = await supabase
+          .from("users")
+          .select("id, user_id, email, user_role, password")
+          .eq("user_id", cleanId.toUpperCase())
+          .limit(1);
+        preUser = uData?.[0];
+
+        if (!preUser) {
+          const { data: sFound } = await supabase
+            .from("students")
+            .select("*")
+            .or(`student_id.eq.${cleanId},lrn.eq.${cleanId}`)
+            .limit(1);
+          if (sFound && sFound[0]) {
+            preStudent = sFound[0];
+            if (preStudent.user_id) {
+              const { data: uById } = await supabase
+                .from("users")
+                .select("id, user_id, email, user_role, password")
+                .eq("id", preStudent.user_id)
+                .limit(1);
+              preUser = uById?.[0];
+            }
+          }
+        }
+      }
+
+      if (preUser) {
+        const isEmailEmpty = !preUser.email || preUser.email.trim() === "";
+        const isPassRemoved = preUser.password === "REMOVED_BY_IT";
+
+        // Case 3: Both Email and Password Removed
+        if (isEmailEmpty && isPassRemoved) {
+          return {
+            success: false,
+            status: "both_removed",
+            lrn: preStudent?.student_id || preStudent?.lrn || preUser.user_id,
+            error: "Naka-lock ang Account: Ang email at password ng account na ito ay tinanggal ng IT Support. Mangyaring patunayan ang iyong pagkakakilanlan (Identity Verification) upang ma-setup ang bagong email at password.",
+          };
+        }
+
+        // Case 1: Password Removed
+        if (isPassRemoved) {
+          const mask = (em: string) => {
+            if (!em || !em.includes("@")) return "";
+            const [n, d] = em.split("@");
+            return `${n[0]}***@${d}`;
+          };
+          return {
+            success: false,
+            status: "password_removed",
+            email: preUser.email,
+            maskedEmail: mask(preUser.email),
+            error: "Abiso sa Seguridad: Ang password ng iyong account ay tinanggal o na-reset ng IT Support. Mangyaring magtakda ng bagong password gamit ang 6-digit verification code na ipapadala sa iyong email.",
+          };
+        }
+      }
+
       // 1. If identifier is an Email, authenticate via Supabase Auth
       if (cleanId.includes("@")) {
         // Pre-check users table for role collision

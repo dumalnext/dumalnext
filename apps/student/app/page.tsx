@@ -11,19 +11,29 @@ import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm
 import SeparatedOtpInput from "@/components/SeparatedOtpInput";
 import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/components/StudentVideoTutorials";
 import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConcernModal";
+import { PasswordResetModal, IdentityRecoveryModal } from "@/components/CredentialRecoveryModals";
+import EmailSetupGuard from "@/components/EmailSetupGuard";
 
 function StudentHomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabQuery = searchParams.get("tab");
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
-  const { user, login, register, verifyEmailOtp, resendVerification, logout } = useAuth();
+  const { user, login, register, verifyEmailOtp, resendVerification, logout, refreshSession } = useAuth();
   const { isEnrollmentOpen, schoolYear, semester, termNumber, closedMessage } = useEnrollmentControl();
 
   // IT Support Student Concerns Modal State
   const [showConcernModal, setShowConcernModal] = useState(false);
   const [concernModalMode, setConcernModalMode] = useState<ConcernModalMode>("submit");
   const [concernCategory, setConcernCategory] = useState("password_reset");
+
+  // IT Support Credential Recovery States (Password Reset & Identity Recovery)
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
+  const [resetIdentifier, setResetIdentifier] = useState("");
+  const [resetMaskedEmail, setResetMaskedEmail] = useState("");
+
+  const [showIdentityRecoveryModal, setShowIdentityRecoveryModal] = useState(false);
+  const [recoveryLrn, setRecoveryLrn] = useState("");
 
   // Active Tab for Visitors: "signin" | "register"
   const [activeTab, setActiveTab] = useState<"signin" | "register">(
@@ -445,6 +455,25 @@ function StudentHomeContent() {
 
       const res = await login(loginEmail, loginPassword);
       if (!res.success) {
+        if (res.status === "password_removed") {
+          setResetIdentifier(loginEmail);
+          setResetMaskedEmail(res.maskedEmail || "");
+          setShowPasswordResetModal(true);
+          setLoginError(res.error || "Abiso sa Seguridad: Ang password ng iyong account ay tinanggal ng IT Support.");
+          setIsLoggingIn(false);
+          setLoginProgress(0);
+          return;
+        }
+
+        if (res.status === "both_removed") {
+          setRecoveryLrn(res.lrn || loginEmail.replace(/\D/g, "").slice(0, 12));
+          setShowIdentityRecoveryModal(true);
+          setLoginError(res.error || "Naka-lock ang Account: Tinanggal ng IT Support ang email at password.");
+          setIsLoggingIn(false);
+          setLoginProgress(0);
+          return;
+        }
+
         setLoginError(res.error || "Invalid email or password. Please try again.");
         if (res.unconfirmedEmail) {
           setUnconfirmedEmail(res.unconfirmedEmail);
@@ -638,6 +667,15 @@ function StudentHomeContent() {
           VIEW A: AUTHENTICATED STUDENT PORTAL DASHBOARD (ALREADY SIGNED IN)
           ========================================================================= */}
       {user ? (
+        !user.email || user.email.trim() === "" ? (
+          <EmailSetupGuard
+            user={user}
+            onEmailSaved={async () => {
+              await refreshSession();
+            }}
+            onLogout={logout}
+          />
+        ) : (
         <div className="space-y-6">
           {/* Student Portal Profile Banner */}
           <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
@@ -1157,6 +1195,7 @@ function StudentHomeContent() {
             </div>
           </div>
         </div>
+        )
       ) : (
         /* =========================================================================
            VIEW B: UNAUTHENTICATED STUDENT PORTAL (HERO + SPLIT AUTHENTICATION CARD)
@@ -1583,6 +1622,30 @@ function StudentHomeContent() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             <span>Track Concern Status</span>
+                          </button>
+                        </div>
+
+                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] border-t border-slate-100 text-slate-600">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setResetIdentifier(loginEmail);
+                              setShowPasswordResetModal(true);
+                            }}
+                            className="text-[#002060] font-bold hover:underline cursor-pointer text-left"
+                          >
+                            Na-reset ng IT ang Password? Magtakda ng bago
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRecoveryLrn(loginEmail.replace(/\D/g, "").slice(0, 12));
+                              setShowIdentityRecoveryModal(true);
+                            }}
+                            className="text-red-700 font-bold hover:underline cursor-pointer text-left sm:text-right"
+                          >
+                            Walang Email at Password? I-recover gamit ang LRN
                           </button>
                         </div>
                       </form>
@@ -2062,6 +2125,31 @@ function StudentHomeContent() {
           prefillLrn={user?.lrn || ""}
         />
       )}
+
+      {/* Password Reset Modal (When Password Removed by IT) */}
+      <PasswordResetModal
+        isOpen={showPasswordResetModal}
+        onClose={() => setShowPasswordResetModal(false)}
+        initialIdentifier={resetIdentifier || loginEmail}
+        initialMaskedEmail={resetMaskedEmail}
+        onSuccess={async (ident, newPass) => {
+          setLoginEmail(ident);
+          setLoginPassword(newPass);
+          await login(ident, newPass);
+        }}
+      />
+
+      {/* Identity Recovery Modal (When Both Email & Password Removed by IT) */}
+      <IdentityRecoveryModal
+        isOpen={showIdentityRecoveryModal}
+        onClose={() => setShowIdentityRecoveryModal(false)}
+        initialLrn={recoveryLrn || (loginEmail.length === 12 ? loginEmail : "")}
+        onSuccess={async (newEm, newPass) => {
+          setLoginEmail(newEm);
+          setLoginPassword(newPass);
+          await login(newEm, newPass);
+        }}
+      />
     </div>
   );
 }
