@@ -278,8 +278,8 @@ function ITSupportLoginFormInner() {
           </section>
         </div>
 
-        {/* RIGHT COLUMN (5 Cols): Sticky Authentication / Onboarding Card */}
-        <div className="lg:col-span-5 lg:sticky lg:top-6">
+        {/* RIGHT COLUMN (5 Cols): Authentication / Onboarding Card */}
+        <div className="lg:col-span-5">
           <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
             <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3.5">
               <div>

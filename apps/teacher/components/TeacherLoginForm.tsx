@@ -297,8 +297,8 @@ function TeacherLoginFormInner() {
         </section>
       </div>
 
-      {/* RIGHT COLUMN (5 cols): Sticky Authentication / Onboarding Card */}
-      <div className="lg:col-span-5 lg:sticky lg:top-6 order-1 lg:order-2 space-y-4">
+      {/* RIGHT COLUMN (5 cols): Authentication / Onboarding Card */}
+      <div className="lg:col-span-5 order-1 lg:order-2 space-y-4">
         {/* Invalid Token Alert if token was passed but invalid */}
         {inviteError && (
           <div className="p-4 bg-red-50 border-2 border-red-400 text-xs text-red-950 space-y-1 rounded-[4px] shadow-xs">

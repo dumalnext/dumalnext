@@ -338,8 +338,8 @@ function AdminLoginFormInner() {
           </section>
         </div>
 
-        {/* RIGHT COLUMN (5 Cols): Sticky Authentication / Onboarding Card */}
-        <div className="lg:col-span-5 lg:sticky lg:top-6">
+        {/* RIGHT COLUMN (5 Cols): Authentication / Onboarding Card */}
+        <div className="lg:col-span-5">
           {invitation ? (
             /* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */
             <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">

@@ -1383,8 +1383,8 @@ function StudentHomeContent() {
               />
             </div>
 
-            {/* RIGHT COLUMN (5 COLS): STICKY STUDENT PORTAL AUTHENTICATION CARD */}
-            <div className="lg:col-span-5 lg:sticky lg:top-6 order-1 lg:order-2">
+            {/* RIGHT COLUMN (5 COLS): STUDENT PORTAL AUTHENTICATION CARD */}
+            <div className="lg:col-span-5 order-1 lg:order-2">
               <div className="bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden">
                 {/* Portal Card Institutional Header */}
                 <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
