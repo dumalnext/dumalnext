@@ -215,6 +215,27 @@ export default function StudentConcernsManager() {
     }
   };
 
+  // Open direct Reply in Gmail Web with prefilled ticket details
+  const handleOpenGmailReply = () => {
+    if (!activeConcern || !activeConcern.email) return;
+    const su = encodeURIComponent(`Re: [Ticket #${activeConcern.ticketNumber}] ${activeConcern.subject || "Dumalneg NHS Student Concern"}`);
+    const draftText = replyText.trim()
+      ? replyText.trim()
+      : `Magandang araw po ${activeConcern.studentName},\n\nIto po ang opisyal na tugon mula sa Dumalneg NHS IT Support Desk hinggil sa iyong inquiry (Ticket #${activeConcern.ticketNumber}).\n\n`;
+    const fullDraft = [
+      draftText,
+      "",
+      "------------------------------------------",
+      `Student Name: ${activeConcern.studentName}`,
+      `12-Digit LRN: ${activeConcern.lrn || "N/A"}`,
+      `Ticket Reference: #${activeConcern.ticketNumber}`,
+      "Dumalneg National High School - IT Support Desk"
+    ].join("\r\n");
+    const body = encodeURIComponent(fullDraft);
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(activeConcern.email)}&su=${su}&body=${body}`;
+    window.open(gmailUrl, "_blank");
+  };
+
   // Quick Status Change from Modal
   const handleQuickStatusChange = async (newStatus: StudentConcern["status"]) => {
     if (!activeConcern) return;
@@ -823,6 +844,20 @@ export default function StudentConcernsManager() {
                     >
                       Close
                     </button>
+
+                    {activeConcern?.email && activeConcern.email.includes("@") && (
+                      <button
+                        type="button"
+                        onClick={handleOpenGmailReply}
+                        className="px-3.5 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer flex items-center gap-1.5 transition-colors"
+                        title="Mag-reply nang direkta gamit ang Gmail"
+                      >
+                        <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                        </svg>
+                        <span>Mag-reply sa Gmail</span>
+                      </button>
+                    )}
                     <button
                       type="submit"
                       disabled={isSendingReply || !replyText.trim()}

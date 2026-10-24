@@ -110,6 +110,35 @@ ${replyMessage}
 
   let providerUsed = "audit_log";
 
+  // 1. Try Gmail SMTP via Nodemailer if configured
+  const gmailPass = (process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD || "").replace(/\s+/g, "");
+  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || "dumalnext@gmail.com";
+
+  if (gmailPass) {
+    try {
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailUser,
+          pass: gmailPass,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"${senderDisplayName}" <${gmailUser}>`,
+        to,
+        replyTo: "dumalnext@gmail.com",
+        subject: cleanSubject,
+        html: htmlContent,
+      });
+
+      providerUsed = "gmail_smtp";
+    } catch (smtpErr) {
+      console.warn("Gmail SMTP delivery error:", smtpErr);
+    }
+  }
+
   // 1. Try Resend API if API Key is configured
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
