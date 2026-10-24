@@ -29,7 +29,15 @@ export type ConcernCategory =
   | "technical"
   | "other";
 
-export type ConcernStatus = "pending" | "in_progress" | "resolved" | "rejected";
+export type ConcernStatus =
+  | "pending"
+  | "in_progress"
+  | "resolved"
+  | "rejected"
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "RESOLVED"
+  | "CLOSED";
 export type ConcernPriority = "low" | "medium" | "high" | "urgent";
 
 export interface StudentConcern {
@@ -141,10 +149,10 @@ export async function GET(req: NextRequest) {
 
     const counts = {
       total: concerns.length,
-      pending: concerns.filter((c) => c.status === "pending").length,
-      inProgress: concerns.filter((c) => c.status === "in_progress").length,
-      resolved: concerns.filter((c) => c.status === "resolved").length,
-      passwordReset: concerns.filter((c) => c.category === "password_reset" && c.status !== "resolved").length,
+      pending: concerns.filter((c) => String(c.status || "").toUpperCase() === "PENDING").length,
+      inProgress: concerns.filter((c) => String(c.status || "").toUpperCase() === "IN_PROGRESS").length,
+      resolved: concerns.filter((c) => String(c.status || "").toUpperCase() === "RESOLVED").length,
+      passwordReset: concerns.filter((c) => c.category === "password_reset" && String(c.status || "").toUpperCase() !== "RESOLVED").length,
     };
 
     return NextResponse.json(
@@ -275,8 +283,8 @@ export async function PATCH(req: NextRequest) {
     }
 
     const current = concerns[index];
-    const newStatus = (status as ConcernStatus) || current.status;
-    const isResolved = newStatus === "resolved" && current.status !== "resolved";
+    const newStatus = (status ? String(status).toUpperCase() : (current.status || "PENDING")) as ConcernStatus;
+    const isResolved = newStatus === "RESOLVED" && String(current.status || "").toUpperCase() !== "RESOLVED";
 
     const existingReplies = Array.isArray(current.replies) ? current.replies : [];
     let updatedReplies = [...existingReplies];
@@ -296,7 +304,7 @@ export async function PATCH(req: NextRequest) {
       priority: (priority as ConcernPriority) || current.priority,
       resolutionNotes: resolutionNotes !== undefined ? String(resolutionNotes).trim() : current.resolutionNotes,
       resolvedBy: resolvedBy || current.resolvedBy,
-      resolvedAt: isResolved ? new Date().toISOString() : (newStatus !== "resolved" ? null : current.resolvedAt),
+      resolvedAt: isResolved ? new Date().toISOString() : (newStatus !== "RESOLVED" && newStatus !== "resolved" ? null : current.resolvedAt),
       replies: updatedReplies,
       updatedAt: new Date().toISOString(),
     };

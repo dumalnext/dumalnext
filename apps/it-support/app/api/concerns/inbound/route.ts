@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
         concerns[existingIdx] = {
           ...existing,
-          status: existing.status === "resolved" ? "in_progress" : existing.status,
+          status: String(existing.status || "").toUpperCase() === "RESOLVED" ? "IN_PROGRESS" : (existing.status || "PENDING"),
           replies: existingReplies,
           updatedAt: new Date().toISOString(),
         };
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
       category: detectedCategory,
       subject: rawSubject,
       message: cleanMessage,
-      status: "pending",
+      status: "PENDING",
       priority: detectedCategory === "password_reset" ? "high" : "medium",
       source: "inbound_email",
       createdAt: new Date().toISOString(),

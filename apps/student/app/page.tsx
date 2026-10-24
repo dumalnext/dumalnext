@@ -11,6 +11,7 @@ import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm
 import SeparatedOtpInput from "@/components/SeparatedOtpInput";
 import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/components/StudentVideoTutorials";
 import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConcernModal";
+import StudentPasswordResetContactModal from "@/components/StudentPasswordResetContactModal";
 import { PasswordResetModal, IdentityRecoveryModal } from "@/components/CredentialRecoveryModals";
 import EmailSetupGuard from "@/components/EmailSetupGuard";
 
@@ -26,6 +27,7 @@ function StudentHomeContent() {
   const [showConcernModal, setShowConcernModal] = useState(false);
   const [concernModalMode, setConcernModalMode] = useState<ConcernModalMode>("submit");
   const [concernCategory, setConcernCategory] = useState("password_reset");
+  const [showPasswordResetContactModal, setShowPasswordResetContactModal] = useState(false);
 
   // IT Support Credential Recovery States (Password Reset & Identity Recovery)
   const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
@@ -1604,28 +1606,16 @@ function StudentHomeContent() {
                           </button>
                         </div>
                         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs border-t border-slate-100">
-                          {(() => {
-                            const emailSubject = encodeURIComponent("Password Reset Request - Dumalneg NHS Student Account");
-                            const userParam = loginEmail.trim();
-                            const isLrn = /^\d{12}$/.test(userParam);
-                            const isEmail = userParam.includes("@");
-                            const emailBody = encodeURIComponent(
-                              `Magandang araw po Dumalneg NHS IT Support Desk,\n\nNais ko po sanang mag-request ng password reset para sa aking student account sa Dumalneg National High School.\n\nMga Detalye ng Aking Account:\n- Buong Pangalan: \n- 12-Digit LRN: ${isLrn ? userParam : ""}\n- Rehistradong Email / Gmail: ${isEmail ? userParam : ""}\n- Dahilan / Concern: Nakalimutan ko po ang aking password at nais ko po itong ma-reset.\n\nMaraming salamat po!`
-                            );
-                            const mailtoLink = `mailto:dumalnext@gmail.com?subject=${emailSubject}&body=${emailBody}`;
-
-                            return (
-                              <a
-                                href={mailtoLink}
-                                className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
-                              >
-                                <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                </svg>
-                                <span>Forgot password? Contact / Email dumalnext@gmail.com</span>
-                              </a>
-                            );
-                          })()}
+                          <button
+                            type="button"
+                            onClick={() => setShowPasswordResetContactModal(true)}
+                            className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
+                          >
+                            <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                            <span>Forgot password? Contact / Email dumalnext@gmail.com</span>
+                          </button>
 
                           <button
                             type="button"
@@ -2160,6 +2150,18 @@ function StudentHomeContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {showPasswordResetContactModal && (
+        <StudentPasswordResetContactModal
+          isOpen={showPasswordResetContactModal}
+          onClose={() => setShowPasswordResetContactModal(false)}
+          initialEmailOrLrn={loginEmail}
+          onTrackTicket={(ticketNum) => {
+            setConcernModalMode("track");
+            setShowConcernModal(true);
+          }}
+        />
       )}
 
       {showConcernModal && (
