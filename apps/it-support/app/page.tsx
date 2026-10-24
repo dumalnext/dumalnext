@@ -9,6 +9,7 @@ import ClassroomFacilityManager from "@/components/ClassroomFacilityManager";
 import UserRoleAuditor from "@/components/UserRoleAuditor";
 import SystemDiagnosticsMonitor from "@/components/SystemDiagnosticsMonitor";
 import StaffInvitationManager from "@/components/StaffInvitationManager";
+import StudentConcernsManager from "@/components/StudentConcernsManager";
 import SessionTimeoutModal from "@/components/SessionTimeoutModal";
 
 function ITSupportPortalContent() {
@@ -49,6 +50,7 @@ function ITSupportPortalContent() {
         {activeTab === "users" && <UserRoleAuditor />}
         {activeTab === "diagnostics" && <SystemDiagnosticsMonitor />}
         {activeTab === "invitations" && <StaffInvitationManager />}
+        {activeTab === "concerns" && <StudentConcernsManager />}
       </main>
 
       <footer className="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500">

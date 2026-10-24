@@ -10,6 +10,7 @@ import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 import SeparatedOtpInput from "@/components/SeparatedOtpInput";
 import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/components/StudentVideoTutorials";
+import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConcernModal";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -18,6 +19,11 @@ function StudentHomeContent() {
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
   const { user, login, register, verifyEmailOtp, resendVerification, logout } = useAuth();
   const { isEnrollmentOpen, schoolYear, semester, termNumber, closedMessage } = useEnrollmentControl();
+
+  // IT Support Student Concerns Modal State
+  const [showConcernModal, setShowConcernModal] = useState(false);
+  const [concernModalMode, setConcernModalMode] = useState<ConcernModalMode>("submit");
+  const [concernCategory, setConcernCategory] = useState("password_reset");
 
   // Active Tab for Visitors: "signin" | "register"
   const [activeTab, setActiveTab] = useState<"signin" | "register">(
@@ -1537,6 +1543,36 @@ function StudentHomeContent() {
                             {isLoggingIn ? "Signing In... Please Wait" : "Sign In to Student Portal"}
                           </button>
                         </div>
+                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs border-t border-slate-100">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setConcernModalMode("submit");
+                              setConcernCategory("password_reset");
+                              setShowConcernModal(true);
+                            }}
+                            className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
+                          >
+                            <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                            <span>Forgot Password? Contact IT Support</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setConcernModalMode("track");
+                              setShowConcernModal(true);
+                            }}
+                            className="text-slate-600 hover:text-slate-900 font-semibold hover:underline cursor-pointer flex items-center gap-1 text-[11px] shrink-0"
+                          >
+                            <svg className="w-3 h-3 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <span>Track Concern Status</span>
+                          </button>
+                        </div>
                       </form>
 
                       <div className="pt-3 border-t border-slate-200 text-center">
@@ -2001,6 +2037,18 @@ function StudentHomeContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {showConcernModal && (
+        <StudentConcernModal
+          isOpen={showConcernModal}
+          onClose={() => setShowConcernModal(false)}
+          initialMode={concernModalMode}
+          initialCategory={concernCategory}
+          prefillName={user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : ""}
+          prefillEmail={user?.email || loginEmail || ""}
+          prefillLrn={user?.lrn || ""}
+        />
       )}
     </div>
   );
