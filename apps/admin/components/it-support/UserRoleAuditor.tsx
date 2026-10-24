@@ -37,37 +37,34 @@ export default function UserRoleAuditor() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
 
-  // Dossier Credential Editing State
-  const [isEditingCredentials, setIsEditingCredentials] = useState(false);
-  const [editEmail, setEditEmail] = useState("");
+  // Credential Security Controls Modal Box State
+  const [showCredentialModal, setShowCredentialModal] = useState(false);
+  const [isEditingLrn, setIsEditingLrn] = useState(false);
   const [editLrn, setEditLrn] = useState("");
-  const [editFullName, setEditFullName] = useState("");
-  const [isSavingCredentials, setIsSavingCredentials] = useState(false);
-
-  // Dossier Password Removal State
-  const [confirmPasswordRemoval, setConfirmPasswordRemoval] = useState(false);
-  const [isRemovingPassword, setIsRemovingPassword] = useState(false);
-
-  // Dossier Field Actions State
+  const [isSavingLrn, setIsSavingLrn] = useState(false);
   const [isRemovingLrn, setIsRemovingLrn] = useState(false);
   const [isRemovingEmail, setIsRemovingEmail] = useState(false);
-  const [dossierNotice, setDossierNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [isRemovingPassword, setIsRemovingPassword] = useState(false);
+  const [credentialNotice, setCredentialNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleOpenDossier = (target: SystemUser) => {
     setViewingUser(target);
-    setIsEditingCredentials(false);
-    setConfirmPasswordRemoval(false);
-    setDossierNotice(null);
-    setEditEmail(target.email || "");
+    setShowCredentialModal(false);
+    setIsEditingLrn(false);
+    setCredentialNotice(null);
     setEditLrn(target.details?.lrn && target.details.lrn !== "Not assigned" ? target.details.lrn : "");
-    setEditFullName(target.fullName || "");
   };
 
-  const handleSaveCredentials = async (e: React.FormEvent) => {
+  const handleSaveLrn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!viewingUser) return;
-    setIsSavingCredentials(true);
-    setDossierNotice(null);
+    const cleanLrn = editLrn.replace(/\D/g, "").slice(0, 12);
+    if (cleanLrn.length !== 12) {
+      setCredentialNotice({ type: "error", text: "LRN must be exactly 12 numeric digits." });
+      return;
+    }
+    setIsSavingLrn(true);
+    setCredentialNotice(null);
     try {
       const res = await fetch("/api/users", {
         method: "PATCH",
@@ -75,73 +72,45 @@ export default function UserRoleAuditor() {
         body: JSON.stringify({
           id: viewingUser.id,
           action: "modify_details",
-          newEmail: editEmail.trim(),
-          newLrn: editLrn.trim(),
-          newFullName: editFullName.trim(),
+          newLrn: cleanLrn,
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to update user credentials.");
-      }
-      setDossierNotice({ type: "success", text: "Credentials updated successfully." });
-      setIsEditingCredentials(false);
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to update LRN.");
+
+      setCredentialNotice({ type: "success", text: `LRN successfully updated to ${cleanLrn}. Synced across portals in real time.` });
+      setIsEditingLrn(false);
       setViewingUser((prev) =>
         prev
           ? {
               ...prev,
-              email: editEmail.trim(),
-              fullName: editFullName.trim() || prev.fullName,
+              userId: prev.userRole === "student" ? cleanLrn : prev.userId,
               details: {
                 ...prev.details,
-                lrn: editLrn.trim() || "Not assigned",
+                lrn: cleanLrn,
               },
             }
           : null
       );
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:users-changed"));
+      }
       fetchUsers(true);
     } catch (err: any) {
-      setDossierNotice({ type: "error", text: err.message || "Failed to save changes." });
+      setCredentialNotice({ type: "error", text: err.message || "Failed to save LRN." });
     } finally {
-      setIsSavingCredentials(false);
-    }
-  };
-
-  const handleRemovePassword = async () => {
-    if (!viewingUser) return;
-    setIsRemovingPassword(true);
-    setDossierNotice(null);
-    try {
-      const res = await fetch("/api/users", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: viewingUser.id,
-          action: "remove_password",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to remove password.");
-      }
-      setDossierNotice({
-        type: "success",
-        text: "Password successfully removed & invalidated. For security, no password is displayed. The student must verify via OTP to set a new password.",
-      });
-      setConfirmPasswordRemoval(false);
-    } catch (err: any) {
-      setDossierNotice({ type: "error", text: err.message || "Failed to remove password." });
-    } finally {
-      setIsRemovingPassword(false);
+      setIsSavingLrn(false);
     }
   };
 
   const handleRemoveLrn = async () => {
     if (!viewingUser) return;
-    const confirm = window.confirm(`Are you sure you want to remove the LRN from ${viewingUser.fullName}'s account?`);
+    const confirm = window.confirm(`Remove LRN from ${viewingUser.fullName}'s record? This change will synchronize in real time across all portals.`);
     if (!confirm) return;
+
     setIsRemovingLrn(true);
-    setDossierNotice(null);
+    setCredentialNotice(null);
     try {
       const res = await fetch("/api/users", {
         method: "PATCH",
@@ -152,11 +121,11 @@ export default function UserRoleAuditor() {
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to remove LRN.");
-      }
-      setDossierNotice({ type: "success", text: "LRN removed successfully." });
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to remove LRN.");
+
+      setCredentialNotice({ type: "success", text: "LRN removed from account. Updated in real time across all portals." });
       setEditLrn("");
+      setIsEditingLrn(false);
       setViewingUser((prev) =>
         prev
           ? {
@@ -168,9 +137,13 @@ export default function UserRoleAuditor() {
             }
           : null
       );
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:users-changed"));
+      }
       fetchUsers(true);
     } catch (err: any) {
-      setDossierNotice({ type: "error", text: err.message || "Failed to remove LRN." });
+      setCredentialNotice({ type: "error", text: err.message || "Failed to remove LRN." });
     } finally {
       setIsRemovingLrn(false);
     }
@@ -178,10 +151,11 @@ export default function UserRoleAuditor() {
 
   const handleRemoveEmail = async () => {
     if (!viewingUser) return;
-    const confirm = window.confirm(`Are you sure you want to remove the email address (${viewingUser.email}) from this account?`);
+    const confirm = window.confirm(`Remove registered email (${viewingUser.email}) from this account? This will synchronize across all systems in real time.`);
     if (!confirm) return;
+
     setIsRemovingEmail(true);
-    setDossierNotice(null);
+    setCredentialNotice(null);
     try {
       const res = await fetch("/api/users", {
         method: "PATCH",
@@ -192,11 +166,9 @@ export default function UserRoleAuditor() {
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to remove email.");
-      }
-      setDossierNotice({ type: "success", text: "Email removed successfully." });
-      setEditEmail("");
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to remove email.");
+
+      setCredentialNotice({ type: "success", text: "Email address removed. Updated across all portals in real time." });
       setViewingUser((prev) =>
         prev
           ? {
@@ -205,11 +177,50 @@ export default function UserRoleAuditor() {
             }
           : null
       );
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:users-changed"));
+      }
       fetchUsers(true);
     } catch (err: any) {
-      setDossierNotice({ type: "error", text: err.message || "Failed to remove email." });
+      setCredentialNotice({ type: "error", text: err.message || "Failed to remove email." });
     } finally {
       setIsRemovingEmail(false);
+    }
+  };
+
+  const handleRemovePassword = async () => {
+    if (!viewingUser) return;
+    const confirm = window.confirm(`Remove password for ${viewingUser.fullName}? For security, IT Support NEVER views passwords. The password will be immediately invalidated and removed from Supabase Auth.`);
+    if (!confirm) return;
+
+    setIsRemovingPassword(true);
+    setCredentialNotice(null);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: viewingUser.id,
+          action: "remove_password",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to remove password.");
+
+      setCredentialNotice({
+        type: "success",
+        text: "Password successfully removed & invalidated in Supabase Auth. For student security, no password was shown. The student must verify via OTP to set a new password.",
+      });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:users-changed"));
+      }
+      fetchUsers(true);
+    } catch (err: any) {
+      setCredentialNotice({ type: "error", text: err.message || "Failed to remove password." });
+    } finally {
+      setIsRemovingPassword(false);
     }
   };
   const [isLoading, setIsLoading] = useState(true);
@@ -267,6 +278,13 @@ export default function UserRoleAuditor() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "users" },
+        () => {
+          fetchUsers(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "students" },
         () => {
           fetchUsers(true);
         }
@@ -938,189 +956,10 @@ export default function UserRoleAuditor() {
               </div>
             )}
 
-            {/* In-Modal Notification Notice */}
-            {dossierNotice && (
-              <div
-                className={`p-3 rounded-lg text-xs font-bold flex items-center justify-between ${
-                  dossierNotice.type === "success"
-                    ? "bg-emerald-50 text-emerald-950 border border-emerald-300"
-                    : "bg-red-50 text-red-950 border border-red-300"
-                }`}
-              >
-                <span>{dossierNotice.text}</span>
-                <button
-                  type="button"
-                  onClick={() => setDossierNotice(null)}
-                  className="text-slate-500 hover:text-slate-800 cursor-pointer ml-2"
-                >
-                  &times;
-                </button>
-              </div>
-            )}
-
-            {/* Password Removal Confirmation Dialog */}
-            {confirmPasswordRemoval && (
-              <div className="p-4 bg-amber-50 border-2 border-amber-400 rounded-lg space-y-2.5 animate-in fade-in">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
-                    Remove Account Password
-                  </span>
-                </div>
-                <p className="text-xs text-amber-900 leading-relaxed">
-                  Are you sure you want to remove the password for <strong>{viewingUser.fullName}</strong>?
-                  <br />
-                  <span className="font-semibold text-amber-950 mt-1 block">
-                    Security Notice: IT Support will NEVER see the student&apos;s password. The current password will be immediately wiped from Supabase Auth and active sessions terminated. The student must verify via OTP to set a new password.
-                  </span>
-                </p>
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={handleRemovePassword}
-                    disabled={isRemovingPassword}
-                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs cursor-pointer disabled:opacity-60"
-                  >
-                    {isRemovingPassword ? "Removing..." : "Yes, Remove Password"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmPasswordRemoval(false)}
-                    className="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-md cursor-pointer hover:bg-slate-50"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Credential Editing Form */}
-            {isEditingCredentials && (
-              <form onSubmit={handleSaveCredentials} className="p-4 bg-blue-50/70 border-2 border-[#002060]/30 rounded-lg space-y-3 animate-in fade-in">
-                <div className="flex items-center justify-between border-b border-blue-200 pb-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#002060]">
-                    Modify Account Credentials &amp; Identity
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-medium">
-                    IT Support Override
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Registered Email / Gmail Address
-                    </label>
-                    <input
-                      type="email"
-                      value={editEmail}
-                      onChange={(e) => setEditEmail(e.target.value)}
-                      placeholder="e.g. learner@gmail.com"
-                      className="w-full p-2.5 bg-white border border-slate-300 rounded text-xs font-medium focus:border-[#002060] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      12-Digit LRN (Learner Reference Number)
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={12}
-                      value={editLrn}
-                      onChange={(e) => setEditLrn(e.target.value.replace(/\D/g, ""))}
-                      placeholder="e.g. 101234567890"
-                      className="w-full p-2.5 bg-white border border-slate-300 rounded text-xs font-mono font-medium focus:border-[#002060] outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Full Legal Name (PSA / School Record)
-                  </label>
-                  <input
-                    type="text"
-                    value={editFullName}
-                    onChange={(e) => setEditFullName(e.target.value)}
-                    placeholder="e.g. Maria Clara Santos"
-                    className="w-full p-2.5 bg-white border border-slate-300 rounded text-xs font-medium focus:border-[#002060] outline-none"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingCredentials(false)}
-                    className="px-3.5 py-1.5 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-50 cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingCredentials}
-                    className="px-4 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white font-bold text-xs rounded shadow-xs cursor-pointer disabled:opacity-60"
-                  >
-                    {isSavingCredentials ? "Saving..." : "Save Credentials"}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Footer with Modify, Remove Password, Remove LRN, Remove Email, and Delete Account Buttons */}
-            <div className="pt-4 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                {/* 1. Modify Email & LRN */}
-                <button
-                  type="button"
-                  onClick={() => setIsEditingCredentials((prev) => !prev)}
-                  className="px-3 py-2 rounded-lg border border-[#002060] bg-blue-50 hover:bg-[#002060] text-[#002060] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <span>{isEditingCredentials ? "Cancel Edit" : "Modify Email / LRN"}</span>
-                </button>
-
-                {/* 2. Remove Password Button (Student privacy & security) */}
-                <button
-                  type="button"
-                  onClick={() => setConfirmPasswordRemoval(true)}
-                  className="px-3 py-2 rounded-lg border border-amber-600 bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span>Remove Password</span>
-                </button>
-
-                {/* 3. Remove LRN Button */}
-                {viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned" && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveLrn}
-                    disabled={isRemovingLrn}
-                    className="px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    <span>{isRemovingLrn ? "Removing LRN..." : "Remove LRN"}</span>
-                  </button>
-                )}
-
-                {/* 4. Remove Email Button */}
-                {viewingUser.email && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveEmail}
-                    disabled={isRemovingEmail}
-                    className="px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    <span>{isRemovingEmail ? "Removing Email..." : "Remove Email"}</span>
-                  </button>
-                )}
-
-                {/* 5. Delete Account */}
+            {/* Footer with Delete and One Credential Security Controls Button */}
+            <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* 1. Delete Account Button */}
                 {viewingUser.email.toLowerCase() === "dumalnext@gmail.com" ? (
                   <span className="px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-300 text-amber-900 text-[10px] font-bold uppercase">
                     Master IT Account - Protected
@@ -1129,18 +968,35 @@ export default function UserRoleAuditor() {
                   <button
                     type="button"
                     onClick={() => setUserToDelete(viewingUser)}
-                    className="px-3 py-2 rounded-lg border border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-bold text-xs transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-lg border border-red-600 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white font-bold text-xs transition-colors cursor-pointer"
                   >
                     Delete Account
                   </button>
                 )}
+
+                {/* 2. THE SINGLE BUTTON TO OPEN CREDENTIAL SECURITY CONTROLS */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCredentialModal(true);
+                    setEditLrn(viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned" ? viewingUser.details.lrn : "");
+                    setIsEditingLrn(false);
+                    setCredentialNotice(null);
+                  }}
+                  className="px-4 py-2 rounded-lg border border-[#002060] bg-blue-50 hover:bg-[#002060] text-[#002060] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Manage Credentials &amp; Security</span>
+                </button>
               </div>
 
               {/* Close Button */}
               <button
                 type="button"
                 onClick={() => setViewingUser(null)}
-                className="px-5 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors w-full md:w-auto text-center cursor-pointer"
+                className="px-5 py-2 rounded-lg border border-slate-300 text-xs font-bold hover:bg-slate-100 transition-colors w-full sm:w-auto text-center cursor-pointer"
               >
                 Close
               </button>
@@ -1149,7 +1005,238 @@ export default function UserRoleAuditor() {
         </div>
       )}
 
-      {/* Account Deletion Confirmation Modal */}
+      {/* DEDICATED MODAL BOX: LRN (MODIFY/REMOVE), EMAIL (REMOVE), PASSWORD (REMOVE) */}
+      {showCredentialModal && viewingUser && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden font-sans animate-in fade-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-4 sm:p-5 flex items-center justify-between border-b-2 border-amber-400">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                  <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                    Account Credential Controls
+                  </span>
+                  <h3 className="text-base font-bold text-white truncate max-w-sm">
+                    {viewingUser.fullName}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCredentialModal(false)}
+                className="text-white/70 hover:text-white cursor-pointer text-xl leading-none px-2"
+                aria-label="Close modal"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {/* Real-time synchronization banner */}
+              <div className="p-3 bg-blue-50 border-l-4 border-[#002060] border border-blue-200 rounded-lg text-[11px] text-slate-700 leading-relaxed">
+                <span className="font-bold text-[#002060] block mb-0.5">
+                  Real-Time Synchronization Active
+                </span>
+                Any modifications or removals made here take effect immediately in Supabase and sync live to Student Portal, Teacher Rosters, Admin, and IT Support.
+              </div>
+
+              {credentialNotice && (
+                <div
+                  className={`p-3 rounded-lg text-xs font-bold flex items-center justify-between ${
+                    credentialNotice.type === "success"
+                      ? "bg-emerald-50 text-emerald-950 border border-emerald-300"
+                      : "bg-red-50 text-red-950 border border-red-300"
+                  }`}
+                >
+                  <span>{credentialNotice.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => setCredentialNotice(null)}
+                    className="text-slate-500 hover:text-slate-800 cursor-pointer ml-2"
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
+
+              {/* 1. LRN SECTION (MODIFY / REMOVE) */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    LRN (Learner Reference Number)
+                  </span>
+                  <span className="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">
+                    12 Digits
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
+                  <div>
+                    <span className="text-[10px] text-slate-500 block">Current LRN:</span>
+                    <span className="font-mono text-sm font-extrabold text-[#002060]">
+                      {viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned"
+                        ? viewingUser.details.lrn
+                        : "None / Not Assigned"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditingLrn((prev) => !prev);
+                        setEditLrn(viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned" ? viewingUser.details.lrn : "");
+                      }}
+                      className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded cursor-pointer transition-colors"
+                    >
+                      {isEditingLrn ? "Cancel" : "Modify LRN"}
+                    </button>
+
+                    {viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned" && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveLrn}
+                        disabled={isRemovingLrn}
+                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-xs font-bold rounded cursor-pointer transition-colors disabled:opacity-60"
+                      >
+                        {isRemovingLrn ? "Removing..." : "Remove LRN"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Inline Modify LRN Form */}
+                {isEditingLrn && (
+                  <form onSubmit={handleSaveLrn} className="bg-blue-50/70 border border-blue-200 p-3 rounded-lg space-y-2 animate-in fade-in">
+                    <label className="block text-xs font-bold text-slate-800">
+                      Enter 12-Digit LRN:
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        maxLength={12}
+                        value={editLrn}
+                        onChange={(e) => setEditLrn(e.target.value.replace(/\D/g, ""))}
+                        placeholder="e.g. 101234567890"
+                        className="flex-1 p-2 bg-white border border-slate-300 rounded text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                        required
+                      />
+                      <button
+                        type="submit"
+                        disabled={isSavingLrn || editLrn.length !== 12}
+                        className="px-4 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded shadow-xs cursor-pointer disabled:opacity-50"
+                      >
+                        {isSavingLrn ? "Saving..." : "Save LRN"}
+                      </button>
+                    </div>
+                    {editLrn && editLrn.length < 12 && (
+                      <span className="text-[10px] text-amber-700 font-semibold block">
+                        Must be exactly 12 digits ({editLrn.length}/12 entered)
+                      </span>
+                    )}
+                  </form>
+                )}
+              </div>
+
+              {/* 2. EMAIL SECTION (REMOVE ONLY) */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    Registered Email Address
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium italic">
+                    Learner Self-Service
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
+                  <div>
+                    <span className="text-[10px] text-slate-500 block">Current Email:</span>
+                    <span className="font-mono text-sm font-bold text-slate-900">
+                      {viewingUser.email || "No email registered"}
+                    </span>
+                  </div>
+
+                  <div>
+                    {viewingUser.email ? (
+                      <button
+                        type="button"
+                        onClick={handleRemoveEmail}
+                        disabled={isRemovingEmail}
+                        className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-xs font-bold rounded cursor-pointer transition-colors disabled:opacity-60"
+                      >
+                        {isRemovingEmail ? "Removing..." : "Remove Email"}
+                      </button>
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">No email linked</span>
+                    )}
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-normal">
+                  Notice: Email modification is managed directly by learners. IT Support may only remove an erroneous email from this record.
+                </p>
+              </div>
+
+              {/* 3. PASSWORD SECTION (REMOVE ONLY - INVISIBLE TO IT SUPPORT) */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    Account Password Security
+                  </span>
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">
+                    Encrypted
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
+                  <div>
+                    <span className="text-[10px] text-slate-500 block">Password Status:</span>
+                    <span className="font-mono text-xs font-bold text-slate-700 tracking-widest">
+                      ● ● ● ● ● ● ● ● (Protected)
+                    </span>
+                  </div>
+
+                  <div>
+                    <button
+                      type="button"
+                      onClick={handleRemovePassword}
+                      disabled={isRemovingPassword}
+                      className="px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-400 text-xs font-bold rounded cursor-pointer transition-colors disabled:opacity-60 flex items-center gap-1.5"
+                    >
+                      <svg className="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span>{isRemovingPassword ? "Removing..." : "Remove Password"}</span>
+                    </button>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-normal">
+                  Security Policy: Passwords are NEVER revealed to IT Support. Removing the password instantly wipes and revokes access in Supabase Auth. The student must verify via 6-digit OTP code to create a new password.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowCredentialModal(false)}
+                className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg cursor-pointer"
+              >
+                Done / Back to Dossier
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+            {/* Account Deletion Confirmation Modal */}
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-red-600 max-w-md w-full p-6 space-y-4 shadow-xl">

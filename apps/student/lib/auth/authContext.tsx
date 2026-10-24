@@ -184,6 +184,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener("focus", handleVisibilitySync);
     document.addEventListener("visibilitychange", handleVisibilitySync);
 
+    // Real-time synchronization on students and users tables
+    const realTimeChannel = supabase
+      .channel("student-auth-realtime-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "students" },
+        () => {
+          refreshSession();
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          refreshSession();
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+          }
+        }
+      )
+      .subscribe();
+
     const heartbeatTimer = setInterval(() => {
       if (typeof document !== "undefined" && !document.hidden) {
         refreshSession();
@@ -192,6 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       subscription.unsubscribe();
+      supabase.removeChannel(realTimeChannel);
       window.removeEventListener("focus", handleVisibilitySync);
       document.removeEventListener("visibilitychange", handleVisibilitySync);
       clearInterval(heartbeatTimer);

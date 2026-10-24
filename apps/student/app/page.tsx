@@ -385,6 +385,17 @@ function StudentHomeContent() {
       )
       .subscribe();
 
+    const userChannel = supabase
+      .channel("home-realtime-users")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          fetchApp();
+        }
+      )
+      .subscribe();
+
     const studentChannel = supabase
       .channel("home-realtime-students")
       .on(
@@ -404,6 +415,7 @@ function StudentHomeContent() {
       clearInterval(heartbeat);
       supabase.removeChannel(channel);
       supabase.removeChannel(studentChannel);
+      supabase.removeChannel(userChannel);
     };
   }, [user?.id, user?.lrn, schoolYear, semester, termNumber]);
 

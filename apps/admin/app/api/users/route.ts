@@ -15,7 +15,6 @@ function getAdminClient() {
   return createSupabaseJsClient(url, key);
 }
 
-// GET: Fetch all system users with role auditing
 export async function GET() {
   try {
     const supabase = getAdminClient() || (await createClient());
@@ -41,7 +40,7 @@ export async function GET() {
     ]);
 
     if (error) {
-      console.error("GET /api/it-support/users error:", error);
+      console.error("GET /api/users error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -136,7 +135,6 @@ export async function GET() {
       };
     });
 
-    // Count user roles
     const counts = {
       all: mappedUsers.length,
       student: mappedUsers.filter((u) => u.userRole === "student").length,
@@ -147,12 +145,11 @@ export async function GET() {
 
     return NextResponse.json({ success: true, users: mappedUsers, counts });
   } catch (err: any) {
-    console.error("GET /api/it-support/users exception:", err);
+    console.error("GET /api/users exception:", err);
     return NextResponse.json({ error: err.message || "Failed to fetch users" }, { status: 500 });
   }
 }
 
-// POST: Provision or update a user account
 export async function POST(req: NextRequest) {
   try {
     const supabase = getAdminClient() || (await createClient());
@@ -162,7 +159,7 @@ export async function POST(req: NextRequest) {
 
     if (!userId || !email || !userRole) {
       return NextResponse.json(
-        { error: "User ID, Email, and User Role ('student', 'teacher', 'admin', 'it_support') are required." },
+        { error: "User ID, Email, and User Role are required." },
         { status: 400 }
       );
     }
@@ -171,7 +168,7 @@ export async function POST(req: NextRequest) {
     const cleanEmail = email.trim().toLowerCase();
     const cleanRole = userRole.toLowerCase();
 
-    // Check if user already exists
+    // Check if user already exists by user_id or email
     const { data: existingUsers } = await supabase
       .from("users")
       .select("*")
@@ -430,7 +427,7 @@ export async function DELETE(req: NextRequest) {
       deletedId: targetUser.id,
     });
   } catch (err: any) {
-    console.error("DELETE /api/it-support/users error:", err);
+    console.error("DELETE /api/users error:", err);
     return NextResponse.json({ error: err.message || "Failed to delete user" }, { status: 500 });
   }
 }
