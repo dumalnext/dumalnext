@@ -1,5 +1,5 @@
 // ==============================================================================
-// DUMAL-NEXT: EMAIL DISPATCHER UTILITY (ADMIN / IT SUPPORT DESK)
+// DUMAL-NEXT: EMAIL DISPATCHER UTILITY (IT SUPPORT DESK)
 // Dispatches official IT Support replies directly to student Gmail inboxes.
 // Supports: Resend API, Inbound/Outbound Webhooks, and Audited DB Logging.
 // ==============================================================================
@@ -110,6 +110,36 @@ ${replyMessage}
 
   let providerUsed = "audit_log";
 
+  // 1. Try Gmail SMTP via Nodemailer if configured
+  const gmailPass = (process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD || "").replace(/\s+/g, "");
+  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || "dumalnext@gmail.com";
+
+  if (gmailPass) {
+    try {
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailUser,
+          pass: gmailPass,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"${senderDisplayName}" <${gmailUser}>`,
+        to,
+        replyTo: "dumalnext@gmail.com",
+        subject: cleanSubject,
+        html: htmlContent,
+      });
+
+      providerUsed = "gmail_smtp";
+    } catch (smtpErr) {
+      console.warn("Gmail SMTP delivery error:", smtpErr);
+    }
+  }
+
+  // 1. Try Resend API if API Key is configured
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     try {
@@ -129,10 +159,16 @@ ${replyMessage}
       });
       if (res.ok) {
         providerUsed = "resend";
+      } else {
+        const errText = await res.text();
+        console.warn("Resend API warning:", errText);
       }
-    } catch {}
+    } catch (apiErr) {
+      console.warn("Resend API connection error:", apiErr);
+    }
   }
 
+  // 2. Persist in system_settings under 'outbound_emails' audit trail
   try {
     const { data } = await supabase
       .from("system_settings")
@@ -156,6 +192,7 @@ ${replyMessage}
       excerpt: replyMessage.substring(0, 150),
     });
 
+    // Keep last 200 logs
     if (logs.length > 200) logs = logs.slice(0, 200);
 
     await supabase.from("system_settings").upsert({
@@ -163,7 +200,11 @@ ${replyMessage}
       value: { emails: logs },
       updated_at: new Date().toISOString(),
     });
-  } catch {}
+  } catch (logErr) {
+    console.warn("Failed to save email audit log:", logErr);
+  }
+
+  console.log(`[Email Dispatcher] Official reply sent to ${to} (Ticket #${ticketNumber}) via ${providerUsed}`);
 
   return { success: true, provider: providerUsed };
 }

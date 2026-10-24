@@ -203,7 +203,9 @@ export default function StudentConcernsManager() {
 
       setStatusMessage({
         type: "success",
-        text: `Reply dispatched to ticket ${activeConcern.ticketNumber} (${activeConcern.studentName}).`,
+        text: data.emailDispatched
+          ? `Mensahe matagumpay na na-save at naipadala sa email ni ${activeConcern.studentName} (${activeConcern.email})!`
+          : `Reply na-save sa system (Ticket #${activeConcern.ticketNumber}). Maaari ring i-click ang pulang "Mag-reply sa Gmail" para siguradong maihatid sa inbox ng estudyante.`,
       });
 
       setReplyText("");
@@ -681,6 +683,19 @@ export default function StudentConcernsManager() {
             <div className="bg-slate-50 border-b border-slate-200 p-3 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
                 <span>Email: <strong className="text-slate-800">{activeConcern.email}</strong></span>
+                {activeConcern.email && activeConcern.email.includes("@") && (
+                  <button
+                    type="button"
+                    onClick={handleOpenGmailReply}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded shadow-xs cursor-pointer transition-colors"
+                    title="Magbukas ng Gmail compose window"
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                    <span>Mag-reply sa Gmail</span>
+                  </button>
+                )}
                 {activeConcern.lrn && (
                   <span>LRN: <strong className="text-slate-800 font-mono">{activeConcern.lrn}</strong></span>
                 )}

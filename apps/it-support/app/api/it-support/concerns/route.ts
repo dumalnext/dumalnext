@@ -309,6 +309,22 @@ export async function PATCH(req: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
+    let emailDispatchResult: { success: boolean; provider?: string; error?: string } | null = null;
+    if (replyMessage && String(replyMessage).trim() && current.email && current.email.includes("@")) {
+      try {
+        emailDispatchResult = await sendEmailReplyToStudent(supabase, {
+          to: current.email.trim(),
+          studentName: current.studentName || "Mag-aaral",
+          ticketNumber: current.ticketNumber || id,
+          subject: current.subject || "Student Concern Inquiry",
+          replyMessage: String(replyMessage).trim(),
+          senderName: resolvedBy || senderName || "IT Support Officer",
+        });
+      } catch (mailErr: any) {
+        console.error("Failed to send email reply to student:", mailErr);
+      }
+    }
+
     const saved = await saveStoredConcerns(supabase, concerns);
     if (!saved) {
       return NextResponse.json(
@@ -322,6 +338,8 @@ export async function PATCH(req: NextRequest) {
         success: true,
         message: "Concern updated successfully.",
         concern: concerns[index],
+        emailDispatched: emailDispatchResult?.success || false,
+        emailProvider: emailDispatchResult?.provider || null,
       },
       { headers: NO_CACHE_HEADERS }
     );
