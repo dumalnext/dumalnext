@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
+import { PwaInstallHeaderButton, PwaInstallDrawerCard } from "@/components/ui/PwaInstallPrompt";
 
 interface StudentHeaderNavProps {
   children?: React.ReactNode;
@@ -444,6 +445,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               </Link>
             </nav>
 
+            <PwaInstallHeaderButton />
+
             {/* Student Identity & Status Pill */}
             <Link
               href={profileHref}
@@ -501,6 +504,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <span>S.Y. {schoolYear || "2026-2027"}</span>
               <span className="hidden sm:inline text-blue-300">&bull; {semester || "Trimester 1"}</span>
             </div>
+            <PwaInstallHeaderButton />
             {pathname !== "/" && (
               <Link
                 href="/"
@@ -765,6 +769,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             {/* Menu Navigation Links */}
             <div className="p-4 space-y-2">
+              <PwaInstallDrawerCard />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
                 PORTAL MODULES
               </span>
