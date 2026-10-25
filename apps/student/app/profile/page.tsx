@@ -18,7 +18,7 @@ interface SectionDetails {
 
 export default function StudentProfilePage() {
   const router = useRouter();
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isLoading: isAuthLoading, refreshSession } = useAuth();
   const { schoolYear, semester } = useEnrollmentControl();
 
   const [studentRec, setStudentRec] = useState<any | null>(null);
@@ -27,6 +27,24 @@ export default function StudentProfilePage() {
   const [assignedSection, setAssignedSection] = useState<SectionDetails | null>(null);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<"academic" | "personal" | "address" | "family" | "security">("academic");
+
+  // Security Credentials Modification States (Password & Email)
+  const [securityModal, setSecurityModal] = useState<"none" | "password" | "email">("none");
+  const [securityStep, setSecurityStep] = useState<1 | 2>(1);
+  const [securityLoading, setSecurityLoading] = useState<boolean>(false);
+  const [securityError, setSecurityError] = useState<string>("");
+  const [securitySuccess, setSecuritySuccess] = useState<string>("");
+
+  // Password Modification Form
+  const [passwordOtp, setPasswordOtp] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+  // Email Modification Form
+  const [newEmailInput, setNewEmailInput] = useState<string>("");
+  const [emailOtp, setEmailOtp] = useState<string>("");
 
   // Authentication Guard: Redirect guests to signin
   useEffect(() => {
@@ -178,6 +196,220 @@ export default function StudentProfilePage() {
     };
   }, [user]);
 
+  // Helpers for Modals
+  const maskEmailAddress = (emailStr: string) => {
+    if (!emailStr || !emailStr.includes("@")) return "";
+    const [name, domain] = emailStr.split("@");
+    if (name.length <= 2) return `${name[0]}***@${domain}`;
+    return `${name[0]}${"*".repeat(Math.max(name.length - 2, 3))}${name[name.length - 1]}@${domain}`;
+  };
+
+  const openPasswordModal = () => {
+    setSecurityModal("password");
+    setSecurityStep(1);
+    setSecurityError("");
+    setSecuritySuccess("");
+    setPasswordOtp("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const openEmailModal = () => {
+    setSecurityModal("email");
+    setSecurityStep(1);
+    setSecurityError("");
+    setSecuritySuccess("");
+    setNewEmailInput("");
+    setEmailOtp("");
+  };
+
+  const closeSecurityModal = () => {
+    setSecurityModal("none");
+    setSecurityStep(1);
+    setSecurityError("");
+    setSecuritySuccess("");
+  };
+
+  // ACTION: Send Password OTP
+  const handleSendPasswordOtp = async () => {
+    try {
+      setSecurityLoading(true);
+      setSecurityError("");
+      const res = await fetch("/api/profile/security", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "send_password_otp",
+          userId: user?.id,
+          email: user?.email,
+          studentName: fullName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Nabigong ipadala ang verification code.");
+      }
+      setSecurityStep(2);
+      setSecuritySuccess(data.message || `Ang 6-digit verification code ay naipadala na sa iyong email (${maskEmailAddress(user?.email || "")}).`);
+    } catch (err: any) {
+      setSecurityError(err.message || "May naganap na error sa pagpapadala ng code.");
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
+  // ACTION: Verify OTP & Update Password
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordOtp || passwordOtp.trim().length !== 6) {
+      setSecurityError("Mangyaring ilagay ang buong 6-digit verification code.");
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setSecurityError("Ang bagong password ay dapat hindi bababa sa 6 na karakter.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setSecurityError("Hindi nagtutugma ang bagong password at ang kumpirmasyon nito.");
+      return;
+    }
+
+    try {
+      setSecurityLoading(true);
+      setSecurityError("");
+
+      // 1. Server verification & DB update
+      const res = await fetch("/api/profile/security", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "verify_and_update_password",
+          userId: user?.id,
+          email: user?.email,
+          otp: passwordOtp.trim(),
+          newPassword: newPassword.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Nabigong i-update ang password.");
+      }
+
+      // 2. Client auth update
+      const supabase = createClient();
+      try {
+        await supabase.auth.updateUser({ password: newPassword.trim() });
+      } catch (authErr) {
+        console.warn("Client auth password update notice:", authErr);
+      }
+
+      setSecuritySuccess(data.message || "Matagumpay na nabago ang iyong password!");
+      setPasswordOtp("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => {
+        closeSecurityModal();
+      }, 2000);
+    } catch (err: any) {
+      setSecurityError(err.message || "May naganap na error sa pagpapalit ng password.");
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
+  // ACTION: Send Email OTP to New Email
+  const handleSendEmailOtp = async () => {
+    const cleanNew = newEmailInput.trim().toLowerCase();
+    if (!cleanNew || !cleanNew.includes("@") || !cleanNew.includes(".")) {
+      setSecurityError("Mangyaring maglagay ng wastong bagong email address.");
+      return;
+    }
+    if (cleanNew === user?.email?.toLowerCase()) {
+      setSecurityError("Ang bagong email ay kapareho na ng iyong kasalukuyang email.");
+      return;
+    }
+
+    try {
+      setSecurityLoading(true);
+      setSecurityError("");
+      const res = await fetch("/api/profile/security", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "send_email_otp",
+          userId: user?.id,
+          currentEmail: user?.email,
+          newEmail: cleanNew,
+          studentName: fullName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Nabigong ipadala ang verification code sa bagong email.");
+      }
+      setSecurityStep(2);
+      setSecuritySuccess(data.message || `Ang 6-digit verification code ay naipadala na sa ${cleanNew}.`);
+    } catch (err: any) {
+      setSecurityError(err.message || "May naganap na error sa pagpapadala ng code.");
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
+  // ACTION: Verify OTP & Update Email
+  const handleUpdateEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailOtp || emailOtp.trim().length !== 6) {
+      setSecurityError("Mangyaring ilagay ang buong 6-digit verification code.");
+      return;
+    }
+
+    const cleanNew = newEmailInput.trim().toLowerCase();
+    try {
+      setSecurityLoading(true);
+      setSecurityError("");
+
+      // 1. Server validation and database update
+      const res = await fetch("/api/profile/security", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "verify_and_update_email",
+          userId: user?.id,
+          currentEmail: user?.email,
+          newEmail: cleanNew,
+          otp: emailOtp.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Nabigong i-update ang email address.");
+      }
+
+      // 2. Client auth update
+      const supabase = createClient();
+      try {
+        await supabase.auth.updateUser({ email: cleanNew });
+      } catch (authErr) {
+        console.warn("Client auth email update notice:", authErr);
+      }
+
+      // 3. Refresh user session in auth context
+      await refreshSession();
+
+      setSecuritySuccess(data.message || `Matagumpay na nabago ang iyong email patungo sa ${cleanNew}!`);
+      setEmailOtp("");
+      setNewEmailInput("");
+      setTimeout(() => {
+        closeSecurityModal();
+      }, 2000);
+    } catch (err: any) {
+      setSecurityError(err.message || "May naganap na error sa pag-update ng email.");
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
   if (isAuthLoading || !user) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
@@ -201,7 +433,7 @@ export default function StudentProfilePage() {
   // Generate initials for avatar
   const initials = `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase() || "DN";
 
-  // 1-Click IT Support Gmail Link
+  // 1-Click IT Support Gmail Link (Fallback / External inquiries)
   const itSupportGmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dumalnext@gmail.com&su=${encodeURIComponent(
     `[Inquiry / Profile Support] ${fullName} (LRN: ${lrnNumber})`
   )}&body=${encodeURIComponent(
@@ -382,7 +614,7 @@ export default function StudentProfilePage() {
           <svg className="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <span>Parent / Guardian</span>
+          <span>Parent &amp; Guardian Details</span>
         </button>
 
         <button
@@ -397,125 +629,118 @@ export default function StudentProfilePage() {
           <svg className="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <span>Account &amp; Security</span>
+          <span>Account Credentials &amp; Security</span>
         </button>
       </div>
 
       {/* Tab Contents Card */}
-      <div className="bg-white rounded-b-xl border border-slate-200 p-5 sm:p-7 shadow-xs">
+      <div className="bg-white border border-slate-200 rounded-b-xl shadow-xs p-5 sm:p-7 min-h-[400px]">
         {isLoadingData ? (
-          <div className="py-12 flex flex-col items-center justify-center gap-3">
-            <div className="w-7 h-7 border-2 border-[#002060] border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs text-slate-500 font-semibold">Loading official record details...</p>
+          <div className="py-20 flex flex-col items-center justify-center gap-3">
+            <div className="w-8 h-8 border-3 border-[#002060] border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-slate-500 font-medium">Loading Learner Profile Details...</p>
           </div>
         ) : (
           <>
-            {/* 1. ACADEMIC & SECTION TAB */}
+            {/* 1. ACADEMIC & SECTION PLACEMENT TAB */}
             {activeTab === "academic" && (
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                    Current Academic Status &amp; Placement
+                    Official Academic Standing &amp; Placement
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Official enrollment and section assignment record in Dumalneg National High School.
+                    DepEd curriculum track, grade level, and verified section advisory.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Current Grade Level
-                    </span>
-                    <span className="text-base font-extrabold text-slate-900 block">
-                      Grade {gradeLevel}
-                    </span>
-                    <span className="text-[11px] text-slate-500 block">
-                      {gradeLevel <= 10 ? "Junior High School" : "Senior High School"}
-                    </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Current Section Card */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                      <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+                        Class Section Advisory
+                      </span>
+                      {assignedSection ? (
+                        <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 font-bold uppercase rounded">
+                          Official
+                        </span>
+                      ) : (
+                        <span className="text-[10px] bg-amber-100 text-amber-950 px-2 py-0.5 font-bold uppercase rounded">
+                          Unassigned
+                        </span>
+                      )}
+                    </div>
+
+                    {assignedSection ? (
+                      <div className="space-y-2 text-xs">
+                        <div>
+                          <span className="text-slate-400 text-[10px] uppercase font-bold block">Section Name:</span>
+                          <span className="text-sm font-black text-slate-900">{assignedSection.name}</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-slate-400 text-[10px] uppercase font-bold block">Class Adviser:</span>
+                            <span className="font-bold text-slate-800">{assignedSection.adviserName || "Assigned by Principal"}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 text-[10px] uppercase font-bold block">Room:</span>
+                            <span className="font-bold text-slate-800">{assignedSection.roomNumber || "Main Campus"}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2">
+                          <Link
+                            href="/section"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002060] hover:text-blue-800 underline cursor-pointer"
+                          >
+                            <span>View Class Schedule &amp; Section Roster</span>
+                            <span>&rarr;</span>
+                          </Link>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center space-y-1">
+                        <p className="text-xs text-slate-600 font-medium">
+                          You are currently not yet assigned to an official class section.
+                        </p>
+                        <p className="text-[11px] text-slate-500">
+                          Section placement will appear automatically upon official registrar approval.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Track &amp; Curriculum Strand
-                    </span>
-                    <span className="text-base font-extrabold text-[#002060] block">
-                      {strandTrack}
-                    </span>
-                    <span className="text-[11px] text-slate-500 block">
-                      DepEd Standard Curriculum
-                    </span>
-                  </div>
+                  {/* Curriculum & Grade Card */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <div className="border-b border-slate-200 pb-2">
+                      <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+                        DepEd Curriculum Level
+                      </span>
+                    </div>
 
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Academic Year &bull; Term
-                    </span>
-                    <span className="text-base font-extrabold text-slate-900 block">
-                      S.Y. {schoolYear || "2026-2027"}
-                    </span>
-                    <span className="text-[11px] text-slate-500 block">
-                      {semester || "Trimester 1"} Active
-                    </span>
+                    <div className="space-y-2 text-xs">
+                      <div>
+                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Grade Level:</span>
+                        <span className="text-sm font-bold text-slate-900">Grade {gradeLevel}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Curriculum Program / Strand:</span>
+                        <span className="font-bold text-slate-800">{strandTrack}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <span className="text-slate-400 text-[10px] uppercase font-bold block">School Year:</span>
+                          <span className="font-bold text-slate-800">{schoolYear || "2026-2027"}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 text-[10px] uppercase font-bold block">Current Term:</span>
+                          <span className="font-bold text-slate-800">{semester || "Trimester 1"}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Section Details Card */}
-                {assignedSection ? (
-                  <div className="p-5 bg-emerald-50/70 border-2 border-emerald-500 rounded-xl space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200/80 pb-2.5">
-                      <div>
-                        <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest block">
-                          Official Class Section Assignment
-                        </span>
-                        <h4 className="text-lg font-black text-emerald-950 mt-0.5">
-                          Section: {assignedSection.name}
-                        </h4>
-                      </div>
-                      <Link
-                        href="/section"
-                        className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded shadow-xs transition-colors"
-                      >
-                        Open Class Roster &rarr;
-                      </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <span className="text-slate-500 block text-[11px]">Class Adviser:</span>
-                        <span className="font-bold text-slate-800 text-sm">
-                          {assignedSection.adviserName || "Assigned by School Head"}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-[11px]">Assigned Classroom:</span>
-                        <span className="font-bold text-slate-800 text-sm">
-                          {assignedSection.roomNumber || "Academic Building Room"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-5 bg-amber-50 border border-amber-300 rounded-xl flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center shrink-0 text-sm mt-0.5">
-                      !
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-amber-950 text-sm">
-                        Section Placement Pending
-                      </h4>
-                      <p className="text-xs text-amber-900 mt-1 leading-relaxed">
-                        Your official class section is currently being organized by the school registrar and administrator. Please check back regularly or visit the Section module.
-                      </p>
-                      <Link
-                        href="/section"
-                        className="inline-block mt-2 text-xs font-bold text-amber-900 underline hover:text-amber-950"
-                      >
-                        Check Section Status &rarr;
-                      </Link>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
@@ -524,92 +749,65 @@ export default function StudentProfilePage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                    Learner Personal Details
+                    Learner Demographic Details
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Official personal data submitted for DepEd Basic Education Information System (BEIS).
+                    Official identity and demographic records as certified on the DepEd enrolment form.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       First Name
                     </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {user.firstName || formData?.firstName || "N/A"}
+                    <span className="text-sm font-bold text-slate-900 mt-0.5 block">
+                      {user.firstName || studentRec?.first_name || "N/A"}
                     </span>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Middle Name
                     </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {user.middleName || formData?.middleName || "(None)"}
+                    <span className="text-sm font-bold text-slate-900 mt-0.5 block">
+                      {user.middleName || studentRec?.middle_name || "None / N/A"}
                     </span>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Last Name
                     </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {user.lastName || formData?.lastName || "N/A"}
+                    <span className="text-sm font-bold text-slate-900 mt-0.5 block">
+                      {user.lastName || studentRec?.last_name || "N/A"}
                     </span>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Learner Reference Number (LRN)
-                    </span>
-                    <span className="text-sm font-mono font-bold text-[#002060] block mt-0.5">
-                      {lrnNumber}
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Gender / Sex
                     </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {studentRec?.gender || formData?.gender || "Not specified"}
+                    <span className="text-sm font-bold text-slate-900 mt-0.5 block">
+                      {studentRec?.gender || formData?.gender || "Not Specified"}
                     </span>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Date of Birth
                     </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {studentRec?.date_of_birth || formData?.dateOfBirth || "On record"}
+                    <span className="text-sm font-bold text-slate-900 mt-0.5 block">
+                      {studentRec?.date_of_birth || formData?.birthDate || "On file in registrar"}
                     </span>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Place of Birth
+                      Contact Mobile Number
                     </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {formData?.placeOfBirth || "Dumalneg, Ilocos Norte"}
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Mother Tongue
-                    </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {formData?.motherTongue || "Ilokano"}
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      IP Community
-                    </span>
-                    <span className="text-sm font-bold text-slate-900 block mt-0.5">
-                      {formData?.isIpCommunity ? formData?.ipCommunityName || "Isnag" : "No"}
+                    <span className="text-sm font-mono font-bold text-slate-900 mt-0.5 block">
+                      {studentRec?.contact_number || formData?.contactNumber || formData?.learnerContact || "09181234567"}
                     </span>
                   </div>
                 </div>
@@ -621,62 +819,41 @@ export default function StudentProfilePage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                    Residential &amp; Permanent Address
+                    Official Residential Address
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Official residence details on file with the school registrar.
+                    Home address registered in the Dumalneg NHS learner information system.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                      <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                        Current Residence
-                      </span>
-                      <span className="text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold rounded">
-                        Primary
-                      </span>
-                    </div>
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                  <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+                    <svg className="w-4 h-4 text-[#002060]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+                      Municipality of Dumalneg, Ilocos Norte
+                    </span>
+                  </div>
 
-                    <div className="space-y-2 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div className="space-y-2">
                       <div>
                         <span className="text-slate-400 text-[10px] uppercase font-bold block">Barangay:</span>
-                        <span className="font-bold text-slate-800">{studentRec?.barangay || formData?.currentBarangay || "CABARITAN"}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Sitio / Street:</span>
-                        <span className="font-bold text-slate-800">{formData?.currentSitio || "Poblacion"}</span>
+                        <span className="font-bold text-slate-900 text-sm">
+                          {studentRec?.barangay || formData?.barangay || "Cabaritan"}
+                        </span>
                       </div>
                       <div>
                         <span className="text-slate-400 text-[10px] uppercase font-bold block">Municipality / City:</span>
-                        <span className="font-bold text-slate-800">{formData?.currentMunicipality || "DUMALNEG"}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Province &bull; Zip:</span>
-                        <span className="font-bold text-slate-800">ILOCOS NORTE &bull; 2921</span>
+                        <span className="font-bold text-slate-800">Dumalneg</span>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                      <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                        Contact Details
-                      </span>
-                      <span className="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 font-bold rounded">
-                        Reachability
-                      </span>
-                    </div>
-
-                    <div className="space-y-2 text-xs">
+                    <div className="space-y-2">
                       <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Mobile Contact:</span>
-                        <span className="font-bold text-slate-800 font-mono">{studentRec?.contact_number || formData?.contactNumber || "09181234567"}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Email Address:</span>
-                        <span className="font-bold text-slate-800">{emailAddress}</span>
+                        <span className="text-slate-400 text-[10px] uppercase font-bold block">Province / Region:</span>
+                        <span className="font-bold text-slate-800">Ilocos Norte (Region I)</span>
                       </div>
                       <div>
                         <span className="text-slate-400 text-[10px] uppercase font-bold block">Country:</span>
@@ -705,7 +882,7 @@ export default function StudentProfilePage() {
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
                       <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-                        Father's Details
+                        Father&apos;s Details
                       </span>
                     </div>
                     <div className="space-y-1.5 text-xs">
@@ -728,7 +905,7 @@ export default function StudentProfilePage() {
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
                       <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-                        Mother's Details (Maiden)
+                        Mother&apos;s Details (Maiden)
                       </span>
                     </div>
                     <div className="space-y-1.5 text-xs">
@@ -758,29 +935,14 @@ export default function StudentProfilePage() {
                     Student Account Credentials &amp; Security
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    DepEd security compliance, session information, and IT Support Desk services.
+                    Pamahalaan ang iyong login email at password nang direkta gamit ang 6-digit OTP verification nang hindi na kailangang dumaan sa IT Support.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        Account System Identifier
-                      </span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 font-bold uppercase rounded">
-                        Active
-                      </span>
-                    </div>
-                    <span className="text-sm font-mono font-bold text-[#002060] block">
-                      {studentId}
-                    </span>
-                    <p className="text-[11px] text-slate-500">
-                      Unique database identifier assigned to your learner account.
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+                {/* Self-Service Credentials Overview Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Card 1: Registered Login Email */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         Registered Login Email
@@ -789,42 +951,480 @@ export default function StudentProfilePage() {
                         Verified
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-slate-900 block truncate">
-                      {emailAddress}
-                    </span>
-                    <p className="text-[11px] text-slate-500">
-                      Used for session login, OTP verification, and official school email updates.
-                    </p>
+
+                    <div>
+                      <span className="text-sm font-bold text-slate-900 block truncate font-mono">
+                        {emailAddress}
+                      </span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Ginagamit sa pag-login, pagtanggap ng mga opisyal na anunsyo, at mga security codes.
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 font-medium">Kailangan baguhin ang email?</span>
+                      <button
+                        type="button"
+                        onClick={openEmailModal}
+                        className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        <span>Change Email</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Account Password */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Account Password
+                      </span>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 font-bold uppercase rounded">
+                        Protected
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-sm font-mono tracking-widest font-black text-slate-700 block">
+                        &bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;
+                      </span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Pinoprotektahan ang iyong personal na rekord at portal access alinsunod sa DepEd security policy.
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 font-medium">Gusto mong magpalit ng password?</span>
+                      <button
+                        type="button"
+                        onClick={openPasswordModal}
+                        className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span>Change Password</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Password Assistance Box */}
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold text-[#002060] block">
-                      Need to update your password or profile information?
+                {/* System ID & Session Info */}
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Learner Account Database ID
                     </span>
-                    <p className="text-[11px] text-blue-900 leading-relaxed max-w-xl">
-                      For student data privacy, all credential changes and corrections to student information are securely facilitated through the <strong>Dumalneg NHS IT Support Desk</strong> at <code>dumalnext@gmail.com</code>.
-                    </p>
+                    <span className="text-sm font-mono font-bold text-[#002060] block mt-0.5">
+                      {studentId}
+                    </span>
                   </div>
-                  <a
-                    href={itSupportGmailUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg shadow-xs transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <div className="text-xs text-slate-500 sm:text-right">
+                    <span>DepEd Learner Status: </span>
+                    <span className="font-bold text-emerald-700">Verified &bull; Active</span>
+                  </div>
+                </div>
+
+                {/* Explanatory Policy Box (Self-Service vs IT Support) */}
+                <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl space-y-2">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Contact IT Support</span>
-                  </a>
+                    <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+                      Self-Service Security Policy
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    Dahil ikaw ay kasalukuyang naka-sign in na sa iyong opisyal na account, <strong>hindi mo na kailangang kontakin ang IT Support</strong> upang magpalit ng iyong password o email. Maaari mo itong gawin agad gamit ang mga buttons sa itaas, at isang 6-digit verification code ang ipapadala sa iyong email upang tiyakin ang seguridad.
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    * Paalala: Ang pagkontak lamang sa IT Support Desk (<code>dumalnext@gmail.com</code>) ay kinakailangan kung nakalimutan mo ang iyong password habang nasa labas (login menu) ng portal.
+                  </p>
                 </div>
               </div>
             )}
           </>
         )}
       </div>
+
+      {/* ========================================================================= */}
+      {/* MODAL 1: CHANGE PASSWORD WITH 6-DIGIT OTP */}
+      {/* ========================================================================= */}
+      {securityModal === "password" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border-t-4 border-[#002060] overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 bg-[#002060] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <h3 className="text-sm font-bold tracking-tight">
+                  Change Account Password
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeSecurityModal}
+                disabled={securityLoading}
+                className="text-slate-300 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4">
+              {/* Error Message */}
+              {securityError && (
+                <div className="p-3 bg-red-50 border border-red-300 rounded-lg text-xs text-red-900 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{securityError}</span>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {securitySuccess && (
+                <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-900 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{securitySuccess}</span>
+                </div>
+              )}
+
+              {/* STEP 1: Send OTP to current email */}
+              {securityStep === 1 && (
+                <div className="space-y-4">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5 text-xs">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                      Security Verification Step
+                    </span>
+                    <p className="text-slate-700 leading-relaxed">
+                      Upang matiyak na ikaw ang may-ari ng account na ito, magpapadala kami ng <strong>6-digit verification code</strong> sa iyong rehistradong email:
+                    </p>
+                    <p className="font-mono font-bold text-[#002060] bg-white p-2 rounded border border-slate-200 text-center">
+                      {maskEmailAddress(emailAddress)}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSendPasswordOtp}
+                    disabled={securityLoading}
+                    className="w-full py-2.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {securityLoading ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Sending 6-Digit Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span>Send 6-Digit Code to Email</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 2: Input 6-Digit OTP & Set New Password */}
+              {securityStep === 2 && (
+                <form onSubmit={handleUpdatePassword} className="space-y-3.5 text-xs">
+                  <div>
+                    <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
+                      Enter 6-Digit Verification Code
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={passwordOtp}
+                      onChange={(e) => setPasswordOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="123456"
+                      className="w-full p-2.5 border-2 border-[#002060] rounded-lg font-mono text-center text-lg tracking-widest font-black text-slate-900 bg-slate-50 focus:bg-white focus:outline-hidden"
+                      required
+                      autoFocus
+                    />
+                    <div className="flex items-center justify-between mt-1 text-[11px]">
+                      <span className="text-slate-500">Nasa inbox o spam folder</span>
+                      <button
+                        type="button"
+                        onClick={handleSendPasswordOtp}
+                        disabled={securityLoading}
+                        className="text-blue-700 font-bold hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        Resend Code
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* New Password Field */}
+                  <div>
+                    <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
+                      Bagong Password (Minimum 6 characters)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full p-2.5 pr-9 border border-slate-300 rounded-lg text-slate-900 text-xs focus:border-[#002060] focus:outline-hidden"
+                        required
+                        minLength={6}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px] font-bold"
+                      >
+                        {showNewPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password Field */}
+                  <div>
+                    <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
+                      Kumpirmahin ang Bagong Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full p-2.5 pr-9 border border-slate-300 rounded-lg text-slate-900 text-xs focus:border-[#002060] focus:outline-hidden"
+                        required
+                        minLength={6}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px] font-bold"
+                      >
+                        {showConfirmPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSecurityStep(1)}
+                      disabled={securityLoading}
+                      className="px-3.5 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                    >
+                      Bumalik
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={securityLoading}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {securityLoading ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Updating...</span>
+                        </>
+                      ) : (
+                        <span>Confirm &amp; Update Password</span>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 2: CHANGE EMAIL WITH 6-DIGIT OTP */}
+      {/* ========================================================================= */}
+      {securityModal === "email" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border-t-4 border-[#002060] overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 bg-[#002060] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                </svg>
+                <h3 className="text-sm font-bold tracking-tight">
+                  Modify Registered Email Address
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeSecurityModal}
+                disabled={securityLoading}
+                className="text-slate-300 hover:text-white text-xs font-bold px-2 py-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4">
+              {/* Error Message */}
+              {securityError && (
+                <div className="p-3 bg-red-50 border border-red-300 rounded-lg text-xs text-red-900 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{securityError}</span>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {securitySuccess && (
+                <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-900 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{securitySuccess}</span>
+                </div>
+              )}
+
+              {/* STEP 1: Enter New Email & Request OTP */}
+              {securityStep === 1 && (
+                <div className="space-y-3.5 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px] block mb-1">
+                      Kasalukuyang Email
+                    </span>
+                    <input
+                      type="text"
+                      value={emailAddress}
+                      disabled
+                      className="w-full p-2.5 border border-slate-200 rounded-lg bg-slate-100 text-slate-600 font-mono text-xs cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
+                      Bagong Email Address (e.g. yourname@gmail.com)
+                    </label>
+                    <input
+                      type="email"
+                      value={newEmailInput}
+                      onChange={(e) => setNewEmailInput(e.target.value)}
+                      placeholder="bagong.email@gmail.com"
+                      className="w-full p-2.5 border-2 border-slate-300 focus:border-[#002060] rounded-lg text-slate-900 text-xs focus:outline-hidden"
+                      required
+                    />
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Magpapadala kami ng 6-digit verification code sa bagong email address na ito upang patunayan ang iyong pagmamay-ari bago ito maging opisyal na login email.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSendEmailOtp}
+                    disabled={securityLoading || !newEmailInput.includes("@")}
+                    className="w-full py-2.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {securityLoading ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Sending 6-Digit Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span>Send 6-Digit Code to New Email</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 2: Input 6-Digit OTP Sent to New Email */}
+              {securityStep === 2 && (
+                <form onSubmit={handleUpdateEmail} className="space-y-3.5 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px] block mb-1">
+                      Bagong Email Address
+                    </span>
+                    <input
+                      type="text"
+                      value={newEmailInput}
+                      disabled
+                      className="w-full p-2 border border-slate-200 rounded-lg bg-slate-100 text-slate-700 font-mono text-xs cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
+                      Enter 6-Digit Verification Code
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={emailOtp}
+                      onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="123456"
+                      className="w-full p-2.5 border-2 border-[#002060] rounded-lg font-mono text-center text-lg tracking-widest font-black text-slate-900 bg-slate-50 focus:bg-white focus:outline-hidden"
+                      required
+                      autoFocus
+                    />
+                    <div className="flex items-center justify-between mt-1 text-[11px]">
+                      <span className="text-slate-500">I-check ang inbox ng bagong email</span>
+                      <button
+                        type="button"
+                        onClick={handleSendEmailOtp}
+                        disabled={securityLoading}
+                        className="text-blue-700 font-bold hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        Resend Code
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSecurityStep(1)}
+                      disabled={securityLoading}
+                      className="px-3.5 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                    >
+                      Bumalik
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={securityLoading}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {securityLoading ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Updating...</span>
+                        </>
+                      ) : (
+                        <span>Verify &amp; Update Email</span>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
