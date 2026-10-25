@@ -4,14 +4,29 @@ import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+let cachedSupabase: any = null;
+
 function getSupabaseClient() {
+  if (cachedSupabase) return cachedSupabase;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     "";
   if (!url || !key) return null;
-  return createSupabaseJsClient(url, key);
+  cachedSupabase = createSupabaseJsClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => {
+        return fetch(input, {
+          ...init,
+          cache: "no-store",
+          keepalive: true,
+        });
+      },
+    },
+  });
+  return cachedSupabase;
 }
 
 const NO_CACHE_HEADERS = {
