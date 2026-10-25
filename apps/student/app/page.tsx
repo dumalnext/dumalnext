@@ -153,6 +153,29 @@ function StudentHomeContent() {
   const [activeTermNum, setActiveTermNum] = useState<number>(termNumber || 1);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [dashboardSubjects, setDashboardSubjects] = useState<any[]>([]);
+  const [dashboardSchedules, setDashboardSchedules] = useState<any[]>([]);
+
+  const formatTime12h = (timeStr?: string | null): string => {
+    if (!timeStr) return "";
+    const cleaned = timeStr.trim();
+    if (/am|pm/i.test(cleaned)) return cleaned;
+    const parts = cleaned.split(":");
+    if (parts.length === 0) return cleaned;
+    const rawHour = parseInt(parts[0], 10);
+    if (isNaN(rawHour)) return cleaned;
+    const minutes = parts.length > 1 ? parts[1].slice(0, 2) : "00";
+    const period = rawHour >= 12 ? "PM" : "AM";
+    const hour12 = rawHour % 12 === 0 ? 12 : rawHour % 12;
+    return `${hour12}:${minutes} ${period}`;
+  };
+
+  const formatScheduleTimeRange = (start?: string | null, end?: string | null): string => {
+    const s = formatTime12h(start);
+    const e = formatTime12h(end);
+    if (s && e) return `${s} - ${e}`;
+    return s || e || "";
+  };
 
   // Real-Time Automatic Synchronization of Logged-In User's Application & Section (Zero-Refresh)
   useEffect(() => {
@@ -349,11 +372,42 @@ function StudentHomeContent() {
                 strand: secData[0].strand,
               };
               if (isMounted) setAssignedSection(secObj);
+
+              const gradeParam = secData[0].grade_level || studentRec.grade_level || activeApp?.target_grade_level || 7;
+              const strandParam = secData[0].strand || studentRec.strand || activeApp?.target_strand || "Regular";
+              try {
+                const [subjRes, schedRes] = await Promise.all([
+                  fetch(`/api/subjects?gradeLevel=${gradeParam}&strand=${encodeURIComponent(strandParam)}`).then((r) => r.json()).catch(() => null),
+                  fetch(`/api/schedules?sectionId=${secData[0].id}&gradeLevel=${gradeParam}`).then((r) => r.json()).catch(() => null),
+                ]);
+                if (isMounted) {
+                  setDashboardSubjects(subjRes?.success && Array.isArray(subjRes.subjects) ? subjRes.subjects : []);
+                  setDashboardSchedules(schedRes?.success && Array.isArray(schedRes.schedules) ? schedRes.schedules : []);
+                }
+              } catch {
+                // Non-blocking schedule preview fetch
+              }
             } else {
-              if (isMounted) setAssignedSection(null);
+              if (isMounted) {
+                setAssignedSection(null);
+                setDashboardSchedules([]);
+              }
             }
           } else {
-            if (isMounted) setAssignedSection(null);
+            if (isMounted) {
+              setAssignedSection(null);
+              setDashboardSchedules([]);
+            }
+            const fallbackGrade = studentRec.grade_level || activeApp?.target_grade_level;
+            const fallbackStrand = studentRec.strand || activeApp?.target_strand || "Regular";
+            if (fallbackGrade) {
+              try {
+                const subjRes = await fetch(`/api/subjects?gradeLevel=${fallbackGrade}&strand=${encodeURIComponent(fallbackStrand)}`).then((r) => r.json()).catch(() => null);
+                if (isMounted && subjRes?.success && Array.isArray(subjRes.subjects)) {
+                  setDashboardSubjects(subjRes.subjects);
+                }
+              } catch {}
+            }
           }
 
           // Determine Section Mode
@@ -783,7 +837,7 @@ function StudentHomeContent() {
       )}
 
       {/* =========================================================================
-          VIEW A: AUTHENTICATED STUDENT PORTAL DASHBOARD (ALREADY SIGNED IN)
+          VIEW A: AUTHENTICATED STUDENT PORTAL DASHBOARD (2-COLUMN STUDENT SIS)
           ========================================================================= */}
       {user ? (
         !user.email || user.email.trim() === "" ? (
@@ -795,203 +849,425 @@ function StudentHomeContent() {
             onLogout={logout}
           />
         ) : (
-        <div className="space-y-6">
-          {/* Student Portal Profile Banner */}
-          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-5 sm:px-7 sm:py-6 border-b-4 border-amber-400">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-start sm:items-center gap-4 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* =====================================================================
+              LEFT COLUMN (4 COLS): OFFICIAL DIGITAL STUDENT ID CARD & QUICK LINKS
+              ===================================================================== */}
+          <div className="lg:col-span-4 space-y-5">
+            {/* Official Digital Learner ID Card */}
+            <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-4 border-b-4 border-amber-400 flex items-center justify-between gap-2">
+                <div>
+                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
+                    Official Learner Identification
+                  </span>
+                  <h2 className="text-sm font-extrabold text-white tracking-tight">
+                    Digital Student ID Card
+                  </h2>
+                </div>
+                {userApplication?.status === "Approved" ? (
+                  <span className="px-2 py-0.5 bg-emerald-500 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                    Enrolled
+                  </span>
+                ) : userApplication?.status === "Needs Revision" ? (
+                  <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                    Revision
+                  </span>
+                ) : userApplication?.status === "Pending" ? (
+                  <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                    Pending
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 bg-white/15 border border-white/30 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                    Active
+                  </span>
+                )}
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Photo & Primary Identity */}
+                <div className="flex items-center gap-3.5">
                   {photoUrl ? (
                     <div className="shrink-0">
                       <img
                         src={photoUrl}
                         alt={`${user.firstName} ${user.lastName}`}
-                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] object-cover border border-white/40 bg-white shadow-xs"
+                        className="w-16 h-16 rounded-[4px] object-cover border border-slate-300 bg-white shadow-xs"
                       />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] bg-white/10 border border-white/25 flex items-center justify-center text-base sm:text-lg font-black text-amber-300 shrink-0 shadow-xs">
+                    <div className="w-16 h-16 rounded-[4px] bg-[#002060] text-white border border-blue-900 flex items-center justify-center text-lg font-black shrink-0 shadow-xs">
                       {(user.firstName?.[0] || "S")}{(user.lastName?.[0] || "P")}
                     </div>
                   )}
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
-                        Official Learner Portal
-                      </span>
-                      <span className="text-[11px] font-semibold text-blue-200">
-                        S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
-                      </span>
+                  <div className="min-w-0 space-y-1">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      Dumalneg NHS Learner
                     </div>
-                    <h1 className="text-lg sm:text-2xl font-bold text-white tracking-tight truncate">
-                      Welcome, {user.firstName} {user.lastName}
+                    <h1 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug break-words">
+                      {user.firstName} {user.middleName ? `${user.middleName[0]}. ` : ""}{user.lastName}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-blue-100">
-                      <span>
-                        Email: <strong className="text-white">{user.email}</strong>
+                    {sectionMode === "ASSIGNED" && assignedSection ? (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-900 border border-emerald-300 text-xs font-bold rounded-[3px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                        {assignedSection.name}
                       </span>
-                      <span className="text-blue-400" aria-hidden="true">&bull;</span>
-                      <span className="inline-flex items-center gap-1.5">
-                        <span>Account ID:</span>
-                        <CopyChip value={user.userId} label="Account ID" variant="dark" />
+                    ) : userApplication?.gradeLevel ? (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold rounded-[3px]">
+                        Grade {userApplication.gradeLevel} &bull; Section Pending
                       </span>
-                      {user.lrn && /^\d{12}$/.test(user.lrn) && (
-                        <>
-                          <span className="text-blue-400" aria-hidden="true">&bull;</span>
-                          <span className="inline-flex items-center gap-1.5">
-                            <span>LRN:</span>
-                            <CopyChip value={user.lrn} label="12-Digit LRN" variant="dark" />
-                          </span>
-                        </>
-                      )}
-                    </div>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold rounded-[3px]">
+                        Section Unassigned
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Single Non-Redundant Profile Action */}
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                {/* Official ID Attributes List */}
+                <div className="border-t border-slate-200 pt-3.5 space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-500 font-medium">Learner Ref. No. (LRN):</span>
+                    {user.lrn && /^\d{12}$/.test(user.lrn) ? (
+                      <CopyChip value={user.lrn} label="12-Digit LRN" />
+                    ) : (
+                      <span className="font-semibold text-slate-700">{userApplication?.lrn || "On File"}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-500 font-medium">Account ID:</span>
+                    <CopyChip value={user.userId} label="Account ID" />
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-500 font-medium shrink-0">Email:</span>
+                    <strong className="text-slate-900 truncate">{user.email}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-500 font-medium">Grade Level:</span>
+                    <strong className="text-slate-900">
+                      {assignedSection?.gradeLevel
+                        ? `Grade ${assignedSection.gradeLevel}${assignedSection.strand ? ` (${assignedSection.strand})` : ""}`
+                        : userApplication?.gradeLevel
+                        ? `Grade ${userApplication.gradeLevel}`
+                        : "Basic Education"}
+                    </strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-500 font-medium">Academic Term:</span>
+                    <strong className="text-[#002060]">
+                      S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* ID Card Bottom Action */}
+                <div className="pt-2 border-t border-slate-200">
                   <Link
                     href="/profile"
-                    className="px-3.5 py-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs font-bold rounded-[4px] transition-colors shadow-xs"
+                    className="w-full py-2 px-3 bg-slate-100 hover:bg-[#002060] hover:text-white text-slate-800 border border-slate-300 text-xs font-bold rounded-[4px] transition-colors flex items-center justify-between shadow-2xs"
                   >
-                    Account &amp; Security Settings &rarr;
+                    <span>Account &amp; Security Settings</span>
+                    <span>&rarr;</span>
                   </Link>
                 </div>
               </div>
             </div>
 
-            <div className="p-5 sm:p-7 space-y-6">
+            {/* Student Portal Quick Links Card */}
+            <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm p-4 space-y-3">
+              <div className="border-b border-slate-200 pb-2">
+                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
+                  Academic Services
+                </span>
+                <h3 className="text-xs font-bold text-slate-900">
+                  Student Portal Navigation
+                </h3>
+              </div>
+              <div className="space-y-1.5 text-xs">
+                <Link
+                  href="/section"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
+                >
+                  <span>My Class Section &amp; Roster</span>
+                  <span>&rarr;</span>
+                </Link>
+                <Link
+                  href="/enroll"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
+                >
+                  <span>Online Enrollment Form</span>
+                  <span>&rarr;</span>
+                </Link>
+                <Link
+                  href={userApplication ? `/track?ref=${userApplication.referenceNumber}` : "/track"}
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
+                >
+                  <span>Track Application Status</span>
+                  <span>&rarr;</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConcernModalMode("submit");
+                    setShowConcernModal(true);
+                  }}
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
+                >
+                  <span>IT Support &amp; Learner Helpdesk</span>
+                  <span>&rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
-            {/* Section Assignment Status Card */}
-            {sectionMode === "ASSIGNED" && assignedSection ? (
-              <div className="p-3.5 sm:p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest block">
-                      SECTION ASSIGNED
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
+          {/* =====================================================================
+              RIGHT COLUMN (8 COLS): ACADEMIC SUMMARY, LIVE TIMETABLE & ENROLLMENT
+              ===================================================================== */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Top 3 Academic Summary KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              {/* KPI 1: Assigned Section */}
+              <div className="bg-white border border-slate-200/90 border-l-4 border-l-[#002060] rounded-[4px] p-4 shadow-xs space-y-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Class Section Placement
+                </span>
+                <div className="text-sm font-extrabold text-slate-900 truncate">
+                  {sectionMode === "ASSIGNED" && assignedSection
+                    ? assignedSection.name
+                    : sectionMode === "ENROLLMENT_REQUIRED"
+                    ? "Enrollment Required"
+                    : "Pending Placement"}
+                </div>
+                <div className="text-xs text-slate-600">
+                  {sectionMode === "ASSIGNED" && assignedSection
+                    ? `Grade ${assignedSection.gradeLevel}${assignedSection.strand ? ` • ${assignedSection.strand}` : ""} Official Roster`
+                    : "Awaiting Registrar Sectioning"}
+                </div>
+              </div>
+
+              {/* KPI 2: Enrollment Status */}
+              <div
+                className={`bg-white border border-slate-200/90 border-l-4 rounded-[4px] p-4 shadow-xs space-y-1 ${
+                  userApplication?.status === "Approved"
+                    ? "border-l-emerald-600"
+                    : userApplication?.status === "Needs Revision"
+                    ? "border-l-red-600"
+                    : "border-l-amber-500"
+                }`}
+              >
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Enrollment Status
+                </span>
+                <div
+                  className={`text-sm font-extrabold truncate ${
+                    userApplication?.status === "Approved"
+                      ? "text-emerald-800"
+                      : userApplication?.status === "Needs Revision"
+                      ? "text-red-800"
+                      : "text-amber-900"
+                  }`}
+                >
+                  {userApplication
+                    ? userApplication.status === "Approved"
+                      ? "Approved & Enrolled"
+                      : userApplication.status === "Needs Revision"
+                      ? "Needs Revision"
+                      : "Pending Evaluation"
+                    : "Not Yet Enrolled"}
+                </div>
+                <div className="text-xs text-slate-600">
+                  S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
+                </div>
+              </div>
+
+              {/* KPI 3: Application Reference */}
+              <div className="bg-white border border-slate-200/90 border-l-4 border-l-amber-400 rounded-[4px] p-4 shadow-xs space-y-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Application Reference
+                </span>
+                <div className="text-sm font-extrabold text-[#002060] truncate">
+                  {userApplication ? userApplication.referenceNumber : "No Active Submission"}
+                </div>
+                <div className="text-xs text-slate-600">
+                  {userApplication
+                    ? `Submitted ${new Date(userApplication.applicationDate).toLocaleDateString()}`
+                    : isEnrollmentOpen
+                    ? "Enrollment Window Open"
+                    : "Enrollment Window Closed"}
+                </div>
+              </div>
+            </div>
+
+            {/* =================================================================
+                LIVE CLASS TIMETABLE & ENROLLED SUBJECTS PREVIEW CARD
+                ================================================================= */}
+            <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+              <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
+                    Academic Schedule &amp; Curriculum
+                  </span>
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                    {sectionMode === "ASSIGNED" && assignedSection
+                      ? `Live Class Timetable & Subjects • ${assignedSection.name}`
+                      : "Class Section & Prescribed Subjects Preview"}
+                  </h3>
+                </div>
+                <Link
+                  href="/section"
+                  className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs whitespace-nowrap"
+                >
+                  Open Full Section &amp; Schedule &rarr;
+                </Link>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Section Placement Status Banner inside Schedule Card */}
+                {sectionMode === "ASSIGNED" && assignedSection ? (
+                  <div className="p-3 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[4px]">
+                    <div className="text-xs text-emerald-950">
+                      <span className="font-bold uppercase tracking-wider text-emerald-800 mr-2">
+                        OFFICIAL PLACEMENT:
+                      </span>
+                      Assigned to <strong className="underline">{assignedSection.name}</strong> (Grade {assignedSection.gradeLevel}
+                      {assignedSection.strand ? ` • ${assignedSection.strand}` : ""})
+                    </div>
+                    <span className="px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase rounded-[3px] shrink-0 self-start sm:self-center">
                       {activeTermNum >= 2 ? "Automatic Continuing Roster" : "Official Roster"}
                     </span>
                   </div>
-                  <div className="text-sm sm:text-base font-bold text-emerald-950">
-                    Assigned in Section: <span className="underline font-black">{assignedSection.name}</span>
+                ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
+                  <div className="p-3.5 bg-blue-50 border border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-[#002060] uppercase">
+                        Enrollment Required for Trimester {activeTermNum}
+                      </div>
+                      <p className="text-xs text-slate-700">
+                        Complete your continuing enrollment for S.Y. {schoolYear} to unlock your class section and timetable.
+                      </p>
+                    </div>
+                    <Link
+                      href="/enroll"
+                      className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap"
+                    >
+                      Complete Enrollment &rarr;
+                    </Link>
                   </div>
-                  <div className="text-xs text-emerald-800">
-                    Grade {assignedSection.gradeLevel} {assignedSection.strand ? `• ${assignedSection.strand}` : ""}
+                ) : (
+                  <div className="p-3.5 bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-amber-950">
+                        {sectionMode === "NOT_ASSIGNED_TRANSFEREE"
+                          ? "Transferee Section Placement Pending Evaluation"
+                          : "Awaiting Official Class Section Placement"}
+                      </div>
+                      <p className="text-xs text-amber-800">
+                        Your class section and room assignment will appear here automatically once finalized by the Registrar.
+                      </p>
+                    </div>
+                    <Link
+                      href="/section"
+                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap"
+                    >
+                      Check Status &rarr;
+                    </Link>
                   </div>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
-                    Official Class Placement
-                  </span>
-                  <Link
-                    href="/section"
-                    className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
-                  >
-                    View Section &rarr;
-                  </Link>
-                </div>
-              </div>
-            ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
-              <div className="p-3.5 sm:p-4 bg-blue-50 border-2 border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
-                      ENROLLMENT REQUIRED
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-200 text-[#002060] text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
-                      Action Needed
-                    </span>
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-slate-900">
-                    Please enroll to see your section assignment
-                  </div>
-                  <p className="text-xs text-slate-700">
-                    Enrollment for Trimester {activeTermNum} (S.Y. {schoolYear}) is open. Complete continuing enrollment to unlock your section.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-[#002060] bg-blue-100 border border-blue-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
-                    Enrollment Required
-                  </span>
-                  <Link
-                    href="/enroll"
-                    className="px-3 py-1 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
-                  >
-                    Complete Enrollment &rarr;
-                  </Link>
-                </div>
-              </div>
-            ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
-              <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-amber-900 uppercase tracking-widest block">
-                      SECTION STATUS &bull; TRANSFEREE
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200 text-amber-950 text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
-                      Transferee Evaluation
-                    </span>
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-amber-950">
-                    You&apos;re not yet assigned to a section
-                  </div>
-                  <p className="text-xs text-amber-900">
-                    As a transferee learner in Trimester {activeTermNum}, your section placement is pending evaluation by the administrator.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
-                    Pending Admin Evaluation
-                  </span>
-                  <Link
-                    href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
-                  >
-                    Check Status &rarr;
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="p-3.5 sm:p-4 bg-amber-50 border-2 border-amber-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block">
-                      SECTION STATUS
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-200/80 text-amber-950 text-[10px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-                      Pending Placement
-                    </span>
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-amber-950">
-                    You&apos;re not yet assigned to a section
-                  </div>
-                  <p className="text-xs text-amber-800">
-                    Awaiting official section placement from the school administrator.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 inline-block uppercase whitespace-nowrap rounded-[4px]">
-                    In Queue for Placement
-                  </span>
-                  <Link
-                    href="/section"
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-xs rounded-[4px] whitespace-nowrap"
-                  >
-                    Check Status &rarr;
-                  </Link>
-                </div>
-              </div>
-            )}
+                )}
 
-            {/* Application Status Card */}
+                {/* Live Timetable Table OR Prescribed Subjects Table */}
+                {dashboardSchedules.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-slate-700">
+                        Weekly Class Schedule ({dashboardSchedules.length} {dashboardSchedules.length === 1 ? "Class" : "Classes"})
+                      </span>
+                      <span className="text-slate-500">Live Registrar Timetable</span>
+                    </div>
+                    <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold">
+                            <th className="py-2 px-3">Subject</th>
+                            <th className="py-2 px-3">Day</th>
+                            <th className="py-2 px-3">Time Window</th>
+                            <th className="py-2 px-3">Assigned Faculty</th>
+                            <th className="py-2 px-3">Room</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {dashboardSchedules.slice(0, 6).map((sch: any, idx: number) => (
+                            <tr key={sch.id || idx} className="hover:bg-slate-50">
+                              <td className="py-2 px-3 font-bold text-[#002060]">
+                                {sch.subject_name || sch.subject_code || "Core Subject"}
+                              </td>
+                              <td className="py-2 px-3 font-semibold text-slate-800">
+                                {sch.day_of_week || "Mon-Fri"}
+                              </td>
+                              <td className="py-2 px-3 text-slate-700 whitespace-nowrap">
+                                {formatScheduleTimeRange(sch.start_time, sch.end_time)}
+                              </td>
+                              <td className="py-2 px-3 text-slate-600">
+                                {sch.teacher_name || "TBA"}
+                              </td>
+                              <td className="py-2 px-3 text-slate-600">
+                                {sch.classroom_name || sch.room || "TBA"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : dashboardSubjects.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-slate-700">
+                        Prescribed Curriculum Subjects ({dashboardSubjects.length})
+                      </span>
+                      <span className="text-slate-500">DepEd Standard Curriculum</span>
+                    </div>
+                    <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold">
+                            <th className="py-2 px-3">Subject Code</th>
+                            <th className="py-2 px-3">Subject Description</th>
+                            <th className="py-2 px-3">Type</th>
+                            <th className="py-2 px-3 text-right">Units</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {dashboardSubjects.slice(0, 6).map((subj: any, idx: number) => (
+                            <tr key={subj.id || idx} className="hover:bg-slate-50">
+                              <td className="py-2 px-3 font-bold text-[#002060]">
+                                {subj.subject_code || `SUBJ-0${idx + 1}`}
+                              </td>
+                              <td className="py-2 px-3 font-semibold text-slate-800">
+                                {subj.subject_name || subj.name}
+                              </td>
+                              <td className="py-2 px-3">
+                                <span className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold uppercase rounded-[3px]">
+                                  {subj.subject_type || "Core"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 text-right font-bold text-slate-700">
+                                {subj.units || 1.0}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            {/* =================================================================
+                SUBMITTED ENROLLMENT APPLICATION / START ENROLLMENT CARD
+                ================================================================= */}
             {userApplication ? (
-              <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-300 space-y-4 rounded-[4px] shadow-sm">
+              <div className="p-5 bg-white border border-slate-200/90 space-y-4 rounded-[4px] shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 block">
@@ -1044,7 +1320,7 @@ function StudentHomeContent() {
                 </div>
 
                 {userApplication.remarks && (
-                  <div className="p-3 bg-white border border-slate-200 text-xs rounded-[4px]">
+                  <div className="p-3 bg-slate-50 border border-slate-200 text-xs rounded-[4px]">
                     <span className="font-bold text-slate-700 block mb-0.5 tracking-wide">
                       Registrar Notes / Remarks:
                     </span>
@@ -1181,7 +1457,7 @@ function StudentHomeContent() {
             ) : (
               /* User has not yet submitted an enrollment application for active term */
               <div className={`p-6 border-2 space-y-4 text-center rounded-[4px] shadow-xs ${
-                !isEnrollmentOpen ? "bg-red-50/60 border-red-300" : "bg-slate-50 border-slate-300"
+                !isEnrollmentOpen ? "bg-red-50/60 border-red-300" : "bg-white border-slate-300"
               }`}>
                 <div className="flex items-center justify-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${
@@ -1249,7 +1525,7 @@ function StudentHomeContent() {
 
             {/* Previous Academic Term Enrollment Records (Continuing Students) */}
             {pastApplications.length > 0 && (
-              <div className="p-4 bg-slate-50 border border-slate-300 space-y-3 rounded-[4px] shadow-xs">
+              <div className="p-4 bg-white border border-slate-200/90 space-y-3 rounded-[4px] shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <span className="text-xs font-bold text-slate-700">
                     Previous Academic Term Records ({pastApplications.length})
@@ -1262,7 +1538,7 @@ function StudentHomeContent() {
                   {pastApplications.map((pApp) => (
                     <div
                       key={pApp.id}
-                      className="p-3 bg-white border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs rounded-[4px]"
+                      className="p-3 bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs rounded-[4px]"
                     >
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -1296,7 +1572,7 @@ function StudentHomeContent() {
                         </span>
                         <Link
                           href={`/track?ref=${pApp.referenceNumber}`}
-                          className="px-2.5 py-1 text-[11px] font-bold text-[#002060] bg-slate-100 border border-slate-300 hover:bg-slate-200 transition-colors rounded-[4px]"
+                          className="px-2.5 py-1 text-[11px] font-bold text-[#002060] bg-white border border-slate-300 hover:bg-slate-100 transition-colors rounded-[4px]"
                         >
                           View Record &rarr;
                         </Link>
@@ -1314,7 +1590,6 @@ function StudentHomeContent() {
               semester={semester}
               isEnrollmentOpen={isEnrollmentOpen}
             />
-            </div>
           </div>
         </div>
         )
