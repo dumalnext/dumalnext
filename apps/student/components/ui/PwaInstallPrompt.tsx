@@ -111,30 +111,20 @@ export function PwaInstallModal({
       >
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-5 border-b-4 border-amber-400">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <img
-                src="/dumalneg-logo.png"
-                alt="DNHS Logo"
-                className="w-10 h-10 rounded-full bg-white object-contain border-2 border-amber-400 shadow-xs shrink-0"
-              />
-              <div>
-                <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
-                  Progressive Web App
-                </span>
-                <h3 className="text-base font-extrabold text-white tracking-tight leading-snug">
-                  Install DNHS Student Portal
-                </h3>
-              </div>
+          <div className="flex items-center gap-3">
+            <img
+              src="/dumalneg-logo.png"
+              alt="DNHS Logo"
+              className="w-10 h-10 rounded-full bg-white object-contain border-2 border-amber-400 shadow-xs shrink-0"
+            />
+            <div>
+              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
+                Progressive Web App
+              </span>
+              <h3 className="text-base font-extrabold text-white tracking-tight leading-snug">
+                Install DNHS Student Portal
+              </h3>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer text-sm font-bold"
-              aria-label="Close dialog"
-            >
-              Close
-            </button>
           </div>
         </div>
 
