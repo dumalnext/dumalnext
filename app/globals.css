@@ -483,3 +483,18 @@ span:not(.rounded-full):not([class*="rounded-full"])[class*="border"],
 label:not(.rounded-full):not([class*="rounded-full"])[class*="border"] {
   border-radius: 4px;
 }
+
+/* =========================================================================
+   NO SCROLLBAR UTILITY
+   Completely hides scrollbars while maintaining touch and swipe functionality
+   ========================================================================= */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}

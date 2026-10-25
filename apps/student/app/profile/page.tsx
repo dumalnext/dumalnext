@@ -592,7 +592,7 @@ export default function StudentProfilePage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-slate-200 bg-white rounded-t-lg overflow-x-auto text-xs font-bold scrollbar-thin">
+      <div className="flex border-b border-slate-200 bg-white rounded-t-lg overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap text-xs font-bold touch-pan-x">
         <button
           type="button"
           onClick={() => setActiveTab("academic")}
