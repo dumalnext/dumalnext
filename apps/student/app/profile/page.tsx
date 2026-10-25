@@ -519,18 +519,15 @@ export default function StudentProfilePage() {
           <div className="flex items-start sm:items-center gap-4">
             {/* 2x2 Official Learner Photo from Enrollment or Fallback Initial Circle */}
             {idPhotoUrl ? (
-              <div className="relative shrink-0">
+              <div className="shrink-0">
                 <img
                   src={idPhotoUrl}
                   alt={fullName}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-amber-400 shadow-md bg-white ring-2 ring-white/20"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white/40 shadow-md bg-white ring-2 ring-white/20"
                 />
-                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-wider rounded-full shadow-xs">
-                  2x2
-                </span>
               </div>
             ) : (
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border-2 border-amber-400 flex items-center justify-center font-black text-xl sm:text-2xl text-amber-300 shrink-0 shadow-inner">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center font-black text-xl sm:text-2xl text-white shrink-0 shadow-inner">
                 {initials}
               </div>
             )}

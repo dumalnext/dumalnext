@@ -802,15 +802,12 @@ function StudentHomeContent() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-start sm:items-center gap-4 min-w-0">
                   {photoUrl ? (
-                    <div className="relative shrink-0">
+                    <div className="shrink-0">
                       <img
                         src={photoUrl}
                         alt={`${user.firstName} ${user.lastName}`}
-                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] object-cover border-2 border-amber-300 bg-white shadow-xs"
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] object-cover border border-white/40 bg-white shadow-xs"
                       />
-                      <span className="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-400 text-slate-950 font-black text-[8px] uppercase tracking-wider rounded-xs shadow-2xs">
-                        2x2
-                      </span>
                     </div>
                   ) : (
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] bg-white/10 border border-white/25 flex items-center justify-center text-base sm:text-lg font-black text-amber-300 shrink-0 shadow-xs">

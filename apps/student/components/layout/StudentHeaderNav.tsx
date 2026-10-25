@@ -457,7 +457,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <img
                   src={photoUrl}
                   alt="2x2"
-                  className="w-5 h-5 rounded-full object-cover border border-amber-300 bg-white shrink-0"
+                  className="w-5 h-5 rounded-full object-cover border border-white/40 bg-white shrink-0"
                 />
               ) : (
                 <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] flex items-center justify-center shrink-0">
@@ -615,15 +615,12 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
                 <div className="flex items-start gap-3">
                   {photoUrl ? (
-                    <div className="relative shrink-0 mt-0.5">
+                    <div className="shrink-0 mt-0.5">
                       <img
                         src={photoUrl}
                         alt={`${user.firstName} ${user.lastName}`}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-[#002060] shadow-xs bg-white"
+                        className="w-12 h-12 rounded-full object-cover border border-slate-300 shadow-xs bg-white"
                       />
-                      <span className="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-400 text-slate-950 font-black text-[8px] uppercase tracking-wider rounded-full shadow-2xs">
-                        2x2
-                      </span>
                     </div>
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-[#002060] text-amber-300 border border-blue-400/50 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs mt-0.5">
