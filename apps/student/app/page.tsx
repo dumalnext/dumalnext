@@ -13,6 +13,7 @@ import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/compon
 import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConcernModal";
 import { PasswordResetModal, IdentityRecoveryModal } from "@/components/CredentialRecoveryModals";
 import EmailSetupGuard from "@/components/EmailSetupGuard";
+import { CopyChip, PasswordStrengthMeter, triggerPortalToast } from "@/components/ui/PortalUI";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -732,6 +733,7 @@ function StudentHomeContent() {
     try {
       const res = await verifyEmailOtp(otpEmail, clean);
       if (res.success) {
+        triggerPortalToast("Verification code confirmed! Your learner account is now active.", "success");
         setOtpSuccess("Verification code confirmed! Your learner account is activated.");
         setShowOtpModal(false);
         setUnconfirmedEmail("");
@@ -832,14 +834,16 @@ function StudentHomeContent() {
                         Email: <strong className="text-white">{user.email}</strong>
                       </span>
                       <span className="text-blue-400" aria-hidden="true">&bull;</span>
-                      <span>
-                        Account ID: <strong className="text-white">{user.userId}</strong>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span>Account ID:</span>
+                        <CopyChip value={user.userId} label="Account ID" variant="dark" />
                       </span>
                       {user.lrn && /^\d{12}$/.test(user.lrn) && (
                         <>
                           <span className="text-blue-400" aria-hidden="true">&bull;</span>
-                          <span className="px-2 py-0.5 bg-white/15 border border-white/25 text-white font-bold rounded-[4px]">
-                            LRN: {user.lrn}
+                          <span className="inline-flex items-center gap-1.5">
+                            <span>LRN:</span>
+                            <CopyChip value={user.lrn} label="12-Digit LRN" variant="dark" />
                           </span>
                         </>
                       )}
@@ -996,9 +1000,12 @@ function StudentHomeContent() {
                     <span className="text-[11px] font-bold text-slate-500 block">
                       Submitted Enrollment Application (S.Y. {userApplication.schoolYear} &bull; {userApplication.semester})
                     </span>
-                    <span className="text-base font-bold text-[#002060]">
-                      {userApplication.referenceNumber}
-                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-base font-bold text-[#002060]">
+                        {userApplication.referenceNumber}
+                      </span>
+                      <CopyChip value={userApplication.referenceNumber} label="Reference Number" />
+                    </div>
                   </div>
                   <div>
                     {userApplication.status === "Approved" ? (
@@ -1998,6 +2005,10 @@ function StudentHomeContent() {
                               )}
                             </div>
                           </div>
+                          <PasswordStrengthMeter
+                            password={regForm.password}
+                            confirmPassword={regForm.confirmPassword}
+                          />
                         </div>
 
                         <div className="p-3 bg-blue-50/60 border border-blue-200 text-[11px] text-slate-700 rounded-[4px]">

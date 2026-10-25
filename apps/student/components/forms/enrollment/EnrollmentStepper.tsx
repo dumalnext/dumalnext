@@ -8,6 +8,7 @@ import Step3FamilyBackground from "./Step3FamilyBackground";
 import Step4CurriculumModality from "./Step4CurriculumModality";
 import Step5DocumentsReview from "./Step5DocumentsReview";
 import ContinuingEnrollmentForm from "./ContinuingEnrollmentForm";
+import { CopyChip, PageCardSkeleton, triggerPortalToast } from "@/components/ui/PortalUI";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
@@ -554,6 +555,16 @@ export default function EnrollmentStepper({
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
+  // 1.0. Skeleton Loading State while checking existing application
+  if (isCheckingApp && !existingApp && !priorApprovedRecord) {
+    return (
+      <PageCardSkeleton
+        title="Checking your official learner application and continuing enrollment records..."
+        rows={3}
+      />
+    );
+  }
+
   // 1.5. Lockout State: Online Enrollment is Closed
   if (!isEnrollmentOpen) {
     return (
@@ -611,8 +622,9 @@ export default function EnrollmentStepper({
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
             Enrollment Application Already Submitted
           </h2>
-          <div className="text-xs text-slate-500 mt-1">
-            Official Reference Number: <strong className="text-[#002060] text-sm">{existingApp.application_id}</strong>
+          <div className="text-xs text-slate-500 mt-1.5 flex items-center justify-center gap-2">
+            <span>Official Reference Number:</span>
+            <CopyChip value={existingApp.application_id} label="Reference Number" />
           </div>
         </div>
 
@@ -660,8 +672,9 @@ export default function EnrollmentStepper({
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
             Official Enrollment Confirmed
           </h2>
-          <div className="text-xs text-slate-500 mt-1">
-            Official Reference: <strong className="text-[#002060] text-sm">{existingApp.application_id}</strong>
+          <div className="text-xs text-slate-500 mt-1.5 flex items-center justify-center gap-2">
+            <span>Official Reference:</span>
+            <CopyChip value={existingApp.application_id} label="Reference Number" />
           </div>
         </div>
 
@@ -948,6 +961,54 @@ export default function EnrollmentStepper({
             onBack={prevStep}
             existingApplication={existingApp}
           />
+        )}
+      </div>
+
+      {/* UPGRADE #5: Mobile Sticky Bottom Step Progress & Quick Jump Bar */}
+      <div className="no-print sm:hidden sticky bottom-2 z-30 bg-white/95 backdrop-blur-xs border border-slate-300 shadow-lg p-2.5 rounded-[4px] flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            if (currentStep > 1) {
+              prevStep();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          disabled={currentStep === 1}
+          className="px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 rounded-[4px] border border-slate-300"
+        >
+          &larr; Prev
+        </button>
+        <div className="text-center min-w-0">
+          <span className="text-[10px] font-bold text-[#002060] uppercase block truncate">
+            Step {currentStep} of 5 &bull; {STEP_LABELS[currentStep - 1].label}
+          </span>
+          <span className="text-[10px] text-slate-500 block">
+            Draft Auto-Saved
+          </span>
+        </div>
+        {currentStep < 5 ? (
+          <button
+            type="button"
+            onClick={() => {
+              nextStep();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="px-3.5 py-2 text-xs font-bold text-white bg-[#002060] hover:bg-blue-950 rounded-[4px] shadow-xs"
+          >
+            Next &rarr;
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+              triggerPortalToast("Review your details and tap Submit Application below", "info");
+            }}
+            className="px-3 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-[4px] shadow-xs"
+          >
+            Review &darr;
+          </button>
         )}
       </div>
     </div>

@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
+import { CopyChip, PageCardSkeleton, PrintPageButton } from "@/components/ui/PortalUI";
 
 interface SectionRecord {
   id: string;
@@ -661,13 +662,8 @@ function SectionPageContent() {
 
   if (isAuthLoading || (isLoading && !studentRec)) {
     return (
-      <div className="max-w-5xl mx-auto py-12 px-4 space-y-6 ">
-        <div className="bg-white border-2 border-slate-300 p-8 text-center space-y-3 rounded-[4px] shadow-sm">
-          <div className="w-8 h-8 border-4 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-bold text-slate-700 tracking-wide">
-            Synchronizing Official Class Section Records...
-          </p>
-        </div>
+      <div className="max-w-5xl mx-auto py-8 px-4">
+        <PageCardSkeleton title="Synchronizing official class section roster and timetable..." rows={3} />
       </div>
     );
   }
@@ -702,10 +698,15 @@ function SectionPageContent() {
             </div>
           </div>
           {user && (
-            <div className="text-left sm:text-right bg-white/10 border border-white/20 p-3 text-xs rounded-[4px] shrink-0">
-              <span className="text-[10px] text-amber-300 font-semibold block">Active Learner</span>
-              <strong className="text-white block">{user.firstName} {user.lastName}</strong>
-              <span className="text-[11px] text-blue-100">LRN: {user.lrn || user.userId}</span>
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <PrintPageButton label="Print Section & Schedule" />
+              <div className="text-left sm:text-right bg-white/10 border border-white/20 px-3 py-2 text-xs rounded-[4px]">
+                <strong className="text-white block">{user.firstName} {user.lastName}</strong>
+                <div className="mt-0.5 flex items-center sm:justify-end gap-1.5 text-[11px] text-blue-100">
+                  <span>LRN:</span>
+                  <CopyChip value={user.lrn || user.userId} label="LRN" variant="dark" />
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -861,7 +862,7 @@ function SectionPageContent() {
 
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="bg-white border-2 border-slate-300 p-6 space-y-6 rounded-[4px] shadow-sm">
+            <div className="bg-white border border-slate-200/90 p-6 space-y-6 rounded-[4px] shadow-sm">
               <div>
                 <span className="text-xs font-bold text-[#002060] block mb-1">
                   Official Advisory Information
@@ -966,13 +967,13 @@ function SectionPageContent() {
                 </button>
                 <Link
                   href="/track"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
                 >
                   Track Full Application
                 </Link>
                 <Link
                   href="/"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
                 >
                   Return to Home Dashboard
                 </Link>
@@ -982,7 +983,7 @@ function SectionPageContent() {
 
           {/* TAB 2: CLASSMATES ROSTER */}
           {activeTab === "classmates" && (
-            <div className="bg-white border-2 border-slate-300 p-6 space-y-5 rounded-[4px] shadow-sm">
+            <div className="bg-white border border-slate-200/90 p-6 space-y-5 rounded-[4px] shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
                   <span className="text-xs font-bold text-[#002060] block">
@@ -1183,7 +1184,7 @@ function SectionPageContent() {
 
           {/* TAB 3: PRESCRIBED SCHEDULE & SUBJECTS */}
           {activeTab === "schedule" && (
-            <div className="bg-white border-2 border-slate-300 p-6 space-y-6 rounded-[4px] shadow-sm">
+            <div className="bg-white border border-slate-200/90 p-6 space-y-6 rounded-[4px] shadow-sm">
               <div className="border-b border-slate-200 pb-3">
                 <span className="text-xs font-bold text-[#002060] block">
                   Prescribed Class Curriculum
@@ -1335,7 +1336,7 @@ function SectionPageContent() {
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
               >
                 Return to Home Dashboard
               </Link>
@@ -1393,7 +1394,7 @@ function SectionPageContent() {
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
               >
                 Return to Home Dashboard
               </Link>
@@ -1466,7 +1467,7 @@ function SectionPageContent() {
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
               >
                 Return to Home Dashboard
               </Link>

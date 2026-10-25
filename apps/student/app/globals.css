@@ -524,3 +524,54 @@ span:not(.rounded-full):not([class*="rounded-full"])[class*="border"],
 label:not(.rounded-full):not([class*="rounded-full"])[class*="border"] {
   border-radius: 4px;
 }
+
+
+/* =========================================================================
+   UPGRADE #6 & #7: PRINT-OPTIMIZED DEPED LAYOUT (@media print)
+   Automatically strips navigation, headers, footers, and buttons when
+   printing Enrollment Status, Timetables, or Section Rosters (Ctrl+P).
+   ========================================================================= */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  header,
+  footer,
+  nav,
+  button:not(.print-keep),
+  .no-print,
+  .deped-header,
+  iframe {
+    display: none !important;
+  }
+
+  body,
+  main {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  section,
+  div {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
+    border: 1px solid #94a3b8 !important;
+    padding: 6px 8px !important;
+  }
+}
