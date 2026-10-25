@@ -1,8 +1,10 @@
 {
+  "id": "/",
   "name": "Dumalneg National High School - Student Portal",
   "short_name": "DNHS Portal",
   "description": "Official Online Basic Education Enrollment and Student Academic Portal for Dumalneg National High School",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#002060",
@@ -12,13 +14,25 @@
       "src": "/dumalneg-logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/dumalneg-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/dumalneg-logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/dumalneg-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

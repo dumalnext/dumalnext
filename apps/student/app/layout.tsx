@@ -30,6 +30,31 @@ export default function StudentLayout({
 }) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#002060" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                window.__dnhsDeferredPrompt = null;
+                window.addEventListener('beforeinstallprompt', function(e) {
+                  e.preventDefault();
+                  window.__dnhsDeferredPrompt = e;
+                  try {
+                    window.dispatchEvent(new CustomEvent('dnhs-prompt-ready'));
+                  } catch(err) {}
+                });
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').catch(function() {});
+                  });
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
         <StudentProviders>
           {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}

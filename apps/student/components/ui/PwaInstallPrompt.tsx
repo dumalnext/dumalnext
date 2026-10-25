@@ -12,8 +12,32 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
+// Global cached prompt to prevent race condition before React mounts
+let cachedPrompt: BeforeInstallPromptEvent | null = null;
+
+if (typeof window !== "undefined") {
+  if ((window as any).__dnhsDeferredPrompt) {
+    cachedPrompt = (window as any).__dnhsDeferredPrompt;
+  }
+  window.addEventListener("beforeinstallprompt", (e: Event) => {
+    e.preventDefault();
+    cachedPrompt = e as BeforeInstallPromptEvent;
+    (window as any).__dnhsDeferredPrompt = e;
+  });
+  window.addEventListener("dnhs-prompt-ready", () => {
+    if ((window as any).__dnhsDeferredPrompt) {
+      cachedPrompt = (window as any).__dnhsDeferredPrompt;
+    }
+  });
+}
+
 export function usePwaInstall() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(() => {
+    if (typeof window !== "undefined") {
+      return (window as any).__dnhsDeferredPrompt || cachedPrompt || null;
+    }
+    return null;
+  });
   const [isStandalone, setIsStandalone] = useState(false);
   const [isIos, setIsIos] = useState(false);
 
@@ -33,22 +57,38 @@ export function usePwaInstall() {
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent) && !(window as any).MSStream;
     setIsIos(isIosDevice);
 
-    const handleBeforeInstallPrompt = (e: Event) => {
+    if ((window as any).__dnhsDeferredPrompt) {
+      setDeferredPrompt((window as any).__dnhsDeferredPrompt);
+    }
+
+    const handlePrompt = (e: Event) => {
       e.preventDefault();
+      (window as any).__dnhsDeferredPrompt = e;
+      cachedPrompt = e as BeforeInstallPromptEvent;
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    const handlePromptReady = () => {
+      if ((window as any).__dnhsDeferredPrompt) {
+        setDeferredPrompt((window as any).__dnhsDeferredPrompt);
+      }
     };
 
     const handleAppInstalled = () => {
       setIsStandalone(true);
       setDeferredPrompt(null);
+      (window as any).__dnhsDeferredPrompt = null;
+      cachedPrompt = null;
       triggerPortalToast("DNHS Portal successfully installed on your device!", "success");
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("beforeinstallprompt", handlePrompt);
+    window.addEventListener("dnhs-prompt-ready", handlePromptReady);
     window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("beforeinstallprompt", handlePrompt);
+      window.removeEventListener("dnhs-prompt-ready", handlePromptReady);
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
@@ -59,28 +99,61 @@ export function usePwaInstall() {
       return "already_installed";
     }
 
-    if (deferredPrompt) {
+    // Check active prompt from React state, window global, or module cache
+    let promptEvent =
+      deferredPrompt ||
+      (typeof window !== "undefined" ? (window as any).__dnhsDeferredPrompt || cachedPrompt : null);
+
+    // If prompt is not ready yet on Android / Desktop, wait briefly (up to 400ms) in case beforeinstallprompt is in-flight
+    if (!promptEvent && !isIos && typeof window !== "undefined") {
+      await new Promise<void>((resolve) => {
+        let done = false;
+        const cleanup = () => {
+          if (!done) {
+            done = true;
+            window.removeEventListener("dnhs-prompt-ready", onReady);
+            window.removeEventListener("beforeinstallprompt", onReady);
+            resolve();
+          }
+        };
+        const onReady = () => cleanup();
+        window.addEventListener("dnhs-prompt-ready", onReady, { once: true });
+        window.addEventListener("beforeinstallprompt", onReady, { once: true });
+        setTimeout(cleanup, 400);
+      });
+      promptEvent =
+        deferredPrompt ||
+        (typeof window !== "undefined" ? (window as any).__dnhsDeferredPrompt || cachedPrompt : null);
+    }
+
+    if (promptEvent) {
       try {
-        await deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        if (choice.outcome === "accepted") {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice;
+        if (choice && choice.outcome === "accepted") {
           setDeferredPrompt(null);
+          if (typeof window !== "undefined") (window as any).__dnhsDeferredPrompt = null;
+          cachedPrompt = null;
           return "accepted";
         }
         return "dismissed";
-      } catch {
+      } catch (err) {
+        console.warn("Native PWA prompt error:", err);
         return "show_modal";
       }
     }
 
-    // iOS Safari or browsers without programmatic install prompt
+    // iOS Safari or browsers where prompt event hasn't fired
     return "show_modal";
   };
 
   return {
     isStandalone,
     isIos,
-    hasNativePrompt: !!deferredPrompt,
+    hasNativePrompt: !!(
+      deferredPrompt ||
+      (typeof window !== "undefined" && ((window as any).__dnhsDeferredPrompt || cachedPrompt))
+    ),
     triggerInstall,
   };
 }
