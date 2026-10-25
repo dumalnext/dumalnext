@@ -36,15 +36,38 @@ interface TimeSlotDef {
 const ACADEMIC_TIME_SLOTS: TimeSlotDef[] = [
   { id: "P1", name: "Period 1", start: "07:30", end: "08:30" },
   { id: "P2", name: "Period 2", start: "08:30", end: "09:30" },
-  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "09:45", isBreak: true },
-  { id: "P3", name: "Period 3", start: "09:45", end: "10:45" },
-  { id: "P4", name: "Period 4", start: "10:45", end: "11:45" },
-  { id: "LUNCH", name: "Noon Lunch Break", start: "11:45", end: "13:00", isBreak: true },
+  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "10:00", isBreak: true },
+  { id: "P3", name: "Period 3", start: "10:00", end: "11:00" },
+  { id: "P4", name: "Period 4", start: "11:00", end: "12:00" },
+  { id: "LUNCH", name: "Noon Lunch Break", start: "12:00", end: "13:00", isBreak: true },
   { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
   { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
   { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
   { id: "P8", name: "Homeroom / Remediation", start: "16:00", end: "17:00" },
 ];
+
+function formatTo12Hour(timeStr?: string | null): string {
+  if (!timeStr) return "";
+  const cleaned = timeStr.trim();
+  if (/am|pm/i.test(cleaned)) return cleaned;
+  const parts = cleaned.split(":");
+  if (parts.length === 0) return cleaned;
+  const rawHour = parseInt(parts[0], 10);
+  if (isNaN(rawHour)) return cleaned;
+  const minutes = parts.length > 1 ? parts[1].slice(0, 2) : "00";
+  const period = rawHour >= 12 ? "PM" : "AM";
+  const hour12 = rawHour % 12 === 0 ? 12 : rawHour % 12;
+  return `${hour12}:${minutes} ${period}`;
+}
+
+function formatTimeRange(start?: string | null, end?: string | null): string {
+  const formattedStart = formatTo12Hour(start);
+  const formattedEnd = formatTo12Hour(end);
+  if (formattedStart && formattedEnd) {
+    return `${formattedStart} – ${formattedEnd}`;
+  }
+  return formattedStart || formattedEnd || "";
+}
 
 const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday"> = [
   "Monday",
@@ -326,11 +349,11 @@ export default function TeachingSchedulePage() {
                     return (
                       <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
                         <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
-                          <div>{slot.start} – {slot.end}</div>
+                          <div>{formatTimeRange(slot.start, slot.end)}</div>
                           <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                         </td>
                         <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                          {slot.start} – {slot.end} &bull; {slot.name}
+                          {formatTimeRange(slot.start, slot.end)} &bull; {slot.name}
                         </td>
                       </tr>
                     );
@@ -341,7 +364,7 @@ export default function TeachingSchedulePage() {
                       {/* Left Time Column */}
                       <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
                         <div className="font-bold text-[#002060] text-xs">
-                          {slot.start} – {slot.end}
+                          {formatTimeRange(slot.start, slot.end)}
                         </div>
                         <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
                           {slot.name}
@@ -358,7 +381,7 @@ export default function TeachingSchedulePage() {
                             {matchedItem ? (
                               <div className="p-2.5 bg-blue-50/70 border border-[#002060]/30 hover:border-[#002060] transition-colors shadow-2xs space-y-1">
                                 <span className="text-[10px] font-mono font-bold text-blue-950 bg-white px-1.5 py-0.5 border border-blue-200 block w-fit">
-                                  {matchedItem.start_time}–{matchedItem.end_time}
+                                  {formatTimeRange(matchedItem.start_time, matchedItem.end_time)}
                                 </span>
                                 <div className="font-bold text-slate-900 uppercase text-xs">
                                   {matchedItem.subject_name}

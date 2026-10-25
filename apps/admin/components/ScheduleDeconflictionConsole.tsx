@@ -2372,7 +2372,7 @@ export default function ScheduleDeconflictionConsole() {
                       1. Junior High School (Grades 7–10)
                     </strong>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Fixed standard DepEd core curriculum (English, Math, Science, AP, Filipino, TLE, ESP, MAPEH). Evenly distributed across 07:30–15:00 periods with zero faculty or classroom collisions.
+                      Fixed standard DepEd core curriculum (English, Math, Science, AP, Filipino, TLE, ESP, MAPEH). Continuous DepEd schedule: 7:30 AM – 12:00 PM and 1:00 PM – 5:00 PM with zero vacant gaps and zero collisions.
                     </p>
                   </div>
                   <div className="p-2.5 bg-white border border-slate-200">
@@ -2380,7 +2380,7 @@ export default function ScheduleDeconflictionConsole() {
                       2. Senior High School (Grades 11–12)
                     </strong>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Two-tier daily architecture: 07:30–15:30 for Academic &amp; Tech-Pro core track subjects; 15:30–17:00 dedicated exclusively to Specialized Electives without timetable overlaps.
+                      Continuous daily schedule: 7:30 AM – 12:00 PM and 1:00 PM – 5:00 PM. Includes specialized laboratory sessions, TVL workshops, and academic track subjects.
                     </p>
                   </div>
                 </div>

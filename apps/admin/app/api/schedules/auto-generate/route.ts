@@ -239,7 +239,13 @@ export async function POST(req: Request) {
     });
 
     // 4. Specialist Teacher Matching
-    const getTeacherForSubject = (subjName: string, isSHS: boolean, preferredOffset: number): TeacherRecord => {
+    const getTeacherForSubject = (
+      subjName: string,
+      isSHS: boolean,
+      preferredOffset: number,
+      day?: string,
+      slot?: { start: string; end: string }
+    ): TeacherRecord => {
       const sLower = subjName.toLowerCase();
       let candidates = allTeachersPool.filter((t) => {
         const fn = (t.first_name || "").toUpperCase();
@@ -286,6 +292,32 @@ export async function POST(req: Request) {
       }
       if (candidates.length === 0) candidates = allTeachersPool;
 
+      if (day && slot) {
+        for (let c = 0; c < candidates.length; c++) {
+          const cand = candidates[(preferredOffset + c) % candidates.length];
+          if (!teacherSlotTracker.has(`${cand.id}|${day}|${slot.start}-${slot.end}`)) {
+            return cand;
+          }
+        }
+        // Fallback within same department
+        const deptTeachers = allTeachersPool.filter((t) =>
+          isSHS
+            ? t.department === "SHS" || t.department === "CROSS_LEVEL"
+            : t.department === "JHS" || t.department === "CROSS_LEVEL"
+        );
+        for (const t of deptTeachers) {
+          if (!teacherSlotTracker.has(`${t.id}|${day}|${slot.start}-${slot.end}`)) {
+            return t;
+          }
+        }
+        // Fallback across all teachers
+        for (const t of allTeachersPool) {
+          if (!teacherSlotTracker.has(`${t.id}|${day}|${slot.start}-${slot.end}`)) {
+            return t;
+          }
+        }
+      }
+
       return candidates[preferredOffset % candidates.length];
     };
 
@@ -325,168 +357,167 @@ export async function POST(req: Request) {
     };
 
     // 6. BUILD NON-VACANT 40-PERIOD CURRICULUM FOR EACH SECTION
+    // Continuous instruction: 7:30 AM - 12:00 PM, 1:00 PM - 5:00 PM (8 periods/day x 5 days = 40 periods/week)
+    // Specialized facilities (Science Lab, ICT Lab, TVL Workshop, Gym Annex) are scheduled
+    // on dedicated non-overlapping slots so sections never collide in facilities!
     for (let secIdx = 0; secIdx < activeSections.length; secIdx++) {
       const sec = activeSections[secIdx];
       const isSHS = sec.grade_level >= 11;
       const isTechPro = (sec.strand || "").toUpperCase().includes("TVL") || (sec.strand || "").toUpperCase().includes("TECH");
       const baseRoom = sectionBaseRoomMap.get(sec.id) || fallbackAcademicRooms[0];
 
-      // Curricular Plans: 8 periods/day x 5 days = 40 periods/week
-      const jhsPlan = [
-        { code: `MTH${sec.grade_level}`, name: `Mathematics ${sec.grade_level}`, roomType: "academic", weeklyFreq: 5 },
-        { code: `SCI${sec.grade_level}`, name: `Science & Laboratory ${sec.grade_level}`, roomType: "science", weeklyFreq: 5 },
-        { code: `ENG${sec.grade_level}`, name: `English ${sec.grade_level}`, roomType: "academic", weeklyFreq: 5 },
-        { code: `FIL${sec.grade_level}`, name: `Filipino ${sec.grade_level}`, roomType: "academic", weeklyFreq: 5 },
-        { code: `AP${sec.grade_level}`, name: `Araling Panlipunan ${sec.grade_level}`, roomType: "academic", weeklyFreq: 4 },
-        { code: `TLE${sec.grade_level}`, name: `Technology & Livelihood Education`, roomType: "tvl", weeklyFreq: 4 },
-        { code: `MAPEH${sec.grade_level}`, name: `MAPEH (Music, Arts, PE, Health)`, roomType: "gym", weeklyFreq: 4 },
-        { code: `ESP${sec.grade_level}`, name: `Edukasyon sa Pagpapakatao`, roomType: "academic", weeklyFreq: 4 },
-        { code: `ICT${sec.grade_level}`, name: `Computer Literacy & ICT`, roomType: "ict", weeklyFreq: 2 },
-        { code: `HG${sec.grade_level}`, name: `Homeroom Guidance & Advisory`, roomType: "academic", weeklyFreq: 2 },
+      // Compute specialized facility slots for this section (2 periods per facility per week)
+      const secRow = Math.floor(secIdx / 5); // 0, 1, 2, or 3
+      const sciSlots = [
+        { day: DAYS_OF_WEEK[secIdx % 5], pIdx: secRow },
+        { day: DAYS_OF_WEEK[(secIdx + 2) % 5], pIdx: secRow + 4 },
+      ];
+      const ictSlots = [
+        { day: DAYS_OF_WEEK[(secIdx + 1) % 5], pIdx: secRow },
+        { day: DAYS_OF_WEEK[(secIdx + 3) % 5], pIdx: secRow + 4 },
+      ];
+      const tvlSlots = [
+        { day: DAYS_OF_WEEK[(secIdx + 3) % 5], pIdx: secRow },
+        { day: DAYS_OF_WEEK[(secIdx + 1) % 5], pIdx: secRow + 4 },
+      ];
+      const gymSlots = [
+        { day: DAYS_OF_WEEK[(secIdx + 4) % 5], pIdx: secRow },
+        { day: DAYS_OF_WEEK[secIdx % 5], pIdx: secRow + 4 },
       ];
 
-      const shsAcadPlan = [
-        { code: `SHS-MTH${sec.grade_level}`, name: `General Mathematics`, roomType: "academic", weeklyFreq: 5 },
-        { code: `SHS-SCI${sec.grade_level}`, name: `General Science & Laboratory`, roomType: "science", weeklyFreq: 5 },
-        { code: `SHS-ENG${sec.grade_level}`, name: `Oral Communication & Writing`, roomType: "academic", weeklyFreq: 5 },
-        { code: `SHS-RES${sec.grade_level}`, name: `Practical Research`, roomType: "academic", weeklyFreq: 5 },
-        { code: `SHS-FIL${sec.grade_level}`, name: `Komunikasyon at Pananaliksik`, roomType: "academic", weeklyFreq: 4 },
-        { code: `SHS-PE${sec.grade_level}`, name: `Physical Education & Health (HOPE)`, roomType: "gym", weeklyFreq: 4 },
-        { code: `SHS-ICT${sec.grade_level}`, name: `Empowerment Technologies (ICT)`, roomType: "ict", weeklyFreq: 4 },
-        { code: `SHS-ELEC${sec.grade_level}`, name: `Specialized Track Elective (${sec.strand || "Academic"})`, roomType: "academic", weeklyFreq: 6 },
-        { code: `SHS-HG${sec.grade_level}`, name: `Homeroom & Career Guidance`, roomType: "academic", weeklyFreq: 2 },
-      ];
+      const isSlot = (slots: { day: string; pIdx: number }[], day: string, pIdx: number) =>
+        slots.some((s) => s.day === day && s.pIdx === pIdx);
 
-      const shsTVLPlan = [
-        { code: `SHS-TVL-WKS${sec.grade_level}`, name: `TVL Workshop Specialization`, roomType: "tvl", weeklyFreq: 8 },
-        { code: `SHS-TVL-ICT${sec.grade_level}`, name: `Computer Systems & ICT Lab`, roomType: "ict", weeklyFreq: 6 },
-        { code: `SHS-TVL-MTH${sec.grade_level}`, name: `General Mathematics`, roomType: "academic", weeklyFreq: 5 },
-        { code: `SHS-TVL-ENG${sec.grade_level}`, name: `Effective Communication in English`, roomType: "academic", weeklyFreq: 5 },
-        { code: `SHS-TVL-SCI${sec.grade_level}`, name: `Applied Science & Safety`, roomType: "science", weeklyFreq: 4 },
-        { code: `SHS-TVL-RES${sec.grade_level}`, name: `Practical Research in TVL`, roomType: "academic", weeklyFreq: 4 },
-        { code: `SHS-TVL-PE${sec.grade_level}`, name: `Physical Education & Health`, roomType: "gym", weeklyFreq: 4 },
-        { code: `SHS-TVL-ENT${sec.grade_level}`, name: `Entrepreneurship & Livelihood`, roomType: "academic", weeklyFreq: 2 },
-        { code: `SHS-TVL-HG${sec.grade_level}`, name: `Homeroom & Work Ethics`, roomType: "academic", weeklyFreq: 2 },
-      ];
+      // Schedule all 5 days and 8 periods per day
+      for (let d = 0; d < DAYS_OF_WEEK.length; d++) {
+        const day = DAYS_OF_WEEK[d];
 
-      const curriculum = isSHS ? (isTechPro ? shsTVLPlan : shsAcadPlan) : jhsPlan;
+        for (let pIdx = 0; pIdx < CORE_TIME_SLOTS.length; pIdx++) {
+          const slot = CORE_TIME_SLOTS[pIdx];
 
-      // Expand into a pool of exactly 40 weekly class periods
-      const flatPool: any[] = [];
-      curriculum.forEach((item) => {
-        for (let i = 0; i < item.weeklyFreq; i++) {
-          flatPool.push({ ...item });
-        }
-      });
+          let subj: { code: string; name: string; roomType: string } | null = null;
+          let targetRoom = baseRoom;
 
-      // Stagger rotation by section index to distribute specialized laboratory demand evenly
-      const rotationShift = (secIdx * 7) % flatPool.length;
-      const sectionQueue = [...flatPool.slice(rotationShift), ...flatPool.slice(0, rotationShift)];
-
-      // Schedule each period across all 5 school days
-      for (const day of DAYS_OF_WEEK) {
-        for (const slot of CORE_TIME_SLOTS) {
-          let scheduled = false;
-
-          for (let attempt = 0; attempt < sectionQueue.length; attempt++) {
-            const subj = sectionQueue[attempt];
-
-            // Subject-Aligned Room Allocation
-            let targetRoom = baseRoom;
-            if (subj.roomType === "science") targetRoom = scienceLab;
-            else if (subj.roomType === "ict") targetRoom = ictLab;
-            else if (subj.roomType === "tvl") targetRoom = tvlWorkshop;
-            else if (subj.roomType === "gym") targetRoom = gymAnnex;
-
-            // Find an available qualified teacher
-            let teacher = getTeacherForSubject(subj.name, isSHS, secIdx + attempt);
-            let teacherOk = isSlotAvailable(teacher.id, targetRoom.id, sec.id, day, slot.start, slot.end);
-
-            if (!teacherOk) {
-              const altTeacher = allTeachersPool.find((t) =>
-                isSlotAvailable(t.id, targetRoom.id, sec.id, day, slot.start, slot.end)
-              );
-              if (altTeacher) {
-                teacher = altTeacher;
-                teacherOk = true;
-              }
+          if (isSlot(sciSlots, day, pIdx)) {
+            subj = {
+              code: isSHS ? `SHS-SCI-LAB${sec.grade_level}` : `SCI${sec.grade_level}-LAB`,
+              name: isSHS ? `Science Practical Laboratory` : `Science & Laboratory Experiment ${sec.grade_level}`,
+              roomType: "science",
+            };
+            targetRoom = scienceLab;
+          } else if (isSlot(ictSlots, day, pIdx)) {
+            subj = {
+              code: isSHS ? `SHS-ICT-LAB${sec.grade_level}` : `ICT${sec.grade_level}-LAB`,
+              name: isSHS ? `Empowerment Technologies (ICT Lab)` : `Computer Literacy & Hands-on ICT`,
+              roomType: "ict",
+            };
+            targetRoom = ictLab;
+          } else if (isSlot(tvlSlots, day, pIdx)) {
+            subj = {
+              code: isSHS ? `SHS-TVL-WKS${sec.grade_level}` : `TLE${sec.grade_level}-WKS`,
+              name: isSHS ? `TVL Workshop Specialization` : `Technology & Livelihood Education (Workshop)`,
+              roomType: "tvl",
+            };
+            targetRoom = tvlWorkshop;
+          } else if (isSlot(gymSlots, day, pIdx)) {
+            subj = {
+              code: isSHS ? `SHS-PE-ACT${sec.grade_level}` : `MAPEH${sec.grade_level}-PE`,
+              name: isSHS ? `Physical Education & Sports Clinic` : `MAPEH (Physical Education & Movement)`,
+              roomType: "gym",
+            };
+            targetRoom = gymAnnex;
+          } else {
+            // Standard Academic Lecture subjects distributed across periods & days
+            if (!isSHS) {
+              const acadSubjects = [
+                { code: `MTH${sec.grade_level}`, name: `Mathematics ${sec.grade_level}` },
+                { code: `ENG${sec.grade_level}`, name: `English ${sec.grade_level}` },
+                { code: `FIL${sec.grade_level}`, name: `Filipino ${sec.grade_level}` },
+                { code: `AP${sec.grade_level}`, name: `Araling Panlipunan ${sec.grade_level}` },
+                { code: `SCI${sec.grade_level}`, name: `Science Lecture & Theory ${sec.grade_level}` },
+                { code: `TLE${sec.grade_level}`, name: `Technology & Livelihood Education` },
+                { code: `ESP${sec.grade_level}`, name: `Edukasyon sa Pagpapakatao` },
+                { code: `MAPEH${sec.grade_level}`, name: `MAPEH (Music, Arts, & Health)` },
+              ];
+              const subIdx = (d * 2 + pIdx + secIdx) % acadSubjects.length;
+              subj = { ...acadSubjects[subIdx], roomType: "academic" };
+            } else if (isTechPro) {
+              const shsTvlAcad = [
+                { code: `SHS-TVL-MTH${sec.grade_level}`, name: `General Mathematics` },
+                { code: `SHS-TVL-ENG${sec.grade_level}`, name: `Effective Communication in English` },
+                { code: `SHS-TVL-RES${sec.grade_level}`, name: `Practical Research in TVL` },
+                { code: `SHS-TVL-ENT${sec.grade_level}`, name: `Entrepreneurship & Business Work` },
+                { code: `SHS-TVL-SCI-THY${sec.grade_level}`, name: `Applied Science Concepts` },
+                { code: `SHS-TVL-PE-THY${sec.grade_level}`, name: `HOPE (Physical Education Theory)` },
+                { code: `SHS-TVL-THY${sec.grade_level}`, name: `TVL Applied Theory & Standards` },
+                { code: `SHS-TVL-HG${sec.grade_level}`, name: `Homeroom & Career Guidance` },
+              ];
+              const subIdx = (d * 2 + pIdx + secIdx) % shsTvlAcad.length;
+              subj = { ...shsTvlAcad[subIdx], roomType: "academic" };
+            } else {
+              const shsAcad = [
+                { code: `SHS-MTH${sec.grade_level}`, name: `General Mathematics` },
+                { code: `SHS-ENG${sec.grade_level}`, name: `Oral Communication & Writing` },
+                { code: `SHS-FIL${sec.grade_level}`, name: `Komunikasyon at Pananaliksik` },
+                { code: `SHS-RES${sec.grade_level}`, name: `Practical Research` },
+                { code: `SHS-SCI-THY${sec.grade_level}`, name: `Science Inquiry & Concepts` },
+                { code: `SHS-ELEC${sec.grade_level}`, name: `Specialized Track Elective (${sec.strand || "Academic"})` },
+                { code: `SHS-PE-THY${sec.grade_level}`, name: `Health Optimization & Wellness` },
+                { code: `SHS-HG${sec.grade_level}`, name: `Homeroom & Career Guidance` },
+              ];
+              const subIdx = (d * 2 + pIdx + secIdx) % shsAcad.length;
+              subj = { ...shsAcad[subIdx], roomType: "academic" };
             }
+            targetRoom = baseRoom;
+          }
 
-            let roomOk = isSlotAvailable(teacher.id, targetRoom.id, sec.id, day, slot.start, slot.end);
+          // Allocate qualified specialist teacher
+          let teacher = getTeacherForSubject(subj.name, isSHS, secIdx + pIdx + d, day, slot);
+          let teacherOk = isSlotAvailable(teacher.id, targetRoom.id, sec.id, day, slot.start, slot.end);
 
-            // If specialized room is booked at this slot, use base academic room for lecture component
-            if (!roomOk && subj.roomType !== "academic") {
-              if (isSlotAvailable(teacher.id, baseRoom.id, sec.id, day, slot.start, slot.end)) {
-                targetRoom = baseRoom;
-                roomOk = true;
-              }
-            }
-
-            if (teacherOk && roomOk) {
-              const middle = teacher.middle_name ? ` ${teacher.middle_name}` : "";
-              const tName = teacher.fullName || `${teacher.first_name}${middle} ${teacher.last_name}`.trim();
-
-              bookSlot({
-                id: `sched-${sec.id.slice(0, 6)}-${day.slice(0, 3)}-${slot.id}-${Date.now().toString(36)}`,
-                section_id: sec.id,
-                teacher_id: teacher.id,
-                classroom_id: targetRoom.id,
-                subject_code: subj.code,
-                subject_name: subj.name,
-                day_of_week: day,
-                start_time: slot.start,
-                end_time: slot.end,
-                school_year: schoolYear,
-                trimester: trimester,
-                section_name: sec.section_name,
-                grade_level: sec.grade_level,
-                strand: sec.strand,
-                teacher_name: tName,
-                teacher_email: teacher.email,
-                classroom_name: targetRoom.room_name,
-                building: targetRoom.building,
-                is_elective_slot: subj.roomType === "academic" && subj.code.includes("ELEC"),
-                created_at: new Date().toISOString(),
-              });
-
-              sectionQueue.splice(attempt, 1);
-              scheduled = true;
-              break;
+          if (!teacherOk) {
+            const altTeacher = allTeachersPool.find((t) =>
+              isSlotAvailable(t.id, targetRoom.id, sec.id, day, slot.start, slot.end)
+            );
+            if (altTeacher) {
+              teacher = altTeacher;
+              teacherOk = true;
             }
           }
 
-          // Fallback guarantee: Never leave a vacant slot in high school
-          if (!scheduled) {
-            const fallbackTeacher =
-              allTeachersPool.find((t) => isSlotAvailable(t.id, baseRoom.id, sec.id, day, slot.start, slot.end)) ||
-              allTeachersPool[0];
-
-            const middle = fallbackTeacher.middle_name ? ` ${fallbackTeacher.middle_name}` : "";
-            const tName = fallbackTeacher.fullName || `${fallbackTeacher.first_name}${middle} ${fallbackTeacher.last_name}`.trim();
-
-            bookSlot({
-              id: `sched-fb-${sec.id.slice(0, 6)}-${day.slice(0, 3)}-${slot.id}-${Date.now().toString(36)}`,
-              section_id: sec.id,
-              teacher_id: fallbackTeacher.id,
-              classroom_id: baseRoom.id,
-              subject_code: `HG-${sec.grade_level}`,
-              subject_name: `Homeroom Guidance & Supervised Study`,
-              day_of_week: day,
-              start_time: slot.start,
-              end_time: slot.end,
-              school_year: schoolYear,
-              trimester: trimester,
-              section_name: sec.section_name,
-              grade_level: sec.grade_level,
-              strand: sec.strand,
-              teacher_name: tName,
-              teacher_email: fallbackTeacher.email,
-              classroom_name: baseRoom.room_name,
-              building: baseRoom.building,
-              is_elective_slot: false,
-              created_at: new Date().toISOString(),
-            });
+          let roomOk = isSlotAvailable(teacher.id, targetRoom.id, sec.id, day, slot.start, slot.end);
+          if (!roomOk && subj.roomType !== "academic") {
+            if (isSlotAvailable(teacher.id, baseRoom.id, sec.id, day, slot.start, slot.end)) {
+              targetRoom = baseRoom;
+              roomOk = true;
+            }
           }
+
+          const middle = teacher.middle_name ? ` ${teacher.middle_name}` : "";
+          const tName = teacher.fullName || `${teacher.first_name}${middle} ${teacher.last_name}`.trim();
+
+          bookSlot({
+            id: `sched-${sec.id.slice(0, 6)}-${day.slice(0, 3)}-${slot.id}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+            section_id: sec.id,
+            teacher_id: teacher.id,
+            classroom_id: targetRoom.id,
+            subject_code: subj.code,
+            subject_name: subj.name,
+            day_of_week: day,
+            start_time: slot.start,
+            end_time: slot.end,
+            school_year: schoolYear,
+            trimester: trimester,
+            section_name: sec.section_name,
+            grade_level: sec.grade_level,
+            strand: sec.strand,
+            teacher_name: tName,
+            teacher_email: teacher.email,
+            classroom_name: targetRoom.room_name,
+            building: targetRoom.building,
+            is_elective_slot: subj.roomType === "academic" && subj.code.includes("ELEC"),
+            created_at: new Date().toISOString(),
+          });
         }
       }
     }
