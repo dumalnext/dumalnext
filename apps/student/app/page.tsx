@@ -967,7 +967,6 @@ function StudentHomeContent() {
                     className="w-full py-2 px-3 bg-slate-100 hover:bg-[#002060] hover:text-white text-slate-800 border border-slate-300 text-xs font-bold rounded-[4px] transition-colors flex items-center justify-between shadow-2xs"
                   >
                     <span>Account &amp; Security Settings</span>
-                    <span>&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -989,21 +988,18 @@ function StudentHomeContent() {
                   className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
                 >
                   <span>My Class Section &amp; Roster</span>
-                  <span>&rarr;</span>
                 </Link>
                 <Link
                   href="/enroll"
                   className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
                 >
                   <span>Online Enrollment Form</span>
-                  <span>&rarr;</span>
                 </Link>
                 <Link
                   href={userApplication ? `/track?ref=${userApplication.referenceNumber}` : "/track"}
                   className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
                 >
                   <span>Track Application Status</span>
-                  <span>&rarr;</span>
                 </Link>
                 <button
                   type="button"
@@ -1014,7 +1010,6 @@ function StudentHomeContent() {
                   className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
                 >
                   <span>IT Support &amp; Learner Helpdesk</span>
-                  <span>&rarr;</span>
                 </button>
               </div>
             </div>
@@ -1117,7 +1112,7 @@ function StudentHomeContent() {
                   href="/section"
                   className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs whitespace-nowrap"
                 >
-                  Open Full Section &amp; Schedule &rarr;
+                  Open Full Section &amp; Schedule
                 </Link>
               </div>
 
@@ -1150,7 +1145,7 @@ function StudentHomeContent() {
                       href="/enroll"
                       className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap"
                     >
-                      Complete Enrollment &rarr;
+                      Complete Enrollment
                     </Link>
                   </div>
                 ) : (
@@ -1169,7 +1164,7 @@ function StudentHomeContent() {
                       href="/section"
                       className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap"
                     >
-                      Check Status &rarr;
+                      Check Status
                     </Link>
                   </div>
                 )}
@@ -1342,7 +1337,7 @@ function StudentHomeContent() {
                       href={`/track?ref=${userApplication.referenceNumber}#timetable`}
                       className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs inline-flex items-center gap-1 rounded-[4px]"
                     >
-                      View Enrolled Subjects &amp; Timetable &rarr;
+                      View Enrolled Subjects &amp; Timetable
                     </Link>
                   )}
 
@@ -1574,7 +1569,7 @@ function StudentHomeContent() {
                           href={`/track?ref=${pApp.referenceNumber}`}
                           className="px-2.5 py-1 text-[11px] font-bold text-[#002060] bg-white border border-slate-300 hover:bg-slate-100 transition-colors rounded-[4px]"
                         >
-                          View Record &rarr;
+                          View Record
                         </Link>
                       </div>
                     </div>
@@ -1966,7 +1961,7 @@ function StudentHomeContent() {
                             }}
                             className="text-slate-600 hover:text-slate-900 font-semibold hover:underline cursor-pointer text-[11px] shrink-0"
                           >
-                            Track Concern Status &rarr;
+                            Track Concern Status
                           </button>
                         </div>
                       </form>
@@ -1983,7 +1978,7 @@ function StudentHomeContent() {
                             }}
                             className="font-bold text-[#002060] hover:underline cursor-pointer"
                           >
-                            Create a Student Account &rarr;
+                            Create a Student Account
                           </button>
                         </p>
                       </div>
@@ -2310,7 +2305,7 @@ function StudentHomeContent() {
                             }}
                             className="font-bold text-[#002060] hover:underline cursor-pointer"
                           >
-                            Sign In here &rarr;
+                            Sign In here
                           </button>
                         </p>
                       </div>

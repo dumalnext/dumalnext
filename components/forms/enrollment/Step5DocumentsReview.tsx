@@ -408,7 +408,7 @@ export default function Step5DocumentsReview({
             href={`/track?ref=${referenceNumber}`}
             className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors text-center shadow-xs"
           >
-            Track Application Live &rarr;
+            Track Application Live
           </a>
         </div>
       </div>
@@ -479,7 +479,7 @@ export default function Step5DocumentsReview({
                     {docs.birth_certificate.file.name}
                   </span>
                   <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.birth_certificate.originalSizeKb}KB &rarr; {docs.birth_certificate.compressedSizeKb}KB (Compressed)
+                    {docs.birth_certificate.originalSizeKb}KB to {docs.birth_certificate.compressedSizeKb}KB (Compressed)
                   </span>
                 </div>
                 <button
@@ -529,7 +529,7 @@ export default function Step5DocumentsReview({
                     {docs.form_138.file.name}
                   </span>
                   <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.form_138.originalSizeKb}KB &rarr; {docs.form_138.compressedSizeKb}KB (Compressed)
+                    {docs.form_138.originalSizeKb}KB to {docs.form_138.compressedSizeKb}KB (Compressed)
                   </span>
                 </div>
                 <button
@@ -573,7 +573,7 @@ export default function Step5DocumentsReview({
                     {docs.id_picture.file.name}
                   </span>
                   <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.id_picture.originalSizeKb}KB &rarr; {docs.id_picture.compressedSizeKb}KB (Compressed)
+                    {docs.id_picture.originalSizeKb}KB to {docs.id_picture.compressedSizeKb}KB (Compressed)
                   </span>
                 </div>
                 <button
@@ -620,7 +620,7 @@ export default function Step5DocumentsReview({
                     {docs.good_moral.file.name}
                   </span>
                   <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.good_moral.originalSizeKb}KB &rarr; {docs.good_moral.compressedSizeKb}KB (Compressed)
+                    {docs.good_moral.originalSizeKb}KB to {docs.good_moral.compressedSizeKb}KB (Compressed)
                   </span>
                 </div>
                 <button
@@ -665,7 +665,7 @@ export default function Step5DocumentsReview({
                       {docs.household_4ps.file.name}
                     </span>
                     <span className="text-[10px] text-slate-500 font-mono">
-                      {docs.household_4ps.originalSizeKb}KB &rarr; {docs.household_4ps.compressedSizeKb}KB (Compressed)
+                      {docs.household_4ps.originalSizeKb}KB to {docs.household_4ps.compressedSizeKb}KB (Compressed)
                     </span>
                   </div>
                   <button
@@ -708,7 +708,7 @@ export default function Step5DocumentsReview({
                       {docs.pwd_id.file.name}
                     </span>
                     <span className="text-[10px] text-slate-500 font-mono">
-                      {docs.pwd_id.originalSizeKb}KB &rarr; {docs.pwd_id.compressedSizeKb}KB (Compressed)
+                      {docs.pwd_id.originalSizeKb}KB to {docs.pwd_id.compressedSizeKb}KB (Compressed)
                     </span>
                   </div>
                   <button
@@ -1010,7 +1010,7 @@ export default function Step5DocumentsReview({
           disabled={isSubmitting}
           className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
         >
-          &larr; Back to Step 4 (Curriculum &amp; Modality)
+Back to Step 4 (Curriculum &amp; Modality)
         </button>
         <button
           type="button"

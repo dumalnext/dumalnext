@@ -118,7 +118,7 @@ function DocumentDropBox({
               </span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-[10px] text-slate-500 ">
-                  {uploadedDoc.originalSizeKb}KB &rarr; {uploadedDoc.compressedSizeKb}KB (Compressed)
+                  {uploadedDoc.originalSizeKb}KB to {uploadedDoc.compressedSizeKb}KB (Compressed)
                 </span>
                 <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-[4px]">
                   Ready
@@ -843,7 +843,7 @@ export default function Step5DocumentsReview({
             href={`/track?ref=${referenceNumber}`}
             className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors text-center shadow-xs rounded-[4px]"
           >
-            Track Application Live &rarr;
+            Track Application Live
           </a>
         </div>
       </div>
@@ -1295,7 +1295,7 @@ export default function Step5DocumentsReview({
           disabled={isSubmitting}
           className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-[4px]"
         >
-          &larr; Back to Step 4 (Curriculum &amp; Modality)
+Back to Step 4 (Curriculum &amp; Modality)
         </button>
         <button
           type="button"

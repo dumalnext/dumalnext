@@ -986,14 +986,14 @@ export default function Step3FamilyBackground({
           onClick={onBack}
           className="w-full sm:w-auto px-6 py-3 border-2 border-slate-300 text-slate-700 font-bold text-xs tracking-wider hover:bg-slate-100 transition-colors rounded-[4px]"
         >
-          &larr; Back to Step 2
+Back to Step 2
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
           className="w-full sm:w-auto px-8 py-3 bg-[#002060] text-white font-bold text-xs tracking-wider hover:bg-blue-950 transition-colors shadow-xs rounded-[4px]"
         >
-          Proceed to Step 4 &rarr;
+          Proceed to Step 4
         </button>
       </div>
     </div>

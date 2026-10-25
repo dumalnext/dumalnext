@@ -183,7 +183,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
               onClick={onSwitchToRegister}
               className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-[4px] shrink-0 cursor-pointer"
             >
-              Create Student Account &rarr;
+              Create Student Account
             </button>
           </div>
         )}
@@ -466,7 +466,6 @@ export function GradeLevelEnrollmentTutorials({
             {isEnrollmentOpen ? (
               <>
                 <span>Open Enrollment Form ({semester})</span>
-                <span aria-hidden="true">&rarr;</span>
               </>
             ) : (
               <span>View Enrollment Form</span>

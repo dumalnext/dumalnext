@@ -1167,12 +1167,12 @@ export default function StudentConcernsManager() {
 
                   <div className="space-y-1.5 text-[11px] text-slate-700">
                     <p>
-                      3. In the left sidebar of Google Apps Script, click <strong>Triggers (clock icon)</strong> &rarr; <strong>Add Trigger</strong>.
+                      3. In the left sidebar of Google Apps Script, click <strong>Triggers (clock icon)</strong> then <strong>Add Trigger</strong>.
                     </p>
                     <ul className="list-disc pl-5 space-y-1 text-slate-600">
                       <li>Choose function: <strong>forwardDumalnegEmails</strong></li>
                       <li>Select event source: <strong>Time-driven</strong></li>
-                      <li>Type of time based trigger: <strong>Minutes timer</strong> &rarr; <strong>Every 1 minute</strong></li>
+                      <li>Type of time based trigger: <strong>Minutes timer</strong> then <strong>Every 1 minute</strong></li>
                     </ul>
                     <p className="text-emerald-700 font-bold pt-1">
                       All inbound emails sent to dumalnext@gmail.com will now automatically synchronize to the Concerns Desk within 60 seconds!

@@ -1365,7 +1365,7 @@ export default function ScheduleDeconflictionConsole() {
 
               {/* Matrix Table with Time Column on the Left */}
               <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
-                <span>&larr; Swipe horizontally to view full Mon–Fri schedule &rarr;</span>
+                <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
               <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
                 <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
@@ -1654,7 +1654,7 @@ export default function ScheduleDeconflictionConsole() {
 
               {/* Matrix Table with Time Column on the Left */}
               <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
-                <span>&larr; Swipe horizontally to view full Mon–Fri schedule &rarr;</span>
+                <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
               <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
                 <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
@@ -1922,7 +1922,7 @@ export default function ScheduleDeconflictionConsole() {
           {viewMode === "all" && (
             <div className="bg-white border-2 border-slate-300 shadow-xs overflow-hidden print:border-none print:shadow-none">
               <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
-                <span>&larr; Swipe horizontally to view all columns &rarr;</span>
+                <span>Swipe horizontally to view all columns</span>
               </div>
               <div className="overflow-x-auto touch-pan-x">
                 <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">

@@ -107,7 +107,7 @@ export default function TeacherHomePage() {
             href="/schedule"
             className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors rounded-[4px] shadow-xs"
           >
-            View Schedule &rarr;
+            View Schedule
           </Link>
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function TeacherHomePage() {
             href="/schedule"
             className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
           >
-            Open Teaching Schedule &rarr;
+            Open Teaching Schedule
           </Link>
         </div>
 
@@ -175,7 +175,7 @@ export default function TeacherHomePage() {
             href="/roster"
             className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
           >
-            View Advisory Section Roster &rarr;
+            View Advisory Section Roster
           </Link>
         </div>
 
@@ -202,7 +202,7 @@ export default function TeacherHomePage() {
             href="/profile"
             className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
           >
-            View Faculty Profile &rarr;
+            View Faculty Profile
           </Link>
         </div>
       </div>

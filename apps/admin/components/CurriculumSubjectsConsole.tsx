@@ -421,7 +421,7 @@ export default function CurriculumSubjectsConsole() {
     return (
       <div>
         <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
-          <span>&larr; Swipe horizontally to view full subject details &rarr;</span>
+          <span>Swipe horizontally to view full subject details</span>
         </div>
         <div className="overflow-x-auto touch-pan-x">
           <table className="w-full min-w-[650px] text-left text-xs border-collapse font-sans">

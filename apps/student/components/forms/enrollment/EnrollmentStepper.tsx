@@ -648,7 +648,7 @@ export default function EnrollmentStepper({
             href={`/track?ref=${existingApp.application_id}`}
             className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
           >
-            Track Application Status &rarr;
+            Track Application Status
           </Link>
           <Link
             href="/"
@@ -695,7 +695,7 @@ export default function EnrollmentStepper({
             href={`/track?ref=${existingApp.application_id}`}
             className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
           >
-            View Enrollment Slip &amp; Section Assignment &rarr;
+            View Enrollment Slip &amp; Section Assignment
           </Link>
           <Link
             href="/"
@@ -977,7 +977,7 @@ export default function EnrollmentStepper({
           disabled={currentStep === 1}
           className="px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 rounded-[4px] border border-slate-300"
         >
-          &larr; Prev
+Prev
         </button>
         <div className="text-center min-w-0">
           <span className="text-[10px] font-bold text-[#002060] uppercase block truncate">
@@ -996,7 +996,7 @@ export default function EnrollmentStepper({
             }}
             className="px-3.5 py-2 text-xs font-bold text-white bg-[#002060] hover:bg-blue-950 rounded-[4px] shadow-xs"
           >
-            Next &rarr;
+            Next
           </button>
         ) : (
           <button
@@ -1007,7 +1007,7 @@ export default function EnrollmentStepper({
             }}
             className="px-3 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-[4px] shadow-xs"
           >
-            Review &darr;
+            Review
           </button>
         )}
       </div>

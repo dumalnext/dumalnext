@@ -413,7 +413,7 @@ export function PwaInstallDrawerCard() {
           onClick={handleClick}
           className="w-full py-2 bg-[#002060] hover:bg-blue-900 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-[4px] transition-colors cursor-pointer text-center shadow-xs"
         >
-          Install DNHS Portal App &rarr;
+          Install DNHS Portal App
         </button>
       </div>
 

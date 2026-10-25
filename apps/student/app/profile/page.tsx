@@ -733,7 +733,6 @@ export default function StudentProfilePage() {
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002060] hover:text-blue-800 underline cursor-pointer"
                           >
                             <span>View Class Schedule &amp; Section Roster</span>
-                            <span>&rarr;</span>
                           </Link>
                         </div>
                       </div>

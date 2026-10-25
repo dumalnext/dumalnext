@@ -430,7 +430,7 @@ function AcceptInviteContent() {
             href={targetUrl}
             className="inline-block w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-xs transition-colors"
           >
-            Proceed to {wrongPortalMeta.portalName} &rarr;
+            Proceed to {wrongPortalMeta.portalName}
           </a>
         </div>
       </div>
@@ -462,7 +462,7 @@ function AcceptInviteContent() {
                 href="/"
                 className="text-xs font-bold text-[#002060] hover:underline flex items-center gap-1"
               >
-                <span>&larr; Return to Portal Home</span>
+                <span>Return to Portal Home</span>
               </Link>
             </div>
           </div>

@@ -113,7 +113,7 @@ export default function StudentEnrollPage() {
                 If you have already submitted an enrollment application prior to closure, you may continue to monitor your evaluation progress.
               </p>
               <Link href="/track" className="font-bold text-[#002060] hover:underline block pt-1">
-                &rarr; Check My Application Status in Smart Tracker
+Check My Application Status in Smart Tracker
               </Link>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function StudentEnrollPage() {
           <div>
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-300">
               <Link href="/" className="hover:underline text-white font-bold">
-                &larr; Student Dashboard
+Student Dashboard
               </Link>
               <span className="text-blue-300">/</span>
               <span>DepEd Learner Enrollment Form</span>

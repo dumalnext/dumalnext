@@ -544,7 +544,7 @@ export default function ContinuingEnrollmentForm({
           {isJHS && enableTransfer && selectedJhsProgram !== previousJhsProgram && (
             <div className="p-3 bg-amber-100/90 border border-amber-500 mt-2 text-xs font-bold text-amber-950 space-y-0.5 rounded-[4px]">
               <span className="block font-bold">
-                Curricular Transfer Request: {previousJhsProgram} &rarr; {selectedJhsProgram}
+                Curricular Transfer Request: {previousJhsProgram} to {selectedJhsProgram}
               </span>
               <p className="text-[11px] font-normal text-amber-900 leading-relaxed">
                 Your request to transfer curriculum from {previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} to {selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} has been officially recorded and queued for Registrar and Coordinator adjudication.
@@ -909,7 +909,7 @@ export default function ContinuingEnrollmentForm({
                 <div className="p-4 bg-amber-50 border-2 border-amber-400 space-y-1 rounded-[4px]">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-amber-950">
-                      Program Transfer Request Flagged: {previousJhsProgram} &rarr; {selectedJhsProgram}
+                      Program Transfer Request Flagged: {previousJhsProgram} to {selectedJhsProgram}
                     </span>
                   </div>
                   <p className="text-xs text-amber-900 leading-relaxed">
@@ -1471,7 +1471,7 @@ export default function ContinuingEnrollmentForm({
               onClick={handleProceedToStep2}
               className="w-full sm:w-auto px-8 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs transition-colors shadow-xs rounded-[4px]"
             >
-              Proceed to Review &amp; Confirmation (Step 2) &rarr;
+              Proceed to Review &amp; Confirmation (Step 2)
             </button>
           </div>
         </div>
@@ -1607,7 +1607,7 @@ export default function ContinuingEnrollmentForm({
               onClick={() => setCurrentStep(1)}
               className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-[4px]"
             >
-              &larr; Back to Electives Selection (Step 1)
+Back to Electives Selection (Step 1)
             </button>
             <button
               type="button"

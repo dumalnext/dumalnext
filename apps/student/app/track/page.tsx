@@ -645,7 +645,7 @@ function TrackApplicationContent() {
             href="/"
             className="no-print px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold rounded-[4px] transition-colors"
           >
-            &larr; Portal Home
+Portal Home
           </Link>
         </div>
       </div>
@@ -673,7 +673,7 @@ function TrackApplicationContent() {
                 href="/enroll"
                 className="btn-primary text-xs font-bold py-2.5 px-5 shrink-0 text-center rounded-[4px]"
               >
-                Enroll Now for {semester} &rarr;
+                Enroll Now for {semester}
               </Link>
             </div>
           )}
@@ -829,7 +829,7 @@ function TrackApplicationContent() {
                   href="/enroll"
                   className="px-5 py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs shadow-xs shrink-0 inline-flex items-center gap-1.5 rounded-[4px]"
                 >
-                  Edit &amp; Resubmit Application &rarr;
+                  Edit &amp; Resubmit Application
                 </Link>
               </div>
             </div>

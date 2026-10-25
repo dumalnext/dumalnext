@@ -358,7 +358,7 @@ export function EmptyStateCard({
               href={actionHref}
               className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs"
             >
-              {actionLabel} &rarr;
+              {actionLabel}
             </Link>
           )}
           {secondaryLabel && secondaryHref && (

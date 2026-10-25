@@ -657,7 +657,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     className="mt-2.5 inline-flex items-center justify-between w-full px-2.5 py-1.5 bg-blue-100/80 hover:bg-blue-200/90 text-[#002060] text-xs font-bold rounded-[4px] border border-blue-300 transition-colors cursor-pointer"
                   >
                     <span>View Full Profile</span>
-                    <span className="text-[11px]">&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -675,7 +674,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       </span>
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-200/70 text-emerald-950 text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
-                        Official Roster &rarr;
+                        Official Roster
                       </span>
                     </div>
                     <div className="text-xs font-bold text-emerald-950">
@@ -697,7 +696,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       </span>
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-200 text-[#002060] text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#002060] animate-pulse" />
-                        Action Needed &rarr;
+                        Action Needed
                       </span>
                     </div>
                     <div className="text-xs font-bold text-slate-900">
@@ -719,7 +718,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       </span>
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200 text-amber-950 text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />
-                        Pending Placement &rarr;
+                        Pending Placement
                       </span>
                     </div>
                     <div className="text-xs font-bold text-amber-950">
@@ -741,7 +740,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       </span>
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-200/70 text-amber-950 text-[9px] font-bold uppercase whitespace-nowrap shrink-0 rounded-[4px]">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-                        Pending Placement &rarr;
+                        Pending Placement
                       </span>
                     </div>
                     <div className="text-xs font-bold text-amber-950">
@@ -784,7 +783,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <span className="text-xs font-bold text-slate-900">
                     Student Profile
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-normal">
                   View complete student records, DepEd LRN, demographic details, parent information, and section assignments.
@@ -805,7 +803,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <span className="text-xs font-bold text-slate-900">
                     Home Dashboard
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-normal">
                   Return to student landing page, view school calendar advisories, and quick notices.
@@ -826,7 +823,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <span className="text-xs font-bold text-slate-900">
                     Basic Education Enrollment
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-normal">
                   Complete the 5-step official DepEd enrollment stepper for Junior and Senior High School.
@@ -847,7 +843,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <span className="text-xs font-bold text-slate-900">
                     Track Application Status
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-normal">
                   Real-time status tracking, registrar review remarks, and Certificate of Enrollment.
@@ -868,7 +863,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <span className="text-xs font-bold text-slate-900">
                     Class Section &amp; Advisory
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-normal">
                   {sectionMode === "ASSIGNED" && assignedSection

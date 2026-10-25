@@ -684,7 +684,7 @@ function SectionPageContent() {
             <div>
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-300">
                 <Link href="/" className="hover:underline text-white font-bold">
-                  &larr; Home Dashboard
+Home Dashboard
                 </Link>
                 <span className="text-blue-300">/</span>
                 <span>DepEd Region I &bull; Dumalneg NHS</span>
@@ -963,7 +963,7 @@ function SectionPageContent() {
                   onClick={() => setActiveTab("classmates")}
                   className="btn-primary text-xs font-bold py-2.5 px-4 cursor-pointer rounded-[4px]"
                 >
-                  View Section Classmates List &rarr;
+                  View Section Classmates List
                 </button>
                 <Link
                   href="/track"
@@ -1332,7 +1332,7 @@ function SectionPageContent() {
                 href="/enroll"
                 className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-[4px]"
               >
-                Complete Continuing Enrollment Now &rarr;
+                Complete Continuing Enrollment Now
               </Link>
               <Link
                 href="/"
@@ -1390,7 +1390,7 @@ function SectionPageContent() {
                 href="/track"
                 className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-[4px]"
               >
-                Track Transferee Application Status &rarr;
+                Track Transferee Application Status
               </Link>
               <Link
                 href="/"

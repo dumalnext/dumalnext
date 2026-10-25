@@ -650,7 +650,7 @@ export default function AdjudicationConsole() {
           )}
           {(app as any).isTransferRequested && (
             <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-400">
-              TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} &rarr; {(app as any).jhsProgram || "SPS"}
+              TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} to {(app as any).jhsProgram || "SPS"}
             </span>
           )}
           <div className="flex flex-wrap items-center gap-1 mt-1">
@@ -1086,7 +1086,7 @@ export default function AdjudicationConsole() {
                       ) : (
                         <div>
                           <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
-                            <span>&larr; Swipe horizontally to view full dossier details &rarr;</span>
+                            <span>Swipe horizontally to view full dossier details</span>
                           </div>
                           <div className="overflow-x-auto touch-pan-x">
                             <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
@@ -1160,7 +1160,7 @@ export default function AdjudicationConsole() {
                       ) : (
                         <div>
                           <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
-                            <span>&larr; Swipe horizontally to view full dossier details &rarr;</span>
+                            <span>Swipe horizontally to view full dossier details</span>
                           </div>
                           <div className="overflow-x-auto touch-pan-x">
                             <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">

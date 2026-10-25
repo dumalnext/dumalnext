@@ -139,7 +139,7 @@ export default function LoginPage() {
         <div className="text-center pt-2 border-t border-slate-200 text-xs text-slate-600">
           First time enrolling or don&apos;t have an account yet?{" "}
           <Link href="/register" className="text-[#002060] font-bold hover:underline block mt-1">
-            Register New Student Account &rarr;
+            Register New Student Account
           </Link>
         </div>
       </div>
