@@ -21,7 +21,6 @@ export const viewport: Viewport = {
 
 import StudentProviders from "@/components/providers/StudentProviders";
 import StudentHeaderNav from "@/components/layout/StudentHeaderNav";
-import { PwaFloatingBanner } from "@/components/ui/PwaInstallPrompt";
 import Link from "next/link";
 
 export default function StudentLayout({
@@ -67,7 +66,6 @@ export default function StudentLayout({
           <main className="flex-1 max-w-7xl w-full mx-auto px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
             {children}
           </main>
-          <PwaFloatingBanner />
         </StudentProviders>
 
         {/* DepEd Institutional Footer */}

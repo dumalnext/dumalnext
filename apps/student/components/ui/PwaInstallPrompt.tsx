@@ -73,7 +73,7 @@ export function usePwaInstall() {
       }
     }
 
-    // iOS or browsers without programmatic install prompt
+    // iOS Safari or browsers without programmatic install prompt
     return "show_modal";
   };
 
@@ -141,7 +141,7 @@ export function PwaInstallModal({
         {/* Modal Body: Dynamic Instructions based on Platform */}
         <div className="p-5 sm:p-6 space-y-4 text-xs text-slate-800">
           <p className="text-slate-600 leading-relaxed">
-            Install the official <strong>Dumalneg National High School Portal</strong> directly on your phone or computer. Enjoy fast 1-tap launch, standalone screen view, and offline-ready access.
+            Install the official <strong>Dumalneg National High School Portal</strong> directly on your home screen. Enjoy fast 1-tap launch, standalone screen view, and offline-ready access.
           </p>
 
           {isIos ? (
@@ -274,17 +274,19 @@ export function PwaInstallModal({
 }
 
 /**
- * 1-Click "Install App" Header / Navigation Button
+ * LOCATION A: 1-Click "Install App" Header / Navigation Button
+ * Strictly displayed on PC / Laptop (Desktop `lg:` screens and above)
+ * Strictly hidden on Android and iOS mobile phones
  */
 export function PwaInstallHeaderButton() {
   const { isStandalone, isIos, triggerInstall } = usePwaInstall();
   const [showModal, setShowModal] = useState(false);
 
-  // If already opened inside standalone installed PWA, hide or show checkmark
+  // If already opened inside standalone installed PWA on PC/laptop
   if (isStandalone) {
     return (
       <span
-        className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 bg-blue-950/70 border border-blue-400/30 text-blue-200 text-[10px] font-bold uppercase rounded-[4px]"
+        className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-950/70 border border-blue-400/30 text-blue-200 text-[10px] font-bold uppercase rounded-[4px]"
         title="Dumalneg NHS Portal is running in standalone app mode"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -305,12 +307,11 @@ export function PwaInstallHeaderButton() {
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-[4px] shadow-xs transition-all cursor-pointer shrink-0"
-        title="Add Dumalneg NHS Student Portal to your Phone Home Screen or Desktop"
+        className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-[4px] shadow-xs transition-all cursor-pointer shrink-0"
+        title="Install Dumalneg NHS Student Portal on your PC or Laptop"
       >
-        <span className="text-xs">📲</span>
-        <span className="hidden sm:inline">Install App</span>
-        <span className="sm:hidden">Install</span>
+        <span className="text-xs">💻</span>
+        <span>Install App</span>
       </button>
 
       <PwaInstallModal
@@ -323,7 +324,8 @@ export function PwaInstallHeaderButton() {
 }
 
 /**
- * Drawer Menu Card Component (Embedded inside Mobile Drawer)
+ * LOCATION B: Drawer Menu Card Component
+ * Embedded strictly inside Mobile Navigation Drawer for Android & iOS phones
  */
 export function PwaInstallDrawerCard() {
   const { isStandalone, isIos, triggerInstall } = usePwaInstall();
@@ -358,7 +360,7 @@ export function PwaInstallDrawerCard() {
           </span>
         </div>
         <p className="text-[11px] text-slate-700 leading-snug">
-          Install the portal on your phone or computer for instant access without opening a browser or typing the URL.
+          Install the portal on your phone for instant 1-tap access without typing the URL.
         </p>
         <button
           type="button"
@@ -368,103 +370,6 @@ export function PwaInstallDrawerCard() {
           Install DNHS Portal App &rarr;
         </button>
       </div>
-
-      <PwaInstallModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        isIos={isIos}
-      />
-    </>
-  );
-}
-
-/**
- * Smart Floating Install Banner for Mobile Visitors
- */
-export function PwaFloatingBanner() {
-  const { isStandalone, isIos, triggerInstall } = usePwaInstall();
-  const [isDismissed, setIsDismissed] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    // Only show if not standalone and not recently dismissed in session
-    if (isStandalone) return;
-    const dismissed = sessionStorage.getItem("dnhs_pwa_dismissed");
-    if (!dismissed) {
-      // Delay display slightly to not startle user upon initial render
-      const timer = setTimeout(() => {
-        setIsDismissed(false);
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [isStandalone]);
-
-  const handleDismiss = () => {
-    setIsDismissed(true);
-    sessionStorage.setItem("dnhs_pwa_dismissed", "true");
-  };
-
-  const handleClick = async () => {
-    const outcome = await triggerInstall();
-    if (outcome === "show_modal") {
-      setShowModal(true);
-    }
-  };
-
-  if (isStandalone || isDismissed) return null;
-
-  return (
-    <>
-      <aside
-        aria-label="App Installation Prompt"
-        className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-50 bg-[#002060] text-white p-4 rounded-xl border-2 border-amber-400 shadow-2xl animate-in slide-in-from-bottom duration-300"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src="/dumalneg-logo.png"
-              alt="DNHS Seal"
-              className="w-10 h-10 rounded-full bg-white object-contain border border-amber-300 shadow-xs shrink-0"
-            />
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
-                Official Student App
-              </span>
-              <h4 className="text-xs font-bold text-white truncate">
-                Install DNHS Portal
-              </h4>
-              <p className="text-[10px] text-blue-100 truncate">
-                Add to your phone home screen for 1-tap access.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleDismiss}
-            className="text-blue-300 hover:text-white text-xs p-1 cursor-pointer font-bold shrink-0"
-            aria-label="Dismiss banner"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="mt-3 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleClick}
-            className="flex-1 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-[4px] shadow-xs transition-colors cursor-pointer text-center"
-          >
-            Add to Home Screen
-          </button>
-          <button
-            type="button"
-            onClick={handleDismiss}
-            className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 text-blue-200 text-xs font-bold rounded-[4px] transition-colors cursor-pointer"
-          >
-            Later
-          </button>
-        </div>
-      </aside>
 
       <PwaInstallModal
         isOpen={showModal}
