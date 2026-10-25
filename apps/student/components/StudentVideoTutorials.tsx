@@ -84,7 +84,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
 
       <div className="p-4 sm:p-5 space-y-4">
         <p className="text-xs text-slate-600 leading-relaxed">
-          Panoorin ang opisyal na video walkthrough ng Dumalneg National High School upang matutunan ang hakbang-hakbang na proseso sa paggawa ng student portal account at pag-verify ng 6-digit security code sa Gmail bago mag-enroll.
+          Watch the official Dumalneg National High School video walkthrough to learn the step-by-step process of creating a student portal account and verifying your 6-digit security code via Gmail before enrolling.
         </p>
 
         {/* Expandable 16:9 Video Container */}
@@ -96,10 +96,10 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
                   Official Video Tutorial
                 </div>
                 <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
-                  Paano Gumawa ng Student Account
+                  How to Create a Student Account
                 </h4>
                 <p className="text-[11px] text-slate-300 max-w-sm mb-4">
-                  Pindutin ang Play button upang simulan ang video tutorial nang direkta sa pahinang ito.
+                  Click the Play button to start watching the video tutorial directly on this page.
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <button
@@ -130,7 +130,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
             ) : (
               <iframe
                 src={embedUrl}
-                title="Paano Gumawa ng Account sa Dumalneg NHS Student Portal"
+                title="How to Create an Account on Dumalneg NHS Student Portal"
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -146,28 +146,28 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Select &ldquo;Create Account&rdquo;</strong>
-              <span className="text-slate-600 text-[11px] leading-snug block">Buksan ang Create Account tab sa portal login card.</span>
+              <span className="text-slate-600 text-[11px] leading-snug block">Open the Create Account tab on the student portal login card.</span>
             </div>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Enter Full Legal Name</strong>
-              <span className="text-slate-600 text-[11px] leading-snug block">I-encode ang opisyal na pangalan ayon sa PSA Birth Certificate.</span>
+              <span className="text-slate-600 text-[11px] leading-snug block">Enter your legal name as indicated on your PSA Birth Certificate.</span>
             </div>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Provide Active Gmail</strong>
-              <span className="text-slate-600 text-[11px] leading-snug block">Gamitin ang aktibong personal na Gmail address at password.</span>
+              <span className="text-slate-600 text-[11px] leading-snug block">Use your active personal Gmail address and a secure password.</span>
             </div>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Verify 6-Digit Code</strong>
-              <span className="text-slate-600 text-[11px] leading-snug block">Ilagay ang 6-digit security code mula sa Gmail upang ma-activate.</span>
+              <span className="text-slate-600 text-[11px] leading-snug block">Enter the 6-digit security code sent to your Gmail to activate your account.</span>
             </div>
           </div>
         </div>
@@ -175,12 +175,12 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
         {onSwitchToRegister && (
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
             <p className="text-[11px] text-slate-500">
-              Wala pang student account? Simulan ang paggawa ng iyong applicant account ngayon.
+              Don&apos;t have a student account yet? Start creating your applicant account now.
             </p>
             <button
               type="button"
               onClick={onSwitchToRegister}
-              className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-[4px] shrink-0"
+              className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-[4px] shrink-0 cursor-pointer"
             >
               Create Student Account &rarr;
             </button>
@@ -216,14 +216,14 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     tabLabel: "Grade 7",
     badgeLabel: "Incoming JHS",
     title: "INCOMING GRADE 7 | DUMALNEXT SYSTEM",
-    description: "Opisyal na gabay para sa mga mag-aaral na papasok sa Grade 7 Junior High School. Kasama rito ang pagpili sa pagitan ng Regular JHS Program at Special Program in Sports (SPS), feeder school verification, at pag-upload ng documentary requirements (PSA Birth Certificate at Form 138 / SF9).",
+    description: "Official enrollment guide for students entering Grade 7 Junior High School. This covers selecting between the Regular JHS Curriculum and the Special Program in Sports (SPS), verifying feeder elementary school information, and uploading documentary requirements (PSA Birth Certificate and Form 138 / SF9).",
     videoId: "sst31YJmb_4",
     youtubeUrl: "https://youtu.be/sst31YJmb_4",
-    targetAudience: "Para sa mga nagtapos ng Grade 6 sa Dumalneg Elementary School o ibang feeder elementary schools.",
+    targetAudience: "For Grade 6 graduates from Dumalneg Elementary School and other feeder elementary schools.",
     keyPoints: [
-      "Ihanda ang 12-digit Learner Reference Number (LRN) mula sa elementary SF9.",
-      "Pumili sa pagitan ng JHS Regular Curriculum o Special Program in Sports (SPS).",
-      "Siguraduhing malinaw at nababasa ang litrato o scan ng PSA Birth Certificate at Form 138.",
+      "Prepare your 12-digit Learner Reference Number (LRN) from your elementary SF9.",
+      "Select between the JHS Regular Curriculum and Special Program in Sports (SPS).",
+      "Ensure clear, legible photo or scan copies of your PSA Birth Certificate and Form 138.",
     ],
   },
   {
@@ -231,14 +231,14 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     tabLabel: "Grade 8, 9, or 10",
     badgeLabel: "Continuing JHS",
     title: "INCOMING GRADE 8,9,10 | DUMALNEXT SYSTEM",
-    description: "Gabay para sa mga continuing Junior High School learners ng Dumalneg NHS (Grade 8, Grade 9, at Grade 10). Dahil fixed at prescribed ang core subjects ng JHS, mas mabilis at direkta ang proseso gamit ang 1-Click Continuing Enrollment.",
+    description: "Enrollment guide for continuing Junior High School learners of Dumalneg NHS (Grade 8, Grade 9, and Grade 10). With a prescribed core curriculum in JHS, enrollment is fast and seamless using 1-Click Continuing Enrollment.",
     videoId: "VlM7VKMVcX8",
     youtubeUrl: "https://youtu.be/VlM7VKMVcX8",
-    targetAudience: "Para sa kasalukuyang mga mag-aaral ng Dumalneg NHS sa Junior High School.",
+    targetAudience: "For current Dumalneg NHS Junior High School learners.",
     keyPoints: [
-      "Fixed core curriculum ang JHS kaya walang electives na kailangang piliin.",
-      "Awtomatikong nire-retrieve ng system ang inyong previous approved records.",
-      "I-verify ang contact details at i-submit para sa mabilisang section schedule assignment.",
+      "JHS follows a prescribed core curriculum, so no elective subjects are required.",
+      "The system automatically retrieves and syncs your previously approved academic records.",
+      "Verify your contact details and submit to receive prompt section and schedule assignments.",
     ],
   },
   {
@@ -246,14 +246,14 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     tabLabel: "Grade 11",
     badgeLabel: "Incoming SHS",
     title: "INCOMING GRADE 11 | DUMALNEXT SYSTEM",
-    description: "Komprehensibong tutorial para sa mga papasok sa Senior High School (Grade 11). Ipinaliliwanag dito ang pagpili ng Senior High School track, Academic o Technical-Professional (Tech-Pro) strand, at ang pagpili ng opisyal na trimester elective subjects.",
+    description: "Comprehensive tutorial for students entering Senior High School (Grade 11). Learn how to select your Senior High School track, Academic or Technical-Professional (Tech-Pro) strand, and trimester elective subjects.",
     videoId: "Xm9mn7eg1Rc",
     youtubeUrl: "https://youtu.be/Xm9mn7eg1Rc",
-    targetAudience: "Para sa mga Grade 10 Completers na papasok sa Senior High School sa Dumalneg NHS.",
+    targetAudience: "For Grade 10 Completers enrolling in Senior High School at Dumalneg NHS.",
     keyPoints: [
-      "Pumili ng Track at Strand na angkop sa inyong career at college pathway.",
-      "Pumili ng Trimester Elective Subject mula sa mga itinalagang kurso ng paaralan ngayong sem.",
-      "Mag-upload ng certified SF9 / Form 138 na may General Average mula sa Grade 10.",
+      "Select a Track and Strand aligned with your career and higher education pathways.",
+      "Choose your Trimester Elective Subject from authorized course offerings for this term.",
+      "Upload your certified SF9 / Form 138 indicating your Grade 10 General Average.",
     ],
   },
   {
@@ -261,14 +261,14 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     tabLabel: "Grade 12",
     badgeLabel: "Continuing SHS",
     title: "INCOMING GRADE 12 | DUMALNEXT SYSTEM",
-    description: "Gabay para sa Grade 12 Senior High School learners sa pagkumpleto ng enrollment para sa kasalukuyang academic trimester, pagpili ng advanced specialized electives, at pag-verify ng graduation credential checklist.",
+    description: "Guide for Grade 12 Senior High School learners on completing enrollment for the active academic trimester, choosing advanced specialized electives, and reviewing graduation credential requirements.",
     videoId: "l-eODho9Z1U",
     youtubeUrl: "https://youtu.be/l-eODho9Z1U",
-    targetAudience: "Para sa kasalukuyang Grade 11 na tutuntong sa Grade 12 Senior High School.",
+    targetAudience: "For current Grade 11 learners progressing to Grade 12 Senior High School.",
     keyPoints: [
-      "I-review ang inyong mga nakalipas na trimester grades at naipon na units.",
-      "Pumili ng authorized elective para sa kasalukuyang trimester alinsunod sa inyong strand.",
-      "Tiyaking kumpleto ang documentary records para sa Department of Education graduation clearance.",
+      "Review your past trimester grades and accumulated course units.",
+      "Select authorized electives for the active trimester according to your strand.",
+      "Ensure all required documentary records are complete for DepEd graduation clearance.",
     ],
   },
 ];
@@ -390,7 +390,7 @@ export function GradeLevelEnrollmentTutorials({
                 {currentTutorial.title}
               </h4>
               <p className="text-[11px] text-slate-300 max-w-sm mb-4">
-                Pindutin ang Play button upang panoorin ang opisyal na walkthrough para sa {currentTutorial.tabLabel}.
+                Click the Play button to watch the official walkthrough for {currentTutorial.tabLabel}.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <button
@@ -428,7 +428,7 @@ export function GradeLevelEnrollmentTutorials({
         {/* Key Reminders & Checklist */}
         <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-[4px] space-y-2">
           <strong className="text-xs font-bold text-[#002060] block tracking-wide">
-            Mahahalagang Paalala para sa {currentTutorial.tabLabel}:
+            Important Reminders for {currentTutorial.tabLabel}:
           </strong>
           <ul className="space-y-1.5 text-xs text-slate-700">
             {currentTutorial.keyPoints.map((point, idx) => (
@@ -443,7 +443,7 @@ export function GradeLevelEnrollmentTutorials({
         {/* Quick Shortcut to Start Form */}
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
           <p className="text-[11px] text-slate-500 italic">
-            Tapos nang panoorin ang video? Maaari mo nang simulan o ipagpatuloy ang enrollment form.
+            Finished watching the video? You can now start or continue filling out your enrollment form.
           </p>
           <Link
             href="/enroll"
@@ -451,11 +451,11 @@ export function GradeLevelEnrollmentTutorials({
           >
             {isEnrollmentOpen ? (
               <>
-                <span>Buksan ang Enrollment Form ({semester})</span>
+                <span>Open Enrollment Form ({semester})</span>
                 <span aria-hidden="true">&rarr;</span>
               </>
             ) : (
-              <span>Tingnan ang Enrollment Form</span>
+              <span>View Enrollment Form</span>
             )}
           </Link>
         </div>

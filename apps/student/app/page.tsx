@@ -151,6 +151,7 @@ function StudentHomeContent() {
   >("NOT_ASSIGNED");
   const [activeTermNum, setActiveTermNum] = useState<number>(termNumber || 1);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   // Real-Time Automatic Synchronization of Logged-In User's Application & Section (Zero-Refresh)
   useEffect(() => {
@@ -159,6 +160,7 @@ function StudentHomeContent() {
       setPastApplications([]);
       setAssignedSection(null);
       setSectionMode("NOT_ASSIGNED");
+      setPhotoUrl(null);
       return;
     }
 
@@ -239,11 +241,74 @@ function StudentHomeContent() {
         if (studentRec) {
           const { data: appData } = await supabase
             .from("enrollment_applications")
-            .select("id, application_id, student_id, applicant_type, school_year, target_grade_level, target_strand, status, admin_feedback, selected_electives, submission_date, created_at, updated_at")
+            .select("id, application_id, student_id, applicant_type, school_year, target_grade_level, target_strand, status, admin_feedback, selected_electives, submitted_documents, submission_date, created_at, updated_at")
             .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
           const userApps = appData || [];
+
+          // Extract 2x2 Photo from submitted_documents or selected_electives
+          let candidatePhoto: string | null = null;
+          const appWithDocs = userApps.find((a: any) => a.submitted_documents && a.submitted_documents.length > 0);
+          if (appWithDocs?.submitted_documents && Array.isArray(appWithDocs.submitted_documents)) {
+            const doc = appWithDocs.submitted_documents.find((d: any) =>
+              (d.docType || d.type || "").toLowerCase().includes("id") ||
+              (d.docType || d.type || "").toLowerCase().includes("picture") ||
+              (d.docType || d.type || "").toLowerCase().includes("photo") ||
+              (d.docType || d.type || "").toLowerCase().includes("2x2")
+            );
+            if (doc?.fileUrl || doc?.fileData) {
+              candidatePhoto = doc.fileUrl || doc.fileData;
+            }
+          }
+
+          if (!candidatePhoto) {
+            for (const a of userApps) {
+              const fd = Array.isArray(a.selected_electives) ? a.selected_electives[0] : a.selected_electives;
+              const subDocs = fd?.submittedDocuments || [];
+              const doc = subDocs.find((d: any) =>
+                (d.docType || d.type || "").toLowerCase().includes("id") ||
+                (d.docType || d.type || "").toLowerCase().includes("picture") ||
+                (d.docType || d.type || "").toLowerCase().includes("photo") ||
+                (d.docType || d.type || "").toLowerCase().includes("2x2")
+              );
+              if (doc?.fileUrl || doc?.fileData) {
+                candidatePhoto = doc.fileUrl || doc.fileData;
+                break;
+              }
+            }
+          }
+
+          if (!candidatePhoto && user.email) {
+            const { data: appsByEmail } = await supabase
+              .from("enrollment_applications")
+              .select("id, selected_electives, submitted_documents")
+              .order("created_at", { ascending: false })
+              .limit(10);
+            if (appsByEmail) {
+              for (const a of appsByEmail) {
+                const fd = Array.isArray(a.selected_electives) ? a.selected_electives[0] : a.selected_electives;
+                const em = (fd?.email || fd?.learnerEmail || "").toLowerCase();
+                if (em === user.email.toLowerCase()) {
+                  const subDocs = a.submitted_documents || fd?.submittedDocuments || [];
+                  const doc = subDocs.find((d: any) =>
+                    (d.docType || d.type || "").toLowerCase().includes("id") ||
+                    (d.docType || d.type || "").toLowerCase().includes("picture") ||
+                    (d.docType || d.type || "").toLowerCase().includes("photo") ||
+                    (d.docType || d.type || "").toLowerCase().includes("2x2")
+                  );
+                  if (doc?.fileUrl || doc?.fileData) {
+                    candidatePhoto = doc.fileUrl || doc.fileData;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+
+          if (isMounted) {
+            setPhotoUrl(candidatePhoto);
+          }
 
           // Find application for CURRENT ACTIVE academic term (School Year & Term/Trimester)
           const activeApp = userApps.find((a: any) =>
@@ -364,6 +429,33 @@ function StudentHomeContent() {
             );
           }
           return;
+        } else {
+          if (user.email) {
+            const { data: appsByEmail } = await supabase
+              .from("enrollment_applications")
+              .select("id, selected_electives, submitted_documents")
+              .order("created_at", { ascending: false })
+              .limit(10);
+            if (appsByEmail) {
+              for (const a of appsByEmail) {
+                const fd = Array.isArray(a.selected_electives) ? a.selected_electives[0] : a.selected_electives;
+                const em = (fd?.email || fd?.learnerEmail || "").toLowerCase();
+                if (em === user.email.toLowerCase()) {
+                  const subDocs = a.submitted_documents || fd?.submittedDocuments || [];
+                  const doc = subDocs.find((d: any) =>
+                    (d.docType || d.type || "").toLowerCase().includes("id") ||
+                    (d.docType || d.type || "").toLowerCase().includes("picture") ||
+                    (d.docType || d.type || "").toLowerCase().includes("photo") ||
+                    (d.docType || d.type || "").toLowerCase().includes("2x2")
+                  );
+                  if (doc?.fileUrl || doc?.fileData) {
+                    if (isMounted) setPhotoUrl(doc.fileUrl || doc.fileData);
+                    break;
+                  }
+                }
+              }
+            }
+          }
         }
 
         if (isMounted) {
@@ -707,9 +799,22 @@ function StudentHomeContent() {
             <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-5 sm:px-7 sm:py-6 border-b-4 border-amber-400">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-start sm:items-center gap-4 min-w-0">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] bg-white/10 border border-white/25 flex items-center justify-center text-base sm:text-lg font-black text-amber-300 shrink-0 shadow-xs">
-                    {(user.firstName?.[0] || "S")}{(user.lastName?.[0] || "P")}
-                  </div>
+                  {photoUrl ? (
+                    <div className="relative shrink-0">
+                      <img
+                        src={photoUrl}
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] object-cover border-2 border-amber-300 bg-white shadow-xs"
+                      />
+                      <span className="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-400 text-slate-950 font-black text-[8px] uppercase tracking-wider rounded-xs shadow-2xs">
+                        2x2
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[4px] bg-white/10 border border-white/25 flex items-center justify-center text-base sm:text-lg font-black text-amber-300 shrink-0 shadow-xs">
+                      {(user.firstName?.[0] || "S")}{(user.lastName?.[0] || "P")}
+                    </div>
+                  )}
                   <div className="space-y-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
