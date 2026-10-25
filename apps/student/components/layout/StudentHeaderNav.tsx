@@ -310,6 +310,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       : "/track"
     : "/?tab=signin&reason=auth_required";
 
+  const profileHref = user ? "/profile" : "/?tab=signin&reason=auth_required";
   const enrollHref = user ? "/enroll" : "/?tab=signin&reason=auth_required";
   const sectionHref = user ? "/section" : "/?tab=signin&reason=auth_required";
 
@@ -394,6 +395,18 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           >
             My Section
           </Link>
+          {user ? (
+            <Link
+              href={profileHref}
+              className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                pathname === "/profile"
+                  ? "bg-white/15 text-white border border-white/25"
+                  : "text-slate-200 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              My Profile
+            </Link>
+          ) : null}
         </nav>
 
         {/* Academic Year Badge */}
@@ -552,6 +565,14 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <p className="text-[11px] text-slate-500 truncate">
                     {user.email}
                   </p>
+                  <Link
+                    href={profileHref}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-2.5 inline-flex items-center justify-between w-full px-2.5 py-1.5 bg-blue-100/80 hover:bg-blue-200/90 text-[#002060] text-xs font-bold rounded-[4px] border border-blue-300 transition-colors cursor-pointer"
+                  >
+                    <span>View Full Profile</span>
+                    <span className="text-[11px]">&rarr;</span>
+                  </Link>
                 </div>
 
                 {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
@@ -661,6 +682,26 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
                 PORTAL MODULES
               </span>
+              {/* Student Profile Module */}
+              <Link
+                href={profileHref}
+                onClick={() => setIsMenuOpen(false)}
+                className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
+                  pathname === "/profile"
+                    ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                    : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">
+                    Student Profile
+                  </span>
+                  <span className="text-[10px] text-slate-400 uppercase">&rarr;</span>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                  View complete student records, DepEd LRN, demographic details, parent information, and section assignments.
+                </p>
+              </Link>
 
               {/* 1. Home Link */}
               <Link
