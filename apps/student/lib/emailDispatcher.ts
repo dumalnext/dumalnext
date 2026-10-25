@@ -47,6 +47,35 @@ export async function sendReceiptToStudent(
 </html>
   `;
 
+  // 1. Try Gmail SMTP via Nodemailer if configured
+  const gmailPass = (process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD || "").replace(/\s+/g, "");
+  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || "dumalnext@gmail.com";
+
+  if (gmailPass) {
+    try {
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailUser,
+          pass: gmailPass,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"${senderDisplayName}" <${gmailUser}>`,
+        to,
+        replyTo: "dumalnext@gmail.com",
+        subject: cleanSubject,
+        html: htmlContent,
+      });
+
+      return { success: true, provider: "gmail_smtp" };
+    } catch (smtpErr) {
+      console.warn("Gmail SMTP delivery error:", smtpErr);
+    }
+  }
+
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     try {
@@ -64,10 +93,11 @@ export async function sendReceiptToStudent(
           reply_to: "dumalnext@gmail.com",
         }),
       });
+      return { success: true, provider: "resend" };
     } catch {}
   }
 
-  return { success: true };
+  return { success: true, provider: "fallback" };
 }
 
 export async function sendSecurityOtpEmail(
@@ -167,10 +197,41 @@ export async function sendSecurityOtpEmail(
 </html>
   `;
 
+  // 1. Try Gmail SMTP via Nodemailer if configured
+  const gmailPass = (process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD || "").replace(/\s+/g, "");
+  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || "dumalnext@gmail.com";
+
+  if (gmailPass) {
+    try {
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailUser,
+          pass: gmailPass,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"${senderDisplayName}" <${gmailUser}>`,
+        to,
+        replyTo: "dumalnext@gmail.com",
+        subject: cleanSubject,
+        html: htmlContent,
+      });
+
+      console.log(`[SECURITY OTP DISPATCH] Sent via Gmail SMTP to: ${to}`);
+      return { success: true, provider: "gmail_smtp" };
+    } catch (smtpErr: any) {
+      console.warn("Gmail SMTP delivery error:", smtpErr?.message);
+    }
+  }
+
+  // 2. Try Resend API if API Key is configured
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     try {
-      await fetch("https://api.resend.com/emails", {
+      const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${resendApiKey}`,
@@ -184,13 +245,16 @@ export async function sendSecurityOtpEmail(
           reply_to: "dumalnext@gmail.com",
         }),
       });
-      return { success: true, provider: "resend" };
+      if (res.ok) {
+        console.log(`[SECURITY OTP DISPATCH] Sent via Resend API to: ${to}`);
+        return { success: true, provider: "resend" };
+      }
     } catch (e: any) {
       console.warn("Resend email dispatch error:", e?.message);
     }
   }
 
-  // Fallback: Console log for development or when Resend key is unconfigured
+  // Fallback: Console log for development or when external SMTP is unconfigured
   console.log(`[SECURITY OTP DISPATCH] To: ${to} | Purpose: ${purpose} | Code: ${code}`);
   return { success: true, provider: "console_fallback" };
 }

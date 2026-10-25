@@ -79,6 +79,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
     const body = await req.json();
     const { action } = body;
 
@@ -97,7 +100,35 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Generate 6-digit numeric OTP code
+      // 1. Dispatch real verification code via Supabase Auth email service
+      let supabaseDispatched = false;
+      if (supabaseUrl && supabaseAnonKey) {
+        try {
+          const authOtpRes = await fetch(`${supabaseUrl}/auth/v1/otp`, {
+            method: "POST",
+            headers: {
+              apikey: supabaseAnonKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, create_user: false }),
+          });
+
+          if (authOtpRes.ok) {
+            supabaseDispatched = true;
+          } else if (authOtpRes.status === 429) {
+            const errData = await authOtpRes.json().catch(() => ({}));
+            // Rate limit warning (60s cooldown)
+            console.warn("Supabase Auth OTP cooldown:", errData);
+          } else {
+            const errText = await authOtpRes.text();
+            console.warn("Supabase Auth OTP dispatch response:", errText);
+          }
+        } catch (authErr: any) {
+          console.warn("Supabase Auth OTP fetch error:", authErr?.message);
+        }
+      }
+
+      // 2. Generate local 6-digit numeric OTP code and persist in database
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = Date.now() + 15 * 60 * 1000; // 15 mins validity
 
@@ -116,7 +147,7 @@ export async function POST(req: NextRequest) {
 
       await saveStoredOtps(supabase, filtered);
 
-      // Dispatch security email
+      // 3. Dispatch security email via Nodemailer (Gmail SMTP) or Resend API if configured
       await sendSecurityOtpEmail(supabase, {
         to: email,
         studentName,
@@ -129,7 +160,7 @@ export async function POST(req: NextRequest) {
           success: true,
           maskedEmail: maskEmail(email),
           email,
-          message: `The 6-digit verification code has been sent to your email (${maskEmail(email)}).`,
+          message: `The 6-digit verification code has been sent to your email (${maskEmail(email)}). Please check your inbox or spam folder.`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -158,6 +189,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Verification Step 1: Check against stored database OTPs
       const currentOtps = await getStoredOtps(supabase);
       const matchIdx = currentOtps.findIndex(
         (o) =>
@@ -167,19 +199,81 @@ export async function POST(req: NextRequest) {
           Date.now() < o.expiresAt
       );
 
-      if (matchIdx === -1) {
+      let isOtpValid = matchIdx !== -1;
+      let sessionAccessToken: string | null = null;
+
+      // Verification Step 2: Fallback/Dual check with Supabase Auth OTP verification
+      if (!isOtpValid && supabaseUrl && supabaseAnonKey) {
+        try {
+          // Check type: "email"
+          let verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
+            method: "POST",
+            headers: {
+              apikey: supabaseAnonKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email,
+              token: otp,
+              type: "email",
+            }),
+          });
+
+          // Fallback: Check type: "recovery"
+          if (!verifyRes.ok) {
+            verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
+              method: "POST",
+              headers: {
+                apikey: supabaseAnonKey,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email,
+                token: otp,
+                type: "recovery",
+              }),
+            });
+          }
+
+          if (verifyRes.ok) {
+            isOtpValid = true;
+            const authData = await verifyRes.json();
+            sessionAccessToken = authData?.access_token || null;
+          }
+        } catch (vErr: any) {
+          console.warn("Supabase Auth verify error:", vErr?.message);
+        }
+      }
+
+      if (!isOtpValid) {
         return NextResponse.json(
-          { error: "Invalid or expired 6-digit verification code. Please try again or request a new code." },
+          { error: "Invalid or expired 6-digit verification code. Please check your Gmail (including Spam folder) or click Resend Code." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
 
-      // Update password in Supabase Auth via admin client if available
+      // Password Update Step 1: If session access token obtained from Supabase Auth verify, update user password
+      if (sessionAccessToken && supabaseUrl && supabaseAnonKey) {
+        try {
+          await fetch(`${supabaseUrl}/auth/v1/user`, {
+            method: "PUT",
+            headers: {
+              apikey: supabaseAnonKey,
+              Authorization: `Bearer ${sessionAccessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ password: newPassword }),
+          });
+        } catch (tokenUpdateErr: any) {
+          console.warn("Session token password update warning:", tokenUpdateErr?.message);
+        }
+      }
+
+      // Password Update Step 2: Update password in Supabase Auth via admin client if service role is present
       const adminClient = getAdminClient();
       let targetAuthId = userId;
 
       if (!targetAuthId || targetAuthId.length !== 36) {
-        // Lookup user id from public.users table
         const { data: uFound } = await supabase
           .from("users")
           .select("id")
@@ -201,7 +295,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Update public.users record timestamp
+      // Password Update Step 3: Update public.users record timestamp
       if (targetAuthId) {
         await supabase
           .from("users")
@@ -211,9 +305,11 @@ export async function POST(req: NextRequest) {
           .eq("id", targetAuthId);
       }
 
-      // Remove used OTP
-      currentOtps.splice(matchIdx, 1);
-      await saveStoredOtps(supabase, currentOtps);
+      // Remove used OTP if matched from local store
+      if (matchIdx !== -1) {
+        currentOtps.splice(matchIdx, 1);
+        await saveStoredOtps(supabase, currentOtps);
+      }
 
       return NextResponse.json(
         {
@@ -286,7 +382,27 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Generate 6-digit OTP code
+      // 1. Dispatch real email to the new email address via Supabase Auth
+      if (supabaseUrl && supabaseAnonKey) {
+        try {
+          const authOtpRes = await fetch(`${supabaseUrl}/auth/v1/otp`, {
+            method: "POST",
+            headers: {
+              apikey: supabaseAnonKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: newEmail }),
+          });
+
+          if (!authOtpRes.ok && authOtpRes.status === 429) {
+            console.warn("Supabase Auth OTP cooldown on new email");
+          }
+        } catch (authErr: any) {
+          console.warn("Supabase Auth OTP dispatch error for newEmail:", authErr?.message);
+        }
+      }
+
+      // 2. Generate local 6-digit numeric OTP code and persist in database
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = Date.now() + 15 * 60 * 1000; // 15 mins
 
@@ -305,7 +421,7 @@ export async function POST(req: NextRequest) {
 
       await saveStoredOtps(supabase, filtered);
 
-      // Send to the NEW email address so student proves ownership
+      // 3. Dispatch via SMTP/Resend
       await sendSecurityOtpEmail(supabase, {
         to: newEmail,
         studentName,
@@ -319,7 +435,7 @@ export async function POST(req: NextRequest) {
           success: true,
           newEmail,
           maskedEmail: maskEmail(newEmail),
-          message: `The 6-digit verification code has been sent to your new email (${newEmail}).`,
+          message: `The 6-digit verification code has been sent to your new email (${newEmail}). Please check your inbox or spam folder.`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -341,6 +457,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Verification Step 1: Check against stored database OTPs
       const currentOtps = await getStoredOtps(supabase);
       const matchIdx = currentOtps.findIndex(
         (o) =>
@@ -350,9 +467,34 @@ export async function POST(req: NextRequest) {
           Date.now() < o.expiresAt
       );
 
-      if (matchIdx === -1) {
+      let isOtpValid = matchIdx !== -1;
+
+      // Verification Step 2: Fallback check with Supabase Auth
+      if (!isOtpValid && supabaseUrl && supabaseAnonKey) {
+        try {
+          const verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
+            method: "POST",
+            headers: {
+              apikey: supabaseAnonKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: newEmail,
+              token: otp,
+              type: "email",
+            }),
+          });
+          if (verifyRes.ok) {
+            isOtpValid = true;
+          }
+        } catch (vErr: any) {
+          console.warn("Supabase Auth email verify error:", vErr?.message);
+        }
+      }
+
+      if (!isOtpValid) {
         return NextResponse.json(
-          { error: "Invalid or expired 6-digit verification code for the new email." },
+          { error: "Invalid or expired 6-digit verification code for the new email. Please check your Gmail or request a new code." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -485,8 +627,10 @@ export async function POST(req: NextRequest) {
       }
 
       // Remove OTP
-      currentOtps.splice(matchIdx, 1);
-      await saveStoredOtps(supabase, currentOtps);
+      if (matchIdx !== -1) {
+        currentOtps.splice(matchIdx, 1);
+        await saveStoredOtps(supabase, currentOtps);
+      }
 
       return NextResponse.json(
         {
