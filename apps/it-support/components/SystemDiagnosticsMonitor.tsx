@@ -289,8 +289,8 @@ export default function SystemDiagnosticsMonitor() {
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-amber-100 text-amber-800 rounded-md font-mono text-xs font-black">
-              ⚡
+            <span className="px-2 py-1 bg-[#002060] text-amber-300 rounded font-mono text-[10px] font-bold uppercase tracking-wider">
+              RTT
             </span>
             <div>
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">

@@ -86,7 +86,7 @@ export function usePwaInstall() {
 }
 
 /**
- * Visual Step-by-Step Installation Modal Guide
+ * Visual Step-by-Step Installation Modal Guide (Zero Emojis - DepEd Standard)
  * Tailored for iOS Safari, Android Chrome, and Desktop Chrome/Edge
  */
 export function PwaInstallModal({
@@ -133,12 +133,12 @@ export function PwaInstallModal({
               className="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer text-sm font-bold"
               aria-label="Close dialog"
             >
-              ✕
+              Close
             </button>
           </div>
         </div>
 
-        {/* Modal Body: Dynamic Instructions based on Platform */}
+        {/* Modal Body: Clean Institutional Instructions */}
         <div className="p-5 sm:p-6 space-y-4 text-xs text-slate-800">
           <p className="text-slate-600 leading-relaxed">
             Install the official <strong>Dumalneg National High School Portal</strong> directly on your home screen. Enjoy fast 1-tap launch, standalone screen view, and offline-ready access.
@@ -147,8 +147,8 @@ export function PwaInstallModal({
           {isIos ? (
             /* iOS Safari Instructions */
             <div className="space-y-3 bg-blue-50/70 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#002060] uppercase">
-                <span>📱 iPhone / iPad (Safari) Instructions:</span>
+              <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
+                iPhone / iPad (Safari) Instructions:
               </div>
               <ol className="space-y-2.5 text-[11px] text-slate-700 pl-1 list-none">
                 <li className="flex items-start gap-2.5">
@@ -156,15 +156,7 @@ export function PwaInstallModal({
                     1
                   </span>
                   <span>
-                    Tap the <strong>Share</strong> button{" "}
-                    <span className="inline-block px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-900 font-bold">
-                      ⎋
-                    </span>{" "}
-                    or{" "}
-                    <span className="inline-block px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-900 font-bold">
-                      📤
-                    </span>{" "}
-                    at the bottom of your Safari browser.
+                    Tap the <strong>Share</strong> button in Safari&apos;s bottom toolbar.
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
@@ -172,13 +164,10 @@ export function PwaInstallModal({
                     2
                   </span>
                   <span>
-                    Scroll down the options list and select{" "}
+                    Scroll down the options list and tap{" "}
                     <strong className="text-slate-950">
                       &quot;Add to Home Screen&quot;
-                    </strong>{" "}
-                    <span className="inline-block px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-900 font-bold">
-                      ➕
-                    </span>.
+                    </strong>.
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
@@ -186,7 +175,7 @@ export function PwaInstallModal({
                     3
                   </span>
                   <span>
-                    Tap <strong className="text-emerald-700">&quot;Add&quot;</strong> in the top-right corner. The DNHS icon will appear on your Home Screen!
+                    Tap <strong className="text-emerald-700">&quot;Add&quot;</strong> in the top-right corner. The DNHS icon will appear on your Home Screen.
                   </span>
                 </li>
               </ol>
@@ -194,8 +183,8 @@ export function PwaInstallModal({
           ) : (
             /* Android / Desktop Instructions */
             <div className="space-y-3 bg-amber-50/70 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-900 uppercase">
-                <span>⚡ Android / Chrome / Edge Instructions:</span>
+              <div className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+                Android / Chrome / Edge Instructions:
               </div>
               <ol className="space-y-2.5 text-[11px] text-slate-700 pl-1 list-none">
                 <li className="flex items-start gap-2.5">
@@ -203,11 +192,7 @@ export function PwaInstallModal({
                     1
                   </span>
                   <span>
-                    Tap the <strong>Browser Menu (3 Dots)</strong>{" "}
-                    <span className="inline-block px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-900 font-bold">
-                      ⋮
-                    </span>{" "}
-                    at the top or bottom of your browser screen.
+                    Tap the <strong>Browser Menu (three dots)</strong> at the top or bottom of your browser screen.
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
@@ -240,19 +225,19 @@ export function PwaInstallModal({
           {/* Quick Perks */}
           <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-1.5">
-              <span className="text-emerald-600 font-bold">✓</span>
+              <span className="text-emerald-600 font-bold">•</span>
               <span>No App Store download required</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-emerald-600 font-bold">✓</span>
+              <span className="text-emerald-600 font-bold">•</span>
               <span>Fast 1-tap home screen launch</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-emerald-600 font-bold">✓</span>
+              <span className="text-emerald-600 font-bold">•</span>
               <span>Instant DepEd enrollment access</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-emerald-600 font-bold">✓</span>
+              <span className="text-emerald-600 font-bold">•</span>
               <span>Zero device storage overhead</span>
             </div>
           </div>
@@ -265,7 +250,7 @@ export function PwaInstallModal({
             onClick={onClose}
             className="px-5 py-2.5 bg-[#002060] hover:bg-blue-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
-            Got It, Thanks!
+            Close
           </button>
         </div>
       </div>
@@ -277,6 +262,7 @@ export function PwaInstallModal({
  * LOCATION A: 1-Click "Install App" Header / Navigation Button
  * Strictly displayed on PC / Laptop (Desktop `lg:` screens and above)
  * Strictly hidden on Android and iOS mobile phones
+ * ZERO EMOJIS - Clean DepEd theme
  */
 export function PwaInstallHeaderButton() {
   const { isStandalone, isIos, triggerInstall } = usePwaInstall();
@@ -307,10 +293,9 @@ export function PwaInstallHeaderButton() {
       <button
         type="button"
         onClick={handleClick}
-        className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-[4px] shadow-xs transition-all cursor-pointer shrink-0"
+        className="hidden lg:inline-flex items-center px-3 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-[4px] shadow-xs transition-all cursor-pointer shrink-0"
         title="Install Dumalneg NHS Student Portal on your PC or Laptop"
       >
-        <span className="text-xs">💻</span>
         <span>Install App</span>
       </button>
 
@@ -326,6 +311,7 @@ export function PwaInstallHeaderButton() {
 /**
  * LOCATION B: Drawer Menu Card Component
  * Embedded strictly inside Mobile Navigation Drawer for Android & iOS phones
+ * ZERO EMOJIS - Clean DepEd theme
  */
 export function PwaInstallDrawerCard() {
   const { isStandalone, isIos, triggerInstall } = usePwaInstall();
@@ -344,16 +330,13 @@ export function PwaInstallDrawerCard() {
     <>
       <div className="p-3.5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-400 rounded-[4px] shadow-xs space-y-2">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base">📲</span>
-            <div>
-              <span className="text-[9px] font-black text-amber-900 uppercase tracking-widest block">
-                INSTALL PROGRESSIVE APP
-              </span>
-              <h4 className="text-xs font-extrabold text-slate-950 leading-tight">
-                Add to Home Screen
-              </h4>
-            </div>
+          <div>
+            <span className="text-[9px] font-black text-amber-900 uppercase tracking-widest block">
+              INSTALL PROGRESSIVE APP
+            </span>
+            <h4 className="text-xs font-extrabold text-slate-950 leading-tight mt-0.5">
+              Add to Home Screen
+            </h4>
           </div>
           <span className="px-1.5 py-0.5 bg-amber-200 text-amber-950 font-mono text-[9px] font-bold rounded-[3px] uppercase">
             1-TAP
