@@ -1730,7 +1730,7 @@ function StudentHomeContent() {
             {/* RIGHT COLUMN (5 COLS): STUDENT PORTAL AUTHENTICATION CARD (3D CARD FLIP) */}
             <div className="lg:col-span-5 order-1 lg:order-2" style={{ perspective: "1400px" }}>
               <div
-                className="grid grid-cols-1 transition-transform duration-700 ease-in-out"
+                className="relative transition-transform duration-700 ease-in-out"
                 style={{
                   transformStyle: "preserve-3d",
                   transform: activeTab === "register" ? "rotateY(180deg)" : "rotateY(0deg)",
@@ -1740,8 +1740,10 @@ function StudentHomeContent() {
                     FRONT FACE: SIGN IN (0deg)
                     ------------------------------------------------------------- */}
                 <div
-                  className={`col-start-1 row-start-1 bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden flex flex-col justify-between ${
-                    activeTab === "signin" ? "pointer-events-auto" : "pointer-events-none select-none"
+                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden ${
+                    activeTab === "signin"
+                      ? "relative z-10 pointer-events-auto"
+                      : "absolute inset-x-0 top-0 z-0 pointer-events-none select-none"
                   }`}
                   style={{
                     backfaceVisibility: "hidden",
@@ -1947,16 +1949,13 @@ function StudentHomeContent() {
                             {isLoggingIn ? "Signing In... Please Wait" : "Sign In to Student Portal"}
                           </button>
                         </div>
-                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs border-t border-slate-100">
+                        <div className="pt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-t border-slate-100">
                           <button
                             type="button"
                             onClick={handleDirectGmailForgotPassword}
-                            className="font-bold text-[#002060] hover:underline cursor-pointer flex items-center gap-1.5 text-left"
+                            className="font-bold text-[#002060] hover:underline cursor-pointer text-left"
                           >
-                            <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                            </svg>
-                            <span>Forgot password? Contact / Email dumalnext@gmail.com</span>
+                            Forgot password? Contact / Email dumalnext@gmail.com
                           </button>
 
                           <button
@@ -1965,12 +1964,9 @@ function StudentHomeContent() {
                               setConcernModalMode("track");
                               setShowConcernModal(true);
                             }}
-                            className="text-slate-600 hover:text-slate-900 font-semibold hover:underline cursor-pointer flex items-center gap-1 text-[11px] shrink-0"
+                            className="text-slate-600 hover:text-slate-900 font-semibold hover:underline cursor-pointer text-[11px] shrink-0"
                           >
-                            <svg className="w-3 h-3 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <span>Track Concern Status</span>
+                            Track Concern Status &rarr;
                           </button>
                         </div>
                       </form>
@@ -2000,8 +1996,10 @@ function StudentHomeContent() {
                     BACK FACE: CREATE ACCOUNT (180deg)
                     ------------------------------------------------------------- */}
                 <div
-                  className={`col-start-1 row-start-1 bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden flex flex-col justify-between ${
-                    activeTab === "register" ? "pointer-events-auto" : "pointer-events-none select-none"
+                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden ${
+                    activeTab === "register"
+                      ? "relative z-10 pointer-events-auto"
+                      : "absolute inset-x-0 top-0 z-0 pointer-events-none select-none"
                   }`}
                   style={{
                     backfaceVisibility: "hidden",
