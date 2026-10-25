@@ -972,6 +972,7 @@ export default function ContinuingEnrollmentForm({
                   Standard DepEd K-12 secondary curriculum covering all core learning areas (Filipino, English, Math, Science, Araling Panlipunan, EsP, MAPEH, and TLE).
                 </p>
               </div>
+            </div>
           ) : (
             <div className="space-y-4 p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
               <div className="border-b-2 border-slate-200 pb-2">

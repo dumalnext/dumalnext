@@ -78,6 +78,7 @@ export interface FullEnrollmentFormData {
   snedDetails: string[];
   hasPwdId: boolean;
   jhsProgram?: "Regular";
+  spsSport?: string;
     targetSemester: string;
   targetTrack: string;
   targetStrand: string;
