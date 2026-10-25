@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
 
       if (!email || !email.includes("@")) {
         return NextResponse.json(
-          { error: "Kailangan ang wastong rehistradong email address." },
+          { error: "A valid registered email address is required." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
           success: true,
           maskedEmail: maskEmail(email),
           email,
-          message: `Ang 6-digit verification code ay naipadala na sa iyong email (${maskEmail(email)}).`,
+          message: `The 6-digit verification code has been sent to your email (${maskEmail(email)}).`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -146,14 +146,14 @@ export async function POST(req: NextRequest) {
 
       if (!email || !otp || !newPassword) {
         return NextResponse.json(
-          { error: "Kailangan ang Email, 6-digit OTP, at ang iyong bagong password." },
+          { error: "Email, 6-digit verification code, and new password are required." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
 
       if (newPassword.length < 6) {
         return NextResponse.json(
-          { error: "Ang bagong password ay dapat hindi bababa sa 6 na karakter." },
+          { error: "The new password must be at least 6 characters in length." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
 
       if (matchIdx === -1) {
         return NextResponse.json(
-          { error: "Mali o expired na ang 6-digit verification code. Pakisubukang muli o humiling ng bagong code." },
+          { error: "Invalid or expired 6-digit verification code. Please try again or request a new code." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -218,7 +218,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          message: "Matagumpay na nabago ang iyong password! Maaari mo na itong gamitin sa susunod mong pag-login.",
+          message: "Password updated successfully! You may now use it on your next login.",
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -235,14 +235,14 @@ export async function POST(req: NextRequest) {
 
       if (!newEmail || !newEmail.includes("@")) {
         return NextResponse.json(
-          { error: "Pakilagay ang isang wastong bagong email address (hal. Gmail)." },
+          { error: "Please enter a valid new email address (e.g., Gmail)." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
 
       if (newEmail === currentEmail) {
         return NextResponse.json(
-          { error: "Ang bagong email ay kapareho na ng iyong kasalukuyang rehistradong email." },
+          { error: "The new email address cannot be the same as your current registered email." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -253,7 +253,7 @@ export async function POST(req: NextRequest) {
         newEmail === "heartistrichford@gmail.com"
       ) {
         return NextResponse.json(
-          { error: "Ang email address na ito ay nakalaan para sa pamunuan ng paaralan." },
+          { error: "This institutional email address is reserved for school administration." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -267,7 +267,7 @@ export async function POST(req: NextRequest) {
 
       if (existingUser && existingUser.length > 0) {
         return NextResponse.json(
-          { error: `Ang email na "${newEmail}" ay nakarehistro na sa ibang account sa system.` },
+          { error: `The email "${newEmail}" is already registered to another account in the system.` },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -281,7 +281,7 @@ export async function POST(req: NextRequest) {
 
       if (teacherFound && teacherFound.length > 0) {
         return NextResponse.json(
-          { error: "Ang email address na ito ay nakarehistro bilang opisyal na Faculty Teacher account." },
+          { error: "This email address is officially registered as a Faculty Teacher account." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -319,7 +319,7 @@ export async function POST(req: NextRequest) {
           success: true,
           newEmail,
           maskedEmail: maskEmail(newEmail),
-          message: `Ang 6-digit verification code ay naipadala na sa iyong bagong email (${newEmail}).`,
+          message: `The 6-digit verification code has been sent to your new email (${newEmail}).`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -336,7 +336,7 @@ export async function POST(req: NextRequest) {
 
       if (!newEmail || !otp) {
         return NextResponse.json(
-          { error: "Kailangan ang bagong email address at ang 6-digit OTP code." },
+          { error: "New email address and 6-digit verification code are required." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -352,7 +352,7 @@ export async function POST(req: NextRequest) {
 
       if (matchIdx === -1) {
         return NextResponse.json(
-          { error: "Mali o expired na ang 6-digit verification code para sa bagong email." },
+          { error: "Invalid or expired 6-digit verification code for the new email." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -381,7 +381,7 @@ export async function POST(req: NextRequest) {
 
         if (updErr) {
           return NextResponse.json(
-            { error: "Hindi ma-update ang email sa database: " + updErr.message },
+            { error: "Failed to update email in database: " + updErr.message },
             { status: 500, headers: NO_CACHE_HEADERS }
           );
         }
@@ -408,14 +408,14 @@ export async function POST(req: NextRequest) {
         {
           success: true,
           newEmail,
-          message: `Matagumpay na nabago ang iyong opisyal na login email patungo sa ${newEmail}!`,
+          message: `Official login email successfully updated to ${newEmail}!`,
         },
         { headers: NO_CACHE_HEADERS }
       );
     }
 
     return NextResponse.json(
-      { error: "Hindi wastong aksyon (Invalid action)." },
+      { error: "Invalid action." },
       { status: 400, headers: NO_CACHE_HEADERS }
     );
   } catch (err: any) {

@@ -247,12 +247,12 @@ export default function StudentProfilePage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Nabigong ipadala ang verification code.");
+        throw new Error(data.error || "Failed to send verification code.");
       }
       setSecurityStep(2);
-      setSecuritySuccess(data.message || `Ang 6-digit verification code ay naipadala na sa iyong email (${maskEmailAddress(user?.email || "")}).`);
+      setSecuritySuccess(data.message || `The 6-digit verification code has been sent to your email (${maskEmailAddress(user?.email || "")}).`);
     } catch (err: any) {
-      setSecurityError(err.message || "May naganap na error sa pagpapadala ng code.");
+      setSecurityError(err.message || "An error occurred while sending the code.");
     } finally {
       setSecurityLoading(false);
     }
@@ -262,15 +262,15 @@ export default function StudentProfilePage() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passwordOtp || passwordOtp.trim().length !== 6) {
-      setSecurityError("Mangyaring ilagay ang buong 6-digit verification code.");
+      setSecurityError("Please enter the complete 6-digit verification code.");
       return;
     }
     if (!newPassword || newPassword.length < 6) {
-      setSecurityError("Ang bagong password ay dapat hindi bababa sa 6 na karakter.");
+      setSecurityError("New password must be at least 6 characters in length.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setSecurityError("Hindi nagtutugma ang bagong password at ang kumpirmasyon nito.");
+      setSecurityError("New password and confirmation do not match.");
       return;
     }
 
@@ -292,7 +292,7 @@ export default function StudentProfilePage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Nabigong i-update ang password.");
+        throw new Error(data.error || "Failed to update password.");
       }
 
       // 2. Client auth update
@@ -303,7 +303,7 @@ export default function StudentProfilePage() {
         console.warn("Client auth password update notice:", authErr);
       }
 
-      setSecuritySuccess(data.message || "Matagumpay na nabago ang iyong password!");
+      setSecuritySuccess(data.message || "Password successfully updated!");
       setPasswordOtp("");
       setNewPassword("");
       setConfirmPassword("");
@@ -311,7 +311,7 @@ export default function StudentProfilePage() {
         closeSecurityModal();
       }, 2000);
     } catch (err: any) {
-      setSecurityError(err.message || "May naganap na error sa pagpapalit ng password.");
+      setSecurityError(err.message || "An error occurred while updating the password.");
     } finally {
       setSecurityLoading(false);
     }
@@ -321,11 +321,11 @@ export default function StudentProfilePage() {
   const handleSendEmailOtp = async () => {
     const cleanNew = newEmailInput.trim().toLowerCase();
     if (!cleanNew || !cleanNew.includes("@") || !cleanNew.includes(".")) {
-      setSecurityError("Mangyaring maglagay ng wastong bagong email address.");
+      setSecurityError("Please enter a valid new email address.");
       return;
     }
     if (cleanNew === user?.email?.toLowerCase()) {
-      setSecurityError("Ang bagong email ay kapareho na ng iyong kasalukuyang email.");
+      setSecurityError("The new email address cannot be the same as your current email.");
       return;
     }
 
@@ -345,12 +345,12 @@ export default function StudentProfilePage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Nabigong ipadala ang verification code sa bagong email.");
+        throw new Error(data.error || "Failed to send verification code to the new email.");
       }
       setSecurityStep(2);
-      setSecuritySuccess(data.message || `Ang 6-digit verification code ay naipadala na sa ${cleanNew}.`);
+      setSecuritySuccess(data.message || `The 6-digit verification code has been sent to ${cleanNew}.`);
     } catch (err: any) {
-      setSecurityError(err.message || "May naganap na error sa pagpapadala ng code.");
+      setSecurityError(err.message || "An error occurred while sending the code.");
     } finally {
       setSecurityLoading(false);
     }
@@ -360,7 +360,7 @@ export default function StudentProfilePage() {
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailOtp || emailOtp.trim().length !== 6) {
-      setSecurityError("Mangyaring ilagay ang buong 6-digit verification code.");
+      setSecurityError("Please enter the complete 6-digit verification code.");
       return;
     }
 
@@ -383,7 +383,7 @@ export default function StudentProfilePage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Nabigong i-update ang email address.");
+        throw new Error(data.error || "Failed to update email address.");
       }
 
       // 2. Client auth update
@@ -397,14 +397,14 @@ export default function StudentProfilePage() {
       // 3. Refresh user session in auth context
       await refreshSession();
 
-      setSecuritySuccess(data.message || `Matagumpay na nabago ang iyong email patungo sa ${cleanNew}!`);
+      setSecuritySuccess(data.message || `Official login email successfully updated to ${cleanNew}!`);
       setEmailOtp("");
       setNewEmailInput("");
       setTimeout(() => {
         closeSecurityModal();
       }, 2000);
     } catch (err: any) {
-      setSecurityError(err.message || "May naganap na error sa pag-update ng email.");
+      setSecurityError(err.message || "An error occurred while updating the email.");
     } finally {
       setSecurityLoading(false);
     }
@@ -927,7 +927,7 @@ export default function StudentProfilePage() {
               </div>
             )}
 
-            {/* 5. ACCOUNT & SECURITY TAB */}
+            {/* 5. ACCOUNT & SECURITY TAB (STRICTLY ENGLISH) */}
             {activeTab === "security" && (
               <div className="space-y-6">
                 <div>
@@ -935,7 +935,7 @@ export default function StudentProfilePage() {
                     Student Account Credentials &amp; Security
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Pamahalaan ang iyong login email at password nang direkta gamit ang 6-digit OTP verification nang hindi na kailangang dumaan sa IT Support.
+                    Manage your login credentials, password, and registered email with secure 6-digit OTP verification directly without contacting IT Support.
                   </p>
                 </div>
 
@@ -957,12 +957,12 @@ export default function StudentProfilePage() {
                         {emailAddress}
                       </span>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        Ginagamit sa pag-login, pagtanggap ng mga opisyal na anunsyo, at mga security codes.
+                        Used for session authentication, official school announcements, and security verification codes.
                       </p>
                     </div>
 
                     <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500 font-medium">Kailangan baguhin ang email?</span>
+                      <span className="text-[10px] text-slate-500 font-medium">Need to change your email?</span>
                       <button
                         type="button"
                         onClick={openEmailModal}
@@ -992,12 +992,12 @@ export default function StudentProfilePage() {
                         &bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;
                       </span>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        Pinoprotektahan ang iyong personal na rekord at portal access alinsunod sa DepEd security policy.
+                        Protects your student records and portal access in compliance with DepEd security policies.
                       </p>
                     </div>
 
                     <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500 font-medium">Gusto mong magpalit ng password?</span>
+                      <span className="text-[10px] text-slate-500 font-medium">Want to change your password?</span>
                       <button
                         type="button"
                         onClick={openPasswordModal}
@@ -1039,10 +1039,10 @@ export default function StudentProfilePage() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-700 leading-relaxed">
-                    Dahil ikaw ay kasalukuyang naka-sign in na sa iyong opisyal na account, <strong>hindi mo na kailangang kontakin ang IT Support</strong> upang magpalit ng iyong password o email. Maaari mo itong gawin agad gamit ang mga buttons sa itaas, at isang 6-digit verification code ang ipapadala sa iyong email upang tiyakin ang seguridad.
+                    Since you are already signed in to your official learner account, <strong>you do not need to contact IT Support</strong> to change your password or email. You can update them directly using the self-service controls above, and a 6-digit verification code will be sent to authorize each update.
                   </p>
                   <p className="text-[11px] text-slate-500">
-                    * Paalala: Ang pagkontak lamang sa IT Support Desk (<code>dumalnext@gmail.com</code>) ay kinakailangan kung nakalimutan mo ang iyong password habang nasa labas (login menu) ng portal.
+                    * Notice: Contacting the IT Support Desk (<code>dumalnext@gmail.com</code>) is only required if you forgot your password outside the portal at the login screen.
                   </p>
                 </div>
               </div>
@@ -1052,7 +1052,7 @@ export default function StudentProfilePage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL 1: CHANGE PASSWORD WITH 6-DIGIT OTP */}
+      {/* MODAL 1: CHANGE PASSWORD WITH 6-DIGIT OTP (STRICTLY ENGLISH) */}
       {/* ========================================================================= */}
       {securityModal === "password" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs">
@@ -1107,7 +1107,7 @@ export default function StudentProfilePage() {
                       Security Verification Step
                     </span>
                     <p className="text-slate-700 leading-relaxed">
-                      Upang matiyak na ikaw ang may-ari ng account na ito, magpapadala kami ng <strong>6-digit verification code</strong> sa iyong rehistradong email:
+                      To verify that you are the authorized owner of this account, we will send a <strong>6-digit verification code</strong> to your registered email:
                     </p>
                     <p className="font-mono font-bold text-[#002060] bg-white p-2 rounded border border-slate-200 text-center">
                       {maskEmailAddress(emailAddress)}
@@ -1155,7 +1155,7 @@ export default function StudentProfilePage() {
                       autoFocus
                     />
                     <div className="flex items-center justify-between mt-1 text-[11px]">
-                      <span className="text-slate-500">Nasa inbox o spam folder</span>
+                      <span className="text-slate-500">Check your email inbox or spam folder</span>
                       <button
                         type="button"
                         onClick={handleSendPasswordOtp}
@@ -1170,7 +1170,7 @@ export default function StudentProfilePage() {
                   {/* New Password Field */}
                   <div>
                     <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
-                      Bagong Password (Minimum 6 characters)
+                      New Password (Minimum 6 characters)
                     </label>
                     <div className="relative">
                       <input
@@ -1195,7 +1195,7 @@ export default function StudentProfilePage() {
                   {/* Confirm Password Field */}
                   <div>
                     <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
-                      Kumpirmahin ang Bagong Password
+                      Confirm New Password
                     </label>
                     <div className="relative">
                       <input
@@ -1224,7 +1224,7 @@ export default function StudentProfilePage() {
                       disabled={securityLoading}
                       className="px-3.5 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-lg transition-colors cursor-pointer"
                     >
-                      Bumalik
+                      Back
                     </button>
 
                     <button
@@ -1250,7 +1250,7 @@ export default function StudentProfilePage() {
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL 2: CHANGE EMAIL WITH 6-DIGIT OTP */}
+      {/* MODAL 2: CHANGE EMAIL WITH 6-DIGIT OTP (STRICTLY ENGLISH) */}
       {/* ========================================================================= */}
       {securityModal === "email" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs">
@@ -1302,7 +1302,7 @@ export default function StudentProfilePage() {
                 <div className="space-y-3.5 text-xs">
                   <div>
                     <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px] block mb-1">
-                      Kasalukuyang Email
+                      Current Registered Email
                     </span>
                     <input
                       type="text"
@@ -1314,18 +1314,18 @@ export default function StudentProfilePage() {
 
                   <div>
                     <label className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block mb-1">
-                      Bagong Email Address (e.g. yourname@gmail.com)
+                      New Email Address (e.g. yourname@gmail.com)
                     </label>
                     <input
                       type="email"
                       value={newEmailInput}
                       onChange={(e) => setNewEmailInput(e.target.value)}
-                      placeholder="bagong.email@gmail.com"
+                      placeholder="new.email@gmail.com"
                       className="w-full p-2.5 border-2 border-slate-300 focus:border-[#002060] rounded-lg text-slate-900 text-xs focus:outline-hidden"
                       required
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Magpapadala kami ng 6-digit verification code sa bagong email address na ito upang patunayan ang iyong pagmamay-ari bago ito maging opisyal na login email.
+                      We will send a 6-digit verification code to this new email address to verify ownership before it is linked to your account.
                     </p>
                   </div>
 
@@ -1357,7 +1357,7 @@ export default function StudentProfilePage() {
                 <form onSubmit={handleUpdateEmail} className="space-y-3.5 text-xs">
                   <div>
                     <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px] block mb-1">
-                      Bagong Email Address
+                      New Email Address
                     </span>
                     <input
                       type="text"
@@ -1382,7 +1382,7 @@ export default function StudentProfilePage() {
                       autoFocus
                     />
                     <div className="flex items-center justify-between mt-1 text-[11px]">
-                      <span className="text-slate-500">I-check ang inbox ng bagong email</span>
+                      <span className="text-slate-500">Check the inbox of your new email address</span>
                       <button
                         type="button"
                         onClick={handleSendEmailOtp}
@@ -1401,7 +1401,7 @@ export default function StudentProfilePage() {
                       disabled={securityLoading}
                       className="px-3.5 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-lg transition-colors cursor-pointer"
                     >
-                      Bumalik
+                      Back
                     </button>
 
                     <button
