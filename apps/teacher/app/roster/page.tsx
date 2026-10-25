@@ -716,7 +716,7 @@ export default function ClassSectionRosterPage() {
                           : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
                       }`}
                     >
-                      &larr; Prev
+Prev
                     </button>
 
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
@@ -748,7 +748,7 @@ export default function ClassSectionRosterPage() {
                           : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
                       }`}
                     >
-                      Next &rarr;
+                      Next
                     </button>
                   </div>
                 </div>
