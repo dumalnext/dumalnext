@@ -552,87 +552,6 @@ export default function Step1ApplicantType({
         </div>
       )}
 
-      {/* Part 4: Junior High School Curricular Program (Regular vs SPS) - Grades 7 to 10 */}
-      {isJHS && data.applicantType && (
-        <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300">
-          <div className="border-l-4 border-[#002060] pl-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
-                Junior High School Curricular Program (DepEd SCP)
-              </label>
-              <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-2 py-0.5 font-bold">
-                JHS CURRICULUM
-              </span>
-            </div>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Select whether the student is enrolling in the standard basic education curriculum or the Special Program in Sports (SPS).
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            {/* Regular JHS */}
-            <button
-              type="button"
-              onClick={() => onChange({ jhsProgram: "Regular" })}
-              className={`p-5 border-2 text-left transition-all ${
-                (data.jhsProgram || "Regular") === "Regular"
-                  ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
-                  : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span
-                  className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
-                    (data.jhsProgram || "Regular") === "Regular"
-                      ? "bg-[#002060] text-white"
-                      : "bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  [ {(data.jhsProgram || "Regular") === "Regular" ? "SELECTED" : "CHOOSE"} ]
-                </span>
-                <span className="text-xs font-bold text-[#002060]">STANDARD JHS</span>
-              </div>
-              <div className="text-base font-bold text-slate-900">
-                Regular Basic Education Curriculum
-              </div>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Standard secondary basic education curriculum covering core subject areas: English, Science, Mathematics, Filipino, Araling Panlipunan, MAPEH, ESP, and TLE.
-              </p>
-            </button>
-
-            {/* SPS */}
-            <button
-              type="button"
-              onClick={() => onChange({ jhsProgram: "SPS" })}
-              className={`p-5 border-2 text-left transition-all ${
-                data.jhsProgram === "SPS"
-                  ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
-                  : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span
-                  className={`text-[11px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider ${
-                    data.jhsProgram === "SPS"
-                      ? "bg-[#002060] text-white"
-                      : "bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  [ {data.jhsProgram === "SPS" ? "SELECTED" : "CHOOSE"} ]
-                </span>
-                <span className="text-xs font-bold text-emerald-800 font-mono">DEPED SCP</span>
-              </div>
-              <div className="text-base font-bold text-slate-900">
-                Special Program in Sports (SPS)
-              </div>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Specialized curricular track for student-athletes with proven athletic competence, combining core academic coursework with dedicated athletic conditioning and sports training.
-              </p>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Part 5: DepEd Section 6: Previous School & Academic Prerequisite Background */}
       {data.applicantType && (
         <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
@@ -1075,11 +994,7 @@ export default function Step1ApplicantType({
               {data.applicantType === "Returning" && `Returning Learner (Balik-Aral) for Grade ${data.targetGradeLevel}`}
             </strong>{" "}
             under the <strong>{data.isGraded ? "Graded Curriculum Program" : "Non-Graded Program (SNEd Only)"}</strong>.
-            {isJHS && (
-              <span className="block mt-1 text-slate-800 font-semibold">
-                JHS Curricular Program: {(data.jhsProgram || "Regular") === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education Curriculum"}
-              </span>
-            )}
+            
             {isSHS && data.targetStrand && (
               <span className="block mt-1 text-slate-800 font-semibold">
                 Senior High Placement: {data.targetSemester} | {data.targetTrack} ({data.targetStrand})

@@ -366,7 +366,7 @@ export default function Step4CurriculumModality({
       if (isJHS) {
         onChange({
           jhsProgram: currentJhsProgram,
-          spsSport: currentJhsProgram === "SPS" ? currentSpsSport : "",
+          spsSport: undefined,
           targetTrack: "",
           targetStrand: "",
           targetSemester: "",
@@ -449,87 +449,23 @@ export default function Step4CurriculumModality({
       {/* CONDITIONAL SECTION A: JUNIOR HIGH SCHOOL CURRICULAR PROGRAM (GRADES 7-10) */}
       {/* ========================================================================= */}
       {isJHS ? (
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
-          <div className="border-b-2 border-slate-200 pb-3">
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px] space-y-2">
+          <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060] block">
-              Section 4-B: Junior High School Curricular Program
+              Section 4-B: Junior High School Curriculum
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select the academic curriculum program for incoming Grade {targetGrade} at Dumalneg National High School:
+              Grade {targetGrade} curriculum at Dumalneg National High School:
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {JHS_PROGRAMS.map((program) => {
-              const isSelected = currentJhsProgram === program.code;
-              return (
-                <label
-                  key={program.code}
-                  className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between rounded-[4px] ${
-                    isSelected
-                      ? "bg-white border-[#002060] shadow-xs"
-                      : "bg-white border-slate-300 hover:border-slate-400"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="jhsProgram"
-                          value={program.code}
-                          checked={isSelected}
-                          onChange={() => {
-                            onChange({
-                              jhsProgram: program.code as "Regular" | "SPS",
-                              step1: { ...data.step1, jhsProgram: program.code as "Regular" | "SPS" },
-                            });
-                            if (errors.jhsProgram) {
-                              setErrors((prev) => {
-                                const next = { ...prev };
-                                delete next.jhsProgram;
-                                return next;
-                              });
-                            }
-                          }}
-                          className="accent-[#002060] mt-0.5"
-                        />
-                        <span className="text-xs font-bold text-slate-900">
-                          {program.title}
-                        </span>
-                      </div>
-                      {isSelected && (
-                        <span className="text-[10px] font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded-[4px]">
-                          SELECTED
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] font-semibold text-[#002060] mb-1">
-                      {program.subtitle}
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {program.description}
-                    </p>
-                  </div>
-                </label>
-              );
-            })}
+          <div className="p-4 bg-white border border-slate-200 rounded-[4px]">
+            <span className="text-xs font-bold text-slate-900 block">
+              Regular Basic Education Curriculum
+            </span>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Standard DepEd K-12 secondary curriculum encompassing core learning areas: English, Mathematics, Science, Filipino, Araling Panlipunan, Values Education (EsP), MAPEH, and Technology &amp; Livelihood Education (TLE).
+            </p>
           </div>
-          {errors.jhsProgram && (
-            <p className="text-[11px] font-bold text-red-700">{errors.jhsProgram}</p>
-          )}
-
-          {/* General SPS Program Notice */}
-          {currentJhsProgram === "SPS" && (
-            <div className="p-4 bg-blue-50/70 border border-blue-300 space-y-1 mt-4 rounded-[4px]">
-              <span className="text-xs font-bold text-[#002060] block">
-                General Special Program in Sports (SPS) Curriculum
-              </span>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                The learner is enrolled under the unified Special Program in Sports curriculum combining secondary academic courses with structured athletic training and sports development. No individual sport selection is required.
-              </p>
-            </div>
-          )}
         </div>
       ) : (
         /* ========================================================================= */

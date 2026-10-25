@@ -488,9 +488,7 @@ export default function CurriculumSubjectsConsole() {
                   <td className="p-3">
                     <span className="text-[11px] font-mono font-bold text-slate-800 block">
                       {isJhs
-                        ? sub.strand === "SPS"
-                          ? "Special Program in Sports (General SPS)"
-                          : "Regular Basic Education"
+                        ? "Regular Basic Education"
                         : sub.strand
                         ? sub.strand === "General"
                           ? "General (All Tracks)"
@@ -802,7 +800,7 @@ export default function CurriculumSubjectsConsole() {
             </span>
             <div className="text-2xl font-mono font-bold text-emerald-800 mt-1">{jhsTotal}</div>
           </div>
-          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Regular &amp; Special Program in Sports</span>
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Regular Basic Education</span>
         </div>
 
         <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
@@ -880,8 +878,7 @@ export default function CurriculumSubjectsConsole() {
                   { value: "Academic", label: "Academic Track (Strengthened SHS)" },
                   { value: "TechPro", label: "Technical-Professional (TechPro) Track" },
                   { value: "Regular", label: "Regular Basic Education (JHS)" },
-                  { value: "SPS", label: "Special Program in Sports (SPS)" },
-                  { value: "STEM", label: "STEM Track (Legacy SHS)" },
+                                    { value: "STEM", label: "STEM Track (Legacy SHS)" },
                   { value: "TVL-ICT", label: "TVL-ICT Track (Legacy SHS)" },
                   { value: "HUMSS", label: "HUMSS Track (Legacy SHS)" },
                   { value: "General", label: "General / Core (SHS)" },
@@ -944,7 +941,7 @@ export default function CurriculumSubjectsConsole() {
                 JHS (Headings)
               </h3>
               <p className="text-xs text-blue-100 mt-0.5 max-w-xl">
-                Junior High School official learning areas for Regular Basic Education and General Special Program in Sports (SPS).
+                Junior High School official learning areas for Regular Basic Education.
               </p>
             </div>
 
@@ -1224,9 +1221,9 @@ export default function CurriculumSubjectsConsole() {
                       onChange={(val) => {
                         const g = Number(val);
                         setFormGrade(g);
-                        if (g <= 10 && formStrand !== "Regular" && formStrand !== "SPS") {
+                        if (g <= 10 && formStrand !== "Regular") {
                           setFormStrand("Regular");
-                        } else if (g >= 11 && (formStrand === "Regular" || formStrand === "SPS")) {
+                        } else if (g >= 11 && (formStrand === "Regular")) {
                           setFormStrand("Academic");
                         }
                       }}
@@ -1315,8 +1312,7 @@ export default function CurriculumSubjectsConsole() {
                     onChange={(val) => setFormStrand(val)}
                     options={[
                       { value: "Regular", label: "Regular Basic Education" },
-                      { value: "SPS", label: "Special Program in Sports (General SPS)", badge: "SPS" },
-                    ]}
+                                          ]}
                   />
                 ) : (
                   <CustomSelect

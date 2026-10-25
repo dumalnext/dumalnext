@@ -403,27 +403,8 @@ export const JHS_PROGRAMS = [
     description:
       'Standard high school secondary curriculum encompassing core learning areas (English, Mathematics, Science, Filipino, Araling Panlipunan, MAPEH, TLE, and Edukasyon sa Pagpapakatao).',
   },
-  {
-    code: 'SPS',
-    title: 'Special Program in Sports (SPS)',
-    subtitle: 'Competitive Athletic & Academic Curriculum',
-    description:
-      'Specialized secondary program designed for students with demonstrated athletic aptitude. Combines academic courses with intensive sports training, coaching, and athletic representation for Dumalneg NHS in Division, Regional (CAVRAA/R1AA), and Palarong Pambansa meets.',
-  },
-] as const;
+  ] as const;
 
-export const SPS_SPORTS = [
-  'Athletics (Track & Field / Running)',
-  'Badminton',
-  'Basketball',
-  'Volleyball',
-  'Sepak Takraw',
-  'Table Tennis',
-  'Chess',
-  'Archery',
-  'Taekwondo / Combative Sports',
-  'Other Sports Discipline',
-] as const;
 
 export interface ElectiveSubject {
   code: string;

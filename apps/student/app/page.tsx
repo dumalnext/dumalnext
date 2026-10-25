@@ -1419,8 +1419,7 @@ function StudentHomeContent() {
                               primaryContactPerson: "Father",
                               hasNoGuardian: true,
                               jhsProgram: userApplication.jhsProgram || "Regular",
-                              spsSport: userApplication.spsSport || "",
-                              targetTrack: userApplication.targetTrack || "",
+                                                            targetTrack: userApplication.targetTrack || "",
                               targetStrand: userApplication.targetStrand || "",
                               targetSemester: userApplication.semester || "1st Semester",
                               isSned: false,
@@ -2345,7 +2344,7 @@ function StudentHomeContent() {
                   Elementary Completers &amp; JHS Applicants
                 </h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Choose between the Regular JHS Curriculum or the Special Program in Sports (SPS). Prepare your 12-digit LRN, PSA Birth Certificate, and Grade 6 SF9 (Form 138).
+                  Enrolling under the Regular Basic Education JHS Curriculum. Prepare your 12-digit LRN, PSA Birth Certificate, and Grade 6 SF9 (Form 138).
                 </p>
               </div>
 

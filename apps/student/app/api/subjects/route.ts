@@ -42,7 +42,6 @@ const DEFAULT_FALLBACK_SUBJECTS: CourseSubjectItem[] = [
   { id: "sub-jhs-7-06", subject_code: "JHS-AP7", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-7-07", subject_code: "JHS-TLE7", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-7-08", subject_code: "JHS-MAP7", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 7, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-7-09", subject_code: "JHS-SPS7", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 7, trimester: 1, strand: "SPS" },
   { id: "sub-jhs-7-10", subject_code: "JHS-ARAL7", subject_name: "ARAL Program (Academic Recovery)", subject_type: "Intervention", grade_level: 7, trimester: 1, strand: "Regular" },
 
   // Grade 8 JHS Core
@@ -54,7 +53,6 @@ const DEFAULT_FALLBACK_SUBJECTS: CourseSubjectItem[] = [
   { id: "sub-jhs-8-06", subject_code: "JHS-AP8", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-8-07", subject_code: "JHS-TLE8", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-8-08", subject_code: "JHS-MAP8", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 8, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-8-09", subject_code: "JHS-SPS8", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 8, trimester: 1, strand: "SPS" },
 
   // Grade 9 JHS Core
   { id: "sub-jhs-9-01", subject_code: "JHS-VAL9", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
@@ -65,7 +63,6 @@ const DEFAULT_FALLBACK_SUBJECTS: CourseSubjectItem[] = [
   { id: "sub-jhs-9-06", subject_code: "JHS-AP9", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-9-07", subject_code: "JHS-TLE9", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-9-08", subject_code: "JHS-MAP9", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 9, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-9-09", subject_code: "JHS-SPS9", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 9, trimester: 1, strand: "SPS" },
 
   // Grade 10 JHS Core
   { id: "sub-jhs-10-01", subject_code: "JHS-VAL10", subject_name: "Values Education (EsP)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
@@ -76,7 +73,6 @@ const DEFAULT_FALLBACK_SUBJECTS: CourseSubjectItem[] = [
   { id: "sub-jhs-10-06", subject_code: "JHS-AP10", subject_name: "Araling Panlipunan", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-10-07", subject_code: "JHS-TLE10", subject_name: "Technology & Livelihood Education (TLE)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
   { id: "sub-jhs-10-08", subject_code: "JHS-MAP10", subject_name: "MAPEH (Music, Arts, PE, Health)", subject_type: "Core", grade_level: 10, trimester: 1, strand: "Regular" },
-  { id: "sub-jhs-10-09", subject_code: "JHS-SPS10", subject_name: "General Sports & Athletic Training", subject_type: "Specialized", grade_level: 10, trimester: 1, strand: "SPS" },
 
   // Senior High School (Grades 11 & 12) - DepEd Strengthened SHS Curriculum
   // 5 Mandatory Core Subjects

@@ -73,8 +73,7 @@ export interface FullEnrollmentFormData {
   snedDetails: string[];
   hasPwdId: boolean;
   jhsProgram?: "Regular" | "SPS";
-  spsSport?: string;
-  targetSemester: "1st Semester" | "2nd Semester" | "";
+    targetSemester: "1st Semester" | "2nd Semester" | "";
   targetTrack: string;
   targetStrand: string;
   selectedElectives: string[];
@@ -155,8 +154,7 @@ const initialFormData: FullEnrollmentFormData = {
   snedDetails: [],
   hasPwdId: false,
   jhsProgram: "Regular",
-  spsSport: "",
-  targetSemester: "1st Semester",
+    targetSemester: "1st Semester",
   targetTrack: "Academic Track",
   targetStrand: "",
   selectedElectives: [],

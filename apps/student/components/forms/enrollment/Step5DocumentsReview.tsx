@@ -510,7 +510,7 @@ export default function Step5DocumentsReview({
         gradeLevel: data.step1.targetGradeLevel,
         applicantType: data.step1.applicantType,
         jhsProgram: data.jhsProgram,
-        spsSport: data.spsSport,
+        
         targetTrack: data.targetTrack,
         targetStrand: data.targetStrand,
         primaryContact: data.primaryContactPerson,
@@ -775,11 +775,7 @@ export default function Step5DocumentsReview({
             <div>
               <span className="font-bold text-slate-500 block text-[10px]">Curriculum Program / Track</span>
               <span className="font-bold text-slate-900">
-                {isG7
-                  ? data.jhsProgram === "SPS"
-                    ? `Special Program in Sports (SPS: ${data.spsSport || "General"})`
-                    : "Regular JHS Curriculum"
-                  : `${data.targetTrack} - ${data.targetStrand}`}
+                {isG7 ? "Regular JHS Curriculum" : `${data.targetTrack} - ${data.targetStrand}`}
               </span>
             </div>
             <div>
@@ -1087,11 +1083,7 @@ export default function Step5DocumentsReview({
               <div className="col-span-2">
                 <span className="text-[10px] font-bold text-slate-500 block">Curricular Program / Track</span>
                 <span className="font-bold text-[#002060]">
-                  {isG7
-                    ? data.jhsProgram === "SPS"
-                    ? `Special Program in Sports (SPS: ${data.spsSport || "Selected"})`
-                    : "Regular Junior High School Curriculum"
-                    : `${data.targetTrack} - ${data.targetStrand} (${data.targetSemester})`}
+                  {isG7 ? "Regular Junior High School Curriculum" : `${data.targetTrack} - ${data.targetStrand} (${data.targetSemester})`}
                 </span>
               </div>
               {data.careerPathway && (

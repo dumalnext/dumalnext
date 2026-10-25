@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import {
   JHS_PROGRAMS,
-  SPS_SPORTS,
+  
   SHS_STRANDS,
   SNED_DIAGNOSES,
   SNED_MANIFESTATIONS,
@@ -97,9 +97,7 @@ export default function Step4CurriculumModality({
       if (!currentJhsProgram) {
         newErrors.jhsProgram = "Please select a Junior High School curricular program.";
       }
-      if (currentJhsProgram === "SPS" && (!currentSpsSport || currentSpsSport.trim() === "")) {
-        newErrors.spsSport = "Please select a designated sports discipline for the Special Program in Sports.";
-      }
+      
     } else {
       // SHS Validation
       if (!currentSemester) {
@@ -135,7 +133,7 @@ export default function Step4CurriculumModality({
       if (isJHS) {
         onChange({
           jhsProgram: currentJhsProgram,
-          spsSport: currentJhsProgram === "SPS" ? currentSpsSport : "",
+          spsSport: undefined,
           targetTrack: "",
           targetStrand: "",
           targetSemester: "",
@@ -205,113 +203,23 @@ export default function Step4CurriculumModality({
       {/* CONDITIONAL SECTION A: JUNIOR HIGH SCHOOL CURRICULAR PROGRAM (GRADES 7-10) */}
       {/* ========================================================================= */}
       {isJHS ? (
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-          <div className="border-b-2 border-slate-200 pb-3">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section 4-B: Junior High School Curricular Program ]
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px] space-y-2">
+          <div className="border-b border-slate-200 pb-2">
+            <span className="text-xs font-bold text-[#002060] block">
+              Section 4-B: Junior High School Curriculum
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select the academic curriculum program for incoming Grade {targetGrade} at Dumalneg National High School:
+              Grade {targetGrade} curriculum at Dumalneg National High School:
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {JHS_PROGRAMS.map((program) => {
-              const isSelected = currentJhsProgram === program.code;
-              return (
-                <label
-                  key={program.code}
-                  className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between ${
-                    isSelected
-                      ? "bg-white border-[#002060] shadow-xs"
-                      : "bg-white border-slate-300 hover:border-slate-400"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="jhsProgram"
-                          value={program.code}
-                          checked={isSelected}
-                          onChange={() => {
-                            onChange({
-                              jhsProgram: program.code as "Regular" | "SPS",
-                              step1: { ...data.step1, jhsProgram: program.code as "Regular" | "SPS" },
-                            });
-                            if (errors.jhsProgram) {
-                              setErrors((prev) => {
-                                const next = { ...prev };
-                                delete next.jhsProgram;
-                                return next;
-                              });
-                            }
-                          }}
-                          className="accent-[#002060] mt-0.5"
-                        />
-                        <span className="text-xs font-bold text-slate-900 uppercase tracking-tight">
-                          {program.title}
-                        </span>
-                      </div>
-                      {isSelected && (
-                        <span className="text-[10px] font-mono font-bold bg-[#002060] text-white px-2 py-0.5 uppercase">
-                          SELECTED
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] font-semibold text-[#002060] uppercase mb-1">
-                      {program.subtitle}
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {program.description}
-                    </p>
-                  </div>
-                </label>
-              );
-            })}
+          <div className="p-4 bg-white border border-slate-200 rounded-[4px]">
+            <span className="text-xs font-bold text-slate-900 block">
+              Regular Basic Education Curriculum
+            </span>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Standard DepEd K-12 secondary curriculum encompassing core learning areas: English, Mathematics, Science, Filipino, Araling Panlipunan, Values Education (EsP), MAPEH, and Technology &amp; Livelihood Education (TLE).
+            </p>
           </div>
-          {errors.jhsProgram && (
-            <p className="text-[11px] font-bold text-red-700">{errors.jhsProgram}</p>
-          )}
-
-          {/* Conditional Sport Specialization when SPS is Selected */}
-          {currentJhsProgram === "SPS" && (
-            <div className="p-5 bg-blue-50/60 border-2 border-blue-200 space-y-3 mt-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Designated Sports Specialization Discipline <span className="text-red-700">*</span>
-                </label>
-                <p className="text-xs text-slate-600 mb-2">
-                  Indicate the primary athletic event or sports discipline the student-athlete specializes in for varsity training and Division Meet representation:
-                </p>
-                <CustomSelect
-                  value={currentSpsSport}
-                  onChange={(val) => {
-                    onChange({ spsSport: val });
-                    if (errors.spsSport) {
-                      setErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.spsSport;
-                        return next;
-                      });
-                    }
-                  }}
-                  options={SPS_SPORTS.map((sport) => ({
-                    value: sport,
-                    label: sport,
-                  }))}
-                  placeholder="-- SELECT SPORT DISCIPLINE --"
-                  className="w-full sm:w-96"
-                  fullWidth
-                  error={Boolean(errors.spsSport)}
-                />
-                {errors.spsSport && (
-                  <p className="text-[11px] font-bold text-red-700 mt-1">{errors.spsSport}</p>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       ) : (
         /* ========================================================================= */

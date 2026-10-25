@@ -393,11 +393,7 @@ export default function ScheduleDeconflictionConsole() {
 
       // 2. Junior High School (Grades 7 - 10)
       if (secGrade <= 10) {
-        if (secStrand === "SPS") {
-          return sub.strand === "SPS" || !sub.strand || sub.strand === "Regular" || sub.subject_type === "Core";
-        } else {
-          return sub.strand !== "SPS";
-        }
+        return true;
       }
 
       // 3. Senior High School (Grades 11 - 12)

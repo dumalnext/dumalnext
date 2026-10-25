@@ -69,8 +69,7 @@ export interface ApplicationDetail {
     last_school_id?: string;
     preferred_modalities?: string[];
     jhs_program?: string;
-    sps_sport?: string;
-  };
+      };
   // Joined user account
   userAccount?: {
     email: string;
@@ -498,7 +497,7 @@ export default function AdjudicationModal({
         if (isSHS) {
           studentUpdates.strand = isTechPro ? "Tech-Pro" : "Academic";
         } else if (!application.target_strand && targetProgram) {
-          studentUpdates.strand = targetProgram === "SPS" ? "SPS" : null;
+          studentUpdates.strand = null;
         }
 
         const { error: stErr } = await supabase
@@ -670,27 +669,7 @@ export default function AdjudicationModal({
 
         {/* Scrollable Content Body */}
         <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 space-y-6 text-xs text-slate-800 stable-gutter custom-scrollbar">
-          {/* Continuing JHS Transfer Request High-Visibility Banner */}
-          {isTransferRequested && (
-            <div className="p-4 bg-amber-50 border-2 border-amber-500 space-y-2 shadow-xs">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 bg-amber-200/80 px-2.5 py-0.5 border border-amber-400">
-                  JHS CURRICULAR PROGRAM TRANSFER REQUEST DETECTED
-                </span>
-                <span className="text-[11px] font-mono text-amber-900 font-bold">
-                  ACTION: REQUIRES REGISTRAR REVIEW
-                </span>
-              </div>
-              <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                This continuing Junior High School learner has requested a curricular program change from{" "}
-                <strong>{previousProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> to{" "}
-                <strong className="text-[#002060]">{targetProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> for S.Y. {application.school_year}.
-              </p>
-              <div className="text-[11px] text-amber-900 font-mono">
-                Previous Program: <strong>{previousProgram}</strong> &bull; Requested Program: <strong className="text-[#002060]">{targetProgram}</strong>
-              </div>
-            </div>
-          )}
+          
 
           {/* TAB 1: LEARNER PROFILE */}
           {activeTab === "learner" && (
@@ -923,8 +902,6 @@ export default function AdjudicationModal({
                     <strong className="text-slate-900">
                       {isSHS
                         ? `Senior High School - ${shsTrackTitle}`
-                        : targetProgram === "SPS"
-                        ? "Special Program in Sports (General SPS)"
                         : "Regular Basic Education JHS Curriculum"}
                     </strong>
                   </div>

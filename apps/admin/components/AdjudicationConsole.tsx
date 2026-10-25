@@ -283,7 +283,7 @@ export default function AdjudicationConsole() {
           last_school_id: fd.lastSchoolId || fd.step1?.lastSchoolId || fd.last_school_id,
           preferred_modalities: fd.preferredModalities || fd.preferred_modalities,
           jhs_program: fd.jhsProgram || fd.step1?.jhsProgram || fd.jhs_program,
-          sps_sport: fd.spsSport || fd.sps_sport,
+          
         } : undefined;
 
         const rawTerm = (
@@ -643,16 +643,10 @@ export default function AdjudicationConsole() {
             </div>
           ) : (
             <span className="text-[10px] text-slate-600 block">
-              {(app as any).jhsProgram === "SPS" || st?.jhs_program === "SPS"
-                ? "JHS (General SPS)"
-                : "JHS Regular Curriculum"}
+              {"JHS Regular Curriculum"}
             </span>
           )}
-          {(app as any).isTransferRequested && (
-            <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-400">
-              TRANSFER REQ: {(app as any).previousJhsProgram || "Regular"} to {(app as any).jhsProgram || "SPS"}
-            </span>
-          )}
+          
           <div className="flex flex-wrap items-center gap-1 mt-1">
             <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block">
               S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}

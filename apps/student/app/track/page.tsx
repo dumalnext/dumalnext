@@ -24,8 +24,7 @@ interface ApplicationRecord {
   gradeLevel: number | string;
   applicantType: string;
   jhsProgram?: string;
-  spsSport?: string;
-  targetTrack?: string;
+    targetTrack?: string;
   targetStrand?: string;
   primaryContact?: string;
   contactNumber?: string;
@@ -117,7 +116,7 @@ function TrackApplicationContent() {
       : (typeof suApp.selected_electives === "object" && suApp.selected_electives !== null ? suApp.selected_electives : {});
     const cleanSY = suApp.school_year || fd.schoolYear || "2026-2027";
     const appSem = fd.term_name || fd.termName || fd.semester || fd.term || fd.targetSemester || suApp.term_name || suApp.semester || "Trimester 1";
-    const jhsProg = fd.jhsProgram || suApp.jhs_program || (suApp.target_strand === "SPS" ? "SPS" : "Regular");
+    const jhsProg = "Regular";
 
     return {
       id: suApp.id,
@@ -210,8 +209,7 @@ function TrackApplicationContent() {
         guardianRelationship: "",
         primaryContactPerson: "Father",
         jhsProgram: "Regular",
-        spsSport: "",
-        targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
+                targetTrack: suApp.target_strand ? "Senior High School" : "Junior High School",
         targetStrand: suApp.target_strand || "",
         selectedElectives: [],
         targetSemester: "1st Semester",
@@ -459,7 +457,7 @@ function TrackApplicationContent() {
       try {
         // 1. Fetch Subjects for Student's Grade Level and Strand/Program
         const gradeParam = record.gradeLevel || 7;
-        const strandParam = record.targetStrand || (record.jhsProgram === "SPS" ? "SPS" : "Regular");
+        const strandParam = record.targetStrand || "Regular";
         const subjectsUrl = `/api/subjects?gradeLevel=${gradeParam}&strand=${encodeURIComponent(strandParam)}`;
 
         const subjPromise = fetch(subjectsUrl)
@@ -569,8 +567,7 @@ function TrackApplicationContent() {
         snedDetails: [],
         hasPwdId: false,
         jhsProgram: (record.jhsProgram as any) || "Regular",
-        spsSport: record.spsSport || "",
-        targetSemester: "1st Semester",
+                targetSemester: "1st Semester",
         targetTrack: record.targetTrack || "Academic Track",
         targetStrand: record.targetStrand || "STEM",
         selectedElectives: [],
@@ -911,7 +908,7 @@ Portal Home
                   Curricular learning areas designated for Grade {record.gradeLevel}{" "}
                   {record.targetStrand
                     ? `(${record.targetStrand})`
-                    : `(${record.jhsProgram === "SPS" ? "Special Program in Sports" : "Regular JHS Curriculum"})`}
+                    : "(Regular JHS Curriculum)"}
                 </p>
               </div>
               <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-3 py-1 border border-slate-300 rounded-[4px]">
