@@ -253,18 +253,7 @@ export default function FacultyProfilePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div className="p-4 bg-slate-50 border border-slate-200 space-y-1">
             <span className="text-[11px] font-mono text-slate-500 uppercase block">Faculty Full Name</span>
-            <div className="flex items-center justify-between">
-              <strong className="text-sm text-slate-900 block">{user.fullName}</strong>
-              {!isEditingName && (
-                <button
-                  type="button"
-                  onClick={handleStartEdit}
-                  className="text-[11px] text-[#002060] font-bold uppercase underline cursor-pointer hover:text-blue-950"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
+            <strong className="text-sm text-slate-900 block">{user.fullName}</strong>
           </div>
 
           <div className="p-4 bg-slate-50 border border-slate-200 space-y-1">
