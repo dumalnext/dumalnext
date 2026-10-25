@@ -1275,7 +1275,7 @@ Home Dashboard
                               {sch.teacher_name || "Faculty Assigned"}
                             </td>
                             <td className="py-2 px-3 text-slate-600">
-                              {sch.room || assignedSection.room || "Room 101"}
+                              {sch.classroom_name || sch.room || assignedSection.room || "Room 101"}
                             </td>
                           </tr>
                         ))}

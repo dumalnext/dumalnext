@@ -75,14 +75,14 @@ interface TimeSlotDef {
 const ACADEMIC_TIME_SLOTS: TimeSlotDef[] = [
   { id: "P1", name: "Period 1", start: "07:30", end: "08:30" },
   { id: "P2", name: "Period 2", start: "08:30", end: "09:30" },
-  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "09:45", isBreak: true },
-  { id: "P3", name: "Period 3", start: "09:45", end: "10:45" },
-  { id: "P4", name: "Period 4", start: "10:45", end: "11:45" },
-  { id: "LUNCH", name: "Noon Lunch Break", start: "11:45", end: "13:00", isBreak: true },
+  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "10:00", isBreak: true },
+  { id: "P3", name: "Period 3", start: "10:00", end: "11:00" },
+  { id: "P4", name: "Period 4", start: "11:00", end: "12:00" },
+  { id: "LUNCH", name: "Noon Lunch Break", start: "12:00", end: "13:00", isBreak: true },
   { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
   { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
-  { id: "P7", name: "Transition / Homeroom", start: "15:00", end: "15:30" },
-  { id: "ELECTIVE", name: "SHS Specialized Electives Window", start: "15:30", end: "17:00" },
+  { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
+  { id: "P8", name: "Period 8", start: "16:00", end: "17:00" },
 ];
 
 const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday"> = [
@@ -92,6 +92,24 @@ const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Fri
   "Thursday",
   "Friday",
 ];
+
+export function formatTime12h(timeStr?: string | null): string {
+  if (!timeStr) return "";
+  const clean = timeStr.trim().split(" ")[0];
+  const [hStr, mStr] = clean.split(":");
+  const h = parseInt(hStr, 10);
+  if (isNaN(h)) return timeStr;
+  const m = mStr ? mStr.padStart(2, "0") : "00";
+  const period = h >= 12 ? "PM" : "AM";
+  const displayH = h % 12 === 0 ? 12 : h % 12;
+  return `${displayH}:${m} ${period}`;
+}
+
+export function formatTimeRange12h(start?: string | null, end?: string | null): string {
+  if (!start) return "";
+  if (!end) return formatTime12h(start);
+  return `${formatTime12h(start)} – ${formatTime12h(end)}`;
+}
 
 function toMinutes(t: string): number {
   if (!t) return 0;
@@ -346,7 +364,7 @@ export default function ScheduleDeconflictionConsole() {
             conflicts.push({
               day,
               type: "teacher",
-              message: `Teacher Collision (${day}): Faculty is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} at ${sc.start_time}–${sc.end_time}.`,
+              message: `Teacher Collision (${day}): Faculty is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
             });
             break;
           }
@@ -354,7 +372,7 @@ export default function ScheduleDeconflictionConsole() {
             conflicts.push({
               day,
               type: "room",
-              message: `Room Collision (${day}): ${sc.classroom_name || "Selected Room"} is already booked by ${sc.section_name || "another class"} at ${sc.start_time}–${sc.end_time}.`,
+              message: `Room Collision (${day}): ${sc.classroom_name || "Selected Room"} is already booked by ${sc.section_name || "another class"} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
             });
             break;
           }
@@ -362,7 +380,7 @@ export default function ScheduleDeconflictionConsole() {
             conflicts.push({
               day,
               type: "section",
-              message: `Section Collision (${day}): ${sc.section_name || "This Section"} already has ${sc.subject_name || sc.subject_code} scheduled at ${sc.start_time}–${sc.end_time}.`,
+              message: `Section Collision (${day}): ${sc.section_name || "This Section"} already has ${sc.subject_name || sc.subject_code} scheduled at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
             });
             break;
           }
@@ -656,13 +674,13 @@ export default function ScheduleDeconflictionConsole() {
         if (excludeIds.includes(sc.id)) continue;
         if (sc.day_of_week.toLowerCase() === day.toLowerCase() && timesOverlap(sc.start_time, sc.end_time, start, end)) {
           if (item.teacher_id && sc.teacher_id && sc.teacher_id === item.teacher_id) {
-            return `Faculty Collision: ${item.teacher_name || "Faculty"} is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${day} at ${sc.start_time}–${sc.end_time}.`;
+            return `Faculty Collision: ${item.teacher_name || "Faculty"} is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
           }
           if (item.classroom_id && sc.classroom_id && item.classroom_id !== "unassigned" && sc.classroom_id !== "unassigned" && sc.classroom_id === item.classroom_id) {
-            return `Room Collision: ${item.classroom_name || "Facility"} is already occupied by ${sc.section_name || "another class"} on ${day} at ${sc.start_time}–${sc.end_time}.`;
+            return `Room Collision: ${item.classroom_name || "Facility"} is already occupied by ${sc.section_name || "another class"} on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
           }
           if (item.section_id && sc.section_id && sc.section_id === item.section_id) {
-            return `Section Collision: ${item.section_name || "Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${day} at ${sc.start_time}–${sc.end_time}.`;
+            return `Section Collision: ${item.section_name || "Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
           }
         }
       }
@@ -702,7 +720,7 @@ export default function ScheduleDeconflictionConsole() {
         setDragOverSlot(null);
         showConflictAlert(
           "Schedule Conflict (Cannot Swap)",
-          `Cannot swap "${occupantItem.subject_name}" into ${activeItem.day_of_week} ${activeItem.start_time.slice(0, 5)}–${activeItem.end_time.slice(0, 5)}:\n\n${conflictB}`
+          `Cannot swap "${occupantItem.subject_name}" into ${activeItem.day_of_week} at ${formatTimeRange12h(activeItem.start_time, activeItem.end_time)}:\n\n${conflictB}`
         );
         return;
       }
@@ -1384,11 +1402,11 @@ export default function ScheduleDeconflictionConsole() {
                         return (
                           <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
                             <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
-                              <div>{slot.start} – {slot.end}</div>
+                              <div>{formatTimeRange12h(slot.start, slot.end)}</div>
                               <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                             </td>
                             <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                              {slot.start} – {slot.end} &bull; {slot.name}
+                              {formatTimeRange12h(slot.start, slot.end)} &bull; {slot.name}
                             </td>
                           </tr>
                         );
@@ -1400,7 +1418,7 @@ export default function ScheduleDeconflictionConsole() {
                           {/* Left Time Column */}
                           <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
                             <div className="font-bold text-[#002060] text-xs">
-                              {slot.start} – {slot.end}
+                              {formatTimeRange12h(slot.start, slot.end)}
                             </div>
                             <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
                               {slot.name}
@@ -1511,7 +1529,7 @@ export default function ScheduleDeconflictionConsole() {
                                             ? "text-purple-950 bg-white border-purple-200"
                                             : "text-blue-950 bg-white border-blue-200"
                                         }`}>
-                                          {matchedItem.start_time}–{matchedItem.end_time}
+                                          {formatTimeRange12h(matchedItem.start_time, matchedItem.end_time)}
                                         </span>
                                         {isElective && (
                                           <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
@@ -1587,7 +1605,7 @@ export default function ScheduleDeconflictionConsole() {
                                           ⤵ Drop to Move Here
                                         </span>
                                         <span className="text-[10px] text-blue-900 mt-0.5 font-medium">
-                                          {day} &bull; {slot.start}–{slot.end}
+                                          {day} &bull; {formatTimeRange12h(slot.start, slot.end)}
                                         </span>
                                       </div>
                                     ) : (
@@ -1598,7 +1616,7 @@ export default function ScheduleDeconflictionConsole() {
                                           className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
                                             draggedSchedule ? "border-blue-400 bg-blue-50/40 text-blue-800" : ""
                                           }`}
-                                          title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${slot.start}–${slot.end}`}
+                                          title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${formatTimeRange12h(slot.start, slot.end)}`}
                                         >
                                           <span className={`font-bold transition-opacity ${
                                             draggedSchedule ? "opacity-100 text-[#002060]" : "opacity-0 group-hover:opacity-100"
@@ -1672,11 +1690,11 @@ export default function ScheduleDeconflictionConsole() {
                         return (
                           <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
                             <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
-                              <div>{slot.start} – {slot.end}</div>
+                              <div>{formatTimeRange12h(slot.start, slot.end)}</div>
                               <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                             </td>
                             <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                              {slot.start} – {slot.end} &bull; {slot.name}
+                              {formatTimeRange12h(slot.start, slot.end)} &bull; {slot.name}
                             </td>
                           </tr>
                         );
@@ -1687,7 +1705,7 @@ export default function ScheduleDeconflictionConsole() {
                           {/* Left Time Column */}
                           <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
                             <div className="font-bold text-[#002060] text-xs">
-                              {slot.start} – {slot.end}
+                              {formatTimeRange12h(slot.start, slot.end)}
                             </div>
                             <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
                               {slot.name}
@@ -1798,7 +1816,7 @@ export default function ScheduleDeconflictionConsole() {
                                             ? "text-purple-950 bg-white border-purple-200"
                                             : "text-emerald-950 bg-white border-emerald-300"
                                         }`}>
-                                          {matchedItem.start_time}–{matchedItem.end_time}
+                                          {formatTimeRange12h(matchedItem.start_time, matchedItem.end_time)}
                                         </span>
                                         {isElective && (
                                           <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
@@ -1874,7 +1892,7 @@ export default function ScheduleDeconflictionConsole() {
                                           ⤵ Drop to Move Here
                                         </span>
                                         <span className="text-[10px] text-emerald-800 mt-0.5 font-medium">
-                                          {day} &bull; {slot.start}–{slot.end}
+                                          {day} &bull; {formatTimeRange12h(slot.start, slot.end)}
                                         </span>
                                       </div>
                                     ) : (
@@ -1885,7 +1903,7 @@ export default function ScheduleDeconflictionConsole() {
                                           className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
                                             draggedSchedule ? "border-emerald-400 bg-emerald-50/40 text-emerald-800" : ""
                                           }`}
-                                          title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${slot.start}–${slot.end}`}
+                                          title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${formatTimeRange12h(slot.start, slot.end)}`}
                                         >
                                           <span className={`font-bold transition-opacity ${
                                             draggedSchedule ? "opacity-100 text-emerald-800" : "opacity-0 group-hover:opacity-100"
@@ -1952,7 +1970,7 @@ export default function ScheduleDeconflictionConsole() {
                       <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                         <td className="p-3 font-bold text-[#002060]">{item.day_of_week}</td>
                         <td className="p-3 font-mono font-bold text-slate-700">
-                          {item.start_time} – {item.end_time}
+                          {formatTimeRange12h(item.start_time, item.end_time)}
                         </td>
                         <td className="p-3 font-bold text-slate-900 uppercase">{item.subject_name}</td>
                         <td className="p-3 text-[#002060] font-semibold">{item.section_name}</td>
@@ -2282,7 +2300,7 @@ export default function ScheduleDeconflictionConsole() {
                       }}
                       className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-mono border border-slate-300 uppercase cursor-pointer"
                     >
-                      {period.name} ({period.start}–{period.end})
+                      {period.name} ({formatTimeRange12h(period.start, period.end)})
                     </button>
                   ))}
                 </div>
@@ -2613,7 +2631,7 @@ export default function ScheduleDeconflictionConsole() {
                   {deleteTargetItem.teacher_name} &bull; Room: {deleteTargetItem.classroom_name || "Unassigned"}
                 </div>
                 <div className="text-[11px] text-slate-500 font-mono">
-                  Time: {deleteTargetItem.start_time} - {deleteTargetItem.end_time}
+                  Time: {formatTimeRange12h(deleteTargetItem.start_time, deleteTargetItem.end_time)}
                 </div>
               </div>
               <p className="text-[11px] text-red-700 font-medium">
@@ -2651,7 +2669,7 @@ export default function ScheduleDeconflictionConsole() {
           <div className="flex items-center gap-2 text-xs font-mono">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping inline-block" />
             <span>
-              Moving: <strong className="text-white uppercase">{draggedSchedule.subject_name}</strong> ({draggedSchedule.day_of_week} {draggedSchedule.start_time}–{draggedSchedule.end_time})
+              Moving: <strong className="text-white uppercase">{draggedSchedule.subject_name}</strong> ({draggedSchedule.day_of_week} &bull; {formatTimeRange12h(draggedSchedule.start_time, draggedSchedule.end_time)})
             </span>
           </div>
           <span className="text-[11px] text-blue-200 hidden md:inline">
@@ -2702,7 +2720,7 @@ export default function ScheduleDeconflictionConsole() {
                     {moveModalItem.subject_name}
                   </span>
                   <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
-                    Current: {moveModalItem.day_of_week} {moveModalItem.start_time}–{moveModalItem.end_time}
+                    Current: {moveModalItem.day_of_week} &bull; {formatTimeRange12h(moveModalItem.start_time, moveModalItem.end_time)}
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-700">
@@ -2766,7 +2784,7 @@ export default function ScheduleDeconflictionConsole() {
                       >
                         <div>
                           <div className="font-mono text-xs font-bold text-slate-800">
-                            {slot.name} ({slot.start}–{slot.end})
+                            {slot.name} ({formatTimeRange12h(slot.start, slot.end)})
                           </div>
                           <div className="text-[10px] mt-0.5">
                             {isCurrent ? (

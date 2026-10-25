@@ -72,6 +72,7 @@ export async function GET(req: Request) {
       { data: sectionsData },
       { data: teachersData },
       { data: classroomsData },
+      { data: sysClassroomsData },
       { data: subjectsData },
       { data: sysSettingsData },
       { data: dbSchedulesData },
@@ -79,6 +80,7 @@ export async function GET(req: Request) {
       supabase.from("sections").select("id, section_name, grade_level, strand"),
       supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department"),
       supabase.from("classrooms").select("id, classroom_id, room_name, building"),
+      supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("course_subjects").select("id, subject_code, subject_name, grade_level, trimester"),
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
       supabase.from("class_schedules").select("*"),
@@ -97,6 +99,18 @@ export async function GET(req: Request) {
 
     const classroomMap = new Map<string, any>();
     (classroomsData || []).forEach((c) => classroomMap.set(c.id, c));
+    const customRooms = sysClassroomsData?.value?.customClassrooms || [];
+    customRooms.forEach((cr: any) => {
+      const roomObj = {
+        id: cr.id,
+        classroom_id: cr.classroom_id || cr.classroomId,
+        room_name: cr.room_name || cr.roomName,
+        building: cr.building,
+      };
+      classroomMap.set(cr.id, roomObj);
+      if (cr.classroom_id) classroomMap.set(cr.classroom_id, roomObj);
+      if (cr.classroomId) classroomMap.set(cr.classroomId, roomObj);
+    });
 
     const subjectMap = new Map<string, any>();
     (subjectsData || []).forEach((sub) => subjectMap.set(sub.subject_code, sub));

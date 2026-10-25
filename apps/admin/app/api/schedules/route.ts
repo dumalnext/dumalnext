@@ -80,6 +80,7 @@ export async function GET(req: Request) {
       { data: sectionsData },
       { data: teachersData },
       { data: classroomsData },
+      { data: sysClassroomsData },
       { data: subjectsData },
       { data: sysSettingsData },
       { data: dbSchedulesData },
@@ -87,6 +88,7 @@ export async function GET(req: Request) {
       supabase.from("sections").select("id, section_name, grade_level, strand"),
       supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department"),
       supabase.from("classrooms").select("id, classroom_id, room_name, building"),
+      supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("course_subjects").select("id, subject_code, subject_name, grade_level, trimester"),
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
       supabase.from("class_schedules").select("*"),
@@ -105,6 +107,18 @@ export async function GET(req: Request) {
 
     const classroomMap = new Map<string, any>();
     (classroomsData || []).forEach((c) => classroomMap.set(c.id, c));
+    const customRooms = sysClassroomsData?.value?.customClassrooms || [];
+    customRooms.forEach((cr: any) => {
+      const roomObj = {
+        id: cr.id,
+        classroom_id: cr.classroom_id || cr.classroomId,
+        room_name: cr.room_name || cr.roomName,
+        building: cr.building,
+      };
+      classroomMap.set(cr.id, roomObj);
+      if (cr.classroom_id) classroomMap.set(cr.classroom_id, roomObj);
+      if (cr.classroomId) classroomMap.set(cr.classroomId, roomObj);
+    });
 
     const subjectMap = new Map<string, any>();
     (subjectsData || []).forEach((sub) => subjectMap.set(sub.subject_code, sub));
@@ -251,12 +265,14 @@ export async function POST(req: Request) {
       { data: dbSchedulesData },
       { data: teachersData },
       { data: classroomsData },
+      { data: sysClassroomsData },
       { data: sectionsData },
     ] = await Promise.all([
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
       supabase.from("class_schedules").select("*"),
       supabase.from("teachers").select("id, first_name, last_name"),
       supabase.from("classrooms").select("id, room_name"),
+      supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("sections").select("id, section_name"),
     ]);
 
@@ -289,8 +305,12 @@ export async function POST(req: Request) {
     const teacherObj = (teachersData || []).find((t) => t.id === teacher_id);
     const teacherName = teacherObj ? `${teacherObj.first_name} ${teacherObj.last_name}` : "Faculty Member";
 
-    const roomObj = (classroomsData || []).find((r) => r.id === classroom_id);
-    const roomName = roomObj ? roomObj.room_name : "Selected Classroom";
+    const roomObj =
+      (classroomsData || []).find((r: any) => r.id === classroom_id) ||
+      (sysClassroomsData?.value?.customClassrooms || []).find(
+        (r: any) => r.id === classroom_id || r.classroomId === classroom_id || r.classroom_id === classroom_id
+      );
+    const roomName = roomObj ? (roomObj.room_name || roomObj.roomName) : "Selected Classroom";
 
     const sectionObj = (sectionsData || []).find((s) => s.id === section_id);
     const sectionName = sectionObj ? sectionObj.section_name : "Selected Section";
@@ -414,12 +434,14 @@ export async function PATCH(req: Request) {
       { data: dbSchedulesData },
       { data: teachersData },
       { data: classroomsData },
+      { data: sysClassroomsData },
       { data: sectionsData },
     ] = await Promise.all([
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
       supabase.from("class_schedules").select("*"),
       supabase.from("teachers").select("id, first_name, last_name"),
       supabase.from("classrooms").select("id, room_name"),
+      supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("sections").select("id, section_name"),
     ]);
 
@@ -460,8 +482,12 @@ export async function PATCH(req: Request) {
             return `Teacher Collision: Faculty ${teacherName} is already assigned to teach ${item.subject_name || item.subject_code} in ${conflictingSection} on ${targetDay} at ${item.start_time}–${item.end_time}.`;
           }
           if (targetItem.classroom_id && item.classroom_id && item.classroom_id !== "unassigned" && targetItem.classroom_id !== "unassigned" && item.classroom_id === targetItem.classroom_id) {
-            const roomObj = (classroomsData || []).find((r) => r.id === targetItem.classroom_id);
-            const roomName = roomObj ? roomObj.room_name : "Selected Classroom";
+            const roomObj =
+              (classroomsData || []).find((r: any) => r.id === targetItem.classroom_id) ||
+              (sysClassroomsData?.value?.customClassrooms || []).find(
+                (r: any) => r.id === targetItem.classroom_id || r.classroomId === targetItem.classroom_id
+              );
+            const roomName = roomObj ? (roomObj.room_name || roomObj.roomName) : "Selected Classroom";
             const conflictingSection = (sectionsData || []).find((s) => s.id === item.section_id)?.section_name || "another class";
             return `Room Collision: ${roomName} is already occupied by ${conflictingSection} on ${targetDay} at ${item.start_time}–${item.end_time}.`;
           }
