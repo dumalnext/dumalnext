@@ -28,6 +28,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
   >("NOT_ASSIGNED");
   const [activeTermNum, setActiveTermNum] = useState<number>(termNumber || 1);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -78,7 +79,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         if (!studentRec) {
           const { data: allApps } = await supabase
             .from("enrollment_applications")
-            .select("id, student_id, selected_electives")
+            .select("id, student_id, selected_electives, submitted_documents")
             .order("created_at", { ascending: false })
             .limit(20);
 
@@ -118,7 +119,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         if (studentRec) {
           const { data: appData } = await supabase
             .from("enrollment_applications")
-            .select("id, application_id, applicant_type, status, school_year, selected_electives, created_at")
+            .select("id, application_id, applicant_type, status, school_year, selected_electives, submitted_documents, created_at")
             .eq("student_id", studentRec.id)
             .order("created_at", { ascending: false });
 
@@ -128,7 +129,41 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           );
 
           const isEnrolledInActiveTerm = !!activeApp;
+
+          // Extract 2x2 Photo from submitted_documents
+          let candidatePhoto: string | null = null;
+          const appWithDocs = userApps.find((a: any) => a.submitted_documents && a.submitted_documents.length > 0) || activeApp;
+          if (appWithDocs?.submitted_documents && Array.isArray(appWithDocs.submitted_documents)) {
+            const doc = appWithDocs.submitted_documents.find((d: any) =>
+              (d.docType || d.type || "").toLowerCase().includes("id") ||
+              (d.docType || d.type || "").toLowerCase().includes("picture") ||
+              (d.docType || d.type || "").toLowerCase().includes("photo") ||
+              (d.docType || d.type || "").toLowerCase().includes("2x2")
+            );
+            if (doc?.fileUrl || doc?.fileData) {
+              candidatePhoto = doc.fileUrl || doc.fileData;
+            }
+          }
+
+          if (!candidatePhoto) {
+            for (const a of userApps) {
+              const fd = Array.isArray(a.selected_electives) ? a.selected_electives[0] : a.selected_electives;
+              const subDocs = fd?.submittedDocuments || [];
+              const doc = subDocs.find((d: any) =>
+                (d.docType || d.type || "").toLowerCase().includes("id") ||
+                (d.docType || d.type || "").toLowerCase().includes("picture") ||
+                (d.docType || d.type || "").toLowerCase().includes("photo") ||
+                (d.docType || d.type || "").toLowerCase().includes("2x2")
+              );
+              if (doc?.fileUrl || doc?.fileData) {
+                candidatePhoto = doc.fileUrl || doc.fileData;
+                break;
+              }
+            }
+          }
+
           if (isMounted) {
+            setPhotoUrl(candidatePhoto);
             if (activeApp) {
               setAppStatus(activeApp.status);
               setAppRef(activeApp.application_id);
@@ -421,6 +456,13 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             className="flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
             title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
           >
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt="2x2"
+                className="w-4 h-4 rounded-full object-cover border border-amber-300 bg-white shrink-0"
+              />
+            ) : null}
             <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
               {user.firstName} {user.lastName}
             </span>
@@ -541,11 +583,28 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   )}
                 </div>
 
-                <div className="space-y-0.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-base font-bold text-slate-900 truncate min-w-0">
-                      {user.firstName} {user.lastName}
-                    </h4>
+                <div className="flex items-start gap-3">
+                  {photoUrl ? (
+                    <div className="relative shrink-0 mt-0.5">
+                      <img
+                        src={photoUrl}
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-[#002060] shadow-xs bg-white"
+                      />
+                      <span className="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-400 text-slate-950 font-black text-[8px] uppercase tracking-wider rounded-full shadow-2xs">
+                        2x2
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-[#002060] text-amber-300 border border-blue-400/50 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs mt-0.5">
+                      {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                    </div>
+                  )}
+                  <div className="space-y-0.5 min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-base font-bold text-slate-900 truncate min-w-0">
+                        {user.firstName} {user.lastName}
+                      </h4>
                     {/* Mobile Only (Android & iOS): Sign Out button on the right side of user's name */}
                     <button
                       type="button"
@@ -574,6 +633,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <span className="text-[11px]">&rarr;</span>
                   </Link>
                 </div>
+              </div>
 
                 {/* Section Assignment Indicator (Clickable Shortcut to /section) */}
                 {sectionMode === "ASSIGNED" && assignedSection ? (

@@ -25,6 +25,7 @@ export default function StudentProfilePage() {
   const [enrollmentApp, setEnrollmentApp] = useState<any | null>(null);
   const [formData, setFormData] = useState<any | null>(null);
   const [assignedSection, setAssignedSection] = useState<SectionDetails | null>(null);
+  const [idPhotoUrl, setIdPhotoUrl] = useState<string | null>(null);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<"academic" | "personal" | "address" | "family" | "security">("academic");
 
@@ -96,7 +97,7 @@ export default function StudentProfilePage() {
         if (student?.id) {
           const { data: apps } = await supabase
             .from("enrollment_applications")
-            .select("id, application_id, student_id, applicant_type, target_grade_level, target_strand, school_year, status, selected_electives, created_at")
+            .select("id, application_id, student_id, applicant_type, target_grade_level, target_strand, school_year, status, selected_electives, submitted_documents, created_at")
             .eq("student_id", student.id)
             .order("created_at", { ascending: false })
             .limit(1);
@@ -110,7 +111,7 @@ export default function StudentProfilePage() {
         if (!appRecord) {
           const { data: recentApps } = await supabase
             .from("enrollment_applications")
-            .select("id, application_id, student_id, applicant_type, target_grade_level, target_strand, school_year, status, selected_electives, created_at")
+            .select("id, application_id, student_id, applicant_type, target_grade_level, target_strand, school_year, status, selected_electives, submitted_documents, created_at")
             .order("created_at", { ascending: false })
             .limit(25);
 
@@ -174,11 +175,38 @@ export default function StudentProfilePage() {
           }
         }
 
+                // Extract 2x2 Photo from submitted_documents or selected_electives
+        let candidatePhoto: string | null = null;
+        if (appRecord?.submitted_documents && Array.isArray(appRecord.submitted_documents)) {
+          const doc = appRecord.submitted_documents.find((d: any) =>
+            (d.docType || d.type || "").toLowerCase().includes("id") ||
+            (d.docType || d.type || "").toLowerCase().includes("picture") ||
+            (d.docType || d.type || "").toLowerCase().includes("photo") ||
+            (d.docType || d.type || "").toLowerCase().includes("2x2")
+          );
+          if (doc?.fileUrl || doc?.fileData) {
+            candidatePhoto = doc.fileUrl || doc.fileData;
+          }
+        }
+
+        if (!candidatePhoto && formPayload?.submittedDocuments && Array.isArray(formPayload.submittedDocuments)) {
+          const doc = formPayload.submittedDocuments.find((d: any) =>
+            (d.docType || d.type || "").toLowerCase().includes("id") ||
+            (d.docType || d.type || "").toLowerCase().includes("picture") ||
+            (d.docType || d.type || "").toLowerCase().includes("photo") ||
+            (d.docType || d.type || "").toLowerCase().includes("2x2")
+          );
+          if (doc?.fileUrl || doc?.fileData) {
+            candidatePhoto = doc.fileUrl || doc.fileData;
+          }
+        }
+
         if (isMounted) {
           setStudentRec(student);
           setEnrollmentApp(appRecord);
           setFormData(formPayload);
           setAssignedSection(secDetails);
+          setIdPhotoUrl(candidatePhoto);
           setIsLoadingData(false);
         }
       } catch (err) {
@@ -489,10 +517,23 @@ export default function StudentProfilePage() {
       <div className="bg-gradient-to-br from-[#002060] to-[#001845] text-white rounded-xl p-5 sm:p-6 shadow-md border-t-4 border-amber-400 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-start sm:items-center gap-4">
-            {/* Avatar Circle */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border-2 border-amber-400 flex items-center justify-center font-black text-xl sm:text-2xl text-amber-300 shrink-0 shadow-inner">
-              {initials}
-            </div>
+            {/* 2x2 Official Learner Photo from Enrollment or Fallback Initial Circle */}
+            {idPhotoUrl ? (
+              <div className="relative shrink-0">
+                <img
+                  src={idPhotoUrl}
+                  alt={fullName}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-amber-400 shadow-md bg-white ring-2 ring-white/20"
+                />
+                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-wider rounded-full shadow-xs">
+                  2x2
+                </span>
+              </div>
+            ) : (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border-2 border-amber-400 flex items-center justify-center font-black text-xl sm:text-2xl text-amber-300 shrink-0 shadow-inner">
+                {initials}
+              </div>
+            )}
 
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -755,6 +796,32 @@ export default function StudentProfilePage() {
                     Official identity and demographic records as certified on the DepEd enrolment form.
                   </p>
                 </div>
+
+                {idPhotoUrl && (
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-4">
+                    <div className="relative shrink-0">
+                      <img
+                        src={idPhotoUrl}
+                        alt="2x2 Official ID"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover border-2 border-[#002060] rounded-lg shadow-xs bg-white"
+                      />
+                      <span className="absolute -bottom-1.5 -right-1.5 px-1.5 py-0.2 bg-[#002060] text-amber-300 font-black text-[9px] uppercase tracking-wider rounded-md shadow-2xs">
+                        2x2 Photo
+                      </span>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                        Official 2x2 ID Photo
+                      </span>
+                      <span className="font-bold text-slate-900 block text-sm">
+                        Certified Learner Photo On File
+                      </span>
+                      <p className="text-[11px] text-slate-500">
+                        Officially submitted during basic education enrollment and verified on file with the school registrar.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">

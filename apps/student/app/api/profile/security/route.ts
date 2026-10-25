@@ -400,6 +400,90 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // 1. Synchronize new email to enrollment_applications (for Admin Adjudication Console & Modal)
+      try {
+        const { data: stList } = await supabase
+          .from("students")
+          .select("id, student_id")
+          .eq("user_id", targetUserId);
+        const studentIds = (stList || []).map((s: any) => s.id);
+
+        let appQuery = supabase
+          .from("enrollment_applications")
+          .select("id, student_id, selected_electives");
+        if (studentIds.length > 0) {
+          appQuery = appQuery.in("student_id", studentIds);
+        }
+
+        const { data: appsToUpdate } = await appQuery;
+        if (appsToUpdate && appsToUpdate.length > 0) {
+          for (const app of appsToUpdate) {
+            let updatedElectives = app.selected_electives;
+            if (Array.isArray(updatedElectives)) {
+              updatedElectives = updatedElectives.map((el: any) => {
+                const copy = { ...el };
+                if (copy.email) copy.email = newEmail;
+                if (copy.learnerEmail) copy.learnerEmail = newEmail;
+                return copy;
+              });
+            } else if (typeof updatedElectives === "object" && updatedElectives !== null) {
+              updatedElectives = {
+                ...updatedElectives,
+                email: newEmail,
+                learnerEmail: newEmail,
+              };
+            }
+
+            await supabase
+              .from("enrollment_applications")
+              .update({
+                selected_electives: updatedElectives,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", app.id);
+          }
+        }
+      } catch (appSyncErr) {
+        console.warn("Notice: enrollment_applications email sync:", appSyncErr);
+      }
+
+      // 2. Synchronize new email to student_concerns in system_settings (for IT Support Concerns Desk)
+      try {
+        const { data: concData } = await supabase
+          .from("system_settings")
+          .select("value")
+          .eq("key", "student_concerns")
+          .maybeSingle();
+
+        if (concData && concData.value && Array.isArray(concData.value.concerns)) {
+          let hasConcernChange = false;
+          const updatedConcerns = concData.value.concerns.map((c: any) => {
+            if (
+              (c.email && c.email.toLowerCase() === currentEmail.toLowerCase()) ||
+              (c.studentEmail && c.studentEmail.toLowerCase() === currentEmail.toLowerCase())
+            ) {
+              hasConcernChange = true;
+              return {
+                ...c,
+                email: newEmail,
+                studentEmail: newEmail,
+              };
+            }
+            return c;
+          });
+
+          if (hasConcernChange) {
+            await supabase.from("system_settings").upsert({
+              key: "student_concerns",
+              value: { ...concData.value, concerns: updatedConcerns },
+              updated_at: new Date().toISOString(),
+            });
+          }
+        }
+      } catch (concSyncErr) {
+        console.warn("Notice: student_concerns email sync:", concSyncErr);
+      }
+
       // Remove OTP
       currentOtps.splice(matchIdx, 1);
       await saveStoredOtps(supabase, currentOtps);

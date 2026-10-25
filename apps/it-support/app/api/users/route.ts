@@ -34,8 +34,7 @@ export async function GET() {
       supabase.from("it_supports").select("*"),
       supabase.from("sections").select("id, section_name, grade_level, strand"),
       supabase
-        .from("enrollment_applications")
-        .select("id, student_id")
+        .from("enrollment_applications").select("id, student_id, submitted_documents, selected_electives")
         .order("created_at", { ascending: false }),
     ]);
 
@@ -74,7 +73,29 @@ export async function GET() {
         const section = (sections || []).find((sec: any) => sec.id === st.current_section_id);
 
         const app = (applications || []).find((a: any) => a.student_id === st.id);
-        photoUrl = null;
+        if (app) {
+          const idPic = (app.submitted_documents || []).find((d: any) =>
+            (d.docType || d.type || "").toLowerCase().includes("id") ||
+            (d.docType || d.type || "").toLowerCase().includes("picture") ||
+            (d.docType || d.type || "").toLowerCase().includes("photo") ||
+            (d.docType || d.type || "").toLowerCase().includes("2x2")
+          );
+          if (idPic?.fileUrl || idPic?.fileData) {
+            photoUrl = idPic.fileUrl || idPic.fileData;
+          } else if (app.selected_electives) {
+            const fd = Array.isArray(app.selected_electives) ? app.selected_electives[0] : app.selected_electives;
+            const subDocs = fd?.submittedDocuments || [];
+            const found = subDocs.find((d: any) =>
+              (d.docType || d.type || "").toLowerCase().includes("id") ||
+              (d.docType || d.type || "").toLowerCase().includes("picture") ||
+              (d.docType || d.type || "").toLowerCase().includes("photo") ||
+              (d.docType || d.type || "").toLowerCase().includes("2x2")
+            );
+            photoUrl = found?.fileUrl || found?.fileData || null;
+          }
+        } else {
+          photoUrl = null;
+        }
 
         details = {
           lrn: st.student_id || "Not assigned",
