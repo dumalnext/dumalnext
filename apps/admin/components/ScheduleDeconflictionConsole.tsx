@@ -140,7 +140,8 @@ export default function ScheduleDeconflictionConsole() {
   const [formClassroomId, setFormClassroomId] = useState<string>("");
   const [formSubjectCode, setFormSubjectCode] = useState<string>("");
   const [formCustomSubject, setFormCustomSubject] = useState<string>("");
-  const [formDayOfWeek, setFormDayOfWeek] = useState<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday">("Monday");
+  const [formDaysOfWeek, setFormDaysOfWeek] = useState<Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday">>(["Monday"]);
+  const formDayOfWeek = formDaysOfWeek[0] || "Monday";
   const [formStartTime, setFormStartTime] = useState<string>("07:30");
   const [formEndTime, setFormEndTime] = useState<string>("08:30");
   const [isSubmittingAdd, setIsSubmittingAdd] = useState<boolean>(false);
@@ -328,34 +329,50 @@ export default function ScheduleDeconflictionConsole() {
     loadData();
   }, []);
 
-  // 2. Client-Side Pre-Flight Conflict Detector (Live in Modal)
-  const preFlightConflict = useMemo(() => {
-    if (!formDayOfWeek || !formStartTime || !formEndTime) return null;
+  // 2. Client-Side Pre-Flight Conflict Detector (Live in Modal across all checked days)
+  const preFlightConflicts = useMemo(() => {
+    if (formDaysOfWeek.length === 0 || !formStartTime || !formEndTime) return [];
 
-    for (const sc of schedules) {
-      if (sc.day_of_week === formDayOfWeek && timesOverlap(sc.start_time, sc.end_time, formStartTime, formEndTime)) {
-        if (formTeacherId && sc.teacher_id === formTeacherId) {
-          return {
-            type: "teacher",
-            message: `Teacher Collision Detected: Faculty is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${formDayOfWeek} at ${sc.start_time}–${sc.end_time}.`,
-          };
-        }
-        if (formClassroomId && sc.classroom_id === formClassroomId) {
-          return {
-            type: "room",
-            message: `Room Collision Detected: ${sc.classroom_name || "Selected Room"} is already booked by ${sc.section_name || "another class"} on ${formDayOfWeek} at ${sc.start_time}–${sc.end_time}.`,
-          };
-        }
-        if (formSectionId && sc.section_id === formSectionId) {
-          return {
-            type: "section",
-            message: `Section Collision Detected: ${sc.section_name || "This Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${formDayOfWeek} at ${sc.start_time}–${sc.end_time}.`,
-          };
+    const conflicts: Array<{
+      day: string;
+      type: "teacher" | "room" | "section";
+      message: string;
+    }> = [];
+
+    for (const day of formDaysOfWeek) {
+      for (const sc of schedules) {
+        if (sc.day_of_week === day && timesOverlap(sc.start_time, sc.end_time, formStartTime, formEndTime)) {
+          if (formTeacherId && sc.teacher_id === formTeacherId) {
+            conflicts.push({
+              day,
+              type: "teacher",
+              message: `Teacher Collision (${day}): Faculty is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} at ${sc.start_time}–${sc.end_time}.`,
+            });
+            break;
+          }
+          if (formClassroomId && sc.classroom_id === formClassroomId) {
+            conflicts.push({
+              day,
+              type: "room",
+              message: `Room Collision (${day}): ${sc.classroom_name || "Selected Room"} is already booked by ${sc.section_name || "another class"} at ${sc.start_time}–${sc.end_time}.`,
+            });
+            break;
+          }
+          if (formSectionId && sc.section_id === formSectionId) {
+            conflicts.push({
+              day,
+              type: "section",
+              message: `Section Collision (${day}): ${sc.section_name || "This Section"} already has ${sc.subject_name || sc.subject_code} scheduled at ${sc.start_time}–${sc.end_time}.`,
+            });
+            break;
+          }
         }
       }
     }
-    return null;
-  }, [schedules, formDayOfWeek, formStartTime, formEndTime, formTeacherId, formClassroomId, formSectionId]);
+    return conflicts;
+  }, [schedules, formDaysOfWeek, formStartTime, formEndTime, formTeacherId, formClassroomId, formSectionId]);
+
+  const preFlightConflict = preFlightConflicts[0] || null;
 
   // Selected Section in the Modal Form
   const selectedFormSection = useMemo(() => {
@@ -428,7 +445,7 @@ export default function ScheduleDeconflictionConsole() {
   // Open modal with pre-filled day & time slot from clicking a grid cell
   const openAddModalWithDefaults = (day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday", start: string, end: string) => {
     setAddError("");
-    setFormDayOfWeek(day);
+    setFormDaysOfWeek([day]);
     setFormStartTime(start);
     setFormEndTime(end);
 
@@ -501,8 +518,8 @@ export default function ScheduleDeconflictionConsole() {
     e.preventDefault();
     setAddError("");
 
-    if (!formSectionId || !formTeacherId || !formClassroomId || !formDayOfWeek || !formStartTime || !formEndTime) {
-      setAddError("Please fill out all required fields.");
+    if (!formSectionId || !formTeacherId || !formClassroomId || formDaysOfWeek.length === 0 || !formStartTime || !formEndTime) {
+      setAddError("Please fill out all required fields and select at least one day of the week.");
       return;
     }
 
@@ -511,9 +528,10 @@ export default function ScheduleDeconflictionConsole() {
       return;
     }
 
-    if (preFlightConflict) {
-      setAddError(preFlightConflict.message);
-      showConflictAlert("Schedule Collision Detected", preFlightConflict.message);
+    if (preFlightConflicts.length > 0) {
+      const summaryMsg = preFlightConflicts.map((c) => c.message).join("\n\n");
+      setAddError(preFlightConflicts[0].message);
+      showConflictAlert("Schedule Collision Detected", summaryMsg);
       return;
     }
 
@@ -524,33 +542,45 @@ export default function ScheduleDeconflictionConsole() {
       const finalSubjectName = formCustomSubject.trim() || selectedSubObj?.subject_name || formSubjectCode || "Academic Subject";
       const finalSubjectCode = formSubjectCode || "CUSTOM-SUBJ";
 
-      const res = await fetch("/api/schedules", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          section_id: formSectionId,
-          teacher_id: formTeacherId,
-          classroom_id: formClassroomId,
-          subject_code: finalSubjectCode,
-          subject_name: finalSubjectName,
-          day_of_week: formDayOfWeek,
-          start_time: formStartTime,
-          end_time: formEndTime,
-          school_year: activeTermInfo?.schoolYear || autoSchoolYear || "2026–2027",
-          trimester: activeTermInfo?.termNumber || autoTrimester || 1,
-        }),
-      });
+      const createdDays: string[] = [];
+      let collisionError: string | null = null;
 
-      const data = await res.json();
+      for (const day of formDaysOfWeek) {
+        const res = await fetch("/api/schedules", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            section_id: formSectionId,
+            teacher_id: formTeacherId,
+            classroom_id: formClassroomId,
+            subject_code: finalSubjectCode,
+            subject_name: finalSubjectName,
+            day_of_week: day,
+            start_time: formStartTime,
+            end_time: formEndTime,
+            school_year: activeTermInfo?.schoolYear || autoSchoolYear || "2026–2027",
+            trimester: activeTermInfo?.termNumber || autoTrimester || 1,
+          }),
+        });
 
-      if (!res.ok || !data.success) {
-        const errMsg = data.message || data.error || "Failed to assign schedule.";
-        setAddError(errMsg);
-        showConflictAlert("Schedule Assignment Collision", errMsg);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          collisionError = data.message || data.error || `Failed to assign schedule for ${day}.`;
+          break;
+        }
+        createdDays.push(day);
+      }
+
+      if (collisionError) {
+        setAddError(collisionError);
+        showConflictAlert("Schedule Assignment Collision", collisionError);
+        await loadData(true);
         return;
       }
 
-      setActionNotice({ type: "success", text: data.message || "Class schedule period successfully assigned." });
+      const countMsg = createdDays.length === 1 ? createdDays[0] : `${createdDays.join(", ")} (${createdDays.length} periods)`;
+      setActionNotice({ type: "success", text: `Class schedule successfully assigned for ${countMsg}.` });
       setIsAddModalOpen(false);
       setFormCustomSubject("");
       await loadData(true);
@@ -2007,13 +2037,19 @@ export default function ScheduleDeconflictionConsole() {
               )}
 
               {/* REAL-TIME PRE-FLIGHT COLLISION ALERT */}
-              {preFlightConflict && (
-                <div className="p-3.5 bg-amber-50 border-2 border-amber-600 text-amber-950 text-xs font-sans space-y-1">
+              {preFlightConflicts.length > 0 && (
+                <div className="p-3.5 bg-amber-50 border-2 border-amber-600 text-amber-950 text-xs font-sans space-y-1.5 shadow-xs rounded-[4px]">
                   <div className="font-bold flex items-center gap-1.5 uppercase tracking-wide text-amber-900">
-                    <span className="w-2 h-2 rounded-full bg-amber-600" />
-                    Automated Collision Warning
+                    <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
+                    Automated Collision Warning ({preFlightConflicts.length} {preFlightConflicts.length === 1 ? "Day Conflict" : "Day Conflicts"} Detected)
                   </div>
-                  <p className="leading-relaxed">{preFlightConflict.message}</p>
+                  <div className="space-y-1 pl-3.5 border-l-2 border-amber-500">
+                    {preFlightConflicts.map((c, idx) => (
+                      <p key={idx} className="leading-relaxed font-semibold">
+                        {c.message}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -2136,23 +2172,77 @@ export default function ScheduleDeconflictionConsole() {
                 />
               </div>
 
-              {/* 5. Day & Time Selection */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-1">
+              {/* 5. Day(s) of Week Selection (Checkboxes) */}
+              <div className="space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                   <label className="text-xs font-bold text-slate-800 uppercase block">
-                    Day of Week: <span className="text-red-600">*</span>
+                    Days of the Week: <span className="text-red-600">*</span>
                   </label>
-                  <CustomSelect
-                    fullWidth
-                    value={formDayOfWeek}
-                    onChange={(val) => setFormDayOfWeek(val as any)}
-                    options={DAYS_OF_WEEK.map((d) => ({
-                      value: d,
-                      label: d,
-                    }))}
-                  />
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setFormDaysOfWeek(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])}
+                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-[3px] cursor-pointer"
+                    >
+                      All (Mon–Fri)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormDaysOfWeek(["Monday", "Wednesday", "Friday"])}
+                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-[3px] cursor-pointer"
+                    >
+                      MWF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormDaysOfWeek(["Tuesday", "Thursday"])}
+                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-[3px] cursor-pointer"
+                    >
+                      TTh
+                    </button>
+                  </div>
                 </div>
 
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {DAYS_OF_WEEK.map((day) => {
+                    const isChecked = formDaysOfWeek.includes(day);
+                    return (
+                      <label
+                        key={day}
+                        className={`flex items-center gap-2 p-2.5 border-2 rounded-[4px] cursor-pointer transition-all select-none text-xs font-bold ${
+                          isChecked
+                            ? "bg-blue-50/90 border-[#002060] text-[#002060] shadow-xs"
+                            : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormDaysOfWeek((prev) => [...prev, day]);
+                            } else {
+                              if (formDaysOfWeek.length > 1) {
+                                setFormDaysOfWeek((prev) => prev.filter((d) => d !== day));
+                              }
+                            }
+                          }}
+                          className="w-4 h-4 text-[#002060] rounded border-slate-300 focus:ring-[#002060] cursor-pointer"
+                        />
+                        <span>{day}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {formDaysOfWeek.length === 0 && (
+                  <p className="text-[11px] text-red-600 font-bold">
+                    Please select at least one day of the week.
+                  </p>
+                )}
+              </div>
+
+              {/* Start & End Time Inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-800 uppercase block">
                     Start Time: <span className="text-red-600">*</span>
@@ -2161,7 +2251,7 @@ export default function ScheduleDeconflictionConsole() {
                     type="time"
                     value={formStartTime}
                     onChange={(e) => setFormStartTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060] rounded-[4px]"
                     required
                   />
                 </div>
@@ -2174,7 +2264,7 @@ export default function ScheduleDeconflictionConsole() {
                     type="time"
                     value={formEndTime}
                     onChange={(e) => setFormEndTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060]"
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060] rounded-[4px]"
                     required
                   />
                 </div>
