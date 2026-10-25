@@ -674,7 +674,7 @@ function SectionPageContent() {
       <section className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 shadow-md rounded-[4px]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-white p-1 border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs">
+            <div className="w-12 h-12 rounded-full border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs overflow-hidden">
               <img
                 src="/dumalneg-logo.png"
                 alt="Dumalneg NHS Official Seal"

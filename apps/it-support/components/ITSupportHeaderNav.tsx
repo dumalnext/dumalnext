@@ -53,7 +53,7 @@ export default function ITSupportHeaderNav({
           <img
             src="/dumalneg-logo.png"
             alt="Dumalneg National High School Seal"
-            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover bg-white p-0.5 shadow-md border-2 border-amber-400 shrink-0 group-hover:scale-105 transition-transform"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover shadow-md border-2 border-amber-400 shrink-0 group-hover:scale-105 transition-transform"
           />
           <div className="min-w-0">
             <span className="text-[11px] font-semibold text-amber-300 uppercase tracking-widest block truncate">

@@ -116,7 +116,14 @@ ${replyMessage}
 
   if (gmailPass) {
     try {
-      const nodemailer = await import("nodemailer");
+      let nodemailer: any = null;
+      try {
+        const req = eval("require");
+        nodemailer = req("nodemailer");
+      } catch {}
+      if (!nodemailer) {
+        throw new Error("nodemailer not available");
+      }
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {

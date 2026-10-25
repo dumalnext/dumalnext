@@ -4,6 +4,17 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Dumal-NEXT | Dumalneg National High School",
   description: "Official Web-Based Enrollment and Schedule Deconfliction System for Dumalneg National High School",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/dumalneg-logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -15,6 +26,7 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#002060" />
         <script
           dangerouslySetInnerHTML={{
@@ -46,7 +58,7 @@ export default function RootLayout({
               <img
                 src="/dumalneg-logo.png"
                 alt="Dumalneg National High School Seal"
-                className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-md bg-white shrink-0"
+                className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-md shrink-0"
               />
               <div>
                 <p className="text-[11px] font-bold tracking-widest text-amber-300 uppercase">

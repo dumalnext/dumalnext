@@ -10,7 +10,7 @@ export default function Home() {
             <img
               src="/dumalneg-logo.png"
               alt="Dumalneg NHS Seal"
-              className="w-14 h-14 rounded-full object-cover border-2 border-amber-400 shadow-md bg-white shrink-0 hidden sm:block mt-0.5"
+              className="w-14 h-14 rounded-full object-cover border-2 border-amber-400 shadow-md shrink-0 hidden sm:block mt-0.5"
             />
             <div>
               <span className="text-xs font-bold tracking-widest text-amber-300 uppercase">

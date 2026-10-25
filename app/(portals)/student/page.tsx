@@ -15,7 +15,7 @@ export default function StudentPortalHomePage() {
           <img
             src="/dumalneg-logo.png"
             alt="Dumalneg NHS Seal"
-            className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+            className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
           />
           <div>
             <span className="text-xs font-bold text-amber-300 uppercase tracking-widest block mb-1">

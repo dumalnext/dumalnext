@@ -737,7 +737,7 @@ export default function AdjudicationConsole() {
           <img
             src="/dumalneg-logo.png"
             alt="Dumalneg NHS Seal"
-            className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+            className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
           />
           <div>
             <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">

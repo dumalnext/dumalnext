@@ -482,7 +482,7 @@ function AcceptInviteContent() {
           <img
             src="/dumalneg-logo.png"
             alt="Dumalneg National High School Seal"
-            className="w-16 h-16 rounded-full object-cover bg-white p-1 shadow-md border-2 border-amber-400 mx-auto"
+            className="w-16 h-16 rounded-full object-cover shadow-md border-2 border-amber-400 mx-auto"
           />
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block">
             DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS

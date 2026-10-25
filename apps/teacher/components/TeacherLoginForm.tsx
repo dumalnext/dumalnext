@@ -199,7 +199,7 @@ function TeacherLoginFormInner() {
         {/* Institutional Hero Card */}
         <section className="bg-gradient-to-br from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-6 sm:p-8 rounded-[4px] shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-blue-800/80 pb-5">
-            <div className="w-16 h-16 rounded-full bg-white p-1.5 border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-sm">
+            <div className="w-16 h-16 rounded-full border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-sm overflow-hidden">
               <img
                 src="/dumalneg-logo.png"
                 alt="Dumalneg National High School Seal"

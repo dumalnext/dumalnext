@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "Dumalneg National High School - Admin Portal",
+  "short_name": "DNHS Admin",
+  "description": "Official School Administrator & Admissions Portal for Dumalneg National High School",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#002060",
+  "theme_color": "#002060",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dumalneg-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -412,7 +412,7 @@ export default function UserRoleAuditor() {
             <img
               src="/dumalneg-logo.png"
               alt="Dumalneg NHS Seal"
-              className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+              className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
             />
             <div>
               <div className="flex flex-wrap items-center gap-2">

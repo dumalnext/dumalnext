@@ -36,7 +36,7 @@ export default function TeacherHeaderNav() {
       {/* Main Title & Faculty Info */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white p-1 border-2 border-amber-400 shadow-sm shrink-0 flex items-center justify-center">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-amber-400 shadow-sm shrink-0 flex items-center justify-center overflow-hidden">
             <img
               src="/dumalneg-logo.png"
               alt="Dumalneg National High School Official Seal"

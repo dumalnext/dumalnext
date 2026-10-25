@@ -59,12 +59,12 @@ export async function GET() {
     const currentTerms = terms || [];
 
     // Auto-ensure terms 1, 2, 3 exist for every existing school year
-    const schoolYears = Array.from(new Set(currentTerms.map((t) => t.schoolYear)));
+    const schoolYears = Array.from(new Set(currentTerms.map((t: any) => t.schoolYear)));
     const missingToCreate: any[] = [];
 
     for (const sy of schoolYears) {
       for (const num of [1, 2, 3]) {
-        const exists = currentTerms.some((t) => t.schoolYear === sy && t.termNumber === num);
+        const exists = currentTerms.some((t: any) => t.schoolYear === sy && t.termNumber === num);
         if (!exists) {
           missingToCreate.push({
             schoolYear: sy,

@@ -5,6 +5,16 @@ export const metadata: Metadata = {
   title: "Student Portal | Dumalneg National High School",
   description: "Official Student Online Enrollment and Academic Workstation for Dumalneg National High School",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/dumalneg-logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -32,6 +42,7 @@ export default function StudentLayout({
     <html lang="en" className="h-full">
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#002060" />
         <script
           dangerouslySetInnerHTML={{

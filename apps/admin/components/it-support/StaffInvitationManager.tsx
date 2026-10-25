@@ -231,7 +231,7 @@ export default function StaffInvitationManager() {
           <img
             src="/dumalneg-logo.png"
             alt="Dumalneg NHS Seal"
-            className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm bg-white shrink-0 hidden sm:block mt-0.5"
+            className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
           />
           <div>
             <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">

@@ -717,7 +717,7 @@ export default function CurriculumSubjectsConsole() {
           <img
             src="/dumalneg-logo.png"
             alt="Dumalneg NHS Seal"
-            className="w-12 h-12 rounded-full object-cover bg-white p-0.5 border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
+            className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
           />
           <div>
             <div className="flex items-center gap-2 mb-0.5 flex-wrap">

@@ -6,12 +6,29 @@ import SessionTimeoutModal from "@/components/SessionTimeoutModal";
 export const metadata: Metadata = {
   title: "School Administrator Portal | Dumalneg National High School",
   description: "Official School Administrator & Admissions Portal for Dumalneg National High School",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/dumalneg-logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "DNHS Admin",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  themeColor: "#002060",
 };
 
 export default function AdminLayout({
@@ -21,6 +38,11 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content="#002060" />
+      </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden">
         <AdminAuthProvider>
           <div className="flex-1 flex flex-col">

@@ -188,7 +188,7 @@ export function PwaInstallModal({
             <img
               src="/dumalneg-logo.png"
               alt="DNHS Logo"
-              className="w-10 h-10 rounded-full bg-white object-contain border-2 border-amber-400 shadow-xs shrink-0"
+              className="w-10 h-10 rounded-full object-contain border-2 border-amber-400 shadow-xs shrink-0"
             />
             <div>
               <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">

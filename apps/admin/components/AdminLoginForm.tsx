@@ -237,7 +237,7 @@ function AdminLoginFormInner() {
                 <img
                   src="/dumalneg-logo.png"
                   alt="Dumalneg National High School Seal"
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover bg-white p-1 shadow-md border-2 border-amber-400 shrink-0"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-md border-2 border-amber-400 shrink-0"
                 />
                 <div className="space-y-1">
                   <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10px] font-bold uppercase tracking-widest">
