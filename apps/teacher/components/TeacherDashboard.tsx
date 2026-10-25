@@ -40,6 +40,8 @@ export default function TeacherDashboard() {
   const [rosterStudents, setRosterStudents] = useState<StudentItem[]>([]);
   const [isLoadingRoster, setIsLoadingRoster] = useState<boolean>(false);
   const [rosterSearch, setRosterSearch] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const STUDENTS_PER_PAGE = 10;
 
   // Schedule State (defaults to empty as required by user)
   const [schedules, setSchedules] = useState<any[]>([]);
@@ -262,6 +264,10 @@ export default function TeacherDashboard() {
     fetchSchedules();
   }, [user]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSectionId, rosterSearch]);
+
   if (!user) return null;
 
   const currentSection = sections.find((s) => s.id === selectedSectionId);
@@ -272,6 +278,13 @@ export default function TeacherDashboard() {
     const lrn = (st.student_id || "").toLowerCase();
     return fullName.includes(q) || lrn.includes(q);
   });
+
+  const totalStudents = filteredStudents.length;
+  const totalPages = Math.max(1, Math.ceil(totalStudents / STUDENTS_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * STUDENTS_PER_PAGE;
+  const endIndex = Math.min(startIndex + STUDENTS_PER_PAGE, totalStudents);
+  const paginatedStudents = filteredStudents.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-6 font-sans">
@@ -437,7 +450,10 @@ export default function TeacherDashboard() {
                 <CustomSelect
                   label="Section:"
                   value={selectedSectionId}
-                  onChange={setSelectedSectionId}
+                  onChange={(val) => {
+                    setSelectedSectionId(val);
+                    setCurrentPage(1);
+                  }}
                   options={sections.map((sec) => ({
                     value: sec.id,
                     label: `${sec.section_name} (Grade ${sec.grade_level})`,
@@ -461,23 +477,42 @@ export default function TeacherDashboard() {
             )}
 
             {/* Search Filter */}
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={rosterSearch}
-                onChange={(e) => setRosterSearch(e.target.value)}
-                placeholder="Search student by Name or 12-digit LRN..."
-                className="w-full max-w-md p-2 bg-slate-50 border border-slate-300 text-xs font-mono text-slate-900 outline-none focus:border-[#002060]"
-              />
-              {rosterSearch && (
-                <button
-                  type="button"
-                  onClick={() => setRosterSearch("")}
-                  className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase cursor-pointer"
-                >
-                  Clear
-                </button>
-              )}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2 w-full max-w-md">
+                <input
+                  type="text"
+                  value={rosterSearch}
+                  onChange={(e) => {
+                    setRosterSearch(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Search student by Name or 12-digit LRN..."
+                  className="w-full p-2 bg-slate-50 border border-slate-300 text-xs font-mono text-slate-900 outline-none focus:border-[#002060]"
+                />
+                {rosterSearch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRosterSearch("");
+                      setCurrentPage(1);
+                    }}
+                    className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <span className="text-xs font-mono text-slate-600">
+                {totalStudents > 0 ? (
+                  <>
+                    Showing <strong>{startIndex + 1}&ndash;{endIndex}</strong> of <strong>{totalStudents}</strong> learner(s)
+                  </>
+                ) : (
+                  <>
+                    Displaying: <strong>0</strong> learner(s)
+                  </>
+                )}
+              </span>
             </div>
 
             {/* Roster Table */}
@@ -490,33 +525,98 @@ export default function TeacherDashboard() {
                 {rosterSearch ? "No students matching search query." : "No students currently enrolled in this section."}
               </div>
             ) : (
-              <div className="overflow-x-auto border border-slate-200">
-                <table className="w-full text-left text-xs font-sans border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100 border-b border-slate-300 font-bold uppercase text-[11px] text-slate-700">
-                      <th className="p-2.5 w-12 text-center font-mono">#</th>
-                      <th className="p-2.5 font-mono">Learner Reference Number (LRN)</th>
-                      <th className="p-2.5">Student Full Name</th>
-                      <th className="p-2.5">Gender</th>
-                      <th className="p-2.5">Barangay</th>
-                      <th className="p-2.5">Contact Number</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {filteredStudents.map((st, idx) => (
-                      <tr key={st.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-2.5 text-center font-mono text-slate-500">{idx + 1}</td>
-                        <td className="p-2.5 font-mono font-bold text-[#002060]">{st.student_id || "PENDING LIS"}</td>
-                        <td className="p-2.5 font-bold text-slate-900">
-                          {st.last_name}, {st.first_name} {st.middle_name || ""}
-                        </td>
-                        <td className="p-2.5 font-mono">{st.gender || "—"}</td>
-                        <td className="p-2.5 text-slate-700">{st.barangay || "—"}</td>
-                        <td className="p-2.5 font-mono text-slate-600">{st.contact_number || "—"}</td>
+              <div className="space-y-3">
+                <div className="overflow-x-auto border border-slate-200">
+                  <table className="w-full text-left text-xs font-sans border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100 border-b border-slate-300 font-bold uppercase text-[11px] text-slate-700">
+                        <th className="p-2.5 w-12 text-center font-mono">#</th>
+                        <th className="p-2.5 font-mono">Learner Reference Number (LRN)</th>
+                        <th className="p-2.5">Student Full Name</th>
+                        <th className="p-2.5">Gender</th>
+                        <th className="p-2.5">Barangay</th>
+                        <th className="p-2.5">Contact Number</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {paginatedStudents.map((st, idx) => (
+                        <tr key={st.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-2.5 text-center font-mono text-slate-500">
+                            {startIndex + idx + 1}
+                          </td>
+                          <td className="p-2.5 font-mono font-bold text-[#002060]">{st.student_id || "PENDING LIS"}</td>
+                          <td className="p-2.5 font-bold text-slate-900">
+                            {st.last_name}, {st.first_name} {st.middle_name || ""}
+                          </td>
+                          <td className="p-2.5 font-mono">{st.gender || "—"}</td>
+                          <td className="p-2.5 text-slate-700">{st.barangay || "—"}</td>
+                          <td className="p-2.5 font-mono text-slate-600">{st.contact_number || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Bar (10 Students Per Page) */}
+                <div
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-200 text-xs font-mono"
+                  role="navigation"
+                  aria-label="Student roster pagination"
+                >
+                  <div className="text-slate-600">
+                    Page <strong className="text-[#002060]">{safeCurrentPage}</strong> of{" "}
+                    <strong className="text-[#002060]">{totalPages}</strong> &bull; Showing{" "}
+                    <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{" "}
+                    <strong>{totalStudents}</strong> learner(s) (10 per page)
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((prev) => Math.max(1, Math.min(prev, totalPages) - 1))}
+                      disabled={safeCurrentPage <= 1}
+                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                        safeCurrentPage <= 1
+                          ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                          : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                      }`}
+                    >
+                      &larr; Prev
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                      const isActive = pageNum === safeCurrentPage;
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => setCurrentPage(pageNum)}
+                          aria-current={isActive ? "page" : undefined}
+                          className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                            isActive
+                              ? "bg-[#002060] border-[#002060] text-white"
+                              : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, Math.min(prev, totalPages) + 1))}
+                      disabled={safeCurrentPage >= totalPages}
+                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                        safeCurrentPage >= totalPages
+                          ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                          : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                      }`}
+                    >
+                      Next &rarr;
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
