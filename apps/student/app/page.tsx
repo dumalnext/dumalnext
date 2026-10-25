@@ -1327,7 +1327,7 @@ function StudentHomeContent() {
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link
                     href={`/track?ref=${userApplication.referenceNumber}`}
-                    className="btn-primary text-xs font-bold py-2.5 px-4 rounded-[4px]"
+                    className="px-4 py-2.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold rounded-[4px] shadow-xs inline-flex items-center gap-1 transition-colors"
                   >
                     View / Track Application Details
                   </Link>
@@ -1335,7 +1335,7 @@ function StudentHomeContent() {
                   {userApplication.status === "Approved" && (
                     <Link
                       href={`/track?ref=${userApplication.referenceNumber}#timetable`}
-                      className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs inline-flex items-center gap-1 rounded-[4px]"
+                      className="px-4 py-2.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold rounded-[4px] shadow-xs inline-flex items-center gap-1 transition-colors"
                     >
                       View Enrolled Subjects &amp; Timetable
                     </Link>
@@ -1442,7 +1442,7 @@ function StudentHomeContent() {
                         }
                       }}
                       disabled={isDownloadingPdf}
-                      className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2.5 transition-colors rounded-[4px]"
+                      className="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded-[4px] border border-amber-500 shadow-xs inline-flex items-center gap-1 transition-colors disabled:opacity-50"
                     >
                       {isDownloadingPdf ? "Generating Official PDF..." : "Download Official DepEd Form (PDF)"}
                     </button>
