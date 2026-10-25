@@ -351,140 +351,166 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
   return (
     <div className="relative max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 w-full">
-      {/* Upper-Left: 3-Line Hamburger Menu Button + School Branding */}
-      <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
-        {/* 3-Line Hamburger Menu Button (Upper-Left positioned for natural human eye-flow) */}
-        <button
-          ref={buttonRef}
-          type="button"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="relative z-10 flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer shadow-sm rounded-[4px] active:scale-90 shrink-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
-          aria-label="Toggle Portal Navigation Menu"
-          aria-expanded={isMenuOpen}
-        >
-          {/* 3 Horizontal Lines (Hamburger Icon) */}
-          <div className="w-4 h-3.5 sm:w-5 sm:h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
-            <span
-              className={`w-full h-0.5 bg-white transition-all duration-300 ease-in-out origin-center ${
-                isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
-              }`}
-            />
-            <span
-              className={`w-full h-0.5 bg-white transition-all duration-300 ease-in-out ${
-                isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
-              }`}
-            />
-            <span
-              className={`w-full h-0.5 bg-white transition-all duration-300 ease-in-out origin-center ${
-                isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
-              }`}
-            />
-          </div>
-          <span className="hidden xs:inline sm:inline transition-colors duration-200">{isMenuOpen ? "Close" : "Menu"}</span>
-        </button>
+      {/* Upper-Left: Mobile Hamburger Button (Logged-in Mobile/Tablet Only) + School Branding */}
+      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        {user && (
+          <button
+            ref={buttonRef}
+            type="button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className="lg:hidden relative z-10 flex items-center gap-2 px-2.5 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm rounded-[4px] active:scale-95 shrink-0"
+            aria-label="Toggle Portal Navigation Menu"
+            aria-expanded={isMenuOpen}
+          >
+            <div className="w-4 h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
+              <span
+                className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${
+                  isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
+                }`}
+              />
+              <span
+                className={`w-full h-0.5 bg-white transition-all duration-300 ${
+                  isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
+                }`}
+              />
+              <span
+                className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${
+                  isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
+                }`}
+              />
+            </div>
+            <span className="hidden sm:inline">{isMenuOpen ? "Close" : "Menu"}</span>
+          </button>
+        )}
 
         {children}
       </div>
 
-      {/* Upper-Right: Desktop Portal Navigation + Quick Status / Auth */}
-      <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0 relative z-10">
-        {/* Desktop Quick Navigation Links */}
-        <nav aria-label="Primary Portal Navigation" className="hidden xl:flex items-center gap-1 mr-1">
-          <Link
-            href="/"
-            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
-              pathname === "/"
-                ? "bg-white/15 text-white border border-white/25"
-                : "text-slate-200 hover:text-white hover:bg-white/10"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            href={enrollHref}
-            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
-              pathname === "/enroll"
-                ? "bg-white/15 text-white border border-white/25"
-                : "text-slate-200 hover:text-white hover:bg-white/10"
-            }`}
-          >
-            Online Enrollment
-          </Link>
-          <Link
-            href={trackHref}
-            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
-              pathname === "/track"
-                ? "bg-white/15 text-white border border-white/25"
-                : "text-slate-200 hover:text-white hover:bg-white/10"
-            }`}
-          >
-            Track Status
-          </Link>
-          <Link
-            href={sectionHref}
-            className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
-              pathname === "/section"
-                ? "bg-white/15 text-white border border-white/25"
-                : "text-slate-200 hover:text-white hover:bg-white/10"
-            }`}
-          >
-            My Section
-          </Link>
-          {user ? (
+      {/* Upper-Right: Clean Context-Aware Navigation */}
+      <div className="flex items-center gap-2 lg:gap-2.5 shrink-0 relative z-10">
+        {user ? (
+          <>
+            {/* Desktop Horizontal Tabs (Replaces Burger Menu on Desktop) */}
+            <nav aria-label="Primary Portal Navigation" className="hidden lg:flex items-center gap-1 mr-1">
+              <Link
+                href="/"
+                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                  pathname === "/"
+                    ? "bg-white text-[#002060] shadow-xs"
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href={enrollHref}
+                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                  pathname === "/enroll"
+                    ? "bg-white text-[#002060] shadow-xs"
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Enrollment
+              </Link>
+              <Link
+                href={trackHref}
+                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                  pathname === "/track"
+                    ? "bg-white text-[#002060] shadow-xs"
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Track Status
+              </Link>
+              <Link
+                href={sectionHref}
+                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                  pathname === "/section"
+                    ? "bg-white text-[#002060] shadow-xs"
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                My Section
+              </Link>
+              <Link
+                href={profileHref}
+                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                  pathname === "/profile"
+                    ? "bg-white text-[#002060] shadow-xs"
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                My Profile
+              </Link>
+            </nav>
+
+            {/* Student Identity & Status Pill */}
             <Link
               href={profileHref}
-              className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
-                pathname === "/profile"
-                  ? "bg-white/15 text-white border border-white/25"
-                  : "text-slate-200 hover:text-white hover:bg-white/10"
-              }`}
+              className="flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
+              title="View your learner profile and account settings"
             >
-              My Profile
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt="2x2"
+                  className="w-5 h-5 rounded-full object-cover border border-amber-300 bg-white shrink-0"
+                />
+              ) : (
+                <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] flex items-center justify-center shrink-0">
+                  {user.firstName?.[0] || "S"}
+                </span>
+              )}
+              <span className="font-bold tracking-tight truncate max-w-[95px] sm:max-w-[140px]">
+                {user.firstName}
+              </span>
+              {appStatus === "Approved" ? (
+                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
+                  APPROVED
+                </span>
+              ) : appStatus === "Needs Revision" ? (
+                <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
+                  REVISION
+                </span>
+              ) : appStatus === "Pending" ? (
+                <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
+                  PENDING
+                </span>
+              ) : (
+                <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
+                  ACTIVE
+                </span>
+              )}
             </Link>
-          ) : null}
-        </nav>
 
-        {/* Academic Year Badge */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-blue-950/70 border border-blue-400/30 rounded-[4px] text-[11px] font-bold text-blue-100">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-          <span>S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}</span>
-        </div>
-
-        {user ? (
-          <Link
-            href={appStatus ? trackHref : "/enroll"}
-            className="flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
-            title={appStatus ? "Click to track your enrollment application status" : "Click to start enrollment for the active academic term"}
-          >
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt="2x2"
-                className="w-4 h-4 rounded-full object-cover border border-amber-300 bg-white shrink-0"
-              />
-            ) : null}
-            <span className="font-bold tracking-tight truncate max-w-[110px] sm:max-w-[160px] md:max-w-[200px]">
-              {user.firstName} {user.lastName}
-            </span>
-            {appStatus === "Approved" ? (
-              <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
-                APPROVED
-              </span>
-            ) : appStatus === "Needs Revision" ? (
-              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
-                REVISION
-              </span>
-            ) : appStatus === "Pending" ? (
-              <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[4px] whitespace-nowrap">
-                PENDING
-              </span>
-            ) : (
-              <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider animate-pulse rounded-[4px] whitespace-nowrap">
-                ENROLL NOW
-              </span>
+            {/* Desktop Direct Sign Out Button */}
+            <button
+              type="button"
+              onClick={logout}
+              className="hidden lg:inline-flex items-center px-2.5 py-1.5 bg-red-600/90 hover:bg-red-700 text-white border border-red-400/40 text-xs font-bold rounded-[4px] transition-colors cursor-pointer shadow-xs"
+              title="Sign Out of Student Portal"
+            >
+              Sign Out
+            </button>
+          </>
+        ) : (
+          /* Logged-Out Visitor Right Header: Clean Academic Year Badge Only */
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-950/80 border border-blue-400/30 rounded-[4px] text-[11px] font-bold text-blue-100">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+              <span>S.Y. {schoolYear || "2026-2027"}</span>
+              <span className="hidden sm:inline text-blue-300">&bull; {semester || "Trimester 1"}</span>
+            </div>
+            {pathname !== "/" && (
+              <Link
+                href="/"
+                className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-[4px] transition-colors shadow-xs"
+              >
+                Sign In
+              </Link>
             )}
-          </Link>
-        ) : null}
+          </div>
+        )}
       </div>
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}

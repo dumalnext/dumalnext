@@ -82,7 +82,8 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
         </div>
       </div>
 
-      <div className="p-4 sm:p-5 space-y-4">
+      {isExpanded && (
+      <div className="p-4 sm:p-5 space-y-4 border-t border-slate-200">
         <p className="text-xs text-slate-600 leading-relaxed">
           Watch the official Dumalneg National High School video walkthrough to learn the step-by-step process of creating a student portal account and verifying your 6-digit security code via Gmail before enrolling.
         </p>
@@ -187,6 +188,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
           </div>
         )}
       </div>
+      )}
     </section>
   );
 }
@@ -297,6 +299,7 @@ export function GradeLevelEnrollmentTutorials({
   };
 
   const [activeTab, setActiveTab] = useState<"grade7" | "grade8to10" | "grade11" | "grade12">(resolveDefaultTab());
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const currentTutorial = ENROLLMENT_TUTORIALS.find((t) => t.id === activeTab) || ENROLLMENT_TUTORIALS[0];
@@ -308,24 +311,35 @@ export function GradeLevelEnrollmentTutorials({
   };
 
   return (
-    <section className="bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 shadow-sm rounded-[4px] overflow-hidden my-6">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-950">
+    <section className="bg-white border border-slate-200/90 shadow-xs rounded-[4px] overflow-hidden">
+      {/* Compact Collapsible Header Banner */}
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-300 block">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
             Student Guidance &amp; Video Walkthroughs
           </span>
           <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
-            Online Enrollment Tutorials by Grade Level
+            Need Help Enrolling? Watch Step-by-Step Video Guides by Grade Level
           </h3>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-200 border border-amber-300/40 rounded-[4px]">
-            Official Video Guides
-          </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              setIsExpanded((prev) => {
+                if (prev) setIsPlaying(false);
+                return !prev;
+              });
+            }}
+            className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors rounded-[4px] cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
+          >
+            {isExpanded ? "Hide Video Guides" : "Watch Video Guides"}
+          </button>
         </div>
       </div>
 
+      {isExpanded && (
+        <>
       {/* Grade Selector Tabs */}
       <div className="grid grid-cols-2 md:grid-cols-4 border-b-2 border-slate-200 text-center font-bold text-xs bg-slate-50">
         {ENROLLMENT_TUTORIALS.map((tutorial) => {
@@ -460,6 +474,8 @@ export function GradeLevelEnrollmentTutorials({
           </Link>
         </div>
       </div>
+        </>
+      )}
     </section>
   );
 }

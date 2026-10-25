@@ -847,25 +847,13 @@ function StudentHomeContent() {
                   </div>
                 </div>
 
-                {/* Quick Module Buttons */}
+                {/* Single Non-Redundant Profile Action */}
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
                   <Link
-                    href="/enroll"
-                    className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-[4px] transition-colors shadow-xs"
+                    href="/profile"
+                    className="px-3.5 py-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs font-bold rounded-[4px] transition-colors shadow-xs"
                   >
-                    Enrollment Form
-                  </Link>
-                  <Link
-                    href={userApplication ? `/track?ref=${userApplication.referenceNumber}` : "/track"}
-                    className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs font-bold rounded-[4px] transition-colors"
-                  >
-                    Track Status
-                  </Link>
-                  <Link
-                    href="/section"
-                    className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs font-bold rounded-[4px] transition-colors"
-                  >
-                    My Section
+                    Account &amp; Security Settings &rarr;
                   </Link>
                 </div>
               </div>
@@ -1332,15 +1320,12 @@ function StudentHomeContent() {
            ========================================================================= */
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* LEFT COLUMN (7 COLS): INSTITUTIONAL HERO, ROADMAP & VIDEO GUIDE */}
-            <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
-              {/* Official DepEd & Dumalneg NHS Hero Card */}
-              <section className="relative bg-gradient-to-br from-[#002060] via-[#002b80] to-[#071739] text-white rounded-[4px] shadow-md border border-blue-900 overflow-hidden">
-                {/* Top Gold Accent Bar */}
-                <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500" />
-
-                <div className="p-6 sm:p-8 space-y-6">
-                  {/* Top Row: Live Enrollment Status Badge & School ID */}
+            {/* LEFT COLUMN (7 COLS): UNIFIED WELCOME & 4-STEP ENROLLMENT GUIDE */}
+            <div className="lg:col-span-7 space-y-5 order-2 lg:order-1">
+              {/* Unified Institutional Welcome & 4-Step Roadmap Card */}
+              <section className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+                {/* Top Dark Navy Institutional Banner */}
+                <div className="bg-gradient-to-br from-[#002060] via-[#002b80] to-[#071739] text-white p-6 sm:p-7 border-b-4 border-amber-400 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div
                       className={`inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[11px] font-bold uppercase tracking-wider border ${
@@ -1366,141 +1351,91 @@ function StudentHomeContent() {
                     </span>
                   </div>
 
-                  {/* School Seal & Headline */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
-                    <img
-                      src="/dumalneg-logo.png"
-                      alt="Dumalneg National High School Seal"
-                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain shrink-0 bg-white/10 p-2 rounded-[4px] border border-white/20 shadow-sm"
-                    />
-                    <div className="space-y-1.5">
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
-                        Republic of the Philippines &bull; DepEd Region I &bull; Ilocos Norte
-                      </p>
-                      <h1 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-white tracking-tight leading-snug">
-                        Dumalneg National High School Online Student Portal
-                      </h1>
-                      <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                        Official Basic Education Admission, Continuing Enrollment, and Academic Records Gateway serving learners across Barangays Cabaritan, Kalabakan, Quibel, and San Isidro.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 3 Quick Institutional Highlights */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-white/15">
-                    <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px]">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
-                        Junior High School
-                      </span>
-                      <strong className="text-sm font-bold text-white block mt-0.5">
-                        Grades 7 to 10
-                      </strong>
-                      <p className="text-[11px] text-blue-100 mt-1 leading-snug">
-                        Regular Curriculum &amp; Special Program in Sports (SPS)
-                      </p>
-                    </div>
-                    <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px]">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
-                        Senior High School
-                      </span>
-                      <strong className="text-sm font-bold text-white block mt-0.5">
-                        Grades 11 to 12
-                      </strong>
-                      <p className="text-[11px] text-blue-100 mt-1 leading-snug">
-                        Academic &amp; Tech-Pro Tracks with Trimester Electives
-                      </p>
-                    </div>
-                    <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px]">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
-                        Fast Digital Processing
-                      </span>
-                      <strong className="text-sm font-bold text-white block mt-0.5">
-                        Real-Time Status &amp; PDF
-                      </strong>
-                      <p className="text-[11px] text-blue-100 mt-1 leading-snug">
-                        Live Registrar Verification &amp; Official DepEd Form Download
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* 4-Step Student Enrollment Journey Roadmap */}
-              <section className="bg-white border border-slate-200/90 p-5 sm:p-6 rounded-[4px] shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#002060] block">
-                      Official Admission Workflow
-                    </span>
-                    <h2 className="text-base font-bold text-slate-900">
-                      How to Enroll Online in 4 Easy Steps
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
+                      Dumalneg, Ilocos Norte &bull; Junior &amp; Senior High School
+                    </p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">
+                      Online Basic Education Admission &amp; Continuing Enrollment
                     </h2>
+                    <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                      Official learner gateway for incoming Grade 7, Grade 11, transferees, and continuing learners of Dumalneg National High School.
+                    </p>
                   </div>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    For Incoming, Transferee &amp; Continuing Learners
-                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-[4px] bg-[#002060] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                      01
-                    </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-slate-900">
-                        Register &amp; Verify Email
-                      </h3>
-                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                        Create your student portal account using your full legal name and active Gmail address, then confirm the 6-digit security code.
-                      </p>
-                    </div>
+                {/* Integrated 4-Step Enrollment Process */}
+                <div className="p-5 sm:p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-200 pb-3">
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                      How to Enroll Online in 4 Simple Steps
+                    </h3>
+                    <span className="text-[11px] font-medium text-slate-500">
+                      Grades 7–10 (JHS) &amp; Grades 11–12 (SHS)
+                    </span>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-[4px] bg-[#002060] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                      02
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-[4px] bg-[#002060] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        1
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900">
+                          Create Account &amp; Verify Gmail
+                        </h4>
+                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                          Register with your PSA full name and active Gmail, then enter the 6-digit verification code.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-slate-900">
-                        Complete Enrollment Form
-                      </h3>
-                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                        Fill out the guided 5-step DepEd Basic Education Form (or 1-click re-enrollment for continuing JHS/SHS learners).
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-[4px] bg-[#002060] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                      03
+                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-[4px] bg-[#002060] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        2
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900">
+                          Fill Out Enrollment Form
+                        </h4>
+                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                          Complete the 5-step DepEd form (or 1-click re-enrollment for continuing learners).
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-slate-900">
-                        Upload School Credentials
-                      </h3>
-                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                        Upload clear photos or scans of your PSA Birth Certificate, SF9 / Form 138 Report Card, and 2x2 ID Picture.
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-[4px] flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-[4px] bg-emerald-700 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                      04
+                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-[4px] bg-[#002060] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        3
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900">
+                          Upload School Documents
+                        </h4>
+                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                          Submit clear copies of your PSA Birth Certificate, SF9 Report Card, and 2x2 ID Picture.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-slate-900">
-                        Track Approval &amp; Sectioning
-                      </h3>
-                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                        Monitor real-time Registrar evaluation, view your assigned class section &amp; timetable, and download your official DepEd PDF.
-                      </p>
+
+                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-[4px] bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        4
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900">
+                          Track Status &amp; Class Section
+                        </h4>
+                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                          View real-time Registrar approval, check your assigned section, and download your DepEd PDF.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </section>
 
-              {/* Collapsible Video Walkthrough Card */}
+              {/* Compact Collapsible Video Walkthrough Bar */}
               <AccountCreationTutorial
                 onSwitchToRegister={() => {
                   setActiveTab("register");
