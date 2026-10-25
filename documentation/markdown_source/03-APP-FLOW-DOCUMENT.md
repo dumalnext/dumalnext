@@ -68,7 +68,7 @@ The following high-resolution diagram illustrates the navigation architecture, r
      * Selects: Primary Emergency Contact Person (`Father`, `Mother`, `Guardian`).
      * Click **"Proceed to Step 4: Curriculum & Modality"** $\rightarrow$ Advances.
   4. **Step 4: Curriculum, Modality, & Special Needs (SNEd)**:
-     * If Grade 7–10 (JHS): Choose between `Regular JHS Curriculum` or `Special Program in Sports (SPS)`.
+     * If Grade 7–10 (JHS): Enrolled under standard `Regular Basic Education Curriculum`.
      * If Grade 11–12 (SHS): Choose `Academic Track` vs. `TVL Track`, select Strand (`STEM`, `HUMSS`, `TVL`, etc.), and select authorized Trimester Electives.
      * SNEd Section: Toggles Special Needs Education category (`Diagnosis` vs `Manifestations`), checklist of accommodations, and PWD ID status.
      * Preferred Modality: Checkboxes for `Modular (Print)`, `Blended Learning`, `Face-to-Face`.

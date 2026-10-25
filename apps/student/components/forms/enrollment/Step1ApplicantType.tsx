@@ -8,7 +8,7 @@ export interface Step1Data {
   isGraded: boolean;
   applicantType: ApplicantType | "";
   targetGradeLevel: number | "";
-  jhsProgram?: "Regular" | "SPS";
+  jhsProgram?: "Regular";
   targetSemester?: string;
   targetTrack?: string;
   targetStrand?: string;

@@ -820,7 +820,7 @@ export default function CurriculumSubjectsConsole() {
             </span>
             <div className="text-2xl font-mono font-bold text-indigo-800 mt-1">{electivesCount}</div>
           </div>
-          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Applied, Sports &amp; Track Subjects</span>
+          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Applied, Specialized &amp; Track Electives</span>
         </div>
       </div>
 

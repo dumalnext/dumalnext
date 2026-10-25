@@ -78,9 +78,8 @@ export interface StudentProfile {
 
   // Academic Placement
   gradeLevel: number; // 7 - 12
-  jhsProgram?: 'Regular' | 'SPS';
-  spsSport?: string;
-  strand?: string; // STEM, HUMSS, TVL, etc.
+  jhsProgram?: 'Regular';
+    strand?: string; // STEM, HUMSS, TVL, etc.
   isReturning: boolean;
   currentSectionId?: string;
 }
@@ -93,9 +92,8 @@ export interface EnrollmentApplication {
   schoolYear: string;
   isGraded: boolean;
   targetGradeLevel: number;
-  jhsProgram?: 'Regular' | 'SPS'; // Junior High School Curricular Program
-  spsSport?: string; // Sports specialization under SPS
-  targetSemester?: string;
+  jhsProgram?: 'Regular'; // Junior High School Curricular Program
+    targetSemester?: string;
   semester?: string;
   targetTrack?: string; // Academic Track, Technical-Professional Track
   targetStrand?: string; // STEM, HUMSS, TVL-Agri-Fishery, TVL-ICT, TVL-HE or Cluster

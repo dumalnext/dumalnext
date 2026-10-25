@@ -93,7 +93,7 @@ flowchart TD
      * **Step 1 (Classification)**: Grade Level selection (Grade 7 to 12), Learner Category (New, Transferee, Returning), Prior School ID and average.
      * **Step 2 (Learner Profile)**: 12-digit LRN validation, PSA Birth Certificate Number, Indigenous Peoples (Isnag) selection, 4Ps Beneficiary ID, Address fields.
      * **Step 3 (Family Background)**: Father, Mother (Maiden), Legal Guardian records, and Emergency Contact priority.
-     * **Step 4 (Academic Program)**: JHS Special Program in Sports (SPS) or Regular; SHS Track (Academic / TVL) and Strand (STEM, HUMSS, TVL-ICT, etc.); Learning modality preference.
+     * **Step 4 (Academic Program)**: JHS Regular Basic Education; SHS Track (Academic / TVL) and Strand (STEM, HUMSS, TVL-ICT, etc.); Learning modality preference.
      * **Step 5 (Documents & Declaration)**: Document file uploader, DepEd data privacy consent, and electronic sign-off.
   2. Implement client-side validation using Zod with bilingual English/Filipino field messages.
 

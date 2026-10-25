@@ -77,7 +77,7 @@ export interface FullEnrollmentFormData {
   snedCategory: "Diagnosis" | "Manifestations" | "";
   snedDetails: string[];
   hasPwdId: boolean;
-  jhsProgram?: "Regular" | "SPS";
+  jhsProgram?: "Regular";
     targetSemester: string;
   targetTrack: string;
   targetStrand: string;

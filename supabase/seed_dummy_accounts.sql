@@ -152,7 +152,7 @@ DECLARE
     'Grade 12 - Turing'
   ];
   v_sec_grades INT[] := ARRAY[7, 7, 8, 9, 10, 11, 11, 12];
-  v_sec_strands TEXT[] := ARRAY['Regular', 'SPS', 'Regular', 'Regular', 'Regular', 'Academic', 'Academic', 'TechPro'];
+  v_sec_strands TEXT[] := ARRAY['Regular', 'Regular', 'Regular', 'Regular', 'Regular', 'Academic', 'Academic', 'TechPro'];
 
   v_sec_approved_target INT[] := ARRAY[31, 27, 33, 29, 32, 28, 30, 26];
   v_sec_pending_target INT[]  := ARRAY[6,  8,  4,  7,  5,  7,  6,  9];
@@ -310,7 +310,6 @@ BEGIN
     ('JHS-AP7',   'Araling Panlipunan',                           'Core',         7,  1, 'Regular'),
     ('JHS-TLE7',  'Technology & Livelihood Education (TLE)',      'Core',         7,  1, 'Regular'),
     ('JHS-MAP7',  'MAPEH (Music, Arts, PE, Health)',              'Core',         7,  1, 'Regular'),
-    ('JHS-SPS7',  'General Sports & Athletic Training',           'Specialized',  7,  1, 'SPS'),
     ('JHS-ARAL7', 'ARAL Program (Academic Recovery)',             'Intervention', 7,  1, 'Regular'),
     ('JHS-VAL8',  'Values Education (EsP)',                       'Core',         8,  1, 'Regular'),
     ('JHS-FIL8',  'Filipino',                                     'Core',         8,  1, 'Regular'),
@@ -320,7 +319,6 @@ BEGIN
     ('JHS-AP8',   'Araling Panlipunan',                           'Core',         8,  1, 'Regular'),
     ('JHS-TLE8',  'Technology & Livelihood Education (TLE)',      'Core',         8,  1, 'Regular'),
     ('JHS-MAP8',  'MAPEH (Music, Arts, PE, Health)',              'Core',         8,  1, 'Regular'),
-    ('JHS-SPS8',  'General Sports & Athletic Training',           'Specialized',  8,  1, 'SPS'),
     ('JHS-VAL9',  'Values Education (EsP)',                       'Core',         9,  1, 'Regular'),
     ('JHS-FIL9',  'Filipino',                                     'Core',         9,  1, 'Regular'),
     ('JHS-ENG9',  'English',                                      'Core',         9,  1, 'Regular'),
@@ -329,7 +327,6 @@ BEGIN
     ('JHS-AP9',   'Araling Panlipunan',                           'Core',         9,  1, 'Regular'),
     ('JHS-TLE9',  'Technology & Livelihood Education (TLE)',      'Core',         9,  1, 'Regular'),
     ('JHS-MAP9',  'MAPEH (Music, Arts, PE, Health)',              'Core',         9,  1, 'Regular'),
-    ('JHS-SPS9',  'General Sports & Athletic Training',           'Specialized',  9,  1, 'SPS'),
     ('JHS-VAL10', 'Values Education (EsP)',                       'Core',         10, 1, 'Regular'),
     ('JHS-FIL10', 'Filipino',                                     'Core',         10, 1, 'Regular'),
     ('JHS-ENG10', 'English',                                      'Core',         10, 1, 'Regular'),
@@ -338,7 +335,6 @@ BEGIN
     ('JHS-AP10',  'Araling Panlipunan',                           'Core',         10, 1, 'Regular'),
     ('JHS-TLE10', 'Technology & Livelihood Education (TLE)',      'Core',         10, 1, 'Regular'),
     ('JHS-MAP10', 'MAPEH (Music, Arts, PE, Health)',              'Core',         10, 1, 'Regular'),
-    ('JHS-SPS10', 'General Sports & Athletic Training',           'Specialized',  10, 1, 'SPS'),
     ('SHS-EFFCOM11',       'Effective Communication / Mabisang Komunikasyon', 'Core', 11, 1, 'General'),
     ('SHS-GMATH11',        'General Mathematics',                     'Core',         11, 1, 'General'),
     ('SHS-GSCI11',         'General Science',                         'Core',         11, 1, 'General'),
@@ -574,7 +570,7 @@ BEGIN
       IF c_idx = 1 THEN
         v_subj_code := (ARRAY['JHS-ENG7','JHS-MTH7','JHS-SCI7','JHS-FIL7','JHS-AP7'])[i];
       ELSIF c_idx = 2 THEN
-        v_subj_code := (ARRAY['JHS-SPS7','JHS-ENG7','JHS-MTH7','JHS-SCI7','JHS-FIL7'])[i];
+        v_subj_code := (ARRAY['JHS-VAL7','JHS-ENG7','JHS-MTH7','JHS-SCI7','JHS-FIL7'])[i];
       ELSIF c_idx = 3 THEN
         v_subj_code := (ARRAY['JHS-ENG8','JHS-MTH8','JHS-SCI8','JHS-FIL8','JHS-TLE8'])[i];
       ELSIF c_idx = 4 THEN
@@ -805,7 +801,7 @@ BEGIN
         ELSIF c_idx = 8 THEN
           v_electives := '["TECH-JAVA", "TECH-CSS"]'::JSONB;
         ELSIF c_idx = 2 THEN
-          v_electives := '["JHS-SPS7"]'::JSONB;
+          v_electives := '[]'::JSONB;
         ELSE
           v_electives := '[]'::JSONB;
         END IF;
@@ -849,7 +845,7 @@ BEGIN
             'termNumber', v_active_term,
             'termName', v_active_term_name,
             'trimester', v_active_term_name,
-            'jhsProgram', CASE WHEN c_idx = 2 THEN 'Special Program in Sports (SPS)' ELSE 'Regular Program' END,
+            'jhsProgram', 'Regular Program',
             'shsCluster', CASE
               WHEN c_idx IN (6, 7) THEN 'Academic Cluster'
               WHEN c_idx = 8 THEN 'Tech-Pro (TVL) Cluster'

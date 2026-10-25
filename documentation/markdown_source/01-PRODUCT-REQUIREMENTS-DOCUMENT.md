@@ -62,7 +62,7 @@ The high-level structure and functional boundary of each portal are depicted in 
   * Father, Mother (Maiden Name), and Legal Guardian contact information.
   * Primary Emergency Contact selection.
 * **Step 4: Curriculum, Modality, & Special Needs (SNEd)**:
-  * Junior High School (JHS): Regular Curriculum vs. Special Program in Sports (SPS).
+  * Junior High School (JHS): Regular Basic Education Curriculum (DNHS does not offer SPS).
   * Senior High School (SHS): Academic Track vs. Technical-Vocational-Livelihood (TVL) Track, Strand selection (STEM, HUMSS, TVL, etc.), and specialized trimester electives.
   * Special Needs Education (SNEd) manifestation and diagnosis tracking, including PWD ID card status.
   * Learning modality preferences (Modular Print, Blended Learning, Face-to-Face).
