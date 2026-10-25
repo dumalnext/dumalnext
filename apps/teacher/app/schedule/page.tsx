@@ -77,6 +77,8 @@ export default function TeachingSchedulePage() {
 
   const [schedules, setSchedules] = useState<ScheduleRecord[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const PERIODS_PER_PAGE = 10;
 
   const fetchSchedules = async () => {
     setIsLoadingSchedules(true);
@@ -154,6 +156,12 @@ export default function TeachingSchedulePage() {
   }
 
   const uniqueSectionsCount = new Set(schedules.map((s) => s.section_id)).size;
+  const totalPeriods = schedules.length;
+  const totalPages = Math.max(1, Math.ceil(totalPeriods / PERIODS_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * PERIODS_PER_PAGE;
+  const endIndex = Math.min(startIndex + PERIODS_PER_PAGE, totalPeriods);
+  const paginatedSchedules = schedules.slice(startIndex, endIndex);
 
   const handlePrint = () => {
     const originalTitle = document.title;
@@ -379,12 +387,12 @@ export default function TeachingSchedulePage() {
 
           {/* Masterlist Detail Table (Screen View Only) */}
           <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto no-print print:hidden">
-            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div className="p-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <span className="text-xs font-mono font-bold text-slate-700 uppercase">
                 COMPLETE INSTRUCTIONAL LOAD MASTERLIST &bull; {schedules.length} PERIODS
               </span>
-              <span className="text-[10px] font-mono text-slate-500 uppercase">
-                Dumalneg NHS Academic Timetable
+              <span className="text-xs font-mono text-slate-600">
+                Showing <strong>{startIndex + 1}&ndash;{endIndex}</strong> of <strong>{totalPeriods}</strong> period(s)
               </span>
             </div>
 
@@ -399,7 +407,7 @@ export default function TeachingSchedulePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {schedules.map((sc) => (
+                {paginatedSchedules.map((sc) => (
                   <tr key={sc.id} className="hover:bg-slate-50">
                     <td className="p-3 font-bold text-[#002060]">{sc.day_of_week}</td>
                     <td className="p-3 font-mono font-bold text-slate-800">
@@ -412,6 +420,67 @@ export default function TeachingSchedulePage() {
                 ))}
               </tbody>
             </table>
+
+            {/* Pagination Bar (10 Periods Per Page) */}
+            <div
+              className="p-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono"
+              role="navigation"
+              aria-label="Instructional load masterlist pagination"
+            >
+              <div className="text-slate-600">
+                Page <strong className="text-[#002060]">{safeCurrentPage}</strong> of{" "}
+                <strong className="text-[#002060]">{totalPages}</strong> &bull; Showing{" "}
+                <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{" "}
+                <strong>{totalPeriods}</strong> period(s) (10 per page)
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.max(1, Math.min(prev, totalPages) - 1))}
+                  disabled={safeCurrentPage <= 1}
+                  className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                    safeCurrentPage <= 1
+                      ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                  }`}
+                >
+                  &larr; Prev
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                  const isActive = pageNum === safeCurrentPage;
+                  return (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => setCurrentPage(pageNum)}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                        isActive
+                          ? "bg-[#002060] border-[#002060] text-white"
+                          : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, Math.min(prev, totalPages) + 1))}
+                  disabled={safeCurrentPage >= totalPages}
+                  className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                    safeCurrentPage >= totalPages
+                      ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                  }`}
+                >
+                  Next &rarr;
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* DepEd Official Signatories for Hard Copy Printout */}
