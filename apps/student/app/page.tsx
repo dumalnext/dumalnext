@@ -14,6 +14,7 @@ import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConce
 import { PasswordResetModal, IdentityRecoveryModal } from "@/components/CredentialRecoveryModals";
 import EmailSetupGuard from "@/components/EmailSetupGuard";
 import { CopyChip, PasswordStrengthMeter, triggerPortalToast } from "@/components/ui/PortalUI";
+import { PushNotificationModal } from "@/components/ui/PushNotificationButton";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -25,6 +26,7 @@ function StudentHomeContent() {
 
   // IT Support Student Concerns Modal State
   const [showConcernModal, setShowConcernModal] = useState(false);
+  const [showPushModal, setShowPushModal] = useState(false);
   const [concernModalMode, setConcernModalMode] = useState<ConcernModalMode>("submit");
   const [concernCategory, setConcernCategory] = useState("password_reset");
   
@@ -1010,6 +1012,14 @@ function StudentHomeContent() {
                   className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
                 >
                   <span>IT Support &amp; Learner Helpdesk</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPushModal(true)}
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
+                >
+                  <span>Device Push Alerts (PC &amp; Mobile)</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 </button>
               </div>
             </div>
@@ -2492,8 +2502,10 @@ function StudentHomeContent() {
 
 
 
+      <PushNotificationModal isOpen={showPushModal} onClose={() => setShowPushModal(false)} />
+
       {showConcernModal && (
-        <StudentConcernModal
+      <StudentConcernModal
           isOpen={showConcernModal}
           onClose={() => setShowConcernModal(false)}
           initialMode={concernModalMode}

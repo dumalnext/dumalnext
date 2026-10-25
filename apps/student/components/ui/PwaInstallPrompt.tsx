@@ -301,8 +301,19 @@ export function PwaInstallModal({
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-emerald-600 font-bold">•</span>
-              <span>Zero device storage overhead</span>
+              <span>Push alerts for PC &amp; cellphone</span>
             </div>
+          </div>
+
+          {/* Device Push Feature Banner */}
+          <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-[4px] flex items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-slate-800 font-bold text-[11px]">Real-Time Push Notifications</span>
+            </div>
+            <span className="text-[10px] font-mono font-bold text-[#002060] bg-white px-2 py-0.5 border border-blue-300 rounded-[3px]">
+              PC &amp; Mobile
+            </span>
           </div>
         </div>
 
