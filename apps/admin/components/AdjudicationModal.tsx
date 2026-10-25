@@ -1521,7 +1521,7 @@ export default function AdjudicationModal({
             <div className="space-y-1.5">
               <div className="flex flex-wrap items-center justify-between gap-1">
                 <label className="text-xs font-bold text-slate-900 uppercase">
-                  Registrar Evaluation Remarks / Official Notice to Student:
+                  School Administrator Evaluation Remarks / Official Notice to Student:
                 </label>
                 <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 border border-slate-200">
                   Smart Auto-Notice System Active

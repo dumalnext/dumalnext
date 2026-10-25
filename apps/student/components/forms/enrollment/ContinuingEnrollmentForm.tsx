@@ -532,7 +532,7 @@ export default function ContinuingEnrollmentForm({
         <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-[4px]">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-[4px]">
-              STATUS: PENDING REGISTRAR ADJUDICATION &amp; APPROVAL
+              STATUS: PENDING ADMINISTRATOR ADJUDICATION &amp; APPROVAL
             </span>
             <span className="text-xs text-slate-700">
               SUBMITTED: <strong>{new Date().toLocaleDateString()}</strong>
@@ -547,7 +547,7 @@ export default function ContinuingEnrollmentForm({
                 Curricular Transfer Request: {previousJhsProgram} to {selectedJhsProgram}
               </span>
               <p className="text-[11px] font-normal text-amber-900 leading-relaxed">
-                Your request to transfer curriculum from {previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} to {selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} has been officially recorded and queued for Registrar and Coordinator adjudication.
+                Your request to transfer curriculum from {previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} to {selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"} has been officially recorded and queued for Administrator and Coordinator adjudication.
               </p>
             </div>
           )}
@@ -562,7 +562,7 @@ export default function ContinuingEnrollmentForm({
             {referenceNumber}
           </div>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
-            Please present or record this reference number when inquiring with the Dumalneg NHS Registrar or Admissions Committee.
+            Please present or record this reference number when inquiring with the Dumalneg NHS School Administrator or Admissions Committee.
           </p>
         </div>
 
@@ -913,7 +913,7 @@ export default function ContinuingEnrollmentForm({
                     </span>
                   </div>
                   <p className="text-xs text-amber-900 leading-relaxed">
-                    You are requesting to transfer from <strong>{previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> to <strong>{selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong>. This application will be marked as a Curricular Transfer Request in the Registrar Adjudication queue for administrative review and approval.
+                    You are requesting to transfer from <strong>{previousJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong> to <strong>{selectedJhsProgram === "SPS" ? "Special Program in Sports (SPS)" : "Regular Basic Education"}</strong>. This application will be marked as a Curricular Transfer Request in the Administrator Adjudication queue for administrative review and approval.
                   </p>
                 </div>
               ) : (
@@ -931,7 +931,7 @@ export default function ContinuingEnrollmentForm({
             Official DepEd Adjudication Policy Notice:
           </span>
           <p className="leading-relaxed">
-            All continuing enrollment applications are received and placed under <strong className="font-bold">Pending Registrar Adjudication</strong>. Applications are officially verified and enrolled by the School Registrar upon section assignment and document review.
+            All continuing enrollment applications are received and placed under <strong className="font-bold">Pending Administrator Adjudication</strong>. Applications are officially verified and enrolled by the School Administrator upon section assignment and document review.
           </p>
         </div>
 

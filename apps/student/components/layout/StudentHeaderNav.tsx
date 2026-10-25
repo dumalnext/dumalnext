@@ -845,7 +845,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                  Real-time status tracking, registrar review remarks, and Certificate of Enrollment.
+                  Real-time status tracking, school administrator review remarks, and Certificate of Enrollment.
                 </p>
               </Link>
 

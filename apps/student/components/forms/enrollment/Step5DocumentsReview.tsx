@@ -724,7 +724,7 @@ export default function Step5DocumentsReview({
             <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-[4px]">
               {existingApplication
                 ? "STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION"
-                : "STATUS: PENDING REGISTRAR VERIFICATION"}
+                : "STATUS: PENDING ADMINISTRATOR VERIFICATION"}
             </span>
             <span className="text-xs text-amber-900 font-bold">
               DATE: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
@@ -732,8 +732,8 @@ export default function Step5DocumentsReview({
           </div>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
             {existingApplication
-              ? "Your revised enrollment dossier and updated documentary requirements have been successfully resubmitted to the Dumalneg National High School Registrar for re-evaluation. Your reference number remains unchanged."
-              : "Your online enrollment application has been successfully submitted to the Dumalneg National High School Registrar. Official documents are currently undergoing evaluation. You will be notified once verified."}
+              ? "Your revised enrollment dossier and updated documentary requirements have been successfully resubmitted to the Dumalneg National High School Administrator for re-evaluation. Your reference number remains unchanged."
+              : "Your online enrollment application has been successfully submitted to the Dumalneg National High School Administrator. Official documents are currently undergoing evaluation. You will be notified once verified."}
           </p>
         </div>
 
@@ -816,7 +816,7 @@ export default function Step5DocumentsReview({
           </div>
           <ol className="list-decimal list-inside text-xs text-slate-700 space-y-2 leading-relaxed">
             <li>
-              <strong>Registrar Evaluation</strong>: The Dumalneg NHS Registrar will review your uploaded credentials (Form 138, PSA Birth Certificate, etc.) within 1 to 2 school business days.
+              <strong>School Administrator Evaluation</strong>: The Dumalneg NHS School Administrator will review your uploaded credentials (Form 138, PSA Birth Certificate, etc.) within 1 to 2 school business days.
             </li>
             <li>
               <strong>Track Your Application Status</strong>: Visit the <strong>Track Application Status</strong> page on the portal anytime using your Application Tracking Number or 12-digit LRN.
@@ -825,7 +825,7 @@ export default function Step5DocumentsReview({
               <strong>Official DepEd PDF Release</strong>: Once your application is marked as <strong>APPROVED &amp; OFFICIALLY ENROLLED</strong> by the school administrator, your official accomplished DepEd Enrollment Form (PDF) and Certificate of Enrollment will be immediately unlocked for download.
             </li>
             <li>
-              <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Registrar&apos;s Office during the first week of classes for physical civil registry validation.
+              <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Administration Office during the first week of classes for physical civil registry validation.
             </li>
           </ol>
         </div>
@@ -869,7 +869,7 @@ export default function Step5DocumentsReview({
           Document Upload &amp; Application Review
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Upload required DepEd credentials using the built-in image compressor (&lt;350KB) and review your encoded information before official submission to the Dumalneg NHS Registrar.
+          Upload required DepEd credentials using the built-in image compressor (&lt;350KB) and review your encoded information before official submission to the Dumalneg NHS School Administrator.
         </p>
       </div>
 
@@ -1284,7 +1284,7 @@ export default function Step5DocumentsReview({
       <div className="p-4 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-[4px]">
         <strong>Important Official Note</strong>: In accordance with DepEd enrollment verification procedures, 
         your official accomplished DepEd Basic Education Enrollment Form (PDF) will become accessible and downloadable 
-        immediately once your application and credentials have been officially verified and <strong>Approved</strong> by the Dumalneg NHS Registrar.
+        immediately once your application and credentials have been officially verified and <strong>Approved</strong> by the Dumalneg NHS School Administrator.
       </div>
 
       {/* Navigation Buttons */}

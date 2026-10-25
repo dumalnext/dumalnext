@@ -589,7 +589,7 @@ export default function EnrollmentStepper({
             </span>
           </div>
           <p className="text-xs text-red-900 leading-relaxed whitespace-pre-line">
-            {closedMessage || "Online basic education enrollment is currently closed by the Registrar's Office. Please await official announcements regarding enrollment schedules."}
+            {closedMessage || "Online basic education enrollment is currently closed by the School Administration Office. Please await official announcements regarding enrollment schedules."}
           </p>
         </div>
 
@@ -632,14 +632,14 @@ export default function EnrollmentStepper({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shrink-0" />
             <span className="text-xs font-bold text-amber-950">
-              Submission Locked: Pending Registrar Verification
+              Submission Locked: Pending Administrator Verification
             </span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed">
             You have already submitted an official enrollment application for School Year {schoolYear}. Under DepEd Basic Education enrollment guidelines, each learner is permitted only one (1) active application at a time.
           </p>
           <p className="text-xs text-amber-900 leading-relaxed">
-            Your application is currently queued for evaluation by the Dumalneg NHS Registrar. If any correction or re-submission is necessary, the registrar will unlock your dossier for revision.
+            Your application is currently queued for evaluation by the Dumalneg NHS School Administrator. If any correction or re-submission is necessary, the registrar will unlock your dossier for revision.
           </p>
         </div>
 
@@ -730,7 +730,7 @@ export default function EnrollmentStepper({
         <div className="p-4 bg-red-50 border-2 border-red-500 text-slate-900 space-y-2 shadow-xs rounded-[4px]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
             <span className="text-xs font-bold text-red-950">
-              Registrar Notice: Application Dossier Returned for Revision
+              School Administrator Notice: Application Dossier Returned for Revision
             </span>
             <span className="text-[10px] bg-red-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded-[4px]">
               REF: {existingApp.application_id}
@@ -738,7 +738,7 @@ export default function EnrollmentStepper({
           </div>
           <div className="bg-white/90 p-3 border border-red-300 space-y-1 rounded-[4px]">
             <span className="text-[10px] font-bold text-red-950 block">
-              Official Evaluation Feedback from Registrar:
+              Official Evaluation Feedback from School Administrator:
             </span>
             <p className="text-xs text-red-900 font-bold leading-relaxed">
               &ldquo;{existingApp.admin_feedback || "Please review and correct your details and documentary requirements before resubmission."}&rdquo;

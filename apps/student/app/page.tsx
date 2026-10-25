@@ -1036,7 +1036,7 @@ function StudentHomeContent() {
                 <div className="text-xs text-slate-600">
                   {sectionMode === "ASSIGNED" && assignedSection
                     ? `Grade ${assignedSection.gradeLevel}${assignedSection.strand ? ` • ${assignedSection.strand}` : ""} Official Roster`
-                    : "Awaiting Registrar Sectioning"}
+                    : "Awaiting Administrator Sectioning"}
                 </div>
               </div>
 
@@ -1157,7 +1157,7 @@ function StudentHomeContent() {
                           : "Awaiting Official Class Section Placement"}
                       </div>
                       <p className="text-xs text-amber-800">
-                        Your class section and room assignment will appear here automatically once finalized by the Registrar.
+                        Your class section and room assignment will appear here automatically once finalized by the School Administrator.
                       </p>
                     </div>
                     <Link
@@ -1176,7 +1176,7 @@ function StudentHomeContent() {
                       <span className="font-bold text-slate-700">
                         Weekly Class Schedule ({dashboardSchedules.length} {dashboardSchedules.length === 1 ? "Class" : "Classes"})
                       </span>
-                      <span className="text-slate-500">Live Registrar Timetable</span>
+                      <span className="text-slate-500">Live Official Timetable</span>
                     </div>
                     <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
                       <table className="w-full text-left text-xs border-collapse">
@@ -1289,7 +1289,7 @@ function StudentHomeContent() {
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-[4px]">
                         <span className="w-2 h-2 rounded-full bg-amber-500 border border-amber-600 shrink-0" />
-                        Status: Pending Registrar Verification
+                        Status: Pending Administrator Verification
                       </span>
                     )}
                   </div>
@@ -1317,7 +1317,7 @@ function StudentHomeContent() {
                 {userApplication.remarks && (
                   <div className="p-3 bg-slate-50 border border-slate-200 text-xs rounded-[4px]">
                     <span className="font-bold text-slate-700 block mb-0.5 tracking-wide">
-                      Registrar Notes / Remarks:
+                      School Administrator Notes / Remarks:
                     </span>
                     <p className="text-slate-800">{userApplication.remarks}</p>
                   </div>
@@ -1491,7 +1491,7 @@ function StudentHomeContent() {
                               ? `Your official learner credentials and documentary requirements are certified on file from your previous approved enrollment. As Junior High School (Grades 7-10) follows a prescribed core curriculum, no electives are required. Click below for instant 1-click re-enrollment for ${semester}.`
                               : `Your learner credentials, family background, and official DepEd documents are verified and on file from your previous approved enrollment. Click below to choose your elective subjects and submit enrollment for ${semester}.`
                             : `Your student account is active. Click below to begin filling out the complete enrollment form for School Year ${schoolYear} (${semester}). Please review and double check all learner credentials and documentary requirements.`
-                          : (closedMessage || "Online enrollment submission is temporarily closed by the Registrar's Office. You can view the official advisory notice below.")}
+                          : (closedMessage || "Online enrollment submission is temporarily closed by the School Administration Office. You can view the official advisory notice below.")}
                       </p>
 
                       <div className="pt-2">
@@ -1549,7 +1549,7 @@ function StudentHomeContent() {
                         </div>
                         {pApp.remarks && (
                           <p className="text-[11px] text-slate-600 mt-1 italic">
-                            Registrar Feedback: {pApp.remarks}
+                            School Administrator Feedback: {pApp.remarks}
                           </p>
                         )}
                       </div>
@@ -1701,7 +1701,7 @@ function StudentHomeContent() {
                           Track Status &amp; Class Section
                         </h4>
                         <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          View real-time Registrar approval, check your assigned section, and download your DepEd PDF.
+                          View real-time Administrator approval, check your assigned section, and download your DepEd PDF.
                         </p>
                       </div>
                     </div>

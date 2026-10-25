@@ -87,7 +87,7 @@ export default function StudentEnrollPage() {
           {/* Registrar Official Announcement */}
           <div className="p-4 bg-red-50/70 border border-red-300 space-y-2 text-xs text-red-950 leading-relaxed rounded-[4px]">
             <span className="font-bold block text-red-900">
-              Official Message from the Dumalneg NHS Registrar's Office:
+              Official Message from the Dumalneg NHS Administration Office:
             </span>
             <p className="whitespace-pre-line text-sm text-slate-800">
               {closedMessage}
@@ -100,7 +100,7 @@ export default function StudentEnrollPage() {
               <span className="text-[10px] font-bold text-slate-500 block">
                 Official School Inquiries
               </span>
-              <p className="font-bold text-slate-900">Dumalneg NHS Registrar&apos;s Office</p>
+              <p className="font-bold text-slate-900">Dumalneg NHS Administration Office</p>
               <p className="text-slate-600">Monday &ndash; Friday &bull; 8:00 AM &ndash; 5:00 PM</p>
               <p className="text-slate-600">Dumalneg, Ilocos Norte, Philippines (2921)</p>
             </div>

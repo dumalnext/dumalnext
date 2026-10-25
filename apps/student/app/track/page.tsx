@@ -631,7 +631,7 @@ function TrackApplicationContent() {
               My Enrollment Application Status
             </h1>
             <p className="text-xs text-blue-100 mt-0.5 leading-relaxed">
-              Real-time registrar evaluation updates for{" "}
+              Real-time administrator evaluation updates for{" "}
               <strong className="text-white">
                 {user.firstName} {user.lastName}
               </strong>{" "}
@@ -724,7 +724,7 @@ Portal Home
               {record.status === "Pending" && (
                 <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-[4px]">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border border-amber-600 inline-block shrink-0" />
-                  Status: Pending Registrar Verification
+                  Status: Pending Administrator Verification
                 </span>
               )}
               {record.status === "Approved" && (
@@ -746,10 +746,10 @@ Portal Home
           {record.status === "Pending" && (
             <div className="p-4 bg-amber-50 border-2 border-amber-300 space-y-1 rounded-[4px]">
               <div className="text-xs font-bold text-amber-900 tracking-wide">
-                Application Under Registrar Evaluation
+                Application Under School Administrator Evaluation
               </div>
               <p className="text-xs text-amber-900 leading-relaxed">
-                Your submitted basic education application and documentary requirements have been received and are currently queued for verification by the Dumalneg NHS Registrar. Official DepEd PDF documents will become accessible once your enrollment is confirmed.
+                Your submitted basic education application and documentary requirements have been received and are currently queued for verification by the Dumalneg NHS School Administrator. Official DepEd PDF documents will become accessible once your enrollment is confirmed.
               </p>
             </div>
           )}
@@ -790,7 +790,7 @@ Portal Home
               </div>
 
               <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                The Dumalneg National High School Registrar has approved your application, verified your credentials, and assigned your official class section. Your official accomplished DepEd enrollment form is ready for download below.
+                The Dumalneg National High School Administrator has approved your application, verified your credentials, and assigned your official class section. Your official accomplished DepEd enrollment form is ready for download below.
               </p>
               <div className="pt-2">
                 <button
@@ -810,7 +810,7 @@ Portal Home
           {record.status === "Needs Revision" && (
             <div className="p-5 bg-red-50 border-2 border-red-400 space-y-3 rounded-[4px]">
               <div className="text-xs font-bold text-red-900 tracking-wide">
-                Registrar Feedback &amp; Action Required
+                School Administrator Feedback &amp; Action Required
               </div>
               <p className="text-xs text-red-900 leading-relaxed font-medium">
                 {record.remarks ||
@@ -1105,7 +1105,7 @@ Portal Home
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] tracking-wide block">
-              Application Status Guide &bull; Registrar Evaluation Indicators
+              Application Status Guide &bull; Administrator Evaluation Indicators
             </span>
             <p className="text-xs text-slate-600 mt-0.5">
               Official DepEd Dumalneg NHS status indicators for enrollment verification:
@@ -1125,7 +1125,7 @@ Portal Home
               </span>
             </div>
             <p className="text-[11px] text-emerald-900 leading-relaxed">
-              Your enrollment application and documentary requirements have been verified by the Registrar. Your official DepEd Enrollment Form (PDF) and section assignment are ready.
+              Your enrollment application and documentary requirements have been verified by the School Administrator. Your official DepEd Enrollment Form (PDF) and section assignment are ready.
             </p>
           </div>
 
@@ -1137,7 +1137,7 @@ Portal Home
               </span>
             </div>
             <p className="text-[11px] text-amber-900 leading-relaxed">
-              Your application has been received and is queued for evaluation by the Registrar. No further action is needed while verification is in progress.
+              Your application has been received and is queued for evaluation by the School Administrator. No further action is needed while verification is in progress.
             </p>
           </div>
 
