@@ -789,7 +789,7 @@ export default function StudentProfilePage() {
                     Learner Demographic Details
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Official identity and demographic records as certified on the DepEd enrolment form.
+
                   </p>
                 </div>
 
@@ -813,7 +813,7 @@ export default function StudentProfilePage() {
                         Certified Learner Photo On File
                       </span>
                       <p className="text-[11px] text-slate-500">
-                        Officially submitted during basic education enrollment and verified on file with the school registrar.
+
                       </p>
                     </div>
                   </div>
