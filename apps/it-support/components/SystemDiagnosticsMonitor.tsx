@@ -25,7 +25,7 @@ export default function SystemDiagnosticsMonitor() {
     totalLatencyMs: 42,
     mode: "full",
     timestamp: new Date().toISOString(),
-    projectRef: "fvybtqghtuarjzlpbwnr",
+    projectRef: "rskwdqvbwrqclrxuxjqp",
   });
 
   const handleRunDiagnostics = async (mode: "full" | "edge" = "full") => {
@@ -56,7 +56,7 @@ export default function SystemDiagnosticsMonitor() {
           totalLatencyMs: totalElapsed,
           mode,
           timestamp: data.timestamp || new Date().toISOString(),
-          projectRef: data.projectRef || "fvybtqghtuarjzlpbwnr",
+          projectRef: data.projectRef || "rskwdqvbwrqclrxuxjqp",
           error: data.dbError || null,
         };
 
@@ -70,7 +70,7 @@ export default function SystemDiagnosticsMonitor() {
           totalLatencyMs: totalElapsed,
           mode,
           timestamp: new Date().toISOString(),
-          projectRef: "fvybtqghtuarjzlpbwnr",
+          projectRef: "rskwdqvbwrqclrxuxjqp",
           error: data?.dbError || "API response degraded",
         });
       }
@@ -83,7 +83,7 @@ export default function SystemDiagnosticsMonitor() {
         totalLatencyMs: totalElapsed,
         mode,
         timestamp: new Date().toISOString(),
-        projectRef: "fvybtqghtuarjzlpbwnr",
+        projectRef: "rskwdqvbwrqclrxuxjqp",
         error: err?.message || "Diagnostic service unreachable",
       });
     } finally {
@@ -185,8 +185,8 @@ export default function SystemDiagnosticsMonitor() {
             </div>
           </div>
           <div className="mt-3 pt-2.5 border-t border-slate-100 text-[10px] text-slate-500">
-            <span className="font-mono block truncate" title="fvybtqghtuarjzlpbwnr">
-              Project: {pingResult?.projectRef || "fvybtqghtuarjzlpbwnr"}
+            <span className="font-mono block truncate" title="rskwdqvbwrqclrxuxjqp">
+              Project: {pingResult?.projectRef || "rskwdqvbwrqclrxuxjqp"}
             </span>
             <span className="text-slate-600 font-medium block mt-0.5">
               DB Query Time:{" "}

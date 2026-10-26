@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
       dbLatencyMs,
       dbError,
       timestamp,
-      projectRef: "fvybtqghtuarjzlpbwnr",
+      projectRef: (process.env.NEXT_PUBLIC_SUPABASE_URL || "").match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] || "rskwdqvbwrqclrxuxjqp",
       regionNote: "Supabase Cloud Database (PostgreSQL)",
     },
     { headers: NO_CACHE_HEADERS }
