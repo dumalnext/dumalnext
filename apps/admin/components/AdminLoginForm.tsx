@@ -229,7 +229,7 @@ function AdminLoginFormInner() {
       {/* 2-Column Split Enrollment System Login Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* LEFT COLUMN (7 Cols): Institutional Hero & Registrar Capabilities */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
           {/* Hero Welcome Card */}
           <section className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white">
             <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-6 sm:p-8 border-b-4 border-amber-400">
@@ -339,7 +339,7 @@ function AdminLoginFormInner() {
         </div>
 
         {/* RIGHT COLUMN (5 Cols): Authentication / Onboarding Card */}
-        <div className="lg:col-span-5">
+        <div className="lg:col-span-5 order-1 lg:order-2 space-y-4">
           {invitation ? (
             /* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */
             <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
