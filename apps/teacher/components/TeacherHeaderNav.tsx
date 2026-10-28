@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTeacherAuth } from "@/lib/auth/authContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function TeacherHeaderNav() {
   const { user, logout } = useTeacherAuth();
@@ -26,7 +25,6 @@ export default function TeacherHeaderNav() {
             </span>
           </div>
           <div className="flex items-center gap-2 text-[11px]">
-            <ThemeToggle size="sm" />
             <span className="inline-flex items-center gap-1.5 bg-amber-400/20 text-amber-200 border border-amber-300/40 px-2.5 py-0.5 font-bold rounded-[4px]">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
               Faculty &amp; Teacher Portal
@@ -60,7 +58,6 @@ export default function TeacherHeaderNav() {
 
         {user && (
           <div className="flex flex-wrap items-center gap-3">
-            <ThemeToggle size="sm" />
             <div className="border border-white/20 bg-white/10 backdrop-blur-xs px-3.5 py-2 text-xs rounded-[4px]">
               <span className="text-[10px] text-amber-300 font-semibold block">
                 Active Faculty Account

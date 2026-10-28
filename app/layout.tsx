@@ -1,4 +1,3 @@
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -50,19 +49,13 @@ export default function RootLayout({
             `,
           }}
         />
-              <script
+                            <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
                   var t = localStorage.getItem('dnhs-theme');
-                  if (t === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.removeAttribute('data-theme');
-                  }
+                  document.documentElement.classList.remove('dark'); document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('dnhs-theme');
                 } catch(e) {}
               })();
             `,
@@ -92,7 +85,6 @@ export default function RootLayout({
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs">
-              <ThemeToggle size="sm" />
               <span className="bg-white/10 border border-white/20 text-white px-3.5 py-1.5 rounded-full font-semibold tracking-wide">
                 Official Institutional Portal &bull; Trimester System
               </span>
