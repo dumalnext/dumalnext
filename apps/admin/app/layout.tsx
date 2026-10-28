@@ -48,13 +48,7 @@ export default function AdminLayout({
               (function() {
                 try {
                   var t = localStorage.getItem('dnhs-theme');
-                  if (t === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.removeAttribute('data-theme');
-                  }
+                  document.documentElement.classList.remove('dark'); document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('dnhs-theme');
                 } catch(e) {}
               })();
             `,

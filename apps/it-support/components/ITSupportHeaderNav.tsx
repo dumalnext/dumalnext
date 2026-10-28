@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useITSupportAuth } from "@/lib/auth/itSupportAuthContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export type ITSupportActiveTab = "calendar" | "classrooms" | "users" | "diagnostics" | "invitations" | "concerns";
 
@@ -41,7 +40,6 @@ export default function ITSupportHeaderNav({
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px]">
             <span className="text-blue-200 font-medium shrink-0">Schools Division of Ilocos Norte</span>
-            <ThemeToggle size="sm" />
             <span className="bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2.5 py-0.5 font-bold uppercase tracking-wider rounded-full text-[10px]">
               IT Support &amp; System Administration
             </span>
@@ -73,7 +71,6 @@ export default function ITSupportHeaderNav({
         {/* Authenticated IT Support Account Badge & Sign Out */}
         {user && (
           <div className="flex items-center justify-between gap-3 w-full md:w-auto shrink-0">
-            <ThemeToggle size="sm" />
             <div className="border border-white/20 bg-white/10 backdrop-blur-xs px-3.5 py-2 text-xs rounded-lg min-w-0 flex-1 md:flex-initial">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
