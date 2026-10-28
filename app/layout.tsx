@@ -92,6 +92,7 @@ export default function RootLayout({
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs">
+              <ThemeToggle size="sm" />
               <span className="bg-white/10 border border-white/20 text-white px-3.5 py-1.5 rounded-full font-semibold tracking-wide">
                 Official Institutional Portal &bull; Trimester System
               </span>

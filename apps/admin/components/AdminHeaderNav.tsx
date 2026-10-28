@@ -1,10 +1,10 @@
-import { ThemeToggle } from "@/components/ThemeToggle";
 "use client";
 
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAdminAuth } from "@/lib/auth/authContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface AdminHeaderNavProps {
   activeSection?: "adjudication" | "sections" | "scheduling" | "subjects" | "curriculum" | "control";
@@ -55,10 +55,10 @@ export default function AdminHeaderNav({
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px]">
             <span className="text-blue-200 font-medium shrink-0">Schools Division of Ilocos Norte</span>
+            <ThemeToggle size="sm" />
             <span className="bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2.5 py-0.5 font-bold uppercase tracking-wider rounded-full text-[10px]">
               Registrar &amp; Administration Portal
             </span>
-
           </div>
         </div>
       </div>

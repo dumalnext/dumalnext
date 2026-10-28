@@ -449,6 +449,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <PushNotificationHeaderButton />
             <PwaInstallHeaderButton />
+            <ThemeToggle size="sm" />
 
             {/* Student Identity & Status Pill */}
             <Link
@@ -509,6 +510,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             </div>
             <PushNotificationHeaderButton />
             <PwaInstallHeaderButton />
+            <ThemeToggle size="sm" />
             {pathname !== "/" && (
               <Link
                 href="/"
