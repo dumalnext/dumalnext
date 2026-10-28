@@ -215,7 +215,7 @@ export function PushNotificationHeaderButton() {
         className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-[4px] transition-all cursor-pointer shadow-xs ${
           isGranted
             ? "bg-blue-950/80 hover:bg-blue-900 text-blue-100 border border-blue-400/30"
-            : "bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-300/40 animate-pulse"
+            : "bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-300/40"
         }`}
         title={isGranted ? "Push notifications active on this device" : "Enable push notifications on this device"}
       >
