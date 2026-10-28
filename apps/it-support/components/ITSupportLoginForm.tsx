@@ -448,12 +448,9 @@ function ITSupportLoginFormInner() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs tracking-wide transition-colors shadow-sm disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs tracking-wide transition-colors shadow-sm disabled:opacity-50 cursor-pointer flex items-center justify-center"
                   >
                     <span>{isSubmitting ? "Verifying Credentials..." : "Sign In to IT Support Console"}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
                   </button>
 
 

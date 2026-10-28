@@ -57,15 +57,7 @@ export default function AdminHeaderNav({
             <span className="bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2.5 py-0.5 font-bold uppercase tracking-wider rounded-full text-[10px]">
               Registrar &amp; Administration Portal
             </span>
-            <Link
-              href="/it-support"
-              className="text-blue-200 hover:text-amber-300 font-semibold transition-colors text-[11px] shrink-0 flex items-center gap-1"
-            >
-              <span>IT Support Console</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
+
           </div>
         </div>
       </div>
