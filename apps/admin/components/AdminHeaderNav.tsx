@@ -105,12 +105,9 @@ export default function AdminHeaderNav({
             <button
               type="button"
               onClick={logout}
-              className="px-4 py-2.5 min-h-[40px] shrink-0 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold tracking-wide transition-colors shadow-sm rounded-lg cursor-pointer flex items-center justify-center gap-1.5"
+              className="px-4 py-2.5 min-h-[40px] shrink-0 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold tracking-wide transition-colors shadow-sm rounded-lg cursor-pointer flex items-center justify-center"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Sign Out</span>
+              Sign Out
             </button>
           </div>
         )}

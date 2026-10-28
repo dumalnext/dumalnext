@@ -93,20 +93,15 @@ export default function ITSupportHeaderNav({
               type="button"
               onClick={handleSignOut}
               disabled={isSigningOut}
-              className="px-4 py-2.5 min-h-[40px] shrink-0 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold tracking-wide transition-colors shadow-sm rounded-lg cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
+              className="px-4 py-2.5 min-h-[40px] shrink-0 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold tracking-wide transition-colors shadow-sm rounded-lg cursor-pointer flex items-center justify-center disabled:opacity-60"
             >
               {isSigningOut ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full mr-1.5" />
                   <span>Signing Out...</span>
                 </>
               ) : (
-                <>
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  <span>Sign Out</span>
-                </>
+                <span>Sign Out</span>
               )}
             </button>
           </div>
