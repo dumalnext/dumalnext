@@ -9,6 +9,7 @@ import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 import { PwaInstallHeaderButton, PwaInstallDrawerCard } from "@/components/ui/PwaInstallPrompt";
 import { PushNotificationHeaderButton, PushNotificationDrawerCard } from "@/components/ui/PushNotificationButton";
+import { ThemeToggle, ThemeToggleDrawerCard } from "@/components/ui/ThemeToggle";
 
 interface StudentHeaderNavProps {
   children?: React.ReactNode;
@@ -770,6 +771,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             <div className="p-4 space-y-2">
               <PwaInstallDrawerCard />
               <PushNotificationDrawerCard />
+              <ThemeToggleDrawerCard />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
                 PORTAL MODULES
               </span>

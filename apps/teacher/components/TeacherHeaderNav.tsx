@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/ThemeToggle";
 "use client";
 
 import React from "react";
@@ -58,6 +59,7 @@ export default function TeacherHeaderNav() {
 
         {user && (
           <div className="flex flex-wrap items-center gap-3">
+            <ThemeToggle size="sm" />
             <div className="border border-white/20 bg-white/10 backdrop-blur-xs px-3.5 py-2 text-xs rounded-[4px]">
               <span className="text-[10px] text-amber-300 font-semibold block">
                 Active Faculty Account

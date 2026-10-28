@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/ThemeToggle";
 "use client";
 
 import React from "react";

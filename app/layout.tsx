@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -45,6 +46,24 @@ export default function RootLayout({
                     navigator.serviceWorker.register('/sw.js').catch(function() {});
                   });
                 }
+              })();
+            `,
+          }}
+        />
+              <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var t = localStorage.getItem('dnhs-theme');
+                  if (t === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.removeAttribute('data-theme');
+                  }
+                } catch(e) {}
               })();
             `,
           }}
