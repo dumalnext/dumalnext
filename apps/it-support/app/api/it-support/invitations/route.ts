@@ -304,7 +304,7 @@ export async function POST(req: NextRequest) {
     if (role === "teacher") {
       portalBaseUrl = isLocal ? "http://localhost:3001" : (process.env.NEXT_PUBLIC_TEACHER_URL || "https://dumalnext-teacher.vercel.app");
     } else if (role === "admin") {
-      portalBaseUrl = isLocal ? "http://localhost:3000" : (process.env.NEXT_PUBLIC_ADMIN_URL || "https://dumalnext-admin.vercel.app");
+      portalBaseUrl = isLocal ? "http://localhost:3002" : (process.env.NEXT_PUBLIC_ADMIN_URL || "https://dumalnext-admin.vercel.app");
     } else {
       portalBaseUrl = isLocal ? "http://localhost:3003" : "https://dumalnext-it-support.vercel.app";
     }
