@@ -404,38 +404,96 @@ export async function DELETE(req: NextRequest) {
     }
 
     const targetUser = existing?.[0];
-    if (!targetUser) {
+    const targetEmail = (targetUser?.email || email || "").trim().toLowerCase();
+    const targetId = targetUser?.id || id || null;
+    const targetUserId = targetUser?.user_id || userId || null;
+
+    if (!targetUser && !targetEmail && !targetId) {
       return NextResponse.json({ success: true, message: "User not found or already deleted." });
     }
 
-    // Clean up dependent profile records
-    await Promise.all([
-      supabase.from("teachers").delete().or(`user_id.eq.${targetUser.id},email.eq.${targetUser.email}`),
-      supabase.from("school_administrators").delete().eq("user_id", targetUser.id),
-      supabase.from("it_supports").delete().eq("user_id", targetUser.id),
-      supabase.from("students").delete().eq("user_id", targetUser.id),
-    ]);
+    // Clean up dependent profile records if targetUser found
+    if (targetUser) {
+      await Promise.all([
+        supabase.from("teachers").delete().or(`user_id.eq.${targetUser.id},email.eq.${targetUser.email}`),
+        supabase.from("school_administrators").delete().eq("user_id", targetUser.id),
+        supabase.from("it_supports").delete().eq("user_id", targetUser.id),
+        supabase.from("students").delete().eq("user_id", targetUser.id),
+      ]);
 
-    // Delete from public.users table
-    const { error: delError } = await supabase
-      .from("users")
-      .delete()
-      .eq("id", targetUser.id);
+      // Delete from public.users table
+      const { error: delError } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", targetUser.id);
 
-    if (delError) {
-      return NextResponse.json({ error: delError.message }, { status: 500 });
+      if (delError) {
+        return NextResponse.json({ error: delError.message }, { status: 500 });
+      }
     }
 
-    // If Supabase Service Role Key is configured, also purge the credential from Supabase Auth
+    // Also clean up any pending staff invitations in system_settings
+    if (targetEmail) {
+      try {
+        const { data: setRow } = await supabase
+          .from("system_settings")
+          .select("value")
+          .eq("key", "staff_invitations")
+          .maybeSingle();
+
+        if (setRow && setRow.value && Array.isArray(setRow.value.invitations)) {
+          const updated = setRow.value.invitations.filter(
+            (inv: any) => inv.email?.trim().toLowerCase() !== targetEmail
+          );
+          await supabase.from("system_settings").upsert({
+            key: "staff_invitations",
+            value: { invitations: updated },
+            updated_at: new Date().toISOString(),
+          });
+        }
+      } catch (invErr) {
+        console.warn("Could not clean up staff invitation record:", invErr);
+      }
+    }
+
+    // Purge from Supabase Auth (auth.users)
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    let authDeleted = false;
+
     if (serviceKey && projectUrl) {
       try {
         const serviceClient = createSupabaseJsClient(projectUrl, serviceKey, {
           auth: { autoRefreshToken: false, persistSession: false },
         });
-        if (targetUser.id) {
-          await serviceClient.auth.admin.deleteUser(targetUser.id);
+
+        // 1. Search in Supabase Auth by email first (handles mismatched UUIDs between public.users and auth.users)
+        if (targetEmail) {
+          try {
+            const { data: userLookup } = await serviceClient.auth.admin.listUsers({ page: 1, perPage: 1000 });
+            const matchedAuthUsers = userLookup?.users?.filter(
+              (u: any) => u.email?.trim().toLowerCase() === targetEmail
+            ) || [];
+
+            for (const authUser of matchedAuthUsers) {
+              const { error: delAuthErr } = await serviceClient.auth.admin.deleteUser(authUser.id);
+              if (!delAuthErr) {
+                authDeleted = true;
+              } else {
+                console.warn(`Failed to delete auth user ${authUser.id}:`, delAuthErr.message);
+              }
+            }
+          } catch (listErr: any) {
+            console.warn("Notice during listUsers search in auth:", listErr?.message);
+          }
+        }
+
+        // 2. Direct delete by ID if not deleted yet
+        if (!authDeleted && targetId) {
+          const { error: directErr } = await serviceClient.auth.admin.deleteUser(targetId);
+          if (!directErr) {
+            authDeleted = true;
+          }
         }
       } catch (authErr) {
         console.warn("Could not delete user from Supabase Auth:", authErr);
@@ -444,8 +502,9 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `User ${targetUser.email} (${targetUser.user_id}) deleted successfully.`,
-      deletedId: targetUser.id,
+      message: `User ${targetEmail || targetId || targetUserId} deleted successfully from database and Supabase Auth.`,
+      deletedId: targetId,
+      authDeleted,
     });
   } catch (err: any) {
     console.error("DELETE /api/users error:", err);
