@@ -1,5 +1,6 @@
 "use client";
 
+// Version 1.1.0 - Real-time Traffic Capacity Gatekeeper for Dumalneg NHS
 import React, { useState, useEffect } from "react";
 
 export default function TrafficCapacityManager() {
