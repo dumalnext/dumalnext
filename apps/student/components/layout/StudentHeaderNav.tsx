@@ -435,6 +435,16 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 My Section
               </Link>
               <Link
+                href="/grades"
+                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
+                  pathname === "/grades"
+                    ? "bg-white text-[#002060] shadow-xs"
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                My Grade
+              </Link>
+              <Link
                 href={profileHref}
                 className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors ${
                   pathname === "/profile"
@@ -876,6 +886,29 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     : sectionMode === "NOT_ASSIGNED_TRANSFEREE"
                     ? "You're not yet assigned to a section. Transferee evaluation in progress."
                     : "You're not yet assigned to a section. Check official class placement."}
+                </p>
+              </Link>
+
+              {/* 5. My Grade Link */}
+              <Link
+                href="/grades"
+                onClick={() => setIsMenuOpen(false)}
+                className={`block p-3 border-2 transition-all rounded-[4px] shadow-xs ${
+                  pathname === "/grades"
+                    ? "bg-blue-50/80 border-[#002060] text-[#002060]"
+                    : "bg-white border-slate-200 hover:border-[#002060] text-slate-800"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">
+                    My Grade
+                  </span>
+                  <span className="px-1.5 py-0.5 bg-blue-100 text-[#002060] text-[9px] font-bold uppercase rounded">
+                    Official
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-1 leading-normal">
+                  View your official grade snapshots and ratings per semester/trimester.
                 </p>
               </Link>
             </div>

@@ -6,6 +6,8 @@ import { useTeacherAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 import TeacherLoginForm from "@/components/TeacherLoginForm";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
+import { compressImage } from "@/lib/utils/image-compressor";
+import { StudentGradeRecord } from "@/lib/types/grade";
 
 interface SectionSummary {
   id: string;
@@ -54,6 +56,22 @@ export default function ClassSectionRosterPage() {
   const [isEnrollingAll, setIsEnrollingAll] = useState<boolean>(false);
   const [enrollNotification, setEnrollNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  // Grade Management States
+  const [isGradeOpen, setIsGradeOpen] = useState<boolean>(true);
+  const [gradesList, setGradesList] = useState<StudentGradeRecord[]>([]);
+  const [selectedGradeStudent, setSelectedGradeStudent] = useState<StudentItem | null>(null);
+  const [gradeUploadTerm, setGradeUploadTerm] = useState<number>(1);
+  const [gradeImageFile, setGradeImageFile] = useState<File | null>(null);
+  const [gradeImageDataUrl, setGradeImageDataUrl] = useState<string>("");
+  const [gradeImagePreview, setGradeImagePreview] = useState<string>("");
+  const [isCompressingGrade, setIsCompressingGrade] = useState<boolean>(false);
+  const [gradeRemarks, setGradeRemarks] = useState<string>("");
+  const [isSubmittingGrade, setIsSubmittingGrade] = useState<boolean>(false);
+  const [gradeModalError, setGradeModalError] = useState<string | null>(null);
+  const [gradeModalSuccess, setGradeModalSuccess] = useState<string | null>(null);
+  const [viewFullGradeModal, setViewFullGradeModal] = useState<StudentGradeRecord | null>(null);
+  const gradeFileInputRef = useRef<HTMLInputElement>(null);
+
   // Fetch sections and filter specifically by the logged-in teacher's advisory assignment
   const fetchAdvisorySections = async (silent: boolean = false) => {
     if (!user) return;
@@ -72,6 +90,7 @@ export default function ClassSectionRosterPage() {
         if (termRes.data) {
           const tNum = Number(termRes.data.termNumber) || 1;
           setActiveTermNumber(tNum);
+          setGradeUploadTerm(tNum);
           setActiveTermName(termRes.data.termName || `Trimester ${tNum}`);
           if (termRes.data.schoolYear) {
             setActiveSchoolYear(termRes.data.schoolYear);
@@ -425,6 +444,20 @@ export default function ClassSectionRosterPage() {
           return (a.first_name || "").localeCompare(b.first_name || "");
         });
 
+        // 4. Fetch official grade records for section
+        try {
+          const gradesRes = await fetch("/api/grades");
+          const gradesData = await gradesRes.json();
+          if (gradesData.success) {
+            if (typeof gradesData.isGradeOpen === "boolean") {
+              setIsGradeOpen(gradesData.isGradeOpen);
+            }
+            setGradesList(gradesData.records || []);
+          }
+        } catch (gErr) {
+          console.warn("Notice loading section grades:", gErr);
+        }
+
         if (isMounted) {
           setRosterStudents(sortedStudents);
         }
@@ -488,6 +521,134 @@ export default function ClassSectionRosterPage() {
   if (!user) {
     return <TeacherLoginForm />;
   }
+
+  // Grade Management Handlers
+  const handleOpenGradeModal = (st: StudentItem) => {
+    setSelectedGradeStudent(st);
+    setGradeUploadTerm(activeTermNumber);
+    setGradeImageFile(null);
+    setGradeImageDataUrl("");
+    setGradeImagePreview("");
+    setGradeRemarks("");
+    setGradeModalError(null);
+    setGradeModalSuccess(null);
+
+    // If student already has a grade for this term, show preview
+    const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+    const existing = gradesList.find(
+      (g) =>
+        (g.studentLrn === st.student_id || g.studentId === st.id) &&
+        g.schoolYear === cleanSY &&
+        g.trimester === activeTermNumber
+    );
+    if (existing) {
+      setGradeImageDataUrl(existing.gradeImageUrl);
+      setGradeImagePreview(existing.gradeImageUrl);
+      if (existing.remarks) setGradeRemarks(existing.remarks);
+    }
+  };
+
+  const handleGradeFileSelect = async (file: File) => {
+    if (!file) return;
+    setGradeModalError(null);
+    setIsCompressingGrade(true);
+    try {
+      const compressed = await compressImage(file, {
+        maxWidth: 1600,
+        maxHeight: 1600,
+        quality: 0.8,
+        outputFormat: "image/jpeg",
+      });
+      setGradeImageFile(compressed.file);
+      setGradeImageDataUrl(compressed.dataUrl);
+      setGradeImagePreview(compressed.dataUrl);
+    } catch {
+      setGradeModalError("Failed to process image. Please try another file.");
+    } finally {
+      setIsCompressingGrade(false);
+    }
+  };
+
+  const handleSendGradeToStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedGradeStudent) return;
+
+    if (!gradeImageDataUrl) {
+      setGradeModalError("Please take or select a picture of the student's grade first.");
+      return;
+    }
+
+    if (!isGradeOpen) {
+      setGradeModalError("Grade submission is currently closed by the School Administrator in the Control Room. Uploading grades is locked.");
+      return;
+    }
+
+    setIsSubmittingGrade(true);
+    setGradeModalError(null);
+    setGradeModalSuccess(null);
+
+    try {
+      const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+      const payload = {
+        studentId: selectedGradeStudent.id,
+        studentLrn: selectedGradeStudent.student_id,
+        studentName: `${selectedGradeStudent.last_name}, ${selectedGradeStudent.first_name}`,
+        sectionId: currentSection?.id,
+        sectionName: currentSection?.section_name,
+        gradeLevel: currentSection?.grade_level,
+        schoolYear: cleanSY,
+        trimester: gradeUploadTerm,
+        termName: `Trimester ${gradeUploadTerm}`,
+        gradeImageUrl: gradeImageDataUrl,
+        gradeImageName: gradeImageFile?.name || `Grade_${selectedGradeStudent.student_id}_T${gradeUploadTerm}.jpg`,
+        uploadedByTeacherId: user?.id,
+        uploadedByTeacherName: user?.fullName || "Class Adviser",
+        remarks: gradeRemarks.trim() || undefined,
+      };
+
+      const res = await fetch("/api/grades", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setGradeModalError(data.error || "Failed to upload grade snapshot.");
+      } else {
+        setGradeModalSuccess(`Grade successfully sent to ${selectedGradeStudent.last_name}, ${selectedGradeStudent.first_name} and marked as DONE!`);
+        
+        // Update local state
+        setGradesList((prev) => {
+          const idx = prev.findIndex(
+            (r) =>
+              (r.studentLrn === selectedGradeStudent.student_id || r.studentId === selectedGradeStudent.id) &&
+              r.schoolYear === cleanSY &&
+              r.trimester === gradeUploadTerm
+          );
+          if (idx >= 0) {
+            const next = [...prev];
+            next[idx] = data.record;
+            return next;
+          }
+          return [data.record, ...prev];
+        });
+
+        setTimeout(() => {
+          setSelectedGradeStudent(null);
+          setGradeImageFile(null);
+          setGradeImageDataUrl("");
+          setGradeImagePreview("");
+          setGradeRemarks("");
+          setGradeModalSuccess(null);
+        }, 1400);
+      }
+    } catch {
+      setGradeModalError("A network error occurred while sending grade.");
+    } finally {
+      setIsSubmittingGrade(false);
+    }
+  };
 
   // 1-Click Continuing Enrollment Handlers for Trimester 2 & 3
   const handleOneClickEnroll = async (student: StudentItem) => {
@@ -941,8 +1102,39 @@ export default function ClassSectionRosterPage() {
                           <td className="p-2.5 font-mono font-bold text-[#002060]">
                             {st.student_id || "PENDING LIS"}
                           </td>
-                          <td className="p-2.5 font-bold text-slate-900 uppercase">
-                            {st.last_name}, {st.first_name} {st.middle_name || ""}
+                          <td className="p-2.5">
+                            {(() => {
+                              const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+                              const currentGrade = gradesList.find(
+                                (g) =>
+                                  (g.studentLrn === st.student_id || g.studentId === st.id) &&
+                                  g.schoolYear === cleanSY &&
+                                  g.trimester === activeTermNumber
+                              );
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenGradeModal(st)}
+                                  className="text-left font-bold text-[#002060] hover:text-[#002b80] hover:underline uppercase cursor-pointer flex flex-col items-start gap-0.5 group"
+                                  title="Click learner name to upload or view grade snapshot"
+                                >
+                                  <span className="group-hover:text-blue-900 transition-colors">
+                                    {st.last_name}, {st.first_name} {st.middle_name || ""}
+                                  </span>
+                                  {currentGrade ? (
+                                    <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-emerald-800 normal-case bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                                      Grade: DONE ({currentGrade.termName})
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-slate-500 normal-case bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                                      Grade: Pending ({activeTermName})
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })()}
                           </td>
                           <td className="p-2.5 font-mono">{st.gender || "—"}</td>
                           <td className="p-2.5 text-slate-700">{st.barangay || "—"}</td>
@@ -961,32 +1153,63 @@ export default function ClassSectionRosterPage() {
                             )}
                           </td>
                           <td className="p-2.5 text-center no-print print:hidden">
-                            {st.isEnrolledInActiveTerm ? (
-                              <span className="text-[11px] font-bold text-emerald-700 inline-flex items-center gap-1">
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                </svg>
-                                Enrolled
-                              </span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleOneClickEnroll(st)}
-                                disabled={enrollingStudentId === st.id || isEnrollingAll}
-                                className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white rounded text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 shrink-0"
-                              >
-                                {enrollingStudentId === st.id ? (
-                                  <>
-                                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    <span>Enrolling...</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <span>1-Click Enroll</span>
-                                  </>
-                                )}
-                              </button>
-                            )}
+                            <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                              {/* Upload Grade Button */}
+                              {(() => {
+                                const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+                                const currentGrade = gradesList.find(
+                                  (g) =>
+                                    (g.studentLrn === st.student_id || g.studentId === st.id) &&
+                                    g.schoolYear === cleanSY &&
+                                    g.trimester === activeTermNumber
+                                );
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenGradeModal(st)}
+                                    className={`px-2.5 py-1 text-[11px] font-bold rounded transition-colors shadow-xs flex items-center gap-1 cursor-pointer ${
+                                      currentGrade
+                                        ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300"
+                                        : "bg-blue-50 hover:bg-blue-100 text-[#002060] border border-blue-300"
+                                    }`}
+                                    title={currentGrade ? "View or update grade snapshot" : "Upload picture of student grade"}
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>{currentGrade ? "Grade: DONE" : "Upload Grade"}</span>
+                                  </button>
+                                );
+                              })()}
+
+                              {/* 1-Click Enroll Button */}
+                              {st.isEnrolledInActiveTerm ? (
+                                <span className="text-[11px] font-bold text-emerald-700 inline-flex items-center gap-1 px-1.5 py-1">
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Enrolled
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleOneClickEnroll(st)}
+                                  disabled={enrollingStudentId === st.id || isEnrollingAll}
+                                  className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white rounded text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 shrink-0"
+                                >
+                                  {enrollingStudentId === st.id ? (
+                                    <>
+                                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                      <span>Enrolling...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span>1-Click Enroll</span>
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1101,6 +1324,337 @@ Prev
             )}
           </div>
         </>
+      )}
+
+      {/* =========================================================================
+          GRADE UPLOAD & EVALUATION MODAL (PER LEARNER)
+          ========================================================================= */}
+      {selectedGradeStudent && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
+          onClick={() => {
+            if (!isSubmittingGrade) setSelectedGradeStudent(null);
+          }}
+        >
+          <div
+            className="bg-white rounded-[4px] border-2 border-[#002060] max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col my-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-[#002060] text-white px-5 py-3.5 flex items-center justify-between border-b border-blue-950">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-200 block">
+                  Official Grade Submission &bull; Advisory Section
+                </span>
+                <h3 className="text-sm font-bold uppercase tracking-wide text-white">
+                  {selectedGradeStudent.last_name}, {selectedGradeStudent.first_name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedGradeStudent(null)}
+                disabled={isSubmittingGrade}
+                className="text-white/80 hover:text-white font-mono text-2xl font-bold px-2 py-0.5 cursor-pointer leading-none"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto font-sans">
+              {/* Admin Grade Control Room Status Notice */}
+              {!isGradeOpen ? (
+                <div className="p-3.5 bg-amber-50 border-2 border-amber-400 rounded text-xs text-amber-950 space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-900 uppercase">
+                    <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
+                    Grade Submission Locked by Administrator
+                  </div>
+                  <p className="leading-relaxed text-[11px] text-amber-800">
+                    The School Administrator has turned off Grade Uploads in the Enrollment &amp; Grade Control Room. You cannot upload new grade pictures at this time.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-300 rounded text-xs text-emerald-950 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    <span className="font-bold text-[11px] uppercase tracking-wide">
+                      Grade Submission is Active &amp; Open
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-emerald-800 font-mono">
+                    Control Room: Enabled
+                  </span>
+                </div>
+              )}
+
+              {/* Student Metadata Card */}
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded text-xs space-y-1 font-mono">
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>LRN (12-Digit):</span>
+                  <strong className="text-[#002060]">{selectedGradeStudent.student_id || "PENDING"}</strong>
+                </div>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>Advisory Section:</span>
+                  <strong className="text-slate-900">{currentSection?.section_name}</strong>
+                </div>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>School Year:</span>
+                  <strong className="text-slate-900">{activeSchoolYear}</strong>
+                </div>
+              </div>
+
+              {/* Trimester Selector Tabs */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                  Target Academic Trimester / Semester:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3].map((t) => {
+                    const isSelected = gradeUploadTerm === t;
+                    const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
+                    const hasDoneGrade = gradesList.some(
+                      (g) =>
+                        (g.studentLrn === selectedGradeStudent.student_id || g.studentId === selectedGradeStudent.id) &&
+                        g.schoolYear === cleanSY &&
+                        g.trimester === t
+                    );
+
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => {
+                          setGradeUploadTerm(t);
+                          // Check if grade already exists for this term
+                          const existing = gradesList.find(
+                            (g) =>
+                              (g.studentLrn === selectedGradeStudent.student_id || g.studentId === selectedGradeStudent.id) &&
+                              g.schoolYear === cleanSY &&
+                              g.trimester === t
+                          );
+                          if (existing) {
+                            setGradeImageDataUrl(existing.gradeImageUrl);
+                            setGradeImagePreview(existing.gradeImageUrl);
+                            setGradeRemarks(existing.remarks || "");
+                          } else {
+                            setGradeImageFile(null);
+                            setGradeImageDataUrl("");
+                            setGradeImagePreview("");
+                            setGradeRemarks("");
+                          }
+                          setGradeModalError(null);
+                          setGradeModalSuccess(null);
+                        }}
+                        className={`py-2 px-2 text-xs font-bold rounded border text-center transition-all cursor-pointer flex flex-col items-center gap-0.5 ${
+                          isSelected
+                            ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                            : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
+                        }`}
+                      >
+                        <span>Trimester {t}</span>
+                        {hasDoneGrade ? (
+                          <span className={`text-[9px] font-bold uppercase ${isSelected ? "text-emerald-300" : "text-emerald-700"}`}>
+                            DONE
+                          </span>
+                        ) : (
+                          <span className={`text-[9px] font-normal ${isSelected ? "text-slate-300" : "text-slate-500"}`}>
+                            Pending
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Error & Success Messages */}
+              {gradeModalError && (
+                <div className="p-3 bg-red-50 border border-red-300 text-red-950 rounded text-xs font-semibold">
+                  {gradeModalError}
+                </div>
+              )}
+              {gradeModalSuccess && (
+                <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-950 rounded text-xs font-semibold">
+                  {gradeModalSuccess}
+                </div>
+              )}
+
+              {/* Picture Upload / Preview Card */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-800 uppercase">
+                  Grade Picture / Report Card Snapshot <span className="text-red-600">*</span>
+                </label>
+
+                {gradeImagePreview ? (
+                  <div className="border-2 border-slate-300 rounded p-3 bg-slate-50 space-y-2 text-center">
+                    <div className="max-h-48 overflow-hidden rounded border border-slate-200 bg-white flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={gradeImagePreview}
+                        alt="Grade Snapshot Preview"
+                        className="max-h-48 w-auto object-contain cursor-pointer"
+                        onClick={() =>
+                          setViewFullGradeModal({
+                            id: "preview",
+                            studentId: selectedGradeStudent.id,
+                            studentLrn: selectedGradeStudent.student_id,
+                            studentName: `${selectedGradeStudent.last_name}, ${selectedGradeStudent.first_name}`,
+                            schoolYear: activeSchoolYear,
+                            trimester: gradeUploadTerm,
+                            termName: `Trimester ${gradeUploadTerm}`,
+                            gradeImageUrl: gradeImagePreview,
+                            status: "DONE",
+                            uploadedAt: new Date().toISOString(),
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-600">
+                      <span>Click photo to enlarge preview</span>
+                      {isGradeOpen && (
+                        <button
+                          type="button"
+                          onClick={() => gradeFileInputRef.current?.click()}
+                          className="text-[#002060] font-bold hover:underline cursor-pointer"
+                        >
+                          Change / Take New Photo
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => {
+                      if (isGradeOpen) gradeFileInputRef.current?.click();
+                    }}
+                    className={`border-2 border-dashed rounded p-6 text-center transition-all flex flex-col items-center justify-center gap-2 ${
+                      isGradeOpen
+                        ? "border-slate-300 hover:border-[#002060] bg-slate-50 hover:bg-blue-50/40 cursor-pointer"
+                        : "border-slate-200 bg-slate-100 cursor-not-allowed opacity-60"
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-blue-100 text-[#002060] flex items-center justify-center">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <div className="text-xs font-bold text-slate-800">
+                      {isCompressingGrade ? "Optimizing image snapshot..." : "Take a photo or choose picture"}
+                    </div>
+                    <p className="text-[10px] text-slate-500">
+                      Accepts Camera snapshot, PNG, JPG, or WebP (Auto-compressed &lt; 350KB)
+                    </p>
+                  </div>
+                )}
+
+                {/* Hidden File Input */}
+                <input
+                  ref={gradeFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleGradeFileSelect(file);
+                    e.target.value = "";
+                  }}
+                  className="hidden"
+                />
+              </div>
+
+              {/* Optional Remarks */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Adviser Remarks / Academic Notes (Optional):
+                </label>
+                <input
+                  type="text"
+                  value={gradeRemarks}
+                  onChange={(e) => setGradeRemarks(e.target.value)}
+                  disabled={!isGradeOpen || isSubmittingGrade}
+                  placeholder="e.g. Trimester 2 Final Rating - Passed with Honors"
+                  className="w-full p-2 bg-slate-50 border border-slate-300 rounded text-xs outline-none focus:border-[#002060] disabled:bg-slate-100"
+                />
+              </div>
+
+              {/* Form Action Buttons */}
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedGradeStudent(null)}
+                  disabled={isSubmittingGrade}
+                  className="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSendGradeToStudent}
+                  disabled={!isGradeOpen || !gradeImageDataUrl || isSubmittingGrade || isCompressingGrade}
+                  className="px-4 py-2 bg-[#002060] hover:bg-[#002b80] text-white rounded text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isSubmittingGrade ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Sending to Student...</span>
+                    </>
+                  ) : (
+                    <span>Send Grade to Student</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          FULL-SCREEN ZOOM / PREVIEW MODAL
+          ========================================================================= */}
+      {viewFullGradeModal && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/85 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setViewFullGradeModal(null)}
+        >
+          <div
+            className="bg-white rounded-[4px] max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-[#002060] text-white px-4 py-3 flex items-center justify-between border-b border-blue-950">
+              <span className="text-xs font-bold uppercase font-mono tracking-wider truncate">
+                Grade Snapshot: {viewFullGradeModal.studentName} ({viewFullGradeModal.termName})
+              </span>
+              <button
+                type="button"
+                onClick={() => setViewFullGradeModal(null)}
+                className="text-white hover:text-slate-300 text-xl font-bold px-2 py-0.5 cursor-pointer leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="p-4 bg-slate-900 flex-1 overflow-auto flex items-center justify-center min-h-[300px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={viewFullGradeModal.gradeImageUrl}
+                alt="Full Grade Snapshot"
+                className="max-w-full max-h-[78vh] object-contain rounded"
+              />
+            </div>
+            <div className="bg-slate-100 p-3 border-t border-slate-200 flex justify-between items-center text-xs">
+              <span className="font-mono text-[11px] text-slate-500">
+                Learner Reference Number: {viewFullGradeModal.studentLrn}
+              </span>
+              <button
+                type="button"
+                onClick={() => setViewFullGradeModal(null)}
+                className="px-3 py-1.5 bg-[#002060] text-white font-bold rounded text-xs hover:bg-[#002b80] cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

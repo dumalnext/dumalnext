@@ -30,6 +30,7 @@ function getConfigFilePath(): string {
 
 const defaultSettings = {
   isEnrollmentOpen: true,
+  isGradeOpen: true,
   schoolYear: "2026–2027",
   semester: "1st Semester",
   enrollmentStartDate: "2026-08-01",
