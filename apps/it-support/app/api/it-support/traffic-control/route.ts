@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
     const newConfig = {
       max_active_students:
         typeof maxActiveStudents === "number" && maxActiveStudents > 0
-          ? Math.min(Math.max(1, maxActiveStudents), 500)
+          ? Math.min(Math.max(50, maxActiveStudents), 500)
           : currentConfig.max_active_students ?? 100,
       queue_enabled:
         typeof queueEnabled === "boolean"

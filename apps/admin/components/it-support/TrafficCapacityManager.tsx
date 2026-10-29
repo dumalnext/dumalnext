@@ -225,7 +225,7 @@ export default function TrafficCapacityManager() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setTempCapacity((c) => Math.max(1, c - 10))}
+                onClick={() => setTempCapacity((c) => Math.max(50, c - 10))}
                 className="w-12 h-11 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 rounded-lg font-black text-lg transition-colors cursor-pointer"
                 title="Decrease by 10 slots"
               >
@@ -233,10 +233,10 @@ export default function TrafficCapacityManager() {
               </button>
               <input
                 type="number"
-                min={1}
+                min={50}
                 max={500}
                 value={tempCapacity}
-                onChange={(e) => setTempCapacity(Math.max(1, Number(e.target.value) || 1))}
+                onChange={(e) => setTempCapacity(Math.max(50, Number(e.target.value) || 50))}
                 className="flex-1 h-11 px-4 border-2 border-slate-300 focus:border-[#002060] rounded-lg text-center font-mono font-black text-xl text-[#002060] outline-none"
               />
               <button
@@ -249,36 +249,16 @@ export default function TrafficCapacityManager() {
               </button>
             </div>
             <p className="text-[11px] text-slate-500">
-              When active sessions reach this threshold, additional students are automatically routed to the Virtual Waiting Room.
+              Minimum capacity is 50 slots. When active sessions reach this threshold, additional students are automatically routed to the Virtual Waiting Room.
             </p>
           </div>
 
           {/* Quick Presets for Defense & Operation */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Quick Presets (Live Demo / Operational Deployment):
+              Quick Presets (Operational Deployment):
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setTempCapacity(3);
-                  handleSaveSettings(3);
-                }}
-                className={`p-2.5 border rounded-lg text-left transition-all cursor-pointer ${
-                  maxCapacity === 3
-                    ? "bg-amber-50 border-amber-400 text-amber-900 shadow-sm"
-                    : "bg-white border-slate-200 hover:border-slate-300 text-slate-700"
-                }`}
-              >
-                <span className="text-[11px] font-black uppercase block text-[#002060]">
-                  Demo Test (3 Slots)
-                </span>
-                <span className="text-[10px] text-slate-500 block">
-                  For live defense demonstration
-                </span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => {
@@ -295,7 +275,7 @@ export default function TrafficCapacityManager() {
                   Conservative (50 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  For low-bandwidth environments
+                  Minimum capacity baseline
                 </span>
               </button>
 
@@ -316,6 +296,26 @@ export default function TrafficCapacityManager() {
                 </span>
                 <span className="text-[10px] text-slate-500 block">
                   Recommended for Dumalneg NHS
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setTempCapacity(150);
+                  handleSaveSettings(150);
+                }}
+                className={`p-2.5 border rounded-lg text-left transition-all cursor-pointer ${
+                  maxCapacity === 150
+                    ? "bg-amber-50 border-amber-400 text-amber-900 shadow-sm"
+                    : "bg-white border-slate-200 hover:border-slate-300 text-slate-700"
+                }`}
+              >
+                <span className="text-[11px] font-black uppercase block text-[#002060]">
+                  Expanded (150 Slots)
+                </span>
+                <span className="text-[10px] text-slate-500 block">
+                  For regular enrollment periods
                 </span>
               </button>
 
