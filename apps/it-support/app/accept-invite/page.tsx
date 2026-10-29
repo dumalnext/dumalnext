@@ -580,12 +580,53 @@ function AcceptInviteContent() {
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Department / Position
               </label>
-              <input
-                type="text"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
-              />
+              {CURRENT_PORTAL_ROLE === "teacher" ? (
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 bg-white font-medium text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
+                >
+                  <option value="Junior High School (JHS)">Junior High School (JHS)</option>
+                  <option value="Senior High School (SHS)">Senior High School (SHS)</option>
+                  <option value="Cross-Level Core">Cross-Level Core</option>
+                  <option value="TVL Faculty">TVL Track Faculty</option>
+                  {department && !["Junior High School (JHS)", "Senior High School (SHS)", "Cross-Level Core", "TVL Faculty"].includes(department) && (
+                    <option value={department}>{department}</option>
+                  )}
+                </select>
+              ) : CURRENT_PORTAL_ROLE === "admin" ? (
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 bg-white font-medium text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
+                >
+                  <option value="Administrator">Administrator</option>
+                  <option value="Office of the Registrar">Office of the Registrar</option>
+                  <option value="Academic Affairs">Academic Affairs</option>
+                  {department && !["Administrator", "Office of the Registrar", "Academic Affairs"].includes(department) && (
+                    <option value={department}>{department}</option>
+                  )}
+                </select>
+              ) : CURRENT_PORTAL_ROLE === "it_support" ? (
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 bg-white font-medium text-slate-900 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
+                >
+                  <option value="IT-support">IT-support</option>
+                  <option value="System Administrator">System Administrator</option>
+                  {department && !["IT-support", "System Administrator"].includes(department) && (
+                    <option value={department}>{department}</option>
+                  )}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#002060] focus:ring-2 focus:ring-[#002060]/15 focus:outline-none"
+                />
+              )}
             </div>
 
             {/* Password Fields */}
