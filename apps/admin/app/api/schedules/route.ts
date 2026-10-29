@@ -161,16 +161,28 @@ export async function GET(req: Request) {
       const rm = classroomMap.get(sc.classroom_id);
       const sub = subjectMap.get(sc.subject_code);
 
+      let normStart = (sc.start_time || "07:30").slice(0, 5);
+      let normEnd = (sc.end_time || "08:30").slice(0, 5);
+      if (normStart === "10:00" && normEnd === "11:00") {
+        normStart = "09:45";
+        normEnd = "10:45";
+      } else if (normStart === "11:00" && normEnd === "12:00") {
+        normStart = "10:45";
+        normEnd = "11:45";
+      }
+
       return {
         ...sc,
-        section_name: sec ? sec.section_name : "General Section",
-        grade_level: sec ? sec.grade_level : undefined,
-        strand: sec?.strand || null,
-        teacher_name: tch ? tch.fullName : "Faculty Member",
-        teacher_email: tch ? tch.email : undefined,
-        department: tch?.department,
-        classroom_name: rm ? rm.room_name : "Main Classroom",
-        building: rm?.building,
+        start_time: normStart,
+        end_time: normEnd,
+        section_name: sec ? sec.section_name : sc.section_name || "General Section",
+        grade_level: sec ? sec.grade_level : sc.grade_level,
+        strand: sec?.strand || sc.strand || null,
+        teacher_name: tch ? tch.fullName : sc.teacher_name || "Faculty Member",
+        teacher_email: tch ? tch.email : sc.teacher_email,
+        department: tch?.department || sc.department,
+        classroom_name: rm ? rm.room_name : sc.classroom_name || "Main Classroom",
+        building: rm?.building || sc.building,
         subject_name: sc.subject_name || sub?.subject_name || sc.subject_code,
       };
     });

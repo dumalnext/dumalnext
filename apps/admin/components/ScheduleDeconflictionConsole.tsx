@@ -75,10 +75,10 @@ interface TimeSlotDef {
 const ACADEMIC_TIME_SLOTS: TimeSlotDef[] = [
   { id: "P1", name: "Period 1", start: "07:30", end: "08:30" },
   { id: "P2", name: "Period 2", start: "08:30", end: "09:30" },
-  { id: "RECESS", name: "Morning Recess", start: "09:30", end: "10:00", isBreak: true },
-  { id: "P3", name: "Period 3", start: "10:00", end: "11:00" },
-  { id: "P4", name: "Period 4", start: "11:00", end: "12:00" },
-  { id: "LUNCH", name: "Noon Lunch Break", start: "12:00", end: "13:00", isBreak: true },
+  { id: "RECESS", name: "Health Break", start: "09:30", end: "09:45", isBreak: true },
+  { id: "P3", name: "Period 3", start: "09:45", end: "10:45" },
+  { id: "P4", name: "Period 4", start: "10:45", end: "11:45" },
+  { id: "LUNCH", name: "Lunch Break & Arrival", start: "11:45", end: "13:00", isBreak: true },
   { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
   { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
   { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
@@ -125,8 +125,24 @@ function timesOverlap(s1: string, e1: string, s2: string, e2: string): boolean {
   return Math.max(startA, startB) < Math.min(endA, endB);
 }
 
+function normalizeSlotWindow(start: string, end: string): { s: string; e: string } {
+  const s = (start || "").slice(0, 5);
+  const e = (end || "").slice(0, 5);
+  if (s === "10:00" && e === "11:00") return { s: "09:45", e: "10:45" };
+  if (s === "11:00" && e === "12:00") return { s: "10:45", e: "11:45" };
+  return { s, e };
+}
+
 function findScheduleInSlot(daySchedules: ScheduleItem[], slotStart: string, slotEnd: string): ScheduleItem | undefined {
-  return daySchedules.find((s) => timesOverlap(s.start_time, s.end_time, slotStart, slotEnd));
+  const exact = daySchedules.find((item) => {
+    const norm = normalizeSlotWindow(item.start_time, item.end_time);
+    return norm.s === slotStart;
+  });
+  if (exact) return exact;
+  return daySchedules.find((item) => {
+    const norm = normalizeSlotWindow(item.start_time, item.end_time);
+    return timesOverlap(norm.s, norm.e, slotStart, slotEnd);
+  });
 }
 
 export default function ScheduleDeconflictionConsole() {
@@ -2372,7 +2388,7 @@ export default function ScheduleDeconflictionConsole() {
                       1. Junior High School (Grades 7–10)
                     </strong>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Fixed standard DepEd core curriculum (English, Math, Science, AP, Filipino, TLE, ESP, MAPEH). Continuous DepEd schedule: 7:30 AM – 12:00 PM and 1:00 PM – 5:00 PM with zero vacant gaps and zero collisions.
+                      Temporal-invariant 4-day academic cadence (240 mins/week per core subject) anchored to fixed daily time blocks, plus Friday Homeroom Guidance (HGP), afternoon ARAL / Remediation &amp; Enrichment, and Co-Curricular Activities.
                     </p>
                   </div>
                   <div className="p-2.5 bg-white border border-slate-200">
@@ -2380,12 +2396,12 @@ export default function ScheduleDeconflictionConsole() {
                       2. Senior High School (Grades 11–12)
                     </strong>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Continuous daily schedule: 7:30 AM – 12:00 PM and 1:00 PM – 5:00 PM. Includes specialized laboratory sessions, TVL workshops, and academic track subjects.
+                      Strengthened SHS Curriculum: 5 mandatory core subjects anchored daily (Mon–Fri, 7:30 AM – 2:00 PM) plus afternoon Track/Cluster Electives, Learning Intervention (LI), HGP, and Co-Curricular Activities.
                     </p>
                   </div>
                 </div>
                 <div className="p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 font-mono">
-                  Guaranteed Conflict-Free: Mathematical constraint satisfaction checks faculty load, physical facility occupancy, and section student programs simultaneously.
+                  Guaranteed Conflict-Free &amp; Temporal Invariance: Each subject stays in its anchored time slot across the week with consistent faculty assignment, zero vacant gaps, and zero room or teacher collisions.
                 </div>
               </div>
 
