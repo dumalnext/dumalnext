@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
         activeCount: activeSessions.length,
         maxCapacity,
         queueEnabled: isQueueActive,
-        message: `Kasalukuyang puno ang sistema (${activeSessions.length}/${maxCapacity} active students).`,
+        message: `The system is currently at maximum capacity (${activeSessions.length}/${maxCapacity} active students). You have been placed in the queue.`,
       },
       { headers: NO_CACHE_HEADERS }
     );

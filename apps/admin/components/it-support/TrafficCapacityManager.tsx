@@ -1,6 +1,6 @@
 "use client";
 
-// Version 1.1.0 - Real-time Traffic Capacity Gatekeeper for Dumalneg NHS
+// Version 1.2.0 - Real-time Traffic Capacity Gatekeeper for Dumalneg NHS (Admin Portal)
 import React, { useState, useEffect } from "react";
 
 export default function TrafficCapacityManager() {
@@ -67,16 +67,16 @@ export default function TrafficCapacityManager() {
         setTempCapacity(data.maxActiveStudents);
         setQueueEnabled(data.queueEnabled);
         setStatusNotice(
-          `Na-update ang kapasidad: ${data.maxActiveStudents} active students limit (Virtual Queue: ${
-            data.queueEnabled ? "AKTIBO" : "OFF"
+          `Capacity limit updated to ${data.maxActiveStudents} active student slots (Virtual Queue: ${
+            data.queueEnabled ? "ENABLED" : "DISABLED"
           }).`
         );
         setTimeout(() => setStatusNotice(""), 5000);
       } else {
-        setErrorMessage(data?.error || "Hindi na-save ang mga pagbabago.");
+        setErrorMessage(data?.error || "Failed to save capacity settings.");
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Nagkaroon ng problema sa koneksyon.");
+      setErrorMessage(err.message || "A network connection error occurred.");
     } finally {
       setIsSaving(false);
     }
@@ -84,7 +84,7 @@ export default function TrafficCapacityManager() {
 
   // Emergency Flush of Active Sessions
   const handleResetSessions = async () => {
-    if (!window.confirm("Kumpirmahin: I-clear ang lahat ng kasalukuyang active student sessions?")) {
+    if (!window.confirm("Confirm: Flush all current active student sessions?")) {
       return;
     }
 
@@ -106,11 +106,11 @@ export default function TrafficCapacityManager() {
       const data = await res.json().catch(() => null);
       if (res.ok && data?.success) {
         setActiveCount(0);
-        setStatusNotice("Matagumpay na na-flush ang lahat ng active student sessions!");
+        setStatusNotice("All active student sessions have been successfully flushed.");
         setTimeout(() => setStatusNotice(""), 5000);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Hindi ma-clear ang active sessions.");
+      setErrorMessage(err.message || "Failed to flush active sessions.");
     } finally {
       setIsSaving(false);
     }
@@ -133,7 +133,7 @@ export default function TrafficCapacityManager() {
             Student Portal User Capacity Controller
           </h3>
           <p className="text-xs text-blue-100 mt-0.5">
-            Pinipigilan ang database crash sa pamamagitan ng paglimita sa sabay-sabay na aktibong transaksyon ng mga estudyante.
+            Protects database stability by regulating concurrent active student sessions and requests.
           </p>
         </div>
 
@@ -157,7 +157,7 @@ export default function TrafficCapacityManager() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Kasalukuyang Aktibong Estudyante (Live Active Users)
+                Current Active Students (Live Active Users)
               </span>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="text-3xl font-black text-[#002060] font-mono">
@@ -176,7 +176,7 @@ export default function TrafficCapacityManager() {
                   }`}
                 >
                   {utilizationPercent >= 100
-                    ? "PUNO / QUEUEING"
+                    ? "AT CAPACITY / QUEUED"
                     : utilizationPercent >= 75
                     ? "HEAVY LOAD"
                     : "OPTIMAL"}
@@ -220,14 +220,14 @@ export default function TrafficCapacityManager() {
           {/* Stepper Control */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              I-adjust ang Maximum Active Capacity (Slots):
+              Adjust Maximum Active Capacity (Slots):
             </label>
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setTempCapacity((c) => Math.max(1, c - 10))}
                 className="w-12 h-11 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 rounded-lg font-black text-lg transition-colors cursor-pointer"
-                title="Bawasan ng 10 slots"
+                title="Decrease by 10 slots"
               >
                 -10
               </button>
@@ -243,20 +243,20 @@ export default function TrafficCapacityManager() {
                 type="button"
                 onClick={() => setTempCapacity((c) => Math.min(500, c + 10))}
                 className="w-12 h-11 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 rounded-lg font-black text-lg transition-colors cursor-pointer"
-                title="Dagdagan ng 10 slots"
+                title="Increase by 10 slots"
               >
                 +10
               </button>
             </div>
             <p className="text-[11px] text-slate-500">
-              Kapag naabot ang bilang na ito, ang mga susunod na estudyante ay awtomatikong ilalagay sa Virtual Waiting Room.
+              When active sessions reach this threshold, additional students are automatically routed to the Virtual Waiting Room.
             </p>
           </div>
 
           {/* Quick Presets for Defense & Operation */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Mabilisang Presets (Para sa Live Demo / Deployment):
+              Quick Presets (Live Demo / Operational Deployment):
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -272,10 +272,10 @@ export default function TrafficCapacityManager() {
                 }`}
               >
                 <span className="text-[11px] font-black uppercase block text-[#002060]">
-                  ⚡ Demo Test (3 Slots)
+                  Demo Test (3 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  Para sa live defense demo
+                  For live defense demonstration
                 </span>
               </button>
 
@@ -292,10 +292,10 @@ export default function TrafficCapacityManager() {
                 }`}
               >
                 <span className="text-[11px] font-black uppercase block text-[#002060]">
-                  🛡️ Conservative (50)
+                  Conservative (50 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  Para sa mabagal na internet
+                  For low-bandwidth environments
                 </span>
               </button>
 
@@ -312,10 +312,10 @@ export default function TrafficCapacityManager() {
                 }`}
               >
                 <span className="text-[11px] font-black uppercase block text-[#002060]">
-                  🎯 Standard (100 Slots)
+                  Standard (100 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  Rekomendado para sa DNHS
+                  Recommended for Dumalneg NHS
                 </span>
               </button>
 
@@ -332,10 +332,10 @@ export default function TrafficCapacityManager() {
                 }`}
               >
                 <span className="text-[11px] font-black uppercase block text-[#002060]">
-                  🚀 Peak Surge (200)
+                  Peak Surge (200 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  Dagsaan sa Enrollment Day
+                  High-volume enrollment day surge
                 </span>
               </button>
             </div>
@@ -353,10 +353,10 @@ export default function TrafficCapacityManager() {
             />
             <div>
               <span className="text-xs font-extrabold uppercase text-slate-900 block">
-                I-enable ang Virtual Waiting Room &amp; Queueing
+                Enable Virtual Waiting Room &amp; Queueing
               </span>
               <span className="text-[11px] text-slate-500 block">
-                Kapag naka-on, hindi magda-down ang system; haharangin at pipilahan ang lalampas sa limit.
+                When enabled, excess student traffic is held in an automated queue to maintain database stability.
               </span>
             </div>
           </label>
@@ -367,7 +367,7 @@ export default function TrafficCapacityManager() {
               onClick={handleResetSessions}
               disabled={isSaving}
               className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-              title="I-clear ang active counters kung may na-stuck na sessions"
+              title="Reset all active student session counters if stale sessions persist"
             >
               Flush Sessions
             </button>
@@ -377,7 +377,7 @@ export default function TrafficCapacityManager() {
               disabled={isSaving}
               className="px-5 py-2.5 bg-[#002060] hover:bg-[#002b80] text-amber-300 font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
             >
-              {isSaving ? "Ina-update..." : "I-save ang Kapasidad"}
+              {isSaving ? "Updating..." : "Save Capacity Settings"}
             </button>
           </div>
         </div>
@@ -385,13 +385,17 @@ export default function TrafficCapacityManager() {
         {/* Status Notices */}
         {statusNotice && (
           <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs font-semibold text-emerald-800 flex items-center gap-2">
-            <span>✓</span>
+            <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
             <span>{statusNotice}</span>
           </div>
         )}
         {errorMessage && (
           <div className="p-3 bg-red-50 border border-red-300 rounded-lg text-xs font-semibold text-red-800 flex items-center gap-2">
-            <span>⚠️</span>
+            <svg className="w-4 h-4 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             <span>{errorMessage}</span>
           </div>
         )}

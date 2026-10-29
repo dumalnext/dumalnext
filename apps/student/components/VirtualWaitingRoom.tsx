@@ -1,5 +1,6 @@
 "use client";
 
+// Version 1.2.0 - Virtual Waiting Room & Queue System for Dumalneg NHS
 import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/lib/auth/authContext";
 
@@ -119,7 +120,7 @@ export default function VirtualWaitingRoom() {
             DepEd High-Traffic Virtual Queue
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            Kasalukuyang Puno ang Sistema
+            System at Maximum Capacity
           </h2>
           <p className="text-xs text-blue-100 mt-1 max-w-sm mx-auto">
             Dumalneg National High School &bull; Concurrency Traffic &amp; Database Protection
@@ -155,24 +156,24 @@ export default function VirtualWaitingRoom() {
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-2 gap-3 text-left">
             <div className="border-r border-slate-200 pr-2">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                Kapasidad ng Server
+                Server Capacity
               </span>
               <span className="text-lg font-black text-slate-900 font-mono">
                 {activeCount} / {maxCapacity}
               </span>
               <span className="text-[10px] text-amber-700 font-semibold block mt-0.5">
-                ● 100% Buong Slots
+                ● 100% Slots Occupied
               </span>
             </div>
             <div className="pl-2">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                Katayuan Mo
+                Your Status
               </span>
               <span className="text-base font-extrabold text-[#002060]">
-                Naka-pila (Queued)
+                In Queue
               </span>
               <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
-                Suriin muli sa {pollCountdown}s
+                Rechecking in {pollCountdown}s
               </span>
             </div>
           </div>
@@ -180,14 +181,19 @@ export default function VirtualWaitingRoom() {
           {/* Explanation Text */}
           <div className="text-xs text-slate-600 space-y-2 text-left bg-blue-50/60 border border-blue-100 p-3.5 rounded-xl">
             <p className="font-semibold text-[#002060]">
-              Bakit may Virtual Waiting Room?
+              Why is there a Virtual Waiting Room?
             </p>
             <p className="leading-relaxed">
-              Upang mapangalagaan ang bilis ng system at maiwasan ang pag-crash ng database habang marami ang sabay-sabay na nag-e-enroll, pansamantalang nililimitahan ang bilang ng aktibong mag-aaral.
+              To preserve system responsiveness and prevent database over-saturation during peak enrollment traffic, the number of simultaneous active students is temporarily regulated.
             </p>
-            <p className="text-[11px] text-slate-500">
-              💡 <strong>Huwag isara ang tab.</strong> Awtomatiko kang makakapasok kapag may nag-logout o natapos na mag-aaral sa loob.
-            </p>
+            <div className="flex items-start gap-2 pt-1 text-[11px] text-slate-600">
+              <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>
+                <strong>Please do not close or refresh this tab.</strong> You will automatically gain access as soon as an active session is completed and released.
+              </span>
+            </div>
           </div>
 
           {/* Action button */}
@@ -201,11 +207,11 @@ export default function VirtualWaitingRoom() {
               {isChecking ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white border-t-amber-400 rounded-full animate-spin" />
-                  Sinusuri ang pila...
+                  Checking queue status...
                 </>
               ) : (
                 <>
-                  Suriin ang Katayuan Ngayon (Recheck Now)
+                  Recheck Queue Status Now
                 </>
               )}
             </button>
