@@ -112,24 +112,26 @@ export async function sendFacultySecurityOtpEmail(
 
   if (gmailPass) {
     try {
-      const nodemailer = await import("nodemailer");
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: gmailUser,
-          pass: gmailPass,
-        },
-      });
+      const nodemailer = await import("nodemailer").then((m) => m.default || m).catch(() => null);
+      if (nodemailer) {
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: gmailUser,
+            pass: gmailPass,
+          },
+        });
 
-      await transporter.sendMail({
-        from: `"${senderDisplayName}" <${gmailUser}>`,
-        to,
-        replyTo: "dumalnext@gmail.com",
-        subject: cleanSubject,
-        html: htmlContent,
-      });
+        await transporter.sendMail({
+          from: `"${senderDisplayName}" <${gmailUser}>`,
+          to,
+          replyTo: "dumalnext@gmail.com",
+          subject: cleanSubject,
+          html: htmlContent,
+        });
 
-      return { success: true, provider: "gmail_smtp" };
+        return { success: true, provider: "gmail_smtp" };
+      }
     } catch (smtpErr) {
       console.warn("Notice: Faculty Gmail SMTP delivery error:", smtpErr);
     }
