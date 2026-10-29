@@ -5,6 +5,7 @@ import CustomSelect from "@/components/CustomSelect";
 import { useTeacherAuth } from "@/lib/auth/authContext";
 import { createClient } from "@/lib/supabase/client";
 import TeacherLoginForm from "@/components/TeacherLoginForm";
+import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 
 interface SectionSummary {
   id: string;
@@ -29,6 +30,7 @@ interface StudentItem {
   barangay?: string;
   contact_number?: string;
   grade_level?: number;
+  isEnrolledInActiveTerm?: boolean;
 }
 
 export default function ClassSectionRosterPage() {
@@ -44,6 +46,13 @@ export default function ClassSectionRosterPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const STUDENTS_PER_PAGE = 10;
   const hasLoadedOnceRef = useRef<boolean>(false);
+  const [activeTermNumber, setActiveTermNumber] = useState<number>(1);
+  const [activeTermName, setActiveTermName] = useState<string>("Trimester 1");
+  const [activeSchoolYear, setActiveSchoolYear] = useState<string>("2026-2027");
+  const [isEnrollmentOpen, setIsEnrollmentOpen] = useState<boolean>(true);
+  const [enrollingStudentId, setEnrollingStudentId] = useState<string | null>(null);
+  const [isEnrollingAll, setIsEnrollingAll] = useState<boolean>(false);
+  const [enrollNotification, setEnrollNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Fetch sections and filter specifically by the logged-in teacher's advisory assignment
   const fetchAdvisorySections = async (silent: boolean = false) => {
@@ -53,6 +62,34 @@ export default function ClassSectionRosterPage() {
     }
 
     try {
+      // 0. Fetch active academic term and enrollment control
+      try {
+        const [termRes, ctrlRes] = await Promise.all([
+          supabase.from("academic_terms").select("schoolYear, termNumber, termName, isActive").eq("isActive", true).maybeSingle(),
+          supabase.from("system_settings").select("value").eq("key", "enrollment_controls").maybeSingle(),
+        ]);
+
+        if (termRes.data) {
+          const tNum = Number(termRes.data.termNumber) || 1;
+          setActiveTermNumber(tNum);
+          setActiveTermName(termRes.data.termName || `Trimester ${tNum}`);
+          if (termRes.data.schoolYear) {
+            setActiveSchoolYear(termRes.data.schoolYear);
+          }
+        }
+
+        if (ctrlRes.data?.value) {
+          if (typeof ctrlRes.data.value.isEnrollmentOpen === "boolean") {
+            setIsEnrollmentOpen(ctrlRes.data.value.isEnrollmentOpen);
+          }
+          if (!termRes.data && ctrlRes.data.value.schoolYear) {
+            setActiveSchoolYear(ctrlRes.data.value.schoolYear);
+          }
+        }
+      } catch (tErr) {
+        console.warn("Notice loading active term:", tErr);
+      }
+
       // 1. Fetch live teacher profile from teachers table for accurate name matching
       const cleanEmail = (user.email || "").trim().toLowerCase();
       const { data: teacherRecords } = await supabase
@@ -356,7 +393,33 @@ export default function ClassSectionRosterPage() {
           }
         }
 
-        const sortedStudents = Array.from(studentMap.values()).sort((a, b) => {
+        // 3. Mark enrollment status for active academic term
+        const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-");
+        const { data: termApps } = await supabase
+          .from("enrollment_applications")
+          .select("id, student_id, status, school_year, selected_electives")
+          .in("status", ["Approved", "approved"]);
+
+        const enrolledIds = new Set<string>();
+        const enrolledLrns = new Set<string>();
+
+        (termApps || []).forEach((app: any) => {
+          if (isApplicationInTerm(app, cleanSY, activeTermNumber)) {
+            if (app.student_id) enrolledIds.add(app.student_id);
+            const fd = Array.isArray(app.selected_electives) && app.selected_electives.length > 0
+              ? app.selected_electives[0]
+              : (typeof app.selected_electives === "object" ? app.selected_electives : {});
+            if (fd?.lrn) enrolledLrns.add(String(fd.lrn));
+          }
+        });
+
+        const sortedStudents = Array.from(studentMap.values()).map((st) => {
+          const isEnrolled = activeTermNumber <= 1 || enrolledIds.has(st.id) || (st.student_id && enrolledLrns.has(st.student_id));
+          return {
+            ...st,
+            isEnrolledInActiveTerm: Boolean(isEnrolled),
+          };
+        }).sort((a, b) => {
           const lComp = (a.last_name || "").localeCompare(b.last_name || "");
           if (lComp !== 0) return lComp;
           return (a.first_name || "").localeCompare(b.first_name || "");
@@ -425,6 +488,149 @@ export default function ClassSectionRosterPage() {
   if (!user) {
     return <TeacherLoginForm />;
   }
+
+  // 1-Click Continuing Enrollment Handlers for Trimester 2 & 3
+  const handleOneClickEnroll = async (student: StudentItem) => {
+    if (!currentSection || !user) return;
+    setEnrollingStudentId(student.id);
+    setEnrollNotification(null);
+
+    try {
+      const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-");
+      const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+      const generatedRef = `DNHS-${cleanSY.split("-")[0] || "2026"}-${randomSuffix}`;
+
+      // Fetch prior application to inherit any submitted documents (PSA, SF9, etc.)
+      const { data: priorApps } = await supabase
+        .from("enrollment_applications")
+        .select("id, application_id, submitted_documents, selected_electives")
+        .eq("student_id", student.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const priorDocs = priorApps?.[0]?.submitted_documents || [];
+      const pastFd = Array.isArray(priorApps?.[0]?.selected_electives) && priorApps?.[0]?.selected_electives?.length > 0
+        ? priorApps?.[0]?.selected_electives[0]
+        : (typeof priorApps?.[0]?.selected_electives === "object" ? priorApps?.[0]?.selected_electives : {});
+
+      const submissionPayload = {
+        ...pastFd,
+        semester: activeTermName,
+        term: activeTermName,
+        targetSemester: activeTermName,
+        term_name: activeTermName,
+        termNumber: activeTermNumber,
+        schoolYear: cleanSY,
+        assigned_track_section_id: currentSection.id,
+        assigned_track_section_name: currentSection.section_name,
+        applicantType: "Continuing",
+        lrn: student.student_id,
+        firstName: student.first_name,
+        lastName: student.last_name,
+        targetGradeLevel: currentSection.grade_level,
+        targetStrand: currentSection.strand || null,
+      };
+
+      // Check if there is already an application for this student in this term
+      const { data: userApps } = await supabase
+        .from("enrollment_applications")
+        .select("id, school_year, selected_electives")
+        .eq("student_id", student.id);
+
+      const existingTermApp = (userApps || []).find((a: any) =>
+        isApplicationInTerm(a, cleanSY, activeTermNumber)
+      );
+
+      if (existingTermApp) {
+        const { error: upErr } = await supabase
+          .from("enrollment_applications")
+          .update({
+            status: "Approved",
+            target_grade_level: currentSection.grade_level,
+            target_strand: currentSection.strand || null,
+            admin_feedback: `Officially Enrolled for ${activeTermName} (S.Y. ${cleanSY}) via 1-Click Continuing Advisory Enrollment by ${user.fullName || "Class Adviser"}.`,
+            selected_electives: [submissionPayload],
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingTermApp.id);
+        if (upErr) throw upErr;
+      } else {
+        const { error: insErr } = await supabase
+          .from("enrollment_applications")
+          .insert({
+            application_id: generatedRef,
+            student_id: student.id,
+            applicant_type: "Continuing",
+            school_year: cleanSY,
+            target_grade_level: currentSection.grade_level,
+            target_strand: currentSection.strand || null,
+            status: "Approved",
+            admin_feedback: `Officially Enrolled for ${activeTermName} (S.Y. ${cleanSY}) via 1-Click Continuing Advisory Enrollment by ${user.fullName || "Class Adviser"}.`,
+            selected_electives: [submissionPayload],
+            submitted_documents: priorDocs,
+          });
+        if (insErr) throw insErr;
+      }
+
+      // Update students table to ensure section and grade level are locked in
+      await supabase
+        .from("students")
+        .update({
+          current_section_id: currentSection.id,
+          grade_level: currentSection.grade_level,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", student.id);
+
+      // System-wide broadcast so Admin & Student portals reflect this instantly
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:admin-data-changed"));
+        window.dispatchEvent(new CustomEvent("dumalnext:teacher-data-changed"));
+      }
+
+      setEnrollNotification({
+        type: "success",
+        message: `Successfully enrolled ${student.last_name}, ${student.first_name} for ${activeTermName}! Status is now ENROLLED across Admin, Teacher, and Student portals.`,
+      });
+
+      // Update local roster list immediately without waiting
+      setRosterStudents((prev) =>
+        prev.map((s) => (s.id === student.id ? { ...s, isEnrolledInActiveTerm: true } : s))
+      );
+    } catch (err: any) {
+      console.error("1-Click Enroll error:", err);
+      setEnrollNotification({
+        type: "error",
+        message: err.message || "Failed to 1-click enroll student.",
+      });
+    } finally {
+      setEnrollingStudentId(null);
+    }
+  };
+
+  const handleOneClickEnrollAll = async () => {
+    const unenrolled = rosterStudents.filter((st) => !st.isEnrolledInActiveTerm);
+    if (unenrolled.length === 0 || !currentSection) return;
+    setIsEnrollingAll(true);
+    setEnrollNotification(null);
+
+    let count = 0;
+    for (const st of unenrolled) {
+      try {
+        await handleOneClickEnroll(st);
+        count++;
+      } catch (err) {
+        console.warn("Failed enrolling student:", st.id, err);
+      }
+    }
+
+    setEnrollNotification({
+      type: "success",
+      message: `Successfully 1-click enrolled ${count} learner(s) for ${activeTermName}! All learners are now officially ENROLLED in Admin, Teacher, and Student portals.`,
+    });
+    setIsEnrollingAll(false);
+  };
 
   const currentSection = advisorySections.find((s) => s.id === selectedSectionId);
 
@@ -509,7 +715,7 @@ export default function ClassSectionRosterPage() {
           </h3>
           <p className="text-xs text-slate-600 max-w-xl mx-auto leading-relaxed">
             You are currently signed in as <strong className="text-slate-900">{user.fullName}</strong> ({user.email}). 
-            The school administration has not yet designated you as a Class Adviser for any section in School Year 2025–2026.
+            The school administration has not yet designated you as a Class Adviser for any section in S.Y. {activeSchoolYear} • {activeTermName}.
           </p>
           <div className="p-4 bg-slate-50 border border-slate-200 max-w-lg mx-auto text-left text-xs text-slate-600 space-y-1">
             <span className="font-bold text-[#002060] block uppercase">
@@ -586,6 +792,76 @@ export default function ClassSectionRosterPage() {
               </div>
             )}
 
+            {/* Real-time Notification Banner */}
+            {enrollNotification && (
+              <div
+                className={`p-3.5 rounded border flex items-center justify-between gap-2 text-xs font-mono shadow-xs no-print print:hidden ${
+                  enrollNotification.type === "success"
+                    ? "bg-emerald-50 text-emerald-950 border-emerald-400"
+                    : "bg-red-50 text-red-950 border-red-400"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm">{enrollNotification.type === "success" ? "✓" : "⚠"}</span>
+                  <span>{enrollNotification.message}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEnrollNotification(null)}
+                  className="px-2 py-0.5 text-xs font-bold hover:opacity-75 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* 1-Click Continuing Enrollment Banner for Trimester 2 and 3 */}
+            {activeTermNumber >= 2 && currentSection && (
+              <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-500 rounded shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 no-print print:hidden">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-700 text-white shadow-xs">
+                      Active: {activeTermName}
+                    </span>
+                    <span className="text-xs font-extrabold text-emerald-950 uppercase tracking-wide">
+                      1-Click Continuing Advisory Enrollment
+                    </span>
+                    <span className="text-[11px] text-emerald-800 font-mono">
+                      &bull; S.Y. {activeSchoolYear}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed font-sans">
+                    As Class Adviser of <strong>{currentSection.section_name}</strong>, you can 1-click enroll your students for <strong>{activeTermName}</strong>. Once enrolled, their status becomes <strong>ENROLLED</strong> across Admin, Teacher, and Student portals.
+                  </p>
+                </div>
+
+                {rosterStudents.filter((st) => !st.isEnrolledInActiveTerm).length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={handleOneClickEnrollAll}
+                    disabled={isEnrollingAll || Boolean(enrollingStudentId)}
+                    className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 font-sans"
+                  >
+                    {isEnrollingAll ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Enrolling All Learners...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>⚡ 1-Click Enroll All ({rosterStudents.filter((st) => !st.isEnrolledInActiveTerm).length} Unenrolled)</span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <div className="px-3.5 py-2 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded text-xs font-bold shrink-0 flex items-center gap-1.5 font-sans">
+                    <span className="text-emerald-700 text-sm font-black">✓</span>
+                    <span>All Learners Enrolled for {activeTermName}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3 no-print print:hidden">
               <div className="flex items-center gap-2 w-full sm:max-w-md">
                 <input
@@ -651,6 +927,8 @@ export default function ClassSectionRosterPage() {
                         <th className="p-2.5">Gender</th>
                         <th className="p-2.5">Barangay</th>
                         <th className="p-2.5">Emergency Contact</th>
+                        <th className="p-2.5 text-center">Enrollment Status</th>
+                        <th className="p-2.5 text-center no-print print:hidden">Action</th>
                       </tr>
                     </thead>
                     {/* Paginated Screen View (Max 10 learners per page) */}
@@ -669,6 +947,47 @@ export default function ClassSectionRosterPage() {
                           <td className="p-2.5 font-mono">{st.gender || "—"}</td>
                           <td className="p-2.5 text-slate-700">{st.barangay || "—"}</td>
                           <td className="p-2.5 font-mono text-slate-600">{st.contact_number || "—"}</td>
+                          <td className="p-2.5 text-center">
+                            {st.isEnrolledInActiveTerm ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
+                                Enrolled ({activeTermName})
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-bold uppercase bg-amber-50 text-amber-950 border border-amber-300 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                Not Enrolled ({activeTermName})
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-2.5 text-center no-print print:hidden">
+                            {st.isEnrolledInActiveTerm ? (
+                              <span className="text-[11px] font-bold text-emerald-700 inline-flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Enrolled
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOneClickEnroll(st)}
+                                disabled={enrollingStudentId === st.id || isEnrollingAll}
+                                className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white rounded text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 shrink-0"
+                              >
+                                {enrollingStudentId === st.id ? (
+                                  <>
+                                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    <span>Enrolling...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>⚡ 1-Click Enroll</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -686,6 +1005,10 @@ export default function ClassSectionRosterPage() {
                           <td className="p-2.5 font-mono">{st.gender || "—"}</td>
                           <td className="p-2.5 text-slate-700">{st.barangay || "—"}</td>
                           <td className="p-2.5 font-mono text-slate-600">{st.contact_number || "—"}</td>
+                          <td className="p-2.5 text-center font-mono">
+                            {st.isEnrolledInActiveTerm ? `Enrolled (${activeTermName})` : `Not Enrolled (${activeTermName})`}
+                          </td>
+                          <td className="p-2.5 text-center font-mono">—</td>
                         </tr>
                       ))}
                     </tbody>
