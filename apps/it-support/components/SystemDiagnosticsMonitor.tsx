@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import TrafficCapacityManager from "./TrafficCapacityManager";
 
 interface DiagnosticResult {
   status: "HEALTHY" | "DEGRADED" | "UNREACHABLE";
@@ -284,6 +285,9 @@ export default function SystemDiagnosticsMonitor() {
           </div>
         </div>
       </div>
+
+      {/* User Capacity & Concurrency Traffic Controller */}
+      <TrafficCapacityManager />
 
       {/* Latency Architecture & Optimization Explanation Drawer */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5">

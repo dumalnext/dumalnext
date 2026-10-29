@@ -90,6 +90,14 @@ export default function SessionTimeoutModal() {
         // Automatic Logout reached at 30 minutes of inactivity
         setShowWarning(false);
         try {
+          const trafficSessId = sessionStorage.getItem("dnhs_student_traffic_session");
+          if (trafficSessId) {
+            fetch("/api/traffic/heartbeat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ sessionId: trafficSessId, action: "leave" }),
+            }).catch(() => {});
+          }
           sessionStorage.setItem(
             TIMEOUT_MSG_KEY,
             "You were automatically signed out after 30 minutes of inactivity for security."
