@@ -318,7 +318,7 @@ function AdminLoginFormInner() {
                     <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
                       04
                     </span>
-                    <span>Enrollment Control Room</span>
+                    <span>Enrollment & Grade Control Room</span>
                   </div>
                   <p className="text-slate-600 text-xs leading-relaxed">
                     Toggle online student registration windows open or closed, configure active School Year parameters, and broadcast advisories.

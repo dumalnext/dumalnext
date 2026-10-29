@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export interface EnrollmentControlSettings {
   isEnrollmentOpen: boolean;
+  isGradeOpen?: boolean;
   schoolYear: string;
   semester: string;
   enrollmentStartDate?: string;
@@ -17,6 +18,7 @@ export interface EnrollmentControlSettings {
 export default function EnrollmentControlRoom() {
   const [settings, setSettings] = useState<EnrollmentControlSettings>({
     isEnrollmentOpen: true,
+    isGradeOpen: true,
     schoolYear: "2026–2027",
     semester: "1st Semester",
     closedMessage:
@@ -61,6 +63,7 @@ export default function EnrollmentControlRoom() {
         const data = await ctrlRes.json();
         setSettings({
           isEnrollmentOpen: typeof data.isEnrollmentOpen === "boolean" ? data.isEnrollmentOpen : true,
+          isGradeOpen: typeof data.isGradeOpen === "boolean" ? data.isGradeOpen : true,
           schoolYear: itActiveYear || data.schoolYear || "2026-2027",
           semester: itActiveTermName || data.semester || "Trimester 1",
           enrollmentStartDate: data.enrollmentStartDate || "",
@@ -163,6 +166,18 @@ export default function EnrollmentControlRoom() {
     await saveAndBroadcast(updated);
   };
 
+  // Instant toggle grade switch handler
+  const handleToggleGradeSwitch = async () => {
+    const nextState = !(settings.isGradeOpen ?? true);
+    const updated: EnrollmentControlSettings = {
+      ...settings,
+      isGradeOpen: nextState,
+      updatedAt: new Date().toISOString(),
+    };
+    setSettings(updated);
+    await saveAndBroadcast(updated);
+  };
+
   // Save settings from form submission
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -181,13 +196,13 @@ export default function EnrollmentControlRoom() {
           />
           <div>
             <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-              Enrollment Control Room &bull; Master System Operations
+              Enrollment &amp; Grade Control Room &bull; Master System Operations
             </span>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
-              Online Enrollment Master Control Room
+              Online Enrollment &amp; Grade Master Control Room
             </h2>
             <p className="text-xs text-blue-100/85 mt-0.5">
-              Configure the master online enrollment switch, active School Year (S.Y.), and institutional student advisories.
+              Configure the master online enrollment and grade submission switches, active School Year (S.Y.), and institutional student advisories.
             </p>
           </div>
         </div>
@@ -314,6 +329,84 @@ export default function EnrollmentControlRoom() {
             </button>
             <span className="text-[11px] text-slate-500 text-center sm:text-right">
               Click to toggle &bull; Broadcasts instantly to student portal
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* =====================================================================
+          1.1 MASTER GRADE ON/OFF TOGGLE CARD
+          ===================================================================== */}
+      <div
+        className={`p-5 sm:p-6 rounded-xl border-2 transition-all shadow-sm ${
+          settings.isGradeOpen !== false
+            ? "bg-emerald-50/70 border-emerald-500"
+            : "bg-red-50/70 border-red-500"
+        }`}
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-sm bg-[#002060] text-amber-300 font-mono font-bold text-xs uppercase tracking-wider">
+                GRADE
+              </span>
+              <span
+                className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
+                  settings.isGradeOpen !== false
+                    ? "bg-emerald-200 text-emerald-950 border-emerald-400"
+                    : "bg-red-200 text-red-950 border-red-400"
+                }`}
+              >
+                {settings.isGradeOpen !== false
+                  ? "Status: Grade is Active & Open"
+                  : "Status: Grade is Officially Closed / Off"}
+              </span>
+              <span className="text-xs font-medium text-slate-600">
+                School Year: <strong>{settings.schoolYear}</strong>
+              </span>
+            </div>
+
+            <h3 className="text-base sm:text-lg font-extrabold text-slate-950">
+              {settings.isGradeOpen !== false
+                ? "Dumalneg NHS Grade Management System is currently ON and open for grade entry"
+                : "Dumalneg NHS Grade Management System is currently OFF and locked"}
+            </h3>
+
+            <p className="text-xs text-slate-700 leading-relaxed">
+              {settings.isGradeOpen !== false ? (
+                <>
+                  Faculty teachers can encode, edit, and submit academic ratings and student quarter evaluations for <strong>S.Y. {settings.schoolYear}</strong>.
+                </>
+              ) : (
+                <>
+                  Grade submission and encoding is currently <strong>locked / off</strong>. Faculty teachers cannot modify or submit new student grades at this time.
+                </>
+              )}
+            </p>
+          </div>
+
+          {/* Master Grade Switch Button */}
+          <div className="shrink-0 flex flex-col items-stretch sm:items-end gap-1.5 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={handleToggleGradeSwitch}
+              disabled={isSaving}
+              className={`w-full sm:w-auto px-6 py-3.5 rounded-lg text-xs font-bold tracking-wide transition-all shadow-sm border cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed text-center ${
+                settings.isGradeOpen !== false
+                  ? "bg-red-700 hover:bg-red-800 text-white border-red-900"
+                  : "bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-900"
+              }`}
+            >
+              {isSaving ? (
+                "Saving Grade Status..."
+              ) : settings.isGradeOpen !== false ? (
+                "Turn Off Grade"
+              ) : (
+                "Turn On Grade"
+              )}
+            </button>
+            <span className="text-[11px] text-slate-500 text-center sm:text-right">
+              Click to toggle &bull; On / Off Grade control
             </span>
           </div>
         </div>

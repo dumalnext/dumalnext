@@ -30,6 +30,7 @@ function getConfigFilePath(): string {
 
 const defaultSettings = {
   isEnrollmentOpen: true,
+  isGradeOpen: true,
   schoolYear: "2026–2027",
   semester: "1st Semester",
   enrollmentStartDate: "2026-08-01",
@@ -186,6 +187,7 @@ export async function POST(req: Request) {
     const updated = {
       ...current,
       isEnrollmentOpen: typeof body.isEnrollmentOpen === "boolean" ? body.isEnrollmentOpen : current.isEnrollmentOpen,
+      isGradeOpen: typeof body.isGradeOpen === "boolean" ? body.isGradeOpen : (typeof (current as any).isGradeOpen === "boolean" ? (current as any).isGradeOpen : true),
       schoolYear: activeTerm ? activeTerm.schoolYear : (body.schoolYear || current.schoolYear).trim(),
       semester: activeTerm ? activeTerm.termName : (body.semester || current.semester).trim(),
       enrollmentStartDate: body.enrollmentStartDate || current.enrollmentStartDate,
