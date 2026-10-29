@@ -144,10 +144,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          code,
           maskedEmail: maskEmail(email),
           email,
-          message: `The 6-digit verification code has been dispatched. Your code is: ${code}`,
+          message: `The 6-digit verification code has been dispatched to ${maskEmail(email)}. Please check your inbox or spam folder.`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -382,10 +381,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          code,
           newEmail,
           maskedEmail: maskEmail(newEmail),
-          message: `The 6-digit verification code has been dispatched. Your code is: ${code}`,
+          message: `The 6-digit verification code has been dispatched to ${maskEmail(newEmail)}. Please check your inbox or spam folder.`,
         },
         { headers: NO_CACHE_HEADERS }
       );

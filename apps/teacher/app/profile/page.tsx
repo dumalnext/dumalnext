@@ -46,7 +46,6 @@ export default function FacultyProfilePage() {
   const [securityLoading, setSecurityLoading] = useState<boolean>(false);
   const [securityError, setSecurityError] = useState<string>("");
   const [securitySuccess, setSecuritySuccess] = useState<string>("");
-  const [activeGeneratedCode, setActiveGeneratedCode] = useState<string>("");
   const [currentPasswordInput, setCurrentPasswordInput] = useState<string>("");
 
   // Password Modification Form
@@ -373,7 +372,6 @@ export default function FacultyProfilePage() {
     setPasswordOtp("");
     setNewPassword("");
     setConfirmPassword("");
-    setActiveGeneratedCode("");
     setCurrentPasswordInput("");
   };
 
@@ -384,7 +382,6 @@ export default function FacultyProfilePage() {
     setSecuritySuccess("");
     setNewEmailInput("");
     setEmailOtp("");
-    setActiveGeneratedCode("");
     setCurrentPasswordInput("");
   };
 
@@ -393,7 +390,6 @@ export default function FacultyProfilePage() {
     setSecurityStep(1);
     setSecurityError("");
     setSecuritySuccess("");
-    setActiveGeneratedCode("");
     setCurrentPasswordInput("");
   };
 
@@ -417,14 +413,8 @@ export default function FacultyProfilePage() {
         throw new Error(data.error || "Failed to send verification code.");
       }
       setSecurityStep(2);
-      if (data.code) {
-        setActiveGeneratedCode(data.code);
-        setPasswordOtp(data.code);
-      }
       setSecuritySuccess(
-        data.code
-          ? `Verification code generated: ${data.code}. It has been pre-filled for your instant convenience.`
-          : `The 6-digit verification code has been dispatched to ${maskEmailAddress(user.email)}.`
+        `The 6-digit verification code has been dispatched to ${maskEmailAddress(user.email)}. Please check your inbox or spam folder.`
       );
     } catch (err: any) {
       setSecurityError(err.message || "An error occurred while generating the code.");
@@ -436,11 +426,11 @@ export default function FacultyProfilePage() {
   // Verify OTP & Update Password
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanOtp = passwordOtp.trim() || activeGeneratedCode.trim();
+    const cleanOtp = passwordOtp.trim();
     const cleanCurrent = currentPasswordInput.trim();
 
     if (!cleanOtp && !cleanCurrent) {
-      setSecurityError("Please enter the 6-digit verification code or your current account password.");
+      setSecurityError("Please enter the 6-digit verification code from your email or your current account password.");
       return;
     }
     if (!newPassword || newPassword.length < 6) {
@@ -527,14 +517,8 @@ export default function FacultyProfilePage() {
         throw new Error(data.error || "Failed to dispatch verification code to the new email.");
       }
       setSecurityStep(2);
-      if (data.code) {
-        setActiveGeneratedCode(data.code);
-        setEmailOtp(data.code);
-      }
       setSecuritySuccess(
-        data.code
-          ? `Verification code generated: ${data.code}. It has been pre-filled for your instant convenience.`
-          : `The 6-digit verification code has been dispatched to ${cleanNew}.`
+        `The 6-digit verification code has been dispatched to ${cleanNew}. Please check your inbox or spam folder.`
       );
     } catch (err: any) {
       setSecurityError(err.message || "An error occurred while generating the code.");
@@ -547,11 +531,11 @@ export default function FacultyProfilePage() {
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanNew = newEmailInput.trim().toLowerCase();
-    const cleanOtp = emailOtp.trim() || activeGeneratedCode.trim();
+    const cleanOtp = emailOtp.trim();
     const cleanCurrent = currentPasswordInput.trim();
 
     if (!cleanOtp && !cleanCurrent) {
-      setSecurityError("Please enter the 6-digit verification code or your current password.");
+      setSecurityError("Please enter the 6-digit verification code from your email or your current password.");
       return;
     }
 
@@ -1406,7 +1390,7 @@ export default function FacultyProfilePage() {
                     <span className="font-bold text-slate-900 block">Registered Faculty Account:</span>
                     <strong className="font-mono text-sm text-[#002060] block">{user.email}</strong>
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Click below to generate your 6-digit one-time authorization code.
+                      A 6-digit one-time verification code will be dispatched to your registered email to authorize this change.
                     </p>
                   </div>
 
@@ -1416,7 +1400,7 @@ export default function FacultyProfilePage() {
                     disabled={securityLoading}
                     className="w-full py-2.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    {securityLoading ? "Generating Security Code..." : "Generate Verification Code"}
+                    {securityLoading ? "Dispatching 6-Digit Code..." : "Send Verification Code"}
                   </button>
                 </div>
               )}
@@ -1424,32 +1408,6 @@ export default function FacultyProfilePage() {
               {/* Step 2: Enter Verification & New Password */}
               {securityStep === 2 && (
                 <form onSubmit={handleUpdatePassword} className="space-y-3">
-                  {/* Highlighted Code Banner */}
-                  {activeGeneratedCode && (
-                    <div className="p-3 bg-blue-50 border-2 border-[#002060] rounded-xl text-xs space-y-1.5 shadow-2xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#002060] uppercase tracking-wider text-[11px]">
-                          Authorized Security Code
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setPasswordOtp(activeGeneratedCode)}
-                          className="px-2 py-0.5 bg-[#002060] text-white font-bold text-[10px] rounded hover:bg-blue-900 transition-colors cursor-pointer"
-                        >
-                          Auto-Fill Code
-                        </button>
-                      </div>
-                      <div className="text-center py-1">
-                        <span className="font-mono font-black text-2xl tracking-widest text-[#002060] bg-white px-4 py-1 rounded border border-blue-200 inline-block shadow-2xs">
-                          {activeGeneratedCode}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-600 text-center">
-                        Code has been generated for your active faculty session.
-                      </p>
-                    </div>
-                  )}
-
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
                       6-Digit Verification Code <span className="text-red-500">*</span>
@@ -1463,6 +1421,17 @@ export default function FacultyProfilePage() {
                       className="w-full p-2.5 border border-slate-300 rounded-lg text-center font-mono font-black text-xl tracking-widest text-[#002060] focus:border-[#002060] outline-none"
                       required
                     />
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+                      <span>Check your email inbox or spam folder</span>
+                      <button
+                        type="button"
+                        onClick={handleSendPasswordOtp}
+                        disabled={securityLoading}
+                        className="text-[#002060] font-bold hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        Resend Code
+                      </button>
+                    </div>
                   </div>
 
                   <div>
@@ -1606,7 +1575,7 @@ export default function FacultyProfilePage() {
                       required
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
-                      A 6-digit one-time authorization code will be generated for this update.
+                      A 6-digit one-time verification code will be dispatched to this new email to verify ownership.
                     </p>
                   </div>
 
@@ -1616,7 +1585,7 @@ export default function FacultyProfilePage() {
                     disabled={securityLoading}
                     className="w-full py-2.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    {securityLoading ? "Generating Security Code..." : "Continue to Verification"}
+                    {securityLoading ? "Dispatching 6-Digit Code..." : "Send Verification Code"}
                   </button>
                 </div>
               )}
@@ -1628,32 +1597,6 @@ export default function FacultyProfilePage() {
                     <span className="font-bold block">New Email Destination:</span>
                     <strong className="font-mono text-xs text-[#002060] block">{newEmailInput.trim()}</strong>
                   </div>
-
-                  {/* Highlighted Code Banner */}
-                  {activeGeneratedCode && (
-                    <div className="p-3 bg-blue-50 border-2 border-[#002060] rounded-xl text-xs space-y-1.5 shadow-2xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#002060] uppercase tracking-wider text-[11px]">
-                          Authorized Security Code
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setEmailOtp(activeGeneratedCode)}
-                          className="px-2 py-0.5 bg-[#002060] text-white font-bold text-[10px] rounded hover:bg-blue-900 transition-colors cursor-pointer"
-                        >
-                          Auto-Fill Code
-                        </button>
-                      </div>
-                      <div className="text-center py-1">
-                        <span className="font-mono font-black text-2xl tracking-widest text-[#002060] bg-white px-4 py-1 rounded border border-blue-200 inline-block shadow-2xs">
-                          {activeGeneratedCode}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-600 text-center">
-                        Code has been generated for your active faculty session.
-                      </p>
-                    </div>
-                  )}
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
@@ -1668,6 +1611,17 @@ export default function FacultyProfilePage() {
                       className="w-full p-2.5 border border-slate-300 rounded-lg text-center font-mono font-black text-xl tracking-widest text-[#002060] focus:border-[#002060] outline-none"
                       required
                     />
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+                      <span>Check your new email inbox or spam folder</span>
+                      <button
+                        type="button"
+                        onClick={handleSendEmailOtp}
+                        disabled={securityLoading}
+                        className="text-[#002060] font-bold hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        Resend Code
+                      </button>
+                    </div>
                   </div>
 
                   <div className="pt-1">
