@@ -277,7 +277,7 @@ export default function SystemDiagnosticsMonitor() {
           </div>
           <div className="mt-3 pt-2.5 border-t border-slate-100 text-[10px] text-slate-500">
             <span className="text-green-700 font-bold block">
-              ✓ UTC Synchronized
+              UTC Synchronized
             </span>
             <span className="text-slate-500 block mt-0.5">
               Audit Status: Fully Compliant

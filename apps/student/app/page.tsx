@@ -633,7 +633,7 @@ function StudentHomeContent() {
           setResetIdentifier(loginEmail);
           setResetMaskedEmail(res.maskedEmail || "");
           setShowPasswordResetModal(true);
-          setLoginError(res.error || "Abiso sa Seguridad: Ang password ng iyong account ay tinanggal ng IT Support.");
+          setLoginError(res.error || "Security Notice: Your account password has been reset by IT Support.");
           setIsLoggingIn(false);
           setLoginProgress(0);
           return;
@@ -642,7 +642,7 @@ function StudentHomeContent() {
         if (res.status === "both_removed") {
           setRecoveryLrn(res.lrn || loginEmail.replace(/\D/g, "").slice(0, 12));
           setShowIdentityRecoveryModal(true);
-          setLoginError(res.error || "Naka-lock ang Account: Tinanggal ng IT Support ang email at password.");
+          setLoginError(res.error || "Account Locked: Your account email and password have been reset by IT Support.");
           setIsLoggingIn(false);
           setLoginProgress(0);
           return;

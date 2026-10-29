@@ -33,7 +33,7 @@ export default function EmailSetupGuard({
   const handleSendOtp = async () => {
     const cleanEmail = newEmail.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes("@")) {
-      setError("Pakilagay ang isang wastong Gmail o email address.");
+      setError("Please enter a valid Gmail or email address.");
       return;
     }
     setError("");
@@ -48,14 +48,14 @@ export default function EmailSetupGuard({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi maipadala ang verification code. Pakisubukang muli.");
+        setError(data.error || "Unable to send verification code. Please try again.");
       } else {
         setOtpSent(true);
         setCooldown(60);
-        setSuccessMsg(data.message || `Ang 6-digit verification code ay naipadala sa ${cleanEmail}.`);
+        setSuccessMsg(data.message || `A 6-digit verification code has been sent to ${cleanEmail}.`);
       }
     } catch {
-      setError("Nagkaroon ng problema sa koneksyon. Pakisubukang muli.");
+      setError("Network connection issue. Please try again.");
     } finally {
       setIsSendingOtp(false);
     }
@@ -68,7 +68,7 @@ export default function EmailSetupGuard({
 
     const cleanEmail = newEmail.trim().toLowerCase();
     if (!otpCode || otpCode.length < 6) {
-      setError("Pakilagay ang 6-digit verification code mula sa iyong email.");
+      setError("Please enter the 6-digit verification code from your email.");
       return;
     }
 
@@ -86,15 +86,15 @@ export default function EmailSetupGuard({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi ma-verify ang 6-digit code. Pakisuri ang email.");
+        setError(data.error || "Unable to verify 6-digit code. Please check your email.");
       } else {
-        setSuccessMsg(data.message || "Matagumpay na nai-link ang iyong bagong email address!");
+        setSuccessMsg(data.message || "Your new email address has been linked successfully!");
         setTimeout(() => {
           onEmailSaved(cleanEmail);
         }, 1000);
       }
     } catch {
-      setError("Nagkaroon ng aberya sa pagsave ng email. Pakisubukang muli.");
+      setError("An error occurred while saving your email. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -113,17 +113,17 @@ export default function EmailSetupGuard({
           </span>
         </div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
-          Kailangan ng Aksyon: Walang Nakakabit na Email Address
+          Action Required: No Linked Email Address
         </h1>
         <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-          Tinanggal o na-reset ng IT Support ang email address ng iyong account. Upang ma-secure ang iyong account at makatanggap ng DepEd enrollment updates at 6-digit verification codes, mangyaring ilagay ang iyong aktibong email address ngayon.
+          Your account email address was reset by IT Support. To secure your account and receive DepEd enrollment updates and verification codes, please link your active email address now.
         </p>
       </div>
 
       {/* Account Identity Card */}
       <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1">
         <div className="flex justify-between items-center text-slate-600">
-          <span>Pangalan ng Mag-aaral:</span>
+          <span>Student Name:</span>
           <strong className="text-slate-900">{user.fullName}</strong>
         </div>
         <div className="flex justify-between items-center text-slate-600">
@@ -131,8 +131,8 @@ export default function EmailSetupGuard({
           <strong className="text-slate-900">{user.lrn || user.userId}</strong>
         </div>
         <div className="flex justify-between items-center text-slate-600">
-          <span>Status ng Email:</span>
-          <span className="text-amber-700 font-bold">Walang Nakakabit (Tinanggal ng IT)</span>
+          <span>Email Status:</span>
+          <span className="text-amber-700 font-bold">Not Linked (Reset by IT)</span>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export default function EmailSetupGuard({
       <form onSubmit={handleVerifyAndSave} className="space-y-4">
         <div>
           <label className="block text-xs font-bold text-slate-800 mb-1">
-            Bagong Email Address (Gmail) <span className="text-red-600">*</span>
+            New Email Address (Gmail) <span className="text-red-600">*</span>
           </label>
           <div className="flex gap-2">
             <input
@@ -162,7 +162,7 @@ export default function EmailSetupGuard({
                 setNewEmail(e.target.value);
                 if (error) setError("");
               }}
-              placeholder="e.g. learner.bagongemail@gmail.com"
+              placeholder="e.g. student.email@gmail.com"
               disabled={otpSent}
               className="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#002060] focus:bg-white outline-none disabled:bg-slate-100"
               required
@@ -173,11 +173,11 @@ export default function EmailSetupGuard({
               disabled={isSendingOtp || cooldown > 0}
               className="px-4 py-2.5 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg disabled:opacity-60 whitespace-nowrap cursor-pointer transition-colors"
             >
-              {isSendingOtp ? "Ipinapadala..." : cooldown > 0 ? `${cooldown}s` : otpSent ? "Resend OTP" : "Ipadala ang OTP"}
+              {isSendingOtp ? "Sending..." : cooldown > 0 ? `${cooldown}s` : otpSent ? "Resend OTP" : "Send OTP"}
             </button>
           </div>
           <p className="text-[11px] text-slate-500 mt-1">
-            Magpapadala ang sistema ng 6-digit verification code upang masigurong ikaw ang may-ari ng email na ito.
+            The system will dispatch a 6-digit verification code to confirm that you own this email address.
           </p>
         </div>
 
@@ -185,7 +185,7 @@ export default function EmailSetupGuard({
           <div className="space-y-3 pt-3 border-t border-slate-200">
             <div>
               <label className="block text-xs font-bold text-slate-800 mb-1.5 text-center">
-                Ipasok ang 6-Digit Code na ipinadala sa {newEmail}
+                Enter the 6-Digit Verification Code sent to {newEmail}
               </label>
               <SeparatedOtpInput
                 value={otpCode}
@@ -201,7 +201,7 @@ export default function EmailSetupGuard({
               disabled={isSaving || otpCode.length < 6}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm disabled:opacity-60 transition-colors cursor-pointer"
             >
-              {isSaving ? "Inia-apply ang Bagong Email..." : "I-verify at I-save ang Bagong Email Address"}
+              {isSaving ? "Applying New Email..." : "Verify & Save New Email Address"}
             </button>
           </div>
         )}
@@ -210,14 +210,14 @@ export default function EmailSetupGuard({
       {/* Logout fallback */}
       <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
         <span className="text-[11px] text-slate-500">
-          Nais munang lumabas?
+          Need to sign out?
         </span>
         <button
           type="button"
           onClick={onLogout}
           className="text-xs font-bold text-red-600 hover:underline cursor-pointer"
         >
-          Mag-Sign Out
+          Sign Out
         </button>
       </div>
     </div>

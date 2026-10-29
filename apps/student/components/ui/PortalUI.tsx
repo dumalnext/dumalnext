@@ -162,7 +162,7 @@ export function CopyChip({
     >
       <span>{value}</span>
       <span className="text-[10px] opacity-85 uppercase tracking-wider">
-        {copied ? "✓ Copied" : "Copy"}
+        {copied ? "Copied" : "Copy"}
       </span>
     </button>
   );
@@ -236,14 +236,14 @@ export function PasswordStrengthMeter({
       </div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] pt-0.5">
         <span className={hasMinLen ? "text-emerald-700 font-bold" : "text-slate-500"}>
-          {hasMinLen ? "✓" : "○"} Min. 6 characters
+          {hasMinLen ? "[OK]" : "[-]"} Min. 6 characters
         </span>
         <span
           className={
             hasLetter && hasNumber ? "text-emerald-700 font-bold" : "text-slate-500"
           }
         >
-          {hasLetter && hasNumber ? "✓" : "○"} Letters &amp; numbers
+          {hasLetter && hasNumber ? "[OK]" : "[-]"} Letters &amp; numbers
         </span>
         {matchesConfirm !== null && (
           <span
@@ -251,7 +251,7 @@ export function PasswordStrengthMeter({
               matchesConfirm ? "text-emerald-700 font-bold" : "text-red-600 font-bold"
             }
           >
-            {matchesConfirm ? "✓ Passwords match" : "✕ Passwords do not match"}
+            {matchesConfirm ? "Passwords match" : "Passwords do not match"}
           </span>
         )}
       </div>

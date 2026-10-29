@@ -1618,7 +1618,7 @@ export default function ScheduleDeconflictionConsole() {
                                     {isDragOver ? (
                                       <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-[#002060] bg-blue-100/90 flex flex-col items-center justify-center text-center animate-pulse pointer-events-none">
                                         <span className="font-mono text-xs font-bold text-[#002060]">
-                                          ⤵ Drop to Move Here
+                                          Drop to Move Here
                                         </span>
                                         <span className="text-[10px] text-blue-900 mt-0.5 font-medium">
                                           {day} &bull; {formatTimeRange12h(slot.start, slot.end)}
@@ -1905,7 +1905,7 @@ export default function ScheduleDeconflictionConsole() {
                                     {isDragOver ? (
                                       <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-emerald-700 bg-emerald-100/90 flex flex-col items-center justify-center text-center animate-pulse pointer-events-none">
                                         <span className="font-mono text-xs font-bold text-emerald-900">
-                                          ⤵ Drop to Move Here
+                                          Drop to Move Here
                                         </span>
                                         <span className="text-[10px] text-emerald-800 mt-0.5 font-medium">
                                           {day} &bull; {formatTimeRange12h(slot.start, slot.end)}
@@ -2440,7 +2440,7 @@ export default function ScheduleDeconflictionConsole() {
                 </div>
 
                 <p className="text-[11px] text-slate-600 font-sans">
-                  Awtomatikong naka-sync sa kasalukuyang active enrollment cycle na itinakda ni IT Support sa Control Room. Hindi na kailangang pumili nang manu-mano.
+                  Automatically synchronized with the current active enrollment cycle configured by IT Support in the Control Room. Manual selection is not required.
                 </p>
               </div>
 
@@ -2874,7 +2874,9 @@ export default function ScheduleDeconflictionConsole() {
             <div className="bg-gradient-to-r from-red-800 via-rose-700 to-red-800 px-4 sm:px-5 py-3 text-white flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-sm shadow-xs shrink-0">
-                  ⚠️
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
                 </div>
                 <div>
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-200 block">
@@ -2939,7 +2941,7 @@ export default function ScheduleDeconflictionConsole() {
               {/* Collision Details Box */}
               <div className="p-3.5 bg-rose-50 border-l-4 border-l-rose-600 border border-rose-200 rounded-[3px] space-y-1.5">
                 <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1">
-                  <span>⚠️</span> Collision Diagnostic:
+                  Collision Diagnostic:
                 </div>
                 <p className="text-xs text-rose-950 font-medium leading-relaxed">
                   {conflictModal.conflictDetail}
@@ -2948,7 +2950,7 @@ export default function ScheduleDeconflictionConsole() {
 
               {/* Helpful Recommendation Card */}
               <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-[3px] flex items-start gap-2.5 text-xs text-amber-950">
-                <span className="text-amber-700 text-base leading-none mt-0.5">💡</span>
+                <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">!</span>
                 <div className="space-y-0.5">
                   <div className="font-bold text-[11px] uppercase tracking-wide text-amber-900">
                     Recommended Resolution:

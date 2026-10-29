@@ -305,7 +305,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             success: false,
             status: "both_removed",
             lrn: preStudent?.student_id || preStudent?.lrn || preUser.user_id,
-            error: "Naka-lock ang Account: Ang email at password ng account na ito ay tinanggal ng IT Support. Mangyaring patunayan ang iyong pagkakakilanlan (Identity Verification) upang ma-setup ang bagong email at password.",
+            error: "Account Locked: The credentials for this account were reset by IT Support. Please complete Identity Verification to set up your new email and password.",
           };
         }
 
@@ -321,7 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             status: "password_removed",
             email: preUser.email,
             maskedEmail: mask(preUser.email),
-            error: "Abiso sa Seguridad: Ang password ng iyong account ay tinanggal o na-reset ng IT Support. Mangyaring magtakda ng bagong password gamit ang 6-digit verification code na ipapadala sa iyong email.",
+            error: "Security Notice: Your account password was reset by IT Support. Please set a new password using the 6-digit verification code sent to your email.",
           };
         }
       }

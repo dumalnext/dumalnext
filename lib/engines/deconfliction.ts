@@ -84,7 +84,7 @@ export function evaluateScheduleConflict(
           return {
             hasConflict: true,
             conflictType: "TEACHER_COLLISION",
-            message: `May conflict sa oras ng guro: Ang guro ay mayroon nang klase sa ${existing.subjectCode} mula ${existing.startTime} hanggang ${existing.endTime} tuwing ${existing.dayOfWeek}.`,
+            message: `Instructor schedule conflict: The instructor already has a class in ${existing.subjectCode} from ${existing.startTime} to ${existing.endTime} on ${existing.dayOfWeek}.`,
             details: {
               conflictingScheduleId: existing.id,
               conflictingSubject: existing.subjectCode,
@@ -98,7 +98,7 @@ export function evaluateScheduleConflict(
           return {
             hasConflict: true,
             conflictType: "ROOM_COLLISION",
-            message: `May conflict sa silid-aralan: Ang silid (${candidate.classroomId}) ay inookupa na ng ${existing.subjectCode} mula ${existing.startTime} hanggang ${existing.endTime}.`,
+            message: `Classroom conflict: Room (${candidate.classroomId}) is already occupied by ${existing.subjectCode} from ${existing.startTime} to ${existing.endTime}.`,
             details: {
               conflictingScheduleId: existing.id,
               conflictingSubject: existing.subjectCode,
@@ -112,7 +112,7 @@ export function evaluateScheduleConflict(
 
   return {
     hasConflict: false,
-    message: "Walang nakitang schedule conflict. Ligtas i-save ang timetable.",
+    message: "No schedule conflicts detected. Timetable is safe to save.",
   };
 }
 
@@ -127,13 +127,13 @@ export function validateSHSCoreSubjectLimit(
     if (coreSubjectsCount > 5) {
       return {
         isValid: false,
-        message: `Lumampas sa limitasyon: Ayon sa patakaran ng Dumalneg NHS, hanggang limang (5) core subjects lamang bawat trisem ang pinapayagan sa Senior High School. (Kasalukuyang pinili: ${coreSubjectsCount}).`,
+        message: `Subject limit exceeded: Per Dumalneg NHS policy, a maximum of five (5) core subjects per trimester are allowed in Senior High School. (Currently selected: ${coreSubjectsCount}).`,
       };
     }
   }
 
   return {
     isValid: true,
-    message: "Pasok sa limitasyon ng mga core subjects para sa trisem.",
+    message: "Complies with core subject load limits for the trimester.",
   };
 }

@@ -2489,7 +2489,7 @@ export default function SectionQuotaConsole() {
                       onClick={() => setRosterSearch("")}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer"
                     >
-                      ✕
+                      &times;
                     </button>
                   )}
                 </div>

@@ -314,7 +314,7 @@ export async function PATCH(req: NextRequest) {
       try {
         emailDispatchResult = await sendEmailReplyToStudent(supabase, {
           to: current.email.trim(),
-          studentName: current.studentName || "Mag-aaral",
+          studentName: current.studentName || "Student",
           ticketNumber: current.ticketNumber || id,
           subject: current.subject || "Student Concern Inquiry",
           replyMessage: String(replyMessage).trim(),

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       .trim();
 
     if (!cleanMessage) {
-      cleanMessage = "(Walang mensahe na kalakip sa natanggap na email)";
+      cleanMessage = "(No message attached to received email)";
     }
 
     let senderEmail = "";
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         existingReplies.push({
           id: `rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
           sender: "student",
-          senderName: senderName || existing.studentName || "Mag-aaral (via Email)",
+          senderName: senderName || existing.studentName || "Student (via Email)",
           message: cleanMessage,
           createdAt: new Date().toISOString(),
         });
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
     const newConcern = {
       id: `con_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       ticketNumber: newTicketNumber,
-      studentName: matchedName || "Mag-aaral (via Email)",
+      studentName: matchedName || "Student (via Email)",
       email: senderEmail,
       lrn: studentLrn,
       gradeLevel: studentGrade,
@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendReceiptToStudent(supabase, {
         to: senderEmail,
-        studentName: matchedName || "Mag-aaral",
+        studentName: matchedName || "Student",
         ticketNumber: newTicketNumber,
         subject: rawSubject,
       });

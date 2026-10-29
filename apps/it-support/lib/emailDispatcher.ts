@@ -380,6 +380,7 @@ export async function sendStaffInvitationEmail(
 
   if (gmailPass) {
     try {
+      // @ts-ignore
       const nodemailer = await import("nodemailer").then((m) => m.default || m).catch(() => null);
       if (nodemailer) {
         const transporter = nodemailer.createTransport({

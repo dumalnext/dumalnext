@@ -760,9 +760,9 @@ export default function CurriculumSubjectsConsole() {
           <button
             type="button"
             onClick={() => setSuccessMessage("")}
-            className="text-emerald-800 hover:text-emerald-950 cursor-pointer"
+            className="text-emerald-800 hover:text-emerald-950 cursor-pointer text-base leading-none"
           >
-            ✕
+            &times;
           </button>
         </div>
       )}
@@ -774,9 +774,9 @@ export default function CurriculumSubjectsConsole() {
           <button
             type="button"
             onClick={() => setErrorMessage("")}
-            className="text-red-800 hover:text-red-950 cursor-pointer"
+            className="text-red-800 hover:text-red-950 cursor-pointer text-base leading-none"
           >
-            ✕
+            &times;
           </button>
         </div>
       )}
@@ -843,7 +843,7 @@ export default function CurriculumSubjectsConsole() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer"
                 title="Clear search"
               >
-                ✕
+                &times;
               </button>
             )}
           </div>
@@ -1106,7 +1106,7 @@ export default function CurriculumSubjectsConsole() {
                 onClick={handleCloseModal}
                 className="text-white hover:text-slate-300 text-lg font-bold px-2 py-0.5 cursor-pointer"
               >
-                ✕
+                &times;
               </button>
             </div>
 

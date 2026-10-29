@@ -231,9 +231,9 @@ export default function EnrollmentControlRoom() {
           <button
             type="button"
             onClick={() => setSaveSuccess("")}
-            className="text-emerald-800 font-bold hover:underline shrink-0"
+            className="text-emerald-800 font-bold hover:underline shrink-0 text-base leading-none"
           >
-            ✕
+            &times;
           </button>
         </div>
       )}
@@ -250,9 +250,9 @@ export default function EnrollmentControlRoom() {
           <button
             type="button"
             onClick={() => setSaveError("")}
-            className="text-red-800 font-bold hover:underline shrink-0"
+            className="text-red-800 font-bold hover:underline shrink-0 text-base leading-none"
           >
-            ✕
+            &times;
           </button>
         </div>
       )}

@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
 
     if (!suUser && !studentProfile) {
       return NextResponse.json(
-        { error: "Walang nahanap na mag-aaral o account para sa ibinigay na Email o LRN." },
+        { error: "No student record or account found for the provided Email or LRN." },
         { status: 404, headers: NO_CACHE_HEADERS }
       );
     }
@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
 
       if (!suUser || !suUser.email) {
         return NextResponse.json(
-          { error: "Walang aktibong email address na nakakabit sa account na ito. Pakisubukang i-recover gamit ang LRN." },
+          { error: "No active email address is linked to this account. Please recover using your 12-digit LRN." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
           success: true,
           maskedEmail: maskEmail(email),
           email,
-          message: `Ang 6-digit verification code ay naipadala na sa iyong email (${maskEmail(email)}).`,
+          message: `A 6-digit verification code has been sent to your email (${maskEmail(email)}).`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -251,11 +251,11 @@ export async function POST(req: NextRequest) {
       const newPassword = String(body.newPassword || "").trim();
 
       if (!identifier || !otp || !newPassword) {
-        return NextResponse.json({ error: "Kailangan ang identifier, 6-digit OTP, at bagong password." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "Identifier, 6-digit verification code, and new password are required." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       if (newPassword.length < 6) {
-        return NextResponse.json({ error: "Ang password ay dapat hindi bababa sa 6 na karakter." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       // Find user
@@ -283,7 +283,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (!suUser) {
-        return NextResponse.json({ error: "Hindi mahanap ang user account." }, { status: 404, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "User account could not be found." }, { status: 404, headers: NO_CACHE_HEADERS });
       }
 
       const email = (suUser.email || "").trim().toLowerCase();
@@ -305,7 +305,7 @@ export async function POST(req: NextRequest) {
 
       if (!isOtpValid) {
         return NextResponse.json(
-          { error: "Mali o expired na ang 6-digit verification code. Pakisubukang muli o humiling ng bagong code." },
+          { error: "Invalid or expired 6-digit verification code. Please try again or request a new code." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -341,7 +341,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          message: "Matagumpay na naitakda ang iyong bagong password! Maaari ka nang mag-sign in.",
+          message: "Your new password has been set successfully! You may now sign in.",
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -351,7 +351,7 @@ export async function POST(req: NextRequest) {
     if (action === "send_email_otp") {
       const newEmail = String(body.newEmail || "").trim().toLowerCase();
       if (!newEmail || !newEmail.includes("@")) {
-        return NextResponse.json({ error: "Pakilagay ang isang wastong Gmail o email address." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "Please enter a valid Gmail or email address." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       // Check if email already registered to someone else
@@ -363,7 +363,7 @@ export async function POST(req: NextRequest) {
 
       if (dupUsers && dupUsers.length > 0) {
         return NextResponse.json(
-          { error: `Ang email na "${newEmail}" ay nakarehistro na sa ibang account. Mangyaring gumamit ng ibang email.` },
+          { error: `The email "${newEmail}" is already registered to another account. Please use a different email.` },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -380,7 +380,7 @@ export async function POST(req: NextRequest) {
         {
           success: true,
           maskedEmail: maskEmail(newEmail),
-          message: `Ang 6-digit verification code ay naipadala sa ${newEmail}.`,
+          message: `A 6-digit verification code has been sent to ${newEmail}.`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -393,7 +393,7 @@ export async function POST(req: NextRequest) {
       const otp = String(body.otp || "").trim();
 
       if (!userId || !newEmail || !otp) {
-        return NextResponse.json({ error: "Kailangan ang User ID, bagong email, at 6-digit OTP." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "User ID, new email, and 6-digit verification code are required." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       const currentOtps = await getStoredOtps(supabase);
@@ -403,7 +403,7 @@ export async function POST(req: NextRequest) {
 
       if (matchIdx === -1) {
         return NextResponse.json(
-          { error: "Mali o expired na ang 6-digit verification code. Pakisuri ang iyong email." },
+          { error: "Invalid or expired 6-digit verification code. Please check your email." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -440,7 +440,7 @@ export async function POST(req: NextRequest) {
         {
           success: true,
           email: newEmail,
-          message: "Matagumpay na na-verify at nai-link ang iyong bagong email address!",
+          message: "Your new email address has been verified and linked successfully!",
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -453,11 +453,11 @@ export async function POST(req: NextRequest) {
       const lastName = String(body.lastName || "").trim().toLowerCase();
 
       if (!lrn || lrn.length !== 12) {
-        return NextResponse.json({ error: "Kailangan ang wastong 12-digit Learner Reference Number (LRN)." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "A valid 12-digit Learner Reference Number (LRN) is required." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       if (!birthDate && !lastName) {
-        return NextResponse.json({ error: "Mangyaring ilagay ang iyong Apelyido o Petsa ng Kapanganakan (Birthdate)." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "Please enter your Last Name or Date of Birth." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       // Lookup student record
@@ -507,7 +507,7 @@ export async function POST(req: NextRequest) {
 
       if (!matchedStudent) {
         return NextResponse.json(
-          { error: "Hindi nagtutugma ang mga impormasyon sa opisyal na rekord ng paaralan. Pakisuri ang 12-digit LRN, Apelyido, o Petsa ng Kapanganakan." },
+          { error: "The provided information does not match official school records. Please check the 12-digit LRN, Last Name, or Date of Birth." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -520,7 +520,7 @@ export async function POST(req: NextRequest) {
           verified: true,
           lrn,
           studentName,
-          message: `Kumpirmado ang pagkakakilanlan: ${studentName}. Maaari mo nang i-setup ang iyong bagong email at password.`,
+          message: `Identity confirmed: ${studentName}. You may now set up your new email and password.`,
         },
         { headers: NO_CACHE_HEADERS }
       );
@@ -535,13 +535,13 @@ export async function POST(req: NextRequest) {
 
       if (!lrn || lrn.length !== 12 || !newEmail || !emailOtp || !newPassword) {
         return NextResponse.json(
-          { error: "Lahat ng field (LRN, Bagong Email, 6-digit OTP, Bagong Password) ay kailangan." },
+          { error: "All fields (LRN, New Email, 6-digit OTP, New Password) are required." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
 
       if (newPassword.length < 6) {
-        return NextResponse.json({ error: "Ang bagong password ay dapat hindi bababa sa 6 na karakter." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "The new password must be at least 6 characters." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       // Verify email OTP
@@ -551,7 +551,7 @@ export async function POST(req: NextRequest) {
       );
 
       if (matchIdx === -1) {
-        return NextResponse.json({ error: "Mali o expired na ang 6-digit verification code para sa iyong email." }, { status: 400, headers: NO_CACHE_HEADERS });
+        return NextResponse.json({ error: "Invalid or expired 6-digit verification code for your email." }, { status: 400, headers: NO_CACHE_HEADERS });
       }
 
       // Find user or student
@@ -622,7 +622,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          message: "Matagumpay na naibalik ang iyong account! Maaari ka nang mag-sign in gamit ang iyong bagong email at password.",
+          message: "Your account has been recovered successfully! You may now sign in using your new email and password.",
         },
         { headers: NO_CACHE_HEADERS }
       );

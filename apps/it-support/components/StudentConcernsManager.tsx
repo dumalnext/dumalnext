@@ -190,7 +190,7 @@ export default function StudentConcernsManager() {
           from: ingestEmailFrom.trim().toLowerCase(),
           to: "dumalnext@gmail.com",
           subject: ingestEmailSubject.trim() || "Password Reset Request",
-          text: ingestEmailBody.trim() || "(Walang mensahe na kalakip)",
+          text: ingestEmailBody.trim() || "(No message attached)",
         }),
       });
       const data = await res.json();

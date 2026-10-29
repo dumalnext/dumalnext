@@ -24,7 +24,7 @@ export async function sendReceiptToStudent(
   const { to, studentName, ticketNumber, subject } = options;
   if (!to || !to.includes("@")) return { success: false };
 
-  const cleanSubject = `[Natanggap] Ticket #${ticketNumber}: ${subject || "Student Concern"}`;
+  const cleanSubject = `[Received] Ticket #${ticketNumber}: ${subject || "Student Concern"}`;
   const senderEmail = process.env.SYSTEM_FROM_EMAIL || "dumalnext@gmail.com";
   const senderDisplayName = "Dumalneg NHS IT Support";
 
@@ -33,13 +33,13 @@ export async function sendReceiptToStudent(
 <html>
 <body style="font-family: sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
   <div style="max-width: 550px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 24px;">
-    <h2 style="color: #002060; margin-top: 0;">Natanggap ang Iyong Mensahe</h2>
-    <p>Kumusta, <strong>${studentName || "Mag-aaral"}</strong>,</p>
-    <p>Matagumpay na natanggap ng aming IT Support Desk ang iyong mensahe ukol sa <strong>${subject}</strong>.</p>
+    <h2 style="color: #002060; margin-top: 0;">Your Inquiry Has Been Received</h2>
+    <p>Greetings, <strong>${studentName || "Student"}</strong>,</p>
+    <p>Our IT Support Desk has successfully received your message regarding <strong>${subject}</strong>.</p>
     <div style="background-color: #f1f5f9; padding: 12px; border-radius: 4px; margin: 16px 0;">
       <strong>Ticket Number: #${ticketNumber}</strong>
     </div>
-    <p>Kasalukuyan na itong sinusuri ng aming IT personnel. Makatatanggap ka ng aming opisyal na tugon dito sa iyong email.</p>
+    <p>Our IT personnel are currently reviewing your request. You will receive an official response via this email address.</p>
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
     <p style="font-size: 11px; color: #64748b; margin: 0;">Dumalneg National High School IT Support &bull; dumalnext@gmail.com</p>
   </div>
@@ -53,6 +53,7 @@ export async function sendReceiptToStudent(
 
   if (gmailPass) {
     try {
+      // @ts-ignore
       const nodemailer = await import("nodemailer");
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -154,7 +155,7 @@ export async function sendSecurityOtpEmail(
         </div>
 
         <p style="font-size: 14px; line-height: 1.6; margin: 0 0 14px 0;">
-          Kumusta, <strong>${studentName || "Learner"}</strong>,
+          Greetings, <strong>${studentName || "Learner"}</strong>,
         </p>
 
         <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
@@ -203,6 +204,7 @@ export async function sendSecurityOtpEmail(
 
   if (gmailPass) {
     try {
+      // @ts-ignore
       const nodemailer = await import("nodemailer");
       const transporter = nodemailer.createTransport({
         service: "gmail",

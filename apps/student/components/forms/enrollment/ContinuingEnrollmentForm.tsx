@@ -818,7 +818,7 @@ export default function ContinuingEnrollmentForm({
             }`}
           >
             <div className="font-bold text-[10px]">
-              {currentStep > 1 ? "✓" : "01"}
+              {currentStep > 1 ? "Done" : "01"}
             </div>
             <div className="font-bold truncate mt-0.5">Electives &amp; Modality</div>
             <div

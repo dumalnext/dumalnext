@@ -116,9 +116,9 @@ export default function SessionTimeoutModal() {
       }
       const titleInterval = setInterval(() => {
         if (typeof document !== "undefined") {
-          document.title = document.title.startsWith("⚠️")
+          document.title = document.title.startsWith("Inactivity Warning")
             ? originalTitleRef.current || "Dumalneg NHS Administrator Console"
-            : "⚠️ Inactivity Warning: Are you still there?";
+            : "Inactivity Warning: Are you still there?";
         }
       }, 1200);
 

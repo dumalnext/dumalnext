@@ -13,7 +13,7 @@ interface Step3FamilyBackgroundProps {
 
 const GUARDIAN_RELATIONSHIPS = [
   "Grandparent (Lolo / Lola)",
-  "Aunt / Uncle (Tita / Tito)",
+  "Aunt / Uncle",
   "Older Sibling (Ate / Kuya)",
   "Authorized Relative",
   "Legal Custodian / Foster Parent",
@@ -201,7 +201,7 @@ export default function Step3FamilyBackground({
 
       if (hasGuardianError) {
         newErrors.general =
-          "DepEd Compliance: Dahil minarkahang unavailable ang Ama at Ina, kailangan pong punan ang Section C (Legal Guardian) kasama ang kanyang pangalan, relasyon, at 11-digit mobile number.";
+          "DepEd Compliance: Since both Father and Mother are marked unavailable, Section C (Legal Guardian) must be completed with their full name, relationship, and 11-digit mobile number.";
       }
     } else {
       // At least one parent is available -> Section C is OPTIONAL!
@@ -601,7 +601,7 @@ export default function Step3FamilyBackground({
         ) : (
           <div className="space-y-4">
             <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-normal rounded-[4px]">
-              <strong>DepEd Civil Verification Note:</strong> DepEd Basic Education records strictly require the mother&apos;s <strong>Maiden Last Name</strong> (apelyido sa pagkadalaga) to verify civil registry records in the PSA Birth Certificate.
+              <strong>DepEd Civil Verification Note:</strong> DepEd Basic Education records strictly require the mother&apos;s <strong>Maiden Last Name</strong> (maiden surname) to verify civil registry records in the PSA Birth Certificate.
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -783,8 +783,8 @@ export default function Step3FamilyBackground({
             </div>
             <p className="text-xs text-slate-600 mt-1">
               {isBothParentsUnavailable
-                ? "Dahil minarkahang unavailable ang Ama at Ina, MANDATORY po na maglagay ng Legal Guardian (Lolo/Lola, Kamag-anak, o Foster Parent) at kanyang 11-digit mobile number."
-                : "Optional: Punan lamang kung ang mag-aaral ay may hiwalay na tagapangalaga (hal. Lolo/Lola, Tita/Tito dahil OFW ang magulang). Kung kasama ang magulang, iwanan itong blangko."}
+                ? "Since both Father and Mother are marked unavailable, registering a Legal Guardian (Grandparent, Relative, or Foster Parent) with an 11-digit mobile number is mandatory."
+                : "Optional: Complete only if the student has a designated guardian (e.g., Grandparent, Aunt/Uncle if parents are working abroad). If living with parents, leave this blank."}
             </p>
           </div>
         </div>

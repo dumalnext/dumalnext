@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import SeparatedOtpInput from "./SeparatedOtpInput";
 
 // -----------------------------------------------------------------------------
-// MODAL 1: Password Reset Modal (Kapag PASSWORD lamang ang tinanggal ng IT)
+// MODAL 1: Password Reset Modal (When PASSWORD was reset by IT Support)
 // -----------------------------------------------------------------------------
 export interface PasswordResetModalProps {
   isOpen: boolean;
@@ -50,7 +50,7 @@ export function PasswordResetModal({
 
   const handleSendOtp = async () => {
     if (!identifier.trim()) {
-      setError("Pakilagay ang iyong rehistradong Email Address o 12-digit LRN.");
+      setError("Please enter your registered Email Address or 12-digit LRN.");
       return;
     }
     setError("");
@@ -65,15 +65,15 @@ export function PasswordResetModal({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi maipadala ang verification code. Pakisubukang muli.");
+        setError(data.error || "Unable to send verification code. Please try again.");
       } else {
         setOtpSent(true);
         if (data.maskedEmail) setMaskedEmail(data.maskedEmail);
-        setSuccessMsg(data.message || "Naipadala na ang 6-digit verification code sa iyong email.");
+        setSuccessMsg(data.message || "A 6-digit verification code has been sent to your email.");
         setCooldown(60);
       }
     } catch {
-      setError("Nagkaroon ng aberya sa koneksyon. Pakisubukang muli.");
+      setError("Network connection error. Please try again.");
     } finally {
       setIsSendingOtp(false);
     }
@@ -85,15 +85,15 @@ export function PasswordResetModal({
     setSuccessMsg("");
 
     if (!otpCode || otpCode.length < 6) {
-      setError("Pakilagay ang kumpletong 6-digit verification code.");
+      setError("Please enter the complete 6-digit verification code.");
       return;
     }
     if (!newPassword || newPassword.length < 6) {
-      setError("Ang bagong password ay dapat hindi bababa sa 6 na karakter.");
+      setError("The new password must be at least 6 characters.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Hindi magkatugma ang Bagong Password at Kumpirmasyon.");
+      setError("The new password and confirmation do not match.");
       return;
     }
 
@@ -111,16 +111,16 @@ export function PasswordResetModal({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi ma-update ang password. Pakisuri ang 6-digit code.");
+        setError(data.error || "Unable to update password. Please verify the 6-digit code.");
       } else {
-        setSuccessMsg(data.message || "Matagumpay na naitakda ang iyong bagong password!");
+        setSuccessMsg(data.message || "Your new password has been set successfully!");
         setTimeout(() => {
           onSuccess(identifier.trim(), newPassword.trim());
           onClose();
         }, 1000);
       }
     } catch {
-      setError("Nagkaroon ng problema sa network. Pakisubukang muli.");
+      setError("A network error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -134,14 +134,14 @@ export function PasswordResetModal({
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold rounded uppercase">
-                Abiso sa Seguridad
+                Security Notice
               </span>
               <span className="text-[11px] font-semibold text-slate-500">
                 Dumalneg NHS
               </span>
             </div>
             <h2 className="text-base font-bold text-slate-900 mt-1">
-              Na-reset ng IT ang Password
+              Password Reset by IT Support
             </h2>
           </div>
           <button
@@ -156,10 +156,10 @@ export function PasswordResetModal({
         {/* Informative Note */}
         <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-950 space-y-1">
           <p className="font-bold">
-            Proteksyon sa Data Privacy:
+            Data Privacy & Security Notice:
           </p>
           <p className="leading-relaxed text-[11px] text-amber-900">
-            Ang dating password ng iyong account ay tinanggal ng IT Support. Hindi kailanman nakikita ng IT Support ang iyong password. Mangyaring humiling ng 6-digit verification code upang makapagtakda ka ng sarili mong bagong password.
+            Your account password was reset by IT Support. IT Support personnel never have access to view your password. Please request a 6-digit verification code to set your own new password.
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export function PasswordResetModal({
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Email Address o 12-Digit LRN <span className="text-red-600">*</span>
+              Email Address or 12-Digit LRN <span className="text-red-600">*</span>
             </label>
             <input
               type="text"
@@ -188,13 +188,13 @@ export function PasswordResetModal({
                 setIdentifier(e.target.value);
                 if (error) setError("");
               }}
-              placeholder="e.g. learner@gmail.com o 100050123456"
+              placeholder="e.g. learner@gmail.com or 100050123456"
               disabled={otpSent}
               className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#002060] focus:bg-white outline-none disabled:bg-slate-100"
             />
             {maskedEmail && (
               <p className="text-[11px] text-slate-500 mt-1">
-                Padadalhan ng verification code: <strong>{maskedEmail}</strong>
+                Verification code will be sent to: <strong>{maskedEmail}</strong>
               </p>
             )}
           </div>
@@ -207,12 +207,12 @@ export function PasswordResetModal({
           >
             <span>
               {isSendingOtp
-                ? "Ipinapadala ang Code..."
+                ? "Sending Code..."
                 : cooldown > 0
-                ? `Maghintay ng ${cooldown}s bago mag-resend`
+                ? `Please wait ${cooldown}s before resending`
                 : otpSent
-                ? "Ipadalang Muli ang 6-Digit Code"
-                : "Ipadala ang 6-Digit Verification Code"}
+                ? "Resend 6-Digit Code"
+                : "Send 6-Digit Verification Code"}
             </span>
           </button>
         </div>
@@ -222,7 +222,7 @@ export function PasswordResetModal({
           <form onSubmit={handleResetPassword} className="space-y-3 pt-2 border-t border-slate-200">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5 text-center">
-                Ipasok ang 6-Digit Verification Code mula sa iyong Gmail
+                Enter the 6-Digit Verification Code sent to your email
               </label>
               <SeparatedOtpInput
                 value={otpCode}
@@ -236,21 +236,21 @@ export function PasswordResetModal({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-bold text-slate-700">
-                  Bagong Password <span className="text-red-600">*</span>
+                  New Password <span className="text-red-600">*</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
                   className="text-[10px] font-bold text-[#002060] hover:underline cursor-pointer"
                 >
-                  {showPassword ? "Itago" : "Ipakita"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
               <input
                 type={showPassword ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Hindi bababa sa 6 na karakter"
+                placeholder="At least 6 characters"
                 className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#002060] focus:bg-white outline-none"
                 required
               />
@@ -258,13 +258,13 @@ export function PasswordResetModal({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Kumpirmahin ang Bagong Password <span className="text-red-600">*</span>
+                Confirm New Password <span className="text-red-600">*</span>
               </label>
               <input
                 type={showPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Ulitin ang bagong password"
+                placeholder="Re-enter your new password"
                 className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#002060] focus:bg-white outline-none"
                 required
               />
@@ -275,7 +275,7 @@ export function PasswordResetModal({
               disabled={isSubmitting || otpCode.length < 6}
               className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg shadow-sm disabled:opacity-60 transition-colors cursor-pointer"
             >
-              {isSubmitting ? "Ipinoproseso ang Bagong Password..." : "I-save ang Bagong Password at Mag-Sign In"}
+              {isSubmitting ? "Setting New Password..." : "Save New Password & Sign In"}
             </button>
           </form>
         )}
@@ -285,7 +285,7 @@ export function PasswordResetModal({
 }
 
 // -----------------------------------------------------------------------------
-// MODAL 2: Identity Recovery Modal (Kapag PAREHONG EMAIL AT PASSWORD ang tinanggal)
+// MODAL 2: Identity Recovery Modal (When both EMAIL and PASSWORD were reset)
 // -----------------------------------------------------------------------------
 export interface IdentityRecoveryModalProps {
   isOpen: boolean;
@@ -343,11 +343,11 @@ export function IdentityRecoveryModal({
 
     const cleanLrn = lrn.replace(/\D/g, "").slice(0, 12);
     if (!cleanLrn || cleanLrn.length !== 12) {
-      setError("Kailangan ang wastong 12-digit Learner Reference Number (LRN).");
+      setError("A valid 12-digit Learner Reference Number (LRN) is required.");
       return;
     }
     if (!lastName.trim() && !birthDate) {
-      setError("Pakilagay ang iyong Apelyido o Petsa ng Kapanganakan (Birthdate).");
+      setError("Please enter your Last Name or Date of Birth.");
       return;
     }
 
@@ -365,14 +365,14 @@ export function IdentityRecoveryModal({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi nagtutugma ang mga impormasyon sa rekord ng paaralan.");
+        setError(data.error || "The provided information does not match official school records.");
       } else {
         setIsVerified(true);
-        setStudentName(data.studentName || "Mag-aaral");
-        setSuccessMsg(data.message || `Kumpirmado ang pagkakakilanlan: ${data.studentName}`);
+        setStudentName(data.studentName || "Student");
+        setSuccessMsg(data.message || `Identity confirmed: ${data.studentName}`);
       }
     } catch {
-      setError("Nagkaroon ng aberya sa pagsusuri ng rekord. Pakisubukang muli.");
+      setError("An error occurred while verifying records. Please try again.");
     } finally {
       setIsVerifyingIdentity(false);
     }
@@ -382,7 +382,7 @@ export function IdentityRecoveryModal({
   const handleSendEmailOtp = async () => {
     const cleanEmail = newEmail.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes("@")) {
-      setError("Pakilagay ang isang wastong Gmail o email address.");
+      setError("Please enter a valid Gmail or email address.");
       return;
     }
     setError("");
@@ -397,14 +397,14 @@ export function IdentityRecoveryModal({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi maipadala ang verification code sa bagong email.");
+        setError(data.error || "Unable to send verification code to the new email address.");
       } else {
         setEmailOtpSent(true);
         setCooldown(60);
-        setSuccessMsg(data.message || `Ang 6-digit code ay naipadala sa ${cleanEmail}.`);
+        setSuccessMsg(data.message || `A 6-digit verification code has been sent to ${cleanEmail}.`);
       }
     } catch {
-      setError("Nagkaroon ng problema sa network. Pakisubukang muli.");
+      setError("A network error occurred. Please try again.");
     } finally {
       setIsSendingEmailOtp(false);
     }
@@ -420,15 +420,15 @@ export function IdentityRecoveryModal({
     const cleanEmail = newEmail.trim().toLowerCase();
 
     if (!emailOtp || emailOtp.length < 6) {
-      setError("Pakilagay ang 6-digit verification code mula sa iyong bagong email.");
+      setError("Please enter the 6-digit verification code sent to your new email.");
       return;
     }
     if (!newPassword || newPassword.length < 6) {
-      setError("Ang bagong password ay dapat hindi bababa sa 6 na karakter.");
+      setError("The new password must be at least 6 characters.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Hindi magkatugma ang Bagong Password at Kumpirmasyon.");
+      setError("The new password and confirmation do not match.");
       return;
     }
 
@@ -449,16 +449,16 @@ export function IdentityRecoveryModal({
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "Hindi makumpleto ang pag-recover ng account.");
+        setError(data.error || "Unable to complete account recovery. Please try again.");
       } else {
-        setSuccessMsg(data.message || "Matagumpay na na-activate ang iyong bagong email at password!");
+        setSuccessMsg(data.message || "Your new email and password have been activated successfully!");
         setTimeout(() => {
           onSuccess(cleanEmail, newPassword.trim());
           onClose();
         }, 1200);
       }
     } catch {
-      setError("Nagkaroon ng aberya sa koneksyon. Pakisubukang muli.");
+      setError("Network connection error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -479,7 +479,7 @@ export function IdentityRecoveryModal({
               </span>
             </div>
             <h2 className="text-base font-bold text-slate-900 mt-1">
-              Pagbawi ng Kredensyal gamit ang LRN
+              Account Recovery via DepEd LRN
             </h2>
           </div>
           <button
@@ -494,10 +494,10 @@ export function IdentityRecoveryModal({
         {/* Informative Note */}
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-950 space-y-1">
           <p className="font-bold">
-            Mensahe mula sa IT Support:
+            Message from IT Support:
           </p>
           <p className="leading-relaxed text-[11px] text-red-900">
-            Tinanggal ng IT Support ang email at password ng account na ito. Upang mapatunayan na ikaw ang tunay na may-ari ng account, mangyaring patunayan ang iyong pagkakakilanlan gamit ang iyong 12-digit LRN at Apelyido o Petsa ng Kapanganakan.
+            IT Support has reset the credentials for this account. To verify that you are the legitimate account owner, please confirm your identity using your 12-digit LRN and Last Name or Date of Birth.
           </p>
         </div>
 
@@ -534,7 +534,7 @@ export function IdentityRecoveryModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Apelyido (Last Name) <span className="text-red-600">*</span>
+                  Last Name <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -547,7 +547,7 @@ export function IdentityRecoveryModal({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Petsa ng Kapanganakan (Birthdate)
+                  Date of Birth
                 </label>
                 <input
                   type="date"
@@ -563,7 +563,7 @@ export function IdentityRecoveryModal({
               disabled={isVerifyingIdentity || lrn.length !== 12}
               className="w-full py-2.5 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg shadow-sm disabled:opacity-60 transition-colors cursor-pointer"
             >
-              {isVerifyingIdentity ? "Sinusuri ang Rekord sa DepEd Database..." : "Patunayan ang Pagkakakilanlan"}
+              {isVerifyingIdentity ? "Verifying Records in DepEd Database..." : "Verify Identity"}
             </button>
           </form>
         ) : (
@@ -571,7 +571,7 @@ export function IdentityRecoveryModal({
           <form onSubmit={handleCompleteRecovery} className="space-y-3.5">
             <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-950 font-semibold flex items-center justify-between">
               <div>
-                <span>Kumpirmadong Rekord: <strong>{studentName}</strong></span>
+                <span>Verified Record: <strong>{studentName}</strong></span>
                 <span className="block text-[11px] text-emerald-800">LRN: {lrn}</span>
               </div>
               <span className="px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-bold rounded">
@@ -581,14 +581,14 @@ export function IdentityRecoveryModal({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Bagong Email Address (Gmail) <span className="text-red-600">*</span>
+                New Email Address (Gmail) <span className="text-red-600">*</span>
               </label>
               <div className="flex gap-2">
                 <input
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="e.g. bago.email@gmail.com"
+                  placeholder="e.g. student.email@gmail.com"
                   disabled={emailOtpSent}
                   className="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#002060] focus:bg-white outline-none disabled:bg-slate-100"
                   required
@@ -608,7 +608,7 @@ export function IdentityRecoveryModal({
               <>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5 text-center">
-                    6-Digit Verification Code mula sa bagong Gmail
+                    6-Digit Verification Code from your new Gmail
                   </label>
                   <SeparatedOtpInput
                     value={emailOtp}
@@ -623,14 +623,14 @@ export function IdentityRecoveryModal({
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="block text-xs font-bold text-slate-700">
-                        Bagong Password <span className="text-red-600">*</span>
+                        New Password <span className="text-red-600">*</span>
                       </label>
                       <button
                         type="button"
                         onClick={() => setShowPassword((p) => !p)}
                         className="text-[10px] font-bold text-[#002060] hover:underline cursor-pointer"
                       >
-                        {showPassword ? "Itago" : "Ipakita"}
+                        {showPassword ? "Hide" : "Show"}
                       </button>
                     </div>
                     <input
@@ -645,13 +645,13 @@ export function IdentityRecoveryModal({
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Kumpirmahin <span className="text-red-600">*</span>
+                      Confirm Password <span className="text-red-600">*</span>
                     </label>
                     <input
                       type={showPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Ulitin ang password"
+                      placeholder="Re-enter password"
                       className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#002060] focus:bg-white outline-none"
                       required
                     />
@@ -663,7 +663,7 @@ export function IdentityRecoveryModal({
                   disabled={isSubmitting || emailOtp.length < 6}
                   className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm disabled:opacity-60 transition-colors cursor-pointer"
                 >
-                  {isSubmitting ? "Inia-activate ang Account..." : "I-save at I-activate ang Account"}
+                  {isSubmitting ? "Activating Account..." : "Save & Activate Account"}
                 </button>
               </>
             )}

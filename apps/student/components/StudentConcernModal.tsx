@@ -293,7 +293,7 @@ export default function StudentConcernModal({
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
                       <span className="text-xs font-bold text-[#002060]">
-                        Maaari ka ring direktang mag-email sa IT Support:
+                        You can also email IT Support directly:
                       </span>
                     </div>
                     <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded border border-blue-300">
@@ -301,11 +301,11 @@ export default function StudentConcernModal({
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Kung hindi ka makapag-login o nais mong mag-email mula sa iyong Gmail, i-click ang pindutan sa ibaba upang mag-compose ng email sa <strong>dumalnext@gmail.com</strong>. Awtomatiko itong papasok sa aming IT Support Desk.
+                    If you cannot sign in or prefer to email directly, click below to send a message to <strong>dumalnext@gmail.com</strong>. It will be automatically routed to our IT Support Desk.
                   </p>
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <a
-                      href="mailto:dumalnext@gmail.com?subject=Password%20Reset%20Request%20-%20Dumalneg%20NHS&body=Pangalan%20ng%20Mag-aaral%3A%0ALRN%20(12-Digit)%3A%0AApelyido%2FRecord%3A%0AMensahe%20ukol%20sa%20Password%20o%20Account%3A%0A"
+                      href="mailto:dumalnext@gmail.com?subject=Password%20Reset%20Request%20-%20Dumalneg%20NHS&body=Student%20Name%3A%0ALRN%20(12-Digit)%3A%0ALast%20Name%2FRecord%3A%0AMessage%20regarding%20Password%20or%20Account%3A%0A"
                       className="px-3 py-1.5 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -313,7 +313,7 @@ export default function StudentConcernModal({
                       <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span>Mag-email sa dumalnext@gmail.com</span>
+                      <span>Email dumalnext@gmail.com</span>
                     </a>
                   </div>
                 </div>

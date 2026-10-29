@@ -491,7 +491,7 @@ export default function Step2LearnerProfile({
                         : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
                     }`}
                   >
-                    {isSelected ? "✓ " : ""}{genderOption}
+                    {genderOption}
                   </button>
                 );
               })}

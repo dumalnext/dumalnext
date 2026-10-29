@@ -802,7 +802,7 @@ export default function ClassSectionRosterPage() {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">{enrollNotification.type === "success" ? "✓" : "⚠"}</span>
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${enrollNotification.type === "success" ? "bg-emerald-600 text-white" : "bg-red-600 text-white"}`}>{enrollNotification.type === "success" ? "Success" : "Notice"}</span>
                   <span>{enrollNotification.message}</span>
                 </div>
                 <button
@@ -810,7 +810,7 @@ export default function ClassSectionRosterPage() {
                   onClick={() => setEnrollNotification(null)}
                   className="px-2 py-0.5 text-xs font-bold hover:opacity-75 cursor-pointer"
                 >
-                  ✕
+                  &times;
                 </button>
               </div>
             )}
@@ -849,13 +849,13 @@ export default function ClassSectionRosterPage() {
                       </>
                     ) : (
                       <>
-                        <span>⚡ 1-Click Enroll All ({rosterStudents.filter((st) => !st.isEnrolledInActiveTerm).length} Unenrolled)</span>
+                        <span>1-Click Enroll All ({rosterStudents.filter((st) => !st.isEnrolledInActiveTerm).length} Unenrolled)</span>
                       </>
                     )}
                   </button>
                 ) : (
                   <div className="px-3.5 py-2 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded text-xs font-bold shrink-0 flex items-center gap-1.5 font-sans">
-                    <span className="text-emerald-700 text-sm font-black">✓</span>
+                    <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider bg-emerald-200 px-1.5 py-0.5 rounded">Enrolled</span>
                     <span>All Learners Enrolled for {activeTermName}</span>
                   </div>
                 )}
@@ -982,7 +982,7 @@ export default function ClassSectionRosterPage() {
                                   </>
                                 ) : (
                                   <>
-                                    <span>⚡ 1-Click Enroll</span>
+                                    <span>1-Click Enroll</span>
                                   </>
                                 )}
                               </button>
