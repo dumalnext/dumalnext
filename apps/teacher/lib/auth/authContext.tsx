@@ -14,6 +14,7 @@ export interface TeacherUser {
   department: string; // 'JHS' | 'SHS' | 'CROSS_LEVEL'
   userRole: "teacher";
   isEmailVerified?: boolean;
+  photoUrl?: string;
 }
 
 interface TeacherAuthContextType {
@@ -24,6 +25,8 @@ interface TeacherAuthContextType {
   logout: () => void;
   refreshSession: () => Promise<void>;
   updateUserName: (firstName: string, middleName: string | undefined, lastName: string) => void;
+  updateUserEmail: (newEmail: string) => void;
+  updateUserPhoto: (photoUrl: string | null) => void;
 }
 
 const TeacherAuthContext = createContext<TeacherAuthContextType | undefined>(undefined);
@@ -107,6 +110,26 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         const teacherId = teacherRecord?.teacher_id || suUser?.user_id || "DNHS-TCH-001";
         const fullName = `${firstName} ${lastName}`.trim();
 
+        // Load 2x2 Photo from system_settings or localStorage
+        let photoUrl: string | undefined = undefined;
+        try {
+          const { data: photoSetting } = await supabase
+            .from("system_settings")
+            .select("value")
+            .eq("key", "teacher_profile_photos")
+            .maybeSingle();
+          if (photoSetting?.value && typeof photoSetting.value === "object") {
+            photoUrl = (photoSetting.value as any)[teacherId] || (photoSetting.value as any)[cleanEmail];
+          }
+        } catch {}
+
+        if (!photoUrl && typeof window !== "undefined") {
+          photoUrl =
+            localStorage.getItem(`dumalnext_teacher_photo_${teacherId}`) ||
+            localStorage.getItem(`dumalnext_teacher_photo_${cleanEmail}`) ||
+            undefined;
+        }
+
         const activeUser: TeacherUser = {
           id: authUser.id,
           teacherDbId: teacherRecord?.id,
@@ -118,6 +141,7 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
           department,
           userRole: "teacher",
           isEmailVerified: !!authUser.email_confirmed_at,
+          photoUrl,
         };
 
         setUser(activeUser);
@@ -391,6 +415,37 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
     setSessionCookie(updatedUser);
   };
 
+  const updateUserEmail = (newEmail: string) => {
+    if (!user) return;
+    const cleanEmail = newEmail.trim().toLowerCase();
+    const updatedUser: TeacherUser = {
+      ...user,
+      email: cleanEmail,
+    };
+    setUser(updatedUser);
+    setSessionCookie(updatedUser);
+  };
+
+  const updateUserPhoto = (photoUrl: string | null) => {
+    if (!user) return;
+    const updatedUser: TeacherUser = {
+      ...user,
+      photoUrl: photoUrl || undefined,
+    };
+    setUser(updatedUser);
+    setSessionCookie(updatedUser);
+    if (typeof window !== "undefined") {
+      if (photoUrl) {
+        localStorage.setItem(`dumalnext_teacher_photo_${user.teacherId}`, photoUrl);
+        localStorage.setItem(`dumalnext_teacher_photo_${user.email}`, photoUrl);
+      } else {
+        localStorage.removeItem(`dumalnext_teacher_photo_${user.teacherId}`);
+        localStorage.removeItem(`dumalnext_teacher_photo_${user.email}`);
+      }
+      window.dispatchEvent(new CustomEvent("dumalnext:teacher-data-changed"));
+    }
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -412,6 +467,8 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         logout,
         refreshSession,
         updateUserName,
+        updateUserEmail,
+        updateUserPhoto,
       }}
     >
       {children}

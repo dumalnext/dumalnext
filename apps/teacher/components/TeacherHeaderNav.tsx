@@ -58,17 +58,34 @@ export default function TeacherHeaderNav() {
 
         {user && (
           <div className="flex flex-wrap items-center gap-3">
-            <div className="border border-white/20 bg-white/10 backdrop-blur-xs px-3.5 py-2 text-xs rounded-[4px]">
-              <span className="text-[10px] text-amber-300 font-semibold block">
-                Active Faculty Account
-              </span>
-              <div className="font-bold text-white tracking-wide">
-                {user.fullName}
+            <Link
+              href="/profile"
+              className="border border-white/20 bg-white/10 hover:bg-white/15 backdrop-blur-xs px-3.5 py-2 text-xs rounded-[4px] flex items-center gap-3 transition-colors cursor-pointer"
+              title="View Faculty Profile & Credentials"
+            >
+              {user.photoUrl ? (
+                <img
+                  src={user.photoUrl}
+                  alt={user.fullName}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-amber-400 shadow-xs bg-white shrink-0"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-amber-400/20 border-2 border-amber-300 text-amber-200 font-black text-sm flex items-center justify-center shrink-0">
+                  {user.firstName?.charAt(0) || "T"}{user.lastName?.charAt(0) || "C"}
+                </div>
+              )}
+              <div>
+                <span className="text-[10px] text-amber-300 font-semibold block">
+                  Active Faculty Account
+                </span>
+                <div className="font-bold text-white tracking-wide">
+                  {user.fullName}
+                </div>
+                <span className="text-[11px] text-blue-100 block">
+                  ID: {user.teacherId} &bull; {user.department}
+                </span>
               </div>
-              <span className="text-[11px] text-blue-100 block">
-                ID: {user.teacherId} &bull; {user.department}
-              </span>
-            </div>
+            </Link>
 
             <button
               type="button"
