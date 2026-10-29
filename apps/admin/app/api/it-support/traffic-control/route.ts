@@ -59,7 +59,7 @@ export async function GET() {
 
     const now = Date.now();
     const validSessions = rawSessions.filter(
-      (s) => s.lastSeen && now - s.lastSeen < 90000
+      (s: any) => s.lastSeen && now - s.lastSeen < 90000
     );
 
     // If pruned, update in background
@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
       ? sessionData.value.sessions
       : [];
     const now = Date.now();
-    const activeCount = sessions.filter((s) => s.lastSeen && now - s.lastSeen < 90000).length;
+    const activeCount = sessions.filter((s: any) => s.lastSeen && now - s.lastSeen < 90000).length;
 
     return NextResponse.json(
       {

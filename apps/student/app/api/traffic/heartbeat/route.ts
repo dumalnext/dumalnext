@@ -73,12 +73,12 @@ export async function POST(req: NextRequest) {
     const now = Date.now();
     // Prune sessions older than 90 seconds
     let activeSessions = rawSessions.filter(
-      (s) => s.id && s.lastSeen && now - s.lastSeen < 90000
+      (s: any) => s.id && s.lastSeen && now - s.lastSeen < 90000
     );
 
     // ACTION: LEAVE (Student logged out or closed browser)
     if (action === "leave") {
-      activeSessions = activeSessions.filter((s) => s.id !== sessionId);
+      activeSessions = activeSessions.filter((s: any) => s.id !== sessionId);
       await supabase.from("system_settings").upsert({
         key: "active_student_sessions",
         value: { sessions: activeSessions },
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ACTION: HEARTBEAT
-    const existingIndex = activeSessions.findIndex((s) => s.id === sessionId);
+    const existingIndex = activeSessions.findIndex((s: any) => s.id === sessionId);
 
     // Case 1: Session is already in the active pool
     if (existingIndex !== -1) {
