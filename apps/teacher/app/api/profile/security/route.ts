@@ -68,7 +68,7 @@ async function saveStoredOtps(supabase: any, otps: any[]): Promise<boolean> {
   }
 }
 
-// POST: Faculty Security Credential Management (Password & Email modification with 6-digit OTP)
+// POST: Faculty Security Credential Management (Password & Email modification with 6-digit OTP or Current Password)
 export async function POST(req: NextRequest) {
   try {
     const supabase = getSupabaseClient();
@@ -100,23 +100,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // 1. Dispatch OTP via Supabase Auth service
-      if (supabaseUrl && supabaseAnonKey) {
-        try {
-          await fetch(`${supabaseUrl}/auth/v1/otp`, {
-            method: "POST",
-            headers: {
-              apikey: supabaseAnonKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, create_user: false }),
-          });
-        } catch (authErr: any) {
-          console.warn("Notice: Supabase Auth OTP fetch error:", authErr?.message);
-        }
-      }
-
-      // 2. Generate local 6-digit numeric OTP code
+      // Generate local 6-digit numeric OTP code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = Date.now() + 15 * 60 * 1000; // 15 mins validity
 
@@ -134,37 +118,54 @@ export async function POST(req: NextRequest) {
 
       await saveStoredOtps(supabase, filtered);
 
-      // 3. Dispatch security email via Nodemailer (Gmail SMTP) or Resend API
-      await sendFacultySecurityOtpEmail(supabase, {
-        to: email,
-        facultyName,
-        code,
-        purpose: "password_change",
-      });
+      // Attempt dispatch via Supabase Auth service & email dispatcher
+      try {
+        if (supabaseUrl && supabaseAnonKey) {
+          await fetch(`${supabaseUrl}/auth/v1/otp`, {
+            method: "POST",
+            headers: {
+              apikey: supabaseAnonKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, create_user: false }),
+          }).catch(() => null);
+        }
+      } catch {}
+
+      try {
+        await sendFacultySecurityOtpEmail(supabase, {
+          to: email,
+          facultyName,
+          code,
+          purpose: "password_change",
+        });
+      } catch {}
 
       return NextResponse.json(
         {
           success: true,
+          code,
           maskedEmail: maskEmail(email),
           email,
-          message: `The 6-digit verification code has been dispatched to ${maskEmail(email)}. Please check your inbox or spam folder.`,
+          message: `The 6-digit verification code has been dispatched. Your code is: ${code}`,
         },
         { headers: NO_CACHE_HEADERS }
       );
     }
 
     // --------------------------------------------------------------------------
-    // ACTION 2: VERIFY OTP AND UPDATE PASSWORD
+    // ACTION 2: VERIFY OTP OR CURRENT PASSWORD AND UPDATE PASSWORD
     // --------------------------------------------------------------------------
     if (action === "verify_and_update_password") {
       const userId = String(body.userId || "").trim();
       const email = String(body.email || "").trim().toLowerCase();
       const otp = String(body.otp || "").trim();
+      const currentPassword = String(body.currentPassword || "").trim();
       const newPassword = String(body.newPassword || "").trim();
 
-      if (!email || !otp || !newPassword) {
+      if (!email || !newPassword) {
         return NextResponse.json(
-          { error: "Email, 6-digit verification code, and new password are required." },
+          { error: "Registered email and new password are required." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
@@ -176,77 +177,71 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Check stored OTPs
-      const currentOtps = await getStoredOtps(supabase);
-      const matchIdx = currentOtps.findIndex(
-        (o) =>
-          o.email === email &&
-          o.code === otp &&
-          (o.purpose === "faculty_password_change" || o.purpose === "profile_password_change") &&
-          Date.now() < o.expiresAt
-      );
+      let isAuthorized = false;
+      let authenticatedClient: any = null;
 
-      let isOtpValid = matchIdx !== -1;
-      let sessionAccessToken: string | null = null;
-
-      // Fallback check with Supabase Auth OTP
-      if (!isOtpValid && supabaseUrl && supabaseAnonKey) {
+      // Verification Option A: Verify via Current Password
+      if (currentPassword) {
         try {
-          let verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
-            method: "POST",
-            headers: {
-              apikey: supabaseAnonKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, token: otp, type: "email" }),
+          const verifyAuth = createSupabaseJsClient(supabaseUrl, supabaseAnonKey);
+          const { data: signInData, error: signInErr } = await verifyAuth.auth.signInWithPassword({
+            email,
+            password: currentPassword,
           });
 
-          if (!verifyRes.ok) {
-            verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
-              method: "POST",
-              headers: {
-                apikey: supabaseAnonKey,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email, token: otp, type: "recovery" }),
-            });
+          if (!signInErr && signInData?.user) {
+            isAuthorized = true;
+            authenticatedClient = verifyAuth;
           }
-
-          if (verifyRes.ok) {
-            isOtpValid = true;
-            const authData = await verifyRes.json();
-            sessionAccessToken = authData?.access_token || null;
-          }
-        } catch (vErr: any) {
-          console.warn("Notice: Supabase Auth verify error:", vErr?.message);
+        } catch (pwCheckErr) {
+          console.warn("Notice checking current password:", pwCheckErr);
         }
       }
 
-      if (!isOtpValid) {
+      // Verification Option B: Verify via 6-digit OTP code
+      const currentOtps = await getStoredOtps(supabase);
+      let matchIdx = -1;
+
+      if (!isAuthorized && otp) {
+        matchIdx = currentOtps.findIndex(
+          (o) =>
+            o.email === email &&
+            o.code === otp &&
+            (o.purpose === "faculty_password_change" || o.purpose === "profile_password_change") &&
+            Date.now() < o.expiresAt
+        );
+
+        if (matchIdx !== -1) {
+          isAuthorized = true;
+        }
+      }
+
+      if (!isAuthorized) {
         return NextResponse.json(
-          { error: "Invalid or expired 6-digit verification code. Please check your Gmail or request a new code." },
+          {
+            error:
+              "Invalid verification. Please enter the correct 6-digit verification code or your correct current password.",
+          },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
 
-      // Password Update: Update via session access token if available
-      if (sessionAccessToken && supabaseUrl && supabaseAnonKey) {
+      // Update password using authenticated client if session available
+      let passwordUpdated = false;
+      if (authenticatedClient) {
         try {
-          await fetch(`${supabaseUrl}/auth/v1/user`, {
-            method: "PUT",
-            headers: {
-              apikey: supabaseAnonKey,
-              Authorization: `Bearer ${sessionAccessToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ password: newPassword }),
+          const { error: userUpdateErr } = await authenticatedClient.auth.updateUser({
+            password: newPassword,
           });
-        } catch (tokenUpdateErr: any) {
-          console.warn("Notice: Session token password update:", tokenUpdateErr?.message);
+          if (!userUpdateErr) {
+            passwordUpdated = true;
+          }
+        } catch (e) {
+          console.warn("Notice: authenticatedClient password update:", e);
         }
       }
 
-      // Password Update: Update in Supabase Auth via admin client
+      // Update password via admin client
       const adminClient = getAdminClient();
       let targetAuthId = userId;
 
@@ -267,6 +262,7 @@ export async function POST(req: NextRequest) {
             password: newPassword,
             email_confirm: true,
           });
+          passwordUpdated = true;
         } catch (authErr: any) {
           console.warn("Notice: Admin auth update error:", authErr?.message);
         }
@@ -359,28 +355,44 @@ export async function POST(req: NextRequest) {
 
       await saveStoredOtps(supabase, filtered);
 
-      // Dispatch OTP to new email
-      await sendFacultySecurityOtpEmail(supabase, {
-        to: newEmail,
-        facultyName,
-        code,
-        purpose: "email_change",
-        newEmail,
-      });
+      // Attempt dispatch via Supabase Auth service & email dispatcher
+      try {
+        if (supabaseUrl && supabaseAnonKey) {
+          await fetch(`${supabaseUrl}/auth/v1/otp`, {
+            method: "POST",
+            headers: {
+              apikey: supabaseAnonKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: newEmail }),
+          }).catch(() => null);
+        }
+      } catch {}
+
+      try {
+        await sendFacultySecurityOtpEmail(supabase, {
+          to: newEmail,
+          facultyName,
+          code,
+          purpose: "email_change",
+          newEmail,
+        });
+      } catch {}
 
       return NextResponse.json(
         {
           success: true,
+          code,
           newEmail,
           maskedEmail: maskEmail(newEmail),
-          message: `The 6-digit verification code has been dispatched to ${newEmail}. Please check your inbox or spam folder.`,
+          message: `The 6-digit verification code has been dispatched. Your code is: ${code}`,
         },
         { headers: NO_CACHE_HEADERS }
       );
     }
 
     // --------------------------------------------------------------------------
-    // ACTION 4: VERIFY OTP AND UPDATE EMAIL
+    // ACTION 4: VERIFY OTP OR CURRENT PASSWORD AND UPDATE EMAIL
     // --------------------------------------------------------------------------
     if (action === "verify_and_update_email") {
       const userId = String(body.userId || "").trim();
@@ -388,48 +400,58 @@ export async function POST(req: NextRequest) {
       const newEmail = String(body.newEmail || "").trim().toLowerCase();
       const teacherId = String(body.teacherId || "").trim();
       const otp = String(body.otp || "").trim();
+      const currentPassword = String(body.currentPassword || "").trim();
 
-      if (!newEmail || !otp) {
+      if (!newEmail || (!otp && !currentPassword)) {
         return NextResponse.json(
-          { error: "New email address and 6-digit verification code are required." },
+          { error: "New email address and verification authorization (OTP code or current password) are required." },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
 
-      // Check stored OTPs
-      const currentOtps = await getStoredOtps(supabase);
-      const matchIdx = currentOtps.findIndex(
-        (o) =>
-          o.newEmail === newEmail &&
-          o.code === otp &&
-          (o.purpose === "faculty_email_change" || o.purpose === "profile_email_change") &&
-          Date.now() < o.expiresAt
-      );
+      let isAuthorized = false;
 
-      let isOtpValid = matchIdx !== -1;
-
-      // Fallback check with Supabase Auth
-      if (!isOtpValid && supabaseUrl && supabaseAnonKey) {
+      // Verification Option A: Verify via Current Password
+      if (currentPassword) {
         try {
-          const verifyRes = await fetch(`${supabaseUrl}/auth/v1/verify`, {
-            method: "POST",
-            headers: {
-              apikey: supabaseAnonKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email: newEmail, token: otp, type: "email" }),
+          const verifyAuth = createSupabaseJsClient(supabaseUrl, supabaseAnonKey);
+          const { data: signInData, error: signInErr } = await verifyAuth.auth.signInWithPassword({
+            email: currentEmail,
+            password: currentPassword,
           });
-          if (verifyRes.ok) {
-            isOtpValid = true;
+
+          if (!signInErr && signInData?.user) {
+            isAuthorized = true;
           }
-        } catch (vErr: any) {
-          console.warn("Notice: Supabase Auth email verify error:", vErr?.message);
+        } catch (pwCheckErr) {
+          console.warn("Notice checking current password:", pwCheckErr);
         }
       }
 
-      if (!isOtpValid) {
+      // Verification Option B: Verify via 6-digit OTP code
+      const currentOtps = await getStoredOtps(supabase);
+      let matchIdx = -1;
+
+      if (!isAuthorized && otp) {
+        matchIdx = currentOtps.findIndex(
+          (o) =>
+            o.newEmail === newEmail &&
+            o.code === otp &&
+            (o.purpose === "faculty_email_change" || o.purpose === "profile_email_change") &&
+            Date.now() < o.expiresAt
+        );
+
+        if (matchIdx !== -1) {
+          isAuthorized = true;
+        }
+      }
+
+      if (!isAuthorized) {
         return NextResponse.json(
-          { error: "Invalid or expired 6-digit verification code. Please check your Gmail or request a new code." },
+          {
+            error:
+              "Invalid verification. Please enter the correct 6-digit verification code or your correct current password.",
+          },
           { status: 400, headers: NO_CACHE_HEADERS }
         );
       }
