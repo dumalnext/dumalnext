@@ -43,12 +43,30 @@ export default function StudentConcernsManager() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
 
+  // Pagination State (Limit 10 per page)
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, categoryFilter, searchQuery]);
+
   // Selected Ticket for Viewing & Replying
   const [activeConcern, setActiveConcern] = useState<StudentConcern | null>(null);
   const [replyText, setReplyText] = useState("");
   const [modalStatus, setModalStatus] = useState<StudentConcern["status"]>("IN_PROGRESS");
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  // Gmail Ingest / Sync Modal State
+  const [showGmailSyncModal, setShowGmailSyncModal] = useState(false);
+  const [gmailSyncTab, setGmailSyncTab] = useState<"manual" | "guide">("manual");
+  const [ingestEmailFrom, setIngestEmailFrom] = useState("");
+  const [ingestEmailSubject, setIngestEmailSubject] = useState("Password Reset Request - Dumalneg NHS Student Account");
+  const [ingestEmailBody, setIngestEmailBody] = useState("");
+  const [isIngestingEmail, setIsIngestingEmail] = useState(false);
+  const [ingestFeedback, setIngestFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [scriptCopied, setScriptCopied] = useState(false);
 
   // Auto-dismiss status banner
   useEffect(() => {
@@ -109,6 +127,42 @@ export default function StudentConcernsManager() {
     });
   }, [concerns, statusFilter, categoryFilter, searchQuery]);
 
+  // Pagination Calculations (Limit 10 per page)
+  const totalPages = Math.ceil(filteredConcerns.length / PAGE_SIZE) || 1;
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, filteredConcerns.length);
+  const paginatedConcerns = filteredConcerns.slice(startIndex, endIndex);
+
+  const getVisiblePageNumbers = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const delta = 2;
+    const range: number[] = [];
+    for (
+      let i = Math.max(2, safeCurrentPage - delta);
+      i <= Math.min(totalPages - 1, safeCurrentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (safeCurrentPage - delta > 2) {
+      range.unshift(-1);
+    }
+    if (safeCurrentPage + delta < totalPages - 1) {
+      range.push(-2);
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
+  };
+
   // Metrics Summary
   const metrics = useMemo(() => {
     const total = concerns.length;
@@ -119,11 +173,113 @@ export default function StudentConcernsManager() {
     return { total, pending, inProgress, resolved, withReplies };
   }, [concerns]);
 
+  // Ingest Email from Gmail (Manual Ingest)
+  const handleIngestEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ingestEmailFrom.trim() || !ingestEmailFrom.includes("@")) {
+      setIngestFeedback({ type: "error", text: "Please enter the student's sender email address." });
+      return;
+    }
+    setIsIngestingEmail(true);
+    setIngestFeedback(null);
+    try {
+      const res = await fetch("/api/concerns/inbound", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: ingestEmailFrom.trim().toLowerCase(),
+          to: "dumalnext@gmail.com",
+          subject: ingestEmailSubject.trim() || "Password Reset Request",
+          text: ingestEmailBody.trim() || "(Walang mensahe na kalakip)",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to ingest inbound email.");
+      }
+      setIngestFeedback({
+        type: "success",
+        text: `Email successfully ingested as Ticket #${data.ticketNumber} and added to the concerns queue.`,
+      });
+      setIngestEmailFrom("");
+      setIngestEmailBody("");
+      await fetchConcerns(true);
+    } catch (err: any) {
+      setIngestFeedback({ type: "error", text: err.message || "Error while ingesting email." });
+    } finally {
+      setIsIngestingEmail(false);
+    }
+  };
+
   // Open Conversation Modal
   const handleOpenConcern = (concern: StudentConcern) => {
     setActiveConcern(concern);
     setModalStatus(concern.status);
     setReplyText("");
+  };
+
+  // Send Reply to Student
+  const handleSendReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeConcern || !replyText.trim()) return;
+
+    setIsSendingReply(true);
+    setStatusMessage(null);
+
+    try {
+      const officerName = user?.fullName || "IT Support Officer";
+      const res = await fetch("/api/it-support/concerns", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: activeConcern.id,
+          status: modalStatus,
+          replyMessage: replyText.trim(),
+          resolvedBy: officerName,
+          senderName: officerName,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to send reply to student.");
+      }
+
+      setStatusMessage({
+        type: "success",
+        text: data.emailDispatched
+          ? `Official response saved and dispatched to ${activeConcern.studentName}'s email (${activeConcern.email})!`
+          : `Response saved in system (Ticket #${activeConcern.ticketNumber}). You can also click "Reply via Gmail" to deliver directly to their inbox.`,
+      });
+
+      setReplyText("");
+      await fetchConcerns(true);
+    } catch (err: any) {
+      setStatusMessage({ type: "error", text: err.message || "Failed to dispatch reply." });
+    } finally {
+      setIsSendingReply(false);
+    }
+  };
+
+  // Open direct Reply in Gmail Web with prefilled ticket details
+  const handleOpenGmailReply = () => {
+    if (!activeConcern || !activeConcern.email) return;
+    const su = encodeURIComponent(`Re: [Ticket #${activeConcern.ticketNumber}] ${activeConcern.subject || "Dumalneg NHS Student Concern"}`);
+    const draftText = replyText.trim()
+      ? replyText.trim()
+      : `Hello ${activeConcern.studentName},\n\nHere is the official response from Dumalneg NHS IT Support Desk regarding your inquiry (Ticket #${activeConcern.ticketNumber}).\n\n`;
+    const fullDraft = [
+      draftText,
+      "",
+      "------------------------------------------",
+      `Student Name: ${activeConcern.studentName}`,
+      `12-Digit LRN: ${activeConcern.lrn || "N/A"}`,
+      `Ticket Reference: #${activeConcern.ticketNumber}`,
+      "Dumalneg National High School - IT Support Desk"
+    ].join("\r\n");
+    const body = encodeURIComponent(fullDraft);
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(activeConcern.email)}&su=${su}&body=${body}`;
+    window.open(gmailUrl, "_blank");
   };
 
   // Quick Status Change from Modal
@@ -175,7 +331,9 @@ export default function StudentConcernsManager() {
   };
 
   // Quick Preset Replies
-
+  const insertPresetReply = (text: string) => {
+    setReplyText((prev) => (prev ? `${prev}\n${text}` : text));
+  };
 
   return (
     <div className="space-y-6">
@@ -332,6 +490,20 @@ export default function StudentConcernsManager() {
               <option value="other">Other Inquiries</option>
             </select>
 
+            <button
+              type="button"
+              onClick={() => {
+                setIngestFeedback(null);
+                setShowGmailSyncModal(true);
+              }}
+              className="py-2 px-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span>Sync / Ingest Gmail</span>
+            </button>
+
             {(searchQuery || statusFilter !== "ALL" || categoryFilter !== "ALL") && (
               <button
                 type="button"
@@ -380,10 +552,11 @@ export default function StudentConcernsManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredConcerns.map((c) => {
-                  const isPending = c.status === "PENDING";
-                  const isResolved = c.status === "RESOLVED";
-                  const isInProgress = c.status === "IN_PROGRESS";
+                {paginatedConcerns.map((c) => {
+                  const norm = (c.status || "").toUpperCase();
+                  const isPending = norm === "PENDING";
+                  const isResolved = norm === "RESOLVED";
+                  const isInProgress = norm === "IN_PROGRESS";
                   const replyCount = c.replies?.length || 0;
 
                   return (
@@ -457,7 +630,7 @@ export default function StudentConcernsManager() {
                             Resolved
                           </span>
                         )}
-                        {c.status === "CLOSED" && (
+                        {norm === "CLOSED" && (
                           <span className="px-2.5 py-1 bg-slate-200 text-slate-700 border border-slate-300 rounded-full font-bold text-[10px] uppercase inline-flex items-center gap-1">
                             Closed
                           </span>
@@ -511,6 +684,72 @@ export default function StudentConcernsManager() {
             </table>
           )}
         </div>
+
+        {/* Pagination Controls (Limit 10 per page) */}
+        {!isLoading && filteredConcerns.length > PAGE_SIZE && (
+          <div className="px-5 py-3.5 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans">
+            <div className="text-slate-600">
+              Page <strong className="text-[#002060]">{safeCurrentPage}</strong> of{" "}
+              <strong className="text-[#002060]">{totalPages}</strong> &bull; Showing{" "}
+              <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{" "}
+              <strong>{filteredConcerns.length}</strong> message(s) (10 per page)
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safeCurrentPage <= 1}
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                  safeCurrentPage <= 1
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                }`}
+              >
+                Prev
+              </button>
+
+              {getVisiblePageNumbers().map((pageNum, idx) => {
+                if (pageNum < 0) {
+                  return (
+                    <span key={`ellipsis-${idx}`} className="px-2 py-1 text-slate-400 font-bold">
+                      &hellip;
+                    </span>
+                  );
+                }
+                const isActive = pageNum === safeCurrentPage;
+                return (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                      isActive
+                        ? "bg-[#002060] border-[#002060] text-white"
+                        : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safeCurrentPage >= totalPages}
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                  safeCurrentPage >= totalPages
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* CONVERSATION & REPLY MODAL */}
@@ -554,6 +793,19 @@ export default function StudentConcernsManager() {
             <div className="bg-slate-50 border-b border-slate-200 p-3 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
                 <span>Email: <strong className="text-slate-800">{activeConcern.email}</strong></span>
+                {activeConcern.email && activeConcern.email.includes("@") && (
+                  <button
+                    type="button"
+                    onClick={handleOpenGmailReply}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded shadow-xs cursor-pointer transition-colors"
+                    title="Open Gmail compose window"
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                    <span>Reply via Gmail</span>
+                  </button>
+                )}
                 {activeConcern.lrn && (
                   <span>LRN: <strong className="text-slate-800 font-mono">{activeConcern.lrn}</strong></span>
                 )}
@@ -649,23 +901,395 @@ export default function StudentConcernsManager() {
               )}
             </div>
 
-            {/* Admin View-Only Footer */}
-            <div className="p-4 bg-white border-t border-slate-200 shrink-0 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-slate-500 text-xs">
-                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-[11px] font-medium text-slate-500">
-                  View-only mode: Ang pagtugon at pag-reply sa student tickets ay nakalaan para sa IT Support Helpdesk.
-                </span>
+            {/* Quick Reply Presets & Input Composer */}
+            <div className="p-4 bg-white border-t border-slate-200 shrink-0 space-y-2.5">
+              {/* Presets */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Presets:</span>
+                <button
+                  type="button"
+                  onClick={() => insertPresetReply("Good day! We have reviewed your account in User Accounts & Roles. Your credentials have been successfully updated.")}
+                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Credentials Updated
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertPresetReply("Good day! Your previous password has been removed for security. Please log in using the 6-digit OTP code sent to your email to create a new password.")}
+                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Password Removed
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertPresetReply("Your inquiry is currently being evaluated with the School Registrar. We will provide updates once verified.")}
+                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Under Review
+                </button>
+              </div>
+
+              {/* Reply Form */}
+              <form onSubmit={handleSendReply} className="space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs mb-2">
+                  <div className="flex items-start sm:items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                      <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-bold text-red-950 block">
+                        Deliver the response directly to {activeConcern.studentName}'s Gmail inbox?
+                      </span>
+                      <span className="text-[11px] text-red-800">
+                        Click <strong>Reply via Gmail</strong> to open a pre-filled draft in Google Mail to <strong>{activeConcern.email}</strong>.
+                      </span>
+                    </div>
+                  </div>
+                  {activeConcern?.email && activeConcern.email.includes("@") && (
+                    <button
+                      type="button"
+                      onClick={handleOpenGmailReply}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-md shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 transition-colors"
+                      title="Open Gmail Compose with pre-filled draft reply"
+                    >
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                      </svg>
+                      <span>Open in Gmail</span>
+                    </button>
+                  )}
+                </div>
+                  <textarea
+                  rows={3}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Type official response to the student..."
+                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:bg-white focus:border-[#002060] outline-none resize-none leading-relaxed"
+                  required
+                />
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <label className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={modalStatus === "RESOLVED"}
+                        onChange={(e) => setModalStatus(e.target.checked ? "RESOLVED" : "IN_PROGRESS")}
+                        className="rounded text-[#002060] focus:ring-0"
+                      />
+                      <span>Mark ticket as RESOLVED with this reply</span>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveConcern(null)}
+                      className="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-lg hover:bg-slate-50 cursor-pointer"
+                    >
+                      Close
+                    </button>
+
+                    {activeConcern?.email && activeConcern.email.includes("@") && (
+                      <button
+                        type="button"
+                        onClick={handleOpenGmailReply}
+                        className="px-3.5 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer flex items-center gap-1.5 transition-colors"
+                        title="Send reply directly via Google Mail"
+                      >
+                        <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                        </svg>
+                        <span>Reply via Gmail</span>
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={isSendingReply || !replyText.trim()}
+                      className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white font-bold text-xs rounded-lg shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-2"
+                    >
+                      {isSendingReply ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                          <span>Sending Reply...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          <span>Save Reply in System</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gmail Ingest & Auto-Sync Modal */}
+      {showGmailSyncModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden font-sans animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between border-b-2 border-amber-400">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-red-500/20 border border-red-400/30 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                    Gmail Integration &bull; dumalnext@gmail.com
+                  </span>
+                  <h2 className="text-base font-bold text-white">
+                    Sync &amp; Ingest Inbound Student Emails
+                  </h2>
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveConcern(null)}
-                className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer"
+                onClick={() => setShowGmailSyncModal(false)}
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
               >
-                Close
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
+            </div>
+
+            {/* Modal Tabs */}
+            <div className="flex border-b border-slate-200 bg-slate-50 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setGmailSyncTab("manual")}
+                className={`flex-1 py-2.5 px-3 text-center cursor-pointer border-b-2 transition-all flex items-center justify-center gap-1.5 ${
+                  gmailSyncTab === "manual"
+                    ? "border-[#002060] bg-white text-[#002060]"
+                    : "border-transparent text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Paste Email (Quick Ingest)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGmailSyncTab("guide")}
+                className={`flex-1 py-2.5 px-3 text-center cursor-pointer border-b-2 transition-all flex items-center justify-center gap-1.5 ${
+                  gmailSyncTab === "guide"
+                    ? "border-[#002060] bg-white text-[#002060]"
+                    : "border-transparent text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Automated Forwarding Setup</span>
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {gmailSyncTab === "manual" ? (
+                <form onSubmit={handleIngestEmail} className="space-y-3.5">
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 leading-relaxed">
+                    If you received an email at <span className="font-bold text-[#002060]">dumalnext@gmail.com</span>, paste its details here to immediately log it as an official ticket in the Dumalneg NHS system.
+                  </div>
+
+                  {ingestFeedback && (
+                    <div
+                      className={`p-3 rounded-lg text-xs flex items-start gap-2 ${
+                        ingestFeedback.type === "success"
+                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                          : "bg-rose-50 text-rose-800 border border-rose-200"
+                      }`}
+                    >
+                      <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{ingestFeedback.text}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Student Sender Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={ingestEmailFrom}
+                      onChange={(e) => setIngestEmailFrom(e.target.value)}
+                      placeholder="e.g. student@gmail.com"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-[#002060] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Subject
+                    </label>
+                    <input
+                      type="text"
+                      value={ingestEmailSubject}
+                      onChange={(e) => setIngestEmailSubject(e.target.value)}
+                      placeholder="Subject of inbound email"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-[#002060] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Email Message Body
+                    </label>
+                    <textarea
+                      rows={5}
+                      value={ingestEmailBody}
+                      onChange={(e) => setIngestEmailBody(e.target.value)}
+                      placeholder="Paste the message received from the student here..."
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#002060] outline-none leading-relaxed"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowGmailSyncModal(false)}
+                      className="py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isIngestingEmail}
+                      className="py-2 px-4 bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {isIngestingEmail ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                          <span>Ingesting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Process & Add to Concerns</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-3.5 text-xs text-slate-700 leading-relaxed">
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-950 font-medium">
+                    Want every email received at <span className="font-bold text-[#002060]">dumalnext@gmail.com</span> to automatically flow into the Concerns Desk without manual copy-pasting?
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                      Quick 3-Step Google Apps Script Automation Setup:
+                    </h4>
+                    <ol className="list-decimal pl-5 space-y-1.5 text-[11px] text-slate-700">
+                      <li>
+                        Log in to <strong>dumalnext@gmail.com</strong> and open{" "}
+                        <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-blue-700 font-bold underline">
+                          script.google.com
+                        </a>.
+                      </li>
+                      <li>Click <strong>New Project</strong> and paste the code below:</li>
+                    </ol>
+                  </div>
+
+                  <div className="relative">
+                    <pre className="p-3 bg-slate-900 text-slate-100 rounded-lg text-[10px] font-mono overflow-x-auto max-h-48 leading-relaxed">
+{`function forwardDumalnegEmails() {
+  var threads = GmailApp.search('is:unread to:dumalnext@gmail.com');
+  for (var i = 0; i < threads.length; i++) {
+    var messages = threads[i].getMessages();
+    for (var j = 0; j < messages.length; j++) {
+      var msg = messages[j];
+      if (msg.isUnread()) {
+        var payload = {
+          from: msg.getFrom(),
+          to: msg.getTo(),
+          subject: msg.getSubject(),
+          text: msg.getPlainBody() || msg.getBody()
+        };
+        var options = {
+          method: 'post',
+          contentType: 'application/json',
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        };
+        UrlFetchApp.fetch('https://dumalnext-it-support.vercel.app/api/concerns/inbound', options);
+        msg.markRead();
+      }
+    }
+  }
+}`}
+                    </pre>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const scriptText = `function forwardDumalnegEmails() {
+  var threads = GmailApp.search('is:unread to:dumalnext@gmail.com');
+  for (var i = 0; i < threads.length; i++) {
+    var messages = threads[i].getMessages();
+    for (var j = 0; j < messages.length; j++) {
+      var msg = messages[j];
+      if (msg.isUnread()) {
+        var payload = {
+          from: msg.getFrom(),
+          to: msg.getTo(),
+          subject: msg.getSubject(),
+          text: msg.getPlainBody() || msg.getBody()
+        };
+        var options = {
+          method: 'post',
+          contentType: 'application/json',
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        };
+        UrlFetchApp.fetch('https://dumalnext-it-support.vercel.app/api/concerns/inbound', options);
+        msg.markRead();
+      }
+    }
+  }
+}`;
+                        await navigator.clipboard.writeText(scriptText);
+                        setScriptCopied(true);
+                        setTimeout(() => setScriptCopied(false), 3000);
+                      }}
+                      className="absolute top-2 right-2 py-1 px-2.5 bg-white/20 hover:bg-white/30 text-white rounded text-[10px] font-bold cursor-pointer transition-colors"
+                    >
+                      {scriptCopied ? "Copied!" : "Copy Script"}
+                    </button>
+                  </div>
+
+                  <div className="space-y-1.5 text-[11px] text-slate-700">
+                    <p>
+                      3. In the left sidebar of Google Apps Script, click <strong>Triggers (clock icon)</strong> then <strong>Add Trigger</strong>.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-slate-600">
+                      <li>Choose function: <strong>forwardDumalnegEmails</strong></li>
+                      <li>Select event source: <strong>Time-driven</strong></li>
+                      <li>Type of time based trigger: <strong>Minutes timer</strong> then <strong>Every 1 minute</strong></li>
+                    </ul>
+                    <p className="text-emerald-700 font-bold pt-1">
+                      All inbound emails sent to dumalnext@gmail.com will now automatically synchronize to the Concerns Desk within 60 seconds!
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

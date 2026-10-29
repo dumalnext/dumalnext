@@ -37,6 +37,14 @@ export default function UserRoleAuditor() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
 
+  // Pagination State (Limit 10 per page)
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedRole, searchQuery, activeSearch]);
+
   // Credential Security Controls Modal Box State
   const [showCredentialModal, setShowCredentialModal] = useState(false);
   const [isEditingLrn, setIsEditingLrn] = useState(false);
@@ -404,6 +412,42 @@ export default function UserRoleAuditor() {
     return matchesRole && matchesSearch;
   });
 
+  // Pagination Calculations (Limit 10 per page)
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE) || 1;
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, filteredUsers.length);
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  const getVisiblePageNumbers = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const delta = 2;
+    const range: number[] = [];
+    for (
+      let i = Math.max(2, safeCurrentPage - delta);
+      i <= Math.min(totalPages - 1, safeCurrentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (safeCurrentPage - delta > 2) {
+      range.unshift(-1);
+    }
+    if (safeCurrentPage + delta < totalPages - 1) {
+      range.push(-2);
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
+  };
+
   return (
     <div className="space-y-6 font-sans">
       <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white rounded-xl p-5 sm:p-6 shadow-md border border-[#001744] border-t-4 border-t-amber-400">
@@ -616,12 +660,12 @@ export default function UserRoleAuditor() {
       </div>
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between flex-wrap gap-2">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
             Registered Users Directory &bull; Dumalneg National High School
           </h3>
           <span className="text-[11px] font-bold text-[#002060] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
-            Displaying {filteredUsers.length} of {users.length}
+            Displaying {filteredUsers.length} of {users.length} {filteredUsers.length > PAGE_SIZE ? `(Showing ${startIndex + 1}–${endIndex})` : ""}
           </span>
         </div>
 
@@ -647,7 +691,7 @@ export default function UserRoleAuditor() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredUsers.map((user) => {
+                {paginatedUsers.map((user) => {
                   let badgeClass = "bg-slate-100 text-slate-800 border-slate-300";
                   if (user.userRole === "admin") badgeClass = "bg-purple-100 text-purple-900 border-purple-300";
                   if (user.userRole === "teacher") badgeClass = "bg-blue-100 text-blue-900 border-blue-300";
@@ -716,6 +760,72 @@ export default function UserRoleAuditor() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls (Limit 10 per page) */}
+        {!isLoading && filteredUsers.length > PAGE_SIZE && (
+          <div className="px-5 py-3.5 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans">
+            <div className="text-slate-600">
+              Page <strong className="text-[#002060]">{safeCurrentPage}</strong> of{" "}
+              <strong className="text-[#002060]">{totalPages}</strong> &bull; Showing{" "}
+              <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{" "}
+              <strong>{filteredUsers.length}</strong> user(s) (10 per page)
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safeCurrentPage <= 1}
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                  safeCurrentPage <= 1
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                }`}
+              >
+                Prev
+              </button>
+
+              {getVisiblePageNumbers().map((pageNum, idx) => {
+                if (pageNum < 0) {
+                  return (
+                    <span key={`ellipsis-${idx}`} className="px-2 py-1 text-slate-400 font-bold">
+                      &hellip;
+                    </span>
+                  );
+                }
+                const isActive = pageNum === safeCurrentPage;
+                return (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                      isActive
+                        ? "bg-[#002060] border-[#002060] text-white"
+                        : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safeCurrentPage >= totalPages}
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                  safeCurrentPage >= totalPages
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                }`}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
