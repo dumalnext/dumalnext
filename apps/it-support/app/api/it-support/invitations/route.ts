@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
+import { sendStaffInvitationEmail } from "@/lib/emailDispatcher";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -311,11 +312,28 @@ export async function POST(req: NextRequest) {
     const inviteUrl = `${portalBaseUrl}/accept-invite?token=${token}`;
     const redirectTo = `${portalBaseUrl}/accept-invite`;
 
-    // Send official invitation email via Supabase Auth Admin API (triggers Supabase's 'Invite user' email template)
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
     let emailSent = false;
     let emailError: string | null = null;
+
+    // 1. Direct Email Dispatch via Nodemailer (Gmail SMTP) or Resend API
+    try {
+      const directResult = await sendStaffInvitationEmail(supabase, {
+        to: cleanEmail,
+        fullName: fullName ? String(fullName).trim() : "",
+        role,
+        department: department ? String(department).trim() : "",
+        inviteUrl,
+      });
+      if (directResult.success && (directResult.provider === "gmail_smtp" || directResult.provider === "resend")) {
+        emailSent = true;
+      }
+    } catch (dispErr: any) {
+      console.warn("Direct staff invitation email warning:", dispErr?.message);
+    }
+
+    // 2. Dispatch official invitation email via Supabase Auth Admin API
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
     if (serviceRoleKey && supabaseUrl) {
       try {
@@ -340,11 +358,24 @@ export async function POST(req: NextRequest) {
           emailSent = true;
         } else if (inviteErr) {
           console.warn("Supabase auth.admin.inviteUserByEmail notice:", inviteErr.message);
-          emailError = inviteErr.message;
+          // If the email already exists in Supabase Auth, trigger password recovery / reset link so they still receive an onboarding email
+          if (inviteErr.message?.toLowerCase().includes("already registered") || inviteErr.message?.toLowerCase().includes("already exists")) {
+            try {
+              const { error: resetErr } = await adminAuthClient.auth.resetPasswordForEmail(cleanEmail, {
+                redirectTo,
+              });
+              if (!resetErr) {
+                emailSent = true;
+              }
+            } catch {}
+          }
+          if (!emailSent) {
+            emailError = inviteErr.message;
+          }
         }
       } catch (err: any) {
         console.warn("Supabase auth admin error:", err?.message);
-        emailError = err?.message;
+        if (!emailSent) emailError = err?.message;
       }
     }
 
