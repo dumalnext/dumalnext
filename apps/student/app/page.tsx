@@ -16,7 +16,6 @@ import EmailSetupGuard from "@/components/EmailSetupGuard";
 import { CopyChip, PasswordStrengthMeter, triggerPortalToast } from "@/components/ui/PortalUI";
 import { PushNotificationModal } from "@/components/ui/PushNotificationButton";
 import { useLanguage } from "@/lib/context/LanguageContext";
-import LanguageSelector from "@/components/ui/LanguageSelector";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -1771,7 +1770,6 @@ function StudentHomeContent() {
                         </h2>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <LanguageSelector className="scale-90 origin-right" />
                         <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
                           S.Y. {schoolYear || "2026-2027"}
                         </span>
@@ -2030,7 +2028,6 @@ function StudentHomeContent() {
                         </h2>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <LanguageSelector className="scale-90 origin-right" />
                         <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
                           S.Y. {schoolYear || "2026-2027"}
                         </span>
