@@ -15,6 +15,8 @@ import { PasswordResetModal, IdentityRecoveryModal } from "@/components/Credenti
 import EmailSetupGuard from "@/components/EmailSetupGuard";
 import { CopyChip, PasswordStrengthMeter, triggerPortalToast } from "@/components/ui/PortalUI";
 import { PushNotificationModal } from "@/components/ui/PushNotificationButton";
+import { useLanguage } from "@/lib/context/LanguageContext";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 function StudentHomeContent() {
   const router = useRouter();
@@ -1639,10 +1641,10 @@ function StudentHomeContent() {
                       Dumalneg, Ilocos Norte &bull; Junior &amp; Senior High School
                     </p>
                     <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">
-                      Online Basic Education Admission &amp; Continuing Enrollment
+                      {t("hero.title", "Online Basic Education Admission & Continuing Enrollment")}
                     </h2>
                     <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                      Official learner gateway for incoming Grade 7, Grade 11, transferees, and continuing learners of Dumalneg National High School.
+                      {t("hero.desc", "Official learner gateway for incoming Grade 7, Grade 11, transferees, and continuing learners of Dumalneg National High School.")}
                     </p>
                   </div>
                 </div>
@@ -1651,7 +1653,7 @@ function StudentHomeContent() {
                 <div className="p-5 sm:p-6 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-200 pb-3">
                     <h3 className="text-sm sm:text-base font-bold text-slate-900">
-                      How to Enroll Online in 4 Simple Steps
+                      {t("steps.header", "How to Enroll Online in 4 Simple Steps")}
                     </h3>
                     <span className="text-[11px] font-medium text-slate-500">
                       Grades 7–10 (JHS) &amp; Grades 11–12 (SHS)
@@ -1665,10 +1667,10 @@ function StudentHomeContent() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-900">
-                          Create Account &amp; Verify Gmail
+                          {t("steps.step1Title", "Create Account & Verify Gmail")}
                         </h4>
                         <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          Register with your PSA full name and active Gmail, then enter the 6-digit verification code.
+                          {t("steps.step1Desc", "Register with your PSA full name and active Gmail, then enter the 6-digit verification code.")}
                         </p>
                       </div>
                     </div>
@@ -1679,10 +1681,10 @@ function StudentHomeContent() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-900">
-                          Fill Out Enrollment Form
+                          {t("steps.step2Title", "Fill Out Enrollment Form")}
                         </h4>
                         <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          Complete the 5-step DepEd form (or 1-click re-enrollment for continuing learners).
+                          {t("steps.step2Desc", "Complete the 5-step DepEd form (or 1-click re-enrollment for continuing learners).")}
                         </p>
                       </div>
                     </div>
@@ -1693,10 +1695,10 @@ function StudentHomeContent() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-900">
-                          Upload School Documents
+                          {t("steps.step3Title", "Upload School Documents")}
                         </h4>
                         <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          Submit clear copies of your PSA Birth Certificate, SF9 Report Card, and 2x2 ID Picture.
+                          {t("steps.step3Desc", "Submit clear copies of your PSA Birth Certificate, SF9 Report Card, and 2x2 ID Picture.")}
                         </p>
                       </div>
                     </div>
@@ -1707,10 +1709,10 @@ function StudentHomeContent() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-900">
-                          Track Status &amp; Class Section
+                          {t("steps.step4Title", "Track Status & Class Section")}
                         </h4>
                         <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          View real-time Administrator approval, check your assigned section, and download your DepEd PDF.
+                          {t("steps.step4Desc", "View real-time Administrator approval, check your assigned section, and download your DepEd PDF.")}
                         </p>
                       </div>
                     </div>
@@ -1758,18 +1760,21 @@ function StudentHomeContent() {
                 >
                   <div>
                     {/* Portal Card Institutional Header */}
-                    <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
+                    <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-2">
                       <div>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-                          Learner Gateway
+                          {t("auth.gateway", "Learner Gateway")}
                         </span>
                         <h2 className="text-base font-bold text-white tracking-tight">
-                          Student Portal Access
+                          {t("auth.accessTitle", "Student Portal Access")}
                         </h2>
                       </div>
-                      <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
-                        S.Y. {schoolYear || "2026-2027"}
-                      </span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <LanguageSelector className="scale-90 origin-right" />
+                        <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                          S.Y. {schoolYear || "2026-2027"}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Clean Segmented Tab Switcher: Sign In vs Create Account */}
@@ -1782,7 +1787,7 @@ function StudentHomeContent() {
                         }}
                         className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs"
                       >
-                        Sign In
+                        {t("auth.signInTab", "Sign In")}
                       </button>
                       <button
                         type="button"
@@ -1793,7 +1798,7 @@ function StudentHomeContent() {
                         }}
                         className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
                       >
-                        Create Account
+                        {t("auth.createAccountTab", "Create Account")}
                       </button>
                     </div>
 
@@ -1801,10 +1806,10 @@ function StudentHomeContent() {
                       <div className="space-y-5">
                       <div className="border-b border-slate-200 pb-3">
                         <h3 className="text-base font-bold text-slate-900">
-                          Sign In to Your Learner Account
+                          {t("auth.signInHeader", "Sign In to Your Learner Account")}
                         </h3>
                         <p className="text-xs text-slate-600 mt-0.5">
-                          Enter your registered email address and password to continue enrollment or check your application status.
+                          {t("auth.signInDesc", "Enter your registered email address and password to continue enrollment or check your application status.")}
                         </p>
                       </div>
 
@@ -1892,7 +1897,7 @@ function StudentHomeContent() {
                       <form onSubmit={handleLoginSubmit} className="space-y-4">
                         <div>
                           <label htmlFor="login-email" className="block text-xs font-bold text-slate-800 mb-1.5">
-                            Registered Email Address <span className="text-red-700">*</span>
+                            {t("auth.emailLabel", "Registered Email Address")} <span className="text-red-700">*</span>
                           </label>
                           <input
                             id="login-email"
@@ -1906,7 +1911,7 @@ function StudentHomeContent() {
                               setLoginEmail(e.target.value);
                               if (loginError) setLoginError("");
                             }}
-                            placeholder="e.g. learner@gmail.com or 12-digit LRN"
+                            placeholder={t("auth.emailPlaceholder", "e.g. learner@gmail.com or 12-digit LRN")}
                             className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
                             disabled={isLoggingIn}
                             required
@@ -1916,14 +1921,14 @@ function StudentHomeContent() {
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
                             <label htmlFor="current-password" className="block text-xs font-bold text-slate-800">
-                              Password <span className="text-red-700">*</span>
+                              {t("auth.passwordLabel", "Password")} <span className="text-red-700">*</span>
                             </label>
                             <button
                               type="button"
                               onClick={() => setShowLoginPassword((prev) => !prev)}
                               className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
                             >
-                              {showLoginPassword ? "Hide Password" : "Show Password"}
+                              {showLoginPassword ? t("auth.hidePassword", "Hide Password") : t("auth.showPassword", "Show Password")}
                             </button>
                           </div>
                           <input
@@ -1937,7 +1942,7 @@ function StudentHomeContent() {
                               setLoginPassword(e.target.value);
                               if (loginError) setLoginError("");
                             }}
-                            placeholder="Enter your account password"
+                            placeholder={t("auth.passwordPlaceholder", "Enter your account password")}
                             className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
                             disabled={isLoggingIn}
                             required
@@ -1950,7 +1955,7 @@ function StudentHomeContent() {
                             disabled={isLoggingIn}
                             className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs"
                           >
-                            {isLoggingIn ? "Signing In... Please Wait" : "Sign In to Student Portal"}
+                            {isLoggingIn ? t("auth.signingIn", "Signing In... Please Wait") : t("auth.signInBtn", "Sign In to Student Portal")}
                           </button>
                         </div>
                         <div className="pt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-t border-slate-100">
@@ -1959,7 +1964,7 @@ function StudentHomeContent() {
                             onClick={handleDirectGmailForgotPassword}
                             className="font-bold text-[#002060] hover:underline cursor-pointer text-left"
                           >
-                            Forgot password? Contact / Email dumalnext@gmail.com
+                            {t("auth.forgotPassword", "Forgot password? Contact / Email dumalnext@gmail.com")}
                           </button>
 
                           <button
@@ -1970,14 +1975,14 @@ function StudentHomeContent() {
                             }}
                             className="text-slate-600 hover:text-slate-900 font-semibold hover:underline cursor-pointer text-[11px] shrink-0"
                           >
-                            Track Concern Status
+                            {t("auth.trackConcern", "Track Concern Status")}
                           </button>
                         </div>
                       </form>
 
                       <div className="pt-3 border-t border-slate-200 text-center">
                         <p className="text-xs text-slate-600">
-                          New applicant or first time using the online portal?{" "}
+                          {t("auth.newApplicant", "New applicant or first time using the online portal?")}{" "}
                           <button
                             type="button"
                             onClick={() => {
@@ -1987,7 +1992,7 @@ function StudentHomeContent() {
                             }}
                             className="font-bold text-[#002060] hover:underline cursor-pointer"
                           >
-                            Create a Student Account
+                            {t("auth.createLink", "Create a Student Account")}
                           </button>
                         </p>
                       </div>
@@ -2014,18 +2019,21 @@ function StudentHomeContent() {
                 >
                   <div>
                     {/* Portal Card Institutional Header */}
-                    <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-3">
+                    <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-2">
                       <div>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-                          Learner Gateway
+                          {t("auth.gateway", "Learner Gateway")}
                         </span>
                         <h2 className="text-base font-bold text-white tracking-tight">
-                          Student Portal Access
+                          {t("auth.accessTitle", "Student Portal Access")}
                         </h2>
                       </div>
-                      <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
-                        S.Y. {schoolYear || "2026-2027"}
-                      </span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <LanguageSelector className="scale-90 origin-right" />
+                        <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                          S.Y. {schoolYear || "2026-2027"}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Clean Segmented Tab Switcher: Sign In vs Create Account */}
@@ -2038,7 +2046,7 @@ function StudentHomeContent() {
                         }}
                         className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
                       >
-                        Sign In
+                        {t("auth.signInTab", "Sign In")}
                       </button>
                       <button
                         type="button"
@@ -2049,7 +2057,7 @@ function StudentHomeContent() {
                         }}
                         className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs"
                       >
-                        Create Account
+                        {t("auth.createAccountTab", "Create Account")}
                       </button>
                     </div>
 
@@ -2057,10 +2065,10 @@ function StudentHomeContent() {
                       <div className="space-y-4">
                       <div className="border-b border-slate-200 pb-3">
                         <h3 className="text-base font-bold text-slate-900">
-                          Create Student Applicant Account
+                          {t("auth.createHeader", "Create Student Applicant Account")}
                         </h3>
                         <p className="text-xs text-slate-600 mt-0.5">
-                          Enter your official PSA name and active Gmail address to start your online enrollment.
+                          {t("auth.createDesc", "Enter your official PSA name and active Gmail address to start your online enrollment.")}
                         </p>
                       </div>
 

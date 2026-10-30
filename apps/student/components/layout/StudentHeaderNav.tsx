@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
 import { isApplicationInTerm, extractTermNumber } from "@/lib/utils/academicTerm";
 import { PwaInstallHeaderButton, PwaInstallDrawerCard } from "@/components/ui/PwaInstallPrompt";
+import LanguageSelector from "@/components/ui/LanguageSelector";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { PushNotificationHeaderButton, PushNotificationDrawerCard } from "@/components/ui/PushNotificationButton";
 
 interface StudentHeaderNavProps {
@@ -458,6 +460,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <PushNotificationHeaderButton />
             <PwaInstallHeaderButton />
+            <LanguageSelector />
 
             {/* Student Identity & Status Pill */}
             <Link
@@ -516,6 +519,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <span>S.Y. {schoolYear || "2026-2027"}</span>
               <span className="hidden sm:inline text-blue-300">&bull; {semester || "Trimester 1"}</span>
             </div>
+            <LanguageSelector />
             {pathname !== "/" && (
               <Link
                 href="/"
@@ -776,6 +780,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             {/* Menu Navigation Links */}
             <div className="p-4 space-y-2">
+              <LanguageSelector variant="drawer" />
               {user && (
                 <>
                   <PwaInstallDrawerCard />
