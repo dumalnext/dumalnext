@@ -20,6 +20,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const { schoolYear, semester, termNumber } = useEnrollmentControl();
+  const { t } = useLanguage();
   const [appStatus, setAppStatus] = useState<string | null>(null);
   const [appRef, setAppRef] = useState<string | null>(null);
   const [assignedSection, setAssignedSection] = useState<{

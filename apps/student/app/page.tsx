@@ -25,6 +25,7 @@ function StudentHomeContent() {
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
   const { user, login, register, verifyEmailOtp, resendVerification, logout, refreshSession } = useAuth();
   const { isEnrollmentOpen, schoolYear, semester, termNumber, closedMessage } = useEnrollmentControl();
+  const { t } = useLanguage();
 
   // IT Support Student Concerns Modal State
   const [showConcernModal, setShowConcernModal] = useState(false);
@@ -1746,7 +1747,7 @@ function StudentHomeContent() {
                     FRONT FACE: SIGN IN (0deg)
                     ------------------------------------------------------------- */}
                 <div
-                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden ${
+                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] ${
                     activeTab === "signin"
                       ? "relative z-10 pointer-events-auto"
                       : "absolute inset-x-0 top-0 z-0 pointer-events-none select-none"
@@ -2005,7 +2006,7 @@ function StudentHomeContent() {
                     BACK FACE: CREATE ACCOUNT (180deg)
                     ------------------------------------------------------------- */}
                 <div
-                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] overflow-hidden ${
+                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] ${
                     activeTab === "register"
                       ? "relative z-10 pointer-events-auto"
                       : "absolute inset-x-0 top-0 z-0 pointer-events-none select-none"

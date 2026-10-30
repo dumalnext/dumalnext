@@ -101,7 +101,7 @@ export default function LanguageSelector({ className = "", variant = "header" }:
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-1.5 w-36 bg-white border-2 border-[#002060] rounded-[4px] shadow-lg z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
+          className="absolute right-0 mt-1.5 w-36 bg-white border-2 border-[#002060] rounded-[4px] shadow-xl z-[100] py-1 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
           role="menu"
           aria-orientation="vertical"
         >
