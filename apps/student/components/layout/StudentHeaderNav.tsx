@@ -516,8 +516,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <span>S.Y. {schoolYear || "2026-2027"}</span>
               <span className="hidden sm:inline text-blue-300">&bull; {semester || "Trimester 1"}</span>
             </div>
-            <PushNotificationHeaderButton />
-            <PwaInstallHeaderButton />
             {pathname !== "/" && (
               <Link
                 href="/"
@@ -778,8 +776,12 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             {/* Menu Navigation Links */}
             <div className="p-4 space-y-2">
-              <PwaInstallDrawerCard />
-              <PushNotificationDrawerCard />
+              {user && (
+                <>
+                  <PwaInstallDrawerCard />
+                  <PushNotificationDrawerCard />
+                </>
+              )}
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
                 PORTAL MODULES
               </span>
