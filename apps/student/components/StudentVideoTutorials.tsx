@@ -239,8 +239,8 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     badgeLabel: "Continuing JHS",
     title: "INCOMING GRADE 8, 9, 10 (2026) | DUMALNEXT SYSTEM",
     description: "Enrollment guide for continuing Junior High School learners of Dumalneg NHS (Grade 8, Grade 9, and Grade 10). With a prescribed core curriculum in JHS, enrollment is fast and seamless using 1-Click Continuing Enrollment.",
-    videoId: "VlM7VKMVcX8",
-    youtubeUrl: "https://youtu.be/VlM7VKMVcX8",
+    videoId: "nU3-Fay9bfo",
+    youtubeUrl: "https://youtube.com/shorts/nU3-Fay9bfo",
     targetAudience: "For current Dumalneg NHS Junior High School learners.",
     keyPoints: [
       "JHS follows a prescribed core curriculum, so no elective subjects are required.",
