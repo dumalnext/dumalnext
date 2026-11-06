@@ -38,19 +38,54 @@ export function usePwaInstall() {
     }
     return null;
   });
-  const [isStandalone, setIsStandalone] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(() => {
+    if (typeof window !== "undefined") {
+      return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true
+      );
+    }
+    return false;
+  });
+  const [isInstalled, setIsInstalled] = useState(() => {
+    if (typeof window !== "undefined") {
+      const isStandaloneMode =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true;
+      return isStandaloneMode || localStorage.getItem("dnhs_pwa_installed") === "true";
+    }
+    return false;
+  });
   const [isIos, setIsIos] = useState(false);
 
   useEffect(() => {
-    // Check if running inside installed standalone PWA
+    // Check if running inside installed standalone PWA or previously installed on device
     const checkStandalone = () => {
       const isStandaloneMode =
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true;
       setIsStandalone(isStandaloneMode);
+      if (isStandaloneMode || localStorage.getItem("dnhs_pwa_installed") === "true") {
+        setIsInstalled(true);
+      }
     };
 
     checkStandalone();
+
+    // Query browser if related app is installed (Chrome 80+)
+    if (typeof navigator !== "undefined" && "getInstalledRelatedApps" in navigator) {
+      (navigator as any)
+        .getInstalledRelatedApps()
+        .then((apps: any[]) => {
+          if (apps && apps.length > 0) {
+            setIsInstalled(true);
+            try {
+              localStorage.setItem("dnhs_pwa_installed", "true");
+            } catch {}
+          }
+        })
+        .catch(() => {});
+    }
 
     // Check if device is iOS (iPhone, iPad, iPod)
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -76,6 +111,10 @@ export function usePwaInstall() {
 
     const handleAppInstalled = () => {
       setIsStandalone(true);
+      setIsInstalled(true);
+      try {
+        localStorage.setItem("dnhs_pwa_installed", "true");
+      } catch {}
       setDeferredPrompt(null);
       (window as any).__dnhsDeferredPrompt = null;
       cachedPrompt = null;
@@ -103,7 +142,7 @@ export function usePwaInstall() {
   }, []);
 
   const triggerInstall = async (): Promise<"accepted" | "dismissed" | "show_modal" | "already_installed"> => {
-    if (isStandalone) {
+    if (isStandalone || isInstalled) {
       triggerPortalToast("DNHS Portal is already installed on your device.", "info");
       return "already_installed";
     }
@@ -143,6 +182,10 @@ export function usePwaInstall() {
           setDeferredPrompt(null);
           if (typeof window !== "undefined") (window as any).__dnhsDeferredPrompt = null;
           cachedPrompt = null;
+          setIsInstalled(true);
+          try {
+            localStorage.setItem("dnhs_pwa_installed", "true");
+          } catch {}
           return "accepted";
         }
         return "dismissed";
@@ -158,6 +201,7 @@ export function usePwaInstall() {
 
   return {
     isStandalone,
+    isInstalled,
     isIos,
     hasNativePrompt: !!(
       deferredPrompt ||
@@ -348,11 +392,11 @@ export function PwaInstallModal({
  * ZERO EMOJIS - Clean DepEd theme
  */
 export function PwaInstallHeaderButton() {
-  const { isStandalone, isIos, triggerInstall } = usePwaInstall();
+  const { isStandalone, isInstalled, isIos, triggerInstall } = usePwaInstall();
   const [showModal, setShowModal] = useState(false);
 
-  // If already opened inside standalone installed PWA on PC/laptop
-  if (isStandalone) {
+  // If already opened inside standalone installed PWA or previously installed on PC/laptop
+  if (isStandalone || isInstalled) {
     return (
       <span
         className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-950/70 border border-blue-400/30 text-blue-200 text-[10px] font-bold uppercase rounded-[4px]"
@@ -397,10 +441,11 @@ export function PwaInstallHeaderButton() {
  * ZERO EMOJIS - Clean DepEd theme
  */
 export function PwaInstallDrawerCard() {
-  const { isStandalone, isIos, triggerInstall } = usePwaInstall();
+  const { isStandalone, isInstalled, isIos, triggerInstall } = usePwaInstall();
   const [showModal, setShowModal] = useState(false);
 
-  if (isStandalone) return null;
+  // If running inside standalone app OR already installed on this device
+  if (isStandalone || isInstalled) return null;
 
   const handleClick = async () => {
     const outcome = await triggerInstall();
