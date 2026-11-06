@@ -88,31 +88,49 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
           Watch the official Dumalneg National High School video walkthrough to learn the step-by-step process of creating a student portal account and verifying your 6-digit security code via Gmail before enrolling.
         </p>
 
-        {/* Expandable 16:9 Video Container */}
+        {/* Expandable Video Container */}
         {isExpanded && (
-          <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
+          <div className={`relative w-full rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs ${
+            !isPlaying ? "min-h-[235px] sm:min-h-0 sm:aspect-video aspect-video" : "aspect-video"
+          }`}>
             {!isPlaying ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-3 sm:p-6 text-center bg-slate-900 text-white">
-                <div className="mb-1.5 sm:mb-3 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+                <div className="mb-1.5 sm:mb-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
                   Official Video Tutorial
                 </div>
                 <h4 className="text-xs sm:text-base font-bold max-w-md mb-1 sm:mb-2 line-clamp-2 sm:line-clamp-none">
                   How to Create a Student Account
                 </h4>
-                <p className="text-[10px] sm:text-[11px] text-slate-300 max-w-sm mb-2.5 sm:mb-4">
+                <p className="text-[10px] sm:text-[11px] text-slate-300 max-w-sm mb-2 sm:mb-3.5">
                   Click the button below to start watching the video tutorial directly on this page.
                 </p>
-                <div className="flex items-center justify-center">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 w-full max-w-xs sm:max-w-none">
                   <button
                     type="button"
                     onClick={() => setIsPlaying(true)}
-                    className="px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center gap-2"
+                    className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center justify-center gap-2 shrink-0"
                   >
                     <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 20 20">
                       <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                     </svg>
                     <span>Play Tutorial Video</span>
                   </button>
+                  <a
+                    href={youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px] inline-flex items-center justify-center gap-1.5 shrink-0"
+                  >
+                    <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
+                      <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
+                        <polygon points="1,1 9,5 1,9" />
+                      </svg>
+                    </span>
+                    <span>Open in YouTube</span>
+                    <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7V16" />
+                    </svg>
+                  </a>
                 </div>
               </div>
             ) : (
@@ -373,30 +391,48 @@ export function GradeLevelEnrollmentTutorials({
           </p>
         </div>
 
-        {/* Responsive 16:9 Video Player */}
-        <div className="relative w-full aspect-video min-h-[190px] sm:min-h-0 rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
+        {/* Responsive Video Player */}
+        <div className={`relative w-full rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs ${
+          !isPlaying ? "min-h-[235px] sm:min-h-0 sm:aspect-video aspect-video" : "aspect-video"
+        }`}>
           {!isPlaying ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-3 sm:p-6 text-center bg-slate-900 text-white">
-              <div className="mb-1.5 sm:mb-3 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+              <div className="mb-1.5 sm:mb-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
                 {currentTutorial.tabLabel} Enrollment Guide
               </div>
               <h4 className="text-xs sm:text-base font-bold max-w-md mb-1 sm:mb-2 line-clamp-2 sm:line-clamp-none">
                 {currentTutorial.title}
               </h4>
-              <p className="text-[10px] sm:text-[11px] text-slate-300 max-w-sm mb-2.5 sm:mb-4">
+              <p className="text-[10px] sm:text-[11px] text-slate-300 max-w-sm mb-2 sm:mb-3.5">
                 Click the button below to watch the official walkthrough for {currentTutorial.tabLabel}.
               </p>
-              <div className="flex items-center justify-center">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 w-full max-w-xs sm:max-w-none">
                 <button
                   type="button"
                   onClick={() => setIsPlaying(true)}
-                  className="px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center justify-center gap-2 shrink-0"
                 >
                   <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 20 20">
                     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                   </svg>
                   <span>Play Tutorial Video</span>
                 </button>
+                <a
+                  href={currentTutorial.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px] inline-flex items-center justify-center gap-1.5 shrink-0"
+                >
+                  <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
+                    <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
+                      <polygon points="1,1 9,5 1,9" />
+                    </svg>
+                  </span>
+                  <span>Open in YouTube</span>
+                  <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7V16" />
+                  </svg>
+                </a>
               </div>
             </div>
           ) : (
