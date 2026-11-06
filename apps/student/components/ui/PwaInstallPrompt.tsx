@@ -79,7 +79,16 @@ export function usePwaInstall() {
       setDeferredPrompt(null);
       (window as any).__dnhsDeferredPrompt = null;
       cachedPrompt = null;
-      triggerPortalToast("DNHS Portal successfully installed on your device!", "success");
+      // Guard against multiple component instances (Header Button + Drawer Card) firing concurrently
+      if (!(window as any).__dnhsInstalledToastDispatched) {
+        (window as any).__dnhsInstalledToastDispatched = true;
+        triggerPortalToast("DNHS Portal successfully installed on your device!", "success");
+        setTimeout(() => {
+          if (typeof window !== "undefined") {
+            (window as any).__dnhsInstalledToastDispatched = false;
+          }
+        }, 5000);
+      }
     };
 
     window.addEventListener("beforeinstallprompt", handlePrompt);

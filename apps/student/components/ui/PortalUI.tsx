@@ -41,11 +41,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const showToast = useCallback((message: string, type: ToastType = "info") => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    setToasts((prev) => [...prev.slice(-3), { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4200);
+    setToasts((prev) => {
+      // Deduplicate: ignore identical toast messages already displayed on screen
+      if (prev.some((t) => t.message === message)) {
+        return prev;
+      }
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      setTimeout(() => {
+        setToasts((current) => current.filter((t) => t.id !== id));
+      }, 4200);
+      return [...prev.slice(-3), { id, message, type }];
+    });
   }, []);
 
   useEffect(() => {
