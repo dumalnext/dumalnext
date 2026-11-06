@@ -92,40 +92,27 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
         {isExpanded && (
           <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
             {!isPlaying ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900 text-white">
-                <div className="mb-3 px-3 py-1 bg-[#002060] border border-blue-400 text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-3 sm:p-6 text-center bg-slate-900 text-white">
+                <div className="mb-1.5 sm:mb-3 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
                   Official Video Tutorial
                 </div>
-                <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
+                <h4 className="text-xs sm:text-base font-bold max-w-md mb-1 sm:mb-2 line-clamp-2 sm:line-clamp-none">
                   How to Create a Student Account
                 </h4>
-                <p className="text-[11px] text-slate-300 max-w-sm mb-4">
-                  Click the Play button to start watching the video tutorial directly on this page.
+                <p className="text-[10px] sm:text-[11px] text-slate-300 max-w-sm mb-2.5 sm:mb-4">
+                  Click the button below to start watching the video tutorial directly on this page.
                 </p>
-                <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="flex items-center justify-center">
                   <button
                     type="button"
                     onClick={() => setIsPlaying(true)}
-                    className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer"
+                    className="px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center gap-2"
                   >
-                    Play Tutorial Video
-                  </button>
-                  <a
-                    href={youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
-                  >
-                    <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
-                      <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
-                        <polygon points="1,1 9,5 1,9" />
-                      </svg>
-                    </span>
-                    <span>Watch on YouTube</span>
-                    <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7V16" />
+                    <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                     </svg>
-                  </a>
+                    <span>Play Tutorial Video</span>
+                  </button>
                 </div>
               </div>
             ) : (
@@ -341,17 +328,23 @@ export function GradeLevelEnrollmentTutorials({
       {isExpanded && (
         <>
       {/* Grade Selector Tabs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 border-b-2 border-slate-200 text-center font-bold text-xs bg-slate-50">
-        {ENROLLMENT_TUTORIALS.map((tutorial) => {
+      <div className="grid grid-cols-2 md:grid-cols-4 border-b border-slate-200 text-center font-bold text-xs bg-slate-50">
+        {ENROLLMENT_TUTORIALS.map((tutorial, index) => {
           const isActive = activeTab === tutorial.id;
           return (
             <button
               key={tutorial.id}
               type="button"
               onClick={() => handleTabChange(tutorial.id)}
-              className={`p-3 sm:py-3.5 sm:px-4 text-left sm:text-center transition-colors border-r last:border-r-0 border-slate-200 cursor-pointer ${
+              className={`p-3 sm:py-3.5 sm:px-4 text-left sm:text-center transition-colors cursor-pointer relative ${
+                index % 2 === 0 ? "border-r border-slate-200 md:border-r" : "border-r-0 md:border-r"
+              } ${
+                index === 3 ? "md:border-r-0" : ""
+              } ${
+                index < 2 ? "border-b border-slate-200 md:border-b-0" : ""
+              } ${
                 isActive
-                  ? "bg-white text-[#002060] border-b-2 border-b-[#002060] shadow-2xs"
+                  ? "bg-white text-[#002060] font-bold shadow-2xs after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#002060]"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
@@ -369,22 +362,9 @@ export function GradeLevelEnrollmentTutorials({
       <div className="p-4 sm:p-6 space-y-4">
         {/* Active Tutorial Title and Description */}
         <div className="border-b border-slate-200 pb-3">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <h4 className="text-xs sm:text-sm font-bold text-[#002060]">
-              {currentTutorial.title}
-            </h4>
-            <a
-              href={currentTutorial.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-300 transition-colors rounded-[4px]"
-            >
-              <span>Open in YouTube</span>
-              <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M7 7h10v10" />
-              </svg>
-            </a>
-          </div>
+          <h4 className="text-xs sm:text-sm font-bold text-[#002060] mb-1">
+            {currentTutorial.title}
+          </h4>
           <p className="text-xs text-slate-600 leading-relaxed">
             {currentTutorial.description}
           </p>
@@ -394,37 +374,29 @@ export function GradeLevelEnrollmentTutorials({
         </div>
 
         {/* Responsive 16:9 Video Player */}
-        <div className="relative w-full aspect-video rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
+        <div className="relative w-full aspect-video min-h-[190px] sm:min-h-0 rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs">
           {!isPlaying ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900 text-white">
-              <div className="mb-3 px-3 py-1 bg-[#002060] border border-blue-400 text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-3 sm:p-6 text-center bg-slate-900 text-white">
+              <div className="mb-1.5 sm:mb-3 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
                 {currentTutorial.tabLabel} Enrollment Guide
               </div>
-              <h4 className="text-sm sm:text-base font-bold max-w-md mb-2">
+              <h4 className="text-xs sm:text-base font-bold max-w-md mb-1 sm:mb-2 line-clamp-2 sm:line-clamp-none">
                 {currentTutorial.title}
               </h4>
-              <p className="text-[11px] text-slate-300 max-w-sm mb-4">
-                Click the Play button to watch the official walkthrough for {currentTutorial.tabLabel}.
+              <p className="text-[10px] sm:text-[11px] text-slate-300 max-w-sm mb-2.5 sm:mb-4">
+                Click the button below to watch the official walkthrough for {currentTutorial.tabLabel}.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex items-center justify-center">
                 <button
                   type="button"
                   onClick={() => setIsPlaying(true)}
-                  className="px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer"
+                  className="px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center gap-2"
                 >
-                  Play Tutorial Video
-                </button>
-                <a
-                  href={currentTutorial.youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px]"
-                >
-                  <span>Open in YouTube</span>
-                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M7 7h10v10" />
+                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                   </svg>
-                </a>
+                  <span>Play Tutorial Video</span>
+                </button>
               </div>
             </div>
           ) : (
