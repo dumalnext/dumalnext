@@ -31,7 +31,6 @@ export const viewport: Viewport = {
 
 import StudentProviders from "@/components/providers/StudentProviders";
 import StudentHeaderNav from "@/components/layout/StudentHeaderNav";
-import Link from "next/link";
 
 export default function StudentLayout({
   children,
@@ -83,32 +82,8 @@ export default function StudentLayout({
       </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
         <StudentProviders>
-          {/* DepEd & DNHS Student Portal Header (Zero Emojis/Icons) */}
-          <header className="deped-header px-3 sm:px-6 py-2 sm:py-3 shadow-md relative z-40">
-            <StudentHeaderNav>
-              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <Link
-                  href="/"
-                  className="shrink-0 flex items-center justify-center group transition-transform active:scale-95"
-                  title="Dumalneg National High School Portal Home"
-                >
-                  <img
-                    src="/dumalneg-logo.png"
-                    alt="Dumalneg National High School Official Seal"
-                    className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
-                  />
-                </Link>
-                <div className="min-w-0">
-                  <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold tracking-tight text-white truncate">
-                    Dumalneg National High School
-                  </h1>
-                  <span className="text-[11px] sm:text-xs text-amber-300 font-semibold block truncate">
-                    Student Portal
-                  </span>
-                </div>
-              </div>
-            </StudentHeaderNav>
-          </header>
+          {/* DepEd & DNHS Official Student Portal Header Navigation */}
+          <StudentHeaderNav />
 
           {/* Main Content Area with Adaptive Mobile & Tablet Padding */}
           <main className="flex-1 max-w-7xl w-full mx-auto px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">

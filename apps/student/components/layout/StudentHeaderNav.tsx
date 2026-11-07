@@ -354,196 +354,147 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
   const sectionHref = user ? "/section" : "/?tab=signin&reason=auth_required";
 
   return (
-    <div className="relative max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 w-full">
-      {/* Upper-Left: Mobile Hamburger Button (Logged-in Mobile/Tablet Only) + School Branding */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-        {user && (
-          <button
-            ref={buttonRef}
-            type="button"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="lg:hidden relative z-10 flex items-center gap-2 px-2.5 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 hover:border-white text-white text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm rounded-[4px] active:scale-95 shrink-0"
-            aria-label="Toggle Portal Navigation Menu"
-            aria-expanded={isMenuOpen}
-          >
-            <div className="w-4 h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
-              <span
-                className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${
-                  isMenuOpen ? "rotate-45 translate-y-[5px]" : ""
-                }`}
-              />
-              <span
-                className={`w-full h-0.5 bg-white transition-all duration-300 ${
-                  isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
-                }`}
-              />
-              <span
-                className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${
-                  isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""
-                }`}
-              />
-            </div>
-            <span className="hidden sm:inline">{isMenuOpen ? "Close" : "Menu"}</span>
-          </button>
-        )}
-
-        {children}
+    <header className="deped-header border-t-4 border-t-amber-400 border-b border-[#001744] bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white shadow-md font-sans">
+      {/* 1. Top DepEd Region I Institutional Strip */}
+      <div className="bg-[#001540]/60 border-b border-white/10 text-white px-3 sm:px-6 lg:px-8 py-2">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+            <span className="font-semibold tracking-wider text-blue-100 uppercase text-[10px] sm:text-xs">
+              Republic of the Philippines &bull; Department of Education &bull; Region I
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px]">
+            <span className="text-blue-200 font-medium shrink-0">Schools Division of Ilocos Norte</span>
+            <span className="bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2.5 py-0.5 font-bold uppercase tracking-wider rounded-full text-[10px]">
+              Student &amp; Learner Portal
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Upper-Right: Clean Context-Aware Navigation */}
-      <div className="flex items-center gap-2 lg:gap-2.5 shrink-0 relative z-10">
+      {/* 2. Main Title & Nav Strip */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-4.5 flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4">
+        {/* Left: School Seal & Official Full Title */}
+        <Link href="/" className="flex items-center gap-3.5 min-w-0 group" title="Dumalneg National High School Portal Home">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-amber-400 shadow-md shrink-0 flex items-center justify-center overflow-hidden bg-white/10 group-hover:scale-105 transition-transform">
+            <img
+              src="/dumalneg-logo.png"
+              alt="Dumalneg National High School Seal"
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-amber-300 uppercase tracking-widest block truncate">
+              Official Basic Education Learner Portal
+            </span>
+            <h1 className="text-lg sm:text-2xl font-extrabold tracking-tight text-white leading-tight mt-0.5">
+              Dumalneg National High School
+            </h1>
+            <p className="text-xs text-blue-100/85 hidden sm:block mt-0.5">
+              Dumalneg, Ilocos Norte &bull; Student Online Enrollment &amp; Academic Records
+            </p>
+          </div>
+        </Link>
+
+        {/* Right: Authenticated Student Account Badge & Quick Actions */}
         {user ? (
-          <>
-            {/* Desktop Horizontal Tabs (Replaces Burger Menu on Desktop) */}
-            <nav aria-label="Primary Portal Navigation" className="hidden lg:flex items-center gap-1 mr-1">
-              <Link
-                href="/"
-                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors flex items-center gap-1.5 ${
-                  pathname === "/"
-                    ? "bg-white text-[#002060] shadow-xs"
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span>Dashboard</span>
-              </Link>
-              <Link
-                href={enrollHref}
-                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors flex items-center gap-1.5 ${
-                  pathname === "/enroll"
-                    ? "bg-white text-[#002060] shadow-xs"
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Enrollment</span>
-              </Link>
-              <Link
-                href={trackHref}
-                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors flex items-center gap-1.5 ${
-                  pathname === "/track"
-                    ? "bg-white text-[#002060] shadow-xs"
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-                <span>Track Status</span>
-              </Link>
-              <Link
-                href={sectionHref}
-                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors flex items-center gap-1.5 ${
-                  pathname === "/section"
-                    ? "bg-white text-[#002060] shadow-xs"
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span>My Section</span>
-              </Link>
-              <Link
-                href="/grades"
-                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors flex items-center gap-1.5 ${
-                  pathname === "/grades"
-                    ? "bg-white text-[#002060] shadow-xs"
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <span>My Grade</span>
-              </Link>
-              <Link
-                href={profileHref}
-                className={`px-3 py-1.5 text-xs font-bold rounded-[4px] transition-colors flex items-center gap-1.5 ${
-                  pathname === "/profile"
-                    ? "bg-white text-[#002060] shadow-xs"
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>My Profile</span>
-              </Link>
-            </nav>
+          <div className="flex items-center justify-between md:justify-end gap-2.5 sm:gap-3 shrink-0">
+            {/* Quick Action Utility Buttons */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <PushNotificationHeaderButton />
+              <PwaInstallHeaderButton />
+            </div>
 
-            <PushNotificationHeaderButton />
-            <PwaInstallHeaderButton />
-
-            {/* Student Identity & Status Pill */}
+            {/* Active Student Session Pill */}
             <Link
               href={profileHref}
-              className="flex items-center gap-2 px-2.5 py-1.5 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-white text-xs transition-colors rounded-[4px] shadow-xs"
-              title="View your learner profile and account settings"
+              className="border border-white/20 bg-white/10 hover:bg-white/15 backdrop-blur-xs px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs rounded-lg min-w-0 transition-colors flex items-center gap-2.5 sm:gap-3 group"
+              title="View Student Profile & Credentials"
             >
               {photoUrl ? (
                 <img
                   src={photoUrl}
-                  alt="2x2"
-                  className="w-5 h-5 rounded-full object-cover border border-white/40 bg-white shrink-0"
+                  alt={user.fullName || user.firstName}
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-amber-400 shadow-xs bg-white shrink-0"
                 />
               ) : (
-                <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] flex items-center justify-center shrink-0">
-                  {user.firstName?.[0] || "S"}
-                </span>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 border-2 border-amber-300 text-amber-200 font-black text-xs sm:text-sm flex items-center justify-center shrink-0">
+                  {user.firstName?.charAt(0) || "S"}{user.lastName?.charAt(0) || "T"}
+                </div>
               )}
-              <span className="font-bold tracking-tight truncate max-w-[95px] sm:max-w-[140px]">
-                {user.firstName}
-              </span>
-              {appStatus === "Approved" ? (
-                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
-                  APPROVED
-                </span>
-              ) : appStatus === "Needs Revision" ? (
-                <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
-                  REVISION
-                </span>
-              ) : appStatus === "Pending" ? (
-                <span className="text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
-                  PENDING
-                </span>
-              ) : (
-                <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[3px] whitespace-nowrap">
-                  ACTIVE
-                </span>
-              )}
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="text-[10px] text-amber-300 font-semibold uppercase tracking-wider truncate">
+                    Active Learner Session
+                  </span>
+                </div>
+                <div className="font-bold text-white tracking-wide truncate text-xs sm:text-sm mt-0.5 group-hover:text-amber-200 transition-colors">
+                  {user.fullName || `${user.firstName} ${user.lastName}`}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[10px] text-blue-200 block truncate">
+                    {user.lrn ? `LRN: ${user.lrn}` : user.userId}
+                  </span>
+                  {appStatus === "Approved" ? (
+                    <span className="text-[9px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 px-1.5 py-0.2 font-bold uppercase rounded-[3px]">
+                      Approved
+                    </span>
+                  ) : appStatus === "Pending" ? (
+                    <span className="text-[9px] bg-amber-500/30 text-amber-300 border border-amber-400/50 px-1.5 py-0.2 font-bold uppercase rounded-[3px]">
+                      Pending
+                    </span>
+                  ) : (
+                    <span className="text-[9px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 px-1.5 py-0.2 font-bold uppercase rounded-[3px]">
+                      Active
+                    </span>
+                  )}
+                </div>
+              </div>
             </Link>
 
-            {/* Desktop Direct Sign Out Button */}
+            {/* Direct Sign Out Button */}
             <button
               type="button"
               onClick={logout}
-              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-red-600/90 hover:bg-red-700 text-white border border-red-400/40 text-xs font-bold rounded-[4px] transition-colors cursor-pointer shadow-xs"
+              className="px-3 sm:px-4 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 border border-red-500 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer rounded-lg shrink-0 flex items-center gap-1.5"
               title="Sign Out of Student Portal"
             >
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              <span>Sign Out</span>
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
-          </>
+
+            {/* Mobile Hamburger Drawer Button */}
+            <button
+              ref={buttonRef}
+              type="button"
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+              className="lg:hidden flex items-center gap-1.5 px-2.5 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 text-white text-xs font-bold rounded-lg cursor-pointer shrink-0"
+              aria-label="Toggle Portal Navigation Menu"
+              aria-expanded={isMenuOpen}
+            >
+              <div className="w-4 h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
+                <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "rotate-45 translate-y-[5px]" : ""}`} />
+                <span className={`w-full h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"}`} />
+                <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""}`} />
+              </div>
+              <span className="hidden sm:inline text-[11px] uppercase tracking-wider">{isMenuOpen ? "Close" : "Menu"}</span>
+            </button>
+          </div>
         ) : (
-          /* Logged-Out Visitor Right Header: Clean Academic Year Badge Only */
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-950/80 border border-blue-400/30 rounded-[4px] text-[11px] font-bold text-blue-100">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-950/80 border border-blue-400/30 rounded-lg text-[11px] font-bold text-blue-100">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>S.Y. {schoolYear || "2026-2027"}</span>
               <span className="hidden sm:inline text-blue-300">&bull; {semester || "Trimester 1"}</span>
             </div>
-
             {pathname !== "/" && (
               <Link
                 href="/"
-                className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-[4px] transition-colors shadow-xs"
+                className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-lg transition-colors shadow-xs"
               >
                 Sign In
               </Link>
@@ -551,6 +502,97 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           </div>
         )}
       </div>
+
+      {/* 3. Sub-Navigation Tabs Bar */}
+      {user && (
+        <div className="bg-slate-50 border-t border-slate-200 px-3 sm:px-6 lg:px-8 text-slate-800 shadow-2xs">
+          <div className="max-w-7xl mx-auto flex items-center overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap gap-1 sm:gap-1.5 text-xs font-bold tracking-wide pt-1.5 sm:pt-2 touch-pan-x">
+            <Link
+              href="/"
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+                pathname === "/"
+                  ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
+                  : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
+              }`}
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span>Dashboard</span>
+            </Link>
+
+            <Link
+              href={enrollHref}
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+                pathname === "/enroll"
+                  ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
+                  : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
+              }`}
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Enrollment</span>
+            </Link>
+
+            <Link
+              href={trackHref}
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+                pathname === "/track"
+                  ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
+                  : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
+              }`}
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span>Track Status</span>
+            </Link>
+
+            <Link
+              href={sectionHref}
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+                pathname === "/section"
+                  ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
+                  : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
+              }`}
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>My Section</span>
+            </Link>
+
+            <Link
+              href="/grades"
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+                pathname === "/grades"
+                  ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
+                  : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
+              }`}
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span>My Grade</span>
+            </Link>
+
+            <Link
+              href={profileHref}
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+                pathname === "/profile"
+                  ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
+                  : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
+              }`}
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>My Profile</span>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Slide-over Drawer / Collapsible Menu Overlay (Left Side Drawer) */}
       <div
@@ -1008,6 +1050,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
