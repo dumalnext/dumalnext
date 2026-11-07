@@ -488,29 +488,31 @@ export function PwaInstallDrawerCard() {
 
   return (
     <>
-      <div className="p-3.5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-400 rounded-[4px] shadow-xs space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <span className="text-[9px] font-black text-amber-900 uppercase tracking-widest block">
-              INSTALL PROGRESSIVE APP
-            </span>
-            <h4 className="text-xs font-extrabold text-slate-950 leading-tight mt-0.5">
-              Add to Home Screen
-            </h4>
+      <div className="p-2.5 bg-amber-50/90 border border-amber-300 rounded-[6px] shadow-2xs flex items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-[5px] bg-amber-400/90 text-slate-950 flex items-center justify-center shrink-0 shadow-2xs">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
           </div>
-          <span className="px-1.5 py-0.5 bg-amber-200 text-amber-950 font-mono text-[9px] font-bold rounded-[3px] uppercase">
-            1-TAP
-          </span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-slate-900 truncate">Install DNHS App</span>
+              <span className="px-1 py-0.2 bg-amber-200/80 text-amber-950 font-mono text-[8px] font-bold rounded uppercase shrink-0">
+                1-Tap
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-600 truncate">
+              Add portal shortcut to home screen
+            </p>
+          </div>
         </div>
-        <p className="text-[11px] text-slate-700 leading-snug">
-          Install the portal on your phone for instant 1-tap access without typing the URL.
-        </p>
         <button
           type="button"
           onClick={handleClick}
-          className="w-full py-2 bg-[#002060] hover:bg-blue-900 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-[4px] transition-colors cursor-pointer text-center shadow-xs"
+          className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 active:scale-95 text-white text-[11px] font-bold uppercase tracking-wider rounded-[4px] transition-all cursor-pointer shrink-0 shadow-2xs"
         >
-          Install DNHS Portal App
+          Install
         </button>
       </div>
 
