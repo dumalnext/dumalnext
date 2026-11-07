@@ -1,6 +1,6 @@
 "use client";
 
-// Version 1.2.0 - Real-time Traffic Capacity Gatekeeper for Dumalneg NHS (Admin Portal)
+// Version 1.2.0 - Real-time Traffic Capacity Gatekeeper for Dumalneg NHS
 import React, { useState, useEffect } from "react";
 
 export default function TrafficCapacityManager() {
@@ -132,9 +132,6 @@ export default function TrafficCapacityManager() {
           <h3 className="text-lg font-black text-white tracking-tight mt-0.5">
             Student Portal User Capacity Controller
           </h3>
-          <p className="text-xs text-blue-100 mt-0.5">
-            Protects database stability by regulating concurrent active student sessions and requests.
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -157,7 +154,7 @@ export default function TrafficCapacityManager() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Current Active Students (Live Active Users)
+                Active Student Sessions
               </span>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="text-3xl font-black text-[#002060] font-mono">
@@ -248,8 +245,8 @@ export default function TrafficCapacityManager() {
                 +10
               </button>
             </div>
-            <p className="text-[11px] text-slate-500">
-              Minimum capacity is 50 slots. When active sessions reach this threshold, additional students are automatically routed to the Virtual Waiting Room.
+            <p className="text-[11px] text-slate-500 font-mono">
+              Automated queueing activates when concurrent sessions reach threshold.
             </p>
           </div>
 
@@ -275,7 +272,7 @@ export default function TrafficCapacityManager() {
                   Conservative (50 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  Minimum capacity baseline
+                  Baseline minimum
                 </span>
               </button>
 
@@ -295,7 +292,7 @@ export default function TrafficCapacityManager() {
                   Standard (100 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  Recommended for Dumalneg NHS
+                  Recommended configuration
                 </span>
               </button>
 
@@ -315,7 +312,7 @@ export default function TrafficCapacityManager() {
                   Expanded (150 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  For regular enrollment periods
+                  Regular enrollment
                 </span>
               </button>
 
@@ -335,7 +332,7 @@ export default function TrafficCapacityManager() {
                   Peak Surge (200 Slots)
                 </span>
                 <span className="text-[10px] text-slate-500 block">
-                  High-volume enrollment day surge
+                  High-volume surge
                 </span>
               </button>
             </div>
@@ -356,7 +353,7 @@ export default function TrafficCapacityManager() {
                 Enable Virtual Waiting Room &amp; Queueing
               </span>
               <span className="text-[11px] text-slate-500 block">
-                When enabled, excess student traffic is held in an automated queue to maintain database stability.
+                Holds excess learner sessions in an automated queue during peak surges.
               </span>
             </div>
           </label>
@@ -366,10 +363,13 @@ export default function TrafficCapacityManager() {
               type="button"
               onClick={handleResetSessions}
               disabled={isSaving}
-              className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase rounded-lg transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               title="Reset all active student session counters if stale sessions persist"
             >
-              Flush Sessions
+              <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Flush Sessions</span>
             </button>
             <button
               type="button"
@@ -377,7 +377,10 @@ export default function TrafficCapacityManager() {
               disabled={isSaving}
               className="px-5 py-2.5 bg-[#002060] hover:bg-[#002b80] text-amber-300 font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
             >
-              {isSaving ? "Updating..." : "Save Capacity Settings"}
+              <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{isSaving ? "Updating..." : "Save Capacity Settings"}</span>
             </button>
           </div>
         </div>
