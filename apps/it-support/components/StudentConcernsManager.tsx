@@ -393,45 +393,73 @@ export default function StudentConcernsManager() {
         )}
 
         {/* Key Metrics Dashboard */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 sm:p-6 bg-slate-50/70 border-b border-slate-200">
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-              Total Messages
-            </span>
-            <span className="text-xl font-extrabold text-[#002060] mt-0.5 block">
-              {metrics.total}
-            </span>
-            <span className="text-[10px] text-slate-400 block mt-0.5">All tickets logged</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 p-4 sm:p-6 bg-slate-50/70 border-b border-slate-200">
+          {/* Total Messages */}
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs hover:border-blue-300 transition-colors flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#002060] shrink-0">
+              <svg className="w-5 h-5 text-[#002060]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">
+                Total Inquiries
+              </span>
+              <span className="text-xl font-black text-[#002060] mt-0.5 block font-mono">
+                {metrics.total}
+              </span>
+            </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-lg border border-amber-300 bg-amber-50/30 shadow-2xs">
-            <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
-              Pending IT Reply
-            </span>
-            <span className="text-xl font-extrabold text-amber-700 mt-0.5 block">
-              {metrics.pending}
-            </span>
-            <span className="text-[10px] text-amber-700 block mt-0.5">Needs reply</span>
+          {/* Pending IT Reply */}
+          <div className="bg-white p-3.5 rounded-xl border border-amber-300 bg-amber-50/30 shadow-2xs hover:border-amber-400 transition-colors flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100/80 border border-amber-300 flex items-center justify-center text-amber-800 shrink-0">
+              <svg className="w-5 h-5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-mono font-bold text-amber-800 uppercase block tracking-wider">
+                Pending Reply
+              </span>
+              <span className="text-xl font-black text-amber-700 mt-0.5 block font-mono">
+                {metrics.pending}
+              </span>
+            </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-lg border border-blue-200 bg-blue-50/30 shadow-2xs">
-            <span className="text-[10px] font-bold text-blue-800 uppercase tracking-wider block">
-              In Progress
-            </span>
-            <span className="text-xl font-extrabold text-blue-700 mt-0.5 block">
-              {metrics.inProgress}
-            </span>
-            <span className="text-[10px] text-blue-600 block mt-0.5">Active conversation</span>
+          {/* In Progress */}
+          <div className="bg-white p-3.5 rounded-xl border border-blue-200 bg-blue-50/30 shadow-2xs hover:border-blue-400 transition-colors flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-100/80 border border-blue-200 flex items-center justify-center text-blue-800 shrink-0">
+              <svg className="w-5 h-5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-mono font-bold text-blue-800 uppercase block tracking-wider">
+                In Progress
+              </span>
+              <span className="text-xl font-black text-blue-700 mt-0.5 block font-mono">
+                {metrics.inProgress}
+              </span>
+            </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-lg border border-emerald-200 bg-emerald-50/30 shadow-2xs">
-            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
-              Resolved
-            </span>
-            <span className="text-xl font-extrabold text-emerald-700 mt-0.5 block">
-              {metrics.resolved}
-            </span>
-            <span className="text-[10px] text-emerald-700 block mt-0.5">Completed inquiries</span>
+          {/* Resolved */}
+          <div className="bg-white p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/30 shadow-2xs hover:border-emerald-400 transition-colors flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100/80 border border-emerald-300 flex items-center justify-center text-emerald-800 shrink-0">
+              <svg className="w-5 h-5 text-emerald-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block tracking-wider">
+                Resolved
+              </span>
+              <span className="text-xl font-black text-emerald-700 mt-0.5 block font-mono">
+                {metrics.resolved}
+              </span>
+            </div>
           </div>
         </div>
 

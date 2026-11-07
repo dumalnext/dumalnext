@@ -361,21 +361,27 @@ export default function StaffInvitationManager() {
       {/* 3 Separated Role Headers / Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* HEADER 1: TEACHER / FACULTY ONBOARDING */}
-        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden hover:border-emerald-300 transition-colors">
           <div>
-            <div className="bg-emerald-800 text-white p-4 border-b border-emerald-950">
-              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-200 block">
-                01. Faculty Desk
-              </span>
-              <h2 className="text-sm font-bold tracking-wide mt-0.5">
-                Teacher / Faculty Member
-              </h2>
+            <div className="bg-emerald-800 text-white p-4 border-b border-emerald-950 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-700/80 border border-emerald-600 flex items-center justify-center text-emerald-200 shrink-0">
+                  <svg className="w-5 h-5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-200 block">
+                    01. Faculty Desk
+                  </span>
+                  <h2 className="text-sm font-bold tracking-wide mt-0.5">
+                    Teacher / Faculty Member
+                  </h2>
+                </div>
+              </div>
             </div>
             <div className="p-4 space-y-3">
-              <p className="text-[11px] text-slate-600">
-                Provisions access to grade submissions, section advisorship, and automated class schedule timelines.
-              </p>
-
               <div>
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
                   Faculty Email Address *
@@ -427,29 +433,37 @@ export default function StaffInvitationManager() {
               type="button"
               disabled={submittingRole === "teacher"}
               onClick={() => handleSendInvite("teacher")}
-              className="w-full py-2.5 px-4 rounded-lg bg-emerald-800 hover:bg-emerald-900 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-emerald-800 hover:bg-emerald-900 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
             >
-              {submittingRole === "teacher" ? "Generating Invite..." : "+ Send Teacher Invite"}
+              <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <span>{submittingRole === "teacher" ? "Generating Invite..." : "Send Teacher Invite"}</span>
             </button>
           </div>
         </div>
 
         {/* HEADER 2: SCHOOL ADMINISTRATOR ONBOARDING */}
-        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden hover:border-blue-300 transition-colors">
           <div>
-            <div className="bg-[#002060] text-white p-4 border-b border-[#001744]">
-              <span className="text-[10px] font-bold tracking-wider uppercase text-amber-300 block">
-                02. Administration Desk
-              </span>
-              <h2 className="text-sm font-bold tracking-wide mt-0.5">
-                School Administrator
-              </h2>
+            <div className="bg-[#002060] text-white p-4 border-b border-[#001744] flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-[#001744]/80 border border-blue-500/40 flex items-center justify-center text-amber-300 shrink-0">
+                  <svg className="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold tracking-wider uppercase text-amber-300 block">
+                    02. Administration Desk
+                  </span>
+                  <h2 className="text-sm font-bold tracking-wide mt-0.5">
+                    School Administrator
+                  </h2>
+                </div>
+              </div>
             </div>
             <div className="p-4 space-y-3">
-              <p className="text-[11px] text-slate-600">
-                Provisions access to application adjudication, enrollment controls, section quotas, and deconfliction engines.
-              </p>
-
               <div>
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
                   Administrator Email *
@@ -498,29 +512,37 @@ export default function StaffInvitationManager() {
               type="button"
               disabled={submittingRole === "admin"}
               onClick={() => handleSendInvite("admin")}
-              className="w-full py-2.5 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
             >
-              {submittingRole === "admin" ? "Generating Invite..." : "+ Send Admin Invite"}
+              <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <span>{submittingRole === "admin" ? "Generating Invite..." : "Send Admin Invite"}</span>
             </button>
           </div>
         </div>
 
         {/* HEADER 3: IT SUPPORT DESK ONBOARDING */}
-        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm overflow-hidden hover:border-indigo-300 transition-colors">
           <div>
-            <div className="bg-indigo-900 text-white p-4 border-b border-indigo-950">
-              <span className="text-[10px] font-bold tracking-wider uppercase text-indigo-200 block">
-                03. Infrastructure Desk
-              </span>
-              <h2 className="text-sm font-bold tracking-wide mt-0.5">
-                IT Support &amp; Systems Desk
-              </h2>
+            <div className="bg-indigo-900 text-white p-4 border-b border-indigo-950 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-center text-indigo-200 shrink-0">
+                  <svg className="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold tracking-wider uppercase text-indigo-200 block">
+                    03. Infrastructure Desk
+                  </span>
+                  <h2 className="text-sm font-bold tracking-wide mt-0.5">
+                    IT Support &amp; Systems Desk
+                  </h2>
+                </div>
+              </div>
             </div>
             <div className="p-4 space-y-3">
-              <p className="text-[11px] text-slate-600">
-                Provisions technical access to dynamic trisem calendar dates, physical classroom registries, and system diagnostics.
-              </p>
-
               <div>
                 <label className="block text-xs font-bold text-slate-800 uppercase mb-1">
                   IT Personnel Email *
@@ -569,9 +591,12 @@ export default function StaffInvitationManager() {
               type="button"
               disabled={submittingRole === "it_support"}
               onClick={() => handleSendInvite("it_support")}
-              className="w-full py-2.5 px-4 rounded-lg bg-indigo-900 hover:bg-indigo-950 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-indigo-900 hover:bg-indigo-950 disabled:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
             >
-              {submittingRole === "it_support" ? "Generating Invite..." : "+ Send IT Support Invite"}
+              <svg className="w-4 h-4 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <span>{submittingRole === "it_support" ? "Generating Invite..." : "Send IT Support Invite"}</span>
             </button>
           </div>
         </div>
@@ -580,13 +605,15 @@ export default function StaffInvitationManager() {
       {/* Invitations Audit Registry & Status Table */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[#002060]/10 flex items-center justify-center text-[#002060]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               Issued Staff Invitations &amp; Registry Audit
             </h3>
-            <p className="text-xs text-slate-500">
-              Active, accepted, and revoked staff onboarding invitation records.
-            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-slate-600 uppercase shrink-0">
@@ -697,24 +724,33 @@ export default function StaffInvitationManager() {
                               <button
                                 type="button"
                                 onClick={() => handleCopyLink(inviteUrl, inv.id)}
-                                className="px-2.5 py-1 text-[11px] font-mono font-bold uppercase bg-slate-200 hover:bg-slate-300 text-slate-800 border border-slate-300 transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold uppercase bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded transition-colors cursor-pointer"
                               >
-                                {copiedToken === inv.id ? "Copied" : "Copy Link"}
+                                <svg className="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span>{copiedToken === inv.id ? "Copied" : "Copy"}</span>
                               </button>
                               <a
                                 href={inviteUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="px-2.5 py-1 text-[11px] font-mono font-bold uppercase bg-[#002060] hover:bg-[#001744] text-white transition-colors"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold uppercase bg-[#002060] hover:bg-[#001744] text-white rounded transition-colors"
                               >
-                                Open
+                                <svg className="w-3 h-3 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                <span>Open</span>
                               </a>
                               <button
                                 type="button"
                                 onClick={() => handleRevoke(inv.id, inv.email)}
-                                className="px-2.5 py-1 text-[11px] font-mono font-bold uppercase bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold uppercase bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 rounded transition-colors cursor-pointer"
                               >
-                                Revoke
+                                <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Revoke</span>
                               </button>
                             </>
                           )}
