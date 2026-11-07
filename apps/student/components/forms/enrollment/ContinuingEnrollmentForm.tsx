@@ -628,50 +628,63 @@ export default function ContinuingEnrollmentForm({
     const isTransferRequested = enableTransfer && selectedJhsProgram !== previousJhsProgram;
 
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 shadow-sm rounded-[4px]">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 shadow-sm rounded-[4px]">
         {/* Header */}
-        <div className="border-b-2 border-slate-200 pb-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <span className="text-xs font-bold tracking-wider text-[#002060]">
-              Continuing JHS Learner Automation &bull; S.Y. {schoolYear} &bull; {semester}
-            </span>
-            <span className="text-xs font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 uppercase rounded-[4px]">
-              Continuing Re-Enrollment Active
-            </span>
+        <div className="border-b-2 border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <span className="text-[11px] font-bold tracking-wider text-[#002060] uppercase block">
+                Continuing JHS Learner &bull; S.Y. {schoolYear} &bull; {semester}
+              </span>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                Junior High School Continuing Enrollment
+              </h2>
+            </div>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Junior High School Continuing Enrollment
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-            Dumalneg National High School &bull; DepEd Prescribed Basic Education Curriculum
-          </p>
+          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-1 uppercase rounded-[4px] self-start sm:self-center shrink-0">
+            Continuing Re-Enrollment Active
+          </span>
         </div>
 
         {/* Certified Credentials Banner */}
-        <div className="p-5 bg-emerald-50 border-2 border-emerald-500 text-slate-900 space-y-2 rounded-[4px]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-            <span className="text-xs font-bold text-emerald-950">
-              Official DepEd Credentials &amp; Documents Verified on File
-            </span>
-            <span className="text-[10px] bg-emerald-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded-[4px]">
-              PREVIOUS REF: {priorApprovedApp.application_id}
-            </span>
+        <div className="p-4 bg-emerald-50 border border-emerald-400 text-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-emerald-950 block">
+                Official DepEd Credentials &amp; Documents Verified on File
+              </span>
+              <span className="text-[11px] text-emerald-800">
+                PSA Birth Certificate, SF9 Report Card, and 2x2 ID Photo inherited from S.Y. {priorApprovedApp.school_year}.
+              </span>
+            </div>
           </div>
-          <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-            Your official DepEd learner profile, family background, and documentary requirements (PSA Birth Certificate, SF9 / Form 138, 2x2 Formal ID Photo) are certified and actively on file from your previous approved enrollment in S.Y. {priorApprovedApp.school_year}.
-          </p>
-          <p className="text-[11px] text-emerald-900 leading-relaxed">
-            Under the DepEd K-12 Basic Education Curriculum, Junior High School (Grades 7 to 10) adheres to prescribed standard core learning areas. No elective subject selection or document re-submission is required.
-          </p>
+          <span className="text-[10px] bg-emerald-800 text-white px-2.5 py-1 uppercase font-bold w-fit rounded-[4px] shrink-0">
+            PREVIOUS REF: {priorApprovedApp.application_id}
+          </span>
         </div>
 
         {/* Verified Student Summary Dossier */}
-        <div className="border-2 border-slate-300 bg-slate-50 divide-y divide-slate-200 text-xs rounded-[4px] overflow-hidden">
+        <div className="border border-slate-300 bg-slate-50 divide-y divide-slate-200 text-xs rounded-[4px] overflow-hidden">
           <div className="p-3 bg-slate-100 font-bold text-slate-800 tracking-wide flex items-center justify-between">
-            <span>Verified Continuing Student Dossier Summary</span>
-            <span className="text-[11px] text-[#002060] font-bold">READY TO SUBMIT</span>
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-[#002060]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+              </svg>
+              <span>Verified Continuing Student Dossier Summary</span>
+            </span>
+            <span className="text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 rounded font-bold">READY TO SUBMIT</span>
           </div>
-          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <span className="text-slate-500 block text-[11px]">Learner Name:</span>
               <strong className="text-slate-900 text-sm">
@@ -679,27 +692,27 @@ export default function ContinuingEnrollmentForm({
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">DepEd Learner Reference Number (LRN):</span>
-              <strong className="text-slate-900 text-sm">{formData.lrn}</strong>
+              <span className="text-slate-500 block text-[11px]">12-Digit DepEd LRN:</span>
+              <strong className="text-slate-900 text-sm font-mono">{formData.lrn}</strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Previous Program on Record:</span>
-              <strong className="text-slate-900">
-                Regular Basic Education Curriculum
-              </strong>
-            </div>
-            <div>
-              <span className="text-slate-500 block text-[11px]">Enrolling Grade Level &amp; Period:</span>
+              <span className="text-slate-500 block text-[11px]">Enrolling Grade &amp; Term:</span>
               <strong className="text-[#002060]">
                 Grade {targetGrade} &bull; S.Y. {schoolYear} ({semester})
               </strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Preferred Distance Learning Modality:</span>
+              <span className="text-slate-500 block text-[11px]">Curricular Program:</span>
+              <strong className="text-slate-900">
+                Regular Basic Education (JHS Core)
+              </strong>
+            </div>
+            <div>
+              <span className="text-slate-500 block text-[11px]">Learning Modality:</span>
               <strong className="text-slate-900">{currentModalities.join(", ")}</strong>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">DepEd Documentary Requirements:</span>
+              <span className="text-slate-500 block text-[11px]">Documentary Status:</span>
               <span className="text-emerald-800 font-bold text-[11px]">
                 Inherited &amp; Certified on File
               </span>
@@ -707,67 +720,45 @@ export default function ContinuingEnrollmentForm({
           </div>
         </div>
 
-        {/* JHS CURRICULAR PROGRAM CONFIRMATION */}
-        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-2 rounded-[4px]">
-          <div className="border-b border-slate-200 pb-2">
-            <span className="text-xs font-bold text-[#002060] block">
-              Curricular Program Confirmation
-            </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Standard Junior High School program for Grade {targetGrade} at Dumalneg National High School:
-            </p>
-          </div>
-          <div className="p-3 bg-white border border-slate-200 rounded-[4px]">
-            <span className="text-xs font-bold text-slate-900 block">
-              Regular Basic Education Curriculum
-            </span>
-            <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-              Standard DepEd K-12 secondary curriculum covering all core learning areas (Filipino, English, Math, Science, Araling Panlipunan, EsP, MAPEH, and TLE).
-            </p>
-          </div>
-        </div>
-
-        {/* DepEd Review and Approval Note */}
-        <div className="p-4 bg-amber-50/70 border border-amber-300 space-y-1 text-xs text-amber-950 rounded-[4px]">
-          <span className="font-bold block text-amber-900 text-xs">
-            Official DepEd Adjudication Policy Notice:
-          </span>
-          <p className="leading-relaxed">
-            All continuing enrollment applications are received and placed under <strong className="font-bold">Pending Administrator Adjudication</strong>. Applications are officially verified and enrolled by the School Administrator upon section assignment and document review.
-          </p>
-        </div>
-
         {/* Submit Action Card */}
-        <div className="p-6 bg-blue-50/70 border-2 border-[#002060] space-y-4 rounded-[4px]">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-[#002060] block">
-              Submit Continuing Enrollment Application
+        <div className="p-5 bg-blue-50/70 border-2 border-[#002060] space-y-3 rounded-[4px]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="text-xs font-bold text-[#002060] block">
+                Confirm &amp; Submit Continuing Enrollment
+              </span>
+              <span className="text-[11px] text-slate-600">
+                Grade {targetGrade} Regular JHS Curriculum &bull; Subject to School Administrator verification.
+              </span>
+            </div>
+            <span className="text-[10px] font-bold text-[#002060] bg-white px-2.5 py-1 border border-blue-200 rounded-[4px] shrink-0 self-start sm:self-center">
+              RA 10173 Compliant
             </span>
-            <p className="text-xs text-slate-700 leading-relaxed">
-              By clicking the button below, you confirm your continuing enrollment application for Grade {targetGrade} under the <strong>Regular Basic Education Curriculum</strong> for School Year {schoolYear} ({semester}) in accordance with Republic Act 10173 (Data Privacy Act of 2012).
-            </p>
           </div>
 
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={handleOneClickJhsSubmit}
-              disabled={isSubmitting || !isEnrollmentOpen}
-              className={`w-full py-4 px-6 text-xs sm:text-sm font-bold transition-all shadow-md rounded-[4px] ${
-                !isEnrollmentOpen
-                  ? "bg-slate-400 text-slate-100 cursor-not-allowed"
-                  : isSubmitting
-                  ? "bg-slate-700 text-white cursor-wait"
-                  : "bg-[#002060] hover:bg-blue-950 text-white active:translate-y-0.5 cursor-pointer"
-              }`}
-            >
+          <button
+            type="button"
+            onClick={handleOneClickJhsSubmit}
+            disabled={isSubmitting || !isEnrollmentOpen}
+            className={`w-full py-3.5 px-6 text-xs sm:text-sm font-bold transition-all shadow-md rounded-[4px] inline-flex items-center justify-center gap-2 ${
+              !isEnrollmentOpen
+                ? "bg-slate-400 text-slate-100 cursor-not-allowed"
+                : isSubmitting
+                ? "bg-slate-700 text-white cursor-wait"
+                : "bg-[#002060] hover:bg-blue-950 text-white active:translate-y-0.5 cursor-pointer"
+            }`}
+          >
+            <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>
               {isSubmitting
                 ? "Submitting Official Continuing Enrollment..."
                 : isTransferRequested
                 ? `Submit Continuing Enrollment with Transfer Request (${previousJhsProgram} -> ${selectedJhsProgram})`
                 : `Confirm & Submit Continuing Enrollment for S.Y. ${schoolYear} (${semester})`}
-            </button>
-          </div>
+            </span>
+          </button>
         </div>
       </div>
     );
