@@ -380,7 +380,7 @@ export default function TeachingSchedulePage() {
                           <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
                         </td>
                         <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
-                          {formatTimeRange(slot.start, slot.end)} &bull; {slot.name}
+                          {slot.name}
                         </td>
                       </tr>
                     );
@@ -407,9 +407,6 @@ export default function TeachingSchedulePage() {
                           <td key={day} className="p-2 border-r border-slate-200 last:border-r-0 align-top w-1/5">
                             {matchedItem ? (
                               <div className="p-2.5 bg-blue-50/70 border border-[#002060]/30 hover:border-[#002060] transition-colors shadow-2xs space-y-1">
-                                <span className="text-[10px] font-mono font-bold text-blue-950 bg-white px-1.5 py-0.5 border border-blue-200 block w-fit">
-                                  {formatTimeRange(matchedItem.start_time, matchedItem.end_time)}
-                                </span>
                                 <div className="font-bold text-slate-900 uppercase text-xs">
                                   {matchedItem.subject_name}
                                 </div>
