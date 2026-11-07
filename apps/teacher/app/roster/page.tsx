@@ -101,6 +101,9 @@ export default function ClassSectionRosterPage() {
           if (typeof ctrlRes.data.value.isEnrollmentOpen === "boolean") {
             setIsEnrollmentOpen(ctrlRes.data.value.isEnrollmentOpen);
           }
+          if (typeof ctrlRes.data.value.isGradeOpen === "boolean") {
+            setIsGradeOpen(ctrlRes.data.value.isGradeOpen);
+          }
           if (!termRes.data && ctrlRes.data.value.schoolYear) {
             setActiveSchoolYear(ctrlRes.data.value.schoolYear);
           }
@@ -261,7 +264,31 @@ export default function ClassSectionRosterPage() {
 
     fetchAdvisorySections(false);
 
-    // Supabase Realtime Channel: Listen for section, teacher, student, or settings changes
+    // 1. Cross-tab BroadcastChannel listener for instant Admin Control Room switches
+    let enrollBc: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        enrollBc = new BroadcastChannel("dumalnext-enrollment-control");
+        enrollBc.onmessage = (event) => {
+          const settings = event.data;
+          if (settings) {
+            if (typeof settings.isGradeOpen === "boolean") {
+              setIsGradeOpen(settings.isGradeOpen);
+            }
+            if (typeof settings.isEnrollmentOpen === "boolean") {
+              setIsEnrollmentOpen(settings.isEnrollmentOpen);
+            }
+            if (settings.schoolYear) {
+              setActiveSchoolYear(settings.schoolYear);
+            }
+          }
+        };
+      }
+    } catch (e) {
+      console.warn("BroadcastChannel notice:", e);
+    }
+
+    // 2. Supabase Realtime Channel: Listen for section, teacher, student, settings changes, or control room push
     const channel = supabase
       .channel("teacher-advisory-roster-channel")
       .on(
@@ -272,7 +299,10 @@ export default function ClassSectionRosterPage() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "system_settings" },
-        () => fetchAdvisorySections(true)
+        () => {
+          fetchAdvisorySections(true);
+          window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        }
       )
       .on(
         "postgres_changes",
@@ -291,6 +321,21 @@ export default function ClassSectionRosterPage() {
         { event: "*", schema: "public", table: "enrollment_applications" },
         () => fetchAdvisorySections(true)
       )
+      .on(
+        "broadcast",
+        { event: "enrollment-settings-updated" },
+        (payload: any) => {
+          const settings = payload?.payload;
+          if (settings) {
+            if (typeof settings.isGradeOpen === "boolean") {
+              setIsGradeOpen(settings.isGradeOpen);
+            }
+            if (typeof settings.isEnrollmentOpen === "boolean") {
+              setIsEnrollmentOpen(settings.isEnrollmentOpen);
+            }
+          }
+        }
+      )
       .subscribe();
 
     const handleCustomEvent = () => fetchAdvisorySections(true);
@@ -300,6 +345,7 @@ export default function ClassSectionRosterPage() {
 
     return () => {
       supabase.removeChannel(channel);
+      if (enrollBc) enrollBc.close();
       window.removeEventListener("dumalnext:data-changed", handleCustomEvent);
       window.removeEventListener("dumalnext:teacher-data-changed", handleCustomEvent);
       window.removeEventListener("dumalnext:admin-data-changed", handleCustomEvent);
@@ -633,6 +679,18 @@ export default function ClassSectionRosterPage() {
           }
           return [data.record, ...prev];
         });
+
+        // Broadcast to student and other open tabs
+        try {
+          if (typeof BroadcastChannel !== "undefined") {
+            const gradesBc = new BroadcastChannel("dumalnext-grades-sync");
+            gradesBc.postMessage({ type: "grade-uploaded", record: data.record });
+            gradesBc.close();
+          }
+        } catch {}
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+        }
 
         setTimeout(() => {
           setSelectedGradeStudent(null);
@@ -1023,6 +1081,26 @@ export default function ClassSectionRosterPage() {
               </div>
             )}
 
+            {/* Grade Submission Status Banner when Closed by Administrator */}
+            {!isGradeOpen && (
+              <div className="p-3.5 bg-amber-50 border-2 border-amber-400 rounded text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs no-print print:hidden">
+                <div className="flex items-start sm:items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 mt-0.5 sm:mt-0" />
+                  <div>
+                    <strong className="uppercase font-mono text-[11px] text-amber-900 block sm:inline mr-2">
+                      Grade Submission is Currently Closed
+                    </strong>
+                    <span className="text-slate-700 text-[11px]">
+                      The School Administrator has turned off Grade Uploads in the Enrollment &amp; Grade Control Room. Grade upload buttons are hidden until reopened.
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold uppercase bg-amber-200 text-amber-950 px-2.5 py-0.5 rounded border border-amber-300 shrink-0 self-start sm:self-auto">
+                  Locked / Off
+                </span>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3 no-print print:hidden">
               <div className="flex items-center gap-2 w-full sm:max-w-md">
                 <input
@@ -1111,14 +1189,31 @@ export default function ClassSectionRosterPage() {
                                   g.schoolYear === cleanSY &&
                                   g.trimester === activeTermNumber
                               );
+                              const canOpenModal = isGradeOpen || Boolean(currentGrade);
+
                               return (
                                 <button
                                   type="button"
-                                  onClick={() => handleOpenGradeModal(st)}
-                                  className="text-left font-bold text-[#002060] hover:text-[#002b80] hover:underline uppercase cursor-pointer flex flex-col items-start gap-0.5 group"
-                                  title="Click learner name to upload or view grade snapshot"
+                                  onClick={() => {
+                                    if (canOpenModal) {
+                                      handleOpenGradeModal(st);
+                                    }
+                                  }}
+                                  disabled={!canOpenModal}
+                                  className={`text-left font-bold uppercase flex flex-col items-start gap-0.5 group ${
+                                    canOpenModal
+                                      ? "text-[#002060] hover:text-[#002b80] hover:underline cursor-pointer"
+                                      : "text-slate-800 cursor-default"
+                                  }`}
+                                  title={
+                                    currentGrade
+                                      ? "Click learner name to view grade snapshot"
+                                      : isGradeOpen
+                                      ? "Click learner name to upload grade snapshot"
+                                      : "Grade submission is currently closed by School Administrator"
+                                  }
                                 >
-                                  <span className="group-hover:text-blue-900 transition-colors">
+                                  <span className={canOpenModal ? "group-hover:text-blue-900 transition-colors" : ""}>
                                     {st.last_name}, {st.first_name} {st.middle_name || ""}
                                   </span>
                                   {currentGrade ? (
@@ -1126,10 +1221,15 @@ export default function ClassSectionRosterPage() {
                                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                                       Grade: DONE ({currentGrade.termName})
                                     </span>
-                                  ) : (
+                                  ) : isGradeOpen ? (
                                     <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-slate-500 normal-case bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                                       <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                                       Grade: Pending ({activeTermName})
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-amber-800 normal-case bg-amber-50 px-1.5 py-0.5 rounded border border-amber-300">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                      Grade: Locked ({activeTermName})
                                     </span>
                                   )}
                                 </button>
@@ -1163,6 +1263,13 @@ export default function ClassSectionRosterPage() {
                                     g.schoolYear === cleanSY &&
                                     g.trimester === activeTermNumber
                                 );
+
+                                // When Grade is turned OFF by Admin in the Control Room:
+                                // If student has no grade yet, do NOT display the "Upload Grade" button at all!
+                                if (!isGradeOpen && !currentGrade) {
+                                  return null;
+                                }
+
                                 return (
                                   <button
                                     type="button"
@@ -1172,7 +1279,13 @@ export default function ClassSectionRosterPage() {
                                         ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300"
                                         : "bg-blue-50 hover:bg-blue-100 text-[#002060] border border-blue-300"
                                     }`}
-                                    title={currentGrade ? "View or update grade snapshot" : "Upload picture of student grade"}
+                                    title={
+                                      !isGradeOpen
+                                        ? "View submitted grade snapshot (Grade submissions locked)"
+                                        : currentGrade
+                                        ? "View or update grade snapshot"
+                                        : "Upload picture of student grade"
+                                    }
                                   >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

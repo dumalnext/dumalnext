@@ -98,8 +98,57 @@ export default function StudentGradesPage() {
 
     loadData();
 
+    // 1. Supabase Realtime: sync when teacher uploads grade or admin changes grade control
+    const channel = supabase
+      .channel("student-grades-sync-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "system_settings" },
+        () => loadData()
+      )
+      .on(
+        "broadcast",
+        { event: "enrollment-settings-updated" },
+        (payload: any) => {
+          const settings = payload?.payload;
+          if (settings && typeof settings.isGradeOpen === "boolean") {
+            setGradesData((prev) => (prev ? { ...prev, isGradeOpen: settings.isGradeOpen } : prev));
+          }
+        }
+      )
+      .subscribe();
+
+    // 2. Cross-tab BroadcastChannels for instantaneous updates
+    let enrollBc: BroadcastChannel | null = null;
+    let gradesBc: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        enrollBc = new BroadcastChannel("dumalnext-enrollment-control");
+        enrollBc.onmessage = (event) => {
+          const settings = event.data;
+          if (settings && typeof settings.isGradeOpen === "boolean") {
+            setGradesData((prev) => (prev ? { ...prev, isGradeOpen: settings.isGradeOpen } : prev));
+          }
+        };
+
+        gradesBc = new BroadcastChannel("dumalnext-grades-sync");
+        gradesBc.onmessage = () => {
+          loadData();
+        };
+      }
+    } catch (e) {
+      console.warn("Student grades BroadcastChannel notice:", e);
+    }
+
+    const handleDataChanged = () => loadData();
+    window.addEventListener("dumalnext:data-changed", handleDataChanged);
+
     return () => {
       isMounted = false;
+      supabase.removeChannel(channel);
+      if (enrollBc) enrollBc.close();
+      if (gradesBc) gradesBc.close();
+      window.removeEventListener("dumalnext:data-changed", handleDataChanged);
     };
   }, [user]);
 

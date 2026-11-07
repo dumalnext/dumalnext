@@ -105,11 +105,19 @@ export default function EnrollmentControlRoom() {
 
       const data = await res.json();
       if (data.success) {
+        const isGradeAction = targetSettings.isGradeOpen !== settings.isGradeOpen;
         setSettings(data.settings);
-        const statusText = data.settings.isEnrollmentOpen ? "OPEN (Active)" : "CLOSED (Offline)";
-        setSaveSuccess(
-          `Real-Time Broadcast: Online Enrollment is now ${statusText} for School Year ${data.settings.schoolYear}. Student portal updated instantly.`
-        );
+        if (isGradeAction) {
+          const gStatus = data.settings.isGradeOpen !== false ? "OPEN (Active)" : "CLOSED / LOCKED (Off)";
+          setSaveSuccess(
+            `Real-Time Broadcast: Grade Management is now ${gStatus} for School Year ${data.settings.schoolYear}. Teacher portal updated instantly.`
+          );
+        } else {
+          const statusText = data.settings.isEnrollmentOpen ? "OPEN (Active)" : "CLOSED (Offline)";
+          setSaveSuccess(
+            `Real-Time Broadcast: Online Enrollment is now ${statusText} for School Year ${data.settings.schoolYear}. Student portal updated instantly.`
+          );
+        }
 
         // 1. Supabase Realtime WebSocket Push (instant sync across any port or device)
         try {
