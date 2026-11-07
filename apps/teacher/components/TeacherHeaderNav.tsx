@@ -100,11 +100,11 @@ export default function TeacherHeaderNav() {
 
       {/* Navigation Links (Visible when logged in) */}
       {user && (
-        <div className="bg-slate-100 border-t border-slate-300 px-4 sm:px-8">
-          <div className="max-w-7xl mx-auto flex flex-wrap gap-1.5 pt-2 text-xs font-bold">
+        <div className="bg-slate-100 border-t border-slate-300 px-3 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto flex items-center overflow-x-auto no-scrollbar scroll-smooth gap-1.5 pt-2 text-xs font-bold whitespace-nowrap">
             <Link
               href="/"
-              className={`py-2.5 px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-2 ${
+              className={`py-2 px-3 sm:px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-1.5 shrink-0 ${
                 isOverview
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/70"
@@ -118,7 +118,7 @@ export default function TeacherHeaderNav() {
 
             <Link
               href="/schedule"
-              className={`py-2.5 px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-2 ${
+              className={`py-2 px-3 sm:px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-1.5 shrink-0 ${
                 isSchedule
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/70"
@@ -132,7 +132,7 @@ export default function TeacherHeaderNav() {
 
             <Link
               href="/roster"
-              className={`py-2.5 px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-2 ${
+              className={`py-2 px-3 sm:px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-1.5 shrink-0 ${
                 isRoster
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/70"
@@ -146,7 +146,7 @@ export default function TeacherHeaderNav() {
 
             <Link
               href="/profile"
-              className={`py-2.5 px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-2 ${
+              className={`py-2 px-3 sm:px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-1.5 shrink-0 ${
                 isProfile
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px]"
                   : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/70"

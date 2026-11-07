@@ -232,16 +232,25 @@ export default function TeachingSchedulePage() {
 
       {/* Title Bar */}
       <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print print:hidden">
-        <div>
-          <span className="text-xs font-bold text-amber-300 tracking-wide block">
-            Instructional Schedule Hub &bull; Dumalneg NHS
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
-            Teaching Load &amp; Class Schedule
-          </h2>
-          <p className="text-xs text-blue-100 mt-1">
-            Official weekly instructional timetable matrix for Faculty Member <strong className="text-white">{user.fullName}</strong> ({user.teacherId}).
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-[4px] bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Teaching Load &amp; Class Schedule
+            </h2>
+            <div className="flex flex-wrap items-center gap-2 mt-0.5">
+              <span className="px-2 py-0.5 bg-white/10 text-blue-100 text-[11px] font-bold rounded-[4px]">
+                {user.fullName} ({user.teacherId})
+              </span>
+              <span className="px-2 py-0.5 bg-amber-400/20 text-amber-200 text-[11px] font-bold rounded-[4px] border border-amber-300/30">
+                Dept: {user.department}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -311,31 +320,27 @@ export default function TeachingSchedulePage() {
       </div>
 
       {isLoadingSchedules ? (
-        <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-2">
+        <div className="p-12 bg-white border-2 border-slate-300 rounded-[4px] text-center space-y-2">
           <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
           <span className="text-xs font-mono text-slate-500 uppercase block">Synchronizing with Official Class Program...</span>
         </div>
       ) : schedules.length === 0 ? (
         /* Empty State */
-        <div className="p-8 sm:p-14 bg-white border-2 border-slate-300 shadow-xs text-center space-y-4">
-          <div className="max-w-xl mx-auto space-y-3">
-            <span className="inline-block px-3 py-1 bg-slate-100 border border-slate-300 font-mono font-bold text-xs text-slate-700 uppercase">
-              NO CLASS SCHEDULE ASSIGNED YET
-            </span>
-            <h3 className="text-lg font-bold text-slate-900 uppercase">
-              Awaiting Administrative Schedule Assignment
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Your official teaching load and class schedule for School Year 2025–2026 has not yet been finalized by the School Administrator or Principal. 
-              Once the Schedule Deconfliction console in the Admin Portal assigns your class program, your weekly timetable will automatically appear here in real time.
-            </p>
-            <div className="p-4 bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700 text-left space-y-1.5">
-              <div>&bull; Assigned Faculty: <strong>{user.fullName}</strong> ({user.teacherId})</div>
-              <div>&bull; Department: <strong>{user.department}</strong></div>
-              <div>&bull; Prescribed Teaching Load: <strong>30 Hours / Week Maximum (DepEd Standard)</strong></div>
-              <div>&bull; Action Required: <strong>None. Please wait for the Principal / Admin to publish the schedule.</strong></div>
-            </div>
+        <div className="p-8 sm:p-14 bg-white border-2 border-slate-300 rounded-[4px] shadow-xs text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 text-slate-500 flex items-center justify-center mx-auto">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
           </div>
+          <span className="inline-block px-3 py-1 bg-amber-50 border border-amber-300 font-mono font-bold text-xs text-amber-900 uppercase rounded-[4px]">
+            No Class Schedule Assigned Yet
+          </span>
+          <h3 className="text-base font-bold text-slate-900 uppercase">
+            Awaiting Administrative Timetable Release
+          </h3>
+          <p className="text-xs text-slate-600 max-w-md mx-auto">
+            Your official weekly teaching load and class schedule will appear here automatically once published by the School Administrator.
+          </p>
         </div>
       ) : (
         /* Active Schedule Timetable Display */

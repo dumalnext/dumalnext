@@ -80,7 +80,7 @@ export default function TeacherHomePage() {
   return (
     <div className="space-y-6">
       {/* Faculty Welcome & Overview Banner */}
-      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-6 rounded-[4px] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-2.5 py-0.5 bg-amber-400/20 text-amber-200 border border-amber-300/40 text-xs font-bold rounded-[4px]">
@@ -97,12 +97,9 @@ export default function TeacherHomePage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
             Welcome, {user.fullName || user.email}
           </h2>
-          <p className="text-xs text-blue-100">
-            Dumalneg National High School &bull; Faculty Workstation &bull; {user.email}
-          </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/schedule"
             className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors rounded-[4px] shadow-xs flex items-center gap-1.5"

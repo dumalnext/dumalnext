@@ -616,9 +616,6 @@ export default function FacultyProfilePage() {
             <h1 className="text-base font-black text-[#002060] tracking-tight">
               Official Faculty Profile &amp; Credentials
             </h1>
-            <p className="text-xs text-slate-500">
-              Department of Education &bull; Dumalneg National High School Personnel Workstation
-            </p>
           </div>
         </div>
 
@@ -835,9 +832,6 @@ export default function FacultyProfilePage() {
                 <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                   Academic Staff Verification Details
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Official DepEd personnel record for Dumalneg National High School.
-                </p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -877,9 +871,6 @@ export default function FacultyProfilePage() {
                 <span className="font-bold text-slate-900 block text-sm">
                   Certified Faculty Photo On File
                 </span>
-                <p className="text-[11px] text-slate-500">
-                  Required for institutional faculty ID card, official class advisory listings, and DepEd compliance records.
-                </p>
 
                 <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <button
@@ -1074,9 +1065,6 @@ export default function FacultyProfilePage() {
                   School Affiliation
                 </span>
                 <strong className="text-sm text-slate-900 block">Dumalneg National High School</strong>
-                <p className="text-[10px] text-slate-500">
-                  School ID: 300050 &bull; Region I &bull; SDO Ilocos Norte
-                </p>
               </div>
 
               {/* Card 6: Account Password & Security (REPLACING DepEd Workload Compliance) */}
@@ -1093,7 +1081,7 @@ export default function FacultyProfilePage() {
                   &bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;
                 </strong>
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Want to change password?</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Password Setting</span>
                   <button
                     type="button"
                     onClick={openPasswordModal}
@@ -1119,9 +1107,6 @@ export default function FacultyProfilePage() {
               <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                 Official Teaching Load &amp; Advisory Assignment
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Instructional allocations, section advisership, and schedule compliance under Dumalneg National High School.
-              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1157,19 +1142,19 @@ export default function FacultyProfilePage() {
                     <span className="text-sm font-bold text-slate-700 block">
                       No Advisory Section Designated
                     </span>
-                    <p className="text-xs text-slate-500">
-                      Subject teacher specialist or pending advisory assignment for the current term.
-                    </p>
                   </div>
                 )}
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">View enrolled students:</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Enrolled Masterlist</span>
                   <Link
                     href="/roster"
-                    className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
                   >
-                    Open Advisory Roster
+                    <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Open Advisory Roster</span>
                   </Link>
                 </div>
               </div>
@@ -1189,21 +1174,21 @@ export default function FacultyProfilePage() {
                   <span className="text-lg font-black text-[#002060] block">
                     30 Hours / Week Maximum
                   </span>
-                  <p className="text-xs text-slate-600">
-                    Teaching load governed by DepEd Order on Teaching Load Deconfliction and Faculty Welfare.
-                  </p>
                   <p className="text-[11px] text-slate-500">
                     Department: {user.department} Specialist
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">View weekly timetable:</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Weekly Timetable</span>
                   <Link
                     href="/schedule"
-                    className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
                   >
-                    View Teaching Schedule
+                    <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>View Teaching Schedule</span>
                   </Link>
                 </div>
               </div>
@@ -1220,9 +1205,6 @@ export default function FacultyProfilePage() {
               <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                 Faculty Account Credentials &amp; Security
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Manage your login credentials, password, and registered Gmail address with fast security verification.
-              </p>
             </div>
 
             {/* Self-Service Credentials Cards */}
@@ -1242,13 +1224,10 @@ export default function FacultyProfilePage() {
                   <span className="text-sm font-bold text-slate-900 block truncate font-mono">
                     {user.email}
                   </span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Used for workstation session authentication, official school transmissions, and security verification codes.
-                  </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Need to change your email?</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Registered Address</span>
                   <button
                     type="button"
                     onClick={openEmailModal}
@@ -1277,13 +1256,10 @@ export default function FacultyProfilePage() {
                   <span className="text-sm font-mono tracking-widest font-black text-slate-700 block">
                     &bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;
                   </span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Protects student grades, confidential advisory rosters, and institutional access in compliance with DepEd security policies.
-                  </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Want to change your password?</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Account Access</span>
                   <button
                     type="button"
                     onClick={openPasswordModal}
@@ -1312,24 +1288,6 @@ export default function FacultyProfilePage() {
                 <span>DepEd Personnel Status: </span>
                 <span className="font-bold text-emerald-700">Verified &bull; Active Faculty</span>
               </div>
-            </div>
-
-            {/* Self-Service Security Policy Box */}
-            <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl space-y-2">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#002060]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-                  Self-Service Security Policy
-                </span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                Since you are already signed in to your verified faculty workstation, <strong>you do not need to contact IT Support</strong> to change your password or Gmail address. You can update them directly using the self-service controls above with instant one-time verification.
-              </p>
-              <p className="text-[11px] text-slate-500">
-                Notice: Contacting the IT Support Desk (<code>dumalnext@gmail.com</code>) is only required if you are locked out outside the portal at the login screen.
-              </p>
             </div>
           </div>
         )}

@@ -305,9 +305,6 @@ export default function TeacherDashboard() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-tight">
             {user.fullName || user.email}
           </h2>
-          <p className="text-xs font-mono text-slate-600">
-            Dumalneg National High School &bull; Faculty Workstation &bull; {user.email}
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -379,25 +376,21 @@ export default function TeacherDashboard() {
 
           {/* Clean DepEd Empty State Advisory as Requested */}
           {schedules.length === 0 ? (
-            <div className="p-8 sm:p-12 bg-white border-2 border-slate-300 shadow-xs text-center space-y-4">
-              <div className="max-w-xl mx-auto space-y-3">
-                <span className="inline-block px-3 py-1 bg-slate-100 border border-slate-300 font-mono font-bold text-xs text-slate-700 uppercase">
-                  NO CLASS SCHEDULE ASSIGNED YET
-                </span>
-                <h4 className="text-lg font-bold text-slate-900 uppercase">
-                  Awaiting Administrative Schedule Assignment
-                </h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Your official teaching load and class schedule for School Year 2026–2027 has not yet been assigned by the School Administrator / Principal. 
-                  Once the Schedule Deconfliction console finalizes the official class program, your weekly timetable will automatically appear here.
-                </p>
-                <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 text-left space-y-1">
-                  <div>&bull; Faculty Account: <strong>{user.fullName}</strong> ({user.teacherId})</div>
-                  <div>&bull; Department: <strong>{user.department}</strong></div>
-                  <div>&bull; Max Prescribed Load: <strong>30 Teaching Hours / Week (DepEd Standard)</strong></div>
-                  <div>&bull; Status: <strong>Waiting for Principal / Admin Timetable Publication</strong></div>
-                </div>
+            <div className="p-8 sm:p-12 bg-white border-2 border-slate-300 shadow-xs text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 text-slate-500 flex items-center justify-center mx-auto">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
               </div>
+              <span className="inline-block px-3 py-1 bg-amber-50 border border-amber-300 font-mono font-bold text-xs text-amber-900 uppercase rounded-[4px]">
+                No Class Schedule Assigned Yet
+              </span>
+              <h4 className="text-base font-bold text-slate-900 uppercase">
+                Awaiting Administrative Schedule Assignment
+              </h4>
+              <p className="text-xs text-slate-600 max-w-md mx-auto">
+                Your official weekly teaching load and class schedule will appear here automatically once published by the School Administrator.
+              </p>
             </div>
           ) : (
             <div className="bg-white border-2 border-slate-300 shadow-xs p-4">
@@ -649,11 +642,6 @@ Prev
             <div className="p-4 bg-slate-50 border border-slate-200 space-y-1">
               <span className="text-[11px] font-mono text-slate-500 uppercase block">Department Affiliation</span>
               <strong className="text-sm text-slate-900 block">{user.department}</strong>
-              <p className="text-[10px] text-slate-500">
-                {user.department === "JHS" && "Junior High School (Grades 7–10) Specialist"}
-                {user.department === "SHS" && "Senior High School (Grades 11–12) Specialist"}
-                {user.department === "CROSS_LEVEL" && "Authorized Cross-Level Instruction (Junior & Senior High School)"}
-              </p>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 space-y-1">
@@ -667,13 +655,11 @@ Prev
             <div className="p-4 bg-slate-50 border border-slate-200 space-y-1">
               <span className="text-[11px] font-mono text-slate-500 uppercase block">School Affiliation</span>
               <strong className="text-sm text-slate-900 block">Dumalneg National High School</strong>
-              <p className="text-[10px] text-slate-500">School ID: 300050 &bull; Region I &bull; SDO Ilocos Norte</p>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 space-y-1">
               <span className="text-[11px] font-mono text-slate-500 uppercase block">DepEd Workload Compliance</span>
               <strong className="text-sm text-slate-900 block">30 Hours / Week Maximum Teaching Hours</strong>
-              <p className="text-[10px] text-slate-500">Governed by DepEd Order on Teaching Load Deconfliction</p>
             </div>
           </div>
         </div>
