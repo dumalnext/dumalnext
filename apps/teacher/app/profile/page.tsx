@@ -720,18 +720,12 @@ export default function FacultyProfilePage() {
                     Class Adviser: {advisorySection.name} (Grade {advisorySection.gradeLevel})
                   </span>
                 )}
-                <span className="bg-white/10 px-2.5 py-0.5 rounded border border-white/10">
-                  Dumalneg NHS &bull; School ID: 300050
-                </span>
               </div>
             </div>
           </div>
 
           {/* IT Support Contact Button */}
           <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t border-white/10 sm:border-t-0 pt-3 sm:pt-0">
-            <span className="text-[10px] font-bold text-blue-200 uppercase tracking-wider block mb-1">
-              Need Help with your record?
-            </span>
             <a
               href={itSupportGmailUrl}
               target="_blank"
@@ -1001,9 +995,6 @@ export default function FacultyProfilePage() {
                   )}
                 </div>
                 <strong className="text-sm text-slate-900 block">{user.fullName}</strong>
-                <span className="text-[10px] text-slate-500 block">
-                  Official Institutional Teaching Name
-                </span>
               </div>
 
               {/* Card 2: Faculty Employee ID */}
@@ -1012,9 +1003,6 @@ export default function FacultyProfilePage() {
                   Faculty Employee ID
                 </span>
                 <strong className="text-sm font-mono text-[#002060] block">{user.teacherId}</strong>
-                <span className="text-[10px] text-slate-500 block">
-                  Assigned Personnel Identifier &bull; Dumalneg NHS
-                </span>
               </div>
 
               {/* Card 3: Department Affiliation */}
@@ -1023,12 +1011,6 @@ export default function FacultyProfilePage() {
                   Department Affiliation
                 </span>
                 <strong className="text-sm text-slate-900 block">{user.department}</strong>
-                <p className="text-[10px] text-slate-500">
-                  {user.department === "JHS" && "Junior High School (Grades 7-10) Specialist"}
-                  {user.department === "SHS" && "Senior High School (Grades 11-12) Specialist"}
-                  {user.department === "CROSS_LEVEL" &&
-                    "Authorized Cross-Level Instruction (Junior & Senior High School)"}
-                </p>
               </div>
 
               {/* Card 4: Verified Gmail Address with Change Email Button */}
@@ -1044,8 +1026,7 @@ export default function FacultyProfilePage() {
                 <strong className="text-sm font-mono text-slate-900 block truncate">
                   {user.email}
                 </strong>
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Need to update email?</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                   <button
                     type="button"
                     onClick={openEmailModal}
@@ -1080,8 +1061,7 @@ export default function FacultyProfilePage() {
                 <strong className="text-sm font-mono tracking-widest text-slate-700 block">
                   &bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;
                 </strong>
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Password Setting</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                   <button
                     type="button"
                     onClick={openPasswordModal}
@@ -1145,8 +1125,7 @@ export default function FacultyProfilePage() {
                   </div>
                 )}
 
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Enrolled Masterlist</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                   <Link
                     href="/roster"
                     className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
@@ -1174,13 +1153,9 @@ export default function FacultyProfilePage() {
                   <span className="text-lg font-black text-[#002060] block">
                     30 Hours / Week Maximum
                   </span>
-                  <p className="text-[11px] text-slate-500">
-                    Department: {user.department} Specialist
-                  </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Weekly Timetable</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                   <Link
                     href="/schedule"
                     className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
@@ -1226,8 +1201,7 @@ export default function FacultyProfilePage() {
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Registered Address</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                   <button
                     type="button"
                     onClick={openEmailModal}
@@ -1258,8 +1232,7 @@ export default function FacultyProfilePage() {
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-medium">Account Access</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                   <button
                     type="button"
                     onClick={openPasswordModal}
