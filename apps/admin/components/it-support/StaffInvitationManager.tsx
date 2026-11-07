@@ -234,15 +234,9 @@ export default function StaffInvitationManager() {
             className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
           />
           <div>
-            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-              Role-Based Staff Invitation &amp; Onboarding Desk
-            </span>
-            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
               Faculty, Registrar &amp; IT Support Invitation Console
             </h2>
-            <p className="text-xs text-blue-100 mt-1 max-w-3xl leading-relaxed">
-              Zero Self-Registration: Faculty, Administrators, and IT Support accounts are strictly provisioned through verified email invitations. When an invitation link is accepted, the authorized recipient sets their own password and is granted direct role-based portal access.
-            </p>
           </div>
         </div>
       </div>
@@ -305,26 +299,26 @@ export default function StaffInvitationManager() {
           {lastGeneratedLink.emailSent ? (
             <div className="p-3 bg-white/90 border border-emerald-200 rounded-lg text-xs text-emerald-950 space-y-1.5 leading-relaxed">
               <p className="font-semibold text-emerald-900">
-                The invitation has been dispatched directly to the staff member's email inbox with an official <strong>[ Accept invitation ]</strong> button from Dumalneg National High School Identity Service.
+                Official invitation email has been dispatched to <strong>{lastGeneratedLink.email}</strong>. The recipient can click the button in their email to access the {lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"} and set up their password.
               </p>
               <p className="text-[11px] text-emerald-800">
-                Manual link copying is not required. When the recipient clicks the button in their email, they will be automatically routed to the <strong>{lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"}</strong> to create their password and activate access.
+                You may also copy the direct activation link below to send directly to the staff member.
               </p>
             </div>
           ) : (
-            <div className="p-3 bg-white/90 border border-blue-200 rounded-lg text-xs text-blue-950 space-y-1.5 leading-relaxed">
-              <p className="font-semibold text-blue-900">
-                Staff invitation record has been created and registered.
+            <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-950 space-y-1.5 leading-relaxed">
+              <p className="font-semibold text-amber-900">
+                Staff invitation created for <strong>{lastGeneratedLink.email}</strong>.
               </p>
-              <p className="text-[11px] text-blue-800">
-                Notice regarding automated email dispatch: Ensure <code>SUPABASE_SERVICE_ROLE_KEY</code> is configured in Vercel Environment Variables. You may also provide the direct activation link below:
+              <p className="text-[11px] text-amber-800">
+                If the email inbox does not receive the automated message (e.g. Supabase email quota or spam filter), <strong>copy and send the direct activation link below to the staff member</strong>. Clicking it allows them to set their password and activate their account immediately.
               </p>
             </div>
           )}
 
-          {/* Collapsible / Direct Link Section */}
+          {/* Direct Link Section - Always Open */}
           <details
-            open={!lastGeneratedLink.emailSent}
+            open={true}
             className="text-xs text-slate-700 pt-1"
           >
             <summary className="cursor-pointer font-bold text-[#002060] hover:underline select-none">

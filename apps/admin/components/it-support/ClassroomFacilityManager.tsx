@@ -197,23 +197,20 @@ export default function ClassroomFacilityManager() {
               className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
             />
             <div>
-              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-                School Facility &amp; Physical Classroom Registry
-              </span>
-              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
                 Instructional Rooms &amp; Seating Capacities
               </h2>
-              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
-                Registered classrooms feed directly into the Schedule Deconfliction Engine. Room capacities are validated against section quotas to prevent physical overcrowding.
-              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={openAddModal}
-            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 shadow-sm cursor-pointer"
+            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 shadow-sm cursor-pointer flex items-center gap-1.5"
           >
-            + Add New Classroom
+            <svg className="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add New Classroom</span>
           </button>
         </div>
       </div>

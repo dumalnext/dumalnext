@@ -342,18 +342,9 @@ export default function StudentConcernsManager() {
         <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-5 sm:px-8 sm:py-6 border-b-4 border-amber-400">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
-                  Dumalneg NHS &bull; Learner Messages &amp; Support Inquiries Desk
-                </span>
-              </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 Student Messages &amp; Concerns
               </h2>
-              <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed max-w-3xl">
-                Review student inquiries, track support messages, and reply directly to learner concerns. Note: Account modifications, password removal, and credential edits are managed in <strong>User Accounts &amp; Roles</strong>.
-              </p>
             </div>
 
             {/* Refresh Action */}

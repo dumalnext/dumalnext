@@ -361,24 +361,21 @@ export default function AcademicCalendarManager() {
               className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
             />
             <div>
-              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-                Dynamic Trisemester Calendar Configuration
-              </span>
-              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
                 Academic Year &amp; Trimester Schedule Control
               </h2>
-              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
-                School year boundaries, instructional periods, summative deadlines, and report card distribution dates are dynamically configured through this IT Support console.
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => setIsAddSYModalOpen(true)}
-              className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+              className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer shadow-sm flex items-center gap-1.5"
             >
-              + Configure New Term
+              <svg className="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Configure New Term</span>
             </button>
           </div>
         </div>
@@ -401,10 +398,12 @@ export default function AcademicCalendarManager() {
       {/* Currently Active Academic Calendar Spotlight */}
       <div className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm">
         <div className="border-b border-slate-200 pb-3 mb-4 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-              Currently Active Academic Calendar
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#002060]/10 border border-[#002060]/20 flex items-center justify-center text-[#002060] shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
             <h3 className="text-lg font-black text-slate-950 uppercase">
               {activeTerm ? `SY ${activeTerm.schoolYear} • ${activeTerm.termName}` : "NO ACTIVE TERM CONFIGURED"}
             </h3>

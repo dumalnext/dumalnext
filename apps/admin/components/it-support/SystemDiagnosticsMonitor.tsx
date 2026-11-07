@@ -128,15 +128,9 @@ export default function SystemDiagnosticsMonitor() {
               className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
             />
             <div>
-              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-                Data Privacy &amp; Platform Integrity Monitor
-              </span>
-              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
                 Database Health, Latency &amp; Security Diagnostics
               </h2>
-              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
-                Verifies system security, database connectivity, and compliance with the Philippine Data Privacy Act of 2012 (RA 10173) for Dumalneg NHS learner data.
-              </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">

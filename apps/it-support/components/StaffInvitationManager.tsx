@@ -234,15 +234,9 @@ export default function StaffInvitationManager() {
             className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
           />
           <div>
-            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-              Role-Based Staff Invitation &amp; Onboarding Desk
-            </span>
-            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
               Faculty, Registrar &amp; IT Support Invitation Console
             </h2>
-            <p className="text-xs text-blue-100 mt-1 max-w-3xl leading-relaxed">
-              Zero Self-Registration: Faculty, Administrators, and IT Support accounts are strictly provisioned through verified email invitations. When an invitation link is accepted, the authorized recipient sets their own password and is granted direct role-based portal access.
-            </p>
           </div>
         </div>
       </div>

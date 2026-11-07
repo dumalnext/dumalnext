@@ -459,29 +459,20 @@ export default function UserRoleAuditor() {
               className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block mt-0.5"
             />
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-                  Role-Based Access Control (RBAC) &amp; Credential Directory
-                </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 rounded-full uppercase">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Cloud Sync Active
-                </span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5">
+              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
                 Institutional Accounts &amp; Role Permissions
               </h2>
-              <p className="text-xs text-blue-100 mt-1 max-w-2xl">
-                Manages the four institutional actor types (Student, Teacher, School Administrator, IT Support). Synchronized in real-time with Supabase database.
-              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 shadow-sm cursor-pointer"
+            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 shadow-sm cursor-pointer flex items-center gap-1.5"
           >
-            + Provision User Account
+            <svg className="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Provision User Account</span>
           </button>
         </div>
       </div>
