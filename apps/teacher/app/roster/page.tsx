@@ -893,10 +893,13 @@ export default function ClassSectionRosterPage() {
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold cursor-pointer transition-colors rounded-[4px] shadow-xs shrink-0"
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold cursor-pointer transition-colors rounded-[4px] shadow-xs shrink-0 flex items-center gap-1.5"
               title="Print official advisory class roster"
             >
-              Print Class Roster
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              <span>Print Class Roster</span>
             </button>
           )}
 

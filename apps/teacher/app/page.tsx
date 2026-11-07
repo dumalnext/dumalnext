@@ -105,9 +105,12 @@ export default function TeacherHomePage() {
         <div className="flex items-center gap-2">
           <Link
             href="/schedule"
-            className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors rounded-[4px] shadow-xs"
+            className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors rounded-[4px] shadow-xs flex items-center gap-1.5"
           >
-            View Schedule
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>View Schedule</span>
           </Link>
         </div>
       </div>
@@ -115,94 +118,138 @@ export default function TeacherHomePage() {
       {/* 3 Main Workstation Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Schedule */}
-        <div className="bg-white p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[4px] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#002060]">
-                Instructional Timetable
+        <div className="bg-white p-5 sm:p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[6px] shadow-xs flex flex-col justify-between space-y-4 transition-all group">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[6px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                    Timetable
+                  </span>
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-[#002060] transition-colors leading-tight">
+                    Teaching Load &amp; Schedule
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+              <span className="text-[11px] font-bold text-slate-500 uppercase">
+                Status
               </span>
               {scheduleCount !== null && scheduleCount > 0 ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                   {scheduleCount} Active Periods
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-900 text-[11px] font-bold border border-amber-300 rounded-[4px]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-50 text-amber-900 text-[11px] font-bold border border-amber-300 rounded-[4px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   Pending Release
                 </span>
               )}
             </div>
-            <h3 className="text-base font-bold text-slate-900">
-              Teaching Load &amp; Schedule
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              {scheduleCount !== null && scheduleCount > 0
-                ? `Official instructional timetable active with ${scheduleCount} assigned period(s). View your weekly schedule and classrooms.`
-                : "View your official weekly instructional timetable, assigned subject periods, and designated classrooms."}
-            </p>
           </div>
 
           <Link
             href="/schedule"
-            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
+            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 transition-colors shadow-xs rounded-[4px]"
           >
-            Open Teaching Schedule
+            <span>Open Teaching Schedule</span>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
 
         {/* Card 2: Roster */}
-        <div className="bg-white p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[4px] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#002060]">
-                Class Advisory
+        <div className="bg-white p-5 sm:p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[6px] shadow-xs flex flex-col justify-between space-y-4 transition-all group">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[6px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                    Class Advisory
+                  </span>
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-[#002060] transition-colors leading-tight">
+                    Advisory Section Roster
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+              <span className="text-[11px] font-bold text-slate-500 uppercase">
+                Status
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 Live Rosters
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900">
-              Advisory Section Roster
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Access certified masterlists of officially enrolled learners in your designated advisory class section, with real-time student LRN search.
-            </p>
           </div>
 
           <Link
             href="/roster"
-            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
+            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 transition-colors shadow-xs rounded-[4px]"
           >
-            View Advisory Section Roster
+            <span>View Advisory Section Roster</span>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
 
         {/* Card 3: Profile */}
-        <div className="bg-white p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[4px] shadow-xs flex flex-col justify-between space-y-4 transition-colors">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#002060]">
-                Personnel Record
+        <div className="bg-white p-5 sm:p-6 border-2 border-slate-200 hover:border-[#002060] border-t-4 border-t-[#002060] rounded-[6px] shadow-xs flex flex-col justify-between space-y-4 transition-all group">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[6px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                    Personnel
+                  </span>
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-[#002060] transition-colors leading-tight">
+                    Faculty Profile &amp; Credentials
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+              <span className="text-[11px] font-bold text-slate-500 uppercase">
+                Status
               </span>
-              <span className="px-2.5 py-0.5 bg-blue-50 text-[#002060] text-[11px] font-bold border border-blue-200 rounded-[4px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-blue-50 text-[#002060] text-[11px] font-bold border border-blue-200 rounded-[4px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
                 Verified
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900">
-              Faculty Profile &amp; Credentials
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Inspect your official DepEd personnel information, department specialization, and teaching load compliance limits.
-            </p>
           </div>
 
           <Link
             href="/profile"
-            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center block transition-colors shadow-xs rounded-[4px]"
+            className="w-full py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 transition-colors shadow-xs rounded-[4px]"
           >
-            View Faculty Profile
+            <span>View Faculty Profile</span>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </div>

@@ -249,20 +249,26 @@ export default function TeachingSchedulePage() {
             type="button"
             onClick={() => fetchSchedules()}
             disabled={isLoadingSchedules}
-            className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer border border-white/25 rounded-[4px] shrink-0 disabled:opacity-50"
+            className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer border border-white/25 rounded-[4px] shrink-0 disabled:opacity-50 flex items-center gap-1.5"
             title="Synchronize schedule from official database"
           >
-            {isLoadingSchedules ? "Synchronizing..." : "Refresh Timetable"}
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>{isLoadingSchedules ? "Synchronizing..." : "Refresh Timetable"}</span>
           </button>
           {schedules.length > 0 ? (
             <>
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors cursor-pointer rounded-[4px] shadow-xs shrink-0"
+                className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold transition-colors cursor-pointer rounded-[4px] shadow-xs shrink-0 flex items-center gap-1.5"
                 title="Print certified weekly teaching load timetable"
               >
-                Print Weekly Schedule
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span>Print Weekly Schedule</span>
               </button>
               <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-500/20 text-emerald-100 text-xs font-bold border border-emerald-400/50 rounded-[4px] shrink-0">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
