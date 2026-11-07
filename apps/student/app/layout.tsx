@@ -56,7 +56,19 @@ export default function StudentLayout({
                     localStorage.removeItem('dnhs_pwa_installed');
                   } catch(err) {}
                   try {
+                    window.dispatchEvent(new CustomEvent('dnhs-installed-changed', { detail: { installed: false } }));
+                  } catch(err) {}
+                  try {
                     window.dispatchEvent(new CustomEvent('dnhs-prompt-ready'));
+                  } catch(err) {}
+                });
+                window.addEventListener('appinstalled', function() {
+                  window.__dnhsDeferredPrompt = null;
+                  try {
+                    localStorage.setItem('dnhs_pwa_installed', 'true');
+                  } catch(err) {}
+                  try {
+                    window.dispatchEvent(new CustomEvent('dnhs-installed-changed', { detail: { installed: true } }));
                   } catch(err) {}
                 });
                 if ('serviceWorker' in navigator) {

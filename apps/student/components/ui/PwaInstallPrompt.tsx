@@ -35,6 +35,13 @@ if (typeof window !== "undefined") {
       } catch {}
     }
   });
+  window.addEventListener("appinstalled", () => {
+    cachedPrompt = null;
+    (window as any).__dnhsDeferredPrompt = null;
+    try {
+      localStorage.setItem("dnhs_pwa_installed", "true");
+    } catch {}
+  });
 }
 
 export function usePwaInstall() {
@@ -162,14 +169,23 @@ export function usePwaInstall() {
       }
     };
 
+    const handleInstalledChanged = (e: Event) => {
+      const detail = (e as CustomEvent)?.detail;
+      if (detail && typeof detail.installed === "boolean") {
+        setIsInstalled(detail.installed);
+      }
+    };
+
     window.addEventListener("beforeinstallprompt", handlePrompt);
     window.addEventListener("dnhs-prompt-ready", handlePromptReady);
     window.addEventListener("appinstalled", handleAppInstalled);
+    window.addEventListener("dnhs-installed-changed", handleInstalledChanged);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handlePrompt);
       window.removeEventListener("dnhs-prompt-ready", handlePromptReady);
       window.removeEventListener("appinstalled", handleAppInstalled);
+      window.removeEventListener("dnhs-installed-changed", handleInstalledChanged);
     };
   }, []);
 
@@ -212,8 +228,11 @@ export function usePwaInstall() {
         const choice = await promptEvent.userChoice;
         if (choice && choice.outcome === "accepted") {
           setDeferredPrompt(null);
-          if (typeof window !== "undefined") (window as any).__dnhsDeferredPrompt = null;
-          cachedPrompt = null;
+          if (typeof window !== "undefined") {
+            (window as any).__dnhsDeferredPrompt = null;
+            cachedPrompt = null;
+            window.dispatchEvent(new CustomEvent("dnhs-installed-changed", { detail: { installed: true } }));
+          }
           setIsInstalled(true);
           try {
             localStorage.setItem("dnhs_pwa_installed", "true");
@@ -430,13 +449,25 @@ export function PwaInstallHeaderButton() {
   // If already opened inside standalone installed PWA or previously installed on PC/laptop
   if (isStandalone || isInstalled) {
     return (
-      <span
-        className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-950/70 border border-blue-400/30 text-blue-200 text-[10px] font-bold uppercase rounded-[4px]"
-        title="Dumalneg NHS Portal is running in standalone app mode"
+      <button
+        type="button"
+        onClick={() => {
+          if (isStandalone) {
+            triggerPortalToast("You are already using the installed DNHS Portal app.", "info");
+          } else {
+            triggerPortalToast("Opening DNHS Portal desktop application...", "info");
+            window.open(window.location.origin + "/dashboard", "_blank");
+          }
+        }}
+        className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/40 hover:border-blue-300 text-blue-200 hover:text-white text-xs font-bold uppercase tracking-wider rounded-[4px] shadow-xs transition-all cursor-pointer shrink-0"
+        title="Open Dumalneg NHS Student Portal in standalone desktop app"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        App Active
-      </span>
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+        <span>Open in App</span>
+        <svg className="w-3 h-3 text-blue-300 shrink-0 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </button>
     );
   }
 
@@ -476,8 +507,47 @@ export function PwaInstallDrawerCard() {
   const { isStandalone, isInstalled, isIos, triggerInstall } = usePwaInstall();
   const [showModal, setShowModal] = useState(false);
 
-  // If running inside standalone app OR already installed on this device
-  if (isStandalone || isInstalled) return null;
+  // If running inside standalone app OR already installed on this device: show "Open in App"
+  if (isStandalone || isInstalled) {
+    return (
+      <div className="p-3.5 bg-gradient-to-br from-blue-50 to-indigo-50/70 border-2 border-blue-300/80 rounded-[4px] shadow-xs space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <span className="text-[9px] font-black text-[#002060] uppercase tracking-widest block">
+              PORTAL APP INSTALLED
+            </span>
+            <h4 className="text-xs font-extrabold text-slate-950 leading-tight mt-0.5">
+              DNHS Mobile Portal
+            </h4>
+          </div>
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 font-mono text-[9px] font-bold rounded-[3px] uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Installed
+          </span>
+        </div>
+        <p className="text-[11px] text-slate-700 leading-snug">
+          The portal is installed on your phone. Tap below to launch fullscreen app mode.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            if (isStandalone) {
+              triggerPortalToast("You are already using the installed DNHS Portal app.", "info");
+            } else {
+              triggerPortalToast("Opening DNHS Portal app on your phone...", "info");
+              window.open(window.location.origin + "/dashboard", "_blank");
+            }
+          }}
+          className="w-full py-2 bg-[#002060] hover:bg-blue-900 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-[4px] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+        >
+          <span>Open in App</span>
+          <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </button>
+      </div>
+    );
+  }
 
   const handleClick = async () => {
     const outcome = await triggerInstall();
