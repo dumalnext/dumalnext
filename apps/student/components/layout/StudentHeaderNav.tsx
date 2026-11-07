@@ -503,9 +503,9 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         )}
       </div>
 
-      {/* 3. Sub-Navigation Tabs Bar */}
+      {/* 3. Sub-Navigation Tabs Bar (Hidden on mobile/tablet - accessible via Hamburger Menu) */}
       {user && (
-        <div className="bg-slate-50 border-t border-slate-200 px-3 sm:px-6 lg:px-8 text-slate-800 shadow-2xs">
+        <div className="hidden lg:block bg-slate-50 border-t border-slate-200 px-3 sm:px-6 lg:px-8 text-slate-800 shadow-2xs">
           <div className="max-w-7xl mx-auto flex items-center overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap gap-1 sm:gap-1.5 text-xs font-bold tracking-wide pt-1.5 sm:pt-2 touch-pan-x">
             <Link
               href="/"
