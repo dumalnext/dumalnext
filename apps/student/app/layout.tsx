@@ -53,6 +53,9 @@ export default function StudentLayout({
                   e.preventDefault();
                   window.__dnhsDeferredPrompt = e;
                   try {
+                    localStorage.removeItem('dnhs_pwa_installed');
+                  } catch(err) {}
+                  try {
                     window.dispatchEvent(new CustomEvent('dnhs-prompt-ready'));
                   } catch(err) {}
                 });

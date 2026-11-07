@@ -23,10 +23,16 @@ if (typeof window !== "undefined") {
     e.preventDefault();
     cachedPrompt = e as BeforeInstallPromptEvent;
     (window as any).__dnhsDeferredPrompt = e;
+    try {
+      localStorage.removeItem("dnhs_pwa_installed");
+    } catch {}
   });
   window.addEventListener("dnhs-prompt-ready", () => {
     if ((window as any).__dnhsDeferredPrompt) {
       cachedPrompt = (window as any).__dnhsDeferredPrompt;
+      try {
+        localStorage.removeItem("dnhs_pwa_installed");
+      } catch {}
     }
   });
 }
@@ -52,20 +58,28 @@ export function usePwaInstall() {
       const isStandaloneMode =
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true;
-      return isStandaloneMode || localStorage.getItem("dnhs_pwa_installed") === "true";
+      if (isStandaloneMode) return true;
+      // If a native deferred prompt is already available, the app is definitely NOT installed
+      if ((window as any).__dnhsDeferredPrompt || cachedPrompt) {
+        try {
+          localStorage.removeItem("dnhs_pwa_installed");
+        } catch {}
+        return false;
+      }
+      return localStorage.getItem("dnhs_pwa_installed") === "true";
     }
     return false;
   });
   const [isIos, setIsIos] = useState(false);
 
   useEffect(() => {
-    // Check if running inside installed standalone PWA or previously installed on device
+    // Check if running inside installed standalone PWA
     const checkStandalone = () => {
       const isStandaloneMode =
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true;
       setIsStandalone(isStandaloneMode);
-      if (isStandaloneMode || localStorage.getItem("dnhs_pwa_installed") === "true") {
+      if (isStandaloneMode) {
         setIsInstalled(true);
       }
     };
@@ -82,6 +96,12 @@ export function usePwaInstall() {
             try {
               localStorage.setItem("dnhs_pwa_installed", "true");
             } catch {}
+          } else {
+            // App was deleted / uninstalled from OS
+            setIsInstalled(false);
+            try {
+              localStorage.removeItem("dnhs_pwa_installed");
+            } catch {}
           }
         })
         .catch(() => {});
@@ -94,6 +114,10 @@ export function usePwaInstall() {
 
     if ((window as any).__dnhsDeferredPrompt) {
       setDeferredPrompt((window as any).__dnhsDeferredPrompt);
+      setIsInstalled(false);
+      try {
+        localStorage.removeItem("dnhs_pwa_installed");
+      } catch {}
     }
 
     const handlePrompt = (e: Event) => {
@@ -101,11 +125,19 @@ export function usePwaInstall() {
       (window as any).__dnhsDeferredPrompt = e;
       cachedPrompt = e as BeforeInstallPromptEvent;
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setIsInstalled(false);
+      try {
+        localStorage.removeItem("dnhs_pwa_installed");
+      } catch {}
     };
 
     const handlePromptReady = () => {
       if ((window as any).__dnhsDeferredPrompt) {
         setDeferredPrompt((window as any).__dnhsDeferredPrompt);
+        setIsInstalled(false);
+        try {
+          localStorage.removeItem("dnhs_pwa_installed");
+        } catch {}
       }
     };
 
