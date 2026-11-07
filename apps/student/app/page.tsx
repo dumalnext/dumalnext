@@ -1992,8 +1992,24 @@ function StudentHomeContent() {
                             </label>
                             <button
                               type="button"
-                              onClick={() => setShowLoginPassword((prev) => !prev)}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setShowLoginPassword(true);
+                              }}
+                              onMouseUp={() => setShowLoginPassword(false)}
+                              onMouseLeave={() => setShowLoginPassword(false)}
+                              onTouchStart={() => setShowLoginPassword(true)}
+                              onTouchEnd={() => setShowLoginPassword(false)}
+                              onTouchCancel={() => setShowLoginPassword(false)}
+                              onKeyDown={(e) => {
+                                if (e.key === " " || e.key === "Enter") setShowLoginPassword(true);
+                              }}
+                              onKeyUp={(e) => {
+                                if (e.key === " " || e.key === "Enter") setShowLoginPassword(false);
+                              }}
+                              onClick={(e) => e.preventDefault()}
                               className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
+                              title="Press and hold to view password"
                             >
                               {showLoginPassword ? t("auth.hidePassword", "Hide Password") : t("auth.showPassword", "Show Password")}
                             </button>
@@ -2313,8 +2329,24 @@ function StudentHomeContent() {
                             </label>
                             <button
                               type="button"
-                              onClick={() => setShowRegPassword((prev) => !prev)}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setShowRegPassword(true);
+                              }}
+                              onMouseUp={() => setShowRegPassword(false)}
+                              onMouseLeave={() => setShowRegPassword(false)}
+                              onTouchStart={() => setShowRegPassword(true)}
+                              onTouchEnd={() => setShowRegPassword(false)}
+                              onTouchCancel={() => setShowRegPassword(false)}
+                              onKeyDown={(e) => {
+                                if (e.key === " " || e.key === "Enter") setShowRegPassword(true);
+                              }}
+                              onKeyUp={(e) => {
+                                if (e.key === " " || e.key === "Enter") setShowRegPassword(false);
+                              }}
+                              onClick={(e) => e.preventDefault()}
                               className="text-[11px] font-bold text-[#002060] hover:underline cursor-pointer select-none"
+                              title="Press and hold to view password"
                             >
                               {showRegPassword ? "Hide Password" : "Show Password"}
                             </button>

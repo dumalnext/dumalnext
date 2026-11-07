@@ -1203,8 +1203,24 @@ export default function StudentProfilePage() {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px] font-bold"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setShowNewPassword(true);
+                        }}
+                        onMouseUp={() => setShowNewPassword(false)}
+                        onMouseLeave={() => setShowNewPassword(false)}
+                        onTouchStart={() => setShowNewPassword(true)}
+                        onTouchEnd={() => setShowNewPassword(false)}
+                        onTouchCancel={() => setShowNewPassword(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === " " || e.key === "Enter") setShowNewPassword(true);
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.key === " " || e.key === "Enter") setShowNewPassword(false);
+                        }}
+                        onClick={(e) => e.preventDefault()}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px] font-bold select-none cursor-pointer"
+                        title="Press and hold to view password"
                       >
                         {showNewPassword ? "Hide" : "Show"}
                       </button>
@@ -1228,8 +1244,24 @@ export default function StudentProfilePage() {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px] font-bold"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setShowConfirmPassword(true);
+                        }}
+                        onMouseUp={() => setShowConfirmPassword(false)}
+                        onMouseLeave={() => setShowConfirmPassword(false)}
+                        onTouchStart={() => setShowConfirmPassword(true)}
+                        onTouchEnd={() => setShowConfirmPassword(false)}
+                        onTouchCancel={() => setShowConfirmPassword(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === " " || e.key === "Enter") setShowConfirmPassword(true);
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.key === " " || e.key === "Enter") setShowConfirmPassword(false);
+                        }}
+                        onClick={(e) => e.preventDefault()}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px] font-bold select-none cursor-pointer"
+                        title="Press and hold to view password"
                       >
                         {showConfirmPassword ? "Hide" : "Show"}
                       </button>
