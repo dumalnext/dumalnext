@@ -374,31 +374,50 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
       </div>
 
       {/* 2. Main Title & Nav Strip (Compact single-line on Mobile, Full Institutional on Desktop) */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3.5 lg:py-4.5 flex items-center justify-between gap-2.5 sm:gap-4">
-        {/* Left: School Seal & Institution Title */}
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 group" title="Dumalneg National High School Portal Home">
-          <div className="w-8 h-8 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full border-2 border-amber-400 shadow-md shrink-0 flex items-center justify-center overflow-hidden bg-white/10 group-hover:scale-105 transition-transform">
-            <img
-              src="/dumalneg-logo.png"
-              alt="Dumalneg National High School Seal"
-              className="w-full h-full object-contain rounded-full"
-            />
-          </div>
-          <div className="min-w-0">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-amber-300 uppercase tracking-widest hidden sm:block truncate">
-              Official Basic Education Learner Portal
-            </span>
-            <h1 className="text-xs sm:text-base lg:text-2xl font-extrabold tracking-tight text-white leading-tight truncate">
-              Dumalneg National High School
-            </h1>
-            <span className="text-[10px] text-amber-300 font-semibold block sm:hidden truncate">
-              Student Portal
-            </span>
-            <p className="text-xs text-blue-100/85 hidden sm:block mt-0.5 truncate">
-              Dumalneg, Ilocos Norte &bull; Student Online Enrollment &amp; Academic Records
-            </p>
-          </div>
-        </Link>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3.5 lg:py-4.5 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Left: Mobile Hamburger Drawer Button + School Seal & Institution Title */}
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
+          {user && (
+            <button
+              ref={buttonRef}
+              type="button"
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+              className="lg:hidden flex items-center justify-center p-2 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg cursor-pointer shrink-0 transition-colors shadow-xs"
+              aria-label="Toggle Portal Navigation Menu"
+              aria-expanded={isMenuOpen}
+            >
+              <div className="w-4 h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
+                <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "rotate-45 translate-y-[5px]" : ""}`} />
+                <span className={`w-full h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"}`} />
+                <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""}`} />
+              </div>
+            </button>
+          )}
+
+          <Link href="/" className="flex items-center gap-2 sm:gap-3.5 min-w-0 group" title="Dumalneg National High School Portal Home">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full border-2 border-amber-400 shadow-md shrink-0 flex items-center justify-center overflow-hidden bg-white/10 group-hover:scale-105 transition-transform">
+              <img
+                src="/dumalneg-logo.png"
+                alt="Dumalneg National High School Seal"
+                className="w-full h-full object-contain rounded-full"
+              />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-amber-300 uppercase tracking-widest hidden sm:block truncate">
+                Official Basic Education Learner Portal
+              </span>
+              <h1 className="text-xs sm:text-base lg:text-2xl font-extrabold tracking-tight text-white leading-tight truncate">
+                Dumalneg National High School
+              </h1>
+              <span className="text-[10px] text-amber-300 font-semibold block sm:hidden truncate">
+                Student Portal
+              </span>
+              <p className="text-xs text-blue-100/85 hidden sm:block mt-0.5 truncate">
+                Dumalneg, Ilocos Norte &bull; Student Online Enrollment &amp; Academic Records
+              </p>
+            </div>
+          </Link>
+        </div>
 
         {/* Right: Authenticated Student Account Badges & Navigation */}
         {user ? (
@@ -496,22 +515,6 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               <span>Sign Out</span>
-            </button>
-
-            {/* Mobile-Only Hamburger Menu Drawer Button */}
-            <button
-              ref={buttonRef}
-              type="button"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              className="lg:hidden flex items-center justify-center p-2 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg cursor-pointer shrink-0 transition-colors shadow-xs"
-              aria-label="Toggle Portal Navigation Menu"
-              aria-expanded={isMenuOpen}
-            >
-              <div className="w-4 h-3.5 flex flex-col justify-between items-center py-0.5" aria-hidden="true">
-                <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "rotate-45 translate-y-[5px]" : ""}`} />
-                <span className={`w-full h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"}`} />
-                <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""}`} />
-              </div>
             </button>
           </div>
         ) : (
