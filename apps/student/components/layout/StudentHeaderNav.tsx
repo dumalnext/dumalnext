@@ -355,8 +355,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
   return (
     <header className="deped-header border-t-4 border-t-amber-400 border-b border-[#001744] bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white shadow-md font-sans">
-      {/* 1. Top DepEd Region I Institutional Strip */}
-      <div className="bg-[#001540]/60 border-b border-white/10 text-white px-3 sm:px-6 lg:px-8 py-2">
+      {/* 1. Top DepEd Region I Institutional Strip (Desktop & Tablet only - Hidden on mobile phones to maximize vertical space) */}
+      <div className="hidden sm:block bg-[#001540]/60 border-b border-white/10 text-white px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-amber-400 shrink-0" />
@@ -373,11 +373,11 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
         </div>
       </div>
 
-      {/* 2. Main Title & Nav Strip */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-4.5 flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4">
-        {/* Left: School Seal & Official Full Title */}
-        <Link href="/" className="flex items-center gap-3.5 min-w-0 group" title="Dumalneg National High School Portal Home">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-amber-400 shadow-md shrink-0 flex items-center justify-center overflow-hidden bg-white/10 group-hover:scale-105 transition-transform">
+      {/* 2. Main Title & Nav Strip (Compact single-line on Mobile, Full Institutional on Desktop) */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3.5 lg:py-4.5 flex items-center justify-between gap-2.5 sm:gap-4">
+        {/* Left: School Seal & Institution Title */}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 group" title="Dumalneg National High School Portal Home">
+          <div className="w-8 h-8 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full border-2 border-amber-400 shadow-md shrink-0 flex items-center justify-center overflow-hidden bg-white/10 group-hover:scale-105 transition-transform">
             <img
               src="/dumalneg-logo.png"
               alt="Dumalneg National High School Seal"
@@ -385,41 +385,72 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-amber-300 uppercase tracking-widest block truncate">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-amber-300 uppercase tracking-widest hidden sm:block truncate">
               Official Basic Education Learner Portal
             </span>
-            <h1 className="text-lg sm:text-2xl font-extrabold tracking-tight text-white leading-tight mt-0.5">
+            <h1 className="text-xs sm:text-base lg:text-2xl font-extrabold tracking-tight text-white leading-tight truncate">
               Dumalneg National High School
             </h1>
-            <p className="text-xs text-blue-100/85 hidden sm:block mt-0.5">
+            <span className="text-[10px] text-amber-300 font-semibold block sm:hidden truncate">
+              Student Portal
+            </span>
+            <p className="text-xs text-blue-100/85 hidden sm:block mt-0.5 truncate">
               Dumalneg, Ilocos Norte &bull; Student Online Enrollment &amp; Academic Records
             </p>
           </div>
         </Link>
 
-        {/* Right: Authenticated Student Account Badge & Quick Actions */}
+        {/* Right: Authenticated Student Account Badges & Navigation */}
         {user ? (
-          <div className="flex items-center justify-between md:justify-end gap-2.5 sm:gap-3 shrink-0">
-            {/* Quick Action Utility Buttons */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <PushNotificationHeaderButton />
-              <PwaInstallHeaderButton />
-            </div>
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2.5 lg:gap-3 shrink-0">
+            {/* Quick Action Alerts Button */}
+            <PushNotificationHeaderButton />
 
-            {/* Active Student Session Pill */}
+            {/* Desktop Only: PWA Install Button */}
+            <PwaInstallHeaderButton />
+
+            {/* Mobile-Only Compact User Avatar Circle (1-tap to Profile) */}
             <Link
               href={profileHref}
-              className="border border-white/20 bg-white/10 hover:bg-white/15 backdrop-blur-xs px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs rounded-lg min-w-0 transition-colors flex items-center gap-2.5 sm:gap-3 group"
+              className="lg:hidden relative shrink-0 flex items-center justify-center rounded-full border-2 border-amber-400/90 p-0.5 active:scale-95 transition-transform shadow-xs"
+              title="View Learner Profile & Credentials"
+            >
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={user.fullName || user.firstName}
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover bg-white"
+                />
+              ) : (
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-400/25 text-amber-200 font-black text-[11px] sm:text-xs flex items-center justify-center">
+                  {user.firstName?.charAt(0) || "S"}{user.lastName?.charAt(0) || "T"}
+                </div>
+              )}
+              <span
+                className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#002060] ${
+                  appStatus === "Approved"
+                    ? "bg-emerald-400"
+                    : appStatus === "Pending"
+                    ? "bg-amber-400"
+                    : "bg-emerald-400"
+                }`}
+              />
+            </Link>
+
+            {/* Desktop-Only Full Active Learner Session Pill */}
+            <Link
+              href={profileHref}
+              className="hidden lg:flex border border-white/20 bg-white/10 hover:bg-white/15 backdrop-blur-xs px-3.5 py-1.5 text-xs rounded-lg min-w-0 transition-colors items-center gap-3 group"
               title="View Student Profile & Credentials"
             >
               {photoUrl ? (
                 <img
                   src={photoUrl}
                   alt={user.fullName || user.firstName}
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-amber-400 shadow-xs bg-white shrink-0"
+                  className="w-9 h-9 rounded-full object-cover border-2 border-amber-400 shadow-xs bg-white shrink-0"
                 />
               ) : (
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 border-2 border-amber-300 text-amber-200 font-black text-xs sm:text-sm flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-full bg-amber-400/20 border-2 border-amber-300 text-amber-200 font-black text-xs flex items-center justify-center shrink-0">
                   {user.firstName?.charAt(0) || "S"}{user.lastName?.charAt(0) || "T"}
                 </div>
               )}
@@ -430,7 +461,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     Active Learner Session
                   </span>
                 </div>
-                <div className="font-bold text-white tracking-wide truncate text-xs sm:text-sm mt-0.5 group-hover:text-amber-200 transition-colors">
+                <div className="font-bold text-white tracking-wide truncate text-xs mt-0.5 group-hover:text-amber-200 transition-colors">
                   {user.fullName || `${user.firstName} ${user.lastName}`}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
@@ -454,25 +485,25 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               </div>
             </Link>
 
-            {/* Direct Sign Out Button */}
+            {/* Desktop-Only Direct Sign Out Button */}
             <button
               type="button"
               onClick={logout}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 border border-red-500 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer rounded-lg shrink-0 flex items-center gap-1.5"
+              className="hidden lg:flex items-center gap-1.5 px-3.5 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 border border-red-500 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer rounded-lg shrink-0"
               title="Sign Out of Student Portal"
             >
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              <span className="hidden sm:inline">Sign Out</span>
+              <span>Sign Out</span>
             </button>
 
-            {/* Mobile Hamburger Drawer Button */}
+            {/* Mobile-Only Hamburger Menu Drawer Button */}
             <button
               ref={buttonRef}
               type="button"
               onClick={() => setIsMenuOpen((prev) => !prev)}
-              className="lg:hidden flex items-center gap-1.5 px-2.5 py-2 bg-blue-950/90 hover:bg-blue-900 border border-blue-400/50 text-white text-xs font-bold rounded-lg cursor-pointer shrink-0"
+              className="lg:hidden flex items-center justify-center p-2 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg cursor-pointer shrink-0 transition-colors shadow-xs"
               aria-label="Toggle Portal Navigation Menu"
               aria-expanded={isMenuOpen}
             >
@@ -481,12 +512,11 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                 <span className={`w-full h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"}`} />
                 <span className={`w-full h-0.5 bg-white transition-all duration-300 origin-center ${isMenuOpen ? "-rotate-45 -translate-y-[5px]" : ""}`} />
               </div>
-              <span className="hidden sm:inline text-[11px] uppercase tracking-wider">{isMenuOpen ? "Close" : "Menu"}</span>
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-950/80 border border-blue-400/30 rounded-lg text-[11px] font-bold text-blue-100">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-blue-950/80 border border-blue-400/30 rounded-lg text-[10px] sm:text-[11px] font-bold text-blue-100">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>S.Y. {schoolYear || "2026-2027"}</span>
               <span className="hidden sm:inline text-blue-300">&bull; {semester || "Trimester 1"}</span>
@@ -494,7 +524,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             {pathname !== "/" && (
               <Link
                 href="/"
-                className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-lg transition-colors shadow-xs"
+                className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-lg transition-colors shadow-xs"
               >
                 Sign In
               </Link>
