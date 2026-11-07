@@ -1175,61 +1175,8 @@ export default function ClassSectionRosterPage() {
                           <td className="p-2.5 font-mono font-bold text-[#002060]">
                             {st.student_id || "PENDING LIS"}
                           </td>
-                          <td className="p-2.5">
-                            {(() => {
-                              const cleanSY = (activeSchoolYear || "2026-2027").replace(/[–—]/g, "-").trim();
-                              const currentGrade = gradesList.find(
-                                (g) =>
-                                  (g.studentLrn === st.student_id || g.studentId === st.id) &&
-                                  g.schoolYear === cleanSY &&
-                                  g.trimester === activeTermNumber
-                              );
-                              const canOpenModal = isGradeOpen || Boolean(currentGrade);
-
-                              return (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (canOpenModal) {
-                                      handleOpenGradeModal(st);
-                                    }
-                                  }}
-                                  disabled={!canOpenModal}
-                                  className={`text-left font-bold uppercase flex flex-col items-start gap-0.5 group ${
-                                    canOpenModal
-                                      ? "text-[#002060] hover:text-[#002b80] hover:underline cursor-pointer"
-                                      : "text-slate-800 cursor-default"
-                                  }`}
-                                  title={
-                                    currentGrade
-                                      ? "Click learner name to view grade snapshot"
-                                      : isGradeOpen
-                                      ? "Click learner name to upload grade snapshot"
-                                      : "Grade submission is currently closed by School Administrator"
-                                  }
-                                >
-                                  <span className={canOpenModal ? "group-hover:text-blue-900 transition-colors" : ""}>
-                                    {st.last_name}, {st.first_name} {st.middle_name || ""}
-                                  </span>
-                                  {currentGrade ? (
-                                    <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-emerald-800 normal-case bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                                      Grade: DONE ({currentGrade.termName})
-                                    </span>
-                                  ) : isGradeOpen ? (
-                                    <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-slate-500 normal-case bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                      Grade: Pending ({activeTermName})
-                                    </span>
-                                  ) : (
-                                    <span className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-amber-800 normal-case bg-amber-50 px-1.5 py-0.5 rounded border border-amber-300">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                      Grade: Locked ({activeTermName})
-                                    </span>
-                                  )}
-                                </button>
-                              );
-                            })()}
+                          <td className="p-2.5 font-bold text-slate-900 uppercase">
+                            {st.last_name}, {st.first_name} {st.middle_name || ""}
                           </td>
                           <td className="p-2.5 font-mono">{st.gender || "—"}</td>
                           <td className="p-2.5 text-slate-700">{st.barangay || "—"}</td>
