@@ -198,80 +198,60 @@ function ITSupportLoginFormInner() {
                       ? "IT Support Account Onboarding"
                       : "System Administration & Identity Desk"}
                   </h2>
-                  <p className="text-xs sm:text-sm text-blue-100/90">
-                    Dumalneg National High School &bull; DepEd Division of Ilocos Norte
-                  </p>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-blue-100/90 mt-5 leading-relaxed">
+              <p className="text-xs sm:text-sm text-blue-100/90 mt-4 leading-relaxed">
                 {invitation
-                  ? "Your IT Support invitation has been verified. Create your security password to activate your system administration clearance."
-                  : "Dedicated infrastructure and identity governance portal for Dumalneg National High School. Manage dynamic trisemester academic calendars, register campus classrooms, audit user role permissions, monitor database health, and issue secure staff onboarding invitations."}
+                  ? "Create your security password to activate your system administration clearance."
+                  : "Manage dynamic academic calendars, campus facilities, role permissions, and staff onboarding."}
               </p>
             </div>
 
             <div className="p-6 sm:p-8 bg-white space-y-5">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div>
-                  <span className="text-[11px] font-bold text-[#002060] uppercase tracking-wider block">
-                    System Infrastructure Modules
-                  </span>
-                  <h3 className="text-base font-bold text-slate-900">
-                    Enrollment System Governance &amp; Security Controls
-                  </h3>
-                </div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Enrollment System Governance &amp; Security Controls
+                </h3>
                 <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
                   System Admin
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      01
-                    </span>
-                    <span>Dynamic Trisemester Calendar</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Configure active School Years and Trimesters with zero hardcoded dates, broadcasting changes to all portals.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">Dynamic Trisemester Calendar</span>
                 </div>
 
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      02
-                    </span>
-                    <span>Classroom &amp; Facility Registry</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Maintain physical room capacities, building assignments, and laboratory classifications for timetable scheduling.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">Classroom &amp; Facility Registry</span>
                 </div>
 
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      03
-                    </span>
-                    <span>User Role &amp; Access Auditor</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Audit Student, Teacher, Registrar, and IT Support accounts with Data Privacy Act of 2012 (RA 10173) safeguards.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">User Role &amp; Access Auditor</span>
                 </div>
 
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      04
-                    </span>
-                    <span>Staff Invitations &amp; Onboarding</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Generate and dispatch single-use cryptographic invitation links for new faculty and administrative personnel.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">Staff Invitations &amp; Onboarding</span>
                 </div>
               </div>
             </div>
@@ -282,18 +262,15 @@ function ITSupportLoginFormInner() {
         <div className="lg:col-span-5 order-1 lg:order-2 space-y-4">
           <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
             <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3.5">
-              <div>
-                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
-                  IT Support &amp; System Security
-                </span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#002060]/10 border border-[#002060]/20 flex items-center justify-center text-[#002060] shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
                 <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
                   {invitation ? "IT Support Onboarding Setup" : "IT Support Portal Login"}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {invitation
-                    ? "Create your security password to activate access"
-                    : "Sign in with your authorized system administrator credentials"}
-                </p>
               </div>
             </div>
 
@@ -323,9 +300,6 @@ function ITSupportLoginFormInner() {
                       disabled
                       className="w-full px-3.5 py-2.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-medium cursor-not-allowed select-all"
                     />
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      System access is permanently bound to this verified email address.
-                    </p>
                   </div>
 
                   <div>
@@ -448,8 +422,11 @@ function ITSupportLoginFormInner() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs tracking-wide transition-colors shadow-sm disabled:opacity-50 cursor-pointer flex items-center justify-center"
+                    className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001845] text-white font-bold text-xs tracking-wide transition-colors shadow-sm disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   >
+                    <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
                     <span>{isSubmitting ? "Verifying Credentials..." : "Sign In to IT Support Console"}</span>
                   </button>
 

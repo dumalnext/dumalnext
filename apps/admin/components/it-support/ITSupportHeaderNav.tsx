@@ -46,15 +46,12 @@ export default function ITSupportHeaderNav({
             className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover bg-white p-0.5 shadow-md border-2 border-amber-400 shrink-0 group-hover:scale-105 transition-transform"
           />
           <div className="min-w-0">
-            <span className="text-[11px] font-semibold text-amber-300 uppercase tracking-widest block truncate">
-              System Infrastructure, Academic Calendar &amp; Identity Governance
-            </span>
-            <h1 className="text-lg sm:text-2xl font-extrabold tracking-tight text-white leading-tight mt-0.5 truncate">
+            <h1 className="text-lg sm:text-2xl font-extrabold tracking-tight text-white leading-tight truncate">
               Dumalneg National High School
             </h1>
-            <p className="text-xs text-blue-100/85 hidden sm:block mt-0.5">
-              Dumalneg, Ilocos Norte &bull; IT Support &amp; System Administration Desk
-            </p>
+            <span className="text-xs text-amber-300 font-semibold block truncate">
+              IT Support Portal
+            </span>
           </div>
         </Link>
 
