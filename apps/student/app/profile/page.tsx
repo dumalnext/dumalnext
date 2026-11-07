@@ -483,9 +483,6 @@ export default function StudentProfilePage() {
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">
             Official Learner Profile
           </h1>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Dumalneg National High School &bull; DepEd School ID: 300017
-          </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -687,9 +684,6 @@ export default function StudentProfilePage() {
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                     Official Academic Standing &amp; Placement
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    DepEd curriculum track, grade level, and verified section advisory.
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -788,9 +782,6 @@ export default function StudentProfilePage() {
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                     Learner Demographic Details
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-
-                  </p>
                 </div>
 
                 {idPhotoUrl && (
@@ -884,9 +875,6 @@ export default function StudentProfilePage() {
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                     Official Residential Address
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Home address registered in the Dumalneg NHS learner information system.
-                  </p>
                 </div>
 
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
@@ -935,9 +923,6 @@ export default function StudentProfilePage() {
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                     Parent &amp; Guardian Information
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Official family contacts registered for notifications and emergency contact.
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -997,9 +982,6 @@ export default function StudentProfilePage() {
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
                     Student Account Credentials &amp; Security
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Manage your login credentials, password, and registered email with secure 6-digit OTP verification directly without contacting IT Support.
-                  </p>
                 </div>
 
                 {/* Self-Service Credentials Overview Cards */}
@@ -1019,13 +1001,9 @@ export default function StudentProfilePage() {
                       <span className="text-sm font-bold text-slate-900 block truncate font-mono">
                         {emailAddress}
                       </span>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        Used for session authentication, official school announcements, and security verification codes.
-                      </p>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500 font-medium">Need to change your email?</span>
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                       <button
                         type="button"
                         onClick={openEmailModal}
@@ -1054,13 +1032,9 @@ export default function StudentProfilePage() {
                       <span className="text-sm font-mono tracking-widest font-black text-slate-700 block">
                         &bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;
                       </span>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        Protects your student records and portal access in compliance with DepEd security policies.
-                      </p>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500 font-medium">Want to change your password?</span>
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-end">
                       <button
                         type="button"
                         onClick={openPasswordModal}
@@ -1089,24 +1063,6 @@ export default function StudentProfilePage() {
                     <span>DepEd Learner Status: </span>
                     <span className="font-bold text-emerald-700">Verified &bull; Active</span>
                   </div>
-                </div>
-
-                {/* Explanatory Policy Box (Self-Service vs IT Support) */}
-                <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl space-y-2">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-[#002060]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-                      Self-Service Security Policy
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">
-                    Since you are already signed in to your official learner account, <strong>you do not need to contact IT Support</strong> to change your password or email. You can update them directly using the self-service controls above, and a 6-digit verification code will be sent to authorize each update.
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    * Notice: Contacting the IT Support Desk (<code>dumalnext@gmail.com</code>) is only required if you forgot your password outside the portal at the login screen.
-                  </p>
                 </div>
               </div>
             )}

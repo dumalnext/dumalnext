@@ -50,15 +50,9 @@ export default function LoginPage() {
     <div className="max-w-md mx-auto space-y-6 ">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4 text-center">
-        <span className="text-xs font-semibold text-[#002060]">
-          Dumalneg National High School &bull; Student Portal
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
           Student Portal Sign In
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-sm mx-auto">
-          Sign in using your registered <strong>Email Address</strong> to access online enrollment and track admission records.
-        </p>
       </div>
 
       {/* Error Alert Banner */}
@@ -89,9 +83,7 @@ export default function LoginPage() {
               className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px]"
               required
             />
-            <p className="text-[10px] text-slate-500 mt-1">
-              Enter your registered account email. (12-digit DepEd LRN is also accepted if already linked).
-            </p>
+
           </div>
 
           {/* Password */}
@@ -126,9 +118,12 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px]"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px] flex items-center justify-center gap-2"
             >
-              {isSubmitting ? "Authenticating Account..." : "Sign In to Student Portal"}
+              <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+              <span>{isSubmitting ? "Authenticating Account..." : "Sign In to Student Portal"}</span>
             </button>
           </div>
         </form>

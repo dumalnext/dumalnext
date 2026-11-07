@@ -259,12 +259,16 @@ function StudentGradesContent() {
               </span>
             )}
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
-            My Academic Grades
-          </h1>
-          <p className="text-xs text-slate-600">
-            View your teacher-submitted report card pictures, SF9 snapshots, and academic evaluations per trimester.
-          </p>
+          <div className="flex items-center gap-2.5 pt-1">
+            <div className="w-8 h-8 rounded-lg bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
+              My Academic Grades
+            </h1>
+          </div>
         </div>
 
         {/* Student Badge Card */}

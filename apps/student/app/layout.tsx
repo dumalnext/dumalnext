@@ -99,15 +99,12 @@ export default function StudentLayout({
                   />
                 </Link>
                 <div className="min-w-0">
-                  <p className="hidden sm:block text-[10px] font-semibold tracking-wider text-slate-200 uppercase truncate">
-                    Republic of the Philippines &bull; Department of Education
-                  </p>
-                  <h1 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold tracking-tight text-white truncate">
-                    DUMALNEG NATIONAL HIGH SCHOOL
+                  <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold tracking-tight text-white truncate">
+                    Dumalneg National High School
                   </h1>
-                  <p className="text-[10px] text-slate-300 font-medium truncate">
-                    Official Student Online Portal
-                  </p>
+                  <span className="text-[11px] sm:text-xs text-amber-300 font-semibold block truncate">
+                    Student Portal
+                  </span>
                 </div>
               </div>
             </StudentHeaderNav>

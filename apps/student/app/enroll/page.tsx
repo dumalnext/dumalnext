@@ -165,7 +165,7 @@ Student Dashboard
               Official Online Basic Education Enrollment
             </h1>
             <p className="text-xs text-blue-100 mt-0.5">
-              School Year {schoolYear} &bull; {semester} &bull; Dumalneg National High School
+              S.Y. {schoolYear} &bull; {semester}
             </p>
           </div>
         </div>

@@ -84,15 +84,9 @@ export default function RegisterPage() {
     <div className="max-w-xl mx-auto space-y-6 ">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-4 text-center">
-        <span className="text-xs font-semibold text-[#002060]">
-          Dumalneg National High School &bull; Student Portal
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
           Create Student Account
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-md mx-auto">
-          Register your official student account to initiate online enrollment, upload school credentials, and track your admission status.
-        </p>
       </div>
 
       {/* Global Error Notice */}
@@ -234,10 +228,8 @@ export default function RegisterPage() {
                   errors.lrn ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
-              {errors.lrn ? (
+              {errors.lrn && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.lrn}</p>
-              ) : (
-                <p className="text-[10px] text-slate-500 mt-0.5">Found on your elementary SF9 / Report Card.</p>
               )}
             </div>
           </div>
@@ -268,9 +260,7 @@ export default function RegisterPage() {
             {errors.email && (
               <p className="text-[11px] font-bold text-red-700 mt-1">{errors.email}</p>
             )}
-            <p className="text-[10px] text-slate-500 mt-0.5">
-              This email will be used for your account login and school admission notifications.
-            </p>
+
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -324,9 +314,12 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px]"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px] flex items-center justify-center gap-2"
             >
-              {isSubmitting ? "Creating Official Account..." : "Register Account & Proceed to Enrollment"}
+              <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <span>{isSubmitting ? "Creating Official Account..." : "Register Account & Proceed to Enrollment"}</span>
             </button>
           </div>
         </form>

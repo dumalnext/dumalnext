@@ -860,11 +860,13 @@ function StudentHomeContent() {
           <div className="lg:col-span-4 space-y-5">
             {/* Official Digital Learner ID Card */}
             <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-4 border-b-4 border-amber-400 flex items-center justify-between gap-2">
-                <div>
-                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
-                    Official Learner Identification
-                  </span>
+              <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-3.5 border-b-4 border-amber-400 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                    </svg>
+                  </div>
                   <h2 className="text-sm font-extrabold text-white tracking-tight">
                     Digital Student ID Card
                   </h2>
@@ -968,9 +970,17 @@ function StudentHomeContent() {
                 <div className="pt-2 border-t border-slate-200">
                   <Link
                     href="/profile"
-                    className="w-full py-2 px-3 bg-slate-100 hover:bg-[#002060] hover:text-white text-slate-800 border border-slate-300 text-xs font-bold rounded-[4px] transition-colors flex items-center justify-between shadow-2xs"
+                    className="w-full py-2 px-3 bg-slate-100 hover:bg-[#002060] hover:text-white text-slate-800 border border-slate-300 text-xs font-bold rounded-[4px] transition-colors flex items-center justify-between shadow-2xs group"
                   >
-                    <span>Account &amp; Security Settings</span>
+                    <span className="flex items-center gap-2">
+                      <svg className="w-3.5 h-3.5 text-[#002060] group-hover:text-amber-300 transition-colors shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span>Account &amp; Security Settings</span>
+                    </span>
+                    <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
                   </Link>
                 </div>
               </div>
@@ -978,10 +988,10 @@ function StudentHomeContent() {
 
             {/* Student Portal Quick Links Card */}
             <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm p-4 space-y-3">
-              <div className="border-b border-slate-200 pb-2">
-                <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
-                  Academic Services
-                </span>
+              <div className="border-b border-slate-200 pb-2 flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
                 <h3 className="text-xs font-bold text-slate-900">
                   Student Portal Navigation
                 </h3>
@@ -989,21 +999,59 @@ function StudentHomeContent() {
               <div className="space-y-1.5 text-xs">
                 <Link
                   href="/section"
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
-                  <span>My Class Section &amp; Roster</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>My Class Section &amp; Roster</span>
+                  </span>
+                  <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
                 <Link
                   href="/enroll"
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
-                  <span>Online Enrollment Form</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Online Enrollment Form</span>
+                  </span>
+                  <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
                 <Link
                   href={userApplication ? `/track?ref=${userApplication.referenceNumber}` : "/track"}
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
-                  <span>Track Application Status</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                    <span>Track Application Status</span>
+                  </span>
+                  <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+                <Link
+                  href="/grades"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
+                >
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>My Academic Grades</span>
+                  </span>
+                  <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
                 <button
                   type="button"
@@ -1011,16 +1059,29 @@ function StudentHomeContent() {
                     setConcernModalMode("submit");
                     setShowConcernModal(true);
                   }}
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
+                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left group"
                 >
-                  <span>IT Support &amp; Learner Helpdesk</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span>IT Support &amp; Learner Helpdesk</span>
+                  </span>
+                  <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowPushModal(true)}
                   className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
                 >
-                  <span>Device Push Alerts (PC &amp; Mobile)</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span>Device Push Alerts (PC &amp; Mobile)</span>
+                  </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 </button>
               </div>
@@ -1034,27 +1095,29 @@ function StudentHomeContent() {
             {/* Top 3 Academic Summary KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               {/* KPI 1: Assigned Section */}
-              <div className="bg-white border border-slate-200/90 border-l-4 border-l-[#002060] rounded-[4px] p-4 shadow-xs space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Class Section Placement
-                </span>
-                <div className="text-sm font-extrabold text-slate-900 truncate">
-                  {sectionMode === "ASSIGNED" && assignedSection
-                    ? assignedSection.name
-                    : sectionMode === "ENROLLMENT_REQUIRED"
-                    ? "Enrollment Required"
-                    : "Pending Placement"}
+              <div className="bg-white border border-slate-200/90 border-l-4 border-l-[#002060] rounded-[4px] p-4 shadow-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-[4px] bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
                 </div>
-                <div className="text-xs text-slate-600">
-                  {sectionMode === "ASSIGNED" && assignedSection
-                    ? `Grade ${assignedSection.gradeLevel}${assignedSection.strand ? ` • ${assignedSection.strand}` : ""} Official Roster`
-                    : "Awaiting Administrator Sectioning"}
+                <div className="min-w-0 space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Class Section
+                  </span>
+                  <div className="text-sm font-extrabold text-slate-900 truncate">
+                    {sectionMode === "ASSIGNED" && assignedSection
+                      ? assignedSection.name
+                      : sectionMode === "ENROLLMENT_REQUIRED"
+                      ? "Enrollment Required"
+                      : "Pending Placement"}
+                  </div>
                 </div>
               </div>
 
               {/* KPI 2: Enrollment Status */}
               <div
-                className={`bg-white border border-slate-200/90 border-l-4 rounded-[4px] p-4 shadow-xs space-y-1 ${
+                className={`bg-white border border-slate-200/90 border-l-4 rounded-[4px] p-4 shadow-xs flex items-center gap-3 ${
                   userApplication?.status === "Approved"
                     ? "border-l-emerald-600"
                     : userApplication?.status === "Needs Revision"
@@ -1062,45 +1125,57 @@ function StudentHomeContent() {
                     : "border-l-amber-500"
                 }`}
               >
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Enrollment Status
-                </span>
                 <div
-                  className={`text-sm font-extrabold truncate ${
+                  className={`w-9 h-9 rounded-[4px] flex items-center justify-center shrink-0 border ${
                     userApplication?.status === "Approved"
-                      ? "text-emerald-800"
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                       : userApplication?.status === "Needs Revision"
-                      ? "text-red-800"
-                      : "text-amber-900"
+                      ? "bg-red-50 border-red-200 text-red-700"
+                      : "bg-amber-50 border-amber-200 text-amber-700"
                   }`}
                 >
-                  {userApplication
-                    ? userApplication.status === "Approved"
-                      ? "Approved & Enrolled"
-                      : userApplication.status === "Needs Revision"
-                      ? "Needs Revision"
-                      : "Pending Evaluation"
-                    : "Not Yet Enrolled"}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </div>
-                <div className="text-xs text-slate-600">
-                  S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
+                <div className="min-w-0 space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Enrollment Status
+                  </span>
+                  <div
+                    className={`text-sm font-extrabold truncate ${
+                      userApplication?.status === "Approved"
+                        ? "text-emerald-800"
+                        : userApplication?.status === "Needs Revision"
+                        ? "text-red-800"
+                        : "text-amber-900"
+                    }`}
+                  >
+                    {userApplication
+                      ? userApplication.status === "Approved"
+                        ? "Approved & Enrolled"
+                        : userApplication.status === "Needs Revision"
+                        ? "Needs Revision"
+                        : "Pending Evaluation"
+                      : "Not Yet Enrolled"}
+                  </div>
                 </div>
               </div>
 
               {/* KPI 3: Application Reference */}
-              <div className="bg-white border border-slate-200/90 border-l-4 border-l-amber-400 rounded-[4px] p-4 shadow-xs space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Application Reference
-                </span>
-                <div className="text-sm font-extrabold text-[#002060] truncate">
-                  {userApplication ? userApplication.referenceNumber : "No Active Submission"}
+              <div className="bg-white border border-slate-200/90 border-l-4 border-l-amber-400 rounded-[4px] p-4 shadow-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-[4px] bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
-                <div className="text-xs text-slate-600">
-                  {userApplication
-                    ? `Submitted ${new Date(userApplication.applicationDate).toLocaleDateString()}`
-                    : isEnrollmentOpen
-                    ? "Enrollment Window Open"
-                    : "Enrollment Window Closed"}
+                <div className="min-w-0 space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Application Ref.
+                  </span>
+                  <div className="text-sm font-extrabold text-[#002060] truncate">
+                    {userApplication ? userApplication.referenceNumber : "No Active Submission"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1110,21 +1185,26 @@ function StudentHomeContent() {
                 ================================================================= */}
             <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
               <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
-                    Academic Schedule &amp; Curriculum
-                  </span>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-[4px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
                   <h3 className="text-sm sm:text-base font-bold text-slate-900">
                     {sectionMode === "ASSIGNED" && assignedSection
-                      ? `Live Class Timetable & Subjects • ${assignedSection.name}`
+                      ? `Class Timetable & Subjects • ${assignedSection.name}`
                       : "Class Section & Prescribed Subjects Preview"}
                   </h3>
                 </div>
                 <Link
                   href="/section"
-                  className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs whitespace-nowrap"
+                  className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs whitespace-nowrap flex items-center gap-1.5"
                 >
-                  Open Full Section &amp; Schedule
+                  <span>Open Full Section &amp; Schedule</span>
+                  <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               </div>
 
@@ -1144,37 +1224,34 @@ function StudentHomeContent() {
                     </span>
                   </div>
                 ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
-                  <div className="p-3.5 bg-blue-50 border border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
-                    <div className="space-y-0.5">
-                      <div className="text-xs font-bold text-[#002060] uppercase">
-                        Enrollment Required for Trimester {activeTermNum}
-                      </div>
-                      <p className="text-xs text-slate-700">
-                        Complete your continuing enrollment for S.Y. {schoolYear} to unlock your class section and timetable.
-                      </p>
+                  <div className="p-3 bg-blue-50 border border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#002060] uppercase">
+                      <span className="w-2 h-2 rounded-full bg-[#002060] shrink-0" />
+                      <span>Enrollment Required for Trimester {activeTermNum}</span>
                     </div>
                     <Link
                       href="/enroll"
-                      className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap"
+                      className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap flex items-center gap-1.5 self-start sm:self-auto"
                     >
-                      Complete Enrollment
+                      <span>Complete Enrollment</span>
+                      <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </Link>
                   </div>
                 ) : (
-                  <div className="p-3.5 bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
-                    <div className="space-y-0.5">
-                      <div className="text-xs font-bold text-amber-950">
+                  <div className="p-3 bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                      <span>
                         {sectionMode === "NOT_ASSIGNED_TRANSFEREE"
                           ? "Transferee Section Placement Pending Evaluation"
                           : "Awaiting Official Class Section Placement"}
-                      </div>
-                      <p className="text-xs text-amber-800">
-                        Your class section and room assignment will appear here automatically once finalized by the School Administrator.
-                      </p>
+                      </span>
                     </div>
                     <Link
                       href="/section"
-                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap"
+                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap self-start sm:self-auto"
                     >
                       Check Status
                     </Link>
@@ -1491,36 +1568,37 @@ function StudentHomeContent() {
                             ? isJhsContinuing
                               ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? (Continuing JHS Learner)`
                               : `Ready to Enroll for S.Y. ${schoolYear} (${semester})? (Continuing SHS Learner)`
-                            : `Ready to Complete Your Basic Education Enrollment for S.Y. ${schoolYear} (${semester})?`
+                            : `Ready to Complete Your Enrollment for S.Y. ${schoolYear} (${semester})?`
                           : `Basic Education Online Enrollment is Currently Closed`}
                       </h3>
 
-                      <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
-                        {isEnrollmentOpen
-                          ? priorApproved
-                            ? isJhsContinuing
-                              ? `Your official learner credentials and documentary requirements are certified on file from your previous approved enrollment. As Junior High School (Grades 7-10) follows a prescribed core curriculum, no electives are required. Click below for instant 1-click re-enrollment for ${semester}.`
-                              : `Your learner credentials, family background, and official DepEd documents are verified and on file from your previous approved enrollment. Click below to choose your elective subjects and submit enrollment for ${semester}.`
-                            : `Your student account is active. Click below to begin filling out the complete enrollment form for School Year ${schoolYear} (${semester}). Please review and double check all learner credentials and documentary requirements.`
-                          : (closedMessage || "Online enrollment submission is temporarily closed by the School Administration Office. You can view the official advisory notice below.")}
-                      </p>
+                      {!isEnrollmentOpen && closedMessage && (
+                        <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
+                          {closedMessage}
+                        </p>
+                      )}
 
-                      <div className="pt-2">
+                      <div className="pt-1">
                         <Link
                           href="/enroll"
-                          className={`inline-block text-xs font-bold py-3 px-8 rounded-[4px] ${
+                          className={`inline-flex items-center justify-center gap-2 text-xs font-bold py-3 px-6 rounded-[4px] ${
                             isEnrollmentOpen
                               ? "btn-primary"
                               : "bg-red-800 hover:bg-red-900 text-white shadow-xs"
                           }`}
                         >
-                          {isEnrollmentOpen
-                            ? priorApproved
-                              ? isJhsContinuing
-                                ? `1-Click Re-Enroll for ${semester} (Grade ${targetContinuingGrade} JHS)`
-                                : `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
-                              : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
-                            : "View Official Enrollment Notice & Advisory"}
+                          <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span>
+                            {isEnrollmentOpen
+                              ? priorApproved
+                                ? isJhsContinuing
+                                  ? `1-Click Re-Enroll for ${semester} (Grade ${targetContinuingGrade} JHS)`
+                                  : `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
+                                : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
+                              : "View Official Enrollment Notice & Advisory"}
+                          </span>
                         </Link>
                       </div>
                     </>
@@ -1637,84 +1715,69 @@ function StudentHomeContent() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
-                      Dumalneg, Ilocos Norte &bull; Junior &amp; Senior High School
-                    </p>
                     <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">
                       {t("hero.title", "Online Basic Education Admission & Continuing Enrollment")}
                     </h2>
                     <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                      {t("hero.desc", "Official learner gateway for incoming Grade 7, Grade 11, transferees, and continuing learners of Dumalneg National High School.")}
+                      {t("hero.desc", "Access online admission, continuing enrollment, class section rosters, and official academic grades.")}
                     </p>
                   </div>
                 </div>
 
-                {/* Integrated 4-Step Enrollment Process */}
+                {/* Integrated 4-Step Enrollment Process with Vector Icons */}
                 <div className="p-5 sm:p-6 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-200 pb-3">
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-3">
                     <h3 className="text-sm sm:text-base font-bold text-slate-900">
                       {t("steps.header", "How to Enroll Online in 4 Simple Steps")}
                     </h3>
-                    <span className="text-[11px] font-medium text-slate-500">
-                      Grades 7–10 (JHS) &amp; Grades 11–12 (SHS)
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
+                      Grades 7–12
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-[4px] bg-[#002060] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        1
+                    <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">
-                          {t("steps.step1Title", "Create Account & Verify Gmail")}
-                        </h4>
-                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          {t("steps.step1Desc", "Register with your PSA full name and active Gmail, then enter the 6-digit verification code.")}
-                        </p>
-                      </div>
+                      <h4 className="text-xs font-bold text-[#002060]">
+                        {t("steps.step1Title", "1. Create Account & Verify Gmail")}
+                      </h4>
                     </div>
 
-                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-[4px] bg-[#002060] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        2
+                    <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">
-                          {t("steps.step2Title", "Fill Out Enrollment Form")}
-                        </h4>
-                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          {t("steps.step2Desc", "Complete the 5-step DepEd form (or 1-click re-enrollment for continuing learners).")}
-                        </p>
-                      </div>
+                      <h4 className="text-xs font-bold text-[#002060]">
+                        {t("steps.step2Title", "2. Fill Out Enrollment Form")}
+                      </h4>
                     </div>
 
-                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-[4px] bg-[#002060] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        3
+                    <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">
-                          {t("steps.step3Title", "Upload School Documents")}
-                        </h4>
-                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          {t("steps.step3Desc", "Submit clear copies of your PSA Birth Certificate, SF9 Report Card, and 2x2 ID Picture.")}
-                        </p>
-                      </div>
+                      <h4 className="text-xs font-bold text-[#002060]">
+                        {t("steps.step3Title", "3. Upload School Documents")}
+                      </h4>
                     </div>
 
-                    <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-[4px] flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-[4px] bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        4
+                    <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-600/40 transition-colors flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-md bg-emerald-600/10 border border-emerald-600/20 text-emerald-700 flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">
-                          {t("steps.step4Title", "Track Status & Class Section")}
-                        </h4>
-                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                          {t("steps.step4Desc", "View real-time Administrator approval, check your assigned section, and download your DepEd PDF.")}
-                        </p>
-                      </div>
+                      <h4 className="text-xs font-bold text-emerald-900">
+                        {t("steps.step4Title", "4. Track Status & Class Section")}
+                      </h4>
                     </div>
                   </div>
                 </div>
@@ -1761,10 +1824,12 @@ function StudentHomeContent() {
                   <div>
                     {/* Portal Card Institutional Header */}
                     <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-                          {t("auth.gateway", "Learner Gateway")}
-                        </span>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        </div>
                         <h2 className="text-base font-bold text-white tracking-tight">
                           {t("auth.accessTitle", "Student Portal Access")}
                         </h2>
@@ -1784,9 +1849,12 @@ function StudentHomeContent() {
                           setActiveTab("signin");
                           setLoginError("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs"
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs flex items-center justify-center gap-1.5"
                       >
-                        {t("auth.signInTab", "Sign In")}
+                        <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                        <span>{t("auth.signInTab", "Sign In")}</span>
                       </button>
                       <button
                         type="button"
@@ -1795,21 +1863,21 @@ function StudentHomeContent() {
                           setRegErrors({});
                           setRegSuccessNotice("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 flex items-center justify-center gap-1.5"
                       >
-                        {t("auth.createAccountTab", "Create Account")}
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        <span>{t("auth.createAccountTab", "Create Account")}</span>
                       </button>
                     </div>
 
                     <div className="p-5 sm:p-6">
-                      <div className="space-y-5">
-                      <div className="border-b border-slate-200 pb-3">
+                      <div className="space-y-4">
+                      <div className="border-b border-slate-200 pb-2.5">
                         <h3 className="text-base font-bold text-slate-900">
                           {t("auth.signInHeader", "Sign In to Your Learner Account")}
                         </h3>
-                        <p className="text-xs text-slate-600 mt-0.5">
-                          {t("auth.signInDesc", "Enter your registered email address and password to continue enrollment or check your application status.")}
-                        </p>
                       </div>
 
                       {regSuccessNotice && (
@@ -1952,9 +2020,12 @@ function StudentHomeContent() {
                           <button
                             type="submit"
                             disabled={isLoggingIn}
-                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs"
+                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs flex items-center justify-center gap-2"
                           >
-                            {isLoggingIn ? t("auth.signingIn", "Signing In... Please Wait") : t("auth.signInBtn", "Sign In to Student Portal")}
+                            <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            <span>{isLoggingIn ? t("auth.signingIn", "Signing In... Please Wait") : t("auth.signInBtn", "Sign In to Student Portal")}</span>
                           </button>
                         </div>
                         <div className="pt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-t border-slate-100">
@@ -2019,10 +2090,12 @@ function StudentHomeContent() {
                   <div>
                     {/* Portal Card Institutional Header */}
                     <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-                          {t("auth.gateway", "Learner Gateway")}
-                        </span>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                          </svg>
+                        </div>
                         <h2 className="text-base font-bold text-white tracking-tight">
                           {t("auth.accessTitle", "Student Portal Access")}
                         </h2>
@@ -2042,9 +2115,12 @@ function StudentHomeContent() {
                           setActiveTab("signin");
                           setLoginError("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900"
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 flex items-center justify-center gap-1.5"
                       >
-                        {t("auth.signInTab", "Sign In")}
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                        <span>{t("auth.signInTab", "Sign In")}</span>
                       </button>
                       <button
                         type="button"
@@ -2053,21 +2129,21 @@ function StudentHomeContent() {
                           setRegErrors({});
                           setRegSuccessNotice("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs"
+                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs flex items-center justify-center gap-1.5"
                       >
-                        {t("auth.createAccountTab", "Create Account")}
+                        <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        <span>{t("auth.createAccountTab", "Create Account")}</span>
                       </button>
                     </div>
 
                     <div className="p-5 sm:p-6">
                       <div className="space-y-4">
-                      <div className="border-b border-slate-200 pb-3">
+                      <div className="border-b border-slate-200 pb-2.5">
                         <h3 className="text-base font-bold text-slate-900">
                           {t("auth.createHeader", "Create Student Applicant Account")}
                         </h3>
-                        <p className="text-xs text-slate-600 mt-0.5">
-                          {t("auth.createDesc", "Enter your official PSA name and active Gmail address to start your online enrollment.")}
-                        </p>
                       </div>
 
                       {/* Real-time Registration Progress Bar & Status */}
@@ -2223,9 +2299,7 @@ function StudentHomeContent() {
                             disabled={isRegistering}
                             required
                           />
-                          <p className="text-[10px] text-slate-500 mt-1">
-                            We will send a 6-digit verification code and application updates to this email.
-                          </p>
+
                           {regErrors.email && (
                             <p className="text-[10px] text-red-700 font-bold mt-1">{regErrors.email}</p>
                           )}
@@ -2291,20 +2365,16 @@ function StudentHomeContent() {
                           />
                         </div>
 
-                        <div className="p-3 bg-blue-50/60 border border-blue-200 text-[11px] text-slate-700 rounded-[4px]">
-                          <strong className="text-[#002060] block mb-0.5">
-                            Note on LRN &amp; School Documents:
-                          </strong>
-                          Your 12-digit LRN, PSA Birth Certificate, and SF9 Report Card will be entered in the 5-step enrollment form right after creating your account.
-                        </div>
-
                         <div className="pt-1">
                           <button
                             type="submit"
                             disabled={isRegistering}
-                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs"
+                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs flex items-center justify-center gap-2"
                           >
-                            {isRegistering ? "Creating Account... Please Wait" : "Create Student Account"}
+                            <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            <span>{isRegistering ? "Creating Account... Please Wait" : "Create Student Account"}</span>
                           </button>
                         </div>
                       </form>
@@ -2333,65 +2403,89 @@ function StudentHomeContent() {
           </div>
 
           {/* Bottom Institutional Section: Enrollment Classifications & Documentary Requirements */}
-          <section className="bg-white p-6 sm:p-7 border border-slate-200/90 rounded-[4px] shadow-sm space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3.5">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#002060] block">
-                  DepEd Admission Guidelines &amp; Requirements
-                </span>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900">
+          <section className="bg-white p-5 sm:p-6 border border-slate-200/90 rounded-[4px] shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h2 className="text-sm sm:text-base font-bold text-slate-900">
                   Learner Classifications &amp; Documentary Checklist
                 </h2>
               </div>
-              <span className="text-xs text-slate-500 font-medium">
-                School Year {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
+              <span className="text-xs text-slate-500 font-semibold">
+                S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
-              <div className="p-5 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-[#002060] rounded-[4px] space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 bg-blue-100 text-[#002060] text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
-                    Incoming Grade 7
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-500">Junior High School</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-[#002060] rounded-[4px] space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-[4px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#002060] block">
+                      Incoming Grade 7
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                      Junior High School
+                    </h3>
+                  </div>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">
-                  Elementary Completers &amp; JHS Applicants
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Enrolling under the Regular Basic Education JHS Curriculum. Prepare your 12-digit LRN, PSA Birth Certificate, and Grade 6 SF9 (Form 138).
-                </p>
+                <div className="pt-2 border-t border-slate-200/80 flex flex-wrap gap-1.5">
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">12-Digit LRN</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">PSA Birth Cert</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Grade 6 SF9</span>
+                </div>
               </div>
 
-              <div className="p-5 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-amber-500 rounded-[4px] space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
-                    Grade 11 &amp; Transferees
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-500">Senior High School</span>
+              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-amber-500 rounded-[4px] space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-[4px] bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                      Grade 11 &amp; Transferees
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                      Senior High School
+                    </h3>
+                  </div>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">
-                  SHS Track, Strand &amp; Trimester Electives
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  For Grade 10 completers and transferees. Select your Academic or Tech-Pro pathway, choose trimester electives, and upload your certified SF9 &amp; PSA Birth Certificate.
-                </p>
+                <div className="pt-2 border-t border-slate-200/80 flex flex-wrap gap-1.5">
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Track &amp; Electives</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">PSA Birth Cert</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Grade 10 SF9</span>
+                </div>
               </div>
 
-              <div className="p-5 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-emerald-600 rounded-[4px] space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] font-bold uppercase tracking-wider rounded-[4px]">
-                    Grades 8–10 &amp; Grade 12
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-500">Continuing Learners</span>
+              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-emerald-600 rounded-[4px] space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-[4px] bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
+                      Grades 8–10 &amp; Grade 12
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                      Continuing Learners
+                    </h3>
+                  </div>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">
-                  1-Click Re-Enrollment &amp; Official DepEd PDF
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Continuing Dumalneg NHS learners have verified records on file for fast re-enrollment, automatic section roster placement, and official 2-page DepEd PDF download.
-                </p>
+                <div className="pt-2 border-t border-slate-200/80 flex flex-wrap gap-1.5">
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">1-Click Re-Enroll</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Auto Section</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">DepEd PDF</span>
+                </div>
               </div>
             </div>
           </section>

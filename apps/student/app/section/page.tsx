@@ -693,7 +693,7 @@ Home Dashboard
                 Class Section &amp; Advisory Placement
               </h1>
               <p className="text-xs text-blue-100 mt-0.5">
-                Official section roster, classroom advisory assignment, and prescribed schedule (S.Y. {schoolYear} &bull; Trimester {activeTermNumber}).
+                S.Y. {schoolYear} &bull; Trimester {activeTermNumber}
               </p>
             </div>
           </div>
@@ -828,35 +828,44 @@ Home Dashboard
             <button
               type="button"
               onClick={() => setActiveTab("overview")}
-              className={`py-2.5 px-4 border-t-2 border-x-2 rounded-t-[4px] transition-all cursor-pointer shrink-0 ${
+              className={`py-2.5 px-4 border-t-2 border-x-2 rounded-t-[4px] transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                 activeTab === "overview"
                   ? "bg-white border-[#002060] text-[#002060] -mb-[2px] border-b-2 border-b-white z-10"
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              Section Overview &amp; Advisory
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span>Section Overview &amp; Advisory</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("classmates")}
-              className={`py-2.5 px-4 border-t-2 border-x-2 rounded-t-[4px] transition-all cursor-pointer shrink-0 ${
+              className={`py-2.5 px-4 border-t-2 border-x-2 rounded-t-[4px] transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                 activeTab === "classmates"
                   ? "bg-white border-[#002060] text-[#002060] -mb-[2px] border-b-2 border-b-white z-10"
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              Section Classmates ({assignedSection.grade_level >= 11 && electiveInfo ? `${classmates.length} Track / ${electiveClassmates.length} Elective` : `${classmates.length}`})
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>Section Classmates ({assignedSection.grade_level >= 11 && electiveInfo ? `${classmates.length} Track / ${electiveClassmates.length} Elective` : `${classmates.length}`})</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("schedule")}
-              className={`py-2.5 px-4 border-t-2 border-x-2 rounded-t-[4px] transition-all cursor-pointer shrink-0 ${
+              className={`py-2.5 px-4 border-t-2 border-x-2 rounded-t-[4px] transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                 activeTab === "schedule"
                   ? "bg-white border-[#002060] text-[#002060] -mb-[2px] border-b-2 border-b-white z-10"
                   : "bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900"
               }`}
             >
-              Prescribed Schedule &amp; Subjects
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>Prescribed Schedule &amp; Subjects</span>
             </button>
           </div>
 
@@ -870,9 +879,6 @@ Home Dashboard
                 <h3 className="text-base font-bold text-slate-900">
                   Class Profile &bull; {assignedSection.section_name}
                 </h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  You are officially designated to this class section for the academic school year. Keep in touch with your assigned Homeroom Adviser for announcements.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -1192,9 +1198,6 @@ Home Dashboard
                 <h3 className="text-base font-bold text-slate-900">
                   Subjects &amp; Timetable &bull; Grade {assignedSection.grade_level}
                 </h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Official subjects aligned with DepEd Order standards for Grade {assignedSection.grade_level}.
-                </p>
               </div>
 
               {/* Prescribed Subjects Table */}
@@ -1305,24 +1308,12 @@ Home Dashboard
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Please enroll to see your section assignment
               </h2>
               <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                Enrollment for <strong>Trimester {activeTermNumber} (S.Y. {schoolYear})</strong> is currently in progress. 
-                Please submit your continuing enrollment application to confirm and view your official class section, advisory teacher, and room placement.
-              </p>
-            </div>
-
-            {/* Explanatory Policy Box */}
-            <div className="p-4 bg-white border border-blue-300 text-xs space-y-2 rounded-[4px]">
-              <span className="font-bold text-[#002060] block text-[11px]">
-                DepEd Dumalneg NHS Continuing Enrollment Policy
-              </span>
-              <p className="text-slate-700 leading-relaxed">
-                As a continuing learner of Dumalneg National High School, your previously assigned class section will be 
-                <strong> automatically retained and unlocked</strong> as soon as your continuing enrollment form is submitted for this semester.
+                Submit your continuing enrollment for <strong>Trimester {activeTermNumber} (S.Y. {schoolYear})</strong> to unlock your retained class section and timetable.
               </p>
             </div>
 
@@ -1332,7 +1323,10 @@ Home Dashboard
                 href="/enroll"
                 className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-[4px]"
               >
-                Complete Continuing Enrollment Now
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Complete Continuing Enrollment Now</span>
               </Link>
               <Link
                 href="/"
@@ -1344,12 +1338,6 @@ Home Dashboard
           </div>
         </div>
       ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
-        /* =========================================================================
-           STATE 3: TRANSFEREE IN SEMESTER 2 OR 3 (AWAITING ADMIN ADJUDICATION)
-           Rule 3: "kung ang isang student ay transferee, tapos nag enroll siya 2 or 3
-           sem ang magpapakita sakanya ay 'You're not yet assigned to a section'
-           kasi nga transferee pa po siya."
-           ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-amber-50 border-2 border-amber-500 shadow-xs space-y-4 rounded-[4px]">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-300 pb-3">
@@ -1362,25 +1350,12 @@ Home Dashboard
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h2 className="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight">
                 You&apos;re not yet assigned to a section
               </h2>
               <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                As a <strong>transferee learner</strong> enrolling in Trimester {activeTermNumber}, your academic credentials, 
-                SF10 / Form 137, and curriculum credits are currently being verified by the School Administrator and Registrar.
-              </p>
-            </div>
-
-            {/* Explanatory Callout */}
-            <div className="p-4 bg-white border border-amber-300 text-xs space-y-2 rounded-[4px]">
-              <span className="font-bold text-amber-900 block text-[11px]">
-                Official Transferee Placement Protocol
-              </span>
-              <p className="text-slate-800 leading-relaxed">
-                Unlike continuing students, incoming transferee learners require manual evaluation of subject prerequisites 
-                and class advisory slotting by the administration. Your designated section will appear here automatically as soon 
-                as the School Administrator finalizes your class placement.
+                Your transferee records and SF10 credentials are currently under evaluation by the School Administrator for section slotting.
               </p>
             </div>
 
@@ -1388,9 +1363,12 @@ Home Dashboard
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-[4px]"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-flex items-center gap-1.5 rounded-[4px]"
               >
-                Track Transferee Application Status
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <span>Track Transferee Application Status</span>
               </Link>
               <Link
                 href="/"
@@ -1402,11 +1380,6 @@ Home Dashboard
           </div>
         </div>
       ) : (
-        /* =========================================================================
-           STATE 4: GENERAL NOT YET ASSIGNED (START OF SCHOOL YEAR / SEMESTER 1)
-           Rule 1: "kung start ng school year tapos 1 sem palang ang magpapakita
-           sa student talaga ay you're not yet assigned po."
-           ========================================================================= */
         <div className="space-y-6">
           <div className="p-6 bg-amber-50 border-2 border-amber-400 shadow-xs space-y-4 rounded-[4px]">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-3">
@@ -1419,51 +1392,62 @@ Home Dashboard
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h2 className="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight">
                 You&apos;re not yet assigned to a section
               </h2>
               <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                Your student profile is currently awaiting official section placement from the school administrator and registrar.
+                Awaiting official section placement from the School Administrator and Registrar.
               </p>
             </div>
 
-            {/* Explanatory Steps */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-              <div className="bg-white p-3.5 border border-amber-300 space-y-1 rounded-[4px]">
-                <span className="text-[10px] font-bold text-slate-400 block">Step 01</span>
-                <strong className="text-slate-900 block">Enrollment Submission</strong>
-                <p className="text-[11px] text-slate-600">
-                  Ensure your DepEd enrollment form and documents have been submitted.
-                </p>
+            {/* Compact Vector Steps */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs">
+              <div className="bg-white p-3.5 border border-amber-300 flex items-center gap-3 rounded-[4px]">
+                <div className="w-8 h-8 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Step 01</span>
+                  <strong className="text-slate-900 block">Enrollment Submission</strong>
+                </div>
               </div>
-              <div className="bg-white p-3.5 border border-amber-300 space-y-1 rounded-[4px]">
-                <span className="text-[10px] font-bold text-amber-700 block">Step 02 &bull; Active</span>
-                <strong className="text-amber-950 block">Registrar Evaluation</strong>
-                <p className="text-[11px] text-amber-900">
-                  School administrators verify academic eligibility and curriculum tracks.
-                </p>
+              <div className="bg-white p-3.5 border border-amber-400 flex items-center gap-3 rounded-[4px]">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-amber-700 uppercase block">Step 02 &bull; Active</span>
+                  <strong className="text-amber-950 block">Registrar Evaluation</strong>
+                </div>
               </div>
-              <div className="bg-white p-3.5 border border-amber-300 space-y-1 rounded-[4px]">
-                <span className="text-[10px] font-bold text-slate-400 block">Step 03 &bull; Next</span>
-                <strong className="text-slate-900 block">Class Section Slotting</strong>
-                <p className="text-[11px] text-slate-600">
-                  Official class section, room, and adviser will appear here automatically.
-                </p>
+              <div className="bg-white p-3.5 border border-amber-300 flex items-center gap-3 rounded-[4px]">
+                <div className="w-8 h-8 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Step 03 &bull; Next</span>
+                  <strong className="text-slate-900 block">Class Section Slotting</strong>
+                </div>
               </div>
-            </div>
-
-            <div className="p-3 bg-amber-100/70 border border-amber-300 text-xs text-amber-950 rounded-[4px]">
-              <strong>Notice for Learners:</strong> Once the school administrator confirms your class slotting in the Section Quota Console, this page will instantly update to show your designated section, homeroom adviser, and classmates.
             </div>
 
             {/* Quick Actions */}
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs font-bold py-2.5 px-4 inline-block rounded-[4px]"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-flex items-center gap-1.5 rounded-[4px]"
               >
-                Track Application Status
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <span>Track Application Status</span>
               </Link>
               <Link
                 href="/"
