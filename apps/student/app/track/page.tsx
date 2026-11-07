@@ -83,7 +83,8 @@ function TrackApplicationContent() {
   const [timetableSchedules, setTimetableSchedules] = useState<any[]>([]);
   const [enrolledSubjects, setEnrolledSubjects] = useState<any[]>([]);
   const [isLoadingTimetable, setIsLoadingTimetable] = useState<boolean>(false);
-  const [selectedDayFilter, setSelectedDayFilter] = useState<string>("All");
+  const [selectedDayFilter, setSelectedDayFilter] = useState<string>("Monday");
+  const [activeScheduleTab, setActiveScheduleTab] = useState<"timetable" | "subjects">("timetable");
 
   const filteredTimetable = React.useMemo(() => {
     if (selectedDayFilter === "All") {
@@ -657,24 +658,34 @@ function TrackApplicationContent() {
           {/* Active Academic Term Enrollment Open Advisory */}
           {!allRecords.some((r) => isApplicationInTerm(r.rawApp, schoolYear, termNumber || semester)) && isEnrollmentOpen && (
             <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
-              <div>
-                <span className="text-xs font-bold text-emerald-950 block mb-0.5">
-                  New Academic Term: S.Y. {schoolYear} &bull; {semester} Enrollment is Open
-                </span>
-                <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                  You are currently reviewing your previous term application record. Online Enrollment for School Year {schoolYear} ({semester}) is now officially open!
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-emerald-950 block">
+                    S.Y. {schoolYear} &bull; {semester} Enrollment is Open
+                  </span>
+                  <p className="text-[11px] text-emerald-800 font-medium">
+                    Viewing previous term record. Submit your continuing enrollment for {semester}.
+                  </p>
+                </div>
               </div>
               <Link
                 href="/enroll"
-                className="btn-primary text-xs font-bold py-2.5 px-5 shrink-0 text-center rounded-[4px]"
+                className="btn-primary text-xs font-bold py-2 px-4 shrink-0 inline-flex items-center justify-center gap-1.5 rounded-[4px]"
               >
-                Enroll Now for {semester}
+                <span>Enroll Now for {semester}</span>
+                <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
             </div>
           )}
 
-          {/* Multi-Term Application Selector (When learner has records across semesters) */}
+          {/* Multi-Term Application Selector */}
           {allRecords.length > 1 && (
             <div className="p-3 bg-white border border-slate-300 flex flex-wrap items-center gap-2 text-xs rounded-[4px]">
               <span className="font-bold text-slate-600 shrink-0">
@@ -700,195 +711,199 @@ function TrackApplicationContent() {
             </div>
           )}
 
-          <div className="bg-white border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-sm rounded-[4px]">
-            {/* Header with Reference Number and Status Badge */}
-            <div className="border-b-2 border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <span className="text-[10px] text-slate-500 block">
-                  Official Application Reference Number &bull; S.Y. {record.schoolYear} ({record.semester})
-                </span>
-                <div className="flex flex-wrap items-center gap-2.5 mt-0.5">
-                  <span className="text-2xl font-bold text-[#002060]">
-                    {record.referenceNumber}
-                  </span>
-                  <CopyChip value={record.referenceNumber} label="Reference Number" />
+          {/* UNIFIED APPLICATION DOSSIER & STATUS CARD */}
+          <div className="bg-white border border-slate-200/90 p-5 sm:p-6 space-y-5 shadow-sm rounded-[4px]">
+            {/* Top Row: Reference Number & Status Pill */}
+            <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
                 </div>
-              </div>
-
-            {/* Institutional Status Badges (Color-coded, Zero Emojis) */}
-            <div>
-              {record.status === "Pending" && (
-                <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-[4px]">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border border-amber-600 inline-block shrink-0" />
-                  Status: Pending Administrator Verification
-                </span>
-              )}
-              {record.status === "Approved" && (
-                <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-[4px]">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 border border-emerald-700 inline-block shrink-0" />
-                  Status: Approved &amp; Officially Enrolled
-                </span>
-              )}
-              {record.status === "Needs Revision" && (
-                <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-[4px]">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-600 border border-red-700 inline-block shrink-0" />
-                  Status: Needs Revision / Action Required
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Status Context Banner */}
-          {record.status === "Pending" && (
-            <div className="p-4 bg-amber-50 border-2 border-amber-300 space-y-1 rounded-[4px]">
-              <div className="text-xs font-bold text-amber-900 tracking-wide">
-                Application Under School Administrator Evaluation
-              </div>
-              <p className="text-xs text-amber-900 leading-relaxed">
-                Your submitted basic education application and documentary requirements have been received and are currently queued for verification by the Dumalneg NHS School Administrator. Official DepEd PDF documents will become accessible once your enrollment is confirmed.
-              </p>
-            </div>
-          )}
-
-          {record.status === "Approved" && (
-            <div className="p-5 bg-emerald-50 border-2 border-emerald-400 space-y-3 rounded-[4px]">
-              <div className="text-xs font-bold text-emerald-900 tracking-wide">
-                Official Enrollment Confirmed
-              </div>
-              <p className="text-xs text-emerald-950 leading-relaxed font-bold">
-                {record.remarks ||
-                  "You're enrolled at Dumalneg National High School for School Year 2025–2026. Welcome to your official class section!"}
-              </p>
-
-              {/* Assigned Section and Class Adviser Information */}
-              <div className="p-3.5 bg-white border border-emerald-300 grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-[4px]">
                 <div>
-                  <span className="text-[10px] font-bold text-emerald-800 block">
-                    Assigned Class Section
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Application Reference &bull; S.Y. {record.schoolYear} ({record.semester})
                   </span>
-                  <span className="text-sm font-bold text-slate-900">
-                    {record.sectionName || "Section Assignment Pending"}
-                  </span>
-                  {record.room && (
-                    <span className="text-[11px] text-slate-600 block">
-                      Room: {record.room}
+                  <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                    <span className="text-xl sm:text-2xl font-black text-[#002060] tracking-tight">
+                      {record.referenceNumber}
                     </span>
-                  )}
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-emerald-800 block">
-                    Class Adviser / Teacher
-                  </span>
-                  <span className="text-sm font-bold text-[#002060]">
-                    {record.adviserName || "Adviser to be Assigned"}
-                  </span>
+                    <CopyChip value={record.referenceNumber} label="Reference Number" />
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-1">
+              <div>
+                {record.status === "Pending" && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border border-amber-400 shadow-2xs rounded-[4px]">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0" />
+                    Status: Pending Verification
+                  </span>
+                )}
+                {record.status === "Approved" && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-500 shadow-2xs rounded-[4px]">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" />
+                    Status: Approved &amp; Enrolled
+                  </span>
+                )}
+                {record.status === "Needs Revision" && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-red-50 text-red-900 border border-red-500 shadow-2xs rounded-[4px]">
+                    <span className="w-2 h-2 rounded-full bg-red-600 inline-block shrink-0" />
+                    Status: Needs Revision
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Compact Status Callout + Primary Action */}
+            {record.status === "Pending" && (
+              <div className="p-4 bg-amber-50/80 border border-amber-300 flex items-center gap-3 rounded-[4px]">
+                <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-amber-950 block">
+                    Under School Administrator Evaluation
+                  </span>
+                  <span className="text-[11px] text-amber-900">
+                    Your application and documents are queued for verification. Official DepEd PDF forms unlock upon approval.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {record.status === "Approved" && (
+              <div className="p-4 bg-emerald-50/90 border border-emerald-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-emerald-950 block">
+                      Official Enrollment Confirmed
+                    </span>
+                    <span className="text-[11px] text-emerald-900 font-medium">
+                      {record.remarks || `Enrolled at Dumalneg NHS for S.Y. ${record.schoolYear || "2026-2027"}.`}
+                    </span>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={handleDownloadApprovedPdf}
                   disabled={isDownloadingPdf}
-                  className="px-5 py-2.5 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs rounded-[4px] inline-flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2.5 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs rounded-[4px] inline-flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                 >
                   <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   <span>
                     {isDownloadingPdf
-                      ? "Generating Official DepEd PDF..."
-                      : "Download Accomplished DepEd Form (PDF)"}
+                      ? "Generating PDF..."
+                      : "Download DepEd Form (PDF)"}
                   </span>
                 </button>
               </div>
-            </div>
-          )}
+            )}
 
-          {record.status === "Needs Revision" && (
-            <div className="p-5 bg-red-50 border-2 border-red-400 space-y-3 rounded-[4px]">
-              <div className="text-xs font-bold text-red-900 tracking-wide">
-                School Administrator Feedback &amp; Action Required
-              </div>
-              <p className="text-xs text-red-900 leading-relaxed font-medium">
-                {record.remarks ||
-                  "One or more submitted documents require correction or re-submission before your enrollment can be confirmed."}
-              </p>
-              <div className="pt-3 border-t border-red-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <span className="text-xs font-bold text-red-950 block">
-                    Complete Application Dossier Unlocked
-                  </span>
-                  <span className="text-[11px] text-red-800 block mt-0.5">
-                    Your complete enrollment application is now editable. Proceed to the enrollment form to update your information and documentary requirements.
-                  </span>
+            {record.status === "Needs Revision" && (
+              <div className="p-4 bg-red-50 border border-red-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-red-950 block">
+                      Administrator Feedback &bull; Action Required
+                    </span>
+                    <span className="text-[11px] text-red-900">
+                      {record.remarks || "One or more submitted details or documents require correction before approval."}
+                    </span>
+                  </div>
                 </div>
                 <Link
                   href="/enroll"
-                  className="px-5 py-2.5 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs shadow-xs shrink-0 inline-flex items-center gap-1.5 rounded-[4px]"
+                  className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs shadow-xs shrink-0 inline-flex items-center gap-1.5 rounded-[4px]"
                 >
-                  Edit &amp; Resubmit Application
+                  <span>Edit &amp; Resubmit</span>
                 </Link>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Official Applicant Details Summary Table */}
-          <div className="border-2 border-slate-200 p-5 space-y-4 rounded-[4px]">
-            <div className="text-xs font-bold text-[#002060] tracking-wide border-b border-slate-200 pb-2">
-              Official Enrollment Application Details
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Learner Full Name</span>
-                <span className="font-bold text-slate-900">{record.fullName}</span>
+            {/* Consolidated 4-Column Learner & Placement Dossier Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Learner Full Name</span>
+                <span className="font-bold text-slate-900 mt-0.5 block truncate">{record.fullName}</span>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">12-Digit LRN</span>
-                {/^\d{12}$/.test(record.lrn) ? (
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">12-Digit DepEd LRN</span>
+                {/^d{12}$/.test(record.lrn) ? (
                   <div className="mt-0.5">
                     <CopyChip value={record.lrn} label="12-Digit LRN" />
                   </div>
                 ) : (
-                  <span className="font-bold text-slate-900">Pending LIS Assignment (No LRN Yet)</span>
+                  <span className="font-bold text-slate-900 mt-0.5 block">Pending LIS Assignment</span>
                 )}
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Grade Level &amp; Type</span>
-                <span className="font-bold text-slate-900">
-                  Grade {record.gradeLevel} ({record.applicantType})
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Grade Level &amp; Type</span>
+                <span className="font-bold text-slate-900 mt-0.5 block">
+                  Grade {record.gradeLevel} &bull;{" "}
+                  {/grade/i.test(record.applicantType || "")
+                    ? "Regular Learner"
+                    : record.applicantType || "Regular"}
                 </span>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Curriculum Program</span>
-                <span className="font-bold text-slate-900">
-                  {record.targetStrand
-                    ? `Senior High School (${record.targetStrand})`
-                    : "Regular Junior High School Curriculum"}
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Curriculum Program</span>
+                <span className="font-bold text-slate-900 mt-0.5 block truncate">
+                  {Number(record.gradeLevel) >= 11 && record.targetStrand && record.targetStrand !== "Regular"
+                    ? `SHS (${record.targetStrand})`
+                    : "Junior High School (Regular)"}
                 </span>
               </div>
-              {record.sectionName && (
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 block">Assigned Section</span>
-                  <span className="font-bold text-slate-900">{record.sectionName}</span>
-                </div>
-              )}
-              {record.adviserName && (
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 block">Class Adviser</span>
-                  <span className="font-bold text-[#002060]">{record.adviserName}</span>
-                </div>
-              )}
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">School Year &bull; Term</span>
-                <span className="font-bold text-slate-900">{record.schoolYear || "2026-2027"} ({record.semester || "Trimester 1"})</span>
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Class Section</span>
+                <span className="font-bold text-[#002060] mt-0.5 block truncate">
+                  {record.sectionName || "Pending Placement"}
+                </span>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Submission Date</span>
-                <span className="font-bold text-slate-900">
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Class Adviser</span>
+                <span className="font-bold text-slate-900 mt-0.5 block truncate">
+                  {record.adviserName || "To Be Designated"}
+                </span>
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Classroom</span>
+                <span className="font-bold text-slate-900 mt-0.5 block truncate">
+                  {record.room
+                    ? /^room\b/i.test(record.room.trim())
+                      ? record.room.trim()
+                      : `Room ${record.room.trim()}`
+                    : "Main Academic Wing"}
+                </span>
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Date Submitted</span>
+                <span className="font-bold text-slate-900 mt-0.5 block">
                   {new Date(record.applicationDate).toLocaleDateString("en-PH", {
                     year: "numeric",
-                    month: "long",
+                    month: "short",
                     day: "numeric",
                   })}
                 </span>
@@ -897,191 +912,222 @@ function TrackApplicationContent() {
           </div>
 
           {/* =========================================================================
-             SECTION: OFFICIAL ENROLLED SUBJECTS & PRESCRIBED DEPED LEARNING AREAS
+             UNIFIED ACADEMIC TIMETABLE & ENROLLED SUBJECTS CARD (TABBED & COMPACT)
              ========================================================================= */}
-          <div className="border border-slate-200/90 bg-white p-6 sm:p-8 space-y-5 shadow-sm rounded-[4px]">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <span className="text-xs font-bold text-[#002060] tracking-wide block">
-                  Official Enrolled Subjects &bull; Grade {record.gradeLevel} {record.targetStrand ? `(${record.targetStrand})` : "(JHS)"}
-                </span>
-              </div>
-              <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-3 py-1 border border-slate-300 rounded-[4px]">
-                {enrolledSubjects.length} Subject Units Registered
-              </span>
-            </div>
-
-            {isLoadingTimetable && enrolledSubjects.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-500">
-                <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                Loading official enrolled subjects...
-              </div>
-            ) : enrolledSubjects.length === 0 ? (
-              <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center rounded-[4px]">
-                No prescribed course subjects registered for this grade level
-              </div>
-            ) : (
-              <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold text-[11px]">
-                      <th className="p-2.5">Subject Code</th>
-                      <th className="p-2.5">Learning Area / Course Title</th>
-                      <th className="p-2.5">Classification</th>
-                      <th className="p-2.5">Grade Level</th>
-                      <th className="p-2.5">Curriculum / Program</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {enrolledSubjects.map((subj: any) => (
-                      <tr key={subj.id || subj.subject_code} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-2.5 font-bold text-[#002060]">
-                          {subj.subject_code}
-                        </td>
-                        <td className="p-2.5 font-bold text-slate-900">
-                          {subj.subject_name}
-                        </td>
-                        <td className="p-2.5">
-                          <span
-                            className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-[4px] ${
-                              subj.subject_type === "Core"
-                                ? "bg-blue-50 text-blue-900 border border-blue-300"
-                                : subj.subject_type === "Specialized"
-                                ? "bg-purple-50 text-purple-900 border border-purple-300"
-                                : subj.subject_type === "Applied"
-                                ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
-                                : "bg-amber-50 text-amber-900 border border-amber-300"
-                            }`}
-                          >
-                            {subj.subject_type || "Core"}
-                          </span>
-                        </td>
-                        <td className="p-2.5 text-slate-700 font-medium">
-                          Grade {subj.grade_level}
-                        </td>
-                        <td className="p-2.5 text-slate-600 text-[11px]">
-                          {subj.strand || "Regular"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* =========================================================================
-             SECTION: OFFICIAL CLASS TIMETABLE & WEEKLY SCHEDULE
-             ========================================================================= */}
-          <div id="timetable" className="border border-slate-200/90 bg-white p-6 sm:p-8 space-y-5 shadow-sm scroll-mt-6 rounded-[4px]">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div id="timetable" className="border border-slate-200/90 bg-white p-5 sm:p-6 space-y-4 shadow-sm scroll-mt-6 rounded-[4px]">
+            {/* Top Bar: Switcher Tabs + Section/Room Badges */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-[5px] border border-slate-200 self-start">
+                <button
+                  type="button"
+                  onClick={() => setActiveScheduleTab("timetable")}
+                  className={`px-3 py-1.5 rounded-[4px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeScheduleTab === "timetable"
+                      ? "bg-[#002060] text-white shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                </div>
-                <span className="text-xs font-bold text-[#002060] tracking-wide block">
-                  Official Class Timetable &bull; Weekly Schedule
-                </span>
+                  <span>Weekly Class Timetable ({timetableSchedules.length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveScheduleTab("subjects")}
+                  className={`px-3 py-1.5 rounded-[4px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeScheduleTab === "subjects"
+                      ? "bg-[#002060] text-white shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span>Enrolled Subjects ({enrolledSubjects.length})</span>
+                </button>
               </div>
-              <div className="flex items-center gap-2">
+
+              <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[10px] font-bold bg-[#002060] text-white px-2.5 py-1 uppercase rounded-[4px]">
                   {record.sectionName || "Section Pending"}
                 </span>
                 {record.room && (
-                  <span className="text-[10px] font-bold bg-slate-100 text-slate-800 px-2.5 py-1 border border-slate-300 uppercase rounded-[4px]">
-                    Room {record.room}
+                  <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2.5 py-1 border border-slate-300 rounded-[4px]">
+                    {/^room\b/i.test(record.room.trim()) ? record.room.trim() : `Room ${record.room.trim()}`}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Day of Week Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              {["All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => {
-                const isDayActive = selectedDayFilter.toLowerCase() === day.toLowerCase();
-                const dayCount =
-                  day === "All"
-                    ? timetableSchedules.length
-                    : timetableSchedules.filter((s: any) => s.day_of_week?.toLowerCase() === day.toLowerCase()).length;
+            {/* TAB 1: WEEKLY CLASS TIMETABLE (COMPACT TABLE) */}
+            {activeScheduleTab === "timetable" ? (
+              <div className="space-y-3">
+                {/* Day of Week Filter Pills */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "All"].map((day) => {
+                      const isDayActive = selectedDayFilter.toLowerCase() === day.toLowerCase();
+                      const dayCount =
+                        day === "All"
+                          ? timetableSchedules.length
+                          : timetableSchedules.filter((s: any) => s.day_of_week?.toLowerCase() === day.toLowerCase()).length;
 
-                return (
-                  <button
-                    key={day}
-                    type="button"
-                    onClick={() => setSelectedDayFilter(day)}
-                    className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer rounded-[4px] ${
-                      isDayActive
-                        ? "bg-[#002060] text-white border-[#002060] shadow-xs"
-                        : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
-                    }`}
-                  >
-                    {day} ({dayCount})
-                  </button>
-                );
-              })}
-            </div>
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => setSelectedDayFilter(day)}
+                          className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer rounded-[4px] ${
+                            isDayActive
+                              ? "bg-[#002060] text-white border-[#002060] shadow-2xs"
+                              : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
+                          }`}
+                        >
+                          {day === "All" ? `All Days (${dayCount})` : `${day} (${dayCount})`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500">
+                    Showing {filteredTimetable.length} {filteredTimetable.length === 1 ? "period" : "periods"}
+                  </span>
+                </div>
 
-            {isLoadingTimetable && timetableSchedules.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-500">
-                <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                Loading section timetable periods...
-              </div>
-            ) : filteredTimetable.length === 0 ? (
-              <div className="p-6 bg-slate-50 border border-slate-300 text-center space-y-2 rounded-[4px]">
-                <span className="text-xs font-bold text-slate-700 block">
-                  Timetable Status: Schedule Under Preparation &bull; Deconfliction Guard Active
-                </span>
-                <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
-                  The weekly timetable periods for this section are currently being finalized by the school administration and registrar. 
-                  Enrolled subjects and learning areas above are officially registered.
-                </p>
+                {isLoadingTimetable && timetableSchedules.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-slate-500">
+                    <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    Loading section timetable periods...
+                  </div>
+                ) : filteredTimetable.length === 0 ? (
+                  <div className="p-6 bg-slate-50 border border-slate-200 text-center space-y-1 rounded-[4px]">
+                    <span className="text-xs font-bold text-slate-700 block">
+                      Schedule Under Preparation
+                    </span>
+                    <p className="text-[11px] text-slate-500">
+                      Weekly timetable periods for this section are being finalized by the registrar.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold text-[11px]">
+                          {selectedDayFilter === "All" && <th className="py-2.5 px-3">Day</th>}
+                          <th className="py-2.5 px-3">Time Window</th>
+                          <th className="py-2.5 px-3">Subject &amp; Code</th>
+                          <th className="py-2.5 px-3">Assigned Faculty</th>
+                          <th className="py-2.5 px-3">Classroom</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {filteredTimetable.map((item: any, idx: number) => {
+                          const rawRoom = item.classroom_name || record.room || "Room 101";
+                          const cleanRoom = /^room\b/i.test(String(rawRoom).trim())
+                            ? String(rawRoom).trim()
+                            : `Room ${String(rawRoom).trim()}`;
+
+                          return (
+                            <tr key={item.id || idx} className="hover:bg-blue-50/40 transition-colors">
+                              {selectedDayFilter === "All" && (
+                                <td className="py-2.5 px-3 font-bold text-[#002060] whitespace-nowrap">
+                                  {item.day_of_week}
+                                </td>
+                              )}
+                              <td className="py-2.5 px-3 whitespace-nowrap">
+                                <span className="inline-block px-2 py-0.5 text-[11px] font-bold bg-[#002060]/10 text-[#002060] rounded-[3px]">
+                                  {formatTimeRange(item.start_time, item.end_time)}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="font-bold text-slate-900">{item.subject_name}</span>
+                                  {item.subject_code && (
+                                    <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 border border-slate-200 rounded-[3px]">
+                                      {item.subject_code}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-700 font-medium">
+                                {item.teacher_name || record.adviserName || "Assigned Faculty"}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-600 text-[11px]">
+                                {cleanRoom}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filteredTimetable.map((item: any) => (
-                  <div
-                    key={item.id}
-                    className="p-3.5 border-2 border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060] transition-colors space-y-2 rounded-[4px]"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-block px-2.5 py-1 text-[11px] font-bold bg-[#002060] text-white uppercase tracking-wider rounded-[4px]">
-                        {item.day_of_week} &bull; {formatTimeRange(item.start_time, item.end_time)}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">
-                        {item.subject_code}
-                      </span>
-                    </div>
-
-                    <div>
-                      <div className="text-sm font-bold text-slate-900 leading-tight">
-                        {item.subject_name}
-                      </div>
-                      <div className="text-xs text-slate-600 mt-1 flex flex-col gap-0.5">
-                        <span>
-                          <strong className="text-slate-700">Teacher:</strong>{" "}
-                          {item.teacher_name || record.adviserName || "Assigned Faculty"}
-                        </span>
-                        <span>
-                          <strong className="text-slate-700">Classroom:</strong>{" "}
-                          {item.classroom_name || (record.room ? `Room ${record.room}` : "Standard Classroom")}
-                          {item.building ? ` (${item.building})` : ""}
-                        </span>
-                      </div>
-                    </div>
+              /* TAB 2: OFFICIAL ENROLLED SUBJECTS */
+              <div>
+                {isLoadingTimetable && enrolledSubjects.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-slate-500">
+                    <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    Loading official enrolled subjects...
                   </div>
-                ))}
+                ) : enrolledSubjects.length === 0 ? (
+                  <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center rounded-[4px]">
+                    No prescribed course subjects registered for this grade level
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold text-[11px]">
+                          <th className="p-2.5">Subject Code</th>
+                          <th className="p-2.5">Learning Area / Course Title</th>
+                          <th className="p-2.5">Classification</th>
+                          <th className="p-2.5">Grade Level</th>
+                          <th className="p-2.5">Curriculum / Program</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {enrolledSubjects.map((subj: any) => (
+                          <tr key={subj.id || subj.subject_code} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-2.5 font-mono font-bold text-[#002060]">
+                              {subj.subject_code}
+                            </td>
+                            <td className="p-2.5 font-bold text-slate-900">
+                              {subj.subject_name}
+                            </td>
+                            <td className="p-2.5">
+                              <span
+                                className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-[4px] ${
+                                  subj.subject_type === "Core"
+                                    ? "bg-blue-50 text-blue-900 border border-blue-300"
+                                    : subj.subject_type === "Specialized"
+                                    ? "bg-purple-50 text-purple-900 border border-purple-300"
+                                    : subj.subject_type === "Applied"
+                                    ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
+                                    : "bg-amber-50 text-amber-900 border border-amber-300"
+                                }`}
+                              >
+                                {subj.subject_type || "Core"}
+                              </span>
+                            </td>
+                            <td className="p-2.5 text-slate-700 font-medium">
+                              Grade {subj.grade_level}
+                            </td>
+                            <td className="p-2.5 text-slate-600 text-[11px]">
+                              {subj.strand || "Regular"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
-      </div>
       ) : (
         /* =========================================================================
            SCENARIO 2: NO APPLICATION SUBMITTED YET (ILLUSTRATED EMPTY STATE)
