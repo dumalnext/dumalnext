@@ -214,52 +214,46 @@ function TeacherLoginFormInner() {
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 Faculty &amp; Academic Staff Portal
               </h2>
-              <p className="text-xs text-blue-100 mt-0.5">
-                Dumalneg National High School &bull; School ID: 300017
-              </p>
             </div>
           </div>
 
           <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-            Welcome to the official faculty workstation of Dumalneg National High School. Sign in with your institutional account to review your weekly teaching schedule, manage your advisory section masterlist, and print official DepEd class rosters.
+            Access certified teaching schedules, advisory class rosters, and academic credentials.
           </p>
 
           {/* 3 Feature Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px] space-y-1">
-              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                01 &bull; Timetable Matrix
-              </span>
-              <h3 className="text-xs font-bold text-white">
+            <div className="bg-white/10 border border-white/15 p-3 rounded-[4px] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-[4px] bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xs font-bold text-white leading-tight">
                 Teaching Load Schedule
               </h3>
-              <p className="text-[11px] text-blue-100 leading-relaxed">
-                Inspect your conflict-free weekly teaching periods, assigned rooms, and subject loads.
-              </p>
             </div>
 
-            <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px] space-y-1">
-              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                02 &bull; Real-Time Roster
-              </span>
-              <h3 className="text-xs font-bold text-white">
+            <div className="bg-white/10 border border-white/15 p-3 rounded-[4px] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-[4px] bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xs font-bold text-white leading-tight">
                 Advisory Class Masterlist
               </h3>
-              <p className="text-[11px] text-blue-100 leading-relaxed">
-                View and print certified lists of enrolled learners in your designated advisory section.
-              </p>
             </div>
 
-            <div className="bg-white/10 border border-white/15 p-3.5 rounded-[4px] space-y-1">
-              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                03 &bull; DepEd Compliance
-              </span>
-              <h3 className="text-xs font-bold text-white">
+            <div className="bg-white/10 border border-white/15 p-3 rounded-[4px] flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-[4px] bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-xs font-bold text-white leading-tight">
                 30-Hour Load Standard
               </h3>
-              <p className="text-[11px] text-blue-100 leading-relaxed">
-                Synchronized with the Registrar&apos;s Schedule Deconfliction &amp; Section Quota consoles.
-              </p>
             </div>
           </div>
         </section>
@@ -267,9 +261,14 @@ function TeacherLoginFormInner() {
         {/* Faculty Guidelines Card */}
         <section className="bg-white border border-slate-300 p-5 sm:p-6 rounded-[4px] shadow-xs space-y-3">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-            <h3 className="text-sm font-bold text-[#002060]">
-              Faculty Portal Access Guidelines
-            </h3>
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-sm font-bold text-[#002060]">
+                Faculty Portal Access Guidelines
+              </h3>
+            </div>
             <span className="text-[11px] font-semibold text-slate-500">
               S.Y. 2026&ndash;2027
             </span>
@@ -314,13 +313,10 @@ function TeacherLoginFormInner() {
           <div className="bg-white border-2 border-emerald-700 border-t-4 border-t-amber-400 rounded-[4px] shadow-md overflow-hidden">
             <div className="bg-[#002060] text-white p-5 flex items-center justify-between gap-3">
               <div>
-                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                    Official Invitation Verified
-                  </span>
-                  <h3 className="text-base font-bold text-white">
-                    Activate Faculty Account
-                  </h3>
-                </div>
+                <h3 className="text-base font-bold text-white">
+                  Activate Faculty Account
+                </h3>
+              </div>
               <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 rounded-[4px]">
                 Teacher Role
               </span>
@@ -350,9 +346,6 @@ function TeacherLoginFormInner() {
                     disabled
                     className="w-full p-2.5 bg-slate-100 border border-slate-300 text-slate-700 cursor-not-allowed select-all rounded-[4px]"
                   />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Account will be bound to this verified institutional email address.
-                  </p>
                 </div>
 
                 <div>
@@ -440,10 +433,12 @@ function TeacherLoginFormInner() {
           <div className="bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 rounded-[4px] shadow-md overflow-hidden">
             {/* Top Card Header */}
             <div className="bg-[#002060] text-white px-6 py-4 flex items-center justify-between gap-3 border-b border-blue-950">
-              <div>
-                <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                  Faculty Portal Authentication
-                </span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
                 <h3 className="text-base font-bold text-white">
                   Teacher &amp; Adviser Sign In
                 </h3>
@@ -492,9 +487,6 @@ function TeacherLoginFormInner() {
                     required
                     className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
                   />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Enter your registered institutional email or assigned Faculty ID.
-                  </p>
                 </div>
 
                 <div>
@@ -524,9 +516,12 @@ function TeacherLoginFormInner() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold text-center transition-colors shadow-xs cursor-pointer disabled:opacity-50 rounded-[4px]"
+                    className="w-full py-3 bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold text-center transition-colors shadow-xs cursor-pointer disabled:opacity-50 rounded-[4px] flex items-center justify-center gap-2"
                   >
-                    {isSubmitting ? "Signing In to Faculty Portal..." : "Sign In to Faculty Workstation"}
+                    <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    <span>{isSubmitting ? "Signing In to Faculty Portal..." : "Sign In to Faculty Workstation"}</span>
                   </button>
                 </div>
               </form>

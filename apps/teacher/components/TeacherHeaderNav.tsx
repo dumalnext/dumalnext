@@ -44,15 +44,12 @@ export default function TeacherHeaderNav() {
             />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-amber-300 tracking-wide block">
-              Official Faculty Instruction &amp; Class Roster System
-            </span>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Dumalneg National High School
             </h1>
-            <p className="text-xs text-blue-100 mt-0.5">
-              Faculty Workstation &amp; Class Advisory Portal
-            </p>
+            <span className="text-xs text-amber-300 font-semibold block">
+              Faculty Portal
+            </span>
           </div>
         </div>
 
