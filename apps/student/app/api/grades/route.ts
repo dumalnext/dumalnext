@@ -128,10 +128,17 @@ export async function GET(req: NextRequest) {
 
     let filtered = records;
     if (lrn || studentId) {
+      const cleanTargetLrn = String(lrn || "").replace(/\D/g, "");
+      const cleanTargetId = String(studentId || "").trim();
+
       filtered = filtered.filter((r) => {
-        const matchLrn = lrn ? r.studentLrn === lrn || r.studentId === lrn : false;
-        const matchId = studentId ? r.studentId === studentId || r.studentLrn === studentId : false;
-        return matchLrn || matchId;
+        const rLrn = String(r.studentLrn || "").replace(/\D/g, "");
+        const rId = String(r.studentId || "").trim();
+
+        const matchByLrn = cleanTargetLrn && (rLrn === cleanTargetLrn || rId === cleanTargetLrn);
+        const matchById = cleanTargetId && (rId === cleanTargetId || rLrn === cleanTargetId);
+
+        return Boolean(matchByLrn || matchById);
       });
     }
 
@@ -149,8 +156,16 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     console.error("GET /api/grades in student app error:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to retrieve student grades" },
-      { status: 500, headers: NO_CACHE_HEADERS }
+      {
+        success: false,
+        error: err.message || "Failed to retrieve student grades",
+        records: [],
+        isGradeOpen: true,
+        schoolYear: "2026-2027",
+        termNumber: 1,
+        termName: "Trimester 1",
+      },
+      { status: 200, headers: NO_CACHE_HEADERS }
     );
   }
 }
