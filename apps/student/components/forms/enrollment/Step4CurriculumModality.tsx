@@ -912,11 +912,11 @@ export default function Step4CurriculumModality({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t border-slate-200">
+      <div className="flex flex-row items-center justify-between gap-3 pt-6 border-t border-slate-200">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-8 text-center rounded-xl transition-all cursor-pointer w-full sm:w-auto"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center rounded-xl transition-all cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -926,7 +926,7 @@ export default function Step4CurriculumModality({
         <button
           type="button"
           onClick={validateAndProceed}
-          className="inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer w-full sm:w-auto"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer"
         >
           <span>Next Step</span>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -75,6 +75,14 @@ export default function Step2LearnerProfile({
       : "";
   });
 
+  const STANDARD_IPS = ["Isnag", "Itneg", "Tingguian"];
+  const [isOtherIpSelected, setIsOtherIpSelected] = useState<boolean>(() => {
+    return Boolean(
+      data.ipCommunityName &&
+      !STANDARD_IPS.some((ip) => ip.toLowerCase() === data.ipCommunityName.trim().toLowerCase())
+    );
+  });
+
   // Religion "Other" handling
   const [isOtherReligion, setIsOtherReligion] = useState<boolean>(() => {
     return Boolean(data.religion && !STANDARD_RELIGIONS.includes(data.religion));
@@ -774,32 +782,83 @@ export default function Step2LearnerProfile({
 
             {data.isIpCommunity && (
               <div className="pt-2">
-                <label className="block text-xs font-bold text-slate-900 mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
                   Specify Indigenous Community Name <span className="text-red-700">*</span>
                 </label>
-                <div className="flex gap-2 mb-2">
-                  {(["Isnag", "Itneg", "Tingguian"] as const).map((ip) => (
-                    <button
-                      key={ip}
-                      type="button"
-                      onClick={() => onChange({ ipCommunityName: ip })}
-                      className={`text-[11px] font-bold px-2.5 py-1 border transition-all rounded-md cursor-pointer ${
-                        data.ipCommunityName === ip
-                          ? "bg-[#002060] text-white border-[#002060]"
-                          : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
-                      }`}
-                    >
-                      {ip}
-                    </button>
-                  ))}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {STANDARD_IPS.map((ip) => {
+                    const isSelected =
+                      !isOtherIpSelected &&
+                      data.ipCommunityName?.trim().toLowerCase() === ip.toLowerCase();
+                    return (
+                      <button
+                        key={ip}
+                        type="button"
+                        onClick={() => {
+                          setIsOtherIpSelected(false);
+                          onChange({ ipCommunityName: ip });
+                          if (errors.ipCommunityName) {
+                            setErrors((prev) => {
+                              const next = { ...prev };
+                              delete next.ipCommunityName;
+                              return next;
+                            });
+                          }
+                        }}
+                        className={`text-[11px] font-bold px-3 py-1.5 border transition-all rounded-md cursor-pointer ${
+                          isSelected
+                            ? "bg-[#002060] text-white border-[#002060]"
+                            : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
+                        }`}
+                      >
+                        {ip}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOtherIpSelected(true);
+                      if (
+                        STANDARD_IPS.some(
+                          (ip) => ip.toLowerCase() === (data.ipCommunityName || "").trim().toLowerCase()
+                        )
+                      ) {
+                        onChange({ ipCommunityName: "" });
+                      }
+                    }}
+                    className={`text-[11px] font-bold px-3 py-1.5 border transition-all rounded-md cursor-pointer ${
+                      isOtherIpSelected
+                        ? "bg-[#002060] text-white border-[#002060]"
+                        : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
+                    }`}
+                  >
+                    Others
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  value={data.ipCommunityName || ""}
-                  onChange={(e) => onChange({ ipCommunityName: e.target.value.toUpperCase() })}
-                  placeholder="e.g. ISNAG"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl"
-                />
+
+                {isOtherIpSelected && (
+                  <div className="pt-1">
+                    <input
+                      type="text"
+                      value={data.ipCommunityName || ""}
+                      onChange={(e) => {
+                        const val = e.target.value.toUpperCase();
+                        onChange({ ipCommunityName: val });
+                        if (errors.ipCommunityName) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next.ipCommunityName;
+                            return next;
+                          });
+                        }
+                      }}
+                      placeholder="Specify Indigenous Community Name (e.g. AGTA)"
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl"
+                      autoFocus
+                    />
+                  </div>
+                )}
                 {errors.ipCommunityName && (
                   <span className="text-xs text-red-700 font-semibold mt-1 block">
                     {errors.ipCommunityName}
@@ -1352,11 +1411,11 @@ export default function Step2LearnerProfile({
       </div>
 
       {/* Navigation Footer */}
-      <div className="border-t border-slate-200 pt-6 flex flex-col sm:flex-row justify-between gap-3">
+      <div className="border-t border-slate-200 pt-6 flex flex-row items-center justify-between gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-8 text-center rounded-xl transition-all cursor-pointer"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center rounded-xl transition-all cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -1366,7 +1425,7 @@ export default function Step2LearnerProfile({
         <button
           type="button"
           onClick={validateAndProceed}
-          className="inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer"
         >
           <span>Next Step</span>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -717,26 +717,23 @@ export default function EnrollmentStepper({
     <div className="space-y-6">
       {/* Revision Notice Banner if Admin returned application */}
       {existingApp?.status === "Needs Revision" && (
-        <div className="p-4 bg-red-50 border-2 border-red-500 text-slate-900 space-y-2 shadow-xs rounded-[4px]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+        <div className="p-4 bg-red-50 border-2 border-red-400 text-slate-900 space-y-2 shadow-xs rounded-xl">
+          <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-bold text-red-950">
-              School Administrator Notice: Application Dossier Returned for Revision
+              Returned for Revision
             </span>
-            <span className="text-[10px] bg-red-800 text-white px-2 py-0.5 uppercase font-bold w-fit rounded-[4px]">
+            <span className="text-[10px] bg-red-800 text-white px-2 py-0.5 uppercase font-bold rounded-md">
               REF: {existingApp.application_id}
             </span>
           </div>
-          <div className="bg-white/90 p-3 border border-red-300 space-y-1 rounded-[4px]">
-            <span className="text-[10px] font-bold text-red-950 block">
-              Official Evaluation Feedback from School Administrator:
+          <div className="bg-white p-3 border border-red-200 rounded-lg">
+            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">
+              Administrator Feedback
             </span>
             <p className="text-xs text-red-900 font-bold leading-relaxed">
               &ldquo;{existingApp.admin_feedback || "Please review and correct your details and documentary requirements before resubmission."}&rdquo;
             </p>
           </div>
-          <p className="text-[11px] text-red-900 leading-relaxed">
-            All 5 enrollment steps below are unlocked and pre-filled with your data. You may edit any field across all steps, change your track or modality, and replace or re-upload scanned documents on Step 5.
-          </p>
         </div>
       )}
 
@@ -913,54 +910,6 @@ export default function EnrollmentStepper({
             onBack={prevStep}
             existingApplication={existingApp}
           />
-        )}
-      </div>
-
-      {/* UPGRADE #5: Mobile Sticky Bottom Step Progress & Quick Jump Bar */}
-      <div className="no-print sm:hidden sticky bottom-2 z-30 bg-white/95 backdrop-blur-xs border border-slate-300 shadow-lg p-2.5 rounded-[4px] flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            if (currentStep > 1) {
-              prevStep();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          }}
-          disabled={currentStep === 1}
-          className="px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 rounded-[4px] border border-slate-300"
-        >
-Prev
-        </button>
-        <div className="text-center min-w-0">
-          <span className="text-[10px] font-bold text-[#002060] uppercase block truncate">
-            Step {currentStep} of 5 &bull; {STEP_LABELS[currentStep - 1].label}
-          </span>
-          <span className="text-[10px] text-slate-500 block">
-            Draft Auto-Saved
-          </span>
-        </div>
-        {currentStep < 5 ? (
-          <button
-            type="button"
-            onClick={() => {
-              nextStep();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className="px-3.5 py-2 text-xs font-bold text-white bg-[#002060] hover:bg-blue-950 rounded-[4px] shadow-xs"
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-              triggerPortalToast("Review your details and tap Submit Application below", "info");
-            }}
-            className="px-3 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-[4px] shadow-xs"
-          >
-            Review
-          </button>
         )}
       </div>
     </div>

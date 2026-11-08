@@ -98,8 +98,9 @@ function DocumentDropBox({
       ) : null}
 
       {uploadedDoc ? (
-        <div className="p-3 bg-blue-50/90 border border-blue-200 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs rounded-[4px]">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="p-3.5 bg-slate-50 border-2 border-blue-200 space-y-3 rounded-xl shadow-2xs">
+          {/* Responsive Auto-Fit Image / Document Preview Container */}
+          <div className="relative w-full rounded-lg overflow-hidden border border-slate-200 bg-white flex items-center justify-center min-h-[140px] max-h-[220px]">
             {uploadedDoc.previewUrl &&
             (uploadedDoc.previewUrl.startsWith("data:image/") ||
               uploadedDoc.previewUrl.startsWith("blob:") ||
@@ -107,42 +108,47 @@ function DocumentDropBox({
               <img
                 src={uploadedDoc.previewUrl}
                 alt={uploadedDoc.file.name}
-                className="w-12 h-12 object-cover border border-blue-300 bg-white shrink-0 rounded-[4px]"
+                className="w-full h-auto max-h-[220px] object-contain rounded-lg p-1"
               />
             ) : (
-              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 border border-blue-300 text-[10px] font-bold text-[#002060] shrink-0 rounded-[4px]">
-                DOC
+              <div className="py-8 flex flex-col items-center justify-center text-slate-500 gap-1.5">
+                <svg className="w-10 h-10 text-[#002060]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-xs font-bold text-slate-700">PDF Document</span>
               </div>
             )}
-            <div className="min-w-0">
-              <span className="font-bold text-[#002060] block truncate max-w-[180px] sm:max-w-[240px]">
+            <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 bg-emerald-600 text-white shadow-xs rounded-md">
+              Ready
+            </span>
+          </div>
+
+          {/* File details & Action Buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="min-w-0 flex-1">
+              <span className="font-bold text-[#002060] text-xs block truncate" title={uploadedDoc.file.name}>
                 {uploadedDoc.file.name}
               </span>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-500 ">
-                  {uploadedDoc.originalSizeKb}KB to {uploadedDoc.compressedSizeKb}KB (Compressed)
-                </span>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-[4px]">
-                  Ready
-                </span>
-              </div>
+              <span className="text-[10px] text-slate-500 block mt-0.5">
+                {uploadedDoc.compressedSizeKb} KB &bull; Compressed from {uploadedDoc.originalSizeKb} KB
+              </span>
             </div>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0 ml-auto sm:ml-2">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="px-2.5 py-1 bg-white border border-slate-300 text-xs text-slate-700 font-medium hover:bg-slate-100 transition-colors rounded-[4px] shadow-2xs cursor-pointer"
-            >
-              Replace
-            </button>
-            <button
-              type="button"
-              onClick={onRemove}
-              className="px-2.5 py-1 bg-white border border-red-300 text-xs text-red-700 font-bold hover:bg-red-50 transition-colors rounded-[4px] shadow-2xs cursor-pointer"
-            >
-              Remove
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 sm:flex-initial px-3.5 py-1.5 bg-white border border-slate-300 text-xs text-slate-700 font-bold hover:bg-slate-100 transition-colors rounded-lg shadow-2xs cursor-pointer text-center"
+              >
+                Replace
+              </button>
+              <button
+                type="button"
+                onClick={onRemove}
+                className="flex-1 sm:flex-initial px-3.5 py-1.5 bg-white border border-red-300 text-xs text-red-700 font-bold hover:bg-red-50 transition-colors rounded-lg shadow-2xs cursor-pointer text-center"
+              >
+                Remove
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -1233,12 +1239,12 @@ export default function Step5DocumentsReview({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t border-slate-200">
+      <div className="flex flex-row items-center justify-between gap-3 pt-6 border-t border-slate-200">
         <button
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-8 text-center rounded-xl transition-all cursor-pointer w-full sm:w-auto disabled:opacity-50"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center rounded-xl transition-all cursor-pointer disabled:opacity-50"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -1249,13 +1255,13 @@ export default function Step5DocumentsReview({
           type="button"
           onClick={handleSubmitApplication}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded-[4px]"
+          className="flex-1 sm:flex-initial px-6 sm:px-10 py-3.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded-xl text-center"
         >
           {isSubmitting
-            ? "Processing Official Submission..."
+            ? "Submitting..."
             : existingApplication
-            ? "Resubmit Revised Enrollment Application"
-            : "Submit Enrollment Application"}
+            ? "Resubmit Application"
+            : "Submit Application"}
         </button>
       </div>
     </div>
