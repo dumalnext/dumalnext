@@ -264,17 +264,6 @@ function StudentGradesContent() {
             <span className="text-[11px] font-mono text-slate-500 font-bold">
               School Year {activeSY}
             </span>
-            {isGradeOpen ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded text-[10px] font-bold uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                Viewing Active
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-300 rounded text-[10px] font-bold uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
-                Administrative Review
-              </span>
-            )}
           </div>
           <div className="flex items-center gap-2.5 pt-1">
             <div className="w-8 h-8 rounded-lg bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
@@ -500,14 +489,11 @@ function StudentGradesContent() {
             </svg>
           </div>
           <div className="space-y-1">
-            <span className="px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-300 rounded text-[10px] font-bold uppercase tracking-wider inline-block">
-              Status: Pending Evaluation
-            </span>
             <h3 className="text-base font-bold text-slate-900 uppercase">
               Trimester {selectedTrimester} Grade Not Yet Released
             </h3>
             <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-              Your class adviser has not uploaded the official grade snapshot for <strong>Trimester {selectedTrimester}</strong> yet. Once evaluated and submitted by your teacher, it will automatically appear here with a <strong>DONE</strong> status.
+              Your class adviser has not uploaded the grade snapshot for this term yet.
             </p>
           </div>
         </div>

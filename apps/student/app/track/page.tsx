@@ -1135,10 +1135,9 @@ function TrackApplicationContent() {
            SCENARIO 2: NO APPLICATION SUBMITTED YET (ILLUSTRATED EMPTY STATE)
            ========================================================================= */
         <EmptyStateCard
-          badge="Application Status • Not Yet Submitted"
-          title="No Submitted Enrollment Application Found"
-          description={`Your learner account (${user.email}) is active and verified, but no enrollment application has been submitted yet for School Year ${schoolYear} (${semester}).`}
-          actionLabel={`Start Online Enrollment Form (${semester})`}
+          title="No Enrollment Application Found"
+          description={`No enrollment application has been submitted yet for School Year ${schoolYear}.`}
+          actionLabel="Start Online Enrollment Form"
           actionHref="/enroll"
           secondaryLabel="Return to Dashboard"
           secondaryHref="/"

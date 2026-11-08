@@ -1339,23 +1339,20 @@ Home Dashboard
         </div>
       ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
         <div className="space-y-6">
-          <div className="p-6 bg-amber-50 border-2 border-amber-500 shadow-xs space-y-4 rounded-[4px]">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-300 pb-3">
-              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-widest block">
-                SECTION STATUS &bull; TRANSFEREE
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 text-xs font-bold uppercase border border-amber-400 whitespace-nowrap shrink-0 rounded-[4px]">
-                <span className="w-2 h-2 rounded-full bg-amber-700 animate-pulse" />
-                Transferee Evaluation
+          <div className="p-6 bg-white border border-slate-200 shadow-xs space-y-4 rounded-[4px]">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                Pending Placement
               </span>
             </div>
 
-            <div className="space-y-1.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight">
-                You&apos;re not yet assigned to a section
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                You are not yet assigned to a section
               </h2>
-              <p className="text-xs text-amber-950 leading-relaxed font-medium">
-                Your transferee records and SF10 credentials are currently under evaluation by the School Administrator for section slotting.
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                Your transferee records and SF10 credentials are under evaluation by the School Administrator.
               </p>
             </div>
 
@@ -1368,7 +1365,7 @@ Home Dashboard
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
-                <span>Track Transferee Application Status</span>
+                <span>Track Application Status</span>
               </Link>
               <Link
                 href="/"
@@ -1381,61 +1378,21 @@ Home Dashboard
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="p-6 bg-amber-50 border-2 border-amber-400 shadow-xs space-y-4 rounded-[4px]">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-3">
-              <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block">
-                SECTION STATUS
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-200 text-amber-950 text-xs font-bold uppercase border border-amber-400 whitespace-nowrap shrink-0 rounded-[4px]">
-                <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
+          <div className="p-6 bg-white border border-slate-200 shadow-xs space-y-4 rounded-[4px]">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
                 Pending Placement
               </span>
             </div>
 
-            <div className="space-y-1.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-amber-950 tracking-tight">
-                You&apos;re not yet assigned to a section
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                You are not yet assigned to a section
               </h2>
-              <p className="text-xs text-amber-950 leading-relaxed font-medium">
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
                 Awaiting official section placement from the School Administrator and Registrar.
               </p>
-            </div>
-
-            {/* Compact Vector Steps */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs">
-              <div className="bg-white p-3.5 border border-amber-300 flex items-center gap-3 rounded-[4px]">
-                <div className="w-8 h-8 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Step 01</span>
-                  <strong className="text-slate-900 block">Enrollment Submission</strong>
-                </div>
-              </div>
-              <div className="bg-white p-3.5 border border-amber-400 flex items-center gap-3 rounded-[4px]">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-amber-700 uppercase block">Step 02 &bull; Active</span>
-                  <strong className="text-amber-950 block">Registrar Evaluation</strong>
-                </div>
-              </div>
-              <div className="bg-white p-3.5 border border-amber-300 flex items-center gap-3 rounded-[4px]">
-                <div className="w-8 h-8 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Step 03 &bull; Next</span>
-                  <strong className="text-slate-900 block">Class Section Slotting</strong>
-                </div>
-              </div>
             </div>
 
             {/* Quick Actions */}

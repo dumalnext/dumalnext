@@ -93,7 +93,9 @@ function DocumentDropBox({
         </span>
       </div>
 
-      <p className="text-[11px] text-slate-600 leading-relaxed">{sublabel}</p>
+      {sublabel ? (
+        <p className="text-[11px] text-slate-600 leading-relaxed">{sublabel}</p>
+      ) : null}
 
       {uploadedDoc ? (
         <div className="p-3 bg-blue-50/90 border border-blue-200 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs rounded-[4px]">
@@ -864,9 +866,6 @@ export default function Step5DocumentsReview({
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Document Upload &amp; Application Review
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Upload required DepEd credentials using the built-in image compressor (&lt;350KB) and review your encoded information before official submission to the Dumalneg NHS School Administrator.
-        </p>
       </div>
 
       {/* Global Error Banner */}
@@ -884,11 +883,8 @@ export default function Step5DocumentsReview({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] block">
-            Section 9: Official Document Upload (Automated Compressor &lt; 350KB)
+            Official Document Upload
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Photos taken from smartphones will be automatically compressed by your browser to ensure fast uploads even on spotty mobile data connections in Dumalneg:
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -897,7 +893,7 @@ export default function Step5DocumentsReview({
             id="file-birth-cert"
             docKey="birth_certificate"
             label="1. PSA Birth Certificate"
-            sublabel="Clear photo of Philippine Statistics Authority (PSA) Birth Certificate or Local Civil Registrar (LCR) / Barangay Certification."
+            sublabel=""
             badgeText="MANDATORY"
             badgeType="slate"
             uploadedDoc={docs.birth_certificate}
@@ -912,13 +908,7 @@ export default function Step5DocumentsReview({
             id="file-form-138"
             docKey="form_138"
             label="2. Learner's Progress Report Card (SF9 / Form 138)"
-            sublabel={
-              isG7
-                ? "Grade 6 Elementary Progress Report Card indicating learner eligibility for Junior High School."
-                : isG11
-                ? "Grade 10 Junior High School Report Card indicating eligibility for Senior High School."
-                : "Report Card from previous school year completed."
-            }
+            sublabel=""
             badgeText="MANDATORY"
             badgeType="slate"
             uploadedDoc={docs.form_138}
@@ -933,7 +923,7 @@ export default function Step5DocumentsReview({
             id="file-id-picture"
             docKey="id_picture"
             label="3. Formal 2x2 or 1x1 ID Picture"
-            sublabel="Recent passport or 2x2 formal photo with white background and printed name tag of the learner."
+            sublabel=""
             badgeText="MANDATORY"
             badgeType="slate"
             accept="image/*"
@@ -949,7 +939,7 @@ export default function Step5DocumentsReview({
             id="file-good-moral"
             docKey="good_moral"
             label="4. Certificate of Good Moral Character"
-            sublabel="Certificate issued by previous school certifying good moral standing and disciplinary record."
+            sublabel=""
             badgeText={isG11 || isTransferee ? "MANDATORY" : "OPTIONAL FOR G7"}
             badgeType={isG11 || isTransferee ? "slate" : "blue"}
             uploadedDoc={docs.good_moral}
@@ -965,7 +955,7 @@ export default function Step5DocumentsReview({
               id="file-household-4ps"
               docKey="household_4ps"
               label="5. Pantawid Pamilya (4Ps) Household ID Card"
-              sublabel="Photocopy or clear photo of DSWD 4Ps ID or Household Pantawid verification passbook."
+              sublabel=""
               badgeText="4PS BENEFICIARY"
               badgeType="blue"
               uploadedDoc={docs.household_4ps}
@@ -981,7 +971,7 @@ export default function Step5DocumentsReview({
               id="file-pwd-id"
               docKey="pwd_id"
               label="6. Official Persons with Disability (PWD) ID"
-              sublabel="Photocopy of Municipal Social Welfare and Development (MSWDO) PWD ID or Clinical Medical Assessment."
+              sublabel=""
               badgeText="SNED / INCLUSIVE"
               badgeType="blue"
               uploadedDoc={docs.pwd_id}
@@ -1002,9 +992,6 @@ export default function Step5DocumentsReview({
             <span className="text-xs font-bold text-[#002060] block">
               Online Application Review Card
             </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Review all encoded applicant information below. Ensure every entry matches your civil registry and academic records before submitting:
-            </p>
           </div>
           <span className="text-[11px] bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded-[4px]">
             PRE-SUBMISSION VERIFICATION
@@ -1237,14 +1224,10 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-[4px]">
         <div className="text-xs font-bold text-[#002060]">
-          DepEd Sworn Certification &amp; Republic Act No. 10173 (Data Privacy Act of 2012)
+          DepEd Data Privacy &amp; Sworn Certification
         </div>
         <p className="text-xs text-slate-700 leading-relaxed">
-          I hereby certify that all information supplied herein is true, complete, and accurate to the best of my knowledge and belief. 
-          I understand that any misrepresentation of facts may result in the invalidation of this enrollment application. 
-          Furthermore, I authorize the Department of Education, Division of Ilocos Norte, and Dumalneg National High School to collect, 
-          record, organize, update, and store the personal and educational data contained in this application in accordance with the 
-          Data Privacy Act of 2012 (Republic Act No. 10173) and official DepEd civil registry guidelines.
+          I hereby certify that all information provided in this application is true, accurate, and complete. I authorize the Department of Education and Dumalneg National High School to process and store this data in compliance with the Data Privacy Act of 2012 (Republic Act No. 10173).
         </p>
 
         <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300 rounded-[4px]">
@@ -1264,7 +1247,7 @@ export default function Step5DocumentsReview({
             className="accent-[#002060] mt-0.5"
           />
           <span className="text-xs font-bold text-slate-900 leading-normal">
-            I have read, understood, and accept the DepEd Data Privacy terms. I solemnly certify that all submitted information is authentic.
+            I agree to the DepEd Data Privacy terms and certify that all submitted information is authentic.
           </span>
         </label>
         {errors.dataPrivacy && (
@@ -1273,10 +1256,8 @@ export default function Step5DocumentsReview({
       </div>
 
       {/* Notice About Official PDF Release */}
-      <div className="p-4 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-[4px]">
-        <strong>Important Official Note</strong>: In accordance with DepEd enrollment verification procedures, 
-        your official accomplished DepEd Basic Education Enrollment Form (PDF) will become accessible and downloadable 
-        immediately once your application and credentials have been officially verified and <strong>Approved</strong> by the Dumalneg NHS School Administrator.
+      <div className="p-3 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-[4px]">
+        <strong>Note</strong>: The official DepEd Enrollment Form (PDF) will be available once your application is verified and approved.
       </div>
 
       {/* Navigation Buttons */}

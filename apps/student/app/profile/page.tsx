@@ -589,17 +589,14 @@ export default function StudentProfilePage() {
                   </span>
                 )}
                 <span className="bg-white/10 px-2 py-0.5 rounded border border-white/10">
-                  S.Y. {schoolYear || "2026-2027"} ({semester || "Trimester 1"})
+                  S.Y. {schoolYear || "2026-2027"}
                 </span>
               </div>
             </div>
           </div>
 
           {/* Quick IT Support Button */}
-          <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t border-white/10 sm:border-t-0 pt-3 sm:pt-0">
-            <span className="text-[10px] font-bold text-blue-200 uppercase tracking-wider block mb-1">
-              Need Help with your record?
-            </span>
+          <div className="shrink-0 flex items-center justify-end border-t border-white/10 sm:border-t-0 pt-3 sm:pt-0">
             <a
               href={itSupportGmailUrl}
               target="_blank"
