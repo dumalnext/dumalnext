@@ -704,29 +704,23 @@ export default function Step5DocumentsReview({
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 rounded-[4px] shadow-sm">
         {/* Acknowledgment Header */}
         <div className="border-b-2 border-slate-200 pb-5 text-center">
-          <div className="text-xs font-bold tracking-wider text-[#002060]">
-            Department of Education &bull; Region I &bull; Division of Ilocos Norte
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Dumalneg National High School
           </h2>
-          <div className="text-xs font-medium text-slate-600 mt-0.5">
-            Dumalneg, Ilocos Norte &bull; DepEd School ID: 300017
-          </div>
-          <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-bold px-4 py-1 tracking-wide rounded-[4px]">
+          <div className="mt-2 inline-block bg-[#002060] text-white text-xs font-bold px-4 py-1 tracking-wide rounded-[4px]">
             {existingApplication
-              ? "Official Online Enrollment Resubmission Acknowledgment Slip"
-              : "Official Online Enrollment Acknowledgment Slip"}
+              ? "Online Enrollment Resubmission Slip"
+              : "Online Enrollment Acknowledgment Slip"}
           </div>
         </div>
 
-        {/* Status Banner - Color Coded (Yellow for Pending) with ZERO Emojis */}
+        {/* Status Banner */}
         <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-[4px] shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-[4px]">
               {existingApplication
-                ? "STATUS: REVISED APPLICATION SUBMITTED & PENDING VERIFICATION"
-                : "STATUS: PENDING ADMINISTRATOR VERIFICATION"}
+                ? "STATUS: REVISED APPLICATION SUBMITTED"
+                : "STATUS: PENDING VERIFICATION"}
             </span>
             <span className="text-xs text-amber-900 font-bold">
               DATE: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
@@ -734,21 +728,21 @@ export default function Step5DocumentsReview({
           </div>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
             {existingApplication
-              ? "Your revised enrollment dossier and updated documentary requirements have been successfully resubmitted to the Dumalneg National High School Administrator for re-evaluation. Your reference number remains unchanged."
-              : "Your online enrollment application has been successfully submitted to the Dumalneg National High School Administrator. Official documents are currently undergoing evaluation. You will be notified once verified."}
+              ? "Your revised enrollment application has been successfully resubmitted and is currently undergoing re-evaluation."
+              : "Your online enrollment application has been successfully submitted and is currently undergoing evaluation."}
           </p>
         </div>
 
         {/* Reference Code Box */}
         <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-[4px] shadow-xs">
           <div className="text-xs font-bold text-slate-600 tracking-wide">
-            Official Application Tracking Reference Number
+            Application Reference Number
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#002060] tracking-widest">
             {referenceNumber}
           </div>
           <p className="text-[11px] text-slate-500">
-            Please screenshot or write down this tracking reference number. You may use this number or your 12-digit LRN to check your live application status on the portal.
+            Please save this reference number to check your live application status on the portal.
           </p>
         </div>
 

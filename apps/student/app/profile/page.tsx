@@ -1101,10 +1101,6 @@ export default function StudentProfilePage() {
                       {studentId}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 sm:text-right">
-                    <span>DepEd Learner Status: </span>
-                    <span className="font-bold text-emerald-700">Verified &bull; Active</span>
-                  </div>
                 </div>
               </div>
             )}

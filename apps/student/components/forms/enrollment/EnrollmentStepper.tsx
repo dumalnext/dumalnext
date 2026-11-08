@@ -615,10 +615,7 @@ export default function EnrollmentStepper({
     return (
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-4">
-          <span className="text-xs font-bold tracking-widest text-[#002060] block">
-            Dumalneg National High School &bull; Admissions Committee
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Enrollment Application Already Submitted
           </h2>
           <div className="text-xs text-slate-500 mt-1.5 flex items-center justify-center gap-2">
@@ -631,14 +628,11 @@ export default function EnrollmentStepper({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shrink-0" />
             <span className="text-xs font-bold text-amber-950">
-              Submission Locked: Pending Administrator Verification
+              Pending Administrator Verification
             </span>
           </div>
-          <p className="text-xs text-amber-900 leading-relaxed">
-            You have already submitted an official enrollment application for School Year {schoolYear}. Under DepEd Basic Education enrollment guidelines, each learner is permitted only one (1) active application at a time.
-          </p>
-          <p className="text-xs text-amber-900 leading-relaxed">
-            Your application is currently queued for evaluation by the Dumalneg NHS School Administrator. If any correction or re-submission is necessary, the registrar will unlock your dossier for revision.
+          <p className="text-xs text-amber-900 leading-relaxed font-medium">
+            Your enrollment application for School Year {schoolYear} has been submitted and is currently queued for evaluation by the School Administrator.
           </p>
         </div>
 
@@ -665,10 +659,7 @@ export default function EnrollmentStepper({
     return (
       <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-4">
-          <span className="text-xs font-bold tracking-widest text-[#002060] block">
-            Department of Education &bull; Region I
-          </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Official Enrollment Confirmed
           </h2>
           <div className="text-xs text-slate-500 mt-1.5 flex items-center justify-center gap-2">
@@ -681,11 +672,11 @@ export default function EnrollmentStepper({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shrink-0" />
             <span className="text-xs font-bold text-emerald-950">
-              Status: Approved &amp; Officially Enrolled
+              Approved &amp; Officially Enrolled
             </span>
           </div>
-          <p className="text-xs text-emerald-900 leading-relaxed">
-            Congratulations! You are officially enrolled at Dumalneg National High School for School Year {schoolYear}. Your section assignment has been established and your official accomplished DepEd registration slip is ready.
+          <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+            You are officially enrolled at Dumalneg National High School for School Year {schoolYear}.
           </p>
         </div>
 
