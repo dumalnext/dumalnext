@@ -1353,9 +1353,13 @@ export default function SectionQuotaConsole() {
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                   Total Sections
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mt-1">
-                  {totalSections}
-                </div>
+                {isLoading ? (
+                  <div className="h-8 w-20 bg-slate-200 animate-pulse rounded-md mt-1" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mt-1">
+                    {totalSections}
+                  </div>
+                )}
               </div>
               <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#002060] flex items-center justify-center border border-blue-100 shrink-0 shadow-2xs">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1375,9 +1379,13 @@ export default function SectionQuotaConsole() {
                 <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">
                   Total Capacity
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-[#002060] mt-1">
-                  {totalCapacity}
-                </div>
+                {isLoading ? (
+                  <div className="h-8 w-20 bg-blue-100 animate-pulse rounded-md mt-1" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold font-mono text-[#002060] mt-1">
+                    {totalCapacity}
+                  </div>
+                )}
               </div>
               <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#002060] flex items-center justify-center border border-blue-200 shrink-0 shadow-2xs">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1397,9 +1405,13 @@ export default function SectionQuotaConsole() {
                 <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider block">
                   Officially Enrolled ({activeTerm.termName})
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-950 mt-1">
-                  {totalEnrolled}
-                </div>
+                {isLoading ? (
+                  <div className="h-8 w-20 bg-emerald-100 animate-pulse rounded-md mt-1" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-950 mt-1">
+                    {totalEnrolled}
+                  </div>
+                )}
               </div>
               <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200 shrink-0 shadow-2xs">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1410,7 +1422,11 @@ export default function SectionQuotaConsole() {
             <div className="mt-2 pt-2 border-t border-emerald-100/60 flex items-center justify-between text-[11px]">
               <span className="text-emerald-700 font-medium">Capacity Utilized:</span>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                {overallPct}%
+                {isLoading ? (
+                  <span className="inline-block w-8 h-3.5 bg-emerald-200/60 animate-pulse rounded" />
+                ) : (
+                  `${overallPct}%`
+                )}
               </span>
             </div>
           </div>
@@ -1422,9 +1438,13 @@ export default function SectionQuotaConsole() {
                 <span className="text-[11px] font-bold text-amber-950 uppercase tracking-wider block">
                   Available Slots
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-amber-950 mt-1">
-                  {totalAvailable}
-                </div>
+                {isLoading ? (
+                  <div className="h-8 w-20 bg-amber-100 animate-pulse rounded-md mt-1" />
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-extrabold font-mono text-amber-950 mt-1">
+                    {totalAvailable}
+                  </div>
+                )}
               </div>
               <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200 shrink-0 shadow-2xs">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

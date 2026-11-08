@@ -1177,10 +1177,16 @@ export default function ScheduleDeconflictionConsole() {
       <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs no-print print:hidden">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
-          <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-            STATUS: 0 TIMETABLE CONFLICTS DETECTED
-          </span>
-          <span className="text-xs text-emerald-900">&bull; {scanSummary}</span>
+          {isLoading ? (
+            <span className="inline-block w-64 h-4 bg-emerald-200/60 animate-pulse rounded" />
+          ) : (
+            <>
+              <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
+                STATUS: 0 TIMETABLE CONFLICTS DETECTED
+              </span>
+              <span className="text-xs text-emerald-900">&bull; {scanSummary}</span>
+            </>
+          )}
         </div>
         <span className="text-[10px] font-mono text-emerald-800">
           Last Scan: {lastScanTime}
@@ -1278,7 +1284,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            Master Timetable Registry ({schedules.length})
+            Master Timetable Registry ({isLoading ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : schedules.length})
           </button>
         </div>
 

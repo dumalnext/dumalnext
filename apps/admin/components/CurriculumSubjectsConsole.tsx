@@ -830,7 +830,11 @@ export default function CurriculumSubjectsConsole() {
             <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
               Specialized &amp; Electives
             </span>
-            <div className="text-2xl font-mono font-bold text-indigo-800 mt-1">{electivesCount}</div>
+            {isLoading ? (
+              <div className="h-7 w-16 bg-purple-100 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-mono font-bold text-indigo-800 mt-1">{electivesCount}</div>
+            )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Applied, Specialized &amp; Track Electives</span>
         </div>
