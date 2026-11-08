@@ -749,35 +749,8 @@ export default function EnrollmentStepper({
         </div>
       )}
 
-      {/* Authenticated Applicant Status Banner */}
-      {user ? (
-        <div className="p-3 bg-blue-50 border border-blue-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[4px]">
-          <span className="text-slate-700">
-            Authenticated Applicant Account: <strong>{user.fullName}</strong> ({user.email})
-          </span>
-          <span className="text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0 rounded-[4px]">
-            Linked Account: {user.userId}
-          </span>
-        </div>
-      ) : (
-        <div className="p-3 bg-amber-50 border border-amber-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[4px]">
-          <span className="text-amber-900">
-            You are currently filling out this enrollment form as a Guest. To link this submission to your personal student account for easier tracking, please sign in or register.
-          </span>
-          <div className="flex gap-2 shrink-0">
-            <a href="/login" className="font-bold text-[#002060] hover:underline text-[11px]">
-              Sign In
-            </a>
-            <span>&bull;</span>
-            <a href="/register" className="font-bold text-[#002060] hover:underline text-[11px]">
-              Register Account
-            </a>
-          </div>
-        </div>
-      )}
-
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
-      <div className="bg-white border border-slate-300 p-3.5 sm:p-5 md:p-6 shadow-sm rounded-[4px]">
+      <div className="bg-white border border-slate-200/80 p-4 sm:p-6 shadow-xs rounded-xl">
         <div className="mb-4 pb-3 border-b border-slate-200">
           <div className="flex items-start sm:items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
@@ -790,20 +763,12 @@ export default function EnrollmentStepper({
                 <button
                   type="button"
                   onClick={handleResetDraft}
-                  className="hidden md:inline-flex text-xs font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
+                  className="hidden md:inline-flex text-xs font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-md active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
                   title="Reset enrollment progress and start over from Step 1"
                 >
                   Reset / Start Over
                 </button>
               )}
-              <div className="text-right shrink-0">
-                <span className="text-xs font-bold text-slate-700 block whitespace-nowrap">
-                  Step {currentStep} of 5
-                </span>
-                <span className="text-[11px] text-[#002060] font-bold tracking-wider whitespace-nowrap">
-                  {Math.round((currentStep / 5) * 100)}% Complete
-                </span>
-              </div>
             </div>
           </div>
 

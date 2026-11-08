@@ -696,7 +696,7 @@ export default function Step1ApplicantType({
           onClick={validateAndProceed}
           className="inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer"
         >
-          <span>Proceed: Learner&apos;s Personal Information (Step 2)</span>
+          <span>Next Step</span>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
           </svg>

@@ -1280,14 +1280,17 @@ export default function Step5DocumentsReview({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t-2 border-slate-200">
+      <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t border-slate-200">
         <button
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-[4px]"
+          className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-8 text-center rounded-xl transition-all cursor-pointer w-full sm:w-auto disabled:opacity-50"
         >
-Back to Step 4 (Curriculum &amp; Modality)
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
         </button>
         <button
           type="button"
