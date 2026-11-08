@@ -857,14 +857,14 @@ export default function AdjudicationConsole() {
       </div>
 
       {/* Filter Controls & Search Bar */}
-      <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-3.5 shadow-2xs">
-        <div className="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-3">
-          {/* Status Tabs (Strictly 1 Row) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 2xl:pb-0 shrink-0">
+      <div className="p-3.5 sm:p-4 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-3">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          {/* Status Tabs: Grid on mobile/tablet (auto-fit, no slide), Inline-flex on PC */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex items-center gap-1.5 sm:gap-2 w-full xl:w-auto">
             <button
               type="button"
               onClick={() => setStatusFilter("ALL")}
-              className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
+              className={`w-full xl:w-auto px-3 py-2 rounded-lg border transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap text-xs font-semibold cursor-pointer ${
                 statusFilter === "ALL"
                   ? "bg-[#002060] text-white border-[#002060] shadow-2xs"
                   : "bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200"
@@ -879,7 +879,7 @@ export default function AdjudicationConsole() {
             <button
               type="button"
               onClick={() => setStatusFilter("Pending")}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
+              className={`w-full xl:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold cursor-pointer ${
                 statusFilter === "Pending"
                   ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-2xs"
                   : "bg-amber-50/70 text-amber-900 hover:bg-amber-100 border-amber-200"
@@ -895,7 +895,7 @@ export default function AdjudicationConsole() {
             <button
               type="button"
               onClick={() => setStatusFilter("Approved")}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
+              className={`w-full xl:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold cursor-pointer ${
                 statusFilter === "Approved"
                   ? "bg-emerald-600 text-white border-emerald-700 font-bold shadow-2xs"
                   : "bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100 border-emerald-200"
@@ -911,7 +911,7 @@ export default function AdjudicationConsole() {
             <button
               type="button"
               onClick={() => setStatusFilter("Needs Revision")}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
+              className={`w-full xl:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold cursor-pointer ${
                 statusFilter === "Needs Revision"
                   ? "bg-rose-600 text-white border-rose-700 font-bold shadow-2xs"
                   : "bg-rose-50/70 text-rose-900 hover:bg-rose-100 border-rose-200"
@@ -925,40 +925,46 @@ export default function AdjudicationConsole() {
             </button>
           </div>
 
-          {/* Academic Period, Grade & Search Filter Controls (Aligned in 1 Row) */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 2xl:pb-0 shrink-0">
+          {/* Academic Period, Grade & Search Filter Controls: Grid on mobile/tablet (auto-fit, no slide), Inline-flex on PC */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:flex items-center gap-2 w-full xl:w-auto">
             {/* School Year Selector */}
-            <div className="w-40 sm:w-44 shrink-0">
+            <div className="w-full xl:w-40">
               <CustomSelect
                 label="SY:"
                 value={selectedSY}
                 onChange={setSelectedSY}
                 options={syOptions}
+                fullWidth
+                triggerClassName="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs"
               />
             </div>
 
             {/* Term / Trimester Selector */}
-            <div className="w-42 sm:w-48 shrink-0">
+            <div className="w-full xl:w-44">
               <CustomSelect
                 label="Term:"
                 value={selectedTerm}
                 onChange={setSelectedTerm}
                 options={termOptions}
+                fullWidth
+                triggerClassName="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs"
               />
             </div>
 
             {/* Grade Selector */}
-            <div className="w-38 sm:w-44 shrink-0">
+            <div className="w-full xl:w-40">
               <CustomSelect
                 label="Grade:"
                 value={gradeFilter}
                 onChange={setGradeFilter}
                 options={gradeOptions}
+                fullWidth
+                triggerClassName="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs"
               />
             </div>
 
-            {/* Search Input with Icon (In the exact same row as dropdowns) */}
-            <div className="relative w-36 sm:w-48 shrink-0">
+            {/* Search Input with Icon */}
+            <div className="relative w-full xl:w-48">
               <svg className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
