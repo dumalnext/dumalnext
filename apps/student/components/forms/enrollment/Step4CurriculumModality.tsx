@@ -8,8 +8,6 @@ import {
   JHS_PROGRAMS,
   SHS_TRACKS,
   STRENGTHENED_SHS_CORE_SUBJECTS,
-  SNED_DIAGNOSES,
-  SNED_MANIFESTATIONS,
   DISTANCE_LEARNING_MODALITIES,
 } from "@/lib/types/enrollment";
 
@@ -300,25 +298,6 @@ export default function Step4CurriculumModality({
     }
   };
 
-  // Toggle SNEd details in multi-select array
-  const handleSnedDetailToggle = (detail: string) => {
-    const currentList = data.snedDetails || [];
-    let updated: string[];
-    if (currentList.includes(detail)) {
-      updated = currentList.filter((d) => d !== detail);
-    } else {
-      updated = [...currentList, detail];
-    }
-    onChange({ snedDetails: updated });
-    if (errors.snedDetails) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next.snedDetails;
-        return next;
-      });
-    }
-  };
-
   // Validation
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
@@ -344,16 +323,6 @@ export default function Step4CurriculumModality({
       }
     }
 
-    // SNEd Validation
-    if (data.isSned) {
-      if (!data.snedCategory) {
-        newErrors.snedCategory = "Please select whether the special need is by medical diagnosis or observed manifestations.";
-      }
-      if (!data.snedDetails || data.snedDetails.length === 0) {
-        newErrors.snedDetails = "Please select at least one specific condition or learning manifestation.";
-      }
-    }
-
     // Modality Validation
     if (!currentModalities || currentModalities.length === 0) {
       newErrors.preferredModalities = "DepEd Requirement: Select at least one preferred distance learning modality.";
@@ -375,6 +344,10 @@ export default function Step4CurriculumModality({
           selectedElectives: [],
           doorwayElectives: [],
           preferredModalities: currentModalities,
+          isSned: false,
+          snedCategory: "",
+          snedDetails: [],
+          hasPwdId: false,
           step1: {
             ...data.step1,
             jhsProgram: currentJhsProgram,
@@ -400,6 +373,10 @@ export default function Step4CurriculumModality({
           jhsProgram: undefined,
           spsSport: undefined,
           preferredModalities: currentModalities,
+          isSned: false,
+          snedCategory: "",
+          snedDetails: [],
+          hasPwdId: false,
           step1: {
             ...data.step1,
             targetTrack: currentTrack,
@@ -895,168 +872,7 @@ export default function Step4CurriculumModality({
       )}
 
       {/* ========================================================================= */}
-      {/* SECTION C: SPECIAL NEEDS EDUCATION (SNED) / INCLUSIVE LEARNING (SEC. 5)    */}
-      {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
-        <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] block">
-            Special Needs Education (SNEd) &amp; Inclusive Support
-          </span>
-        </div>
-
-        {/* SNEd Yes/No Selector */}
-        <div>
-          <label className="block text-xs font-bold text-slate-900 mb-2">
-            Does the learner have a diagnosed disability, health condition, or require special education support? <span className="text-red-700">*</span>
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
-            <label
-              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-[4px] ${
-                !data.isSned
-                  ? "bg-[#002060] text-white border-[#002060]"
-                  : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
-              }`}
-            >
-              <input
-                type="radio"
-                name="isSned"
-                checked={!data.isSned}
-                onChange={() => {
-                  onChange({
-                    isSned: false,
-                    snedCategory: "",
-                    snedDetails: [],
-                    hasPwdId: false,
-                  });
-                  setErrors((prev) => {
-                    const next = { ...prev };
-                    delete next.snedCategory;
-                    delete next.snedDetails;
-                    return next;
-                  });
-                }}
-                className="accent-[#002060]"
-              />
-              <div className="text-xs font-bold">
-                No (General Education Learner)
-              </div>
-            </label>
-
-            <label
-              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-[4px] ${
-                data.isSned
-                  ? "bg-[#002060] text-white border-[#002060]"
-                  : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
-              }`}
-            >
-              <input
-                type="radio"
-                name="isSned"
-                checked={data.isSned}
-                onChange={() => {
-                  onChange({
-                    isSned: true,
-                    snedCategory: data.snedCategory || "Diagnosis",
-                  });
-                }}
-                className="accent-[#002060]"
-              />
-              <div className="text-xs font-bold">
-                Yes (SNEd / Inclusive Learner)
-              </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Expanded SNEd Fields */}
-        {data.isSned && (
-          <div className="p-5 bg-white border-2 border-blue-200 space-y-4 rounded-[4px]">
-            <div>
-              <label className="block text-xs font-bold text-slate-900 mb-1">
-                Classification Assessment Basis <span className="text-red-700">*</span>
-              </label>
-              <div className="flex flex-wrap gap-4 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
-                  <input
-                    type="radio"
-                    name="snedCategory"
-                    value="Diagnosis"
-                    checked={data.snedCategory === "Diagnosis"}
-                    onChange={() => {
-                      onChange({ snedCategory: "Diagnosis", snedDetails: [] });
-                    }}
-                    className="accent-[#002060]"
-                  />
-                  With Formal Medical / Clinical Diagnosis
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
-                  <input
-                    type="radio"
-                    name="snedCategory"
-                    value="Manifestations"
-                    checked={data.snedCategory === "Manifestations"}
-                    onChange={() => {
-                      onChange({ snedCategory: "Manifestations", snedDetails: [] });
-                    }}
-                    className="accent-[#002060]"
-                  />
-                  Observed Learning Manifestations / Difficulty
-                </label>
-              </div>
-              {errors.snedCategory && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.snedCategory}</p>
-              )}
-            </div>
-
-            {/* Category Checklists */}
-            <div>
-              <label className="block text-xs font-bold text-slate-900 mb-2">
-                Specific Learning Need / Condition (DepEd Official Form Checklist) <span className="text-red-700">*</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-3 border border-slate-300 bg-slate-50 rounded-[4px]">
-                {(data.snedCategory === "Manifestations" ? SNED_MANIFESTATIONS : SNED_DIAGNOSES).map(
-                  (item) => {
-                    const isChecked = (data.snedDetails || []).includes(item);
-                    return (
-                      <label
-                        key={item}
-                        className="flex items-start gap-2 p-1.5 hover:bg-white text-xs text-slate-800 cursor-pointer rounded-[4px]"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => handleSnedDetailToggle(item)}
-                          className="accent-[#002060] mt-0.5"
-                        />
-                        <span className={isChecked ? "font-bold text-[#002060]" : ""}>{item}</span>
-                      </label>
-                    );
-                  }
-                )}
-              </div>
-              {errors.snedDetails && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.snedDetails}</p>
-              )}
-            </div>
-
-            {/* PWD ID Checkbox */}
-            <div className="pt-2 border-t border-slate-200">
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-800 font-bold">
-                <input
-                  type="checkbox"
-                  checked={data.hasPwdId}
-                  onChange={(e) => onChange({ hasPwdId: e.target.checked })}
-                  className="accent-[#002060]"
-                />
-                Learner possesses an official Persons with Disability (PWD) ID Card or Medical Certificate
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ========================================================================= */}
-      {/* SECTION D: DISTANCE LEARNING MODALITIES (DEPED SECTION 8)                  */}
+      {/* SECTION C: DISTANCE LEARNING MODALITIES (DEPED SECTION 8)                  */}
       {/* ========================================================================= */}
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3">

@@ -959,21 +959,7 @@ export default function Step5DocumentsReview({
             />
           )}
 
-          {/* 6. Conditional PWD ID Photocopy */}
-          {data.hasPwdId && (
-            <DocumentDropBox
-              id="file-pwd-id"
-              docKey="pwd_id"
-              label="6. Official Persons with Disability (PWD) ID"
-              sublabel=""
-              badgeText="SNED / INCLUSIVE"
-              badgeType="blue"
-              uploadedDoc={docs.pwd_id}
-              error={errors.pwd_id}
-              onUpload={(file) => handleFileUpload("pwd_id", file)}
-              onRemove={() => handleRemoveDoc("pwd_id")}
-            />
-          )}
+
         </div>
       </div>
 
@@ -1188,22 +1174,14 @@ export default function Step5DocumentsReview({
             </div>
           </div>
 
-          {/* Card 5: SNEd & Modality */}
+          {/* Card 5: Preferred Modality */}
           <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
             <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
-              5. Inclusive Education &amp; Preferred Modality
+              5. Preferred Learning Modality
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Special Education (SNEd)</span>
-                <span className="font-bold text-slate-900">
-                  {data.isSned
-                    ? `Yes - ${data.snedCategory}: ${(data.snedDetails || []).join(", ")}`
-                    : "No (General Education Learner)"}
-                </span>
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Preferred Emergency Learning Modalities</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Preferred Distance Learning Modalities</span>
                 <span className="font-bold text-slate-900">
                   {(data.preferredModalities || ["Modular (Print)"]).join(", ")}
                 </span>

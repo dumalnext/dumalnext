@@ -70,14 +70,18 @@ export default function Step1ApplicantType({
 
   // Auto-preset feeder school if applicant type is chosen and no school attended is yet specified
   React.useEffect(() => {
+    if (data.isGraded !== true) {
+      onChange({ isGraded: true });
+    }
     if (data.applicantType && !data.lastSchoolAttended) {
       onChange({
+        isGraded: true,
         lastSchoolAttended: defaultFeederSchoolName,
         lastSchoolId: defaultFeederSchoolId,
         lastSchoolYearCompleted: data.lastSchoolYearCompleted || "2024-2025",
       });
     }
-  }, [data.applicantType, defaultFeederSchoolName, defaultFeederSchoolId]);
+  }, [data.applicantType, data.isGraded, defaultFeederSchoolName, defaultFeederSchoolId]);
 
   // When applicant type changes, set appropriate default grade levels and conditional parameters
   const handleSelectApplicantType = (type: ApplicantType) => {
@@ -279,52 +283,19 @@ export default function Step1ApplicantType({
           </label>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-          {/* Graded Program */}
-          <button
-            type="button"
-            onClick={() => onChange({ isGraded: true })}
-            className={`p-4 sm:p-5 border-2 text-left transition-all rounded-xl cursor-pointer ${
-              data.isGraded
-                ? "border-[#002060] bg-blue-50/50 shadow-xs ring-2 ring-[#002060]/10"
-                : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
-            }`}
-          >
+        <div className="pt-1">
+          {/* Graded Program (Fixed DepEd Curriculum Program) */}
+          <div className="p-4 sm:p-5 border-2 border-[#002060] bg-blue-50/50 shadow-xs ring-2 ring-[#002060]/10 rounded-xl">
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm sm:text-base font-bold text-slate-900">
                 Graded Curriculum Program
               </span>
-              <OptionRadio selected={data.isGraded} />
+              <OptionRadio selected={true} />
             </div>
-            {data.isGraded && (
-              <p className="text-xs text-slate-600 mt-2.5 pt-2.5 border-t border-blue-200/70 leading-relaxed">
-                Standard secondary basic education program for Junior High School and Senior High School.
-              </p>
-            )}
-          </button>
-
-          {/* Non-Graded Program */}
-          <button
-            type="button"
-            onClick={() => onChange({ isGraded: false })}
-            className={`p-4 sm:p-5 border-2 text-left transition-all rounded-xl cursor-pointer ${
-              !data.isGraded
-                ? "border-[#002060] bg-blue-50/50 shadow-xs ring-2 ring-[#002060]/10"
-                : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
-            }`}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm sm:text-base font-bold text-slate-900">
-                Non-Graded Program (SNEd Only)
-              </span>
-              <OptionRadio selected={!data.isGraded} />
-            </div>
-            {!data.isGraded && (
-              <p className="text-xs text-slate-600 mt-2.5 pt-2.5 border-t border-blue-200/70 leading-relaxed">
-                Tailored individualized educational program reserved exclusively for learners with special education needs (SNEd).
-              </p>
-            )}
-          </button>
+            <p className="text-xs text-slate-600 mt-2.5 pt-2.5 border-t border-blue-200/70 leading-relaxed">
+              Standard secondary basic education program for Junior High School and Senior High School.
+            </p>
+          </div>
         </div>
       </div>
 

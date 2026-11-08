@@ -183,7 +183,7 @@ const STEP_LABELS = [
   { step: 1, label: "Classification", sublabel: "Learner Category" },
   { step: 2, label: "Learner Profile", sublabel: "Personal & Address" },
   { step: 3, label: "Family Background", sublabel: "Parent & Guardian" },
-  { step: 4, label: "Curriculum & Modality", sublabel: "Program, SNEd & Mode" },
+  { step: 4, label: "Curriculum & Modality", sublabel: "Program & Modality" },
   { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
