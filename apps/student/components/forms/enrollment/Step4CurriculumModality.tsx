@@ -429,11 +429,6 @@ export default function Step4CurriculumModality({
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Curricular Program, Special Education, &amp; Learning Modalities
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          {isJHS
-            ? `Official curriculum placement for Grade ${targetGrade} Junior High School learner, inclusive education profile, and emergency alternative delivery preferences.`
-            : `Senior High School Track and Strand designation for Grade ${targetGrade}, semester tracking, inclusive education, and alternative delivery preferences.`}
-        </p>
       </div>
 
       {/* Global Error Notice */}
@@ -449,22 +444,19 @@ export default function Step4CurriculumModality({
       {/* CONDITIONAL SECTION A: JUNIOR HIGH SCHOOL CURRICULAR PROGRAM (GRADES 7-10) */}
       {/* ========================================================================= */}
       {isJHS ? (
-        <div className="p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px] space-y-2">
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px] space-y-3">
           <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060] block">
-              Section 4-B: Junior High School Curriculum
+              Junior High School Curriculum
             </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Grade {targetGrade} curriculum at Dumalneg National High School:
-            </p>
           </div>
-          <div className="p-4 bg-white border border-slate-200 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 block">
               Regular Basic Education Curriculum
             </span>
-            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-              Standard DepEd K-12 secondary curriculum encompassing core learning areas: English, Mathematics, Science, Filipino, Araling Panlipunan, Values Education (EsP), MAPEH, and Technology &amp; Livelihood Education (TLE).
-            </p>
+            <span className="text-[10px] font-bold bg-blue-50 text-[#002060] border border-blue-200 px-2.5 py-1 rounded-md">
+              Grade {targetGrade} JHS
+            </span>
           </div>
         </div>
       ) : (
@@ -478,11 +470,8 @@ export default function Step4CurriculumModality({
             <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold text-[#002060] block">
-                  Section 7-A: Senior High School Track Selection
+                  Senior High School Track Selection
                 </span>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  The Strengthened Senior High School Program offers two (2) distinct tracks with unified core foundations and specialized elective clusters:
-                </p>
               </div>
               <span className="text-[10px] font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider w-fit rounded-[4px]">
                 DEPED REFORM STANDARD
@@ -508,9 +497,6 @@ export default function Step4CurriculumModality({
                   AUTO-SYNCED (ACTIVE)
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Centrally managed and synchronized with IT-Support Registered Academic Terms
-              </p>
             </div>
 
             {/* 2-Track Selection Cards */}
@@ -633,11 +619,8 @@ export default function Step4CurriculumModality({
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-bold text-[#002060] block">
-                    Section 7-B: Grade {targetGrade} Academic Track - Elective Part (Maximum 1 Subject)
+                    Grade {targetGrade} Academic Track - Elective Subject
                   </span>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Choose one (1) elective subject for this semester. Under DepEd curriculum guidelines, learners may enroll in a maximum of one (1) elective offering per semester:
-                  </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase rounded-[4px]">
@@ -744,11 +727,8 @@ export default function Step4CurriculumModality({
               <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-bold text-[#002060] block">
-                    Section 7-B: Grade {targetGrade} Technical-Professional Track - Prescribed Curriculum
+                    Grade {targetGrade} Technical-Professional Track - Prescribed Curriculum
                   </span>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Standardized TechPro Curriculum: All specialized industry subjects configured by administration are fixed and automatically assigned for the full academic year.
-                  </p>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase shrink-0 rounded-[4px]">
                   FIXED CURRICULUM (NO ELECTIVES)
@@ -844,11 +824,8 @@ export default function Step4CurriculumModality({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
                   <div>
                     <span className="text-xs font-bold text-[#002060] block">
-                      Section 7-C: Grade {targetGrade} Mandatory Unified Core Subjects
+                      Grade {targetGrade} Mandatory Unified Core Subjects
                     </span>
-                    <p className="text-xs text-slate-600 mt-0.5">
-                      Mandatory foundation subjects automatically enrolled for all Grade {targetGrade} {currentTrack} learners:
-                    </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase rounded-[4px]">
@@ -899,9 +876,6 @@ export default function Step4CurriculumModality({
                     ))}
                   </div>
                 )}
-                <p className="text-[11px] text-slate-500 italic">
-                  Notice: Core foundation courses are synchronized live from the administrator curriculum catalog and automatically assigned to all Grade {targetGrade} learners upon enrollment.
-                </p>
               </div>
             );
           })()}
@@ -926,11 +900,8 @@ export default function Step4CurriculumModality({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] block">
-            Section 5: Special Needs Education (SNEd) &amp; Inclusive Support
+            Special Needs Education (SNEd) &amp; Inclusive Support
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            DepEd mandate on inclusive education: Inquire if the learner requires specialized academic accommodations, adaptive facilities, or individualized learning assistance:
-          </p>
         </div>
 
         {/* SNEd Yes/No Selector */}
@@ -1090,11 +1061,8 @@ export default function Step4CurriculumModality({
       <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] block">
-            Section 8: Preferred Distance Learning Modalities
+            Preferred Distance Learning Modalities
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            DepEd Disaster Contingency Standard: In the event of emergency class suspensions (severe weather typhoons or PAGASA extreme heat index), select the learner&apos;s preferred remote alternative learning delivery modes:
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -1103,9 +1071,9 @@ export default function Step4CurriculumModality({
             return (
               <label
                 key={modality}
-                className={`p-3.5 border-2 flex items-start gap-3 cursor-pointer transition-colors rounded-[4px] ${
+                className={`p-3.5 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-xl ${
                   isChecked
-                    ? "bg-white border-[#002060] shadow-xs"
+                    ? "bg-blue-50/50 border-[#002060] shadow-xs"
                     : "bg-white border-slate-300 hover:border-slate-400"
                 }`}
               >
@@ -1113,28 +1081,11 @@ export default function Step4CurriculumModality({
                   type="checkbox"
                   checked={isChecked}
                   onChange={() => handleModalityToggle(modality)}
-                  className="accent-[#002060] mt-0.5"
+                  className="accent-[#002060]"
                 />
-                <div className="text-xs">
-                  <div className={`font-bold ${isChecked ? "text-[#002060]" : "text-slate-800"}`}>
-                    {modality}
-                  </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">
-                    {modality === "Modular (Print)"
-                      ? "Printed Self-Learning Modules via Barangay / Sitio"
-                      : modality === "Modular (Digital)"
-                      ? "Offline digital copies on USB flash drive / OTG"
-                      : modality === "Online"
-                      ? "Synchronous virtual meet and online classroom"
-                      : modality === "Blended (Combination)"
-                      ? "Alternating in-person and distance modular"
-                      : modality === "Educational Television"
-                      ? "Instructional lessons broadcast via DepEd TV"
-                      : modality === "Radio-Based Television"
-                      ? "Community radio broadcast lessons"
-                      : "DepEd parent-guided home instruction"}
-                  </div>
-                </div>
+                <span className={`text-xs font-bold ${isChecked ? "text-[#002060]" : "text-slate-800"}`}>
+                  {modality}
+                </span>
               </label>
             );
           })}

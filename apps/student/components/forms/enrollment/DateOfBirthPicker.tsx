@@ -127,27 +127,11 @@ export default function DateOfBirthPicker({
     }
   };
 
-  // Human-readable formatted date display
-  const formattedDate = useMemo(() => {
-    if (year && month && day) {
-      const monthObj = MONTHS.find((m) => m.value === month);
-      return `${monthObj?.label || month} ${parseInt(day, 10)}, ${year}`;
-    }
-    return null;
-  }, [year, month, day]);
-
   return (
     <div className="w-full">
-      <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
-        <label className="block text-xs font-bold text-slate-900">
-          {label} {required && <span className="text-red-700">*</span>}
-        </label>
-        {formattedDate && (
-          <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-[4px] shrink-0">
-            {formattedDate}
-          </span>
-        )}
-      </div>
+      <label className="block text-xs font-bold text-slate-900 mb-1">
+        {label} {required && <span className="text-red-700">*</span>}
+      </label>
 
       {/* 3 Modern DepEd Styled Drop Boxes: Month, Day, Year */}
       <div className="grid grid-cols-3 gap-1.5 sm:gap-2">

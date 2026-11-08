@@ -508,19 +508,19 @@ export default function Step2LearnerProfile({
             <label className="block text-xs font-bold text-slate-900 mb-1">
               Age (Years Old) <span className="text-red-700">*</span>
             </label>
-            <div className="flex items-center gap-2">
+            <div className="relative">
               <input
                 type="number"
                 value={data.age || ""}
                 readOnly
                 placeholder="Auto"
-                className={`w-full p-3 border-2 text-sm font-bold cursor-not-allowed outline-none text-center rounded-xl ${
+                className={`w-full h-[46px] px-3 pr-9 border-2 text-sm font-bold cursor-not-allowed outline-none text-center rounded-xl ${
                   isUnderage || errors.age
                     ? "border-red-600 bg-red-50 text-red-700 font-extrabold ring-2 ring-red-400"
                     : "bg-slate-100 border-slate-300 text-slate-800"
                 }`}
               />
-              <span className={`text-xs font-bold whitespace-nowrap ${isUnderage || errors.age ? "text-red-700 font-extrabold" : "text-slate-500"}`}>
+              <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold pointer-events-none ${isUnderage || errors.age ? "text-red-700 font-extrabold" : "text-slate-500"}`}>
                 Y/O
               </span>
             </div>
@@ -558,7 +558,7 @@ export default function Step2LearnerProfile({
                         });
                       }
                     }}
-                    className={`p-3 border-2 font-bold text-xs tracking-wider transition-all rounded-[4px] cursor-pointer ${
+                    className={`h-[46px] flex items-center justify-center border-2 font-bold text-xs tracking-wider transition-all rounded-xl cursor-pointer ${
                       isSelected
                         ? "bg-[#002060] text-white border-[#002060] shadow-sm"
                         : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
@@ -586,7 +586,7 @@ export default function Step2LearnerProfile({
               value={data.placeOfBirth || ""}
               onChange={(e) => onChange({ placeOfBirth: e.target.value.toUpperCase() })}
               placeholder="e.g. DUMALNEG, ILOCOS NORTE / LAOAG CITY"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-[4px]"
+              className="w-full h-[46px] px-3 bg-white border-2 border-slate-300 text-sm font-medium uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl"
             />
             {errors.placeOfBirth && (
               <span className="text-xs text-red-700 font-semibold mt-1 block">

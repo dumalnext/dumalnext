@@ -279,9 +279,6 @@ export default function Step3FamilyBackground({
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Parent &amp; Legal Guardian Information
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Provide parental and guardian background in accordance with official DepEd Civil Registry verification standards.
-        </p>
       </div>
 
       {/* Global Error Banner */}
@@ -306,9 +303,6 @@ export default function Step3FamilyBackground({
           <span className="text-xs font-bold text-[#002060] tracking-wider block">
             Primary School Contact / Designated Custodian
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Select who the Dumalneg NHS administration and faculty should prioritize for urgent student notifications, emergency situations, and report card releases:
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
@@ -394,11 +388,8 @@ export default function Step3FamilyBackground({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] tracking-wider block">
-              Section A: Father&apos;s Legal Information
+              Father&apos;s Information
             </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Official legal name and active mobile number as registered in official civil documents.
-            </p>
           </div>
           <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded-[4px]">
             <input
@@ -561,9 +552,6 @@ export default function Step3FamilyBackground({
                   }`}
                 />
               </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Standard 11-digit Philippine mobile format (e.g., 09171234567).
-              </p>
               {errors.fatherContactNumber && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.fatherContactNumber}</p>
               )}
@@ -577,11 +565,8 @@ export default function Step3FamilyBackground({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] tracking-wider block">
-              Section B: Mother&apos;s Maiden Legal Information
+              Mother&apos;s Maiden Information
             </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Important: Enter your mother&apos;s legal <strong>Maiden Name</strong> (her surname at birth, before marriage).
-            </p>
           </div>
           <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded-[4px]">
             <input
@@ -600,10 +585,6 @@ export default function Step3FamilyBackground({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-normal rounded-[4px]">
-              <strong>DepEd Civil Verification Note:</strong> DepEd Basic Education records strictly require the mother&apos;s <strong>Maiden Last Name</strong> (maiden surname) to verify civil registry records in the PSA Birth Certificate.
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Mother Maiden Last Name */}
               <div>
@@ -748,9 +729,6 @@ export default function Step3FamilyBackground({
                   }`}
                 />
               </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Standard 11-digit Philippine mobile format (e.g., 09181234567).
-              </p>
               {errors.motherContactNumber && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.motherContactNumber}</p>
               )}
@@ -769,7 +747,7 @@ export default function Step3FamilyBackground({
               <span className={`text-xs font-bold tracking-wider block ${
                 isBothParentsUnavailable ? "text-red-900" : "text-[#002060]"
               }`}>
-                Section C: Legal Guardian / Authorized Custodian
+                Legal Guardian / Authorized Custodian
               </span>
               {isBothParentsUnavailable ? (
                 <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-red-700 text-white rounded-[4px]">
@@ -781,11 +759,11 @@ export default function Step3FamilyBackground({
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-600 mt-1">
-              {isBothParentsUnavailable
-                ? "Since both Father and Mother are marked unavailable, registering a Legal Guardian (Grandparent, Relative, or Foster Parent) with an 11-digit mobile number is mandatory."
-                : "Optional: Complete only if the student has a designated guardian (e.g., Grandparent, Aunt/Uncle if parents are working abroad). If living with parents, leave this blank."}
-            </p>
+            {isBothParentsUnavailable && (
+              <p className="text-xs text-red-700 mt-1 font-semibold">
+                Both parents are marked unavailable. Registering a Legal Guardian with an active contact number is required.
+              </p>
+            )}
           </div>
         </div>
 
@@ -793,7 +771,7 @@ export default function Step3FamilyBackground({
           {/* Guardian Relationship Selector */}
           <div>
             <label className="block text-xs font-bold text-slate-900 mb-1">
-              Guardian&apos;s Relationship to Learner {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
+              Guardian&apos;s Relationship to Learner {isBothParentsUnavailable && <span className="text-red-700">*</span>}
             </label>
             <CustomSelect
               value={data.guardianRelationship || ""}
@@ -826,7 +804,7 @@ export default function Step3FamilyBackground({
             <div>
               <div className="h-6 flex items-center mb-1">
                 <label className="text-xs font-bold text-slate-900">
-                  Guardian&apos;s Last Name {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-400 font-normal text-[10px] ml-1">(Optional)</span>}
+                  Guardian&apos;s Last Name {isBothParentsUnavailable && <span className="text-red-700">*</span>}
                 </label>
               </div>
               <input
@@ -856,7 +834,7 @@ export default function Step3FamilyBackground({
             <div>
               <div className="h-6 flex items-center mb-1">
                 <label className="text-xs font-bold text-slate-900">
-                  Guardian&apos;s First Name {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-400 font-normal text-[10px] ml-1">(Optional)</span>}
+                  Guardian&apos;s First Name {isBothParentsUnavailable && <span className="text-red-700">*</span>}
                 </label>
               </div>
               <input
@@ -945,7 +923,7 @@ export default function Step3FamilyBackground({
           {/* Guardian Contact Number */}
           <div className="max-w-md">
             <label className="block text-xs font-bold text-slate-900 mb-1">
-              Guardian&apos;s Mobile Contact Number {isBothParentsUnavailable ? <span className="text-red-700">*</span> : <span className="text-slate-500 font-normal">(Optional)</span>}
+              Guardian&apos;s Mobile Contact Number {isBothParentsUnavailable && <span className="text-red-700">*</span>}
             </label>
             <div className="relative">
               <input
@@ -969,9 +947,6 @@ export default function Step3FamilyBackground({
                 }`}
               />
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">
-              Standard 11-digit Philippine mobile format (e.g., 09191234567).
-            </p>
             {errors.guardianContactNumber && (
               <p className="text-[11px] font-bold text-red-700 mt-1">{errors.guardianContactNumber}</p>
             )}

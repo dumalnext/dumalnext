@@ -88,9 +88,9 @@ export default function CustomSelect({
         aria-expanded={isOpen}
         className={`${
           fullWidth
-            ? "w-full flex items-center justify-between p-3"
-            : "flex items-center gap-1.5 px-2.5 py-1.5"
-        } bg-white hover:bg-slate-50 border-2 text-xs font-sans transition-all cursor-pointer select-none rounded-[4px] ${
+            ? "w-full flex items-center justify-between h-[46px] px-3 rounded-xl"
+            : "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px]"
+        } bg-white hover:bg-slate-50 border-2 text-xs font-sans transition-all cursor-pointer select-none ${
           error
             ? "border-red-600 bg-red-50/50"
             : isOpen
