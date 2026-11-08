@@ -105,7 +105,7 @@ export default function ITSupportHeaderNav({
       {/* Sub-Navigation Tabs */}
       {user && (
         <div className="bg-slate-50 border-t border-slate-200 px-3 sm:px-8 text-slate-800">
-          <div className="max-w-7xl mx-auto flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap gap-1.5 text-xs font-bold tracking-wide py-1.5 sm:py-0 touch-pan-x">
+          <div className="max-w-7xl mx-auto flex overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth whitespace-nowrap gap-1.5 text-xs font-bold tracking-wide py-1.5 sm:py-0 touch-pan-x" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <button
               type="button"
               onClick={() => onSelectTab("calendar")}

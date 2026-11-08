@@ -98,7 +98,7 @@ export default function TeacherHeaderNav() {
       {/* Navigation Links (Visible when logged in) */}
       {user && (
         <div className="bg-slate-100 border-t border-slate-300 px-3 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto flex items-center overflow-x-auto no-scrollbar scroll-smooth gap-1.5 pt-2 text-xs font-bold whitespace-nowrap">
+          <div className="max-w-7xl mx-auto flex items-center overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth gap-1.5 pt-2 text-xs font-bold whitespace-nowrap" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <Link
               href="/"
               className={`py-2 px-3 sm:px-4 border-t-2 border-x-2 transition-colors rounded-t-[4px] flex items-center gap-1.5 shrink-0 ${

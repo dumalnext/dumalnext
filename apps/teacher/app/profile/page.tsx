@@ -764,7 +764,7 @@ export default function FacultyProfilePage() {
       {/* ========================================================================= */}
       {/* TABS NAVIGATION (IDENTICAL STYLING TO PROVIDED SCREENSHOT) */}
       {/* ========================================================================= */}
-      <div className="flex border-b border-slate-200 bg-slate-100/70 px-2 pt-2 rounded-t-xl overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap text-xs font-bold touch-pan-x gap-1.5 shadow-2xs">
+      <div className="flex border-b border-slate-200 bg-slate-100/70 px-2 pt-2 rounded-t-xl overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth whitespace-nowrap text-xs font-bold touch-pan-x gap-1.5 shadow-2xs" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         <button
           type="button"
           onClick={() => setActiveTab("personal")}
