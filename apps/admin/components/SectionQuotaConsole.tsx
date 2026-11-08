@@ -1176,18 +1176,31 @@ export default function SectionQuotaConsole() {
             )}
           </div>
 
-          {/* Slots Remaining */}
-          <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs mt-3">
-            <span className="text-slate-500 font-medium">Available Slots:</span>
-            <span
-              className={`inline-flex items-center font-bold font-mono px-2.5 py-0.5 rounded-full border text-[11px] shadow-2xs ${
-                isFull
-                  ? "bg-rose-50 text-rose-700 border-rose-200"
-                  : "bg-emerald-50 text-emerald-800 border-emerald-200"
-              }`}
-            >
-              {isFull ? "FULL (0 SLOTS)" : `${capacity - count} SLOTS REMAINING`}
-            </span>
+          {/* Progress & Capacity Counter */}
+          <div className="pt-2.5 border-t border-slate-100 space-y-1.5 mt-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500 font-medium">
+                {isElectiveView ? "Elective Enrolled:" : "Enrolled:"}
+              </span>
+              <span className="font-mono text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                {isFull && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-rose-100 text-rose-700 font-bold uppercase">
+                    Full
+                  </span>
+                )}
+                <span>
+                  <strong>{count}</strong> / {capacity} <span className="text-slate-400 font-normal">({pct}%)</span>
+                </span>
+              </span>
+            </div>
+            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
+              <div
+                className={`h-full rounded-full transition-all duration-300 ${
+                  isFull ? "bg-rose-600" : isElectiveView ? "bg-purple-600" : pct > 75 ? "bg-amber-500" : "bg-[#002060]"
+                }`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
           </div>
         </div>
 
