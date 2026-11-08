@@ -656,13 +656,23 @@ export default function UserRoleAuditor() {
             Registered Users Directory &bull; Dumalneg National High School
           </h3>
           <span className="text-[11px] font-bold text-[#002060] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
-            Displaying {filteredUsers.length} of {users.length} {filteredUsers.length > PAGE_SIZE ? `(Showing ${startIndex + 1}–${endIndex})` : ""}
+            Displaying {isLoading ? (
+              <span className="inline-block w-6 h-3 bg-blue-200 animate-pulse rounded align-middle" />
+            ) : (
+              filteredUsers.length
+            )} of {isLoading ? (
+              <span className="inline-block w-6 h-3 bg-blue-200 animate-pulse rounded align-middle" />
+            ) : (
+              users.length
+            )} {filteredUsers.length > PAGE_SIZE ? `(Showing ${startIndex + 1}–${endIndex})` : ""}
           </span>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-semibold text-slate-500">
-            Loading user directory...
+          <div className="p-4 space-y-2 animate-pulse" aria-busy="true" aria-label="Loading user directory">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-10 bg-slate-50 rounded w-full border border-slate-100" />
+            ))}
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">

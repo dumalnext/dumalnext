@@ -635,8 +635,10 @@ export default function StaffInvitationManager() {
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-semibold text-slate-500">
-            Loading staff invitations...
+          <div className="p-4 space-y-2 animate-pulse" aria-busy="true" aria-label="Loading staff invitations">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-10 bg-slate-50 rounded w-full border border-slate-100" />
+            ))}
           </div>
         ) : filteredInvitations.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-500">

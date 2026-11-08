@@ -158,7 +158,7 @@ export default function TrafficCapacityManager() {
               </span>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="text-3xl font-black text-[#002060] font-mono">
-                  {activeCount}
+                  {isLoading ? <span className="inline-block w-12 h-7 bg-slate-200 animate-pulse rounded" /> : activeCount}
                 </span>
                 <span className="text-slate-400 font-bold text-lg font-mono">
                   / {maxCapacity} slots
@@ -186,7 +186,7 @@ export default function TrafficCapacityManager() {
                 Server Capacity Load
               </span>
               <span className="text-xl font-black text-slate-900 font-mono">
-                {utilizationPercent}%
+                {isLoading ? <span className="inline-block w-12 h-5 bg-slate-200 animate-pulse rounded" /> : `${utilizationPercent}%`}
               </span>
             </div>
           </div>

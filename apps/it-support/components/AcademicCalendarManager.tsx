@@ -421,7 +421,20 @@ export default function AcademicCalendarManager() {
           )}
         </div>
 
-        {activeTerm ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 animate-pulse">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-200 shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="h-3 w-20 bg-slate-200 rounded" />
+                  <div className="h-4 w-28 bg-slate-200 rounded" />
+                  <div className="h-2.5 w-16 bg-slate-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : activeTerm ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {/* 1. Term Duration */}
             <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 hover:border-blue-300 transition-colors flex items-start gap-3">
@@ -514,9 +527,13 @@ export default function AcademicCalendarManager() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               Registered Academic Terms
             </h3>
-            <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-mono text-[10px] font-bold">
-              {terms.length}
-            </span>
+            {isLoading ? (
+              <span className="inline-block w-6 h-4 bg-slate-300 animate-pulse rounded-full" />
+            ) : (
+              <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-mono text-[10px] font-bold">
+                {terms.length}
+              </span>
+            )}
           </div>
 
           {/* View Toggle */}
@@ -553,8 +570,10 @@ export default function AcademicCalendarManager() {
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-mono text-slate-500 uppercase">
-            Loading Academic Terms from PostgreSQL Database...
+          <div className="p-4 space-y-2 animate-pulse" aria-busy="true" aria-label="Loading Academic Terms">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-10 bg-slate-50 rounded w-full border border-slate-100" />
+            ))}
           </div>
         ) : terms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">

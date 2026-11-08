@@ -234,13 +234,19 @@ export default function ClassroomFacilityManager() {
             Dumalneg National High School &bull; Instructional Spaces
           </h3>
           <span className="text-[11px] font-bold text-[#002060] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
-            Total Rooms: {classrooms.length} {classrooms.length > PAGE_SIZE ? `(Showing ${startIndex + 1}–${endIndex})` : ""}
+            Total Rooms: {isLoading ? (
+              <span className="inline-block w-6 h-3 bg-blue-200 animate-pulse rounded align-middle" />
+            ) : (
+              classrooms.length
+            )} {classrooms.length > PAGE_SIZE ? `(Showing ${startIndex + 1}–${endIndex})` : ""}
           </span>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs font-semibold text-slate-500">
-            Loading facilities directory...
+          <div className="p-4 space-y-2 animate-pulse" aria-busy="true" aria-label="Loading facilities directory">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-10 bg-slate-50 rounded w-full border border-slate-100" />
+            ))}
           </div>
         ) : classrooms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">

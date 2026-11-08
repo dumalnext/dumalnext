@@ -20,13 +20,42 @@ function ITSupportPortalContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         <ITSupportHeaderNav activeTab={activeTab} onSelectTab={setActiveTab} />
-        <div className="max-w-md w-full mx-auto my-20 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-3 shadow-sm">
-          <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
-          <span className="text-xs uppercase font-bold text-[#002060] tracking-wider block">
-            Verifying IT Support Session
-          </span>
-          <p className="text-xs text-slate-500">Checking credentials with Dumalneg NHS system registry...</p>
-        </div>
+        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6 animate-pulse" aria-busy="true" aria-label="Loading IT Support Portal">
+          {/* Top Banner Skeleton */}
+          <div className="bg-slate-200 border-t-4 border-amber-400 p-6 rounded-xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="h-6 w-64 bg-slate-300 rounded" />
+              <div className="h-4 w-96 bg-slate-300 rounded" />
+            </div>
+            <div className="h-10 w-44 bg-slate-300 rounded-lg" />
+          </div>
+
+          {/* 4 KPI Cards Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-4 bg-white rounded-xl border border-slate-200 shadow-xs flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 shrink-0" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="h-3 w-20 bg-slate-200 rounded" />
+                  <div className="h-5 w-28 bg-slate-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Main Table / Console Skeleton */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <div className="h-4 w-48 bg-slate-200 rounded" />
+              <div className="h-8 w-32 bg-slate-200 rounded" />
+            </div>
+            <div className="divide-y divide-slate-100 p-2 space-y-2">
+              {[1, 2, 3, 4, 5, 6].map((row) => (
+                <div key={row} className="h-12 bg-slate-50 rounded w-full" />
+              ))}
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

@@ -391,12 +391,13 @@ function AcceptInviteContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
-        <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-3 shadow-sm max-w-md w-full">
-          <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
-          <span className="text-xs uppercase font-bold text-[#002060] tracking-wider block">
-            Verifying Invitation Credentials
-          </span>
-          <p className="text-xs text-slate-500">Connecting to Dumalneg NHS Identity Service...</p>
+        <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-4 shadow-sm max-w-md w-full animate-pulse" aria-busy="true" aria-label="Verifying Invitation Credentials">
+          <div className="w-12 h-12 bg-slate-200 rounded-full mx-auto" />
+          <div className="space-y-2">
+            <div className="h-3.5 w-44 bg-slate-200 rounded mx-auto" />
+            <div className="h-4 w-60 bg-slate-200 rounded mx-auto" />
+            <div className="h-3 w-36 bg-slate-200 rounded mx-auto" />
+          </div>
         </div>
       </div>
     );
