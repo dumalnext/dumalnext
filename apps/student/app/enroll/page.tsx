@@ -1,5 +1,6 @@
-import { PageCardSkeleton } from "@/components/ui/PortalUI";
 "use client";
+
+import { PageCardSkeleton } from "@/components/ui/PortalUI";
 
 import React, { useEffect } from "react";
 import Link from "next/link";

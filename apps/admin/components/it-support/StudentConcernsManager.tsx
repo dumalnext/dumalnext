@@ -406,7 +406,7 @@ export default function StudentConcernsManager() {
                 Total Inquiries
               </span>
               <span className="text-xl font-black text-[#002060] mt-0.5 block font-mono">
-                {metrics.total}
+                {isLoading ? <span className="inline-block w-10 h-6 bg-slate-200 animate-pulse rounded" /> : metrics.total}
               </span>
             </div>
           </div>
@@ -423,7 +423,7 @@ export default function StudentConcernsManager() {
                 Pending Reply
               </span>
               <span className="text-xl font-black text-amber-700 mt-0.5 block font-mono">
-                {metrics.pending}
+                {isLoading ? <span className="inline-block w-10 h-6 bg-amber-200 animate-pulse rounded" /> : metrics.pending}
               </span>
             </div>
           </div>
@@ -440,7 +440,7 @@ export default function StudentConcernsManager() {
                 In Progress
               </span>
               <span className="text-xl font-black text-blue-700 mt-0.5 block font-mono">
-                {metrics.inProgress}
+                {isLoading ? <span className="inline-block w-10 h-6 bg-blue-200 animate-pulse rounded" /> : metrics.inProgress}
               </span>
             </div>
           </div>
@@ -457,7 +457,7 @@ export default function StudentConcernsManager() {
                 Resolved
               </span>
               <span className="text-xl font-black text-emerald-700 mt-0.5 block font-mono">
-                {metrics.resolved}
+                {isLoading ? <span className="inline-block w-10 h-6 bg-emerald-200 animate-pulse rounded" /> : metrics.resolved}
               </span>
             </div>
           </div>
@@ -542,9 +542,10 @@ export default function StudentConcernsManager() {
         {/* Concerns Table */}
         <div className="overflow-x-auto">
           {isLoading ? (
-            <div className="py-16 text-center space-y-3">
-              <div className="w-8 h-8 rounded-full border-2 border-[#002060] border-t-transparent animate-spin mx-auto" />
-              <p className="text-xs text-slate-500 font-medium">Loading student messages and inquiries...</p>
+            <div className="p-4 space-y-2 animate-pulse" aria-busy="true" aria-label="Loading student messages and inquiries">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-12 bg-slate-50 rounded w-full border border-slate-100" />
+              ))}
             </div>
           ) : filteredConcerns.length === 0 ? (
             <div className="py-16 text-center space-y-2">
