@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
 import Step2LearnerProfile from "./Step2LearnerProfile";
@@ -551,8 +551,38 @@ export default function EnrollmentStepper({
     }
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const stepperTopRef = useRef<HTMLDivElement>(null);
+
+  const scrollToTop = () => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (stepperTopRef.current) {
+        stepperTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+        if (stepperTopRef.current) {
+          stepperTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 60);
+    }
+  };
+
+  const nextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, 5));
+    scrollToTop();
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    scrollToTop();
+  };
+
+  useEffect(() => {
+    scrollToTop();
+  }, [currentStep]);
 
   // 1.0. Skeleton Loading State while checking existing application
   if (isCheckingApp && !existingApp && !priorApprovedRecord) {
@@ -714,7 +744,7 @@ export default function EnrollmentStepper({
 
   // 5. Standard Full 5-Step Enrollment Form (New Student, Pending, or Needs Revision Flow)
   return (
-    <div className="space-y-6">
+    <div ref={stepperTopRef} id="enrollment-form-top" className="space-y-6 scroll-mt-6">
       {/* Revision Notice Banner if Admin returned application */}
       {existingApp?.status === "Needs Revision" && (
         <div className="p-4 bg-red-50 border-2 border-red-400 text-slate-900 space-y-2 shadow-xs rounded-xl">
