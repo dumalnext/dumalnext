@@ -793,9 +793,13 @@ export default function AdjudicationConsole() {
             <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
               Total Applications
             </span>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
-              {totalCount}
-            </div>
+            {isFetchingApps && !hasLoadedAppsOnce.current ? (
+              <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1" />
+            ) : (
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
+                {totalCount}
+              </div>
+            )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
@@ -813,9 +817,13 @@ export default function AdjudicationConsole() {
                 Pending Verification
               </span>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
-              {pendingCount}
-            </div>
+            {isFetchingApps && !hasLoadedAppsOnce.current ? (
+              <div className="h-8 w-16 bg-amber-100 animate-pulse rounded-md mt-1" />
+            ) : (
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
+                {pendingCount}
+              </div>
+            )}
           </div>
           <span className="text-[10px] text-amber-900 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
@@ -833,9 +841,13 @@ export default function AdjudicationConsole() {
                 Approved &amp; Enrolled
               </span>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
-              {approvedCount}
-            </div>
+            {isFetchingApps && !hasLoadedAppsOnce.current ? (
+              <div className="h-8 w-16 bg-emerald-100 animate-pulse rounded-md mt-1" />
+            ) : (
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
+                {approvedCount}
+              </div>
+            )}
           </div>
           <span className="text-[10px] text-emerald-900 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
@@ -853,9 +865,13 @@ export default function AdjudicationConsole() {
                 Needs Revision
               </span>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-red-950 mt-1">
-              {revisionCount}
-            </div>
+            {isFetchingApps && !hasLoadedAppsOnce.current ? (
+              <div className="h-8 w-16 bg-red-100 animate-pulse rounded-md mt-1" />
+            ) : (
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-red-950 mt-1">
+                {revisionCount}
+              </div>
+            )}
           </div>
           <span className="text-[10px] text-red-900 block leading-tight mt-1.5 break-words">
             {effectiveSY === "ALL" && effectiveTerm === "ALL"
@@ -879,7 +895,7 @@ export default function AdjudicationConsole() {
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-300"
               }`}
             >
-              All ({totalCount})
+              All ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : totalCount})
             </button>
 
             <button
@@ -892,7 +908,7 @@ export default function AdjudicationConsole() {
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />
-              Pending ({pendingCount})
+              Pending ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : pendingCount})
             </button>
 
             <button
@@ -905,7 +921,7 @@ export default function AdjudicationConsole() {
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
-              Approved ({approvedCount})
+              Approved ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : approvedCount})
             </button>
 
             <button
@@ -918,7 +934,7 @@ export default function AdjudicationConsole() {
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
-              Needs Revision ({revisionCount})
+              Needs Revision ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : revisionCount})
             </button>
           </div>
 
@@ -1007,9 +1023,34 @@ export default function AdjudicationConsole() {
 
       {/* Applications Directory Grouped by JHS and SHS */}
       {isFetchingApps && !hasLoadedAppsOnce.current ? (
-        <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center">
-          <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <span className="text-xs font-mono uppercase text-slate-500">Loading Adjudication Queue...</span>
+        <div className="space-y-6 animate-pulse">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-slate-100/70 p-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="space-y-1.5">
+                <div className="h-3 w-32 bg-slate-200 rounded" />
+                <div className="h-5 w-48 bg-slate-200 rounded" />
+              </div>
+              <div className="h-6 w-24 bg-slate-200 rounded-full" />
+            </div>
+            <div className="divide-y divide-slate-100">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-28 bg-slate-200 rounded" />
+                      <div className="h-4 w-20 bg-slate-100 rounded-full" />
+                    </div>
+                    <div className="h-4 w-56 bg-slate-200 rounded" />
+                    <div className="h-3 w-40 bg-slate-100 rounded" />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-6 w-20 bg-slate-100 rounded-full" />
+                    <div className="h-8 w-28 bg-slate-200 rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : filteredApplications.length === 0 ? (
         <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center space-y-3">

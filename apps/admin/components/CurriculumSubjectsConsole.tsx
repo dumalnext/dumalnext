@@ -788,7 +788,11 @@ export default function CurriculumSubjectsConsole() {
             <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
               Total Active Subjects
             </span>
-            <div className="text-2xl font-mono font-bold text-[#002060] mt-1">{totalCount}</div>
+            {isLoading ? (
+              <div className="h-7 w-16 bg-slate-200 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-mono font-bold text-[#002060] mt-1">{totalCount}</div>
+            )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Across all Grade 7-12 levels</span>
         </div>
@@ -798,7 +802,11 @@ export default function CurriculumSubjectsConsole() {
             <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
               JHS Subjects (Grades 7–10)
             </span>
-            <div className="text-2xl font-mono font-bold text-emerald-800 mt-1">{jhsTotal}</div>
+            {isLoading ? (
+              <div className="h-7 w-16 bg-emerald-100 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-mono font-bold text-emerald-800 mt-1">{jhsTotal}</div>
+            )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Regular Basic Education</span>
         </div>
@@ -808,7 +816,11 @@ export default function CurriculumSubjectsConsole() {
             <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
               SHS Subjects (Grades 11–12)
             </span>
-            <div className="text-2xl font-mono font-bold text-blue-800 mt-1">{shsTotal}</div>
+            {isLoading ? (
+              <div className="h-7 w-16 bg-blue-100 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-mono font-bold text-blue-800 mt-1">{shsTotal}</div>
+            )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Academic, TechPro &amp; Core Tracks</span>
         </div>
@@ -911,13 +923,32 @@ export default function CurriculumSubjectsConsole() {
         )}
       </div>
 
-      {/* LOADING STATE */}
+      {/* LOADING STATE SKELETON */}
       {isLoading && (
-        <div className="bg-white border-2 border-slate-300 p-12 text-center shadow-xs">
-          <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <span className="text-xs font-mono text-slate-600 uppercase block font-bold">
-            Loading Subjects Database...
-          </span>
+        <div className="space-y-6 animate-pulse">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-[#002060]/90 p-4 sm:p-5 flex items-center justify-between">
+              <div className="space-y-1.5">
+                <div className="h-3 w-28 bg-blue-300/40 rounded" />
+                <div className="h-5 w-64 bg-white/40 rounded" />
+              </div>
+              <div className="h-6 w-32 bg-white/20 rounded-full" />
+            </div>
+            <div className="p-4 space-y-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="p-3 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-5 w-20 bg-slate-200 rounded font-mono" />
+                    <div className="h-4 w-48 bg-slate-200 rounded" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-16 bg-slate-100 rounded-full" />
+                    <div className="h-5 w-20 bg-slate-100 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

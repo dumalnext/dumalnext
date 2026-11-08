@@ -1192,7 +1192,11 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
           <div>
             <span className="text-[10px] font-mono text-slate-500 uppercase block">Active Timetable Slots</span>
-            <div className="text-2xl font-bold text-[#002060] font-mono mt-1">{schedules.length}</div>
+            {isLoading ? (
+              <div className="h-7 w-16 bg-slate-200 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-bold text-[#002060] font-mono mt-1">{schedules.length}</div>
+            )}
           </div>
           <span className="text-[11px] text-slate-600 block leading-tight mt-1">Total instructional periods assigned</span>
         </div>
@@ -1200,9 +1204,13 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
           <div>
             <span className="text-[10px] font-mono text-slate-500 uppercase block">Class Sections Programmed</span>
-            <div className="text-2xl font-bold text-emerald-800 font-mono mt-1">
-              {uniqueSectionsScheduled} / {sections.length}
-            </div>
+            {isLoading ? (
+              <div className="h-7 w-20 bg-emerald-100 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-bold text-emerald-800 font-mono mt-1">
+                {uniqueSectionsScheduled} / {sections.length}
+              </div>
+            )}
           </div>
           <span className="text-[11px] text-slate-600 block leading-tight mt-1">Sections with active schedules</span>
         </div>
@@ -1210,9 +1218,13 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
           <div>
             <span className="text-[10px] font-mono text-slate-500 uppercase block">Faculty Teaching Deployed</span>
-            <div className="text-2xl font-bold text-blue-900 font-mono mt-1">
-              {uniqueTeachersAssigned} / {teachers.length}
-            </div>
+            {isLoading ? (
+              <div className="h-7 w-20 bg-blue-100 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-bold text-blue-900 font-mono mt-1">
+                {uniqueTeachersAssigned} / {teachers.length}
+              </div>
+            )}
           </div>
           <span className="text-[11px] text-slate-600 block leading-tight mt-1">Teachers with scheduled classes</span>
         </div>
@@ -1220,7 +1232,11 @@ export default function ScheduleDeconflictionConsole() {
         <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
           <div>
             <span className="text-[10px] font-mono text-slate-500 uppercase block">Collision Protection</span>
-            <div className="text-2xl font-bold text-emerald-700 font-mono mt-1">100%</div>
+            {isLoading ? (
+              <div className="h-7 w-16 bg-emerald-100 animate-pulse rounded mt-1" />
+            ) : (
+              <div className="text-2xl font-bold text-emerald-700 font-mono mt-1">100%</div>
+            )}
           </div>
           <span className="text-[11px] text-emerald-900 font-semibold block leading-tight mt-1">Zero overlapping double-assignments</span>
         </div>
@@ -1364,9 +1380,30 @@ export default function ScheduleDeconflictionConsole() {
       {/* VIEW CONTENT */}
       {/* ========================================================================= */}
       {isLoading ? (
-        <div className="p-12 bg-white border-2 border-slate-300 text-center">
-          <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-          <span className="text-xs font-mono text-slate-500 uppercase mt-2 block">Loading Schedules &amp; Resources...</span>
+        <div className="space-y-4 animate-pulse">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex items-center justify-between">
+            <div className="h-5 w-64 bg-slate-200 rounded" />
+            <div className="h-5 w-40 bg-slate-100 rounded" />
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs overflow-x-auto">
+            <div className="grid grid-cols-5 gap-3 min-w-[700px]">
+              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => (
+                <div key={day} className="space-y-3">
+                  <div className="h-8 bg-slate-100 rounded-lg flex items-center justify-center font-bold text-xs text-slate-400">
+                    {day}
+                  </div>
+                  {[1, 2, 3, 4].map((slot) => (
+                    <div key={slot} className="p-3 bg-slate-50 border border-slate-100 rounded-lg space-y-2">
+                      <div className="h-3 w-16 bg-blue-100 rounded" />
+                      <div className="h-4 w-full bg-slate-200 rounded" />
+                      <div className="h-3 w-20 bg-slate-100 rounded" />
+                      <div className="h-3 w-14 bg-slate-100 rounded" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <>

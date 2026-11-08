@@ -20,12 +20,12 @@ function ITSupportPortalContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         <ITSupportHeaderNav activeTab={activeTab} onSelectTab={setActiveTab} />
-        <div className="max-w-md w-full mx-auto my-20 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-3 shadow-sm">
-          <div className="w-10 h-10 rounded-full border-2 border-[#002060] border-t-amber-400 animate-spin mx-auto" />
-          <span className="text-xs uppercase font-bold text-[#002060] tracking-wider block">
-            Verifying IT Support Session
-          </span>
-          <p className="text-xs text-slate-500">Checking credentials with Dumalneg NHS system registry...</p>
+        <div className="max-w-md w-full mx-auto my-20 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] p-8 text-center space-y-4 shadow-sm animate-pulse">
+          <div className="w-12 h-12 rounded-full bg-slate-200 mx-auto" />
+          <div className="space-y-2">
+            <div className="h-4 w-44 bg-slate-200 rounded mx-auto" />
+            <div className="h-3 w-64 bg-slate-100 rounded mx-auto" />
+          </div>
         </div>
       </div>
     );
