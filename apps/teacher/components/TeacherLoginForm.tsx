@@ -177,17 +177,13 @@ function TeacherLoginFormInner() {
 
   if (isCheckingToken) {
     return (
-      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 text-center space-y-3 rounded-[4px] shadow-sm">
-        <div className="w-8 h-8 border-3 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-        <span className="text-xs font-bold text-[#002060] block">
-          Dumalneg National High School &bull; Faculty Portal
-        </span>
-        <h2 className="text-base font-bold text-slate-900">
-          Verifying Faculty Invitation Clearance...
-        </h2>
-        <p className="text-xs text-slate-500">
-          Connecting to DepEd System Registry &bull; Please wait.
-        </p>
+      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 text-center space-y-4 rounded-[4px] shadow-sm animate-pulse" aria-busy="true" aria-label="Verifying Faculty Invitation Clearance">
+        <div className="w-12 h-12 bg-slate-200 rounded-full mx-auto" />
+        <div className="space-y-2">
+          <div className="h-3 w-48 bg-slate-200 rounded mx-auto" />
+          <div className="h-5 w-64 bg-slate-200 rounded mx-auto" />
+          <div className="h-3 w-56 bg-slate-200 rounded mx-auto" />
+        </div>
       </div>
     );
   }

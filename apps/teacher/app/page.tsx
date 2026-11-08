@@ -59,16 +59,46 @@ export default function TeacherHomePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-3">
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          DUMALNEG NATIONAL HIGH SCHOOL
-        </span>
-        <h2 className="text-base font-bold text-slate-900 uppercase">
-          Verifying Faculty Session Credentials...
-        </h2>
-        <p className="text-xs font-mono text-slate-500">
-          Connecting to DepEd Faculty Database &bull; Please wait.
-        </p>
+      <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Faculty Dashboard">
+        {/* Faculty Welcome Banner Skeleton */}
+        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="h-5 w-24 bg-slate-300 rounded-[4px]" />
+              <div className="h-5 w-28 bg-slate-300 rounded-[4px]" />
+              <div className="h-5 w-32 bg-slate-300 rounded-[4px]" />
+            </div>
+            <div className="h-7 w-64 bg-slate-300 rounded-[4px]" />
+          </div>
+          <div className="h-9 w-32 bg-slate-300 rounded-[4px]" />
+        </div>
+
+        {/* 3 Main Workstation Navigation Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((card) => (
+            <div
+              key={card}
+              className="bg-white p-5 sm:p-6 border-2 border-slate-200 border-t-4 border-t-slate-300 rounded-[6px] shadow-xs flex flex-col justify-between space-y-4"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-[6px] bg-slate-200 shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <div className="h-3 w-16 bg-slate-200 rounded" />
+                    <div className="h-4.5 w-40 bg-slate-200 rounded" />
+                  </div>
+                </div>
+
+                <div className="pt-3 flex items-center justify-between border-t border-slate-100">
+                  <div className="h-3 w-12 bg-slate-200 rounded" />
+                  <div className="h-5 w-24 bg-slate-200 rounded-[4px]" />
+                </div>
+              </div>
+
+              <div className="w-full h-10 bg-slate-200 rounded-[4px]" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -139,7 +169,9 @@ export default function TeacherHomePage() {
               <span className="text-[11px] font-bold text-slate-500 uppercase">
                 Status
               </span>
-              {scheduleCount !== null && scheduleCount > 0 ? (
+              {scheduleCount === null ? (
+                <span className="inline-block w-24 h-5 bg-slate-200 animate-pulse rounded-[4px]" />
+              ) : scheduleCount > 0 ? (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                   {scheduleCount} Active Periods

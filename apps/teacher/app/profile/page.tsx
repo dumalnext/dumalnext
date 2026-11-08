@@ -101,13 +101,50 @@ export default function FacultyProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-2 font-sans">
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          DUMALNEG NATIONAL HIGH SCHOOL
-        </span>
-        <p className="text-xs font-mono text-slate-600">
-          Loading Faculty Profile...
-        </p>
+      <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Profile">
+        {/* Banner Skeleton */}
+        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[4px] bg-slate-300 shrink-0" />
+            <div className="space-y-2">
+              <div className="h-6 w-56 bg-slate-300 rounded" />
+              <div className="h-4 w-40 bg-slate-300 rounded" />
+            </div>
+          </div>
+          <div className="h-8 w-28 bg-slate-300 rounded-[4px]" />
+        </div>
+
+        {/* 2-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: ID Card Skeleton */}
+          <div className="lg:col-span-4 bg-white p-6 border-2 border-slate-200 rounded-xl space-y-4 shadow-xs">
+            <div className="w-28 h-28 bg-slate-200 rounded-full mx-auto" />
+            <div className="space-y-2 text-center">
+              <div className="h-5 w-40 bg-slate-200 rounded mx-auto" />
+              <div className="h-3.5 w-28 bg-slate-200 rounded mx-auto" />
+            </div>
+            <div className="pt-4 border-t border-slate-100 space-y-2">
+              <div className="h-8 w-full bg-slate-100 rounded" />
+              <div className="h-8 w-full bg-slate-100 rounded" />
+            </div>
+          </div>
+
+          {/* Right: Info Card Skeleton */}
+          <div className="lg:col-span-8 bg-white p-6 border-2 border-slate-200 rounded-xl space-y-6 shadow-xs">
+            <div className="space-y-2">
+              <div className="h-5 w-44 bg-slate-200 rounded" />
+              <div className="h-3.5 w-64 bg-slate-200 rounded" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                  <div className="h-3 w-20 bg-slate-200 rounded" />
+                  <div className="h-4.5 w-36 bg-slate-200 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -1102,7 +1139,11 @@ export default function FacultyProfilePage() {
                 </div>
 
                 {isLoadingSection ? (
-                  <p className="text-xs text-slate-500 font-mono">Loading Advisory Assignment...</p>
+                  <div className="space-y-2 animate-pulse py-1">
+                    <div className="h-5 w-36 bg-slate-200 rounded" />
+                    <div className="h-3.5 w-28 bg-slate-200 rounded" />
+                    <div className="h-3 w-40 bg-slate-200 rounded" />
+                  </div>
                 ) : advisorySection ? (
                   <div className="space-y-1.5">
                     <span className="text-lg font-black text-[#002060] block">

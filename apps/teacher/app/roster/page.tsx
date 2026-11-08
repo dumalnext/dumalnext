@@ -553,13 +553,43 @@ export default function ClassSectionRosterPage() {
 
   if (isAuthLoading) {
     return (
-      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-2">
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          DUMALNEG NATIONAL HIGH SCHOOL
-        </span>
-        <p className="text-xs font-mono text-slate-600">
-          Verifying Faculty Session...
-        </p>
+      <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Advisory Roster">
+        {/* Banner Skeleton */}
+        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[4px] bg-slate-300 shrink-0" />
+            <div className="space-y-2">
+              <div className="h-6 w-56 bg-slate-300 rounded" />
+              <div className="h-4 w-40 bg-slate-300 rounded" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-28 bg-slate-300 rounded-[4px]" />
+            <div className="h-8 w-32 bg-slate-300 rounded-[4px]" />
+          </div>
+        </div>
+
+        {/* Section Summary Bar Skeleton */}
+        <div className="p-3.5 bg-white border-2 border-slate-200 rounded-[4px] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-4 w-36 bg-slate-200 rounded" />
+            <div className="h-4 w-28 bg-slate-200 rounded" />
+          </div>
+          <div className="h-4 w-24 bg-slate-200 rounded" />
+        </div>
+
+        {/* Table Container Skeleton */}
+        <div className="bg-white p-5 border-2 border-slate-200 rounded-[4px] space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="h-9 w-64 bg-slate-100 rounded" />
+            <div className="h-4 w-32 bg-slate-200 rounded" />
+          </div>
+          <div className="space-y-2">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-10 bg-slate-100 rounded w-full" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -931,8 +961,22 @@ export default function ClassSectionRosterPage() {
       </div>
 
       {isLoadingSections ? (
-        <div className="p-8 bg-white border-2 border-slate-200 text-center">
-          <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
+        <div className="space-y-4 animate-pulse">
+          <div className="p-3.5 bg-white border-2 border-slate-200 rounded-[4px] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="h-4 w-36 bg-slate-200 rounded" />
+              <div className="h-4 w-28 bg-slate-200 rounded" />
+            </div>
+            <div className="h-4 w-28 bg-slate-200 rounded" />
+          </div>
+          <div className="bg-white p-5 border-2 border-slate-200 rounded-[4px] space-y-3">
+            <div className="h-9 w-64 bg-slate-100 rounded" />
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-10 bg-slate-100 rounded w-full" />
+              ))}
+            </div>
+          </div>
         </div>
       ) : advisorySections.length === 0 ? (
         /* SCENARIO: NO ADVISORY SECTION CURRENTLY DESIGNATED BY ADMIN */
@@ -966,7 +1010,11 @@ export default function ClassSectionRosterPage() {
                 </div>
               </div>
               <div className="text-slate-800 font-bold shrink-0">
-                Enrolled: {rosterStudents.length} / {currentSection.capacity} Max
+                Enrolled: {isLoadingRoster ? (
+                  <span className="inline-block w-6 h-3.5 bg-slate-200 animate-pulse rounded align-middle mx-1" />
+                ) : (
+                  rosterStudents.length
+                )} / {currentSection.capacity} Max
               </div>
             </div>
           )}
@@ -1122,7 +1170,9 @@ export default function ClassSectionRosterPage() {
                 )}
               </div>
               <span className="text-xs font-mono text-slate-600">
-                {totalStudents > 0 ? (
+                {isLoadingRoster ? (
+                  <span className="inline-block w-36 h-4 bg-slate-200 animate-pulse rounded" />
+                ) : totalStudents > 0 ? (
                   <>
                     Showing <strong>{startIndex + 1}&ndash;{endIndex}</strong> of <strong>{totalStudents}</strong> learner(s)
                   </>
@@ -1135,8 +1185,37 @@ export default function ClassSectionRosterPage() {
             </div>
 
             {isLoadingRoster ? (
-              <div className="p-8 text-center">
-                <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="space-y-3 animate-pulse">
+                <div className="overflow-x-auto border border-slate-200">
+                  <table className="w-full text-left text-xs font-sans border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100 border-b border-slate-200 font-bold uppercase text-[11px] text-slate-700">
+                        <th className="p-2.5 w-12 text-center font-mono">#</th>
+                        <th className="p-2.5 font-mono">Learner Reference Number (LRN)</th>
+                        <th className="p-2.5">Student Full Name</th>
+                        <th className="p-2.5">Gender</th>
+                        <th className="p-2.5">Barangay</th>
+                        <th className="p-2.5">Emergency Contact</th>
+                        <th className="p-2.5 text-center">Enrollment Status</th>
+                        <th className="p-2.5 text-center no-print print:hidden">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((row) => (
+                        <tr key={row} className="hover:bg-slate-50">
+                          <td className="p-2.5 text-center"><div className="h-3.5 w-4 bg-slate-200 rounded mx-auto" /></td>
+                          <td className="p-2.5"><div className="h-3.5 w-28 bg-slate-200 rounded" /></td>
+                          <td className="p-2.5"><div className="h-3.5 w-36 bg-slate-200 rounded" /></td>
+                          <td className="p-2.5"><div className="h-3.5 w-12 bg-slate-200 rounded" /></td>
+                          <td className="p-2.5"><div className="h-3.5 w-24 bg-slate-200 rounded" /></td>
+                          <td className="p-2.5"><div className="h-3.5 w-24 bg-slate-200 rounded" /></td>
+                          <td className="p-2.5 text-center"><div className="h-5 w-20 bg-slate-200 rounded mx-auto" /></td>
+                          <td className="p-2.5 text-center"><div className="h-7 w-20 bg-slate-200 rounded mx-auto" /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             ) : filteredStudents.length === 0 ? (
               <div className="p-8 bg-slate-50 border border-slate-200 text-center text-xs font-mono text-slate-600 space-y-1">

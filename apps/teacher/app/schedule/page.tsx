@@ -179,13 +179,49 @@ export default function TeachingSchedulePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] text-center space-y-2">
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          DUMALNEG NATIONAL HIGH SCHOOL
-        </span>
-        <p className="text-xs font-mono text-slate-600">
-          Loading Teaching Load &amp; Schedule...
-        </p>
+      <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Schedule">
+        {/* Title Bar Skeleton */}
+        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[4px] bg-slate-300 shrink-0" />
+            <div className="space-y-2">
+              <div className="h-6 w-56 bg-slate-300 rounded" />
+              <div className="h-4 w-40 bg-slate-300 rounded" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-32 bg-slate-300 rounded-[4px]" />
+            <div className="h-8 w-36 bg-slate-300 rounded-[4px]" />
+          </div>
+        </div>
+
+        {/* Summary Card Skeleton */}
+        <div className="p-4 bg-white border-2 border-slate-200 rounded-[4px] flex flex-wrap items-center justify-between gap-3">
+          <div className="h-4 w-48 bg-slate-200 rounded" />
+          <div className="h-4 w-56 bg-slate-200 rounded" />
+        </div>
+
+        {/* Timetable Matrix Skeleton */}
+        <div className="bg-white border-2 border-slate-200 rounded-[4px] overflow-hidden">
+          <div className="grid grid-cols-6 bg-slate-100 border-b border-slate-200 p-3 gap-2">
+            {["Time", "Mon", "Tue", "Wed", "Thu", "Fri"].map((d, i) => (
+              <div key={i} className="h-4 bg-slate-200 rounded w-16 mx-auto" />
+            ))}
+          </div>
+          <div className="divide-y divide-slate-100 p-2 space-y-2">
+            {[1, 2, 3, 4, 5].map((row) => (
+              <div key={row} className="grid grid-cols-6 gap-2 py-2.5 items-center">
+                <div className="h-4 bg-slate-200 rounded w-16 mx-auto" />
+                {[1, 2, 3, 4, 5].map((col) => (
+                  <div key={col} className="h-12 bg-slate-100 border border-slate-200 rounded p-1 space-y-1">
+                    <div className="h-3 bg-slate-200 rounded w-3/4" />
+                    <div className="h-2.5 bg-slate-200 rounded w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -266,7 +302,9 @@ export default function TeachingSchedulePage() {
             </svg>
             <span>{isLoadingSchedules ? "Synchronizing..." : "Refresh Timetable"}</span>
           </button>
-          {schedules.length > 0 ? (
+          {isLoadingSchedules ? (
+            <span className="inline-block w-40 h-8 bg-white/20 animate-pulse rounded-[4px] shrink-0" />
+          ) : schedules.length > 0 ? (
             <>
               <button
                 type="button"
@@ -320,9 +358,40 @@ export default function TeachingSchedulePage() {
       </div>
 
       {isLoadingSchedules ? (
-        <div className="p-12 bg-white border-2 border-slate-300 rounded-[4px] text-center space-y-2">
-          <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-          <span className="text-xs font-mono text-slate-500 uppercase block">Synchronizing with Official Class Program...</span>
+        <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Schedule Timetable">
+          {/* Summary Load Card Skeleton */}
+          <div className="p-4 bg-white border-2 border-slate-200 rounded-[4px] shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-32 bg-slate-200 rounded" />
+              <div className="h-4 w-36 bg-slate-200 rounded" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-40 bg-slate-200 rounded" />
+              <div className="h-4 w-28 bg-slate-200 rounded" />
+            </div>
+          </div>
+
+          {/* Timetable Matrix Skeleton */}
+          <div className="bg-white border-2 border-slate-200 rounded-[4px] shadow-xs overflow-hidden">
+            <div className="grid grid-cols-6 bg-slate-100 border-b border-slate-200 p-3 gap-2">
+              {["Time Window", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((header, idx) => (
+                <div key={idx} className="h-4 bg-slate-200 rounded w-20 mx-auto" />
+              ))}
+            </div>
+            <div className="divide-y divide-slate-100 p-2 space-y-2">
+              {[1, 2, 3, 4, 5, 6].map((row) => (
+                <div key={row} className="grid grid-cols-6 gap-2 py-3 items-center">
+                  <div className="h-4 bg-slate-200 rounded w-20 mx-auto" />
+                  {[1, 2, 3, 4, 5].map((col) => (
+                    <div key={col} className="h-14 bg-slate-100 border border-slate-200 rounded p-2 space-y-1.5">
+                      <div className="h-3 bg-slate-200 rounded w-4/5" />
+                      <div className="h-2.5 bg-slate-200 rounded w-3/5" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : schedules.length === 0 ? (
         /* Empty State */
