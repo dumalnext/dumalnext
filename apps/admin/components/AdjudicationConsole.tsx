@@ -648,16 +648,16 @@ export default function AdjudicationConsole() {
           )}
           
           <div className="flex flex-wrap items-center gap-1 mt-1">
-            <span className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block">
+            <span className="text-[10px] font-medium text-[#002060] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block">
               S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
             </span>
             {st?.current_section_id && (
-              <span className="text-[10px] font-mono font-bold text-emerald-900 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300 inline-block">
+              <span className="text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
                 {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
               </span>
             )}
             {app.target_grade_level >= 11 && ((app as any).selected_electives?.[0]?.assigned_elective_section_name || ((app as any).selected_electives?.[0]?.assigned_elective_name ? `Elective - ${(app as any).selected_electives[0].assigned_elective_name}` : null)) && (
-              <span className="text-[10px] font-mono font-bold text-purple-900 bg-purple-100 px-1.5 py-0.5 border border-purple-300 inline-block">
+              <span className="text-[10px] font-medium text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 inline-block">
                 {(app as any).selected_electives[0].assigned_elective_section_name || `Elective - ${(app as any).selected_electives[0].assigned_elective_name}`}
               </span>
             )}
@@ -668,18 +668,24 @@ export default function AdjudicationConsole() {
         </td>
         <td className="p-3">
           {app.status === "Approved" ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-950 border border-emerald-500">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <svg className="w-3 h-3 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
               APPROVED
             </span>
           ) : app.status === "Needs Revision" ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-red-50 text-red-950 border border-red-500">
-              <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+              <svg className="w-3 h-3 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
               REVISION
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-50 text-amber-950 border border-amber-400">
-              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+              <svg className="w-3 h-3 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               PENDING
             </span>
           )}
@@ -688,9 +694,13 @@ export default function AdjudicationConsole() {
           <button
             type="button"
             onClick={() => setSelectedApp(app)}
-            className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-semibold rounded-lg transition-colors shadow-2xs hover:shadow-xs cursor-pointer"
           >
-            Review Dossier
+            <svg className="w-3.5 h-3.5 text-blue-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>Review Dossier</span>
           </button>
         </td>
       </tr>
@@ -726,7 +736,7 @@ export default function AdjudicationConsole() {
   return (
     <div className="space-y-6">
       {/* Title & Real-Time Sync Banner */}
-      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-xs bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <img
             src="/dumalneg-logo.png"
@@ -740,23 +750,23 @@ export default function AdjudicationConsole() {
             <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
               Basic Education Enrollment Applications
             </h2>
-            <p className="text-xs text-blue-100/85 mt-0.5">
-              Review learner profiles, verify PSA birth certificates and SF9 report cards, and assign official class sections.
+            <p className="text-xs text-blue-100/80 mt-1">
+              Review applicant profiles, verify submitted documents, and assign official class sections.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           {/* Live Real-time Status Badge */}
-          <div className="flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-xs px-3.5 py-2 rounded-lg text-xs font-semibold text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          <div className="flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-xs px-3.5 py-1.5 rounded-lg text-xs font-medium text-white">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <span>Real-Time Queue Sync</span>
           </div>
         </div>
       </div>
 
       {/* Active Academic Period Context Banner */}
-      <div className="p-4 bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-4 bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
           <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
@@ -786,155 +796,184 @@ export default function AdjudicationConsole() {
       </div>
 
       {/* Executive KPI Metric Cards (Real-Time Dynamic Recalculation) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Applications */}
-        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs transition-all flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
-              Total Applications
-            </span>
-            {isFetchingApps && !hasLoadedAppsOnce.current ? (
-              <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1" />
-            ) : (
-              <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
-                {totalCount}
-              </div>
-            )}
+        <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide block">
+                Total Applications
+              </span>
+              {isFetchingApps && !hasLoadedAppsOnce.current ? (
+                <div className="h-8 w-16 bg-slate-100 animate-pulse rounded-md mt-1.5" />
+              ) : (
+                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+                  {totalCount}
+                </div>
+              )}
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-[#002060] border border-blue-100 flex items-center justify-center shrink-0">
+              <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
           </div>
-          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">
-            {effectiveSY === "ALL" && effectiveTerm === "ALL"
-              ? (gradeFilter === "ALL" ? "All Terms • All Grades" : `All Terms • Grade ${gradeFilter}`)
-              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
-          </span>
+          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+            <span className="text-slate-500 font-medium">
+              {gradeFilter === "ALL" ? "All grade levels" : `Grade ${gradeFilter} filter`}
+            </span>
+            <span className="font-semibold text-blue-700">Submissions</span>
+          </div>
         </div>
 
-        {/* Pending (Yellow) */}
-        <div className="p-3.5 sm:p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs transition-all flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
-              <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
+        {/* Pending Verification */}
+        <div className="p-4 bg-white rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/30 to-white shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wide block">
                 Pending Verification
               </span>
+              {isFetchingApps && !hasLoadedAppsOnce.current ? (
+                <div className="h-8 w-16 bg-amber-100 animate-pulse rounded-md mt-1.5" />
+              ) : (
+                <div className="text-2xl sm:text-3xl font-extrabold text-amber-950 tracking-tight mt-1">
+                  {pendingCount}
+                </div>
+              )}
             </div>
-            {isFetchingApps && !hasLoadedAppsOnce.current ? (
-              <div className="h-8 w-16 bg-amber-100 animate-pulse rounded-md mt-1" />
-            ) : (
-              <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
-                {pendingCount}
-              </div>
-            )}
+            <div className="w-9 h-9 rounded-lg bg-amber-100/70 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
+              <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <span className="text-[10px] text-amber-900 block leading-tight mt-1.5 break-words">
-            {effectiveSY === "ALL" && effectiveTerm === "ALL"
-              ? (gradeFilter === "ALL" ? "All Terms • Awaiting decision" : `Grade ${gradeFilter} • Awaiting decision`)
-              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
-          </span>
+          <div className="mt-3 pt-2.5 border-t border-amber-100 flex items-center justify-between text-[11px]">
+            <span className="text-amber-800 font-medium">Awaiting evaluation</span>
+            <span className="font-semibold text-amber-700">In Queue</span>
+          </div>
         </div>
 
-        {/* Approved (Green) */}
-        <div className="p-3.5 sm:p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs transition-all flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
-              <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
+        {/* Approved & Enrolled */}
+        <div className="p-4 bg-white rounded-xl border border-emerald-200/80 bg-gradient-to-b from-emerald-50/30 to-white shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wide block">
                 Approved &amp; Enrolled
               </span>
+              {isFetchingApps && !hasLoadedAppsOnce.current ? (
+                <div className="h-8 w-16 bg-emerald-100 animate-pulse rounded-md mt-1.5" />
+              ) : (
+                <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950 tracking-tight mt-1">
+                  {approvedCount}
+                </div>
+              )}
             </div>
-            {isFetchingApps && !hasLoadedAppsOnce.current ? (
-              <div className="h-8 w-16 bg-emerald-100 animate-pulse rounded-md mt-1" />
-            ) : (
-              <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
-                {approvedCount}
-              </div>
-            )}
+            <div className="w-9 h-9 rounded-lg bg-emerald-100/70 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0">
+              <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <span className="text-[10px] text-emerald-900 block leading-tight mt-1.5 break-words">
-            {effectiveSY === "ALL" && effectiveTerm === "ALL"
-              ? (gradeFilter === "ALL" ? "All Terms • Official enrollees" : `Grade ${gradeFilter} • Official enrollees`)
-              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
-          </span>
+          <div className="mt-3 pt-2.5 border-t border-emerald-100 flex items-center justify-between text-[11px]">
+            <span className="text-emerald-800 font-medium">Officially enrolled</span>
+            <span className="font-semibold text-emerald-700">Completed</span>
+          </div>
         </div>
 
-        {/* Needs Revision (Red) */}
-        <div className="p-3.5 sm:p-4 bg-red-50/70 border-2 border-red-500 shadow-xs transition-all flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0" />
-              <span className="text-[10px] font-mono font-bold text-red-950 uppercase block">
+        {/* Needs Revision */}
+        <div className="p-4 bg-white rounded-xl border border-rose-200/80 bg-gradient-to-b from-rose-50/30 to-white shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="text-[11px] font-semibold text-rose-800 uppercase tracking-wide block">
                 Needs Revision
               </span>
+              {isFetchingApps && !hasLoadedAppsOnce.current ? (
+                <div className="h-8 w-16 bg-rose-100 animate-pulse rounded-md mt-1.5" />
+              ) : (
+                <div className="text-2xl sm:text-3xl font-extrabold text-rose-950 tracking-tight mt-1">
+                  {revisionCount}
+                </div>
+              )}
             </div>
-            {isFetchingApps && !hasLoadedAppsOnce.current ? (
-              <div className="h-8 w-16 bg-red-100 animate-pulse rounded-md mt-1" />
-            ) : (
-              <div className="text-2xl sm:text-3xl font-bold font-mono text-red-950 mt-1">
-                {revisionCount}
-              </div>
-            )}
+            <div className="w-9 h-9 rounded-lg bg-rose-100/70 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">
+              <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
           </div>
-          <span className="text-[10px] text-red-900 block leading-tight mt-1.5 break-words">
-            {effectiveSY === "ALL" && effectiveTerm === "ALL"
-              ? (gradeFilter === "ALL" ? "All Terms • Action required" : `Grade ${gradeFilter} • Action required`)
-              : (gradeFilter === "ALL" ? `S.Y. ${effectiveSY} • ${effectiveTerm}` : `S.Y. ${effectiveSY} • ${effectiveTerm} • Gr. ${gradeFilter}`)}
-          </span>
+          <div className="mt-3 pt-2.5 border-t border-rose-100 flex items-center justify-between text-[11px]">
+            <span className="text-rose-800 font-medium">Requires follow-up</span>
+            <span className="font-semibold text-rose-700">Action</span>
+          </div>
         </div>
       </div>
 
       {/* Filter Controls & Search Bar */}
-      <div className="p-4 bg-white border-2 border-slate-300 space-y-3 shadow-xs">
+      <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-3.5 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Status Tabs */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs font-bold uppercase tracking-wider">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setStatusFilter("ALL")}
-              className={`px-3 py-1.5 border transition-colors ${
+              className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${
                 statusFilter === "ALL"
-                  ? "bg-[#002060] text-white border-[#002060]"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-300"
+                  ? "bg-[#002060] text-white border-[#002060] shadow-2xs"
+                  : "bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200"
               }`}
             >
-              All ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : totalCount})
+              <span>All</span>
+              <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${statusFilter === "ALL" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"}`}>
+                {isFetchingApps && !hasLoadedAppsOnce.current ? "-" : totalCount}
+              </span>
             </button>
 
             <button
               type="button"
               onClick={() => setStatusFilter("Pending")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border transition-colors ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
                 statusFilter === "Pending"
-                  ? "bg-amber-500 text-slate-950 border-amber-600 font-bold"
-                  : "bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-300"
+                  ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-2xs"
+                  : "bg-amber-50/70 text-amber-900 hover:bg-amber-100 border-amber-200"
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />
-              Pending ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : pendingCount})
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              <span>Pending</span>
+              <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${statusFilter === "Pending" ? "bg-black/10 text-slate-950" : "bg-amber-100 text-amber-900"}`}>
+                {isFetchingApps && !hasLoadedAppsOnce.current ? "-" : pendingCount}
+              </span>
             </button>
 
             <button
               type="button"
               onClick={() => setStatusFilter("Approved")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border transition-colors ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
                 statusFilter === "Approved"
-                  ? "bg-emerald-600 text-white border-emerald-700 font-bold"
-                  : "bg-emerald-50 text-emerald-900 hover:bg-emerald-100 border-emerald-300"
+                  ? "bg-emerald-600 text-white border-emerald-700 font-bold shadow-2xs"
+                  : "bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100 border-emerald-200"
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
-              Approved ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : approvedCount})
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span>Approved</span>
+              <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${statusFilter === "Approved" ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-900"}`}>
+                {isFetchingApps && !hasLoadedAppsOnce.current ? "-" : approvedCount}
+              </span>
             </button>
 
             <button
               type="button"
               onClick={() => setStatusFilter("Needs Revision")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border transition-colors ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
                 statusFilter === "Needs Revision"
-                  ? "bg-red-600 text-white border-red-700 font-bold"
-                  : "bg-red-50 text-red-900 hover:bg-red-100 border-red-300"
+                  ? "bg-rose-600 text-white border-rose-700 font-bold shadow-2xs"
+                  : "bg-rose-50/70 text-rose-900 hover:bg-rose-100 border-rose-200"
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
-              Needs Revision ({isFetchingApps && !hasLoadedAppsOnce.current ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : revisionCount})
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span>Needs Revision</span>
+              <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${statusFilter === "Needs Revision" ? "bg-white/20 text-white" : "bg-rose-100 text-rose-900"}`}>
+                {isFetchingApps && !hasLoadedAppsOnce.current ? "-" : revisionCount}
+              </span>
             </button>
           </div>
 
@@ -973,8 +1012,11 @@ export default function AdjudicationConsole() {
               />
             </div>
 
-            {/* Search Input */}
+            {/* Search Input with Icon */}
             <div className="relative w-full sm:col-span-3 lg:col-span-1 lg:w-64">
+              <svg className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
               <input
                 type="text"
                 value={searchQuery}
@@ -984,14 +1026,14 @@ export default function AdjudicationConsole() {
                     setSelectedApp(filteredApplications[0]);
                   }
                 }}
-                placeholder="Search LRN, Ref Code, or Name..."
-                className="w-full pl-3 pr-7 py-2 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                placeholder="Search LRN, Ref, Name..."
+                className="w-full pl-8 pr-7 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none transition-all"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs cursor-pointer"
                   title="Clear search"
                 >
                   &times;
@@ -1003,7 +1045,7 @@ export default function AdjudicationConsole() {
 
         {/* Live Search Result Indicator */}
         {searchQuery.trim() && (
-          <div className="p-3 bg-blue-50/80 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="p-3 bg-blue-50/80 border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
               <span className="font-mono font-bold text-[#002060] uppercase">
                 SEARCH ACTIVE: &ldquo;{searchQuery.trim()}&rdquo;
@@ -1053,11 +1095,16 @@ export default function AdjudicationConsole() {
           </div>
         </div>
       ) : filteredApplications.length === 0 ? (
-        <div className="bg-white border-2 border-slate-300 shadow-xs p-12 text-center space-y-3">
-          <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-            NO APPLICATIONS FOUND FOR S.Y. {effectiveSY} &bull; {effectiveTerm}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-10 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">
+            No Applications Found for S.Y. {effectiveSY} &bull; {effectiveTerm}
           </span>
-          <p className="text-xs text-slate-600 max-w-md mx-auto">
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
             {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE"
               ? `No student enrollment applications have been submitted yet for the current active period (S.Y. ${effectiveSY} • ${effectiveTerm}). As students enroll online, they will appear in this queue automatically.`
               : `No enrollment applications match the selected academic period (S.Y. ${effectiveSY} • ${effectiveTerm}), grade level, or search query.`}
@@ -1070,7 +1117,7 @@ export default function AdjudicationConsole() {
                   setSelectedSY("ALL");
                   setSelectedTerm("ALL");
                 }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 uppercase tracking-wider transition-colors cursor-pointer"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 transition-colors cursor-pointer"
               >
                 View Applications Across All Terms
               </button>
@@ -1081,33 +1128,38 @@ export default function AdjudicationConsole() {
         <div className="space-y-6">
           {/* 1. JUNIOR HIGH SCHOOL (JHS) SECTION */}
           {activeJhsGrades.length > 0 && (
-            <div className="bg-white border-2 border-[#002060] shadow-xs overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
               {/* JHS HEADING */}
-              <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-300">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold uppercase tracking-wider text-xs sm:text-sm">
+              <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-900">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center shrink-0">
+                    <svg className="w-3.5 h-3.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <span className="font-bold uppercase tracking-wider text-xs sm:text-sm">
                     JUNIOR HIGH SCHOOL (JHS) ENROLLEES
                   </span>
                   <span className="text-[11px] text-blue-200 hidden sm:inline">&bull; Grades 7, 8, 9, &amp; 10</span>
                 </div>
-                <span className="font-mono font-bold text-xs bg-white/20 px-2.5 py-1 rounded text-white self-start sm:self-auto">
+                <span className="text-xs font-semibold bg-white/15 px-2.5 py-0.5 rounded-full text-white self-start sm:self-auto">
                   {jhsTotalCount} Enrollee{jhsTotalCount === 1 ? "" : "s"}
                 </span>
               </div>
 
               {/* JHS SUB-HEADINGS */}
-              <div className="divide-y-2 divide-slate-200">
+              <div className="divide-y divide-slate-200">
                 {activeJhsGrades.map((grade) => {
                   const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
                   return (
                     <div key={grade} className="bg-white">
                       {/* SUB-HEADING */}
-                      <div className="bg-slate-100 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
+                      <div className="bg-slate-50 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
                             Grade {grade}
                           </span>
-                          <span className="text-[11px] font-mono text-slate-600 font-bold">
+                          <span className="text-[11px] font-mono text-slate-500 font-semibold">
                             ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
                           </span>
                         </div>
@@ -1115,7 +1167,7 @@ export default function AdjudicationConsole() {
 
                       {/* Content: Table or Empty state */}
                       {gradeApps.length === 0 ? (
-                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/40">
+                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/50">
                           No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
                         </div>
                       ) : (
@@ -1126,7 +1178,7 @@ export default function AdjudicationConsole() {
                           <div className="overflow-x-auto touch-pan-x">
                             <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
                               <thead>
-                                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                <tr className="bg-slate-100/75 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
                                   <th className="p-2.5">Reference No.</th>
                                   <th className="p-2.5">Learner Full Name</th>
                                   <th className="p-2.5">12-Digit LRN</th>
@@ -1152,44 +1204,49 @@ export default function AdjudicationConsole() {
 
           {/* 2. SENIOR HIGH SCHOOL (SHS) SECTION */}
           {activeShsGrades.length > 0 && (
-            <div className="bg-white border-2 border-[#002060] shadow-xs overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
               {/* SHS HEADING */}
-              <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-300">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold uppercase tracking-wider text-xs sm:text-sm">
+              <div className="bg-[#002060] text-white px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-900">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center shrink-0">
+                    <svg className="w-3.5 h-3.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <span className="font-bold uppercase tracking-wider text-xs sm:text-sm">
                     SENIOR HIGH SCHOOL (SHS) ENROLLEES
                   </span>
                   <span className="text-[11px] text-blue-200 hidden sm:inline">&bull; Grades 11 &amp; 12 &bull; Academic &amp; Tech-Pro</span>
                 </div>
-                <span className="font-mono font-bold text-xs bg-white/20 px-2.5 py-1 rounded text-white self-start sm:self-auto">
+                <span className="text-xs font-semibold bg-white/15 px-2.5 py-0.5 rounded-full text-white self-start sm:self-auto">
                   {shsTotalCount} Enrollee{shsTotalCount === 1 ? "" : "s"}
                 </span>
               </div>
 
               {/* SHS SUB-HEADINGS */}
-              <div className="divide-y-2 divide-slate-200">
+              <div className="divide-y divide-slate-200">
                 {activeShsGrades.map((grade) => {
                   const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
                   return (
                     <div key={grade} className="bg-white">
                       {/* SUB-HEADING */}
-                      <div className="bg-slate-100 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
+                      <div className="bg-slate-50 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
                             Grade {grade}
                           </span>
-                          <span className="text-[11px] font-mono text-slate-600 font-bold">
+                          <span className="text-[11px] font-mono text-slate-500 font-semibold">
                             ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-500 uppercase">
+                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
                           Academic &amp; Tech-Pro Tracks
                         </span>
                       </div>
 
                       {/* Content: Table or Empty state */}
                       {gradeApps.length === 0 ? (
-                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/40">
+                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/50">
                           No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
                         </div>
                       ) : (
@@ -1200,7 +1257,7 @@ export default function AdjudicationConsole() {
                           <div className="overflow-x-auto touch-pan-x">
                             <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
                               <thead>
-                                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                <tr className="bg-slate-100/75 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
                                   <th className="p-2.5">Reference No.</th>
                                   <th className="p-2.5">Learner Full Name</th>
                                   <th className="p-2.5">12-Digit LRN</th>
