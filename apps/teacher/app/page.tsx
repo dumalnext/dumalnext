@@ -7,10 +7,35 @@ import TeacherLoginForm from "@/components/TeacherLoginForm";
 
 export default function TeacherHomePage() {
   const { user, isLoading, logout } = useTeacherAuth();
-  const [scheduleCount, setScheduleCount] = React.useState<number | null>(null);
+  const [scheduleCount, setScheduleCount] = React.useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("dumalnext_teacher_schedule_count");
+        if (stored !== null) {
+          const parsed = parseInt(stored, 10);
+          if (!isNaN(parsed)) return parsed;
+        }
+      } catch {}
+    }
+    return null;
+  });
 
   React.useEffect(() => {
     if (!user) return;
+
+    const cacheKey = user.teacherId
+      ? `dumalnext_teacher_schedule_count_${user.teacherId}`
+      : "dumalnext_teacher_schedule_count";
+
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(cacheKey) || localStorage.getItem("dumalnext_teacher_schedule_count");
+        if (stored !== null) {
+          const parsed = parseInt(stored, 10);
+          if (!isNaN(parsed)) setScheduleCount(parsed);
+        }
+      } catch {}
+    }
 
     const fetchLoad = async () => {
       try {
@@ -28,6 +53,12 @@ export default function TeacherHomePage() {
           const data = await res.json();
           if (data.success && Array.isArray(data.schedules)) {
             setScheduleCount(data.schedules.length);
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem(cacheKey, data.schedules.length.toString());
+                localStorage.setItem("dumalnext_teacher_schedule_count", data.schedules.length.toString());
+              } catch {}
+            }
             return;
           }
         }
@@ -61,16 +92,16 @@ export default function TeacherHomePage() {
     return (
       <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Faculty Dashboard">
         {/* Faculty Welcome Banner Skeleton */}
-        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2.5">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="h-5 w-24 bg-slate-300 rounded-[4px]" />
-              <div className="h-5 w-28 bg-slate-300 rounded-[4px]" />
-              <div className="h-5 w-32 bg-slate-300 rounded-[4px]" />
+              <div className="h-5 w-24 bg-white/20 rounded-[4px]" />
+              <div className="h-5 w-28 bg-emerald-500/20 rounded-[4px]" />
+              <div className="h-5 w-32 bg-white/10 rounded-[4px]" />
             </div>
-            <div className="h-7 w-64 bg-slate-300 rounded-[4px]" />
+            <div className="h-7 w-64 bg-white/30 rounded-[4px]" />
           </div>
-          <div className="h-9 w-32 bg-slate-300 rounded-[4px]" />
+          <div className="h-9 w-32 bg-amber-400/40 rounded-[4px]" />
         </div>
 
         {/* 3 Main Workstation Navigation Cards Skeleton */}
@@ -78,24 +109,31 @@ export default function TeacherHomePage() {
           {[1, 2, 3].map((card) => (
             <div
               key={card}
-              className="bg-white p-5 sm:p-6 border-2 border-slate-200 border-t-4 border-t-slate-300 rounded-[6px] shadow-xs flex flex-col justify-between space-y-4"
+              className="bg-white p-5 sm:p-6 border-2 border-slate-200 border-t-4 border-t-[#002060] rounded-[6px] shadow-xs flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[6px] bg-slate-200 shrink-0" />
+                  <div className="w-10 h-10 rounded-[6px] bg-[#002060]/10 flex items-center justify-center shrink-0">
+                    <div className="w-5 h-5 bg-[#002060]/20 rounded" />
+                  </div>
                   <div className="space-y-1.5 flex-1">
-                    <div className="h-3 w-16 bg-slate-200 rounded" />
-                    <div className="h-4.5 w-40 bg-slate-200 rounded" />
+                    <div className="h-2.5 w-16 bg-slate-200 rounded" />
+                    <div className="h-4.5 w-44 bg-slate-200 rounded" />
                   </div>
                 </div>
 
-                <div className="pt-3 flex items-center justify-between border-t border-slate-100">
-                  <div className="h-3 w-12 bg-slate-200 rounded" />
-                  <div className="h-5 w-24 bg-slate-200 rounded-[4px]" />
+                <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase">
+                    Status
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-100 text-slate-400 text-[11px] font-bold border border-slate-200 rounded-[4px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                    <span className="inline-block w-20 h-3 bg-slate-200 rounded" />
+                  </span>
                 </div>
               </div>
 
-              <div className="w-full h-10 bg-slate-200 rounded-[4px]" />
+              <div className="w-full h-10 bg-[#002060]/20 rounded-[4px]" />
             </div>
           ))}
         </div>
@@ -170,7 +208,10 @@ export default function TeacherHomePage() {
                 Status
               </span>
               {scheduleCount === null ? (
-                <span className="inline-block w-24 h-5 bg-slate-200 animate-pulse rounded-[4px]" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-100 text-slate-400 text-[11px] font-bold border border-slate-200 rounded-[4px] animate-pulse select-none">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                  <span className="inline-block w-20 h-3 bg-slate-200 rounded" />
+                </span>
               ) : scheduleCount > 0 ? (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 rounded-[4px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />

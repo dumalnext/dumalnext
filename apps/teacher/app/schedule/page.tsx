@@ -138,6 +138,14 @@ export default function TeachingSchedulePage() {
           const data = await res.json();
           if (data.success && Array.isArray(data.schedules)) {
             setSchedules(data.schedules);
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem("dumalnext_teacher_schedule_count", data.schedules.length.toString());
+                if (user?.teacherId) {
+                  localStorage.setItem(`dumalnext_teacher_schedule_count_${user.teacherId}`, data.schedules.length.toString());
+                }
+              } catch {}
+            }
             return;
           }
         }
@@ -181,17 +189,17 @@ export default function TeachingSchedulePage() {
     return (
       <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Schedule">
         {/* Title Bar Skeleton */}
-        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-[4px] bg-slate-300 shrink-0" />
+            <div className="w-10 h-10 rounded-[4px] bg-white/20 shrink-0" />
             <div className="space-y-2">
-              <div className="h-6 w-56 bg-slate-300 rounded" />
-              <div className="h-4 w-40 bg-slate-300 rounded" />
+              <div className="h-6 w-56 bg-white/30 rounded" />
+              <div className="h-4 w-40 bg-white/20 rounded" />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-8 w-32 bg-slate-300 rounded-[4px]" />
-            <div className="h-8 w-36 bg-slate-300 rounded-[4px]" />
+            <div className="h-8 w-32 bg-white/20 rounded-[4px]" />
+            <div className="h-8 w-36 bg-amber-400/40 rounded-[4px]" />
           </div>
         </div>
 
