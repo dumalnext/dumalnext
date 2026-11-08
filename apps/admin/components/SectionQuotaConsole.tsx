@@ -1129,7 +1129,7 @@ export default function SectionQuotaConsole() {
                 </div>
               )}
               <h4 className={`text-base font-extrabold tracking-tight truncate leading-snug ${isElectiveView ? "text-purple-950" : "text-[#002060]"}`} title={sec.section_name}>
-                {sec.section_name}
+                {extractBaseSectionName(sec.section_name, sec.grade_level, sec.strand) || sec.section_name}
               </h4>
 
               {sec.adviser_name ? (
@@ -1159,55 +1159,33 @@ export default function SectionQuotaConsole() {
               )}
             </div>
 
-            <span
-              className={`inline-flex items-center text-[10px] font-bold px-2.5 py-1 rounded-full border shadow-2xs shrink-0 ${
-                isElectiveView
-                  ? "bg-purple-50 text-purple-800 border-purple-200"
-                  : "bg-slate-100 text-slate-700 border-slate-200"
-              }`}
-            >
-              Grade {sec.grade_level}{" "}
-              {sec.grade_level >= 11
-                ? isElectiveView
-                  ? "(Elective)"
-                  : sec.strand?.toUpperCase().includes("TECH") || sec.strand?.toUpperCase().includes("TVL")
-                  ? "(TechPro)"
-                  : "(Academic)"
-                : ""}
-            </span>
-          </div>
-
-          {/* Progress & Capacity */}
-          <div className="space-y-1.5 mt-3.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-medium">
-                {isElectiveView ? "Enrolled in Elective:" : `Enrolled (${activeTerm.termName}):`}
-              </span>
-              <span className="font-mono text-xs font-bold text-slate-900">
-                <strong>{count}</strong> / {capacity} <span className="text-slate-400 font-normal">({pct}%)</span>
-              </span>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
-              <div
-                className={`h-full rounded-full transition-all duration-300 ${
-                  isFull ? "bg-rose-600" : isElectiveView ? "bg-purple-600" : pct > 75 ? "bg-amber-500" : "bg-[#002060]"
+            {sec.grade_level >= 11 && (
+              <span
+                className={`inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border shadow-2xs shrink-0 ${
+                  isElectiveView
+                    ? "bg-purple-50 text-purple-800 border-purple-200"
+                    : "bg-slate-100 text-slate-700 border-slate-200"
                 }`}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
+              >
+                {isElectiveView
+                  ? "Elective"
+                  : sec.strand?.toUpperCase().includes("TECH") || sec.strand?.toUpperCase().includes("TVL")
+                  ? "TechPro"
+                  : "Academic"}
+              </span>
+            )}
           </div>
 
           {/* Slots Remaining */}
           <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs mt-3">
             <span className="text-slate-500 font-medium">Available Slots:</span>
             <span
-              className={`inline-flex items-center gap-1.5 font-bold font-mono px-2.5 py-0.5 rounded-full border text-[11px] shadow-2xs ${
+              className={`inline-flex items-center font-bold font-mono px-2.5 py-0.5 rounded-full border text-[11px] shadow-2xs ${
                 isFull
                   ? "bg-rose-50 text-rose-700 border-rose-200"
                   : "bg-emerald-50 text-emerald-800 border-emerald-200"
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${isFull ? "bg-rose-500" : "bg-emerald-500"}`} />
               {isFull ? "FULL (0 SLOTS)" : `${capacity - count} SLOTS REMAINING`}
             </span>
           </div>
@@ -1226,9 +1204,6 @@ export default function SectionQuotaConsole() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <span>View {isElectiveView ? "Elective" : "Class"} Roster</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/20 font-mono">
-              {count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} Roster` : ""}
-            </span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -1284,7 +1259,7 @@ export default function SectionQuotaConsole() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto shrink-0">
+          <div className="flex items-center gap-2.5 w-full md:w-auto shrink-0">
             {/* Add Section Button */}
             <button
               type="button"
@@ -1293,11 +1268,6 @@ export default function SectionQuotaConsole() {
             >
               <span>+ Add New Class Section</span>
             </button>
-
-            <div className="flex items-center justify-center gap-2 bg-white/10 border border-white/20 backdrop-blur-xs px-3 py-2 rounded-lg text-xs font-semibold text-white">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Live Capacity Sync</span>
-            </div>
           </div>
         </div>
 
@@ -1320,29 +1290,6 @@ export default function SectionQuotaConsole() {
             </button>
           </div>
         )}
-
-        {/* Active Academic Term Banner */}
-        <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold bg-[#002060] text-amber-300 px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Active Academic Term
-            </span>
-            <span className="text-xs font-extrabold text-[#002060] flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              S.Y. {activeTerm.schoolYear} &bull; {activeTerm.termName}
-            </span>
-          </div>
-          <div className="text-[11px] text-slate-600 font-medium">
-            {activeTerm.termNumber === 1 ? (
-              <span>Semester 1: Section counts begin at 0. Assign learners as they enroll.</span>
-            ) : (
-              <span>Semester {activeTerm.termNumber}: Section rosters fixed from Sem 1. Active term enrollment automatically tracked.</span>
-            )}
-          </div>
-        </div>
 
         {/* KPI Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -1583,20 +1530,9 @@ export default function SectionQuotaConsole() {
           {shouldShowJhs && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-600" />
-                    <span className="text-[11px] font-bold text-[#002060] uppercase tracking-wider">
-                      Secondary Education • JHS
-                    </span>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-                    Junior High School (JHS)
-                  </h3>
-                </div>
-                <span className="text-xs font-bold bg-[#002060] text-white px-3 py-1.5 rounded-lg shadow-2xs self-start sm:self-auto">
-                  Grades 7 - 10 Core Curricula
-                </span>
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                  Junior High School (JHS)
+                </h3>
               </div>
 
               {/* Grade 7 Sub-block */}
@@ -1711,20 +1647,9 @@ export default function SectionQuotaConsole() {
           {shouldShowShs && (
             <div className="space-y-8">
               <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-indigo-600" />
-                    <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider">
-                      Post-Secondary Education • SHS
-                    </span>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-                    Senior High School (SHS)
-                  </h3>
-                </div>
-                <span className="text-xs font-bold bg-indigo-950 text-white px-3 py-1.5 rounded-lg shadow-2xs self-start sm:self-auto">
-                  Grades 11 - 12 Academic &amp; Tech-Pro
-                </span>
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                  Senior High School (SHS)
+                </h3>
               </div>
 
               {/* Grade 11 Block */}
