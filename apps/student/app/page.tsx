@@ -13,7 +13,7 @@ import { AccountCreationTutorial, GradeLevelEnrollmentTutorials } from "@/compon
 import StudentConcernModal, { ConcernModalMode } from "@/components/StudentConcernModal";
 import { PasswordResetModal, IdentityRecoveryModal } from "@/components/CredentialRecoveryModals";
 import EmailSetupGuard from "@/components/EmailSetupGuard";
-import { CopyChip, PasswordStrengthMeter, triggerPortalToast } from "@/components/ui/PortalUI";
+import { CopyChip, PageCardSkeleton, PasswordStrengthMeter, triggerPortalToast } from "@/components/ui/PortalUI";
 import { PushNotificationModal } from "@/components/ui/PushNotificationButton";
 import { useLanguage } from "@/lib/context/LanguageContext";
 
