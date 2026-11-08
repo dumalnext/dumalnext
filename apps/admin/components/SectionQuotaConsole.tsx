@@ -1189,7 +1189,7 @@ export default function SectionQuotaConsole() {
                   </span>
                 )}
                 <span>
-                  <strong>{count}</strong> / {capacity} <span className="text-slate-400 font-normal">({pct}%)</span>
+                  <strong>{count}</strong> / {capacity}
                 </span>
               </span>
             </div>
