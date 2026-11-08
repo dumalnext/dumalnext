@@ -1627,17 +1627,6 @@ function StudentHomeContent() {
               <div className={`p-6 border-2 space-y-4 text-center rounded-[4px] shadow-xs ${
                 !isEnrollmentOpen ? "bg-red-50/60 border-red-300" : "bg-white border-slate-300"
               }`}>
-                <div className="flex items-center justify-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${
-                    isEnrollmentOpen ? "bg-emerald-500" : "bg-red-500"
-                  }`} />
-                  <span className={`text-xs font-bold ${
-                    isEnrollmentOpen ? "text-emerald-900" : "text-red-900"
-                  }`}>
-                    Online Enrollment: {isEnrollmentOpen ? `Open for S.Y. ${schoolYear} • ${semester}` : `Closed for S.Y. ${schoolYear} • ${semester}`}
-                  </span>
-                </div>
-
                 {(() => {
                   const priorApproved = pastApplications.find((p) => p.status === "Approved");
                   const isJhsContinuing = priorApproved
@@ -1651,10 +1640,10 @@ function StudentHomeContent() {
                         {isEnrollmentOpen
                           ? priorApproved
                             ? isJhsContinuing
-                              ? `Ready to Enroll for S.Y. ${schoolYear} (${semester})? (Continuing JHS Learner)`
-                              : `Ready to Enroll for S.Y. ${schoolYear} (${semester})? (Continuing SHS Learner)`
-                            : `Ready to Complete Your Enrollment for S.Y. ${schoolYear} (${semester})?`
-                          : `Basic Education Online Enrollment is Currently Closed`}
+                              ? "Ready to Complete Your Re-Enrollment? (Continuing JHS Learner)"
+                              : "Ready to Complete Your Re-Enrollment? (Continuing SHS Learner)"
+                            : "Ready to Complete Your Enrollment?"
+                          : "Basic Education Online Enrollment is Currently Closed"}
                       </h3>
 
                       {!isEnrollmentOpen && closedMessage && (
@@ -1679,9 +1668,9 @@ function StudentHomeContent() {
                             {isEnrollmentOpen
                               ? priorApproved
                                 ? isJhsContinuing
-                                  ? `1-Click Re-Enroll for ${semester} (Grade ${targetContinuingGrade} JHS)`
-                                  : `Continue Enrollment: Select Electives (S.Y. ${schoolYear} • ${semester})`
-                                : `Start Online Enrollment Form (S.Y. ${schoolYear} • ${semester})`
+                                  ? `1-Click Re-Enroll (Grade ${targetContinuingGrade} JHS)`
+                                  : "Continue Enrollment: Select Electives"
+                                : "Start Online Enrollment Form"
                               : "View Official Enrollment Notice & Advisory"}
                           </span>
                         </Link>

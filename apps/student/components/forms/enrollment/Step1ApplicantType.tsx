@@ -237,11 +237,11 @@ export default function Step1ApplicantType({
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border border-slate-200/80 shadow-xs rounded-xl">
       {/* Step Header */}
-      <div className="border-b-2 border-slate-200 pb-5">
+      <div className="border-b border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-md">
             Step 01 of 05
           </span>
           <span className="text-xs font-semibold text-slate-500 tracking-wider">
@@ -249,9 +249,9 @@ export default function Step1ApplicantType({
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-1">
-          Learner Classification &amp; Target Grade Level
+          Learner Classification &amp; Grade Level
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 mt-1">
           Select the education program, learner category, and previous academic background.
         </p>
       </div>
@@ -272,27 +272,26 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => onChange({ isGraded: true })}
-            className={`p-5 border-2 text-left transition-all relative rounded-[4px] ${
+            className={`p-5 border-2 text-left transition-all rounded-xl relative ${
               data.isGraded
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                   data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                {data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
+                {data.isGraded ? "Selected" : "Select"}
               </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 whitespace-nowrap shrink-0">CODE: GRADED</span>
             </div>
             <div className="text-base font-bold text-slate-900">Graded Curriculum Program</div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-              Standard secondary basic education program for Junior High School (Grades 7–10) and Senior High School (Grades 11–12).
+              Standard secondary basic education program for Junior High School and Senior High School.
             </p>
           </button>
 
@@ -300,23 +299,22 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => onChange({ isGraded: false })}
-            className={`p-5 border-2 text-left transition-all relative rounded-[4px] ${
+            className={`p-5 border-2 text-left transition-all rounded-xl relative ${
               !data.isGraded
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                   !data.isGraded
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                {!data.isGraded ? "SELECTED" : "CLICK TO SELECT"}
+                {!data.isGraded ? "Selected" : "Select"}
               </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 whitespace-nowrap shrink-0">CODE: SNED-ONLY</span>
             </div>
             <div className="text-base font-bold text-slate-900">Non-Graded Program (SNEd Only)</div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
@@ -338,7 +336,7 @@ export default function Step1ApplicantType({
         </div>
 
         {errors.applicantType && (
-          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs rounded-[4px]">
+          <div className="p-3.5 bg-red-50 border-l-4 border-red-700 text-xs text-red-800 font-semibold shadow-xs rounded-lg">
             Validation Required: {errors.applicantType}
           </div>
         )}
@@ -348,27 +346,26 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 7")}
-            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
+            className={`p-5 border-2 text-left transition-all rounded-xl ${
               data.applicantType === "Grade 7"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                   data.applicantType === "Grade 7"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                {data.applicantType === "Grade 7" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 01
+                {data.applicantType === "Grade 7" ? "Selected" : "Select"}
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-[#002060] whitespace-nowrap shrink-0">Target: Grade 7</span>
             </div>
             <div className="text-base font-bold text-slate-900">Incoming Grade 7</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-              Elementary Grade 6 completers transitioning into the First Year of Junior High School at Dumalneg NHS.
+              Elementary Grade 6 completers transitioning into Junior High School at Dumalneg NHS.
             </p>
           </button>
 
@@ -376,23 +373,22 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Grade 11")}
-            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
+            className={`p-5 border-2 text-left transition-all rounded-xl ${
               data.applicantType === "Grade 11"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                   data.applicantType === "Grade 11"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                {data.applicantType === "Grade 11" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 02
+                {data.applicantType === "Grade 11" ? "Selected" : "Select"}
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-[#002060] whitespace-nowrap shrink-0">Target: Grade 11</span>
             </div>
             <div className="text-base font-bold text-slate-900">Incoming Grade 11</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -404,23 +400,22 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Transferee")}
-            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
+            className={`p-5 border-2 text-left transition-all rounded-xl ${
               data.applicantType === "Transferee"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                   data.applicantType === "Transferee"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                {data.applicantType === "Transferee" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 03
+                {data.applicantType === "Transferee" ? "Selected" : "Select"}
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-amber-800 whitespace-nowrap shrink-0">Grades 7–12</span>
             </div>
             <div className="text-base font-bold text-slate-900">Transferee (Move-In)</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -432,27 +427,26 @@ export default function Step1ApplicantType({
           <button
             type="button"
             onClick={() => handleSelectApplicantType("Returning")}
-            className={`p-5 border-2 text-left transition-all rounded-[4px] ${
+            className={`p-5 border-2 text-left transition-all rounded-xl ${
               data.applicantType === "Returning"
                 ? "border-[#002060] bg-blue-50/50 shadow-sm ring-1 ring-[#002060]"
                 : "border-slate-300 bg-white hover:border-[#002060]/70 hover:bg-slate-50/60"
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span
-                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] whitespace-nowrap shrink-0 ${
+                className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                   data.applicantType === "Returning"
                     ? "bg-[#002060] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                {data.applicantType === "Returning" ? "ACTIVE" : "SELECT"} &bull; CATEGORY 04
+                {data.applicantType === "Returning" ? "Selected" : "Select"}
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-indigo-800 whitespace-nowrap shrink-0">Balik-Aral (Grades 7–12)</span>
             </div>
             <div className="text-base font-bold text-slate-900">Returning Learner (Balik-Aral)</div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-              Learners who previously dropped out or stopped schooling and are resuming their studies.
+              Learners who previously stopped schooling and are resuming their studies.
             </p>
           </button>
         </div>
@@ -460,13 +454,13 @@ export default function Step1ApplicantType({
 
       {/* Part 3: Target Grade Level Selector (for Transferee / Returning) */}
       {isTransfereeOrReturning && (
-        <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+        <div className="space-y-4 p-5 sm:p-6 bg-slate-50/80 border border-slate-300 rounded-xl">
           <div className="border-l-4 border-[#002060] pl-3">
             <label className="text-xs font-bold text-slate-900 tracking-wider block">
-              3. Target Grade Level at Dumalneg NHS (Grades 7 to 12)
+              3. Target Grade Level at Dumalneg NHS
             </label>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select the target grade level you intend to enroll in for the upcoming school year.
+              Select the grade level you intend to enroll in.
             </p>
           </div>
 
@@ -480,7 +474,7 @@ export default function Step1ApplicantType({
                   key={lvl}
                   type="button"
                   onClick={() => handleTargetGradeChange(lvl)}
-                  className={`p-3.5 border-2 text-center font-bold transition-all relative rounded-[4px] ${
+                  className={`p-3.5 border-2 text-center font-bold transition-all rounded-xl ${
                     isSelected
                       ? "bg-[#002060] text-white border-[#002060] shadow-sm"
                       : "bg-white text-slate-800 border-slate-300 hover:border-[#002060] hover:bg-slate-100"
@@ -490,11 +484,6 @@ export default function Step1ApplicantType({
                     {isJHSLevel ? "JHS" : "SHS"}
                   </div>
                   <div className="text-base sm:text-lg font-bold">Grade {lvl}</div>
-                  {isSelected && (
-                    <span className="block text-[10px] uppercase text-blue-200 mt-0.5">
-                      TARGET
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -508,31 +497,15 @@ export default function Step1ApplicantType({
         </div>
       )}
 
-      {/* Part 4: DepEd Section 6: Previous School & Academic Prerequisite Background */}
+      {/* Part 4: DepEd Section 6: Previous School Attended */}
       {data.applicantType && (
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
-          <div className="border-b-2 border-slate-200 pb-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-bold text-[#002060] tracking-wider block">
-                DepEd Section 6: Previous School Attended &amp; Academic History
-              </span>
-              <span className="text-[11px] bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold rounded-[4px]">
-                SMART PREREQUISITE VALIDATION ACTIVE
-              </span>
-            </div>
+        <div className="space-y-5 p-5 sm:p-6 bg-slate-50/80 border border-slate-300 rounded-xl">
+          <div className="border-b border-slate-200 pb-3">
+            <span className="text-xs font-bold text-[#002060] tracking-wider block">
+              DepEd Section 6: Previous School Attended &amp; Academic History
+            </span>
             <p className="text-xs text-slate-600 mt-1">
-              {data.applicantType === "Grade 7" && (
-                <>Provide credentials of the graduated Elementary School. Prerequisite: Completed Grade 6.</>
-              )}
-              {data.applicantType === "Grade 11" && (
-                <>Provide credentials of the completed Junior High School. Prerequisite: Completed Grade 10.</>
-              )}
-              {isTransfereeOrReturning && (
-                <>
-                  Based on target <strong>Grade {data.targetGradeLevel || 7}</strong>, 
-                  impossible future grade levels have been automatically excluded.
-                </>
-              )}
+              Provide information regarding your last completed school and grade level.
             </p>
           </div>
 
@@ -557,9 +530,6 @@ export default function Step1ApplicantType({
                 fullWidth
                 error={Boolean(errors.lastGradeCompleted)}
               />
-              <span className="text-[11px] text-slate-500 mt-1 block">
-                Prerequisite for Grade {data.targetGradeLevel || 7}: Successful completion of Grade {(Number(data.targetGradeLevel) || 7) - 1}.
-              </span>
               {errors.lastGradeCompleted && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.lastGradeCompleted}
@@ -577,7 +547,7 @@ export default function Step1ApplicantType({
                 value={data.lastSchoolYearCompleted || ""}
                 onChange={(e) => onChange({ lastSchoolYearCompleted: e.target.value })}
                 placeholder="e.g. 2024-2025"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-[4px]"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl"
               />
               <span className="text-[11px] text-slate-500 mt-1 block">
                 Format: 4-digit start year - 4-digit end year (e.g., 2024-2025).
@@ -601,7 +571,7 @@ export default function Step1ApplicantType({
                   <span className="text-red-700">*</span>
                 </label>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Select your completed feeder school or choose &apos;Others&apos; to specify a different institution.
+                  Select your feeder school or choose &apos;Others&apos; to specify a different institution.
                 </p>
               </div>
 
@@ -624,7 +594,7 @@ export default function Step1ApplicantType({
                       });
                     }
                   }}
-                  className={`p-4 border-2 text-left transition-all rounded-[4px] ${
+                  className={`p-4 border-2 text-left transition-all rounded-xl ${
                     isDefaultSchool
                       ? "border-[#002060] bg-blue-50/70 shadow-sm ring-1 ring-[#002060]"
                       : "border-slate-300 bg-white hover:border-slate-400"
@@ -632,23 +602,23 @@ export default function Step1ApplicantType({
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
+                      className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                         isDefaultSchool
                            ? "bg-[#002060] text-white"
                           : "bg-slate-200 text-slate-700"
                       }`}
                     >
-                      {isDefaultSchool ? "SELECTED" : "SELECT"}
+                      {isDefaultSchool ? "Selected" : "Select"}
                     </span>
                     <span className="text-[11px] font-bold text-[#002060]">
-                      ID: {defaultFeederSchoolId}
+                      DepEd ID: {defaultFeederSchoolId}
                     </span>
                   </div>
                   <div className="text-sm font-bold text-slate-900">
                     {defaultFeederSchoolName}
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    Official public feeder school in Dumalneg. DepEd School ID ({defaultFeederSchoolId}) is automatically filled and verified.
+                    Official public school in Dumalneg. DepEd School ID ({defaultFeederSchoolId}) is automatically set.
                   </p>
                 </button>
 
@@ -663,7 +633,7 @@ export default function Step1ApplicantType({
                       });
                     }
                   }}
-                  className={`p-4 border-2 text-left transition-all rounded-[4px] ${
+                  className={`p-4 border-2 text-left transition-all rounded-xl ${
                     !isDefaultSchool
                       ? "border-[#002060] bg-blue-50/70 shadow-sm ring-1 ring-[#002060]"
                       : "border-slate-300 bg-white hover:border-slate-400"
@@ -671,47 +641,27 @@ export default function Step1ApplicantType({
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-[4px] ${
+                      className={`text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-md ${
                         !isDefaultSchool
                           ? "bg-[#002060] text-white"
                           : "bg-slate-200 text-slate-700"
                       }`}
                     >
-                      {!isDefaultSchool ? "SELECTED" : "SELECT"}
-                    </span>
-                    <span className="text-[10px] text-slate-500 uppercase font-bold">
-                      MANUAL ENTRY
+                      {!isDefaultSchool ? "Selected" : "Select"}
                     </span>
                   </div>
                   <div className="text-sm font-bold text-slate-900">
                     Others (Specify School &amp; ID)
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-normal">
-                    Select if transferring or graduated from another school outside Dumalneg (e.g., Pagudpud, Bangui, Adams, private school).
+                    Graduated or transferring from another school outside Dumalneg (e.g. Pagudpud, Bangui, Adams, private school).
                   </p>
                 </button>
               </div>
 
-              {/* Verified Feeder Confirmation Banner */}
-              {isDefaultSchool && (
-                <div className="p-3.5 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs rounded-[4px]">
-                  <div>
-                    <span className="font-bold text-emerald-950 block">
-                      Automatic Feeder Applied: {defaultFeederSchoolName}
-                    </span>
-                    <span className="text-[11px] text-emerald-800">
-                      DepEd School ID: <strong>{defaultFeederSchoolId}</strong> (Division of Ilocos Norte). Ready for verification.
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold bg-emerald-800 text-white px-2.5 py-1 uppercase tracking-wider self-start sm:self-auto rounded-[4px]">
-                    AUTO-PRESET VERIFIED
-                  </span>
-                </div>
-              )}
-
               {/* Manual Entry Inputs when "Others (Specify)" is selected */}
               {!isDefaultSchool && (
-                <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner rounded-[4px]">
+                <div className="p-5 bg-white border-2 border-slate-300 space-y-4 mt-2 shadow-inner rounded-xl">
                   <div className="border-b border-slate-200 pb-2">
                     <span className="text-xs font-bold text-[#002060] tracking-wider block">
                       Manual School Specification
@@ -743,7 +693,7 @@ export default function Step1ApplicantType({
                           ? "e.g. CABARITAN ELEMENTARY SCHOOL / BANGUI CENTRAL SCHOOL"
                           : "e.g. PAGUDPUD NATIONAL HIGH SCHOOL / ADAMS NATIONAL HIGH SCHOOL"
                       }
-                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                      className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                         errors.lastSchoolAttended ? "border-red-600 bg-red-50" : "border-slate-300"
                       }`}
                     />
@@ -773,7 +723,7 @@ export default function Step1ApplicantType({
                           }
                         }}
                         placeholder="100XXX"
-                        className={`w-40 p-2.5 bg-white border-2 text-xs font-bold tracking-widest text-center focus:border-[#002060] outline-none rounded-[4px] ${
+                        className={`w-40 p-2.5 bg-white border-2 text-xs font-bold tracking-widest text-center focus:border-[#002060] outline-none rounded-xl ${
                           errors.lastSchoolId ? "border-red-600 bg-red-50" : "border-slate-300"
                         }`}
                       />
@@ -794,12 +744,11 @@ export default function Step1ApplicantType({
 
       {/* Confirmation Box of Selection */}
       {data.applicantType && data.targetGradeLevel && (
-        <div className="p-5 bg-blue-50 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-[4px]">
-          <div className="font-bold text-[#002060] tracking-wider flex items-center justify-between">
-            <span>Enrollment Classification Summary</span>
-            <span className="text-[11px] text-blue-900">VERIFIED</span>
+        <div className="p-4 sm:p-5 bg-blue-50/70 border-l-4 border-[#002060] text-xs space-y-1.5 shadow-xs rounded-lg">
+          <div className="font-bold text-[#002060] tracking-wider">
+            Enrollment Classification Summary
           </div>
-          <p className="text-slate-900 leading-relaxed">
+          <p className="text-slate-800 leading-relaxed">
             Applicant is registering as:{" "}
             <strong className="text-[#002060]">
               {data.applicantType === "Grade 7" && "Incoming Grade 7 (Junior High School)"}
@@ -819,11 +768,11 @@ export default function Step1ApplicantType({
       )}
 
       {/* Navigation Footer */}
-      <div className="border-t-2 border-slate-200 pt-6 flex flex-col sm:flex-row justify-end gap-3">
+      <div className="border-t border-slate-200 pt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-[4px]"
+          className="btn-primary text-xs tracking-wider font-bold py-3.5 px-8 text-center shadow-sm rounded-xl"
         >
           Proceed: Learner&apos;s Personal Information (Step 2)
         </button>

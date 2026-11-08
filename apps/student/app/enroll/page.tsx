@@ -161,9 +161,6 @@ Student Dashboard
             <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight mt-0.5">
               Official Online Basic Education Enrollment
             </h1>
-            <p className="text-xs text-blue-100 mt-0.5">
-              S.Y. {schoolYear} &bull; {semester}
-            </p>
           </div>
         </div>
         <div className="self-start sm:self-center shrink-0">
