@@ -197,11 +197,28 @@ function StudentGradesContent() {
   // Loading state while checking authentication
   if (isAuthLoading) {
     return (
-      <div className="max-w-4xl mx-auto p-12 bg-white border-2 border-slate-300 text-center space-y-3 rounded-[4px]">
-        <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-        <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-          Checking Student Authentication...
-        </span>
+      <div className="max-w-4xl mx-auto space-y-6 animate-pulse" aria-busy="true" aria-label="Checking Student Authentication">
+        {/* Header Skeleton */}
+        <div className="bg-white border-2 border-slate-300 p-5 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="h-4 w-44 bg-slate-200 rounded" />
+            <div className="h-6 w-60 bg-slate-200 rounded" />
+          </div>
+          <div className="h-12 w-48 bg-slate-100 rounded" />
+        </div>
+
+        {/* Tab strip skeleton */}
+        <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-[4px] border border-slate-300">
+          <div className="h-10 bg-slate-200 rounded" />
+          <div className="h-10 bg-slate-200 rounded" />
+          <div className="h-10 bg-slate-200 rounded" />
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="bg-white border-2 border-slate-300 p-8 rounded-[4px] space-y-4">
+          <div className="h-6 w-48 bg-slate-200 rounded" />
+          <div className="h-40 bg-slate-100 rounded" />
+        </div>
       </div>
     );
   }
@@ -355,11 +372,30 @@ function StudentGradesContent() {
 
       {/* Grade Card Content */}
       {isLoadingGrades ? (
-        <div className="bg-white border-2 border-slate-300 p-12 text-center rounded-[4px]">
-          <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <p className="text-xs font-mono text-slate-600">
-            Loading official grade records...
-          </p>
+        <div className="bg-white border-2 border-slate-300 rounded-[4px] shadow-xs overflow-hidden animate-pulse" aria-busy="true" aria-label="Loading official grade records">
+          {/* Grade Meta Header Skeleton */}
+          <div className="bg-slate-50 border-b border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-20 bg-slate-200 rounded" />
+                <div className="h-4 w-44 bg-slate-200 rounded" />
+              </div>
+              <div className="h-3.5 w-56 bg-slate-200 rounded" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-28 bg-slate-200 rounded" />
+              <div className="h-8 w-28 bg-slate-200 rounded" />
+            </div>
+          </div>
+          {/* Grade Card Body / Image Preview Skeleton */}
+          <div className="p-8 sm:p-12 flex flex-col items-center justify-center space-y-4 min-h-[300px] bg-slate-50/40">
+            <div className="w-14 h-14 rounded-full bg-slate-200" />
+            <div className="space-y-2 text-center">
+              <div className="h-4 w-48 bg-slate-200 rounded mx-auto" />
+              <div className="h-3 w-64 bg-slate-200 rounded mx-auto" />
+            </div>
+            <div className="w-full max-w-md h-36 bg-slate-200/70 rounded border border-slate-200" />
+          </div>
         </div>
       ) : gradeError ? (
         <div className="bg-red-50 border-2 border-red-300 p-6 rounded-[4px] text-xs text-red-950 font-mono space-y-2">
@@ -539,11 +575,15 @@ export default function StudentGradesPage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-4xl mx-auto p-12 bg-white border-2 border-slate-300 text-center space-y-3 rounded-[4px]">
-          <div className="w-6 h-6 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
-          <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-            Loading Academic Grade Records...
-          </span>
+        <div className="max-w-4xl mx-auto space-y-6 animate-pulse p-4">
+          <div className="bg-white border-2 border-slate-300 p-5 rounded-[4px] shadow-xs flex justify-between items-center">
+            <div className="space-y-2">
+              <div className="h-4 w-44 bg-slate-200 rounded" />
+              <div className="h-6 w-60 bg-slate-200 rounded" />
+            </div>
+            <div className="h-12 w-48 bg-slate-100 rounded" />
+          </div>
+          <div className="bg-white border-2 border-slate-300 p-8 rounded-[4px] h-64" />
         </div>
       }
     >

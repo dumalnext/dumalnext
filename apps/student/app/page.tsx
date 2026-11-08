@@ -22,7 +22,7 @@ function StudentHomeContent() {
   const searchParams = useSearchParams();
   const tabQuery = searchParams.get("tab");
   const noticeQuery = searchParams.get("notice") || searchParams.get("reason");
-  const { user, login, register, verifyEmailOtp, resendVerification, logout, refreshSession } = useAuth();
+  const { user, isLoading: isAuthLoading, login, register, verifyEmailOtp, resendVerification, logout, refreshSession } = useAuth();
   const { isEnrollmentOpen, schoolYear, semester, termNumber, closedMessage } = useEnrollmentControl();
   const { t } = useLanguage();
 
@@ -820,6 +820,91 @@ function StudentHomeContent() {
     }
     setIsResending(false);
   };
+
+  if (isAuthLoading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-pulse" aria-busy="true" aria-label="Loading Student Dashboard">
+        {/* LEFT COLUMN (4 COLS): ID CARD & QUICK LINKS SKELETON */}
+        <div className="lg:col-span-4 space-y-5">
+          {/* Official Digital Learner ID Card Skeleton */}
+          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+            <div className="bg-[#002060] text-white px-5 py-3.5 border-b-4 border-amber-400 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-[4px] bg-white/20" />
+                <div className="h-4 w-32 bg-white/30 rounded" />
+              </div>
+              <div className="h-5 w-14 bg-white/20 rounded-[4px]" />
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
+                <div className="w-14 h-14 rounded-full bg-slate-200 shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-2.5 w-24 bg-slate-200 rounded" />
+                  <div className="h-4.5 w-36 bg-slate-200 rounded" />
+                  <div className="h-3 w-28 bg-slate-200 rounded" />
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center justify-between py-1 border-b border-slate-50">
+                    <div className="h-3 w-20 bg-slate-200 rounded" />
+                    <div className="h-3.5 w-28 bg-slate-200 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Links Nav Skeleton */}
+          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm p-4 space-y-2">
+            <div className="h-3.5 w-36 bg-slate-200 rounded mb-3" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-9 w-full bg-slate-100 rounded-[4px]" />
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN (8 COLS): SUMMARY & TIMETABLE SKELETON */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Top 3 KPI Cards Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border border-slate-200/90 border-l-4 border-l-slate-300 rounded-[4px] p-4 shadow-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-[4px] bg-slate-100 shrink-0" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="h-2.5 w-20 bg-slate-200 rounded" />
+                  <div className="h-4 w-28 bg-slate-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Schedule Preview Skeleton */}
+          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <div className="h-4 w-48 bg-slate-200 rounded" />
+              <div className="h-7 w-32 bg-slate-200 rounded-[4px]" />
+            </div>
+            <div className="p-5 space-y-3">
+              <div className="h-10 bg-slate-100 rounded-[4px]" />
+              <div className="space-y-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-8 bg-slate-50 rounded" />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Enrollment CTA Skeleton */}
+          <div className="p-6 bg-white border border-slate-200/90 rounded-[4px] space-y-3 text-center">
+            <div className="h-3.5 w-48 bg-slate-200 rounded mx-auto" />
+            <div className="h-5 w-64 bg-slate-200 rounded mx-auto" />
+            <div className="h-9 w-44 bg-slate-200 rounded mx-auto" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-8">
@@ -2680,8 +2765,8 @@ export default function StudentHomePage() {
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-xs text-slate-500">
-          Loading Dumalneg NHS Student Portal...
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+          <PageCardSkeleton title="Loading Dumalneg NHS Student Portal..." rows={3} />
         </div>
       }
     >

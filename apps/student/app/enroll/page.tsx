@@ -1,3 +1,4 @@
+import { PageCardSkeleton } from "@/components/ui/PortalUI";
 "use client";
 
 import React, { useEffect } from "react";
@@ -20,13 +21,8 @@ export default function StudentEnrollPage() {
 
   if (isLoading && !user) {
     return (
-      <div className="max-w-4xl mx-auto p-8 bg-white border-2 border-slate-300 text-center rounded-[4px] shadow-sm">
-        <span className="text-xs font-bold text-[#002060] block mb-1">
-          Authenticating Applicant Session
-        </span>
-        <p className="text-xs font-bold text-slate-800">
-          Loading student console...
-        </p>
+      <div className="max-w-4xl mx-auto py-8">
+        <PageCardSkeleton title="Authenticating Applicant Session & Loading Console..." rows={4} />
       </div>
     );
   }

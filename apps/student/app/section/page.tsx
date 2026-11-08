@@ -1467,11 +1467,8 @@ export default function SectionPage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-5xl mx-auto py-12 px-4 text-center">
-          <div className="w-8 h-8 border-4 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">
-            Loading Class Section Module...
-          </span>
+        <div className="max-w-5xl mx-auto py-8 px-4">
+          <PageCardSkeleton title="Loading Class Section Module..." rows={3} />
         </div>
       }
     >

@@ -996,9 +996,10 @@ function TrackApplicationContent() {
                 </div>
 
                 {isLoadingTimetable && timetableSchedules.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-slate-500">
-                    <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                    Loading section timetable periods...
+                  <div className="space-y-2 p-4 animate-pulse">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-10 bg-slate-100 rounded-[4px] w-full" />
+                    ))}
                   </div>
                 ) : filteredTimetable.length === 0 ? (
                   <div className="p-6 bg-slate-50 border border-slate-200 text-center space-y-1 rounded-[4px]">
@@ -1068,9 +1069,10 @@ function TrackApplicationContent() {
               /* TAB 2: OFFICIAL ENROLLED SUBJECTS */
               <div>
                 {isLoadingTimetable && enrolledSubjects.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-slate-500">
-                    <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                    Loading official enrolled subjects...
+                  <div className="space-y-2 p-4 animate-pulse">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="h-10 bg-slate-100 rounded-[4px] w-full" />
+                    ))}
                   </div>
                 ) : enrolledSubjects.length === 0 ? (
                   <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center rounded-[4px]">
@@ -1197,8 +1199,8 @@ export default function TrackApplicationPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-xs text-slate-500">
-          Loading application tracking interface...
+        <div className="max-w-4xl mx-auto py-8">
+          <PageCardSkeleton title="Loading application tracking interface..." rows={3} />
         </div>
       }
     >
