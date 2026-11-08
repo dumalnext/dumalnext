@@ -650,40 +650,6 @@ function TrackApplicationContent() {
            SCENARIO 1: ENROLLMENT APPLICATION FOUND (AUTOMATIC LIVE TRACKING CARD)
            ========================================================================= */
         <div className="space-y-4">
-          {/* Active Academic Term Enrollment Open Advisory (only if user has no pending or active application for this year) */}
-          {!allRecords.some((r) => {
-            if (r.status === "Pending") return true;
-            const isSameSY = normalizeSchoolYear(r.schoolYear) === normalizeSchoolYear(schoolYear);
-            return isSameSY || isApplicationInTerm(r.rawApp, schoolYear, termNumber || semester);
-          }) && isEnrollmentOpen && (
-            <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-emerald-950 block">
-                    Enrollment is Open for S.Y. {schoolYear}
-                  </span>
-                  <p className="text-[11px] text-emerald-800 font-medium">
-                    Submit your enrollment application for the active academic term.
-                  </p>
-                </div>
-              </div>
-              <Link
-                href="/enroll"
-                className="btn-primary text-xs font-bold py-2 px-4 shrink-0 inline-flex items-center justify-center gap-1.5 rounded-[4px]"
-              >
-                <span>Enroll Now</span>
-                <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          )}
-
           {/* Multi-Term Application Selector */}
           {allRecords.length > 1 && (
             <div className="p-3 bg-white border border-slate-300 flex flex-wrap items-center gap-2 text-xs rounded-[4px]">
@@ -737,19 +703,19 @@ function TrackApplicationContent() {
                 {record.status === "Pending" && (
                   <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border border-amber-400 shadow-2xs rounded-[4px]">
                     <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0" />
-                    Status: Pending Verification
+                    Pending
                   </span>
                 )}
                 {record.status === "Approved" && (
                   <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-500 shadow-2xs rounded-[4px]">
                     <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" />
-                    Status: Approved &amp; Enrolled
+                    Approved
                   </span>
                 )}
                 {record.status === "Needs Revision" && (
                   <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-red-50 text-red-900 border border-red-500 shadow-2xs rounded-[4px]">
                     <span className="w-2 h-2 rounded-full bg-red-600 inline-block shrink-0" />
-                    Status: Needs Revision
+                    Needs Revision
                   </span>
                 )}
               </div>
