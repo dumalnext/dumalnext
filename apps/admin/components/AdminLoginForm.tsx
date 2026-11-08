@@ -246,90 +246,62 @@ function AdminLoginFormInner() {
                       ? "Administrator Account Onboarding"
                       : "Enrollment Adjudication & Registrar Console"}
                   </h2>
-                  <p className="text-xs sm:text-sm text-blue-100/90">
-                    Dumalneg National High School &bull; DepEd Division of Ilocos Norte
-                  </p>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-blue-100/90 mt-5 leading-relaxed">
+              <p className="text-xs sm:text-sm text-blue-100/90 mt-4 leading-relaxed">
                 {invitation
-                  ? "Your official Registrar & Administrator invitation has been verified by IT Support. Set up your security password to activate your administrative access."
-                  : "Authorized management workspace for the School Principal, Registrar, and Admissions Committee. Evaluate learner applications, inspect PSA birth certificates and SF9 report cards, manage section capacities, and resolve master timetable conflicts."}
+                  ? "Create your security password to activate your administrative access."
+                  : "Evaluate learner applications, inspect PSA documents, manage section capacities, and resolve master timetables."}
               </p>
             </div>
 
             {/* 4 Core Registrar Modules Grid */}
             <div className="p-6 sm:p-8 bg-white space-y-5">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div>
-                  <span className="text-[11px] font-bold text-[#002060] uppercase tracking-wider block">
-                    Registrar &amp; Admissions Modules
-                  </span>
-                  <h3 className="text-base font-bold text-slate-900">
-                    Integrated Enrollment Administration Tools
-                  </h3>
-                </div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Integrated Enrollment Administration Tools
+                </h3>
                 <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
                   Audited Access
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      01
-                    </span>
-                    <span>Enrollment Adjudication Queue</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Inspect submitted PSA birth certificates and Form 138 report cards side-by-side, approve applications, or request document revisions.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">Enrollment Adjudication Queue</span>
                 </div>
 
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      02
-                    </span>
-                    <span>Section Quotas &amp; Capacity</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Enforce DepEd standard section ceilings (40 learners per class) across Junior High School and Senior High School tracks.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">Section Quotas &amp; Capacity</span>
                 </div>
 
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      03
-                    </span>
-                    <span>3D Schedule Deconfliction</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Automatically detect and prevent teacher double-booking, classroom collisions, and SHS subject overload.
-                  </p>
+                  <span className="text-[#002060] font-bold text-xs">3D Schedule Deconfliction</span>
                 </div>
 
-                <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors space-y-1.5">
-                  <div className="flex items-center gap-2 text-[#002060] font-bold text-xs">
-                    <span className="w-6 h-6 rounded-md bg-[#002060] text-amber-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                      04
-                    </span>
-                    <span>Enrollment & Grade Control Room</span>
+                <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Toggle online student registration windows open or closed, configure active School Year parameters, and broadcast advisories.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-3.5 rounded-lg bg-amber-50/80 border border-amber-200/80 flex items-start gap-3 text-xs text-amber-950">
-                <svg className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <div className="leading-relaxed">
-                  <strong className="font-bold">Security Audit Notice:</strong> All enrollment approvals, section capacity overrides, and status transitions are logged under your Registrar account.
+                  <span className="text-[#002060] font-bold text-xs">Enrollment &amp; Grade Control Room</span>
                 </div>
               </div>
             </div>
@@ -342,14 +314,16 @@ function AdminLoginFormInner() {
             /* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */
             <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
               <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3">
-                <div>
-                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
-                      Official Invitation Verified
-                    </span>
-                    <h3 className="text-base font-extrabold text-slate-900">
-                      Create Registrar Password
-                    </h3>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
+                  <h3 className="text-base font-extrabold text-slate-900">
+                    Create Registrar Password
+                  </h3>
+                </div>
                 <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-blue-100 text-[#002060] border border-blue-200 rounded-full">
                   Admin Role
                 </span>
@@ -379,9 +353,6 @@ function AdminLoginFormInner() {
                       disabled
                       className="w-full px-3.5 py-2.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-medium cursor-not-allowed select-all"
                     />
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Account is permanently bound to this verified email address.
-                    </p>
                   </div>
 
                   <div>
@@ -469,9 +440,12 @@ function AdminLoginFormInner() {
                     <button
                       type="submit"
                       disabled={isActivating || Boolean(activationSuccess)}
-                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold tracking-wide transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold tracking-wide transition-colors shadow-sm cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isActivating ? "Activating Account..." : "Activate Admin Account & Sign In"}
+                      <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      <span>{isActivating ? "Activating Account..." : "Activate Admin Account & Sign In"}</span>
                     </button>
                   </div>
                 </form>
@@ -481,16 +455,15 @@ function AdminLoginFormInner() {
             /* CASE 2: NORMAL LOGIN FORM */
             <div className="bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] shadow-md overflow-hidden">
               <div className="p-6 sm:p-7 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3.5">
-                <div>
-                  <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider block">
-                    Registrar &amp; Admissions Sign-In
-                  </span>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#002060]/10 border border-[#002060]/20 flex items-center justify-center text-[#002060] shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
                   <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
                     Administrator Portal Login
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Sign in with your authorized DepEd Registrar credentials
-                  </p>
                 </div>
               </div>
 
@@ -610,8 +583,11 @@ function AdminLoginFormInner() {
                     <button
                       type="submit"
                       disabled={isLoggingIn}
-                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold tracking-wide transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+                      className="w-full py-3 px-4 rounded-lg bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold tracking-wide transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
                     >
+                      <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                      </svg>
                       <span>{isLoggingIn ? "Signing In to Console..." : "Sign In to Administration Console"}</span>
                     </button>
                   </div>
