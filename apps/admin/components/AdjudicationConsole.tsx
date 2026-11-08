@@ -587,6 +587,22 @@ export default function AdjudicationConsole() {
     const isSHS = Number(app.target_grade_level) >= 11;
     const shsInfo = isSHS ? getShsInfo(app) : null;
 
+    let singleElective = "";
+    if (isSHS) {
+      if ((app as any).selected_electives?.[0]?.assigned_elective_name) {
+        singleElective = (app as any).selected_electives[0].assigned_elective_name;
+      } else if (shsInfo && shsInfo.electives.length > 0) {
+        const el = shsInfo.electives[0];
+        const mapped = subjectsMap.get(el.toLowerCase());
+        singleElective = mapped || el;
+      } else if ((app as any).selected_electives?.[0]?.assigned_elective_section_name) {
+        singleElective = ((app as any).selected_electives[0].assigned_elective_section_name as string)
+          .replace(/^Grade\s+\d+\s*(Elective\s*[-–—:]\s*)?/i, "")
+          .replace(/^Elective\s*[-–—:]\s*/i, "")
+          .trim();
+      }
+    }
+
     return (
       <tr key={app.id} className="hover:bg-slate-50 transition-colors">
         <td className="p-3 font-mono font-bold text-[#002060]">
@@ -608,30 +624,19 @@ export default function AdjudicationConsole() {
           )}
         </td>
         <td className="p-3">
-          {isSHS && shsInfo ? (
-            <div className="space-y-0.5">
+          {isSHS ? (
+            <div className="space-y-1">
               <span className="font-bold text-slate-900 text-xs block">
-                {shsInfo.trackTitle}
+                {shsInfo?.trackTitle || "Academic Track"}
               </span>
-              {shsInfo.isTechPro ? (
+              {singleElective ? (
+                <span className="text-[10px] font-medium text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 inline-block">
+                  Elective: {singleElective}
+                </span>
+              ) : shsInfo?.isTechPro ? (
                 <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 border border-slate-200 rounded inline-block">
                   Fixed Tech-Pro Curriculum
                 </span>
-              ) : shsInfo.electives.length > 0 ? (
-                <div className="flex flex-wrap gap-1 mt-0.5">
-                  {shsInfo.electives.map((el) => {
-                    const name = subjectsMap.get(el.toLowerCase());
-                    return (
-                      <span
-                        key={el}
-                        className="text-[10px] font-medium text-[#002060] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block"
-                        title={name || el}
-                      >
-                        Elective: {name ? `${el} (${name})` : el}
-                      </span>
-                    );
-                  })}
-                </div>
               ) : (
                 <span className="text-[10px] font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block">
                   Pending Elective Selection
@@ -643,35 +648,6 @@ export default function AdjudicationConsole() {
               JHS Regular Curriculum
             </span>
           )}
-          
-          <div className="flex flex-wrap items-center gap-1 mt-1.5">
-            <span className="text-[10px] font-medium text-[#002060] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block">
-              S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
-            </span>
-            {st?.current_section_id && (() => {
-              const rawName = sections.find((s) => s.id === st.current_section_id)?.section_name || "";
-              const cleanName = rawName.replace(/^Grade\s+\d+\s*[-–—:]\s*/i, "").trim() || rawName || "Section Assigned";
-              const label = /^section/i.test(cleanName) ? cleanName : `Section: ${cleanName}`;
-              return (
-                <span className="text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
-                  {label}
-                </span>
-              );
-            })()}
-            {app.target_grade_level >= 11 && (() => {
-              const rawElectiveSec = (app as any).selected_electives?.[0]?.assigned_elective_section_name;
-              const rawElectiveName = (app as any).selected_electives?.[0]?.assigned_elective_name;
-              const electiveVal = rawElectiveSec || (rawElectiveName ? `Elective - ${rawElectiveName}` : null);
-              if (!electiveVal) return null;
-              const cleanElective = electiveVal.replace(/^Grade\s+\d+\s*(Elective\s*[-–—:]\s*)?/i, "").trim();
-              const electiveLabel = /^elective/i.test(cleanElective) ? cleanElective : `Elective: ${cleanElective}`;
-              return (
-                <span className="text-[10px] font-medium text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 inline-block">
-                  {electiveLabel}
-                </span>
-              );
-            })()}
-          </div>
         </td>
         <td className="p-3 font-mono text-slate-600">
           {new Date(app.created_at).toLocaleDateString()}
@@ -745,8 +721,8 @@ export default function AdjudicationConsole() {
 
   return (
     <div className="space-y-6">
-      {/* Title & Real-Time Sync Banner */}
-      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-xs bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Title Banner */}
+      <div className="rounded-xl overflow-hidden border border-slate-200 shadow-xs bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-t-amber-400 p-5 sm:p-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <img
             src="/dumalneg-logo.png"
@@ -765,44 +741,6 @@ export default function AdjudicationConsole() {
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Live Real-time Status Badge */}
-          <div className="flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-xs px-3.5 py-1.5 rounded-lg text-xs font-medium text-white">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-            <span>Real-Time Queue Sync</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Active Academic Period Context Banner */}
-      <div className="p-4 bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-          <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
-            Active Academic Period &bull; S.Y. {activeTerm?.schoolYear || "2026-2027"} &bull; {activeTerm?.termName || "Trimester 1"}
-          </span>
-          <span className="text-xs text-slate-600">
-            {selectedSY === "ACTIVE" && selectedTerm === "ACTIVE" ? (
-              <span>Showing <strong>enrollees for this active term</strong>.</span>
-            ) : (
-              <span>Custom filter applied: <strong>S.Y. {effectiveSY} &bull; {effectiveTerm}</strong>.</span>
-            )}
-          </span>
-        </div>
-
-        {(selectedSY !== "ACTIVE" || selectedTerm !== "ACTIVE") && (
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedSY("ACTIVE");
-              setSelectedTerm("ACTIVE");
-            }}
-            className="px-3.5 py-1.5 rounded-lg bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs transition-colors shrink-0 shadow-xs cursor-pointer"
-          >
-            Reset to Active Term
-          </button>
-        )}
       </div>
 
       {/* Executive KPI Metric Cards (Real-Time Dynamic Recalculation) */}
@@ -920,13 +858,13 @@ export default function AdjudicationConsole() {
 
       {/* Filter Controls & Search Bar */}
       <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-3.5 shadow-2xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          {/* Status Tabs */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs font-semibold">
+        <div className="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-3">
+          {/* Status Tabs (Strictly 1 Row) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 2xl:pb-0 shrink-0">
             <button
               type="button"
               onClick={() => setStatusFilter("ALL")}
-              className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
                 statusFilter === "ALL"
                   ? "bg-[#002060] text-white border-[#002060] shadow-2xs"
                   : "bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200"
@@ -941,7 +879,7 @@ export default function AdjudicationConsole() {
             <button
               type="button"
               onClick={() => setStatusFilter("Pending")}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
                 statusFilter === "Pending"
                   ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-2xs"
                   : "bg-amber-50/70 text-amber-900 hover:bg-amber-100 border-amber-200"
@@ -957,7 +895,7 @@ export default function AdjudicationConsole() {
             <button
               type="button"
               onClick={() => setStatusFilter("Approved")}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
                 statusFilter === "Approved"
                   ? "bg-emerald-600 text-white border-emerald-700 font-bold shadow-2xs"
                   : "bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100 border-emerald-200"
@@ -973,7 +911,7 @@ export default function AdjudicationConsole() {
             <button
               type="button"
               onClick={() => setStatusFilter("Needs Revision")}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors whitespace-nowrap text-xs font-semibold shrink-0 cursor-pointer ${
                 statusFilter === "Needs Revision"
                   ? "bg-rose-600 text-white border-rose-700 font-bold shadow-2xs"
                   : "bg-rose-50/70 text-rose-900 hover:bg-rose-100 border-rose-200"
@@ -987,43 +925,40 @@ export default function AdjudicationConsole() {
             </button>
           </div>
 
-          {/* Academic Period, Grade & Search Filter Controls */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-wrap items-center gap-2 w-full lg:w-auto">
+          {/* Academic Period, Grade & Search Filter Controls (Aligned in 1 Row) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 2xl:pb-0 shrink-0">
             {/* School Year Selector */}
-            <div className="w-full sm:w-auto">
+            <div className="w-40 sm:w-44 shrink-0">
               <CustomSelect
                 label="SY:"
                 value={selectedSY}
                 onChange={setSelectedSY}
                 options={syOptions}
-                fullWidth
               />
             </div>
 
             {/* Term / Trimester Selector */}
-            <div className="w-full sm:w-auto">
+            <div className="w-42 sm:w-48 shrink-0">
               <CustomSelect
                 label="Term:"
                 value={selectedTerm}
                 onChange={setSelectedTerm}
                 options={termOptions}
-                fullWidth
               />
             </div>
 
             {/* Grade Selector */}
-            <div className="w-full sm:w-auto">
+            <div className="w-38 sm:w-44 shrink-0">
               <CustomSelect
                 label="Grade:"
                 value={gradeFilter}
                 onChange={setGradeFilter}
                 options={gradeOptions}
-                fullWidth
               />
             </div>
 
-            {/* Search Input with Icon */}
-            <div className="relative w-full sm:col-span-3 lg:col-span-1 lg:w-64">
+            {/* Search Input with Icon (In the exact same row as dropdowns) */}
+            <div className="relative w-36 sm:w-48 shrink-0">
               <svg className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -1036,8 +971,8 @@ export default function AdjudicationConsole() {
                     setSelectedApp(filteredApplications[0]);
                   }
                 }}
-                placeholder="Search LRN, Ref, Name..."
-                className="w-full pl-8 pr-7 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none transition-all"
+                placeholder="Search"
+                className="w-full pl-8 pr-7 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none transition-all h-[36px]"
               />
               {searchQuery && (
                 <button
