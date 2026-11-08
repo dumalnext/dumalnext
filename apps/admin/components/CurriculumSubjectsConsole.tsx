@@ -718,20 +718,9 @@ export default function CurriculumSubjectsConsole() {
             className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
           />
           <div>
-            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
-                DepEd Course Catalog &amp; Subject Offerings
-              </span>
-              <span className="text-[10px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-2 py-0.5 rounded-full uppercase">
-                Live Subject Catalog
-              </span>
-            </div>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
               Curriculum &amp; Subjects Management Console
             </h2>
-            <p className="text-xs text-blue-100/85 mt-0.5 max-w-2xl leading-relaxed">
-              Manage official learning areas and subjects across Junior High School (Grades 7–10) and Senior High School (Grades 11–12) at Dumalneg National High School.
-            </p>
           </div>
         </div>
 
@@ -957,27 +946,16 @@ export default function CurriculumSubjectsConsole() {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. JHS (HEADINGS) SECTION */}
+      {/* 1. JHS SECTION */}
       {/* ========================================================================= */}
       {!isLoading && (
         <section className="border-4 border-[#002060] bg-slate-50 shadow-md">
           {/* Main JHS Heading Bar */}
           <div className="bg-[#002060] text-white p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-mono uppercase tracking-widest bg-blue-900 border border-blue-300/40 px-2 py-0.5 font-bold text-blue-200">
-                  DEPED BASIC EDUCATION
-                </span>
-                <span className="text-[10px] font-mono uppercase bg-emerald-900/90 border border-emerald-400/40 px-2 py-0.5 font-bold text-emerald-200">
-                  Grades 7, 8, 9, and 10
-                </span>
-              </div>
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight uppercase text-white">
-                JHS (Headings)
+                Junior High School (JHS)
               </h3>
-              <p className="text-xs text-blue-100 mt-0.5 max-w-xl">
-                Junior High School official learning areas for Regular Basic Education.
-              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -996,38 +974,38 @@ export default function CurriculumSubjectsConsole() {
 
           {/* JHS Sub-Headings Stack */}
           <div className="p-4 sm:p-6 space-y-2">
-            {/* Grade 7 Sub-Heading */}
+            {/* Grade 7 */}
             {renderSubjectTable(
               jhsGrade7,
               7,
-              "Grade 7 (Sub Headings)",
+              "Grade 7",
               "Regular",
               "+ Add Grade 7 Subject"
             )}
 
-            {/* Grade 8 Sub-Heading */}
+            {/* Grade 8 */}
             {renderSubjectTable(
               jhsGrade8,
               8,
-              "Grade 8 (Sub Headings)",
+              "Grade 8",
               "Regular",
               "+ Add Grade 8 Subject"
             )}
 
-            {/* Grade 9 Sub-Heading */}
+            {/* Grade 9 */}
             {renderSubjectTable(
               jhsGrade9,
               9,
-              "Grade 9 (Sub Headings)",
+              "Grade 9",
               "Regular",
               "+ Add Grade 9 Subject"
             )}
 
-            {/* Grade 10 Sub-Heading */}
+            {/* Grade 10 */}
             {renderSubjectTable(
               jhsGrade10,
               10,
-              "Grade 10 (Sub Headings)",
+              "Grade 10",
               "Regular",
               "+ Add Grade 10 Subject"
             )}
@@ -1036,27 +1014,16 @@ export default function CurriculumSubjectsConsole() {
       )}
 
       {/* ========================================================================= */}
-      {/* 2. SHS (HEADINGS) SECTION */}
+      {/* 2. SHS SECTION */}
       {/* ========================================================================= */}
       {!isLoading && (
         <section className="border-4 border-[#0b3c7e] bg-slate-50 shadow-md">
           {/* Main SHS Heading Bar */}
           <div className="bg-[#0b3c7e] text-white p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-mono uppercase tracking-widest bg-blue-950 border border-blue-300/40 px-2 py-0.5 font-bold text-blue-200">
-                  DEPED SENIOR HIGH SCHOOL
-                </span>
-                <span className="text-[10px] font-mono uppercase bg-indigo-900/90 border border-indigo-400/40 px-2 py-0.5 font-bold text-indigo-200">
-                  Grades 11 and 12
-                </span>
-              </div>
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight uppercase text-white">
-                SHS (Headings)
+                Senior High School (SHS)
               </h3>
-              <p className="text-xs text-blue-100 mt-0.5 max-w-xl">
-                Senior High School Academic Tracks (STEM, HUMSS, TVL-ICT) and General Core subject offerings.
-              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1075,36 +1042,36 @@ export default function CurriculumSubjectsConsole() {
 
           {/* SHS Sub-Headings Stack */}
           <div className="p-4 sm:p-6 space-y-4">
-            {/* Grade 11 Academic (Sub Headings) */}
+            {/* Grade 11 Academic */}
             {renderSeparatedTrackBox(
-              "Grade 11 Academic (Sub Headings)",
+              "Grade 11 Academic",
               shsGrade11AcademicCore,
               shsGrade11AcademicElectives,
               "Academic",
               11
             )}
 
-            {/* Grade 11 Techpro (Sub Headings) */}
+            {/* Grade 11 Techpro */}
             {renderSeparatedTrackBox(
-              "Grade 11 Techpro (Sub Headings)",
+              "Grade 11 Tech-Pro",
               shsGrade11TechproCore,
               shsGrade11TechproElectives,
               "TechPro",
               11
             )}
 
-            {/* Grade 12 Academic (Sub Headings) */}
+            {/* Grade 12 Academic */}
             {renderSeparatedTrackBox(
-              "Grade 12 Academic (Sub Headings)",
+              "Grade 12 Academic",
               shsGrade12AcademicCore,
               shsGrade12AcademicElectives,
               "Academic",
               12
             )}
 
-            {/* Grade 12 Techpro (Sub Headings) */}
+            {/* Grade 12 Techpro */}
             {renderSeparatedTrackBox(
-              "Grade 12 Techpro (Sub Headings)",
+              "Grade 12 Tech-Pro",
               shsGrade12TechproCore,
               shsGrade12TechproElectives,
               "TechPro",

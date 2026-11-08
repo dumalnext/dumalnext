@@ -1171,28 +1171,6 @@ export default function ScheduleDeconflictionConsole() {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* AUDIT STATUS BANNER & METRICS */}
-      {/* ========================================================================= */}
-      <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs no-print print:hidden">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
-          {isLoading ? (
-            <span className="inline-block w-64 h-4 bg-emerald-200/60 animate-pulse rounded" />
-          ) : (
-            <>
-              <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-                STATUS: 0 TIMETABLE CONFLICTS DETECTED
-              </span>
-              <span className="text-xs text-emerald-900">&bull; {scanSummary}</span>
-            </>
-          )}
-        </div>
-        <span className="text-[10px] font-mono text-emerald-800">
-          Last Scan: {lastScanTime}
-        </span>
-      </div>
-
       {/* 3 Pillars of Conflict Checking Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print print:hidden">
         <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
@@ -1298,7 +1276,9 @@ export default function ScheduleDeconflictionConsole() {
                 onChange={setSelectedSectionId}
                 options={sections.map((sec) => ({
                   value: sec.id,
-                  label: `${sec.section_name} (Grade ${sec.grade_level}${sec.strand ? ` • ${sec.strand}` : ""})`,
+                  label: sec.section_name.startsWith(`Grade ${sec.grade_level}`)
+                    ? (sec.grade_level >= 11 && sec.strand ? `${sec.section_name} (${sec.strand})` : sec.section_name)
+                    : `Grade ${sec.grade_level} - ${sec.section_name}${sec.grade_level >= 11 && sec.strand ? ` (${sec.strand})` : ""}`,
                 }))}
               />
             </div>
@@ -1421,8 +1401,7 @@ export default function ScheduleDeconflictionConsole() {
               {currentSection && (
                 <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono no-print print:hidden">
                   <div>
-                    Class Program: <strong className="text-[#002060] text-sm uppercase">{currentSection.section_name}</strong> &bull; Grade: <strong>Grade {currentSection.grade_level}</strong>
-                    {currentSection.strand && <> &bull; Strand: <strong>{currentSection.strand}</strong></>}
+                    Class Program: <strong className="text-[#002060] text-sm uppercase">{currentSection.section_name}</strong>
                   </div>
                   <div className="flex items-center gap-3 text-slate-700">
                     <div>
@@ -1441,10 +1420,10 @@ export default function ScheduleDeconflictionConsole() {
                 <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
               <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
-                <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
+                <table className="w-full border-collapse text-xs font-sans min-w-[650px] md:min-w-0">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
+                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-mono border-r border-blue-900">
                         Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
@@ -1560,7 +1539,7 @@ export default function ScheduleDeconflictionConsole() {
                                       setDraggedSchedule(null);
                                       setDragOverSlot(null);
                                     }}
-                                    className={`p-2.5 border transition-all shadow-2xs space-y-1 relative group cursor-grab active:cursor-grabbing select-none ${
+                                    className={`p-3 rounded-lg border transition-all shadow-2xs space-y-1.5 relative group cursor-grab active:cursor-grabbing select-none ${
                                       isCurrentlyDragged
                                         ? "opacity-30 border-2 border-dashed border-[#002060] scale-[0.98] bg-blue-50"
                                         : isElective
@@ -1583,13 +1562,7 @@ export default function ScheduleDeconflictionConsole() {
                                         >
                                           ⠿
                                         </div>
-                                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 border ${
-                                          isElective
-                                            ? "text-purple-950 bg-white border-purple-200"
-                                            : "text-blue-950 bg-white border-blue-200"
-                                        }`}>
-                                          {formatTimeRange12h(matchedItem.start_time, matchedItem.end_time)}
-                                        </span>
+                                        
                                         {isElective && (
                                           <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
                                             Elective
@@ -1730,10 +1703,10 @@ export default function ScheduleDeconflictionConsole() {
                 <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
               <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
-                <table className="w-full border-collapse text-xs font-sans min-w-[750px]">
+                <table className="w-full border-collapse text-xs font-sans min-w-[650px] md:min-w-0">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-44 text-left font-mono border-r border-blue-900">
+                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-mono border-r border-blue-900">
                         Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
@@ -1847,7 +1820,7 @@ export default function ScheduleDeconflictionConsole() {
                                       setDraggedSchedule(null);
                                       setDragOverSlot(null);
                                     }}
-                                    className={`p-2.5 border transition-all shadow-2xs space-y-1 relative group cursor-grab active:cursor-grabbing select-none ${
+                                    className={`p-3 rounded-lg border transition-all shadow-2xs space-y-1.5 relative group cursor-grab active:cursor-grabbing select-none ${
                                       isCurrentlyDragged
                                         ? "opacity-30 border-2 border-dashed border-emerald-700 scale-[0.98] bg-emerald-50"
                                         : isElective
@@ -1870,13 +1843,7 @@ export default function ScheduleDeconflictionConsole() {
                                         >
                                           ⠿
                                         </div>
-                                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 border ${
-                                          isElective
-                                            ? "text-purple-950 bg-white border-purple-200"
-                                            : "text-emerald-950 bg-white border-emerald-300"
-                                        }`}>
-                                          {formatTimeRange12h(matchedItem.start_time, matchedItem.end_time)}
-                                        </span>
+                                        
                                         {isElective && (
                                           <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
                                             Elective

@@ -203,27 +203,10 @@ export default function EnrollmentControlRoom() {
             className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-sm shrink-0 hidden sm:block"
           />
           <div>
-            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-              Enrollment &amp; Grade Control Room &bull; Master System Operations
-            </span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
               Online Enrollment &amp; Grade Master Control Room
             </h2>
-            <p className="text-xs text-blue-100/85 mt-0.5">
-              Configure the master online enrollment and grade submission switches, active School Year (S.Y.), and institutional student advisories.
-            </p>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2.5 bg-white/10 border border-white/20 backdrop-blur-xs px-3.5 py-2 rounded-lg shrink-0">
-          <span
-            className={`w-3 h-3 rounded-full ${
-              settings.isEnrollmentOpen ? "bg-emerald-400 animate-pulse" : "bg-red-400"
-            }`}
-          />
-          <span className="text-xs font-bold uppercase tracking-wide text-white">
-            {settings.isEnrollmentOpen ? "System Open (Active)" : "System Closed (Offline)"}
-          </span>
         </div>
       </div>
 
@@ -278,17 +261,6 @@ export default function EnrollmentControlRoom() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <span
-                className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
-                  settings.isEnrollmentOpen
-                    ? "bg-emerald-200 text-emerald-950 border-emerald-400"
-                    : "bg-red-200 text-red-950 border-red-400"
-                }`}
-              >
-                {settings.isEnrollmentOpen
-                  ? "Status: Enrollment is Active & Open"
-                  : "Status: Enrollment is Officially Closed"}
-              </span>
               <span className="text-xs font-medium text-slate-600">
                 School Year: <strong>{settings.schoolYear}</strong>
               </span>
@@ -299,20 +271,6 @@ export default function EnrollmentControlRoom() {
                 ? "Dumalneg NHS Online Enrollment System is currently accepting applications"
                 : "Dumalneg NHS Online Enrollment System is currently closed to new applicants"}
             </h3>
-
-            <p className="text-xs text-slate-700 leading-relaxed">
-              {settings.isEnrollmentOpen ? (
-                <>
-                  Students can sign in, click <strong>&ldquo;Start 5-Step Online Enrollment Form&rdquo;</strong>, 
-                  and submit their learner profiles and documentary credentials for <strong>S.Y. {settings.schoolYear}</strong>.
-                </>
-              ) : (
-                <>
-                  Students can still log in and create accounts, but clicking on the enrollment form will display 
-                  the official <strong>DepEd Closed Advisory</strong>. No new applications can be filled out or submitted.
-                </>
-              )}
-            </p>
           </div>
 
           {/* Master Switch Button */}
@@ -335,9 +293,6 @@ export default function EnrollmentControlRoom() {
                 "Turn On / Open Online Enrollment"
               )}
             </button>
-            <span className="text-[11px] text-slate-500 text-center sm:text-right">
-              Click to toggle &bull; Broadcasts instantly to student portal
-            </span>
           </div>
         </div>
       </div>
@@ -358,17 +313,6 @@ export default function EnrollmentControlRoom() {
               <span className="px-2.5 py-0.5 rounded-sm bg-[#002060] text-amber-300 font-mono font-bold text-xs uppercase tracking-wider">
                 GRADE
               </span>
-              <span
-                className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
-                  settings.isGradeOpen !== false
-                    ? "bg-emerald-200 text-emerald-950 border-emerald-400"
-                    : "bg-red-200 text-red-950 border-red-400"
-                }`}
-              >
-                {settings.isGradeOpen !== false
-                  ? "Status: Grade is Active & Open"
-                  : "Status: Grade is Officially Closed / Off"}
-              </span>
               <span className="text-xs font-medium text-slate-600">
                 School Year: <strong>{settings.schoolYear}</strong>
               </span>
@@ -379,18 +323,6 @@ export default function EnrollmentControlRoom() {
                 ? "Dumalneg NHS Grade Management System is currently ON and open for grade entry"
                 : "Dumalneg NHS Grade Management System is currently OFF and locked"}
             </h3>
-
-            <p className="text-xs text-slate-700 leading-relaxed">
-              {settings.isGradeOpen !== false ? (
-                <>
-                  Faculty teachers can encode, edit, and submit academic ratings and student quarter evaluations for <strong>S.Y. {settings.schoolYear}</strong>.
-                </>
-              ) : (
-                <>
-                  Grade submission and encoding is currently <strong>locked / off</strong>. Faculty teachers cannot modify or submit new student grades at this time.
-                </>
-              )}
-            </p>
           </div>
 
           {/* Master Grade Switch Button */}
@@ -413,9 +345,6 @@ export default function EnrollmentControlRoom() {
                 "Turn On Grade"
               )}
             </button>
-            <span className="text-[11px] text-slate-500 text-center sm:text-right">
-              Click to toggle &bull; On / Off Grade control
-            </span>
           </div>
         </div>
       </div>
@@ -426,7 +355,7 @@ export default function EnrollmentControlRoom() {
       <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-6 shadow-xs">
         <div className="border-b border-slate-200 pb-2">
           <span className="font-bold text-[#002060] uppercase tracking-wider text-xs">
-            DepEd Academic Year (S.Y.) &amp; Term Parameters &bull; Synchronized from IT Support
+            DepEd Academic Year (S.Y.) &amp; Term Parameters
           </span>
         </div>
 
@@ -436,15 +365,9 @@ export default function EnrollmentControlRoom() {
             <label className="text-xs font-bold text-slate-900 block">
               Official DepEd School Year (S.Y.):
             </label>
-            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-300 font-extrabold text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2">
+            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-300 font-extrabold text-sm text-[#002060]">
               <span>{settings.schoolYear}</span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-700 text-white font-bold text-[10px] uppercase tracking-wider">
-                Synced from IT Support
-              </span>
             </div>
-            <span className="text-[11px] text-slate-500 block leading-normal">
-              This School Year is automatically dictated by IT Support&apos;s active academic calendar. Administrators cannot manually modify this to prevent institutional desynchronization.
-            </span>
           </div>
 
           {/* Active Academic Term (Synced from IT Support) */}
@@ -452,15 +375,9 @@ export default function EnrollmentControlRoom() {
             <label className="text-xs font-bold text-slate-900 block">
               Active Trimester / Term:
             </label>
-            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-300 font-extrabold text-sm text-[#002060] flex flex-wrap items-center justify-between gap-2">
+            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-300 font-extrabold text-sm text-[#002060]">
               <span>{settings.semester}</span>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#002060] text-white font-bold text-[10px] uppercase tracking-wider">
-                Active Trimester
-              </span>
             </div>
-            <span className="text-[11px] text-slate-500 block leading-normal">
-              Official academic term currently active at Dumalneg National High School, established in the IT Support Console.
-            </span>
           </div>
         </div>
 
@@ -470,9 +387,6 @@ export default function EnrollmentControlRoom() {
             <label className="text-xs font-bold text-slate-900 uppercase">
               Official DepEd Closed Advisory Message (Visible to Students when System is OFF):
             </label>
-            <span className="text-[10px] font-mono text-slate-500">
-              Markdown &amp; Plain Text Supported
-            </span>
           </div>
 
           <textarea
