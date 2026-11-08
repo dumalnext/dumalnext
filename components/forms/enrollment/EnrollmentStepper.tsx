@@ -1,13 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import Step1ApplicantType, { Step1Data } from "./Step1ApplicantType";
 import Step2LearnerProfile from "./Step2LearnerProfile";
 import Step3FamilyBackground from "./Step3FamilyBackground";
 import Step4CurriculumModality from "./Step4CurriculumModality";
 import Step5DocumentsReview from "./Step5DocumentsReview";
+import ContinuingEnrollmentForm from "./ContinuingEnrollmentForm";
+import { CopyChip, PageCardSkeleton, triggerPortalToast } from "@/components/ui/PortalUI";
 import { downloadDepEdEnrollmentPdf } from "@/lib/utils/depedPdfGenerator";
 import { useAuth } from "@/lib/auth/authContext";
+import { createClient } from "@/lib/supabase/client";
+import { isApplicationInTerm } from "@/lib/utils/academicTerm";
 
 export interface FullEnrollmentFormData {
   // Step 1: Classification
@@ -73,29 +78,40 @@ export interface FullEnrollmentFormData {
   snedDetails: string[];
   hasPwdId: boolean;
   jhsProgram?: "Regular";
-    targetSemester: "1st Semester" | "2nd Semester" | "";
+  spsSport?: string;
+    targetSemester: string;
   targetTrack: string;
   targetStrand: string;
+  careerPathway?: string;
+  primaryCluster?: string;
+  doorwayElectives?: string[];
   selectedElectives: string[];
   preferredModalities: string[];
 
   // Step 5: Documents & Agreements
   submittedDocuments: {
-    type: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "other";
+    type: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "household_4ps" | "pwd_id" | "other" | string;
     fileName: string;
     fileUrl: string;
     sizeKb: number;
   }[];
   dataPrivacyAccepted: boolean;
+  schoolYear?: string;
+  semester?: string;
 }
 
 const initialFormData: FullEnrollmentFormData = {
+  schoolYear: "2026-2027",
+  semester: "Trimester 1",
+  careerPathway: "",
+  primaryCluster: "",
+  doorwayElectives: [],
   step1: {
     isGraded: true,
     applicantType: "",
     targetGradeLevel: "",
     jhsProgram: "Regular",
-    targetSemester: "1st Semester",
+    targetSemester: "Trimester 1",
     targetTrack: "Academic Track",
     targetStrand: "",
     lastGradeCompleted: "",
@@ -167,28 +183,343 @@ const STEP_LABELS = [
   { step: 1, label: "Classification", sublabel: "Learner Category" },
   { step: 2, label: "Learner Profile", sublabel: "Personal & Address" },
   { step: 3, label: "Family Background", sublabel: "Parent & Guardian" },
-  { step: 4, label: "Curriculum & Modality", sublabel: "Program, SNEd & Mode" },
+  { step: 4, label: "Curriculum & Modality", sublabel: "Program & Modality" },
   { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
 ];
 
-export default function EnrollmentStepper() {
+const STEP_STORAGE_KEY = "dumalnext_student_enrollment_step";
+const DRAFT_STORAGE_KEY = "dumalnext_student_enrollment_draft";
+
+export default function EnrollmentStepper({
+  schoolYear = "2026-2027",
+  semester = "Trimester 1",
+  isEnrollmentOpen = true,
+  closedMessage,
+}: {
+  schoolYear?: string;
+  semester?: string;
+  isEnrollmentOpen?: boolean;
+  closedMessage?: string;
+}) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [formData, setFormData] = useState<FullEnrollmentFormData>(initialFormData);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FullEnrollmentFormData>(() => {
+    const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+    const activeSem = semester || "Trimester 1";
+    return {
+      ...initialFormData,
+      schoolYear: cleanSY,
+      semester: activeSem,
+      targetSemester: activeSem,
+      step1: {
+        ...initialFormData.step1,
+        targetSemester: activeSem,
+      },
+    };
+  });
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
+  const [existingApp, setExistingApp] = useState<any | null>(null);
+  const [priorApprovedRecord, setPriorApprovedRecord] = useState<any | null>(null);
+  const [isCheckingApp, setIsCheckingApp] = useState<boolean>(false);
 
-  // Auto pre-fill if student is logged in
+  // Restore step and form draft on mount
   useEffect(() => {
+    const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+    const activeSem = semester || "Trimester 1";
+
+    try {
+      const savedStep = localStorage.getItem(STEP_STORAGE_KEY);
+      if (savedStep) {
+        const parsed = parseInt(savedStep, 10);
+        if (parsed >= 1 && parsed <= 5) {
+          setCurrentStep(parsed);
+        }
+      }
+
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        setFormData((prev) => ({
+          ...prev,
+          ...parsed,
+          schoolYear: cleanSY,
+          semester: activeSem,
+          targetSemester: activeSem,
+          step1: {
+            ...prev.step1,
+            ...(parsed.step1 || {}),
+            targetSemester: activeSem,
+          },
+        }));
+      }
+    } catch {}
+    setIsHydrated(true);
+  }, [schoolYear, semester]);
+
+  // Persist current step to localStorage upon change
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(STEP_STORAGE_KEY, String(currentStep));
+    } catch {}
+  }, [currentStep, isHydrated]);
+
+  // Persist form data draft to localStorage (excluding heavy document files)
+  useEffect(() => {
+    if (!isHydrated || !formData) return;
+    try {
+      const { submittedDocuments, ...draftToSave } = formData;
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftToSave));
+    } catch {}
+  }, [formData, isHydrated]);
+
+  // Reset draft and start over from Step 1
+  const handleResetDraft = () => {
+    if (confirm("Are you sure you want to reset your enrollment progress and start over from Step 1?")) {
+      try {
+        localStorage.removeItem(STEP_STORAGE_KEY);
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {}
+      setCurrentStep(1);
+      const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+      const activeSem = semester || "Trimester 1";
+      setFormData({
+        ...initialFormData,
+        schoolYear: cleanSY,
+        semester: activeSem,
+        targetSemester: activeSem,
+        step1: {
+          ...initialFormData.step1,
+          targetSemester: activeSem,
+        },
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  // Auto pre-fill basic account names if student is logged in and sync schoolYear and semester
+  useEffect(() => {
+    const cleanSY = (schoolYear || "2026-2027").replace("–", "-");
+    const activeSem = semester || "Trimester 1";
+
     if (user) {
       setFormData((prev) => ({
         ...prev,
+        schoolYear: cleanSY || prev.schoolYear || "2026-2027",
+        semester: activeSem || prev.semester || "Trimester 1",
+        targetSemester: activeSem || prev.targetSemester || "Trimester 1",
+        step1: {
+          ...prev.step1,
+          targetSemester: activeSem || prev.step1?.targetSemester || "Trimester 1",
+        },
         lastName: prev.lastName || user.lastName,
         firstName: prev.firstName || user.firstName,
         middleName: prev.middleName || user.middleName || "",
-        lrn: prev.lrn || user.lrn || "",
+        lrn: prev.lrn || "",
+      }));
+    } else if (schoolYear || semester) {
+      setFormData((prev) => ({
+        ...prev,
+        schoolYear: cleanSY || prev.schoolYear || "2026-2027",
+        semester: activeSem || prev.semester || "Trimester 1",
+        targetSemester: activeSem || prev.targetSemester || "Trimester 1",
+        step1: {
+          ...prev.step1,
+          targetSemester: activeSem || prev.step1?.targetSemester || "Trimester 1",
+        },
       }));
     }
-  }, [user]);
+  }, [user, schoolYear, semester]);
+
+  // Check if student already has an active enrollment application in Supabase for the active term
+  useEffect(() => {
+    if (!user) {
+      setIsCheckingApp(false);
+      setExistingApp(null);
+      setPriorApprovedRecord(null);
+      return;
+    }
+
+    let isMounted = true;
+
+    const checkExistingApplication = async () => {
+      setIsCheckingApp(true);
+      try {
+        const supabase = createClient();
+
+        // 1. Locate student record
+        const { data: stList } = await supabase
+          .from("students")
+          .select("*")
+          .or(`student_id.eq.${user.lrn || user.userId},user_id.eq.${user.id}`)
+          .limit(1);
+
+        let appData: any = null;
+        let studentRecord: any = null;
+
+        if (stList && stList.length > 0) {
+          studentRecord = stList[0];
+          const { data: appRows } = await supabase
+            .from("enrollment_applications")
+            .select("*")
+            .eq("student_id", studentRecord.id)
+            .order("created_at", { ascending: false });
+
+          if (appRows && appRows.length > 0) {
+            // Find application for CURRENT ACTIVE academic term
+            const activeTermApp = appRows.find((a: any) =>
+              isApplicationInTerm(a, schoolYear, semester)
+            );
+
+            if (activeTermApp) {
+              appData = activeTermApp;
+              setPriorApprovedRecord(null);
+              if (activeTermApp.status !== "Needs Revision") {
+                try {
+                  localStorage.removeItem(STEP_STORAGE_KEY);
+                  localStorage.removeItem(DRAFT_STORAGE_KEY);
+                } catch {}
+              }
+            } else {
+              // Check if student has an APPROVED enrollment application from any prior term
+              const pastApproved = appRows.find((a: any) =>
+                a.status === "Approved" && !isApplicationInTerm(a, schoolYear, semester)
+              );
+
+              if (pastApproved) {
+                setPriorApprovedRecord(pastApproved);
+              } else {
+                setPriorApprovedRecord(null);
+              }
+
+              // Pre-fill profile and parent info from past application and student profile
+              const pastApp = pastApproved || appRows[0];
+              const pastFd = Array.isArray(pastApp.selected_electives) && pastApp.selected_electives.length > 0
+                ? pastApp.selected_electives[0]
+                : (typeof pastApp.selected_electives === "object" && pastApp.selected_electives !== null ? pastApp.selected_electives : {});
+
+              setFormData((prev) => ({
+                ...prev,
+                lrn: prev.lrn || "",
+                lastName: studentRecord?.last_name || user.lastName || prev.lastName,
+                firstName: studentRecord?.first_name || user.firstName || prev.firstName,
+                middleName: studentRecord?.middle_name || user.middleName || prev.middleName,
+                gender: studentRecord?.gender || pastFd.gender || prev.gender || "Male",
+                dateOfBirth: studentRecord?.date_of_birth || pastFd.dateOfBirth || prev.dateOfBirth || "2012-05-15",
+                contactNumber: studentRecord?.contact_number || pastFd.contactNumber || prev.contactNumber || "09181234567",
+                currentBarangay: studentRecord?.barangay || pastFd.currentBarangay || prev.currentBarangay || "CABARITAN",
+                psaBirthCertNo: pastFd.psaBirthCertNo || prev.psaBirthCertNo || "",
+                placeOfBirth: pastFd.placeOfBirth || prev.placeOfBirth || "Dumalneg, Ilocos Norte",
+                religion: pastFd.religion || prev.religion || "Roman Catholic",
+                motherTongue: pastFd.motherTongue || prev.motherTongue || "Ilokano",
+                isIpCommunity: pastFd.isIpCommunity ?? prev.isIpCommunity ?? true,
+                ipCommunityName: pastFd.ipCommunityName || prev.ipCommunityName || "Isnag",
+                is4psBeneficiary: pastFd.is4psBeneficiary ?? prev.is4psBeneficiary ?? false,
+                householdId4ps: pastFd.householdId4ps || prev.householdId4ps || "",
+                currentHouseNo: pastFd.currentHouseNo || prev.currentHouseNo || "",
+                currentSitio: pastFd.currentSitio || prev.currentSitio || "",
+                currentMunicipality: pastFd.currentMunicipality || prev.currentMunicipality || "DUMALNEG",
+                currentProvince: pastFd.currentProvince || prev.currentProvince || "ILOCOS NORTE",
+                currentCountry: pastFd.currentCountry || prev.currentCountry || "PHILIPPINES",
+                currentZipCode: pastFd.currentZipCode || prev.currentZipCode || "2921",
+                isPermanentSameAsCurrent: pastFd.isPermanentSameAsCurrent ?? prev.isPermanentSameAsCurrent ?? true,
+                permanentHouseNo: pastFd.permanentHouseNo || prev.permanentHouseNo || "",
+                permanentSitio: pastFd.permanentSitio || prev.permanentSitio || "",
+                permanentBarangay: pastFd.permanentBarangay || prev.permanentBarangay || "CABARITAN",
+                permanentMunicipality: pastFd.permanentMunicipality || prev.permanentMunicipality || "DUMALNEG",
+                permanentProvince: pastFd.permanentProvince || prev.permanentProvince || "ILOCOS NORTE",
+                permanentCountry: pastFd.permanentCountry || prev.permanentCountry || "PHILIPPINES",
+                permanentZipCode: pastFd.permanentZipCode || prev.permanentZipCode || "2921",
+                fatherLastName: pastFd.fatherLastName || prev.fatherLastName || "",
+                fatherFirstName: pastFd.fatherFirstName || prev.fatherFirstName || "",
+                fatherMiddleName: pastFd.fatherMiddleName || prev.fatherMiddleName || "",
+                fatherContactNumber: pastFd.fatherContactNumber || prev.fatherContactNumber || "",
+                motherMaidenLastName: pastFd.motherMaidenLastName || prev.motherMaidenLastName || "",
+                motherFirstName: pastFd.motherFirstName || prev.motherFirstName || "",
+                motherMiddleName: pastFd.motherMiddleName || prev.motherMiddleName || "",
+                motherContactNumber: pastFd.motherContactNumber || prev.motherContactNumber || "",
+                guardianLastName: pastFd.guardianLastName || prev.guardianLastName || "",
+                guardianFirstName: pastFd.guardianFirstName || prev.guardianFirstName || "",
+                guardianMiddleName: pastFd.guardianMiddleName || prev.guardianMiddleName || "",
+                guardianContactNumber: pastFd.guardianContactNumber || prev.guardianContactNumber || "",
+                guardianRelationship: pastFd.guardianRelationship || prev.guardianRelationship || "",
+                primaryContactPerson: pastFd.primaryContactPerson || prev.primaryContactPerson || "Father",
+              }));
+            }
+          }
+        }
+
+        if (!isMounted) return;
+
+        if (appData) {
+          setExistingApp(appData);
+
+          // If "Needs Revision", pre-fill the entire formData so the student can edit EVERYTHING!
+          if (appData.status === "Needs Revision") {
+            const docsArray = Array.isArray(appData.submitted_documents)
+              ? appData.submitted_documents.map((d: any) => ({
+                  type: d.docType || "other",
+                  fileName: d.fileName || "document.jpg",
+                  fileUrl: d.fileData || "",
+                  sizeKb: d.sizeKb || 25,
+                }))
+              : [];
+
+            setFormData((prev) => ({
+              ...prev,
+              step1: {
+                ...prev.step1,
+                applicantType: appData.applicant_type || prev.step1.applicantType || "Grade 7",
+                targetGradeLevel: Number(appData.target_grade_level) || prev.step1.targetGradeLevel || 7,
+                targetStrand: appData.target_strand || prev.step1.targetStrand || "",
+                targetTrack: appData.target_strand ? "Senior High School" : "Junior High School",
+              },
+              lrn: (studentRecord?.student_id && /^\d{12}$/.test(studentRecord.student_id))
+                ? studentRecord.student_id
+                : (user.lrn && /^\d{12}$/.test(user.lrn))
+                ? user.lrn
+                : (prev.lrn && /^\d{12}$/.test(prev.lrn) ? prev.lrn : ""),
+              lastName: studentRecord?.last_name || user.lastName || prev.lastName,
+              firstName: studentRecord?.first_name || user.firstName || prev.firstName,
+              middleName: studentRecord?.middle_name || user.middleName || prev.middleName,
+              gender: studentRecord?.gender || prev.gender || "Male",
+              dateOfBirth: studentRecord?.date_of_birth || prev.dateOfBirth || "2012-05-15",
+              contactNumber: studentRecord?.contact_number || prev.contactNumber || "09181234567",
+              currentBarangay: studentRecord?.barangay || prev.currentBarangay || "CABARITAN",
+              targetStrand: appData.target_strand || prev.targetStrand || "",
+              targetTrack: appData.target_strand ? "Senior High School" : "Junior High School",
+              submittedDocuments: docsArray,
+              dataPrivacyAccepted: true,
+            }));
+          }
+        } else {
+          setExistingApp(null);
+        }
+      } catch (err) {
+        console.warn("Notice checking existing application:", err);
+      } finally {
+        if (isMounted) setIsCheckingApp(false);
+      }
+    };
+
+    checkExistingApplication();
+
+    // Listen for data changes
+    const handleDataChanged = () => {
+      checkExistingApplication();
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("dumalnext:data-changed", handleDataChanged);
+    }
+
+    return () => {
+      isMounted = false;
+      if (typeof window !== "undefined") {
+        window.removeEventListener("dumalnext:data-changed", handleDataChanged);
+      }
+    };
+  }, [user, schoolYear, semester]);
 
   const handleStep1Change = (fields: Partial<Step1Data>) => {
     setFormData((prev) => ({
@@ -223,58 +554,277 @@ export default function EnrollmentStepper() {
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
+  // 1.0. Skeleton Loading State while checking existing application
+  if (isCheckingApp && !existingApp && !priorApprovedRecord) {
+    return (
+      <PageCardSkeleton
+        title="Checking your official learner application and continuing enrollment records..."
+        rows={3}
+      />
+    );
+  }
+
+  // 1.5. Lockout State: Online Enrollment is Closed
+  if (!isEnrollmentOpen) {
+    return (
+      <div className="bg-white border-2 border-red-500 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
+        <div className="border-b-2 border-red-200 pb-4">
+          <span className="text-xs font-bold tracking-widest text-[#002060] block">
+            Department of Education &bull; Region I &bull; Dumalneg NHS
+          </span>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
+            Online Basic Education Enrollment is Currently Closed
+          </h2>
+          <div className="text-xs text-slate-500 mt-1">
+            School Year: <strong className="text-[#002060] text-sm">{schoolYear}</strong>
+          </div>
+        </div>
+
+        <div className="p-5 bg-red-50 border-2 border-red-400 text-left space-y-2 max-w-2xl mx-auto rounded-[4px]">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block shrink-0" />
+            <span className="text-xs font-bold text-red-950">
+              DepEd Official Notice: Submission System Temporarily Locked
+            </span>
+          </div>
+          <p className="text-xs text-red-900 leading-relaxed whitespace-pre-line">
+            {closedMessage || "Online basic education enrollment is currently closed by the School Administration Office. Please await official announcements regarding enrollment schedules."}
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Link
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
+          >
+            Return to Student Home
+          </Link>
+          <Link
+            href="/track"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-[4px]"
+          >
+            Track Existing Application
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Lockout State: Pending Verification (One-time submission rule)
+  if (existingApp && existingApp.status === "Pending") {
+    return (
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
+        <div className="border-b-2 border-slate-200 pb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Enrollment Application Already Submitted
+          </h2>
+          <div className="text-xs text-slate-500 mt-1.5 flex items-center justify-center gap-2">
+            <span>Official Reference Number:</span>
+            <CopyChip value={existingApp.application_id} label="Reference Number" />
+          </div>
+        </div>
+
+        <div className="p-5 bg-amber-50 border-2 border-amber-300 text-left space-y-2 max-w-2xl mx-auto rounded-[4px]">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shrink-0" />
+            <span className="text-xs font-bold text-amber-950">
+              Pending Administrator Verification
+            </span>
+          </div>
+          <p className="text-xs text-amber-900 leading-relaxed font-medium">
+            Your enrollment application for School Year {schoolYear} has been submitted and is currently queued for evaluation by the School Administrator.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Link
+            href={`/track?ref=${existingApp.application_id}`}
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
+          >
+            Track Application Status
+          </Link>
+          <Link
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-[4px]"
+          >
+            Return to Student Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Lockout State: Officially Approved & Enrolled
+  if (existingApp && existingApp.status === "Approved") {
+    return (
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
+        <div className="border-b-2 border-slate-200 pb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Official Enrollment Confirmed
+          </h2>
+          <div className="text-xs text-slate-500 mt-1.5 flex items-center justify-center gap-2">
+            <span>Official Reference:</span>
+            <CopyChip value={existingApp.application_id} label="Reference Number" />
+          </div>
+        </div>
+
+        <div className="p-5 bg-emerald-50 border-2 border-emerald-400 text-left space-y-2 max-w-2xl mx-auto rounded-[4px]">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shrink-0" />
+            <span className="text-xs font-bold text-emerald-950">
+              Approved &amp; Officially Enrolled
+            </span>
+          </div>
+          <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+            You are officially enrolled at Dumalneg National High School for School Year {schoolYear}.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Link
+            href={`/track?ref=${existingApp.application_id}`}
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
+          >
+            View Enrollment Slip &amp; Section Assignment
+          </Link>
+          <Link
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-[4px]"
+          >
+            Return to Student Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 4. Active Enrollment Form: If Continuing Student with Approved Prior Record, render streamlined 2-step continuing flow
+  if (!existingApp && priorApprovedRecord) {
+    return (
+      <ContinuingEnrollmentForm
+        priorApprovedApp={priorApprovedRecord}
+        initialData={formData}
+        schoolYear={schoolYear}
+        semester={semester}
+        isEnrollmentOpen={isEnrollmentOpen}
+        closedMessage={closedMessage}
+      />
+    );
+  }
+
+  // 5. Standard Full 5-Step Enrollment Form (New Student, Pending, or Needs Revision Flow)
   return (
     <div className="space-y-6">
-      {/* Authenticated Applicant Status Banner */}
-      {user ? (
-        <div className="p-3 bg-blue-50 border border-blue-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span className="text-slate-700">
-            Authenticated Applicant Account: <strong>{user.fullName}</strong> ({user.email})
-          </span>
-          <span className="font-mono text-[#002060] font-bold text-[11px] bg-white px-2.5 py-0.5 border border-blue-300 shrink-0">
-            LINKED ACCOUNT: {user.userId}
-          </span>
-        </div>
-      ) : (
-        <div className="p-3 bg-amber-50 border border-amber-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span className="text-amber-900">
-            You are currently filling out this enrollment form as a Guest. To link this submission to your personal student account for easier tracking, please sign in or register.
-          </span>
-          <div className="flex gap-2 shrink-0">
-            <a href="/login" className="font-bold text-[#002060] hover:underline uppercase text-[11px]">
-              Sign In
-            </a>
-            <span>&bull;</span>
-            <a href="/register" className="font-bold text-[#002060] hover:underline uppercase text-[11px]">
-              Register Account
-            </a>
+      {/* Revision Notice Banner if Admin returned application */}
+      {existingApp?.status === "Needs Revision" && (
+        <div className="p-4 bg-red-50 border-2 border-red-400 text-slate-900 space-y-2 shadow-xs rounded-xl">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-bold text-red-950">
+              Returned for Revision
+            </span>
+            <span className="text-[10px] bg-red-800 text-white px-2 py-0.5 uppercase font-bold rounded-md">
+              REF: {existingApp.application_id}
+            </span>
+          </div>
+          <div className="bg-white p-3 border border-red-200 rounded-lg">
+            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">
+              Administrator Feedback
+            </span>
+            <p className="text-xs text-red-900 font-bold leading-relaxed">
+              &ldquo;{existingApp.admin_feedback || "Please review and correct your details and documentary requirements before resubmission."}&rdquo;
+            </p>
           </div>
         </div>
       )}
 
       {/* Official Stepper Progress Bar (Zero Emoji / Zero Icon) */}
-      <div className="bg-white border border-slate-300 p-3.5 sm:p-5 md:p-6 shadow-sm rounded-[4px]">
-        <div className="flex items-start sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] sm:text-xs font-bold tracking-normal sm:tracking-wider text-[#002060] block leading-snug break-words">
-              Dumalneg NHS Online Enrollment
-            </span>
-            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight mt-0.5">
-              Basic Education Enrollment Form
-            </h1>
+      <div className="bg-white border border-slate-200/80 p-4 sm:p-6 shadow-xs rounded-xl">
+        <div className="mb-4 pb-3 border-b border-slate-200">
+          <div className="flex items-start sm:items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+                Basic Education Enrollment Form
+              </h1>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-start sm:self-center ml-auto">
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  onClick={handleResetDraft}
+                  className="hidden md:inline-flex text-xs font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-md active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
+                  title="Reset enrollment progress and start over from Step 1"
+                >
+                  Reset / Start Over
+                </button>
+              )}
+            </div>
           </div>
-          <div className="text-right shrink-0">
-            <span className="text-xs font-mono font-bold text-slate-700 block whitespace-nowrap">
-              Step {currentStep} of 5
+
+          {/* Mobile & Small Tablet (< md): Dedicated action row for Reset / Start Over so title is NEVER squished */}
+          {currentStep > 1 && (
+            <div className="flex justify-end pt-2 md:hidden">
+              <button
+                type="button"
+                onClick={handleResetDraft}
+                className="text-[11px] font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
+                title="Reset enrollment progress and start over from Step 1"
+              >
+                Reset / Start Over
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Smart Linear Progress Bar (Universal for all devices) */}
+        <div className="w-full bg-slate-200 h-2.5 overflow-hidden mb-4 rounded-full">
+          <div
+            className="bg-[#002060] h-full transition-all duration-300 ease-out rounded-full"
+            style={{ width: `${(currentStep / 5) * 100}%` }}
+          />
+        </div>
+
+        {/* MOBILE VIEW (< sm): Clean Compact Step Navigation Pills */}
+        <div className="sm:hidden space-y-2">
+          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200 rounded-[4px]">
+            <span className="font-bold text-[#002060] text-[11px]">
+              Active: {STEP_LABELS[currentStep - 1].label}
             </span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider whitespace-nowrap">
-              {Math.round((currentStep / 5) * 100)}% Complete
+            <span className="text-[10px] text-slate-500">
+              {STEP_LABELS[currentStep - 1].sublabel}
             </span>
+          </div>
+          <div className="grid grid-cols-5 gap-1.5">
+            {STEP_LABELS.map((item) => {
+              const isActive = currentStep === item.step;
+              const isDone = currentStep > item.step;
+
+              return (
+                <button
+                  key={item.step}
+                  type="button"
+                  onClick={() => {
+                    if (existingApp?.status === "Needs Revision" || item.step < currentStep) {
+                      setCurrentStep(item.step);
+                    }
+                  }}
+                  disabled={existingApp?.status !== "Needs Revision" && item.step > currentStep}
+                  className={`py-2 text-center text-xs font-bold border rounded-[4px] transition-all active:scale-95 ${
+                    isActive
+                      ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                      : isDone || existingApp?.status === "Needs Revision"
+                      ? "bg-emerald-50 text-emerald-900 border-emerald-400 cursor-pointer"
+                      : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                  }`}
+                >
+                  0{item.step}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Stepper Steps Breadcrumbs */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+        {/* TABLET & DESKTOP VIEW (>= sm): Full 5-Card Step Grid */}
+        <div className="hidden sm:grid sm:grid-cols-5 gap-2 text-xs">
           {STEP_LABELS.map((item) => {
             const isActive = currentStep === item.step;
             const isDone = currentStep > item.step;
@@ -282,16 +832,21 @@ export default function EnrollmentStepper() {
             return (
               <div
                 key={item.step}
-                className={`p-2.5 border rounded-[4px] transition-colors ${
+                onClick={() => {
+                  if (existingApp?.status === "Needs Revision" || item.step < currentStep) {
+                    setCurrentStep(item.step);
+                  }
+                }}
+                className={`p-2.5 border rounded-[4px] transition-all ${
                   isActive
-                    ? "bg-[#002060] text-white border-[#002060]"
-                    : isDone
-                    ? "bg-blue-50 text-[#002060] border-blue-200"
-                    : "bg-slate-50 text-slate-500 border-slate-200"
+                    ? "bg-[#002060] text-white border-[#002060] shadow-xs"
+                    : isDone || existingApp?.status === "Needs Revision"
+                    ? "bg-blue-50 text-[#002060] border-blue-200 cursor-pointer hover:border-[#002060]"
+                    : "bg-slate-50 text-slate-500 border-slate-200 cursor-not-allowed"
                 }`}
               >
-                <div className="font-mono font-bold text-[10px] uppercase">
-                  [ {isDone ? "OK" : `0${item.step}`} ]
+                <div className="font-bold text-[10px] uppercase">
+                  {isDone ? "OK" : `0${item.step}`}
                 </div>
                 <div className="font-bold truncate mt-0.5">{item.label}</div>
                 <div
@@ -312,6 +867,7 @@ export default function EnrollmentStepper() {
         {currentStep === 1 && (
           <Step1ApplicantType
             data={formData.step1}
+            schoolYear={schoolYear}
             onChange={handleStep1Change}
             onNext={nextStep}
           />
@@ -338,6 +894,8 @@ export default function EnrollmentStepper() {
         {currentStep === 4 && (
           <Step4CurriculumModality
             data={formData}
+            schoolYear={schoolYear}
+            semester={semester}
             onChange={handleFormDataChange}
             onNext={nextStep}
             onBack={prevStep}
@@ -346,9 +904,11 @@ export default function EnrollmentStepper() {
 
         {currentStep === 5 && (
           <Step5DocumentsReview
-            data={formData}
+            data={{ ...formData, schoolYear }}
+            isEnrollmentOpen={isEnrollmentOpen}
             onChange={handleFormDataChange}
             onBack={prevStep}
+            existingApplication={existingApp}
           />
         )}
       </div>

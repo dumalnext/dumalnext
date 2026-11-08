@@ -1,22 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
+import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
+import { createClient } from "@/lib/supabase/client";
 import {
   JHS_PROGRAMS,
-  
-  SHS_STRANDS,
-  SNED_DIAGNOSES,
-  SNED_MANIFESTATIONS,
+  SHS_TRACKS,
+  STRENGTHENED_SHS_CORE_SUBJECTS,
   DISTANCE_LEARNING_MODALITIES,
 } from "@/lib/types/enrollment";
-import CustomSelect from "@/components/CustomSelect";
+
+export interface CourseSubjectItem {
+  id: string;
+  subject_code: string;
+  subject_name: string;
+  subject_type: "Core" | "Elective" | "Applied" | "Specialized" | "Intervention";
+  grade_level: number;
+  trimester: number;
+  strand?: string | null;
+  description?: string | null;
+}
+
+const isTechProSubject = (s: CourseSubjectItem) => {
+  const strand = (s.strand || "").toUpperCase();
+  const code = (s.subject_code || "").toUpperCase();
+  return (
+    strand === "TECHPRO" ||
+    strand.startsWith("TVL") ||
+    code.startsWith("TECH-") ||
+    code.startsWith("TVL-")
+  );
+};
 
 interface Step4CurriculumModalityProps {
   data: FullEnrollmentFormData;
   onChange: (fields: Partial<FullEnrollmentFormData>) => void;
   onNext: () => void;
   onBack: () => void;
+  schoolYear?: string;
+  semester?: string;
 }
 
 export default function Step4CurriculumModality({
@@ -24,8 +47,45 @@ export default function Step4CurriculumModality({
   onChange,
   onNext,
   onBack,
+  schoolYear,
+  semester,
 }: Step4CurriculumModalityProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Real-time synchronization with IT-Support Registered Academic Terms
+  const { semester: controlSemester, schoolYear: controlSchoolYear, activeTerm } = useEnrollmentControl();
+
+  const activeSemester =
+    semester ||
+    controlSemester ||
+    activeTerm?.termName ||
+    data.targetSemester ||
+    data.semester ||
+    data.step1.targetSemester ||
+    "Trimester 1";
+
+  const activeSchoolYear =
+    schoolYear ||
+    controlSchoolYear ||
+    activeTerm?.schoolYear ||
+    data.schoolYear ||
+    "2026–2027";
+
+  const currentSemester = activeSemester;
+
+  // Auto-sync form state to active semester managed by IT-support
+  useEffect(() => {
+    if (activeSemester && (data.targetSemester !== activeSemester || data.step1?.targetSemester !== activeSemester)) {
+      onChange({
+        targetSemester: activeSemester,
+        semester: activeSemester,
+        step1: {
+          ...data.step1,
+          targetSemester: activeSemester,
+        },
+      });
+    }
+  }, [activeSemester]);
 
   // Detection: Check if learner belongs to Junior High School (Grade 7 - 10) or Senior High School (Grade 11 - 12)
   const isJHS =
@@ -34,26 +94,194 @@ export default function Step4CurriculumModality({
     Number(data.step1.targetGradeLevel) === 7;
 
   const targetGrade = data.step1.targetGradeLevel || (data.step1.applicantType === "Grade 7" ? 7 : 11);
+  const gradeNum = Number(targetGrade);
 
   // Current values with fallbacks
   const currentJhsProgram = data.jhsProgram || data.step1.jhsProgram || "Regular";
   const currentSpsSport = data.spsSport || "";
-  const currentSemester = data.targetSemester || data.step1.targetSemester || "1st Semester";
-  const currentTrack = data.targetTrack || data.step1.targetTrack || "Academic Track";
-  const currentStrand = data.targetStrand || data.step1.targetStrand || (currentTrack === "Academic Track" ? "STEM" : "TVL-ICT");
+
+  // Track normalization
+  const rawTrack = data.targetTrack || data.step1.targetTrack || "Academic Track";
+  const currentTrack =
+    rawTrack === "Technical-Vocational-Livelihood Track" || rawTrack === "TVL Track"
+      ? "Technical-Professional Track"
+      : rawTrack;
+
+  const dataRef = useRef(data);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  // Live subjects synchronized from Admin catalog
+  const [subjectsList, setSubjectsList] = useState<CourseSubjectItem[]>([]);
+  const [isLoadingSubjects, setIsLoadingSubjects] = useState<boolean>(!isJHS);
+
+  // Fetch live subjects (silent mode avoids flickering skeleton)
+  const fetchLiveSubjects = useCallback(async (showLoading: boolean = false) => {
+    if (isJHS) return;
+    if (showLoading) setIsLoadingSubjects(true);
+
+    try {
+      const res = await fetch(`/api/subjects?gradeLevel=${gradeNum}&_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      if (!res.ok) throw new Error("Failed to fetch subjects");
+      const json = await res.json();
+      if (json.success && Array.isArray(json.subjects)) {
+        setSubjectsList(json.subjects);
+
+        // Real-time synchronization check: if student had selected an elective that admin just deleted, clean it up
+        const currentData = dataRef.current;
+        if (currentTrack === "Academic Track" && currentData.selectedElectives && currentData.selectedElectives.length > 0) {
+          const validCodes = new Set(
+            json.subjects
+              .filter((s: CourseSubjectItem) => s.grade_level === gradeNum && s.subject_type !== "Core" && !isTechProSubject(s))
+              .map((s: CourseSubjectItem) => s.subject_code)
+          );
+          const filtered = currentData.selectedElectives.filter((c: string) => validCodes.has(c));
+          if (filtered.length !== currentData.selectedElectives.length) {
+            onChangeRef.current({ selectedElectives: filtered });
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Could not load live subjects:", err);
+    } finally {
+      if (showLoading) setIsLoadingSubjects(false);
+    }
+  }, [isJHS, gradeNum, currentTrack]);
+
+  // Real-time multi-channel listener: Supabase WebSocket + BroadcastChannel + Window Events + 3s Polling
+  useEffect(() => {
+    if (isJHS) return;
+
+    // 1. Initial immediate fetch with loading skeleton
+    fetchLiveSubjects(true);
+
+    // 2. Supabase Realtime WebSocket Push (0-millisecond sync across any port or device)
+    const supabase = createClient();
+    const realtimeChannel = supabase
+      .channel("dumalnext-subjects-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "course_subjects" },
+        () => {
+          fetchLiveSubjects(false);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "system_settings" },
+        (payload: any) => {
+          if (payload?.new?.key === "subjects_config" || payload?.eventType === "DELETE") {
+            fetchLiveSubjects(false);
+          }
+        }
+      )
+      .on("broadcast", { event: "subjects-updated" }, () => {
+        fetchLiveSubjects(false);
+      })
+      .subscribe();
+
+    // 3. Browser BroadcastChannel for instant local cross-tab communication
+    let bc: BroadcastChannel | null = null;
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        bc = new BroadcastChannel("dumalnext-subjects-sync");
+        bc.onmessage = () => {
+          fetchLiveSubjects(false);
+        };
+      } catch {}
+    }
+
+    // 4. Window events and storage listener (cross-origin / tab focus)
+    const handleUpdate = () => fetchLiveSubjects(false);
+    window.addEventListener("dumalnext:data-changed", handleUpdate);
+    window.addEventListener("dumalnext:admin-data-changed", handleUpdate);
+    window.addEventListener("dumalnext:subjects-changed", handleUpdate);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "dumalnext:subjects-timestamp") {
+        fetchLiveSubjects(false);
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("focus", handleUpdate);
+
+    // 5. Silent background polling fallback (every 2 minutes, active tab only)
+    const pollInterval = setInterval(() => {
+      if (typeof document !== "undefined" && !document.hidden) {
+        fetchLiveSubjects(false);
+      }
+    }, 120000);
+
+    return () => {
+      clearInterval(pollInterval);
+      if (bc) bc.close();
+      supabase.removeChannel(realtimeChannel);
+      window.removeEventListener("dumalnext:data-changed", handleUpdate);
+      window.removeEventListener("dumalnext:admin-data-changed", handleUpdate);
+      window.removeEventListener("dumalnext:subjects-changed", handleUpdate);
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("focus", handleUpdate);
+    };
+  }, [isJHS, gradeNum, fetchLiveSubjects]);
+
+  // Categorized subjects for the current Grade level
+  const academicCoreSubjects = subjectsList.filter(
+    (s) => s.grade_level === gradeNum && s.subject_type === "Core" && !isTechProSubject(s)
+  );
+  const academicElectiveSubjects = subjectsList.filter(
+    (s) => s.grade_level === gradeNum && s.subject_type !== "Core" && !isTechProSubject(s)
+  );
+
+  const techproCoreSubjects = subjectsList.filter(
+    (s) =>
+      s.grade_level === gradeNum &&
+      s.subject_type === "Core" &&
+      (isTechProSubject(s) || s.strand === "General" || !s.strand)
+  );
+  const techproSpecializedSubjects = subjectsList.filter(
+    (s) => s.grade_level === gradeNum && s.subject_type !== "Core" && isTechProSubject(s)
+  );
+
+  const [showCoreDetails, setShowCoreDetails] = useState<boolean>(false);
+
   const currentModalities = data.preferredModalities && data.preferredModalities.length > 0
     ? data.preferredModalities
     : ["Modular (Print)"];
 
-  // Filter SHS Strands based on selected track
-  const availableStrands = SHS_STRANDS.filter((s) => s.track === currentTrack);
+  // Single-select Elective (Maximum of 1 allowed per semester)
+  const handleElectiveToggle = (subjectCode: string) => {
+    const current = data.selectedElectives || [];
+    let updated: string[];
+    if (current.includes(subjectCode)) {
+      // Deselect if already selected
+      updated = [];
+    } else {
+      // Select the clicked elective as the single chosen subject
+      updated = [subjectCode];
+    }
+    onChange({ selectedElectives: updated });
+    if (errors.selectedElectives) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.selectedElectives;
+        return next;
+      });
+    }
+  };
 
   // Toggle Modality in multi-select array
   const handleModalityToggle = (modality: string) => {
     let updated: string[];
     if (currentModalities.includes(modality)) {
       if (currentModalities.length === 1) {
-        // Prevent deselecting all
         return;
       }
       updated = currentModalities.filter((m) => m !== modality);
@@ -70,25 +298,6 @@ export default function Step4CurriculumModality({
     }
   };
 
-  // Toggle SNEd details in multi-select array
-  const handleSnedDetailToggle = (detail: string) => {
-    const currentList = data.snedDetails || [];
-    let updated: string[];
-    if (currentList.includes(detail)) {
-      updated = currentList.filter((d) => d !== detail);
-    } else {
-      updated = [...currentList, detail];
-    }
-    onChange({ snedDetails: updated });
-    if (errors.snedDetails) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next.snedDetails;
-        return next;
-      });
-    }
-  };
-
   // Validation
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
@@ -97,7 +306,6 @@ export default function Step4CurriculumModality({
       if (!currentJhsProgram) {
         newErrors.jhsProgram = "Please select a Junior High School curricular program.";
       }
-      
     } else {
       // SHS Validation
       if (!currentSemester) {
@@ -106,18 +314,12 @@ export default function Step4CurriculumModality({
       if (!currentTrack) {
         newErrors.targetTrack = "Senior High School track selection is required.";
       }
-      if (!currentStrand) {
-        newErrors.targetStrand = "Senior High School strand selection is required.";
-      }
-    }
-
-    // SNEd Validation
-    if (data.isSned) {
-      if (!data.snedCategory) {
-        newErrors.snedCategory = "Please select whether the special need is by medical diagnosis or observed manifestations.";
-      }
-      if (!data.snedDetails || data.snedDetails.length === 0) {
-        newErrors.snedDetails = "Please select at least one specific condition or learning manifestation.";
+      if (currentTrack === "Academic Track" && academicElectiveSubjects.length > 0) {
+        if (!data.selectedElectives || data.selectedElectives.length === 0) {
+          newErrors.selectedElectives = `Please select one (1) elective subject for your Grade ${targetGrade} Academic Track curriculum.`;
+        } else if (data.selectedElectives.length > 1) {
+          newErrors.selectedElectives = "DepEd Policy: A maximum of one (1) elective subject is allowed per semester.";
+        }
       }
     }
 
@@ -137,7 +339,15 @@ export default function Step4CurriculumModality({
           targetTrack: "",
           targetStrand: "",
           targetSemester: "",
+          careerPathway: "",
+          primaryCluster: "",
+          selectedElectives: [],
+          doorwayElectives: [],
           preferredModalities: currentModalities,
+          isSned: false,
+          snedCategory: "",
+          snedDetails: [],
+          hasPwdId: false,
           step1: {
             ...data.step1,
             jhsProgram: currentJhsProgram,
@@ -147,17 +357,30 @@ export default function Step4CurriculumModality({
           },
         });
       } else {
+        const finalStrand = currentTrack === "Academic Track" ? "Academic" : "TechPro";
+        const finalElectives = currentTrack === "Academic Track"
+          ? (data.selectedElectives || [])
+          : techproSpecializedSubjects.map((s) => s.subject_code);
+
         onChange({
           targetTrack: currentTrack,
-          targetStrand: currentStrand,
+          targetStrand: finalStrand,
           targetSemester: currentSemester,
+          careerPathway: "",
+          primaryCluster: finalStrand,
+          doorwayElectives: [],
+          selectedElectives: finalElectives,
           jhsProgram: undefined,
           spsSport: undefined,
           preferredModalities: currentModalities,
+          isSned: false,
+          snedCategory: "",
+          snedDetails: [],
+          hasPwdId: false,
           step1: {
             ...data.step1,
             targetTrack: currentTrack,
-            targetStrand: currentStrand,
+            targetStrand: finalStrand,
             targetSemester: currentSemester,
           },
         });
@@ -169,32 +392,27 @@ export default function Step4CurriculumModality({
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px] font-sans">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded-[4px]">
-            STEP 04 OF 05
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
+            Step 04 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 tracking-wider">
             DepEd Form Sections 5, 7, &amp; 8
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Curricular Program, Special Education, &amp; Learning Modalities
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          {isJHS
-            ? `Official curriculum placement for Grade ${targetGrade} Junior High School learner, inclusive education profile, and emergency alternative delivery preferences.`
-            : `Senior High School Track and Strand designation for Grade ${targetGrade}, semester tracking, inclusive education, and alternative delivery preferences.`}
-        </p>
       </div>
 
       {/* Global Error Notice */}
       {Object.keys(errors).length > 0 && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-[4px]">
           <p className="text-xs font-bold text-red-800 leading-normal">
-            [ Validation Required ]: Please address the highlighted required fields before advancing to Step 5.
+            Validation Required: Please address the highlighted required fields before advancing to Step 5.
           </p>
         </div>
       )}
@@ -203,319 +421,464 @@ export default function Step4CurriculumModality({
       {/* CONDITIONAL SECTION A: JUNIOR HIGH SCHOOL CURRICULAR PROGRAM (GRADES 7-10) */}
       {/* ========================================================================= */}
       {isJHS ? (
-        <div className="p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px] space-y-2">
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 rounded-[4px] space-y-3">
           <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060] block">
-              Section 4-B: Junior High School Curriculum
+              Junior High School Curriculum
             </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Grade {targetGrade} curriculum at Dumalneg National High School:
-            </p>
           </div>
-          <div className="p-4 bg-white border border-slate-200 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 block">
               Regular Basic Education Curriculum
             </span>
-            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-              Standard DepEd K-12 secondary curriculum encompassing core learning areas: English, Mathematics, Science, Filipino, Araling Panlipunan, Values Education (EsP), MAPEH, and Technology &amp; Livelihood Education (TLE).
-            </p>
+            <span className="text-[10px] font-bold bg-blue-50 text-[#002060] border border-blue-200 px-2.5 py-1 rounded-md">
+              Grade {targetGrade} JHS
+            </span>
           </div>
         </div>
       ) : (
         /* ========================================================================= */
         /* CONDITIONAL SECTION B: SENIOR HIGH SCHOOL PROGRAM (GRADES 11-12)          */
+        /* DEPED STRENGTHENED SENIOR HIGH SCHOOL PROGRAM (REFORM STANDARD)           */
         /* ========================================================================= */
-        <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-          <div className="border-b-2 border-slate-200 pb-3">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Section 7: Senior High School (SHS) Program Confirmation ]
-            </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Confirm academic track and official strand for Grade {targetGrade} Senior High School enrollment:
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Semester Selector */}
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Semester of Enrollment <span className="text-red-700">*</span>
-              </label>
-              <CustomSelect
-                value={currentSemester}
-                onChange={(val) => {
-                  const sVal = val as "1st Semester" | "2nd Semester";
-                  onChange({
-                    targetSemester: sVal,
-                    step1: { ...data.step1, targetSemester: sVal },
-                  });
-                  if (errors.targetSemester) {
-                    setErrors((prev) => {
-                      const next = { ...prev };
-                      delete next.targetSemester;
-                      return next;
-                    });
-                  }
-                }}
-                options={[
-                  { value: "1st Semester", label: "1st Semester (August - December)" },
-                  { value: "2nd Semester", label: "2nd Semester (January - May)" },
-                ]}
-                placeholder="Select Semester"
-                fullWidth
-                error={Boolean(errors.targetSemester)}
-              />
-              {errors.targetSemester && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetSemester}</p>
-              )}
+        <div className="space-y-6">
+          {/* SECTION 7-A: ACADEMIC TRACK & SEMESTER SELECTION */}
+          <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+            <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold text-[#002060] block">
+                  Senior High School Track Selection
+                </span>
+              </div>
+              <span className="text-[10px] font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider w-fit rounded-[4px]">
+                DEPED REFORM STANDARD
+              </span>
             </div>
 
-            {/* SHS Track Selector */}
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Senior High Track <span className="text-red-700">*</span>
+            {/* Auto-Synced Official Academic Term from IT-Support */}
+            <div className="max-w-md">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
+                Semester / Trimester of Enrollment
               </label>
-              <CustomSelect
-                value={currentTrack}
-                onChange={(val) => {
-                  const defaultNewStrand = val === "Academic Track" ? "STEM" : "TVL-ICT";
-                  onChange({
-                    targetTrack: val,
-                    targetStrand: defaultNewStrand,
-                    step1: { ...data.step1, targetTrack: val, targetStrand: defaultNewStrand },
-                  });
-                  if (errors.targetTrack) {
-                    setErrors((prev) => {
-                      const next = { ...prev };
-                      delete next.targetTrack;
-                      return next;
-                    });
-                  }
-                }}
-                options={[
-                  { value: "Academic Track", label: "Academic Track" },
-                  { value: "Technical-Vocational-Livelihood Track", label: "Technical-Vocational-Livelihood (TVL) Track" },
-                ]}
-                placeholder="Select Track"
-                fullWidth
-                error={Boolean(errors.targetTrack)}
-              />
+              <div className="p-3.5 bg-white border-2 border-[#002060] flex flex-wrap items-center justify-between gap-2 shadow-xs rounded-[4px]">
+                <div className="space-y-0.5 min-w-0 flex-1">
+                  <div className="text-sm font-bold text-[#002060]">
+                    {activeSemester}
+                  </div>
+                  <div className="text-[11px] text-slate-600">
+                    School Year {activeSchoolYear}
+                    {activeTerm?.startDate && activeTerm?.endDate ? ` (${activeTerm.startDate} to ${activeTerm.endDate})` : ""}
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-950 border border-emerald-400 px-2.5 py-1 uppercase tracking-wider shrink-0 rounded-[4px]">
+                  AUTO-SYNCED (ACTIVE)
+                </span>
+              </div>
+            </div>
+
+            {/* 2-Track Selection Cards */}
+            <div>
+              <label className="block text-xs font-bold text-slate-900 mb-2">
+                Select Track <span className="text-red-700">*</span>
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {SHS_TRACKS.map((t) => {
+                  const isSelected = currentTrack === t.code;
+                  return (
+                    <label
+                      key={t.code}
+                      className={`p-5 border-2 cursor-pointer transition-all flex flex-col justify-between rounded-[4px] ${
+                        isSelected
+                          ? "bg-white border-[#002060] shadow-xs"
+                          : "bg-white border-slate-300 hover:border-slate-400"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="targetTrack"
+                              value={t.code}
+                              checked={isSelected}
+                              onChange={() => {
+                                const newStrand = t.code === "Academic Track" ? "Academic" : "TechPro";
+                                onChange({
+                                  targetTrack: t.code,
+                                  primaryCluster: newStrand,
+                                  targetStrand: newStrand,
+                                  selectedElectives:
+                                    t.code === "Academic Track"
+                                      ? []
+                                      : techproSpecializedSubjects.map((s) => s.subject_code),
+                                  doorwayElectives: [],
+                                  step1: {
+                                    ...data.step1,
+                                    targetTrack: t.code,
+                                    targetStrand: newStrand,
+                                  },
+                                });
+                                if (errors.targetTrack) {
+                                  setErrors((prev) => {
+                                    const next = { ...prev };
+                                    delete next.targetTrack;
+                                    return next;
+                                  });
+                                }
+                                if (errors.selectedElectives) {
+                                  setErrors((prev) => {
+                                    const next = { ...prev };
+                                    delete next.selectedElectives;
+                                    return next;
+                                  });
+                                }
+                              }}
+                              className="accent-[#002060] mt-0.5"
+                            />
+                            <span className="text-sm font-bold text-slate-900">
+                              {t.name}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <span className="text-[10px] font-bold bg-[#002060] text-white px-2 py-0.5 uppercase rounded-[4px]">
+                              SELECTED
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-[11px] font-semibold text-[#002060] mb-1">
+                          {t.code === "Academic Track"
+                            ? "Unified Core Foundations • Student Elective Selection"
+                            : "Standardized Prescribed Curriculum • TESDA NC-Aligned"}
+                        </div>
+
+                        <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                          {t.code === "Academic Track"
+                            ? "Comprehensive academic preparation featuring fixed core foundations and student-selected elective courses configured by school administration."
+                            : "Prescribed technical-vocational training with standardized specialized courses for the full academic year without elective choices."}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200 text-[10px] text-slate-600">
+                          {t.code === "Academic Track" ? (
+                            <>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-[4px]">STEM</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-[4px]">Humanities &amp; Social Sciences</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-[4px]">Business &amp; Management</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-[4px]">Arts &amp; Design</span>
+                              <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-[4px]">Sports &amp; Health</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded-[4px]">Fixed Curriculum</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded-[4px]">TESDA NC II / III</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded-[4px]">Work Immersion</span>
+                              <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-950 rounded-[4px]">Industry Direct</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
               {errors.targetTrack && (
                 <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetTrack}</p>
               )}
             </div>
+          </div>
 
-            {/* SHS Strand Selector */}
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Specialized Strand <span className="text-red-700">*</span>
-              </label>
-              <CustomSelect
-                value={currentStrand}
-                onChange={(val) => {
-                  onChange({
-                    targetStrand: val,
-                    step1: { ...data.step1, targetStrand: val },
-                  });
-                  if (errors.targetStrand) {
-                    setErrors((prev) => {
-                      const next = { ...prev };
-                      delete next.targetStrand;
-                      return next;
-                    });
-                  }
-                }}
-                options={availableStrands.map((s) => ({
-                  value: s.code,
-                  label: `[${s.code}] ${s.name}`,
-                }))}
-                placeholder="Select Strand"
-                fullWidth
-                error={Boolean(errors.targetStrand)}
-              />
-              {errors.targetStrand && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.targetStrand}</p>
+          {/* ========================================================================= */}
+          {/* SECTION 7-B: ELECTIVE PART / PRESCRIBED TRACK CURRICULUM (SYNCED WITH ADMIN) */}
+          {/* ========================================================================= */}
+          {currentTrack === "Academic Track" ? (
+            /* ACADEMIC TRACK: ELECTIVE SUBJECT SELECTION */
+            <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+              <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-bold text-[#002060] block">
+                    Grade {targetGrade} Academic Track - Elective Subject
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 uppercase rounded-[4px]">
+                    {(data.selectedElectives || []).length} / 1 SELECTED
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-[#002060] border border-blue-300 uppercase rounded-[4px]">
+                    MAX 1 PER SEMESTER
+                  </span>
+                </div>
+              </div>
+
+              {isLoadingSubjects ? (
+                <div className="p-8 text-center bg-white border border-slate-200 space-y-2 rounded-[4px]">
+                  <div className="text-xs font-bold text-[#002060] animate-pulse">
+                    Synchronizing elective subject offerings with Administrator catalog...
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Retrieving active Grade {targetGrade} elective offerings from database.
+                  </p>
+                </div>
+              ) : academicElectiveSubjects.length === 0 ? (
+                <div className="p-6 text-center bg-white border border-slate-200 space-y-2 rounded-[4px]">
+                  <span className="text-xs font-bold text-slate-600 block">
+                    No Elective Subjects on Record for Grade {targetGrade} Academic Track
+                  </span>
+                  <p className="text-xs text-slate-600 max-w-md mx-auto">
+                    The school administrator has not yet scheduled specific elective subjects for Grade {targetGrade} Academic Track. You may proceed with enrollment and your assigned adviser will confirm your schedule upon registration.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-slate-900">
+                      Select Elective Subject (Choose Maximum 1) <span className="text-red-700">*</span>
+                    </label>
+                    <span className="text-[11px] text-slate-500">
+                      Click any card to select or switch your elective
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {academicElectiveSubjects.map((sub) => {
+                      const isSelected = (data.selectedElectives || []).includes(sub.subject_code);
+                      return (
+                        <div
+                          key={sub.id || sub.subject_code}
+                          onClick={() => handleElectiveToggle(sub.subject_code)}
+                          className={`p-4 border-2 cursor-pointer transition-all flex flex-col justify-between select-none rounded-[4px] ${
+                            isSelected
+                              ? "bg-blue-50/60 border-[#002060] shadow-xs"
+                              : "bg-white border-slate-300 hover:border-slate-400"
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-start justify-between gap-2 mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="radio"
+                                  name="academicElectiveRadio"
+                                  value={sub.subject_code}
+                                  checked={isSelected}
+                                  onChange={() => {}}
+                                  className="accent-[#002060] pointer-events-none"
+                                />
+                                <span className="text-xs font-bold text-[#002060]">
+                                  {sub.subject_code}
+                                </span>
+                              </div>
+                              <span
+                                className={`text-[9px] font-bold px-2 py-0.5 uppercase border rounded-[4px] ${
+                                  isSelected
+                                    ? "bg-[#002060] text-white border-[#002060]"
+                                    : "bg-purple-100 text-purple-950 border-purple-300"
+                                }`}
+                              >
+                                {isSelected ? "SELECTED" : sub.subject_type.toUpperCase()}
+                              </span>
+                            </div>
+
+                            <div className="text-xs font-bold text-slate-900 leading-snug">
+                              {sub.subject_name}
+                            </div>
+
+                            {sub.description && (
+                              <p className="text-[11px] text-slate-600 leading-relaxed mt-1.5 pt-1.5 border-t border-slate-200">
+                                {sub.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {errors.selectedElectives && (
+                    <p className="text-[11px] font-bold text-red-700 mt-2">{errors.selectedElectives}</p>
+                  )}
+                </div>
               )}
             </div>
+          ) : (
+            /* TECHPRO TRACK: PRESCRIBED STANDARDIZED CURRICULUM (NO ELECTIVES) */
+            <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+              <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-bold text-[#002060] block">
+                    Grade {targetGrade} Technical-Professional Track - Prescribed Curriculum
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase shrink-0 rounded-[4px]">
+                  FIXED CURRICULUM (NO ELECTIVES)
+                </span>
+              </div>
+
+              {isLoadingSubjects ? (
+                <div className="p-8 text-center bg-white border border-slate-200 space-y-2 rounded-[4px]">
+                  <div className="text-xs font-bold text-[#002060] animate-pulse">
+                    Synchronizing TechPro specialized courses with Administrator catalog...
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Retrieving prescribed Grade {targetGrade} TechPro curriculum from database.
+                  </p>
+                </div>
+              ) : techproSpecializedSubjects.length === 0 ? (
+                <div className="p-6 text-center bg-white border border-slate-200 space-y-2 rounded-[4px]">
+                  <span className="text-xs font-bold text-slate-600 block">
+                    No Specialized TechPro Subjects on Record for Grade {targetGrade}
+                  </span>
+                  <p className="text-xs text-slate-600 max-w-md mx-auto">
+                    The administrator has not yet registered specific specialized courses for Grade {targetGrade} TechPro.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900">
+                      Prescribed Industry Specialization Courses ({techproSpecializedSubjects.length} Courses)
+                    </span>
+                    <span className="text-[10px] font-medium text-slate-500">
+                      TESDA NC-Aligned Standards
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {techproSpecializedSubjects.map((sub) => (
+                      <div
+                        key={sub.id || sub.subject_code}
+                        className="p-4 bg-white border-2 border-amber-300 space-y-1.5 shadow-2xs rounded-[4px]"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-xs font-bold text-[#002060]">
+                            {sub.subject_code}
+                          </span>
+                          <span className="text-[9px] font-bold px-2 py-0.5 bg-amber-100 text-amber-950 border border-amber-400 uppercase rounded-[4px]">
+                            PRESCRIBED / SPECIALIZED
+                          </span>
+                        </div>
+                        <div className="text-xs font-bold text-slate-900 leading-snug">
+                          {sub.subject_name}
+                        </div>
+                        {sub.description && (
+                          <p className="text-[11px] text-slate-600 leading-relaxed pt-1.5 border-t border-slate-100">
+                            {sub.description}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-3 bg-amber-50/80 border border-amber-300 text-xs text-amber-950 rounded-[4px]">
+                    <strong className="block text-[11px] mb-0.5">Automatic Enrollment Policy:</strong>
+                    Under DepEd Technical-Professional track guidelines, learners undergo a standardized, unified industry syllabus without elective branching. All courses above will be studied throughout the entire academic year as configured by the school administration.
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* SECTION 7-C: MANDATORY CORE FOUNDATION SUBJECTS (SYNCED WITH ADMIN)       */}
+          {/* ========================================================================= */}
+          {(() => {
+            const activeCoreList = currentTrack === "Academic Track" ? academicCoreSubjects : techproCoreSubjects;
+            const displayCoreSubjects =
+              activeCoreList.length > 0
+                ? activeCoreList
+                : gradeNum === 11
+                ? STRENGTHENED_SHS_CORE_SUBJECTS.map((s, i) => ({
+                    id: `fallback-core-${i}`,
+                    subject_code: s.code,
+                    subject_name: s.name,
+                    subject_type: "Core" as const,
+                    grade_level: 11,
+                    trimester: 1,
+                    description: s.description,
+                  }))
+                : [];
+
+            return (
+              <div className="space-y-4 p-6 bg-white border-2 border-slate-300 rounded-[4px]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
+                  <div>
+                    <span className="text-xs font-bold text-[#002060] block">
+                      Grade {targetGrade} Mandatory Unified Core Subjects
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase rounded-[4px]">
+                      AUTOMATICALLY ENROLLED
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowCoreDetails(!showCoreDetails)}
+                      className="text-xs font-bold text-[#002060] hover:underline cursor-pointer"
+                    >
+                      {showCoreDetails ? "Hide Details" : "View Details"}
+                    </button>
+                  </div>
+                </div>
+
+                {isLoadingSubjects && displayCoreSubjects.length === 0 ? (
+                  <div className="p-6 text-center text-xs font-bold text-[#002060] animate-pulse">
+                    Synchronizing core curriculum foundation...
+                  </div>
+                ) : displayCoreSubjects.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-500">
+                    No core subjects on record for Grade {targetGrade}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {displayCoreSubjects.map((sub, idx) => (
+                      <div
+                        key={sub.id || sub.subject_code}
+                        className="p-3 bg-slate-50 border border-slate-200 space-y-1 rounded-[4px]"
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">
+                            {sub.subject_code || `Core 0${idx + 1}`}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.2 bg-blue-100 text-[#002060] font-bold rounded-[4px]">
+                            CORE
+                          </span>
+                        </div>
+                        <div className="text-xs font-bold text-slate-900 leading-snug">
+                          {sub.subject_name}
+                        </div>
+                        {showCoreDetails && sub.description && (
+                          <p className="text-[11px] text-slate-600 leading-relaxed pt-1 border-t border-slate-200">
+                            {sub.description}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* SECTION 7-D: WORK IMMERSION & FIELD EXPERIENCE NOTICE */}
+          <div className="p-4 bg-slate-100 border border-slate-300 text-xs space-y-1 rounded-[4px]">
+            <span className="text-xs font-bold text-slate-900 block">
+              DepEd Work Immersion & Field Experience Requirement
+            </span>
+            <p className="text-slate-700 leading-relaxed">
+              {currentTrack === "Technical-Professional Track"
+                ? "Technical-Professional learners complete a mandatory 320 to 640 hours of workplace immersion in Grade 12 directly aligned with TESDA qualifications and partner industry facilities in Dumalneg and northern Luzon."
+                : "Academic Track learners undergo Field Experience and Prototyping (160 to 320 hours) in research laboratories, legal offices, medical clinics, or corporate enterprises during Grade 12."}
+            </p>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* SECTION C: SPECIAL NEEDS EDUCATION (SNED) / INCLUSIVE LEARNING (SEC. 5)    */}
+      {/* SECTION C: DISTANCE LEARNING MODALITIES (DEPED SECTION 8)                  */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Section 5: Special Needs Education (SNEd) &amp; Inclusive Support ]
+          <span className="text-xs font-bold text-[#002060] block">
+            Preferred Distance Learning Modalities
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            DepEd mandate on inclusive education: Inquire if the learner requires specialized academic accommodations, adaptive facilities, or individualized learning assistance:
-          </p>
-        </div>
-
-        {/* SNEd Yes/No Selector */}
-        <div>
-          <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
-            Does the learner have a diagnosed disability, health condition, or require special education support? <span className="text-red-700">*</span>
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
-            <label
-              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
-                !data.isSned
-                  ? "bg-[#002060] text-white border-[#002060]"
-                  : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
-              }`}
-            >
-              <input
-                type="radio"
-                name="isSned"
-                checked={!data.isSned}
-                onChange={() => {
-                  onChange({
-                    isSned: false,
-                    snedCategory: "",
-                    snedDetails: [],
-                    hasPwdId: false,
-                  });
-                  setErrors((prev) => {
-                    const next = { ...prev };
-                    delete next.snedCategory;
-                    delete next.snedDetails;
-                    return next;
-                  });
-                }}
-                className="accent-[#002060]"
-              />
-              <div className="text-xs font-bold uppercase">
-                No (General Education Learner)
-              </div>
-            </label>
-
-            <label
-              className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors ${
-                data.isSned
-                  ? "bg-[#002060] text-white border-[#002060]"
-                  : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
-              }`}
-            >
-              <input
-                type="radio"
-                name="isSned"
-                checked={data.isSned}
-                onChange={() => {
-                  onChange({
-                    isSned: true,
-                    snedCategory: data.snedCategory || "Diagnosis",
-                  });
-                }}
-                className="accent-[#002060]"
-              />
-              <div className="text-xs font-bold uppercase">
-                Yes (SNEd / Inclusive Learner)
-              </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Expanded SNEd Fields */}
-        {data.isSned && (
-          <div className="p-5 bg-white border-2 border-blue-200 space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Classification Assessment Basis <span className="text-red-700">*</span>
-              </label>
-              <div className="flex flex-wrap gap-4 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
-                  <input
-                    type="radio"
-                    name="snedCategory"
-                    value="Diagnosis"
-                    checked={data.snedCategory === "Diagnosis"}
-                    onChange={() => {
-                      onChange({ snedCategory: "Diagnosis", snedDetails: [] });
-                    }}
-                    className="accent-[#002060]"
-                  />
-                  With Formal Medical / Clinical Diagnosis
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
-                  <input
-                    type="radio"
-                    name="snedCategory"
-                    value="Manifestations"
-                    checked={data.snedCategory === "Manifestations"}
-                    onChange={() => {
-                      onChange({ snedCategory: "Manifestations", snedDetails: [] });
-                    }}
-                    className="accent-[#002060]"
-                  />
-                  Observed Learning Manifestations / Difficulty
-                </label>
-              </div>
-              {errors.snedCategory && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.snedCategory}</p>
-              )}
-            </div>
-
-            {/* Category Checklists */}
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-2">
-                Specific Learning Need / Condition (DepEd Official Form Checklist) <span className="text-red-700">*</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-3 border border-slate-300 bg-slate-50">
-                {(data.snedCategory === "Manifestations" ? SNED_MANIFESTATIONS : SNED_DIAGNOSES).map(
-                  (item) => {
-                    const isChecked = (data.snedDetails || []).includes(item);
-                    return (
-                      <label
-                        key={item}
-                        className="flex items-start gap-2 p-1.5 hover:bg-white text-xs text-slate-800 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => handleSnedDetailToggle(item)}
-                          className="accent-[#002060] mt-0.5"
-                        />
-                        <span className={isChecked ? "font-bold text-[#002060]" : ""}>{item}</span>
-                      </label>
-                    );
-                  }
-                )}
-              </div>
-              {errors.snedDetails && (
-                <p className="text-[11px] font-bold text-red-700 mt-1">{errors.snedDetails}</p>
-              )}
-            </div>
-
-            {/* PWD ID Checkbox */}
-            <div className="pt-2 border-t border-slate-200">
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-800 font-bold">
-                <input
-                  type="checkbox"
-                  checked={data.hasPwdId}
-                  onChange={(e) => onChange({ hasPwdId: e.target.checked })}
-                  className="accent-[#002060]"
-                />
-                Learner possesses an official Persons with Disability (PWD) ID Card or Medical Certificate
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ========================================================================= */}
-      {/* SECTION D: DISTANCE LEARNING MODALITIES (DEPED SECTION 8)                  */}
-      {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Section 8: Preferred Distance Learning Modalities ]
-          </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            DepEd Disaster Contingency Standard: In the event of emergency class suspensions (severe weather typhoons or PAGASA extreme heat index), select the learner&apos;s preferred remote alternative learning delivery modes:
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -524,9 +887,9 @@ export default function Step4CurriculumModality({
             return (
               <label
                 key={modality}
-                className={`p-3.5 border-2 flex items-start gap-3 cursor-pointer transition-colors ${
+                className={`p-3.5 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-xl ${
                   isChecked
-                    ? "bg-white border-[#002060] shadow-xs"
+                    ? "bg-blue-50/50 border-[#002060] shadow-xs"
                     : "bg-white border-slate-300 hover:border-slate-400"
                 }`}
               >
@@ -534,28 +897,11 @@ export default function Step4CurriculumModality({
                   type="checkbox"
                   checked={isChecked}
                   onChange={() => handleModalityToggle(modality)}
-                  className="accent-[#002060] mt-0.5"
+                  className="accent-[#002060]"
                 />
-                <div className="text-xs">
-                  <div className={`font-bold ${isChecked ? "text-[#002060]" : "text-slate-800"}`}>
-                    {modality}
-                  </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">
-                    {modality === "Modular (Print)"
-                      ? "Printed Self-Learning Modules via Barangay / Sitio"
-                      : modality === "Modular (Digital)"
-                      ? "Offline digital copies on USB flash drive / OTG"
-                      : modality === "Online"
-                      ? "Synchronous virtual meet and online classroom"
-                      : modality === "Blended (Combination)"
-                      ? "Alternating in-person and distance modular"
-                      : modality === "Educational Television"
-                      ? "Instructional lessons broadcast via DepEd TV"
-                      : modality === "Radio-Based Television"
-                      ? "Community radio broadcast lessons"
-                      : "DepEd parent-guided home instruction"}
-                  </div>
-                </div>
+                <span className={`text-xs font-bold ${isChecked ? "text-[#002060]" : "text-slate-800"}`}>
+                  {modality}
+                </span>
               </label>
             );
           })}
@@ -566,20 +912,26 @@ export default function Step4CurriculumModality({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t-2 border-slate-200">
+      <div className="flex flex-row items-center justify-between gap-3 pt-6 border-t border-slate-200">
         <button
           type="button"
           onClick={onBack}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center rounded-xl transition-all cursor-pointer"
         >
-Back to Family Background (Step 3)
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="w-full sm:w-auto px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-xs"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer"
         >
-          Proceed to Document Upload (Step 5)
+          <span>Next Step</span>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     </div>

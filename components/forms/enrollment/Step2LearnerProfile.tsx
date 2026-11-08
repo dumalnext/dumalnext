@@ -6,6 +6,34 @@ import { DUMALNEG_BARANGAYS } from "@/lib/types/enrollment";
 import CustomSelect from "@/components/CustomSelect";
 import DateOfBirthPicker from "./DateOfBirthPicker";
 
+const STANDARD_MOTHER_TONGUES = ["Ilokano", "Isnag", "Tagalog", "English"];
+
+const STANDARD_RELIGIONS = [
+  "Roman Catholic",
+  "Iglesia ni Cristo",
+  "Born Again / Evangelical Christian",
+  "Islam",
+  "Seventh-day Adventist",
+  "Baptist",
+  "Jehovah's Witnesses",
+  "Philippine Independent Church (Aglipayan)",
+  "United Church of Christ in the Philippines (UCCP)",
+  "Methodist",
+  "None / No Religious Affiliation",
+];
+
+const getMinAgeForGrade = (grade: number): number => {
+  switch (grade) {
+    case 7: return 11;
+    case 8: return 12;
+    case 9: return 13;
+    case 10: return 14;
+    case 11: return 15;
+    case 12: return 16;
+    default: return 11;
+  }
+};
+
 interface Step2LearnerProfileProps {
   data: FullEnrollmentFormData;
   onChange: (fields: Partial<FullEnrollmentFormData>) => void;
@@ -23,9 +51,60 @@ export default function Step2LearnerProfile({
   const [hasNoMiddleName, setHasNoMiddleName] = useState<boolean>(
     data.middleName === "N/A" || data.middleName === "None"
   );
-  const [hasNoLrnYet, setHasNoLrnYet] = useState<boolean>(
-    data.lrn === "TO_BE_ISSUED"
-  );
+
+  // Grade level detection and age calculation constraints
+  const targetGrade =
+    Number(data.step1?.targetGradeLevel) ||
+    (data.step1?.applicantType === "Grade 7"
+      ? 7
+      : data.step1?.applicantType === "Grade 11"
+      ? 11
+      : 7);
+
+  const minRequiredAge = getMinAgeForGrade(targetGrade);
+  const maxUnderageLimit = minRequiredAge - 1;
+  const isUnderage = typeof data.age === "number" && data.age < minRequiredAge;
+
+  // Mother Tongue "Other" handling
+  const [isOtherMotherTongue, setIsOtherMotherTongue] = useState<boolean>(() => {
+    return Boolean(data.motherTongue && !STANDARD_MOTHER_TONGUES.includes(data.motherTongue));
+  });
+  const [customMotherTongue, setCustomMotherTongue] = useState<string>(() => {
+    return data.motherTongue && !STANDARD_MOTHER_TONGUES.includes(data.motherTongue)
+      ? data.motherTongue
+      : "";
+  });
+
+  const STANDARD_IPS = ["Isnag", "Itneg", "Tingguian"];
+  const [isOtherIpSelected, setIsOtherIpSelected] = useState<boolean>(() => {
+    return Boolean(
+      data.ipCommunityName &&
+      !STANDARD_IPS.some((ip) => ip.toLowerCase() === data.ipCommunityName.trim().toLowerCase())
+    );
+  });
+
+  // Religion "Other" handling
+  const [isOtherReligion, setIsOtherReligion] = useState<boolean>(() => {
+    return Boolean(data.religion && !STANDARD_RELIGIONS.includes(data.religion));
+  });
+  const [customReligion, setCustomReligion] = useState<string>(() => {
+    return data.religion && !STANDARD_RELIGIONS.includes(data.religion)
+      ? data.religion
+      : "";
+  });
+
+  // Municipality selection mode: DUMALNEG or OTHER
+  const [currentMuniMode, setCurrentMuniMode] = useState<"DUMALNEG" | "OTHER">(() => {
+    return data.currentMunicipality && data.currentMunicipality.toUpperCase() !== "DUMALNEG"
+      ? "OTHER"
+      : "DUMALNEG";
+  });
+
+  const [permanentMuniMode, setPermanentMuniMode] = useState<"DUMALNEG" | "OTHER">(() => {
+    return data.permanentMunicipality && data.permanentMunicipality.toUpperCase() !== "DUMALNEG"
+      ? "OTHER"
+      : "DUMALNEG";
+  });
 
   // Smart Age Calculator: Recalculate age whenever dateOfBirth changes
   const handleDateOfBirthChange = (dob: string) => {
@@ -39,7 +118,7 @@ export default function Step2LearnerProfile({
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
           age--;
         }
-        if (age >= 10 && age <= 30) {
+        if (age >= 0 && age <= 100) {
           calculatedAge = age;
         }
       }
@@ -50,14 +129,20 @@ export default function Step2LearnerProfile({
       age: calculatedAge,
     });
 
-    if (errors.dateOfBirth || errors.age) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next.dateOfBirth;
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.dateOfBirth;
+      if (typeof calculatedAge === "number") {
+        if (calculatedAge < minRequiredAge) {
+          next.age = `Ineligible for Grade ${targetGrade}: Learners aged ${maxUnderageLimit} and below are not accepted. Minimum required age is ${minRequiredAge} years old.`;
+        } else {
+          delete next.age;
+        }
+      } else {
         delete next.age;
-        return next;
-      });
-    }
+      }
+      return next;
+    });
   };
 
   // Handle current address changes with auto-mirroring to permanent address if synced
@@ -94,6 +179,7 @@ export default function Step2LearnerProfile({
         permanentCountry: data.currentCountry,
         permanentZipCode: data.currentZipCode,
       });
+      setPermanentMuniMode(currentMuniMode);
     } else {
       onChange({ isPermanentSameAsCurrent: false });
     }
@@ -102,12 +188,10 @@ export default function Step2LearnerProfile({
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
 
-    // 1. Identification
-    if (!hasNoLrnYet) {
-      const cleanedLrn = (data.lrn || "").replace(/\D/g, "");
-      if (!cleanedLrn || cleanedLrn.length !== 12) {
-        newErrors.lrn = "Learner Reference Number (LRN) must be exactly 12 numeric digits.";
-      }
+    // 1. Identification (LRN is strictly required and must be 12 numeric digits)
+    const cleanedLrn = (data.lrn || "").replace(/\D/g, "");
+    if (!cleanedLrn || cleanedLrn.length !== 12) {
+      newErrors.lrn = "Learner Reference Number (LRN) is required and must be exactly 12 numeric digits.";
     }
 
     // 2. Personal Name
@@ -121,21 +205,31 @@ export default function Step2LearnerProfile({
       newErrors.middleName = "Learner's middle name is required, or check 'No Middle Name'.";
     }
 
-    // 3. Demographics
+    // 3. Demographics & Smart Age Error Trapping
     if (!data.dateOfBirth) {
       newErrors.dateOfBirth = "Date of birth is required.";
     }
-    if (!data.age || typeof data.age !== "number" || data.age < 10) {
+    if (data.age === "" || typeof data.age !== "number") {
       newErrors.age = "Valid age is required (automatically calculated from birthdate).";
+    } else if (data.age < minRequiredAge) {
+      newErrors.age = `Ineligible for Grade ${targetGrade}: Learners aged ${maxUnderageLimit} and below cannot proceed. Minimum required age is ${minRequiredAge} years old.`;
     }
+
     if (!data.gender) {
       newErrors.gender = "Sex (Male / Female) is required.";
     }
     if (!data.placeOfBirth || data.placeOfBirth.trim() === "") {
       newErrors.placeOfBirth = "Place of birth (Municipality/City) is required.";
     }
-    if (!data.motherTongue || data.motherTongue.trim() === "") {
-      newErrors.motherTongue = "Mother tongue is required.";
+
+    // Mother Tongue
+    if (!data.motherTongue || data.motherTongue.trim() === "" || (isOtherMotherTongue && (!customMotherTongue || customMotherTongue.trim() === "" || customMotherTongue === "Other"))) {
+      newErrors.motherTongue = "Mother tongue is required. Please specify your mother tongue.";
+    }
+
+    // Religion
+    if (isOtherReligion && (!customReligion || customReligion.trim() === "" || customReligion === "Other")) {
+      newErrors.religion = "Please specify your religious affiliation.";
     }
 
     // 4. IP & 4Ps
@@ -150,11 +244,18 @@ export default function Step2LearnerProfile({
     }
 
     // 5. Current Address
+    if (currentMuniMode === "OTHER") {
+      if (!data.currentMunicipality || data.currentMunicipality.trim() === "" || data.currentMunicipality.toUpperCase() === "OTHER") {
+        newErrors.currentMunicipality = "Please specify your municipality or city.";
+      }
+    } else {
+      if (!data.currentMunicipality || data.currentMunicipality.trim() === "") {
+        newErrors.currentMunicipality = "Municipality is required.";
+      }
+    }
+
     if (!data.currentBarangay || data.currentBarangay.trim() === "") {
       newErrors.currentBarangay = "Current residential barangay is required.";
-    }
-    if (!data.currentMunicipality || data.currentMunicipality.trim() === "") {
-      newErrors.currentMunicipality = "Municipality is required.";
     }
     if (!data.currentProvince || data.currentProvince.trim() === "") {
       newErrors.currentProvince = "Province is required.";
@@ -162,11 +263,17 @@ export default function Step2LearnerProfile({
 
     // 6. Permanent Address (if not same)
     if (!data.isPermanentSameAsCurrent) {
+      if (permanentMuniMode === "OTHER") {
+        if (!data.permanentMunicipality || data.permanentMunicipality.trim() === "" || data.permanentMunicipality.toUpperCase() === "OTHER") {
+          newErrors.permanentMunicipality = "Please specify permanent municipality or city.";
+        }
+      } else {
+        if (!data.permanentMunicipality || data.permanentMunicipality.trim() === "") {
+          newErrors.permanentMunicipality = "Permanent municipality is required.";
+        }
+      }
       if (!data.permanentBarangay || data.permanentBarangay.trim() === "") {
         newErrors.permanentBarangay = "Permanent barangay is required.";
-      }
-      if (!data.permanentMunicipality || data.permanentMunicipality.trim() === "") {
-        newErrors.permanentMunicipality = "Permanent municipality is required.";
       }
       if (!data.permanentProvince || data.permanentProvince.trim() === "") {
         newErrors.permanentProvince = "Permanent province is required.";
@@ -187,86 +294,56 @@ export default function Step2LearnerProfile({
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
+    <div className="space-y-6 sm:space-y-8 bg-white p-6 sm:p-10 border border-slate-200/80 shadow-xs rounded-2xl">
       {/* Step Header */}
-      <div className="border-b-2 border-slate-200 pb-5">
+      <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded-[4px]">
-            STEP 02 OF 05
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-md">
+            Step 02 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 tracking-wider">
             DepEd Form Section 3
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Learner&apos;s Personal Information
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Provide complete, official civil registry credentials and residential address in compliance with DepEd Basic Education standards.
-        </p>
       </div>
 
-      {/* Part A: Official DepEd Identifiers (LRN & PSA) */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part A: Official DepEd Identifiers ]
+      {/* Official DepEd Identifiers (LRN & PSA) */}
+      <div className="space-y-5 p-5 sm:p-6 bg-slate-50/80 border border-slate-200 rounded-xl">
+        <div className="border-b border-slate-200 pb-2.5">
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Official DepEd Identifiers
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Learner Reference Number (LRN) registered in DepEd LIS and Philippine Statistics Authority (PSA) Certificate.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* LRN (12 Digits) */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold text-slate-900 uppercase">
-                Learner Reference Number (LRN) {!hasNoLrnYet && <span className="text-red-700">*</span>}
-              </label>
-              <label className="text-[11px] text-slate-600 flex items-center gap-1.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={hasNoLrnYet}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setHasNoLrnYet(checked);
-                    if (checked) {
-                      onChange({ lrn: "TO_BE_ISSUED" });
-                      if (errors.lrn) {
-                        setErrors((prev) => {
-                          const next = { ...prev };
-                          delete next.lrn;
-                          return next;
-                        });
-                      }
-                    } else {
-                      onChange({ lrn: "" });
-                    }
-                  }}
-                  className="rounded text-[#002060] focus:ring-[#002060]"
-                />
-                <span>No LRN yet (New Enrollee)</span>
-              </label>
-            </div>
-
+            <label className="block text-xs font-bold text-slate-900 mb-1">
+              Learner Reference Number (LRN) <span className="text-red-700">*</span>
+            </label>
             <input
               type="text"
               maxLength={12}
-              disabled={hasNoLrnYet}
-              value={hasNoLrnYet ? "PENDING ASSIGNMENT IN LIS" : data.lrn || ""}
+              value={data.lrn || ""}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "");
+                const val = e.target.value.replace(/\D/g, "").slice(0, 12);
                 onChange({ lrn: val });
+                if (errors.lrn) {
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.lrn;
+                    return next;
+                  });
+                }
               }}
-              placeholder="100234567890"
-              className={`w-full p-3 bg-white border-2 text-sm font-mono tracking-wider font-bold focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none ${
-                hasNoLrnYet ? "bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed" : "border-slate-300"
+              placeholder="Enter 12-digit LRN (e.g. 100234567890)"
+              className={`w-full p-3 bg-white border-2 text-sm tracking-wider font-bold focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl ${
+                errors.lrn ? "border-red-600 bg-red-50 text-red-900" : "border-slate-300"
               }`}
             />
-            <span className="text-[11px] text-slate-500 mt-1 block">
-              12-digit permanent student identification number issued by DepEd.
-            </span>
             {errors.lrn && (
               <span className="text-xs text-red-700 font-semibold mt-1 block">
                 {errors.lrn}
@@ -276,38 +353,32 @@ export default function Step2LearnerProfile({
 
           {/* PSA Birth Certificate No. */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-              PSA Birth Certificate No. <span className="text-slate-400 font-normal">(Optional upon registration)</span>
+            <label className="block text-xs font-bold text-slate-900 mb-1">
+              PSA Birth Certificate No. <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
             <input
               type="text"
               value={data.psaBirthCertNo || ""}
               onChange={(e) => onChange({ psaBirthCertNo: e.target.value.toUpperCase() })}
               placeholder="e.g. 1234-5678-9012"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-mono uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-sm uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl"
             />
-            <span className="text-[11px] text-slate-500 mt-1 block">
-              Official Birth Certificate Registry Number found on the PSA document header.
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Part B: Legal Name Details */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part B: Learner&apos;s Legal Name (As Appearing on PSA Birth Certificate) ]
+      {/* Learner's Legal Name */}
+      <div className="space-y-5 p-5 sm:p-6 bg-slate-50/80 border border-slate-200 rounded-xl">
+        <div className="border-b border-slate-200 pb-2.5">
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Learner&apos;s Legal Name (PSA Birth Certificate)
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Print legibly in capital letters. Do not use nicknames or informal abbreviations.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Last Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Last Name <span className="text-red-700">*</span>
             </label>
             <input
@@ -315,7 +386,7 @@ export default function Step2LearnerProfile({
               value={data.lastName || ""}
               onChange={(e) => onChange({ lastName: e.target.value.toUpperCase() })}
               placeholder="DELA CRUZ"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-bold uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-bold uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl"
             />
             {errors.lastName && (
               <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -326,7 +397,7 @@ export default function Step2LearnerProfile({
 
           {/* First Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               First Name <span className="text-red-700">*</span>
             </label>
             <input
@@ -334,7 +405,7 @@ export default function Step2LearnerProfile({
               value={data.firstName || ""}
               onChange={(e) => onChange({ firstName: e.target.value.toUpperCase() })}
               placeholder="JUAN MIGUEL"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-bold uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-bold uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl"
             />
             {errors.firstName && (
               <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -346,7 +417,7 @@ export default function Step2LearnerProfile({
           {/* Middle Name */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold text-slate-900 uppercase">
+              <label className="text-xs font-bold text-slate-900">
                 Middle Name {!hasNoMiddleName && <span className="text-red-700">*</span>}
               </label>
               <label className="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer">
@@ -380,7 +451,7 @@ export default function Step2LearnerProfile({
               value={hasNoMiddleName ? "N/A" : data.middleName || ""}
               onChange={(e) => onChange({ middleName: e.target.value.toUpperCase() })}
               placeholder="SANTOS"
-              className={`w-full p-3 bg-white border-2 text-sm font-bold uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none ${
+              className={`w-full p-3 bg-white border-2 text-sm font-bold uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl ${
                 hasNoMiddleName ? "bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed" : "border-slate-300"
               }`}
             />
@@ -393,7 +464,7 @@ export default function Step2LearnerProfile({
 
           {/* Extension Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Extension Name <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
             <CustomSelect
@@ -415,20 +486,19 @@ export default function Step2LearnerProfile({
         </div>
       </div>
 
-      {/* Part C: Demographics & Smart Age Calculator */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3">
+      {/* Demographics & Age Information */}
+      <div className="space-y-5 p-5 sm:p-6 bg-slate-50/80 border border-slate-200 rounded-xl">
+        <div className="border-b border-slate-200 pb-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Part C: Demographics &amp; Smart Age Calculation ]
+            <span className="text-xs font-bold text-[#002060] tracking-wider block">
+              Demographics &amp; Age Information
             </span>
-            <span className="text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 font-bold">
-              [ AUTO-AGE COMPUTATION ACTIVE ]
-            </span>
+            {(isUnderage || errors.age) && (
+              <span className="text-[11px] bg-red-100 text-red-800 border border-red-400 px-2 py-0.5 font-bold rounded-md">
+                Ineligible: Underage for Grade {targetGrade}
+              </span>
+            )}
           </div>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Age is automatically derived from the registered Date of Birth.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
@@ -443,29 +513,40 @@ export default function Step2LearnerProfile({
 
           {/* Age (Auto-Calculated) */}
           <div className="sm:col-span-1 lg:col-span-1">
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Age (Years Old) <span className="text-red-700">*</span>
             </label>
-            <div className="flex items-center gap-2">
+            <div className="relative">
               <input
                 type="number"
                 value={data.age || ""}
                 readOnly
                 placeholder="Auto"
-                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-sm font-bold text-slate-800 cursor-not-allowed outline-none text-center rounded-[4px]"
+                className={`w-full h-[46px] px-3 pr-9 border-2 text-sm font-bold cursor-not-allowed outline-none text-center rounded-xl ${
+                  isUnderage || errors.age
+                    ? "border-red-600 bg-red-50 text-red-700 font-extrabold ring-2 ring-red-400"
+                    : "bg-slate-100 border-slate-300 text-slate-800"
+                }`}
               />
-              <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Y/O</span>
-            </div>
-            {errors.age && (
-              <span className="text-xs text-red-700 font-semibold mt-1 block">
-                {errors.age}
+              <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold pointer-events-none ${isUnderage || errors.age ? "text-red-700 font-extrabold" : "text-slate-500"}`}>
+                Y/O
               </span>
+            </div>
+            {(isUnderage || errors.age) && (
+              <div className="mt-1.5 p-2.5 bg-red-100 border border-red-400 text-red-900 space-y-1 rounded-lg">
+                <div className="text-[11px] font-bold tracking-wider flex items-center gap-1.5 text-red-800">
+                  <span>Ineligible for Grade {targetGrade}</span>
+                </div>
+                <p className="text-[11px] text-red-700 font-semibold leading-tight">
+                  {errors.age || `Learners aged ${maxUnderageLimit} and below are not eligible for Grade ${targetGrade}. Minimum required age is ${minRequiredAge} years old.`}
+                </p>
+              </div>
             )}
           </div>
 
           {/* Sex (Male / Female) */}
           <div className="sm:col-span-1 lg:col-span-1">
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Sex <span className="text-red-700">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -485,7 +566,7 @@ export default function Step2LearnerProfile({
                         });
                       }
                     }}
-                    className={`p-3 border-2 font-bold text-xs uppercase tracking-wider transition-all rounded-[4px] cursor-pointer ${
+                    className={`h-[46px] flex items-center justify-center border-2 font-bold text-xs tracking-wider transition-all rounded-xl cursor-pointer ${
                       isSelected
                         ? "bg-[#002060] text-white border-[#002060] shadow-sm"
                         : "bg-white text-slate-700 border-slate-300 hover:border-[#002060]"
@@ -505,7 +586,7 @@ export default function Step2LearnerProfile({
 
           {/* Place of Birth */}
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Place of Birth (Municipality/City) <span className="text-red-700">*</span>
             </label>
             <input
@@ -513,7 +594,7 @@ export default function Step2LearnerProfile({
               value={data.placeOfBirth || ""}
               onChange={(e) => onChange({ placeOfBirth: e.target.value.toUpperCase() })}
               placeholder="e.g. DUMALNEG, ILOCOS NORTE / LAOAG CITY"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+              className="w-full h-[46px] px-3 bg-white border-2 border-slate-300 text-sm font-medium uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none rounded-xl"
             />
             {errors.placeOfBirth && (
               <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -524,55 +605,156 @@ export default function Step2LearnerProfile({
 
           {/* Mother Tongue */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-900 mb-1">
               Mother Tongue <span className="text-red-700">*</span>
             </label>
             <CustomSelect
-              value={data.motherTongue || "Ilokano"}
-              onChange={(val) => onChange({ motherTongue: val })}
+              value={isOtherMotherTongue ? "Other" : (data.motherTongue || "Ilokano")}
+              onChange={(val) => {
+                if (val === "Other") {
+                  setIsOtherMotherTongue(true);
+                  onChange({ motherTongue: customMotherTongue || "Other" });
+                } else {
+                  setIsOtherMotherTongue(false);
+                  onChange({ motherTongue: val });
+                }
+                if (errors.motherTongue) {
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.motherTongue;
+                    return next;
+                  });
+                }
+              }}
               options={[
                 { value: "Ilokano", label: "Ilokano" },
                 { value: "Isnag", label: "Isnag" },
                 { value: "Tagalog", label: "Tagalog" },
                 { value: "English", label: "English" },
-                { value: "Other", label: "Other" },
+                { value: "Other", label: "Other (Please specify)" },
               ]}
               placeholder="Select Mother Tongue"
               fullWidth
+              error={Boolean(errors.motherTongue)}
             />
+
+            {isOtherMotherTongue && (
+              <div className="mt-2">
+                <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                  Please specify Mother Tongue <span className="text-red-700">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={customMotherTongue}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCustomMotherTongue(val);
+                    onChange({ motherTongue: val });
+                    if (errors.motherTongue) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.motherTongue;
+                        return next;
+                      });
+                    }
+                  }}
+                  placeholder="e.g. Pangasinense, Ibanag, Kankanaey"
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-[4px] ${
+                    errors.motherTongue ? "border-red-600 bg-red-50 text-red-900" : "border-slate-300"
+                  }`}
+                />
+              </div>
+            )}
+            {errors.motherTongue && (
+              <span className="text-xs text-red-700 font-semibold mt-1 block">
+                {errors.motherTongue}
+              </span>
+            )}
           </div>
 
           {/* Religion */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-              Religion <span className="text-slate-400 font-normal">(Optional)</span>
+            <label className="block text-xs font-bold text-slate-900 mb-1">
+              Religion <span className="text-slate-500 font-normal">(Select or specify)</span>
             </label>
-            <input
-              type="text"
-              value={data.religion || ""}
-              onChange={(e) => onChange({ religion: e.target.value.toUpperCase() })}
-              placeholder="e.g. ROMAN CATHOLIC / INC"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-sm font-medium uppercase focus:border-[#002060] focus:ring-1 focus:ring-[#002060] outline-none"
+            <CustomSelect
+              value={isOtherReligion ? "Other" : (data.religion || "Roman Catholic")}
+              onChange={(val) => {
+                if (val === "Other") {
+                  setIsOtherReligion(true);
+                  onChange({ religion: customReligion || "Other" });
+                } else {
+                  setIsOtherReligion(false);
+                  onChange({ religion: val });
+                }
+                if (errors.religion) {
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.religion;
+                    return next;
+                  });
+                }
+              }}
+              options={[
+                ...STANDARD_RELIGIONS.map((rel) => ({
+                  value: rel,
+                  label: rel,
+                })),
+                { value: "Other", label: "Other (Please specify)" },
+              ]}
+              placeholder="Select Religion"
+              fullWidth
+              error={Boolean(errors.religion)}
             />
+
+            {isOtherReligion && (
+              <div className="mt-2">
+                <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                  Please specify Religion <span className="text-red-700">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={customReligion}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCustomReligion(val);
+                    onChange({ religion: val });
+                    if (errors.religion) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.religion;
+                        return next;
+                      });
+                    }
+                  }}
+                  placeholder="e.g. Latter-day Saints (Mormon), Buddhism, etc."
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-[4px] ${
+                    errors.religion ? "border-red-600 bg-red-50 text-red-900" : "border-slate-300"
+                  }`}
+                />
+              </div>
+            )}
+            {errors.religion && (
+              <span className="text-xs text-red-700 font-semibold mt-1 block">
+                {errors.religion}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Part D: Social Welfare & Indigenous Cultural Community */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part D: Indigenous Cultural Community &amp; 4Ps Beneficiary Data ]
+      {/* Indigenous Cultural Community & 4Ps Beneficiary */}
+      <div className="space-y-5 p-5 sm:p-6 bg-slate-50/80 border border-slate-200 rounded-xl">
+        <div className="border-b border-slate-200 pb-2.5">
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Indigenous Cultural Community &amp; 4Ps Beneficiary
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Dumalneg is an ancestral domain of the Isnag/Itneg people. Specify cultural heritage and national social welfare affiliations.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* IP Community Toggle & Specifier */}
-          <div className="p-4 bg-white border-2 border-slate-200 space-y-3">
-            <label className="block text-xs font-bold text-slate-900 uppercase">
+          <div className="p-4 bg-white border border-slate-200 space-y-3 rounded-xl">
+            <label className="block text-xs font-bold text-slate-900">
               Belonging to any Indigenous Peoples (IP) Community? <span className="text-red-700">*</span>
             </label>
             <div className="flex gap-4">
@@ -584,7 +766,7 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ isIpCommunity: true, ipCommunityName: data.ipCommunityName || "Isnag" })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>YES</span>
+                <span>Yes</span>
               </label>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
                 <input
@@ -594,38 +776,89 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ isIpCommunity: false, ipCommunityName: "" })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>NO</span>
+                <span>No</span>
               </label>
             </div>
 
             {data.isIpCommunity && (
               <div className="pt-2">
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
                   Specify Indigenous Community Name <span className="text-red-700">*</span>
                 </label>
-                <div className="flex gap-2 mb-2">
-                  {(["Isnag", "Itneg", "Tingguian"] as const).map((ip) => (
-                    <button
-                      key={ip}
-                      type="button"
-                      onClick={() => onChange({ ipCommunityName: ip })}
-                      className={`text-[11px] font-bold px-2.5 py-1 border transition-all ${
-                        data.ipCommunityName === ip
-                          ? "bg-[#002060] text-white border-[#002060]"
-                          : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
-                      }`}
-                    >
-                      {ip}
-                    </button>
-                  ))}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {STANDARD_IPS.map((ip) => {
+                    const isSelected =
+                      !isOtherIpSelected &&
+                      data.ipCommunityName?.trim().toLowerCase() === ip.toLowerCase();
+                    return (
+                      <button
+                        key={ip}
+                        type="button"
+                        onClick={() => {
+                          setIsOtherIpSelected(false);
+                          onChange({ ipCommunityName: ip });
+                          if (errors.ipCommunityName) {
+                            setErrors((prev) => {
+                              const next = { ...prev };
+                              delete next.ipCommunityName;
+                              return next;
+                            });
+                          }
+                        }}
+                        className={`text-[11px] font-bold px-3 py-1.5 border transition-all rounded-md cursor-pointer ${
+                          isSelected
+                            ? "bg-[#002060] text-white border-[#002060]"
+                            : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
+                        }`}
+                      >
+                        {ip}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOtherIpSelected(true);
+                      if (
+                        STANDARD_IPS.some(
+                          (ip) => ip.toLowerCase() === (data.ipCommunityName || "").trim().toLowerCase()
+                        )
+                      ) {
+                        onChange({ ipCommunityName: "" });
+                      }
+                    }}
+                    className={`text-[11px] font-bold px-3 py-1.5 border transition-all rounded-md cursor-pointer ${
+                      isOtherIpSelected
+                        ? "bg-[#002060] text-white border-[#002060]"
+                        : "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-500"
+                    }`}
+                  >
+                    Others
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  value={data.ipCommunityName || ""}
-                  onChange={(e) => onChange({ ipCommunityName: e.target.value.toUpperCase() })}
-                  placeholder="e.g. ISNAG"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
-                />
+
+                {isOtherIpSelected && (
+                  <div className="pt-1">
+                    <input
+                      type="text"
+                      value={data.ipCommunityName || ""}
+                      onChange={(e) => {
+                        const val = e.target.value.toUpperCase();
+                        onChange({ ipCommunityName: val });
+                        if (errors.ipCommunityName) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next.ipCommunityName;
+                            return next;
+                          });
+                        }
+                      }}
+                      placeholder="Specify Indigenous Community Name (e.g. AGTA)"
+                      className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl"
+                      autoFocus
+                    />
+                  </div>
+                )}
                 {errors.ipCommunityName && (
                   <span className="text-xs text-red-700 font-semibold mt-1 block">
                     {errors.ipCommunityName}
@@ -636,8 +869,8 @@ export default function Step2LearnerProfile({
           </div>
 
           {/* 4Ps Beneficiary Toggle & 16-Digit ID */}
-          <div className="p-4 bg-white border-2 border-slate-200 space-y-3">
-            <label className="block text-xs font-bold text-slate-900 uppercase">
+          <div className="p-4 bg-white border border-slate-200 space-y-3 rounded-xl">
+            <label className="block text-xs font-bold text-slate-900">
               Is your family a beneficiary of 4Ps (Pantawid Pamilya)? <span className="text-red-700">*</span>
             </label>
             <div className="flex gap-4">
@@ -649,7 +882,7 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ is4psBeneficiary: true })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>YES</span>
+                <span>Yes</span>
               </label>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
                 <input
@@ -659,13 +892,13 @@ export default function Step2LearnerProfile({
                   onChange={() => onChange({ is4psBeneficiary: false, householdId4ps: "" })}
                   className="text-[#002060] focus:ring-[#002060]"
                 />
-                <span>NO</span>
+                <span>No</span>
               </label>
             </div>
 
             {data.is4psBeneficiary && (
               <div className="pt-2">
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   4Ps Household ID Number (16 Digits) <span className="text-red-700">*</span>
                 </label>
                 <input
@@ -677,11 +910,8 @@ export default function Step2LearnerProfile({
                     onChange({ householdId4ps: val });
                   }}
                   placeholder="0123456789012345"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-widest focus:border-[#002060] outline-none text-center"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold tracking-widest focus:border-[#002060] outline-none text-center rounded-xl"
                 />
-                <span className="text-[11px] text-slate-500 mt-1 block">
-                  16-digit official household identification number on the DSWD 4Ps card.
-                </span>
                 {errors.householdId4ps && (
                   <span className="text-xs text-red-700 font-semibold mt-1 block">
                     {errors.householdId4ps}
@@ -693,26 +923,23 @@ export default function Step2LearnerProfile({
         </div>
       </div>
 
-      {/* Part E: Residential Addresses */}
-      <div className="space-y-6 p-6 bg-slate-50 border-2 border-slate-300">
-        <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Part E: Current &amp; Permanent Residential Address ]
+      {/* Residential Address */}
+      <div className="space-y-6 p-4 sm:p-6 bg-slate-50/80 border border-slate-200 rounded-xl">
+        <div className="border-b border-slate-200 pb-2.5">
+          <span className="text-xs font-bold text-[#002060] tracking-wider block">
+            Residential Address
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Provide the physical domicile address of the enrolling student.
-          </p>
         </div>
 
         {/* Current Address */}
         <div className="space-y-3">
-          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block border-l-3 border-[#002060] pl-2">
+          <span className="text-xs font-bold text-slate-900 tracking-wider block border-l-3 border-[#002060] pl-2">
             Current Residential Address
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* House No */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 House No. / Street
               </label>
               <input
@@ -720,13 +947,13 @@ export default function Step2LearnerProfile({
                 value={data.currentHouseNo || ""}
                 onChange={(e) => handleCurrentAddressChange({ currentHouseNo: e.target.value.toUpperCase() })}
                 placeholder="e.g. BLOCK 1 LOT 2"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
               />
             </div>
 
             {/* Sitio */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Sitio / Purok
               </label>
               <input
@@ -734,26 +961,143 @@ export default function Step2LearnerProfile({
                 value={data.currentSitio || ""}
                 onChange={(e) => handleCurrentAddressChange({ currentSitio: e.target.value.toUpperCase() })}
                 placeholder="e.g. PUROK MANGGA"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
               />
             </div>
 
-            {/* Barangay */}
+            {/* Municipality Dropdown */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Barangay <span className="text-red-700">*</span>
+              <label className="block text-xs font-bold text-slate-900 mb-1">
+                Municipality / City <span className="text-red-700">*</span>
               </label>
               <CustomSelect
-                value={(data.currentBarangay || "CABARITAN").toUpperCase()}
-                onChange={(val) => handleCurrentAddressChange({ currentBarangay: val.toUpperCase() })}
-                options={DUMALNEG_BARANGAYS.map((brgy) => ({
-                  value: brgy.toUpperCase(),
-                  label: `BRGY. ${brgy.toUpperCase()}`,
-                }))}
-                placeholder="Select Barangay"
+                value={currentMuniMode}
+                onChange={(val) => {
+                  const mode = val as "DUMALNEG" | "OTHER";
+                  setCurrentMuniMode(mode);
+                  if (mode === "DUMALNEG") {
+                    handleCurrentAddressChange({
+                      currentMunicipality: "DUMALNEG",
+                      currentBarangay:
+                        data.currentBarangay &&
+                        DUMALNEG_BARANGAYS.includes(data.currentBarangay.toUpperCase() as any)
+                          ? data.currentBarangay.toUpperCase()
+                          : "CABARITAN",
+                      currentProvince: "ILOCOS NORTE",
+                      currentZipCode: "2921",
+                    });
+                  } else {
+                    handleCurrentAddressChange({
+                      currentMunicipality: "",
+                      currentBarangay: "",
+                    });
+                  }
+                  if (errors.currentMunicipality) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.currentMunicipality;
+                      return next;
+                    });
+                  }
+                }}
+                options={[
+                  { value: "DUMALNEG", label: "DUMALNEG" },
+                  { value: "OTHER", label: "OTHER (OUTSIDE DUMALNEG)" },
+                ]}
+                placeholder="Select Municipality"
                 fullWidth
-                error={Boolean(errors.currentBarangay)}
+                error={Boolean(errors.currentMunicipality)}
               />
+
+              {currentMuniMode === "OTHER" && (
+                <div className="mt-2">
+                  <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                    Specify Municipality / City <span className="text-red-700">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      data.currentMunicipality &&
+                      data.currentMunicipality.toUpperCase() !== "DUMALNEG"
+                        ? data.currentMunicipality
+                        : ""
+                    }
+                    onChange={(e) => {
+                      handleCurrentAddressChange({
+                        currentMunicipality: e.target.value.toUpperCase(),
+                      });
+                      if (errors.currentMunicipality) {
+                        setErrors((prev) => {
+                          const next = { ...prev };
+                          delete next.currentMunicipality;
+                          return next;
+                        });
+                      }
+                    }}
+                    placeholder="e.g. BANGUI, PAGUDPUD, ADAMS, LAOAG"
+                    className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                      errors.currentMunicipality
+                        ? "border-red-600 bg-red-50 text-red-900"
+                        : "border-slate-300"
+                    }`}
+                  />
+                </div>
+              )}
+              {errors.currentMunicipality && (
+                <span className="text-xs text-red-700 font-semibold mt-1 block">
+                  {errors.currentMunicipality}
+                </span>
+              )}
+            </div>
+
+            {/* Barangay (Smart Dropdown for Dumalneg, Text Box for Other) */}
+            <div>
+              <label className="block text-xs font-bold text-slate-900 mb-1">
+                Barangay <span className="text-red-700">*</span>
+              </label>
+              {currentMuniMode === "DUMALNEG" ? (
+                <CustomSelect
+                  value={(data.currentBarangay || "CABARITAN").toUpperCase()}
+                  onChange={(val) => {
+                    handleCurrentAddressChange({ currentBarangay: val.toUpperCase() });
+                    if (errors.currentBarangay) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.currentBarangay;
+                        return next;
+                      });
+                    }
+                  }}
+                  options={DUMALNEG_BARANGAYS.map((brgy) => ({
+                    value: brgy.toUpperCase(),
+                    label: `BRGY. ${brgy.toUpperCase()}`,
+                  }))}
+                  placeholder="Select Barangay"
+                  fullWidth
+                  error={Boolean(errors.currentBarangay)}
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={data.currentBarangay || ""}
+                  onChange={(e) => {
+                    handleCurrentAddressChange({ currentBarangay: e.target.value.toUpperCase() });
+                    if (errors.currentBarangay) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.currentBarangay;
+                        return next;
+                      });
+                    }
+                  }}
+                  placeholder="e.g. SAN NICOLAS / POBLACION"
+                  className={`w-full p-3 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                    errors.currentBarangay
+                      ? "border-red-600 bg-red-50 text-red-900"
+                      : "border-slate-300"
+                  }`}
+                />
+              )}
               {errors.currentBarangay && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
                   {errors.currentBarangay}
@@ -761,61 +1105,58 @@ export default function Step2LearnerProfile({
               )}
             </div>
 
-            {/* Municipality */}
-            <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                Municipality / City <span className="text-red-700">*</span>
-              </label>
-              <input
-                type="text"
-                value={data.currentMunicipality || "Dumalneg"}
-                onChange={(e) => handleCurrentAddressChange({ currentMunicipality: e.target.value.toUpperCase() })}
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
-              />
-            </div>
-
             {/* Province */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Province <span className="text-red-700">*</span>
               </label>
               <input
                 type="text"
-                value={data.currentProvince || "Ilocos Norte"}
+                value={data.currentProvince || "ILOCOS NORTE"}
                 onChange={(e) => handleCurrentAddressChange({ currentProvince: e.target.value.toUpperCase() })}
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px]"
               />
+              {errors.currentProvince && (
+                <span className="text-xs text-red-700 font-semibold mt-1 block">
+                  {errors.currentProvince}
+                </span>
+              )}
             </div>
 
             {/* Country */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Country
               </label>
               <input
                 type="text"
                 value={data.currentCountry || "Philippines"}
                 readOnly
-                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-700 cursor-not-allowed outline-none"
+                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-700 cursor-not-allowed outline-none rounded-[4px]"
               />
             </div>
 
             {/* Zip Code */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Zip Code
               </label>
               <input
                 type="text"
                 value={data.currentZipCode || "2921"}
-                readOnly
-                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-xs font-mono font-bold text-slate-700 text-center cursor-not-allowed outline-none"
+                onChange={(e) => handleCurrentAddressChange({ currentZipCode: e.target.value })}
+                readOnly={currentMuniMode === "DUMALNEG"}
+                className={`w-full p-3 border-2 text-xs font-bold text-center outline-none rounded-[4px] ${
+                  currentMuniMode === "DUMALNEG"
+                    ? "bg-slate-100 border-slate-300 text-slate-700 cursor-not-allowed"
+                    : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
+                }`}
               />
             </div>
 
             {/* Contact Number */}
             <div>
-              <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-900 mb-1">
                 Learner / Family Mobile No. <span className="text-red-700">*</span>
               </label>
               <input
@@ -827,7 +1168,7 @@ export default function Step2LearnerProfile({
                   onChange({ contactNumber: val });
                 }}
                 placeholder="09171234567"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-mono font-bold tracking-wider focus:border-[#002060] outline-none text-center"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none text-center rounded-[4px]"
               />
               {errors.contactNumber && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -840,20 +1181,17 @@ export default function Step2LearnerProfile({
 
         {/* Permanent Address Toggle */}
         <div className="pt-3 border-t border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 bg-white border-2 border-slate-200 rounded-[4px] overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 bg-white border border-slate-200 rounded-xl overflow-hidden">
             <div className="min-w-0 flex-1">
               <span className="text-xs font-bold text-slate-900 block leading-tight">
                 Permanent Residential Address
               </span>
-              <p className="text-[11px] text-slate-600 mt-0.5 leading-normal">
-                Is your permanent address identical to your current residential address?
-              </p>
             </div>
             <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center">
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(true)}
-                className={`w-full sm:w-auto min-w-0 px-2 sm:px-3.5 py-1.5 sm:py-2 border-2 text-[11px] sm:text-xs font-bold transition-all rounded-[4px] text-center truncate cursor-pointer ${
+                className={`w-full sm:w-auto min-w-0 px-3.5 py-2 border-2 text-xs font-bold transition-all rounded-lg text-center truncate cursor-pointer ${
                   data.isPermanentSameAsCurrent
                     ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
@@ -864,7 +1202,7 @@ export default function Step2LearnerProfile({
               <button
                 type="button"
                 onClick={() => handlePermanentToggle(false)}
-                className={`w-full sm:w-auto min-w-0 px-2 sm:px-3.5 py-1.5 sm:py-2 border-2 text-[11px] sm:text-xs font-bold transition-all rounded-[4px] text-center truncate cursor-pointer ${
+                className={`w-full sm:w-auto min-w-0 px-3.5 py-2 border-2 text-xs font-bold transition-all rounded-lg text-center truncate cursor-pointer ${
                   !data.isPermanentSameAsCurrent
                     ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:bg-slate-50"
@@ -877,74 +1215,194 @@ export default function Step2LearnerProfile({
 
           {/* If Permanent Address is different */}
           {!data.isPermanentSameAsCurrent && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white border-2 border-t-0 border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white border-2 border-t-0 border-slate-200 rounded-b-[4px]">
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent House No. / Street
                 </label>
                 <input
                   type="text"
                   value={data.permanentHouseNo || ""}
                   onChange={(e) => onChange({ permanentHouseNo: e.target.value.toUpperCase() })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Sitio / Purok
                 </label>
                 <input
                   type="text"
                   value={data.permanentSitio || ""}
                   onChange={(e) => onChange({ permanentSitio: e.target.value.toUpperCase() })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
-                  Permanent Barangay <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={data.permanentBarangay || ""}
-                  onChange={(e) => onChange({ permanentBarangay: e.target.value.toUpperCase() })}
-                  placeholder="e.g. CABARITAN"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Municipality <span className="text-red-700">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={data.permanentMunicipality || ""}
-                  onChange={(e) => onChange({ permanentMunicipality: e.target.value.toUpperCase() })}
-                  placeholder="e.g. DUMALNEG"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                <CustomSelect
+                  value={permanentMuniMode}
+                  onChange={(val) => {
+                    const mode = val as "DUMALNEG" | "OTHER";
+                    setPermanentMuniMode(mode);
+                    if (mode === "DUMALNEG") {
+                      onChange({
+                        permanentMunicipality: "DUMALNEG",
+                        permanentBarangay:
+                          data.permanentBarangay &&
+                          DUMALNEG_BARANGAYS.includes(data.permanentBarangay.toUpperCase() as any)
+                            ? data.permanentBarangay.toUpperCase()
+                            : "CABARITAN",
+                        permanentProvince: "ILOCOS NORTE",
+                        permanentZipCode: "2921",
+                      });
+                    } else {
+                      onChange({
+                        permanentMunicipality: "",
+                        permanentBarangay: "",
+                      });
+                    }
+                    if (errors.permanentMunicipality) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.permanentMunicipality;
+                        return next;
+                      });
+                    }
+                  }}
+                  options={[
+                    { value: "DUMALNEG", label: "DUMALNEG" },
+                    { value: "OTHER", label: "OTHER (OUTSIDE DUMALNEG)" },
+                  ]}
+                  placeholder="Select Municipality"
+                  fullWidth
+                  error={Boolean(errors.permanentMunicipality)}
                 />
+
+                {permanentMuniMode === "OTHER" && (
+                  <div className="mt-2">
+                    <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                      Specify Municipality / City <span className="text-red-700">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        data.permanentMunicipality &&
+                        data.permanentMunicipality.toUpperCase() !== "DUMALNEG"
+                          ? data.permanentMunicipality
+                          : ""
+                      }
+                      onChange={(e) => {
+                        onChange({ permanentMunicipality: e.target.value.toUpperCase() });
+                        if (errors.permanentMunicipality) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next.permanentMunicipality;
+                            return next;
+                          });
+                        }
+                      }}
+                      placeholder="e.g. BANGUI, PAGUDPUD, ADAMS, LAOAG"
+                      className={`w-full p-2 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                        errors.permanentMunicipality
+                          ? "border-red-600 bg-red-50 text-red-900"
+                          : "border-slate-300"
+                      }`}
+                    />
+                  </div>
+                )}
+                {errors.permanentMunicipality && (
+                  <span className="text-xs text-red-700 font-semibold mt-1 block">
+                    {errors.permanentMunicipality}
+                  </span>
+                )}
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
+                  Permanent Barangay <span className="text-red-700">*</span>
+                </label>
+                {permanentMuniMode === "DUMALNEG" ? (
+                  <CustomSelect
+                    value={(data.permanentBarangay || "CABARITAN").toUpperCase()}
+                    onChange={(val) => {
+                      onChange({ permanentBarangay: val.toUpperCase() });
+                      if (errors.permanentBarangay) {
+                        setErrors((prev) => {
+                          const next = { ...prev };
+                          delete next.permanentBarangay;
+                          return next;
+                        });
+                      }
+                    }}
+                    options={DUMALNEG_BARANGAYS.map((brgy) => ({
+                      value: brgy.toUpperCase(),
+                      label: `BRGY. ${brgy.toUpperCase()}`,
+                    }))}
+                    placeholder="Select Barangay"
+                    fullWidth
+                    error={Boolean(errors.permanentBarangay)}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={data.permanentBarangay || ""}
+                    onChange={(e) => {
+                      onChange({ permanentBarangay: e.target.value.toUpperCase() });
+                      if (errors.permanentBarangay) {
+                        setErrors((prev) => {
+                          const next = { ...prev };
+                          delete next.permanentBarangay;
+                          return next;
+                        });
+                      }
+                    }}
+                    placeholder="e.g. CABARITAN / SAN NICOLAS"
+                    className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                      errors.permanentBarangay
+                        ? "border-red-600 bg-red-50 text-red-900"
+                        : "border-slate-300"
+                    }`}
+                  />
+                )}
+                {errors.permanentBarangay && (
+                  <span className="text-xs text-red-700 font-semibold mt-1 block">
+                    {errors.permanentBarangay}
+                  </span>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Province <span className="text-red-700">*</span>
                 </label>
                 <input
                   type="text"
-                  value={data.permanentProvince || ""}
+                  value={data.permanentProvince || "ILOCOS NORTE"}
                   onChange={(e) => onChange({ permanentProvince: e.target.value.toUpperCase() })}
                   placeholder="e.g. ILOCOS NORTE"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px]"
                 />
+                {errors.permanentProvince && (
+                  <span className="text-xs text-red-700 font-semibold mt-1 block">
+                    {errors.permanentProvince}
+                  </span>
+                )}
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-900 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-900 mb-1">
                   Permanent Zip Code
                 </label>
                 <input
                   type="text"
                   value={data.permanentZipCode || "2921"}
                   onChange={(e) => onChange({ permanentZipCode: e.target.value })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-mono font-bold text-center focus:border-[#002060] outline-none"
+                  readOnly={permanentMuniMode === "DUMALNEG"}
+                  className={`w-full p-2.5 border-2 text-xs font-bold text-center outline-none rounded-[4px] ${
+                    permanentMuniMode === "DUMALNEG"
+                      ? "bg-slate-100 border-slate-300 text-slate-700 cursor-not-allowed"
+                      : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
+                  }`}
                 />
               </div>
             </div>
@@ -953,20 +1411,26 @@ export default function Step2LearnerProfile({
       </div>
 
       {/* Navigation Footer */}
-      <div className="border-t-2 border-slate-200 pt-6 flex flex-col sm:flex-row justify-between gap-3">
+      <div className="border-t border-slate-200 pt-6 flex flex-row items-center justify-between gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="btn-secondary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center rounded-xl transition-all cursor-pointer"
         >
-          Back to Step 1: Classification
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btn-primary text-xs uppercase tracking-wider font-bold py-3.5 px-8 text-center shadow-sm"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-[#002060] hover:bg-[#001744] active:scale-[0.99] text-white text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center shadow-sm rounded-xl transition-all cursor-pointer"
         >
-          Proceed: Family Background (Step 3)
+          <span>Next Step</span>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FullEnrollmentFormData } from "./EnrollmentStepper";
 import { compressImage } from "@/lib/utils/image-compressor";
 import { useAuth } from "@/lib/auth/authContext";
@@ -10,6 +10,8 @@ interface Step5DocumentsReviewProps {
   data: FullEnrollmentFormData;
   onChange: (fields: Partial<FullEnrollmentFormData>) => void;
   onBack: () => void;
+  existingApplication?: any;
+  isEnrollmentOpen?: boolean;
 }
 
 interface UploadedDocState {
@@ -20,10 +22,195 @@ interface UploadedDocState {
   isCompressing: boolean;
 }
 
+interface DocumentDropBoxProps {
+  id: string;
+  docKey: string;
+  label: React.ReactNode;
+  sublabel: string;
+  badgeText: string;
+  badgeType?: "slate" | "amber" | "blue";
+  accept?: string;
+  uploadedDoc: UploadedDocState | null;
+  error?: string;
+  onUpload: (file: File) => void;
+  onRemove: () => void;
+  isMandatory?: boolean;
+}
+
+function DocumentDropBox({
+  id,
+  label,
+  sublabel,
+  badgeText,
+  badgeType = "slate",
+  accept = "image/*,.pdf",
+  uploadedDoc,
+  error,
+  onUpload,
+  onRemove,
+  isMandatory = false,
+}: DocumentDropBoxProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  return (
+    <div className="p-4 bg-white border-2 border-slate-300 space-y-2.5 rounded-[4px] shadow-2xs hover:border-slate-400 transition-colors">
+      <div className="flex items-center justify-between gap-2">
+        <label htmlFor={id} className="text-xs font-bold text-slate-900 cursor-pointer">
+          {label} {isMandatory && <span className="text-red-700">*</span>}
+        </label>
+        <span
+          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-[4px] ${
+            badgeType === "blue"
+              ? "bg-blue-100 text-[#002060] border border-blue-200"
+              : badgeType === "amber"
+              ? "bg-amber-100 text-amber-900 border border-amber-300"
+              : "bg-slate-100 text-slate-600 border border-slate-200"
+          }`}
+        >
+          {badgeText}
+        </span>
+      </div>
+
+      {sublabel ? (
+        <p className="text-[11px] text-slate-600 leading-relaxed">{sublabel}</p>
+      ) : null}
+
+      {uploadedDoc ? (
+        <div className="p-3.5 bg-slate-50 border-2 border-blue-200 space-y-3 rounded-xl shadow-2xs">
+          {/* Responsive Auto-Fit Image / Document Preview Container */}
+          <div className="relative w-full rounded-lg overflow-hidden border border-slate-200 bg-white flex items-center justify-center min-h-[140px] max-h-[220px]">
+            {uploadedDoc.previewUrl &&
+            (uploadedDoc.previewUrl.startsWith("data:image/") ||
+              uploadedDoc.previewUrl.startsWith("blob:") ||
+              uploadedDoc.previewUrl.startsWith("http")) ? (
+              <img
+                src={uploadedDoc.previewUrl}
+                alt={uploadedDoc.file.name}
+                className="w-full h-auto max-h-[220px] object-contain rounded-lg p-1"
+              />
+            ) : (
+              <div className="py-8 flex flex-col items-center justify-center text-slate-500 gap-1.5">
+                <svg className="w-10 h-10 text-[#002060]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-xs font-bold text-slate-700">PDF Document</span>
+              </div>
+            )}
+            <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 bg-emerald-600 text-white shadow-xs rounded-md">
+              Ready
+            </span>
+          </div>
+
+          {/* File details & Action Buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="min-w-0 flex-1">
+              <span className="font-bold text-[#002060] text-xs block truncate" title={uploadedDoc.file.name}>
+                {uploadedDoc.file.name}
+              </span>
+              <span className="text-[10px] text-slate-500 block mt-0.5">
+                {uploadedDoc.compressedSizeKb} KB &bull; Compressed from {uploadedDoc.originalSizeKb} KB
+              </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 sm:flex-initial px-3.5 py-1.5 bg-white border border-slate-300 text-xs text-slate-700 font-bold hover:bg-slate-100 transition-colors rounded-lg shadow-2xs cursor-pointer text-center"
+              >
+                Replace
+              </button>
+              <button
+                type="button"
+                onClick={onRemove}
+                className="flex-1 sm:flex-initial px-3.5 py-1.5 bg-white border border-red-300 text-xs text-red-700 font-bold hover:bg-red-50 transition-colors rounded-lg shadow-2xs cursor-pointer text-center"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-[4px] p-4 transition-all text-center cursor-pointer group flex flex-col items-center justify-center gap-1.5 ${
+            isDragging
+              ? "border-[#002060] bg-blue-50/70 scale-[1.01]"
+              : "border-slate-300 hover:border-[#002060] bg-slate-50/60 hover:bg-blue-50/30"
+          }`}
+        >
+          <div className="w-9 h-9 rounded-full bg-blue-100/80 text-[#002060] flex items-center justify-center group-hover:scale-105 group-hover:bg-[#002060] group-hover:text-white transition-all shadow-2xs">
+            <svg
+              className="w-4.5 h-4.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+          </div>
+          <div className="text-xs font-bold text-slate-800 group-hover:text-[#002060] transition-colors">
+            Click to upload or drag and drop file
+          </div>
+          <div className="text-[10px] text-slate-500">
+            Supports JPG, PNG, or PDF (Auto-compressed &lt; 350KB)
+          </div>
+        </div>
+      )}
+
+      <input
+        ref={fileInputRef}
+        id={id}
+        type="file"
+        accept={accept}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onUpload(file);
+          e.target.value = "";
+        }}
+        className="hidden"
+      />
+
+      {error && <p className="text-[11px] font-bold text-red-700">{error}</p>}
+    </div>
+  );
+}
+
 export default function Step5DocumentsReview({
   data,
   onChange,
   onBack,
+  existingApplication,
+  isEnrollmentOpen = true,
 }: Step5DocumentsReviewProps) {
   const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -41,6 +228,42 @@ export default function Step5DocumentsReview({
     pwd_id: null,
   });
 
+  // Track keys that the learner explicitly removed during this session
+  const removedKeysRef = useRef<Set<string>>(new Set());
+  const hasInitializedDocsRef = useRef<boolean>(false);
+
+  // Pre-populate docs ONCE on mount or when data/existingApplication becomes available
+  useEffect(() => {
+    if (hasInitializedDocsRef.current) return;
+
+    const sourceList =
+      data.submittedDocuments && data.submittedDocuments.length > 0
+        ? data.submittedDocuments
+        : existingApplication && Array.isArray(existingApplication.submitted_documents)
+        ? existingApplication.submitted_documents
+        : null;
+
+    if (sourceList && sourceList.length > 0) {
+      setDocs((prev) => {
+        const next = { ...prev };
+        sourceList.forEach((d: any) => {
+          const key = d.docType || d.type;
+          if (key && !removedKeysRef.current.has(key) && (d.fileData || d.fileUrl || d.fileName)) {
+            next[key] = {
+              file: new File([], d.fileName || `${key}.jpg`),
+              previewUrl: d.fileData || d.fileUrl || "",
+              originalSizeKb: d.sizeKb || 25,
+              compressedSizeKb: d.sizeKb || 25,
+              isCompressing: false,
+            };
+          }
+        });
+        return next;
+      });
+      hasInitializedDocsRef.current = true;
+    }
+  }, [existingApplication, data.submittedDocuments]);
+
   const isG7 =
     data.step1.applicantType === "Grade 7" ||
     Number(data.step1.targetGradeLevel) === 7;
@@ -54,10 +277,12 @@ export default function Step5DocumentsReview({
   // File Upload Handler with HTML5 Canvas Compression (<350KB)
   const handleFileUpload = async (
     docKey: string,
-    docType: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "other",
     file: File | null
   ) => {
     if (!file) return;
+
+    // Unmark as removed since learner is uploading a new file for this slot
+    removedKeysRef.current.delete(docKey);
 
     // Set loading indicator for this slot
     setDocs((prev) => ({
@@ -88,8 +313,12 @@ export default function Step5DocumentsReview({
         finalDataUrl = result.dataUrl;
         compressedKb = Math.round(result.compressedSize / 1024);
       } else {
-        // PDF or other document
-        finalDataUrl = URL.createObjectURL(file);
+        // PDF or other document - convert to Data URL
+        finalDataUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string) || "");
+          reader.readAsDataURL(file);
+        });
       }
 
       // Upload to Supabase Storage Bucket to get a lightweight public URL (~80 bytes)
@@ -104,14 +333,15 @@ export default function Step5DocumentsReview({
         const cleanExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(originalExt) ? originalExt : "jpg";
         const storagePath = `${cleanId}/${cleanDoc}_${Date.now()}.${cleanExt}`;
 
-        const { error: uploadErr } = await supabase.storage
+        // 1. Direct upload from browser to Supabase storage bucket
+        const { error: directUploadErr } = await supabase.storage
           .from("student-documents")
           .upload(storagePath, finalFile, {
             contentType: finalFile.type || (cleanExt === "pdf" ? "application/pdf" : "image/jpeg"),
             upsert: true,
           });
 
-        if (!uploadErr) {
+        if (!directUploadErr) {
           const { data: pubData } = supabase.storage
             .from("student-documents")
             .getPublicUrl(storagePath);
@@ -119,8 +349,28 @@ export default function Step5DocumentsReview({
             finalStoredUrl = pubData.publicUrl;
           }
         }
+
+        // 2. Fallback to API route if direct upload failed
+        if (!finalStoredUrl) {
+          const uploadForm = new FormData();
+          uploadForm.append("file", finalFile);
+          uploadForm.append("docType", docKey);
+          uploadForm.append("identifier", data.lrn || user?.userId || user?.id || "applicant");
+
+          const uploadRes = await fetch("/api/upload-document", {
+            method: "POST",
+            body: uploadForm,
+          });
+
+          if (uploadRes.ok) {
+            const uploadJson = await uploadRes.json();
+            if (uploadJson.success && uploadJson.url) {
+              finalStoredUrl = uploadJson.url;
+            }
+          }
+        }
       } catch (storageErr) {
-        console.warn("Storage upload notice (fallback to preview):", storageErr);
+        console.warn("Storage upload notice (fallback to client preview):", storageErr);
       }
 
       setDocs((prev) => ({
@@ -135,16 +385,18 @@ export default function Step5DocumentsReview({
       }));
 
       // Update parent formData submittedDocuments array
-      const existingDocs = (data.submittedDocuments || []).filter((d) => d.type !== docType);
+      const existingDocs = (data.submittedDocuments || []).filter(
+        (d) => d.type !== docKey && (d as any).docType !== docKey
+      );
       const newDocEntry = {
-        type: docType,
+        type: docKey,
         fileName: finalFile.name,
         fileUrl: finalStoredUrl || finalDataUrl,
         sizeKb: compressedKb,
       };
 
       onChange({
-        submittedDocuments: [...existingDocs, newDocEntry],
+        submittedDocuments: [...existingDocs, newDocEntry as any],
       });
 
       // Clear any errors for this doc
@@ -165,12 +417,17 @@ export default function Step5DocumentsReview({
   };
 
   // Remove uploaded document
-  const handleRemoveDoc = (
-    docKey: string,
-    docType: "birth_certificate" | "form_138" | "id_picture" | "good_moral" | "other"
-  ) => {
+  const handleRemoveDoc = (docKey: string) => {
+    // 1. Mark as permanently removed so no auto-fill can resurrect it
+    removedKeysRef.current.add(docKey);
+
+    // 2. Clear from local slot state
     setDocs((prev) => ({ ...prev, [docKey]: null }));
-    const updated = (data.submittedDocuments || []).filter((d) => d.type !== docType);
+
+    // 3. Clear from parent form data
+    const updated = (data.submittedDocuments || []).filter(
+      (d) => d.type !== docKey && (d as any).docType !== docKey
+    );
     onChange({ submittedDocuments: updated });
   };
 
@@ -212,15 +469,43 @@ export default function Step5DocumentsReview({
       return;
     }
 
+    // Guard: Online Enrollment must be open to submit
+    if (isEnrollmentOpen === false) {
+      alert(
+        `DepEd Official Notice:\nOnline basic education enrollment is currently CLOSED for School Year ${data.schoolYear || "2026–2027"}.\n\nSubmissions cannot be processed at this time.`
+      );
+      if (typeof window !== "undefined") {
+        window.location.href = "/enroll";
+      }
+      return;
+    }
+
+    // Live Server Re-verification: Double check live API with cache busting
+    try {
+      const checkRes = await fetch(`/api/enrollment-control?_t=${Date.now()}`, { cache: "no-store" });
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.isEnrollmentOpen === false) {
+          alert(
+            `DepEd Official Notice:\nOnline basic education enrollment is currently CLOSED for School Year ${checkData.schoolYear || "2026–2027"}.\n\n${checkData.closedMessage || "Submissions cannot be processed at this time."}`
+          );
+          if (typeof window !== "undefined") {
+            window.location.href = "/enroll";
+          }
+          return;
+        }
+      }
+    } catch {}
+
     // Proceed with submission
     setIsSubmitting(true);
 
     try {
-      // Generate Official Dumalneg NHS Reference Number
+      // Generate or reuse Official Dumalneg NHS Reference Number
       const randomSuffix = Math.floor(10000 + Math.random() * 90000);
-      const generatedRef = `DNHS-2025-${randomSuffix}`;
+      const generatedRef = existingApplication?.application_id || `DNHS-2025-${randomSuffix}`;
 
-      // Save to localStorage application registry for local and offline resilience
+      // 1. Cloud Database Synchronization: Save directly to Supabase
       const applicationPayload = {
         referenceNumber: generatedRef,
         applicationDate: new Date().toISOString(),
@@ -246,11 +531,157 @@ export default function Step5DocumentsReview({
         formData: data,
       };
 
-      if (typeof window !== "undefined") {
-        const existingRegistry = JSON.parse(localStorage.getItem("dumalnext_applications") || "[]");
-        existingRegistry.unshift(applicationPayload);
-        localStorage.setItem("dumalnext_applications", JSON.stringify(existingRegistry));
-        localStorage.setItem("dumalnext_last_submitted_ref", generatedRef);
+      // 1. Cloud Database Synchronization: Save to Supabase 'enrollment_applications'
+      try {
+        const supabase = createClient();
+
+        if (existingApplication && existingApplication.id) {
+          // UPDATE existing application row (Resubmission Flow)
+          const { error: appErr } = await supabase
+            .from("enrollment_applications")
+            .update({
+              applicant_type: data.step1.applicantType,
+              school_year: (data.schoolYear || "2026-2027").replace("–", "-"),
+              target_grade_level: data.step1.targetGradeLevel,
+              target_strand: data.targetStrand || null,
+              status: "Pending", // Reset back to Pending for registrar evaluation
+              admin_feedback: null, // Clear revision remarks
+              selected_electives: [{
+                ...data,
+                semester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                term: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                targetSemester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                schoolYear: (data.schoolYear || "2026-2027").replace("–", "-"),
+              }],
+              submitted_documents: Object.entries(docs)
+                .filter(([_, v]) => v !== null)
+                .map(([k, v]) => ({
+                  docType: k,
+                  fileName: v?.file.name,
+                  sizeKb: v?.compressedSizeKb,
+                  fileData: v?.previewUrl || null,
+                  fileUrl: v?.previewUrl || null,
+                })),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingApplication.id);
+
+          if (appErr) {
+            console.warn("Supabase enrollment_applications update notice:", appErr.message);
+          }
+
+          // Update student profile record
+          if (existingApplication.student_id) {
+            await supabase
+              .from("students")
+              .update({
+                first_name: data.firstName,
+                middle_name: data.middleName || null,
+                last_name: data.lastName,
+                date_of_birth: data.dateOfBirth || null,
+                gender: data.gender || null,
+                contact_number: applicationPayload.contactNumber,
+                barangay: data.currentBarangay || "CABARITAN",
+                grade_level: data.step1.targetGradeLevel,
+                strand: data.targetStrand || null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", existingApplication.student_id);
+          }
+        } else {
+          // Check if student profile exists in Supabase
+          let studentUuid = user?.id;
+          const numericLrn = data.lrn && /^\d{12}$/.test(data.lrn) ? data.lrn : null;
+          let studentQuery = supabase.from("students").select("id, first_name, last_name");
+          if (numericLrn && user?.id) {
+            studentQuery = studentQuery.or(`student_id.eq.${numericLrn},user_id.eq.${user.id}`);
+          } else if (user?.id) {
+            studentQuery = studentQuery.eq("user_id", user.id);
+          } else if (numericLrn) {
+            studentQuery = studentQuery.eq("student_id", numericLrn);
+          }
+          const { data: existingStudent } = await studentQuery.limit(1);
+
+          if (existingStudent && existingStudent.length > 0) {
+            studentUuid = existingStudent[0].id;
+            // Ensure student profile has latest personal information
+            await supabase
+              .from("students")
+              .update({
+                first_name: data.firstName || existingStudent[0].first_name,
+                middle_name: data.middleName || null,
+                last_name: data.lastName || existingStudent[0].last_name,
+                date_of_birth: data.dateOfBirth || null,
+                gender: data.gender || null,
+                contact_number: applicationPayload.contactNumber,
+                barangay: data.currentBarangay || "CABARITAN",
+                grade_level: data.step1.targetGradeLevel,
+                strand: data.targetStrand || null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", studentUuid);
+          } else {
+            // Insert student profile record
+            const assignedStudentId = numericLrn || `100050${Math.floor(100000 + Math.random() * 900000)}`;
+            const { data: createdStudent } = await supabase
+              .from("students")
+              .insert({
+                user_id: user?.id && user.id.length === 36 ? user.id : null,
+                student_id: assignedStudentId,
+                first_name: data.firstName,
+                middle_name: data.middleName || null,
+                last_name: data.lastName,
+                date_of_birth: data.dateOfBirth || null,
+                gender: data.gender || null,
+                contact_number: applicationPayload.contactNumber,
+                barangay: data.currentBarangay || "CABARITAN",
+                grade_level: data.step1.targetGradeLevel,
+                strand: data.targetStrand || null,
+              })
+              .select()
+              .single();
+
+            if (createdStudent) {
+              studentUuid = createdStudent.id;
+            }
+          }
+
+          if (studentUuid) {
+            const { error: appErr } = await supabase
+              .from("enrollment_applications")
+              .insert({
+                application_id: generatedRef,
+                student_id: studentUuid,
+                applicant_type: data.step1.applicantType,
+                school_year: (data.schoolYear || "2026-2027").replace("–", "-"),
+                target_grade_level: data.step1.targetGradeLevel,
+                target_strand: data.targetStrand || null,
+                status: "Pending",
+                selected_electives: [{
+                  ...data,
+                  semester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                  term: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                  targetSemester: data.semester || data.targetSemester || data.step1?.targetSemester || "Trimester 1",
+                  schoolYear: (data.schoolYear || "2026-2027").replace("–", "-"),
+                }],
+                submitted_documents: Object.entries(docs)
+                  .filter(([_, v]) => v !== null)
+                  .map(([k, v]) => ({
+                    docType: k,
+                    fileName: v?.file.name,
+                    sizeKb: v?.compressedSizeKb,
+                    fileData: v?.previewUrl || null,
+                    fileUrl: v?.previewUrl || null,
+                  })),
+              });
+
+            if (appErr) {
+              console.warn("Supabase enrollment_applications insert notice:", appErr.message);
+            }
+          }
+        }
+      } catch (suAppErr) {
+        console.warn("Supabase application submission exception:", suAppErr);
       }
 
       // Simulate network latency for realism
@@ -258,6 +689,13 @@ export default function Step5DocumentsReview({
 
       setReferenceNumber(generatedRef);
       setIsSubmitted(true);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("dumalnext_student_enrollment_step");
+          localStorage.removeItem("dumalnext_student_enrollment_draft");
+        } catch {}
+        window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
@@ -269,88 +707,87 @@ export default function Step5DocumentsReview({
   // =========================================================================
   if (isSubmitted) {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 font-sans">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 rounded-[4px] shadow-sm">
         {/* Acknowledgment Header */}
         <div className="border-b-2 border-slate-200 pb-5 text-center">
-          <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#002060]">
-            DEPARTMENT OF EDUCATION &bull; REGION I &bull; DIVISION OF ILOCOS NORTE
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 uppercase tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Dumalneg National High School
           </h2>
-          <div className="text-xs font-semibold text-slate-600 mt-0.5">
-            Dumalneg, Ilocos Norte &bull; DepEd School ID: 300017
-          </div>
-          <div className="mt-3 inline-block bg-[#002060] text-white text-xs font-mono font-bold px-4 py-1 uppercase tracking-wider">
-            Official Online Enrollment Acknowledgment Slip
+          <div className="mt-2 inline-block bg-[#002060] text-white text-xs font-bold px-4 py-1 tracking-wide rounded-[4px]">
+            {existingApplication
+              ? "Online Enrollment Resubmission Slip"
+              : "Online Enrollment Acknowledgment Slip"}
           </div>
         </div>
 
-        {/* Status Banner - Color Coded (Yellow for Pending) with ZERO Emojis */}
-        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2">
+        {/* Status Banner */}
+        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-[4px] shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400">
-              [ STATUS: PENDING REGISTRAR VERIFICATION ]
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-[4px]">
+              {existingApplication
+                ? "STATUS: REVISED APPLICATION SUBMITTED"
+                : "STATUS: PENDING VERIFICATION"}
             </span>
-            <span className="text-xs font-mono text-amber-900 font-bold">
+            <span className="text-xs text-amber-900 font-bold">
               DATE: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
             </span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
-            Your online enrollment application has been successfully submitted to the Dumalneg National High School Registrar. 
-            Official documents are currently undergoing evaluation. You will be notified once verified.
+            {existingApplication
+              ? "Your revised enrollment application has been successfully resubmitted and is currently undergoing re-evaluation."
+              : "Your online enrollment application has been successfully submitted and is currently undergoing evaluation."}
           </p>
         </div>
 
         {/* Reference Code Box */}
-        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2">
-          <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-            Official Application Tracking Reference Number
+        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-[4px] shadow-xs">
+          <div className="text-xs font-bold text-slate-600 tracking-wide">
+            Application Reference Number
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-bold text-[#002060] tracking-widest">
+          <div className="text-2xl sm:text-3xl font-bold text-[#002060] tracking-widest">
             {referenceNumber}
           </div>
           <p className="text-[11px] text-slate-500">
-            Please screenshot or write down this tracking reference number. You may use this number or your 12-digit LRN to check your live application status on the portal.
+            Please save this reference number to check your live application status on the portal.
           </p>
         </div>
 
         {/* Learner & Enrollment Summary */}
-        <div className="border-2 border-slate-300 p-5 space-y-4">
-          <div className="text-xs font-bold text-[#002060] uppercase tracking-wider border-b border-slate-200 pb-2">
-            [ Official Application Summary ]
+        <div className="border-2 border-slate-300 p-5 space-y-4 rounded-[4px] shadow-xs">
+          <div className="text-xs font-bold text-[#002060] border-b border-slate-200 pb-2">
+            Official Application Summary
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Learner Name</span>
-              <span className="font-bold text-slate-900 uppercase">
+              <span className="font-bold text-slate-500 block text-[10px]">Learner Name</span>
+              <span className="font-bold text-slate-900">
                 {data.lastName}, {data.firstName} {data.middleName || ""} {data.extensionName || ""}
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Learner Reference Number (LRN)</span>
-              <span className="font-mono font-bold text-slate-900">{data.lrn || "N/A"}</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Learner Reference Number (LRN)</span>
+              <span className="font-bold text-slate-900">{data.lrn || "N/A"}</span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Enrollment Level</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Enrollment Level</span>
               <span className="font-bold text-slate-900">
                 Grade {data.step1.targetGradeLevel} ({data.step1.applicantType})
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Curriculum Program / Track</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Curriculum Program / Track</span>
               <span className="font-bold text-slate-900">
                 {isG7 ? "Regular JHS Curriculum" : `${data.targetTrack} - ${data.targetStrand}`}
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Residential Address</span>
-              <span className="font-bold text-slate-900 uppercase">
+              <span className="font-bold text-slate-500 block text-[10px]">Residential Address</span>
+              <span className="font-bold text-slate-900">
                 Brgy. {data.currentBarangay}, {data.currentSitio ? `Sitio ${data.currentSitio}, ` : ""}Dumalneg
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Emergency School Contact</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Emergency School Contact</span>
               <span className="font-bold text-slate-900">
                 {data.primaryContactPerson} (
                 {data.primaryContactPerson === "Father"
@@ -362,7 +799,7 @@ export default function Step5DocumentsReview({
               </span>
             </div>
             <div>
-              <span className="font-bold text-slate-500 block uppercase text-[10px]">Linked Student Account</span>
+              <span className="font-bold text-slate-500 block text-[10px]">Linked Student Account</span>
               <span className="font-bold text-[#002060]">
                 {user ? `${user.fullName} (${user.email})` : "Guest / Direct Submission"}
               </span>
@@ -371,22 +808,22 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Next Steps for Student / Parent */}
-        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3">
-          <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-            [ Instructions &amp; Next Steps for Dumalneg NHS Enrollees ]
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3 rounded-[4px] shadow-xs">
+          <div className="text-xs font-bold text-[#002060]">
+            Instructions &amp; Next Steps for Dumalneg NHS Enrollees
           </div>
           <ol className="list-decimal list-inside text-xs text-slate-700 space-y-2 leading-relaxed">
             <li>
-              <strong>Registrar Evaluation</strong>: The Dumalneg NHS Registrar will review your uploaded credentials (Form 138, PSA Birth Certificate, etc.) within 1 to 2 school business days.
+              <strong>School Administrator Evaluation</strong>: The Dumalneg NHS School Administrator will review your uploaded credentials (Form 138, PSA Birth Certificate, etc.) within 1 to 2 school business days.
             </li>
             <li>
               <strong>Track Your Application Status</strong>: Visit the <strong>Track Application Status</strong> page on the portal anytime using your Application Tracking Number or 12-digit LRN.
             </li>
             <li>
-              <strong>Official DepEd PDF Release</strong>: Once your application is marked as <strong>[ APPROVED &amp; OFFICIALLY ENROLLED ]</strong> by the school administrator, your official accomplished DepEd Enrollment Form (PDF) and Certificate of Enrollment will be immediately unlocked for download.
+              <strong>Official DepEd PDF Release</strong>: Once your application is marked as <strong>APPROVED &amp; OFFICIALLY ENROLLED</strong> by the school administrator, your official accomplished DepEd Enrollment Form (PDF) and Certificate of Enrollment will be immediately unlocked for download.
             </li>
             <li>
-              <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Registrar&apos;s Office during the first week of classes for physical civil registry validation.
+              <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Administration Office during the first week of classes for physical civil registry validation.
             </li>
           </ol>
         </div>
@@ -396,13 +833,13 @@ export default function Step5DocumentsReview({
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
+            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-[4px]"
           >
             Print Acknowledgment Slip
           </button>
           <a
             href={`/track?ref=${referenceNumber}`}
-            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors text-center shadow-xs"
+            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors text-center shadow-xs rounded-[4px]"
           >
             Track Application Live
           </a>
@@ -415,30 +852,27 @@ export default function Step5DocumentsReview({
   // RENDER: STEP 5 FORM (DOCUMENTS UPLOAD & ONLINE REVIEW CARD)
   // =========================================================================
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px] font-sans">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-mono font-bold bg-[#002060] text-white px-2.5 py-1 uppercase tracking-wider rounded-[4px]">
-            STEP 05 OF 05
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
+            Step 05 of 05
           </span>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 tracking-wider">
             DepEd Requirements &bull; Final Submission
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Document Upload &amp; Application Review
         </h2>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-          Upload required DepEd credentials using the built-in image compressor (&lt;350KB) and review your encoded information before official submission to the Dumalneg NHS Registrar.
-        </p>
       </div>
 
       {/* Global Error Banner */}
       {Object.keys(errors).length > 0 && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-[4px]">
           <p className="text-xs font-bold text-red-800 leading-normal">
-            [ Submission Requirement Notice ]: Please resolve the highlighted required items below before submitting your application.
+            Submission Requirement Notice: Please resolve the highlighted required items below before submitting your application.
           </p>
         </div>
       )}
@@ -446,304 +880,106 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION A: OFFICIAL DOCUMENT UPLOAD SLOTS                                  */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3">
-          <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            [ Section 9: Official Document Upload (Automated Compressor &lt; 350KB) ]
+          <span className="text-xs font-bold text-[#002060] block">
+            Official Document Upload
           </span>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Photos taken from smartphones will be automatically compressed by your browser to ensure fast uploads even on spotty mobile data connections in Dumalneg:
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 1. PSA Birth Certificate */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
-                1. PSA Birth Certificate <span className="text-red-700">*</span>
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              Clear photo of Philippine Statistics Authority (PSA) Birth Certificate or Local Civil Registrar (LCR) / Barangay Certification.
-            </p>
-            {docs.birth_certificate ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.birth_certificate.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.birth_certificate.originalSizeKb}KB to {docs.birth_certificate.compressedSizeKb}KB (Compressed)
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("birth_certificate", "birth_certificate")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) =>
-                    handleFileUpload("birth_certificate", "birth_certificate", e.target.files?.[0] || null)
-                  }
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
-                />
-              </div>
-            )}
-            {errors.birth_certificate && (
-              <p className="text-[11px] font-bold text-red-700">{errors.birth_certificate}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-birth-cert"
+            docKey="birth_certificate"
+            label="1. PSA Birth Certificate"
+            sublabel=""
+            badgeText="MANDATORY"
+            badgeType="slate"
+            uploadedDoc={docs.birth_certificate}
+            error={errors.birth_certificate}
+            onUpload={(file) => handleFileUpload("birth_certificate", file)}
+            onRemove={() => handleRemoveDoc("birth_certificate")}
+            isMandatory
+          />
 
           {/* 2. Form 138 / SF9 Report Card */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
-                2. Learner&apos;s Progress Report Card (SF9 / Form 138) <span className="text-red-700">*</span>
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              {isG7
-                ? "Grade 6 Elementary Progress Report Card indicating learner eligibility for Junior High School."
-                : isG11
-                ? "Grade 10 Junior High School Report Card indicating eligibility for Senior High School."
-                : "Report Card from previous school year completed."}
-            </p>
-            {docs.form_138 ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.form_138.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.form_138.originalSizeKb}KB to {docs.form_138.compressedSizeKb}KB (Compressed)
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("form_138", "form_138")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload("form_138", "form_138", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
-                />
-              </div>
-            )}
-            {errors.form_138 && (
-              <p className="text-[11px] font-bold text-red-700">{errors.form_138}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-form-138"
+            docKey="form_138"
+            label="2. Learner's Progress Report Card (SF9 / Form 138)"
+            sublabel=""
+            badgeText="MANDATORY"
+            badgeType="slate"
+            uploadedDoc={docs.form_138}
+            error={errors.form_138}
+            onUpload={(file) => handleFileUpload("form_138", file)}
+            onRemove={() => handleRemoveDoc("form_138")}
+            isMandatory
+          />
 
           {/* 3. 2x2 Official ID Picture */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
-                3. Formal 2x2 or 1x1 ID Picture <span className="text-red-700">*</span>
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">MANDATORY</span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              Recent passport or 2x2 formal photo with white background and printed name tag of the learner.
-            </p>
-            {docs.id_picture ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.id_picture.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.id_picture.originalSizeKb}KB to {docs.id_picture.compressedSizeKb}KB (Compressed)
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("id_picture", "id_picture")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload("id_picture", "id_picture", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
-                />
-              </div>
-            )}
-            {errors.id_picture && (
-              <p className="text-[11px] font-bold text-red-700">{errors.id_picture}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-id-picture"
+            docKey="id_picture"
+            label="3. Formal 2x2 or 1x1 ID Picture"
+            sublabel=""
+            badgeText="MANDATORY"
+            badgeType="slate"
+            accept="image/*"
+            uploadedDoc={docs.id_picture}
+            error={errors.id_picture}
+            onUpload={(file) => handleFileUpload("id_picture", file)}
+            onRemove={() => handleRemoveDoc("id_picture")}
+            isMandatory
+          />
 
           {/* 4. Certificate of Good Moral Character */}
-          <div className="p-4 bg-white border-2 border-slate-300 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 uppercase">
-                4. Certificate of Good Moral Character
-                {(isG11 || isTransferee) && <span className="text-red-700"> *</span>}
-              </label>
-              <span className="text-[10px] font-mono text-slate-500">
-                {isG11 || isTransferee ? "MANDATORY" : "OPTIONAL FOR G7"}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600">
-              Certificate issued by previous school certifying good moral standing and disciplinary record.
-            </p>
-            {docs.good_moral ? (
-              <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                    {docs.good_moral.file.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {docs.good_moral.originalSizeKb}KB to {docs.good_moral.compressedSizeKb}KB (Compressed)
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDoc("good_moral", "good_moral")}
-                  className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload("good_moral", "good_moral", e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
-                />
-              </div>
-            )}
-            {errors.good_moral && (
-              <p className="text-[11px] font-bold text-red-700">{errors.good_moral}</p>
-            )}
-          </div>
+          <DocumentDropBox
+            id="file-good-moral"
+            docKey="good_moral"
+            label="4. Certificate of Good Moral Character"
+            sublabel=""
+            badgeText={isG11 || isTransferee ? "MANDATORY" : "OPTIONAL FOR G7"}
+            badgeType={isG11 || isTransferee ? "slate" : "blue"}
+            uploadedDoc={docs.good_moral}
+            error={errors.good_moral}
+            onUpload={(file) => handleFileUpload("good_moral", file)}
+            onRemove={() => handleRemoveDoc("good_moral")}
+            isMandatory={isG11 || isTransferee}
+          />
 
-          {/* Conditional 4Ps Household ID Photocopy */}
+          {/* 5. Conditional 4Ps Household ID Photocopy */}
           {data.is4psBeneficiary && (
-            <div className="p-4 bg-white border-2 border-blue-200 space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 uppercase">
-                  5. Pantawid Pamilya (4Ps) Household ID Card
-                </label>
-                <span className="text-[10px] font-mono text-blue-700 font-bold">4PS BENEFICIARY</span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                Photocopy or clear photo of DSWD 4Ps ID or Household Pantawid verification passbook.
-              </p>
-              {docs.household_4ps ? (
-                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                      {docs.household_4ps.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      {docs.household_4ps.originalSizeKb}KB to {docs.household_4ps.compressedSizeKb}KB (Compressed)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveDoc("household_4ps", "other")}
-                    className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={(e) => handleFileUpload("household_4ps", "other", e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
-                  />
-                </div>
-              )}
-            </div>
+            <DocumentDropBox
+              id="file-household-4ps"
+              docKey="household_4ps"
+              label="5. Pantawid Pamilya (4Ps) Household ID Card"
+              sublabel=""
+              badgeText="4PS BENEFICIARY"
+              badgeType="blue"
+              uploadedDoc={docs.household_4ps}
+              error={errors.household_4ps}
+              onUpload={(file) => handleFileUpload("household_4ps", file)}
+              onRemove={() => handleRemoveDoc("household_4ps")}
+            />
           )}
 
-          {/* Conditional PWD ID Photocopy */}
-          {data.hasPwdId && (
-            <div className="p-4 bg-white border-2 border-blue-200 space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 uppercase">
-                  6. Official Persons with Disability (PWD) ID
-                </label>
-                <span className="text-[10px] font-mono text-blue-700 font-bold">SNED / INCLUSIVE</span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                Photocopy of Municipal Social Welfare and Development (MSWDO) PWD ID or Clinical Medical Assessment.
-              </p>
-              {docs.pwd_id ? (
-                <div className="p-3 bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-[#002060] block truncate max-w-[200px]">
-                      {docs.pwd_id.file.name}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      {docs.pwd_id.originalSizeKb}KB to {docs.pwd_id.compressedSizeKb}KB (Compressed)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveDoc("pwd_id", "other")}
-                    className="text-xs text-red-700 font-bold uppercase hover:underline ml-2"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={(e) => handleFileUpload("pwd_id", "other", e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#002060] file:text-white hover:file:bg-blue-950 cursor-pointer border border-slate-300 p-1"
-                  />
-                </div>
-              )}
-            </div>
-          )}
+
         </div>
       </div>
 
       {/* ========================================================================= */}
       {/* SECTION B: ONLINE APPLICATION REVIEW CARD (NO PRE-APPROVAL PDF)           */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
         <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-              [ Online Application Review Card ]
+            <span className="text-xs font-bold text-[#002060] block">
+              Online Application Review Card
             </span>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Review all encoded applicant information below. Ensure every entry matches your civil registry and academic records before submitting:
-            </p>
           </div>
-          <span className="text-[11px] font-mono bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0">
+          <span className="text-[11px] bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded-[4px]">
             PRE-SUBMISSION VERIFICATION
           </span>
         </div>
@@ -751,166 +987,188 @@ export default function Step5DocumentsReview({
         {/* Review Card Grid */}
         <div className="space-y-4">
           {/* Card 1: Learner Identity */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               1. Learner Civil Registry &amp; Personal Details
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Last Name</span>
-                <span className="font-bold text-slate-900 uppercase">{data.lastName || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Last Name</span>
+                <span className="font-bold text-slate-900">{data.lastName || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">First Name</span>
-                <span className="font-bold text-slate-900 uppercase">{data.firstName || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">First Name</span>
+                <span className="font-bold text-slate-900">{data.firstName || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Middle Name</span>
-                <span className="font-bold text-slate-900 uppercase">{data.middleName || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Middle Name</span>
+                <span className="font-bold text-slate-900">{data.middleName || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Extension</span>
-                <span className="font-bold text-slate-900 uppercase">{data.extensionName || "None"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Extension</span>
+                <span className="font-bold text-slate-900">{data.extensionName || "None"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">12-Digit LRN</span>
-                <span className="font-mono font-bold text-slate-900">{data.lrn || "None (First Time Enrollee)"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">12-Digit LRN</span>
+                <span className="font-bold text-slate-900">{data.lrn || "None (First Time Enrollee)"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Date of Birth / Age</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Date of Birth / Age</span>
                 <span className="font-bold text-slate-900">{data.dateOfBirth || "-"} ({data.age} yrs old)</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Gender</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Gender</span>
                 <span className="font-bold text-slate-900">{data.gender || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Mother Tongue</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Mother Tongue</span>
                 <span className="font-bold text-slate-900">{data.motherTongue || "Ilokano"}</span>
               </div>
               {data.isIpCommunity && (
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">IP Community</span>
+                  <span className="text-[10px] font-bold text-slate-500 block">IP Community</span>
                   <span className="font-bold text-blue-900">{data.ipCommunityName || "Isnag"}</span>
                 </div>
               )}
               {data.is4psBeneficiary && (
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">4Ps Household ID</span>
-                  <span className="font-mono font-bold text-blue-900">{data.householdId4ps || "Beneficiary"}</span>
+                  <span className="text-[10px] font-bold text-slate-500 block">4Ps Household ID</span>
+                  <span className="font-bold text-blue-900">{data.householdId4ps || "Beneficiary"}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Card 2: Academic Classification & Feeder School */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               2. Enrollment Placement &amp; Academic Background
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Target Grade Level</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Target Grade Level</span>
                 <span className="font-bold text-slate-900">Grade {data.step1.targetGradeLevel}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Applicant Category</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Applicant Category</span>
                 <span className="font-bold text-slate-900">{data.step1.applicantType}</span>
               </div>
               <div className="col-span-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Curricular Program / Track</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Curricular Program / Track</span>
                 <span className="font-bold text-[#002060]">
                   {isG7 ? "Regular Junior High School Curriculum" : `${data.targetTrack} - ${data.targetStrand} (${data.targetSemester})`}
                 </span>
               </div>
+              {data.careerPathway && (
+                <div className="col-span-2">
+                  <span className="text-[10px] font-bold text-slate-500 block">Career Pathway Specialization</span>
+                  <span className="font-bold text-slate-900">{data.careerPathway}</span>
+                </div>
+              )}
+              {data.doorwayElectives && data.doorwayElectives.length > 0 && (
+                <div className="col-span-2">
+                  <span className="text-[10px] font-bold text-slate-500 block">Doorway Cross-Track Electives</span>
+                  <span className="font-bold text-blue-900">{data.doorwayElectives.join(", ")}</span>
+                </div>
+              )}
+              {data.selectedElectives && data.selectedElectives.length > 0 && (
+                <div className="col-span-2">
+                  <span className="text-[10px] font-bold text-slate-500 block">
+                    Elective / Prescribed Course Offerings
+                  </span>
+                  <span className="font-bold text-[#002060]">
+                    {data.selectedElectives.join(", ")}
+                  </span>
+                </div>
+              )}
               <div className="col-span-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Last School Attended</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Last School Attended</span>
+                <span className="font-bold text-slate-900">
                   {data.step1.lastSchoolAttended || "-"}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">DepEd School ID</span>
-                <span className="font-mono font-bold text-slate-900">{data.step1.lastSchoolId || "-"}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">DepEd School ID</span>
+                <span className="font-bold text-slate-900">{data.step1.lastSchoolId || "-"}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Last S.Y. Completed</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Last S.Y. Completed</span>
                 <span className="font-bold text-slate-900">{data.step1.lastSchoolYearCompleted || "-"}</span>
               </div>
             </div>
           </div>
 
           {/* Card 3: Residential Address */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               3. Residential Address
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Barangay</span>
-                <span className="font-bold text-slate-900 uppercase">{data.currentBarangay}</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Barangay</span>
+                <span className="font-bold text-slate-900">{data.currentBarangay}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Sitio / House No.</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Sitio / House No.</span>
+                <span className="font-bold text-slate-900">
                   {data.currentSitio ? `Sitio ${data.currentSitio}` : data.currentHouseNo || "Poblacion"}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Municipality &amp; Province</span>
-                <span className="font-bold text-slate-900 uppercase">DUMALNEG, ILOCOS NORTE</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Municipality &amp; Province</span>
+                <span className="font-bold text-slate-900">Dumalneg, Ilocos Norte</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Zip Code</span>
-                <span className="font-mono font-bold text-slate-900">2921</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Zip Code</span>
+                <span className="font-bold text-slate-900">2921</span>
               </div>
             </div>
           </div>
 
           {/* Card 4: Parent & Guardian Information */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               4. Parents &amp; Legal Guardian
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Father&apos;s Full Name</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Father&apos;s Full Name</span>
+                <span className="font-bold text-slate-900">
                   {data.fatherLastName === "N/A"
                     ? "N/A (Not Available)"
                     : `${data.fatherLastName || ""}, ${data.fatherFirstName || ""} ${data.fatherMiddleName || ""}`}
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 block">
+                <span className="text-[10px] text-slate-500 block">
                   {data.fatherContactNumber || "No mobile specified"}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Mother&apos;s Maiden Name</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Mother&apos;s Maiden Name</span>
+                <span className="font-bold text-slate-900">
                   {data.motherMaidenLastName === "N/A"
                     ? "N/A (Not Available)"
                     : `${data.motherMaidenLastName || ""}, ${data.motherFirstName || ""} ${data.motherMiddleName || ""}`}
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 block">
+                <span className="text-[10px] text-slate-500 block">
                   {data.motherContactNumber || "No mobile specified"}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Legal Guardian</span>
-                <span className="font-bold text-slate-900 uppercase">
+                <span className="text-[10px] font-bold text-slate-500 block">Legal Guardian</span>
+                <span className="font-bold text-slate-900">
                   {data.guardianLastName
                     ? `${data.guardianLastName}, ${data.guardianFirstName} (${data.guardianRelationship || "Guardian"})`
                     : "Living with Parents"}
                 </span>
                 {data.guardianContactNumber && (
-                  <span className="text-[10px] font-mono text-slate-500 block">
+                  <span className="text-[10px] text-slate-500 block">
                     {data.guardianContactNumber}
                   </span>
                 )}
               </div>
             </div>
             <div className="pt-2 border-t border-slate-100 text-xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">Primary Emergency Contact Dispatcher</span>
+              <span className="text-[10px] font-bold text-slate-500 block">Primary Emergency Contact Dispatcher</span>
               <span className="font-bold text-[#002060]">
                 {data.primaryContactPerson} &bull; Contact Number:{" "}
                 {data.primaryContactPerson === "Father"
@@ -922,22 +1180,14 @@ export default function Step5DocumentsReview({
             </div>
           </div>
 
-          {/* Card 5: SNEd & Modality */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3">
-            <div className="text-xs font-bold text-[#002060] uppercase tracking-wide border-b border-slate-100 pb-1.5">
-              5. Inclusive Education &amp; Preferred Modality
+          {/* Card 5: Preferred Modality */}
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+            <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
+              5. Preferred Learning Modality
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Special Education (SNEd)</span>
-                <span className="font-bold text-slate-900">
-                  {data.isSned
-                    ? `Yes - ${data.snedCategory}: ${(data.snedDetails || []).join(", ")}`
-                    : "No (General Education Learner)"}
-                </span>
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Preferred Emergency Learning Modalities</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Preferred Distance Learning Modalities</span>
                 <span className="font-bold text-slate-900">
                   {(data.preferredModalities || ["Modular (Print)"]).join(", ")}
                 </span>
@@ -950,19 +1200,15 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION C: DATA PRIVACY ACT OF 2012 (RA 10173) & DEPED CERTIFICATION      */}
       {/* ========================================================================= */}
-      <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3">
-        <div className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-          [ DepEd Sworn Certification &amp; Republic Act No. 10173 (Data Privacy Act of 2012) ]
+      <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-[4px]">
+        <div className="text-xs font-bold text-[#002060]">
+          DepEd Data Privacy &amp; Sworn Certification
         </div>
         <p className="text-xs text-slate-700 leading-relaxed">
-          I hereby certify that all information supplied herein is true, complete, and accurate to the best of my knowledge and belief. 
-          I understand that any misrepresentation of facts may result in the invalidation of this enrollment application. 
-          Furthermore, I authorize the Department of Education, Division of Ilocos Norte, and Dumalneg National High School to collect, 
-          record, organize, update, and store the personal and educational data contained in this application in accordance with the 
-          Data Privacy Act of 2012 (Republic Act No. 10173) and official DepEd civil registry guidelines.
+          I hereby certify that all information provided in this application is true, accurate, and complete. I authorize the Department of Education and Dumalneg National High School to process and store this data in compliance with the Data Privacy Act of 2012 (Republic Act No. 10173).
         </p>
 
-        <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300">
+        <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300 rounded-[4px]">
           <input
             type="checkbox"
             checked={data.dataPrivacyAccepted}
@@ -979,7 +1225,7 @@ export default function Step5DocumentsReview({
             className="accent-[#002060] mt-0.5"
           />
           <span className="text-xs font-bold text-slate-900 leading-normal">
-            I have read, understood, and accept the DepEd Data Privacy terms. I solemnly certify that all submitted information is authentic.
+            I agree to the DepEd Data Privacy terms and certify that all submitted information is authentic.
           </span>
         </label>
         {errors.dataPrivacy && (
@@ -988,29 +1234,34 @@ export default function Step5DocumentsReview({
       </div>
 
       {/* Notice About Official PDF Release */}
-      <div className="p-4 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed">
-        <strong>Important Official Note</strong>: In accordance with DepEd enrollment verification procedures, 
-        your official accomplished DepEd Basic Education Enrollment Form (PDF) will become accessible and downloadable 
-        immediately once your application and credentials have been officially verified and <strong>Approved</strong> by the Dumalneg NHS Registrar.
+      <div className="p-3 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-[4px]">
+        <strong>Note</strong>: The official DepEd Enrollment Form (PDF) will be available once your application is verified and approved.
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t-2 border-slate-200">
+      <div className="flex flex-row items-center justify-between gap-3 pt-6 border-t border-slate-200">
         <button
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-100 transition-colors"
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 text-xs tracking-wider font-bold py-3.5 px-6 sm:px-8 text-center rounded-xl transition-all cursor-pointer disabled:opacity-50"
         >
-Back to Step 4 (Curriculum &amp; Modality)
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
         </button>
         <button
           type="button"
           onClick={handleSubmitApplication}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-10 py-3 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white uppercase tracking-wider hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed"
+          className="flex-1 sm:flex-initial px-6 sm:px-10 py-3.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors shadow-sm disabled:bg-slate-400 disabled:border-slate-400 disabled:cursor-not-allowed rounded-xl text-center"
         >
-          {isSubmitting ? "[ PROCESSING OFFICIAL SUBMISSION... ]" : "[ SUBMIT ENROLLMENT APPLICATION ]"}
+          {isSubmitting
+            ? "Submitting..."
+            : existingApplication
+            ? "Resubmit Application"
+            : "Submit Application"}
         </button>
       </div>
     </div>
