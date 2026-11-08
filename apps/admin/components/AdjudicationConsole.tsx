@@ -608,16 +608,13 @@ export default function AdjudicationConsole() {
           )}
         </td>
         <td className="p-3">
-          <span className="font-bold text-slate-900 block">
-            Grade {app.target_grade_level}
-          </span>
           {isSHS && shsInfo ? (
-            <div className="space-y-0.5 mt-0.5">
-              <span className="text-[11px] font-bold text-[#002060] block">
+            <div className="space-y-0.5">
+              <span className="font-bold text-slate-900 text-xs block">
                 {shsInfo.trackTitle}
               </span>
               {shsInfo.isTechPro ? (
-                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 border border-slate-200 inline-block">
+                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 border border-slate-200 rounded inline-block">
                   Fixed Tech-Pro Curriculum
                 </span>
               ) : shsInfo.electives.length > 0 ? (
@@ -627,7 +624,7 @@ export default function AdjudicationConsole() {
                     return (
                       <span
                         key={el}
-                        className="text-[10px] font-mono font-bold text-[#002060] bg-blue-50 px-1.5 py-0.5 border border-blue-200 inline-block"
+                        className="text-[10px] font-medium text-[#002060] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block"
                         title={name || el}
                       >
                         Elective: {name ? `${el} (${name})` : el}
@@ -636,31 +633,44 @@ export default function AdjudicationConsole() {
                   })}
                 </div>
               ) : (
-                <span className="text-[10px] font-mono text-amber-800 bg-amber-50 px-1.5 py-0.5 border border-amber-200 inline-block">
+                <span className="text-[10px] font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block">
                   Pending Elective Selection
                 </span>
               )}
             </div>
           ) : (
-            <span className="text-[10px] text-slate-600 block">
-              {"JHS Regular Curriculum"}
+            <span className="font-bold text-slate-900 text-xs block">
+              JHS Regular Curriculum
             </span>
           )}
           
-          <div className="flex flex-wrap items-center gap-1 mt-1">
+          <div className="flex flex-wrap items-center gap-1 mt-1.5">
             <span className="text-[10px] font-medium text-[#002060] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block">
               S.Y. {app.school_year || "2026-2027"} &bull; {app.term_name || app.semester || "Trimester 1"}
             </span>
-            {st?.current_section_id && (
-              <span className="text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
-                {sections.find((s) => s.id === st.current_section_id)?.section_name || "Section Assigned"}
-              </span>
-            )}
-            {app.target_grade_level >= 11 && ((app as any).selected_electives?.[0]?.assigned_elective_section_name || ((app as any).selected_electives?.[0]?.assigned_elective_name ? `Elective - ${(app as any).selected_electives[0].assigned_elective_name}` : null)) && (
-              <span className="text-[10px] font-medium text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 inline-block">
-                {(app as any).selected_electives[0].assigned_elective_section_name || `Elective - ${(app as any).selected_electives[0].assigned_elective_name}`}
-              </span>
-            )}
+            {st?.current_section_id && (() => {
+              const rawName = sections.find((s) => s.id === st.current_section_id)?.section_name || "";
+              const cleanName = rawName.replace(/^Grade\s+\d+\s*[-–—:]\s*/i, "").trim() || rawName || "Section Assigned";
+              const label = /^section/i.test(cleanName) ? cleanName : `Section: ${cleanName}`;
+              return (
+                <span className="text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
+                  {label}
+                </span>
+              );
+            })()}
+            {app.target_grade_level >= 11 && (() => {
+              const rawElectiveSec = (app as any).selected_electives?.[0]?.assigned_elective_section_name;
+              const rawElectiveName = (app as any).selected_electives?.[0]?.assigned_elective_name;
+              const electiveVal = rawElectiveSec || (rawElectiveName ? `Elective - ${rawElectiveName}` : null);
+              if (!electiveVal) return null;
+              const cleanElective = electiveVal.replace(/^Grade\s+\d+\s*(Elective\s*[-–—:]\s*)?/i, "").trim();
+              const electiveLabel = /^elective/i.test(cleanElective) ? cleanElective : `Elective: ${cleanElective}`;
+              return (
+                <span className="text-[10px] font-medium text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 inline-block">
+                  {electiveLabel}
+                </span>
+              );
+            })()}
           </div>
         </td>
         <td className="p-3 font-mono text-slate-600">
