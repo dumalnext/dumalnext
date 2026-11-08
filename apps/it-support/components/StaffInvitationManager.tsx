@@ -50,6 +50,13 @@ export default function StaffInvitationManager() {
   } | null>(null);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [roleFilter, searchQuery]);
 
   const fetchInvitations = async () => {
     setIsLoading(true);
@@ -219,9 +226,58 @@ export default function StaffInvitationManager() {
   };
 
   const filteredInvitations = invitations.filter((inv) => {
-    if (roleFilter === "all") return true;
-    return inv.role === roleFilter;
+    if (roleFilter !== "all" && inv.role !== roleFilter) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const email = (inv.email || "").toLowerCase();
+    const name = (inv.fullName || "").toLowerCase();
+    const dept = (inv.department || "").toLowerCase();
+    const role = (inv.role || "").toLowerCase();
+    const status = (inv.status || "").toLowerCase();
+    return (
+      email.includes(q) ||
+      name.includes(q) ||
+      dept.includes(q) ||
+      role.includes(q) ||
+      status.includes(q)
+    );
   });
+
+  // Pagination Calculations (Limit 10 per page)
+  const totalPages = Math.ceil(filteredInvitations.length / PAGE_SIZE) || 1;
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, filteredInvitations.length);
+  const paginatedInvitations = filteredInvitations.slice(startIndex, endIndex);
+
+  const getVisiblePageNumbers = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const delta = 2;
+    const range: number[] = [];
+    for (
+      let i = Math.max(2, safeCurrentPage - delta);
+      i <= Math.min(totalPages - 1, safeCurrentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (safeCurrentPage - delta > 2) {
+      range.unshift(-1);
+    }
+    if (safeCurrentPage + delta < totalPages - 1) {
+      range.push(-2);
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
+  };
 
   return (
     <div className="space-y-6 font-sans">
@@ -611,11 +667,56 @@ export default function StaffInvitationManager() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-              Issued Staff Invitations &amp; Registry Audit
-            </h3>
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                Issued Staff Invitations &amp; Registry Audit
+              </h3>
+              <p className="text-[11px] text-slate-500">
+                Active, accepted, and revoked staff onboarding invitation records.
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-[#002060] bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full whitespace-nowrap">
+              {isLoading ? (
+                <span className="inline-block w-12 h-3 bg-blue-200 animate-pulse rounded align-middle" />
+              ) : (
+                `Total: ${invitations.length} Records`
+              )}
+            </span>
+          </div>
+        </div>
+
+        {/* Search & Filter Toolbar */}
+        <div className="p-3 sm:px-4 sm:py-3 bg-white border-b border-slate-200 flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between">
+          <div className="flex-1 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by email, recipient name, role, department, or status..."
+              className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium focus:bg-white focus:border-[#002060] outline-none"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search query"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold text-slate-600 uppercase shrink-0">
               Filter:
             </span>
@@ -631,6 +732,23 @@ export default function StaffInvitationManager() {
               align="right"
               className="min-w-[170px]"
             />
+
+            {(searchQuery || roleFilter !== "all") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setRoleFilter("all");
+                }}
+                className="py-1.5 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-lg transition-colors cursor-pointer"
+              >
+                Reset
+              </button>
+            )}
+
+            <span className="text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md whitespace-nowrap">
+              Showing {filteredInvitations.length === 0 ? 0 : `${startIndex + 1}–${endIndex}`} of {filteredInvitations.length}
+            </span>
           </div>
         </div>
 
@@ -642,7 +760,23 @@ export default function StaffInvitationManager() {
           </div>
         ) : filteredInvitations.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-500">
-            No invitations found. Use the forms above to issue staff invitations.
+            {searchQuery || roleFilter !== "all" ? (
+              <div className="space-y-2">
+                <p>No invitations match your active filter or search &ldquo;{searchQuery}&rdquo;.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setRoleFilter("all");
+                  }}
+                  className="px-3 py-1.5 bg-[#002060] hover:bg-[#001744] text-white rounded text-xs font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Clear Filters &amp; Search
+                </button>
+              </div>
+            ) : (
+              "No invitations found. Use the forms above to issue staff invitations."
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -658,7 +792,7 @@ export default function StaffInvitationManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredInvitations.map((inv) => {
+                {paginatedInvitations.map((inv) => {
                   const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
                   let portalBase = "";
                   if (inv.role === "teacher") {
@@ -768,6 +902,72 @@ export default function StaffInvitationManager() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls (Limit 10 per page) */}
+        {!isLoading && filteredInvitations.length > PAGE_SIZE && (
+          <div className="px-5 py-3.5 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans">
+            <div className="text-slate-600">
+              Page <strong className="text-[#002060]">{safeCurrentPage}</strong> of{" "}
+              <strong className="text-[#002060]">{totalPages}</strong> &bull; Showing{" "}
+              <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{" "}
+              <strong>{filteredInvitations.length}</strong> invitation(s) (10 per page)
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safeCurrentPage <= 1}
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                  safeCurrentPage <= 1
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                }`}
+              >
+                Prev
+              </button>
+
+              {getVisiblePageNumbers().map((pageNum, idx) => {
+                if (pageNum < 0) {
+                  return (
+                    <span key={`ellipsis-${idx}`} className="px-2 py-1 text-slate-400 font-bold">
+                      &hellip;
+                    </span>
+                  );
+                }
+                const isActive = pageNum === safeCurrentPage;
+                return (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                      isActive
+                        ? "bg-[#002060] border-[#002060] text-white"
+                        : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safeCurrentPage >= totalPages}
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                  safeCurrentPage >= totalPages
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
+                }`}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
