@@ -1104,49 +1104,66 @@ export default function SectionQuotaConsole() {
     return (
       <div
         key={sec.id}
-        className={`p-5 bg-white border-2 shadow-xs space-y-4 transition-colors flex flex-col justify-between ${
-          isElectiveView ? "border-purple-300 hover:border-purple-600" : "border-slate-300 hover:border-[#002060]"
+        className={`rounded-xl bg-white border p-4 sm:p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between ${
+          isElectiveView
+            ? "border-purple-200/90 hover:border-purple-400 hover:ring-1 hover:ring-purple-200 bg-gradient-to-b from-purple-50/20 via-white to-white"
+            : "border-slate-200/90 hover:border-blue-400 hover:ring-1 hover:ring-blue-100"
         }`}
       >
         <div>
           {/* Card Header */}
           <div
-            className={`flex items-start justify-between gap-2 border-b pb-3 ${
-              isElectiveView ? "border-purple-100" : "border-slate-200"
+            className={`flex items-start justify-between gap-2.5 pb-3.5 border-b ${
+              isElectiveView ? "border-purple-100" : "border-slate-100"
             }`}
           >
-            <div>
+            <div className="min-w-0 flex-1">
               {isElectiveView && (
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-900 border border-purple-300 px-1.5 py-0.2 uppercase">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wide">
+                    <svg className="w-3 h-3 text-purple-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
                     ELECTIVE: {sec.electiveCode || "SHS-ELEC"}
                   </span>
                 </div>
               )}
-              <span className={`text-sm font-bold block ${isElectiveView ? "text-purple-950" : "text-[#002060]"}`}>
+              <h4 className={`text-base font-extrabold tracking-tight truncate leading-snug ${isElectiveView ? "text-purple-950" : "text-[#002060]"}`} title={sec.section_name}>
                 {sec.section_name}
-              </span>
+              </h4>
+
               {sec.adviser_name ? (
-                <span className="text-[11px] text-slate-700 block mt-0.5">
-                  {isElectiveView ? "Instructor:" : "Adviser:"}{" "}
-                  <strong className="text-slate-900 uppercase">{sec.adviser_name}</strong>
-                </span>
+                <div className="flex items-center gap-1.5 text-xs text-slate-700 mt-1.5">
+                  <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="text-[11px] text-slate-500 font-medium">{isElectiveView ? "Instructor:" : "Adviser:"}</span>
+                  <strong className="text-slate-900 font-bold truncate uppercase text-xs">{sec.adviser_name}</strong>
+                </div>
               ) : (
-                <span className="inline-block mt-1 text-[10px] bg-amber-50 text-amber-900 border border-amber-300 font-mono font-bold px-1.5 py-0.5 uppercase">
-                  Needs Faculty Assignment
-                </span>
+                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs">
+                  <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>Needs Faculty Assignment</span>
+                </div>
               )}
+
               {sec.room && (
-                <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
-                  {isElectiveView ? "Facility:" : "Room:"} {sec.room}
-                </span>
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1 font-mono">
+                  <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <span className="truncate">{sec.room}</span>
+                </div>
               )}
             </div>
+
             <span
-              className={`text-[10px] font-mono px-2.5 py-1 border font-bold shrink-0 ${
+              className={`inline-flex items-center text-[10px] font-bold px-2.5 py-1 rounded-full border shadow-2xs shrink-0 ${
                 isElectiveView
-                  ? "bg-purple-50 text-purple-900 border-purple-200"
-                  : "bg-slate-100 text-slate-800 border-slate-300"
+                  ? "bg-purple-50 text-purple-800 border-purple-200"
+                  : "bg-slate-100 text-slate-700 border-slate-200"
               }`}
             >
               Grade {sec.grade_level}{" "}
@@ -1161,19 +1178,19 @@ export default function SectionQuotaConsole() {
           </div>
 
           {/* Progress & Capacity */}
-          <div className="space-y-1.5 mt-3">
+          <div className="space-y-1.5 mt-3.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-600">
+              <span className="text-slate-500 font-medium">
                 {isElectiveView ? "Enrolled in Elective:" : `Enrolled (${activeTerm.termName}):`}
               </span>
-              <strong className="font-mono text-slate-900">
-                {count} / {capacity} students ({pct}%)
-              </strong>
+              <span className="font-mono text-xs font-bold text-slate-900">
+                <strong>{count}</strong> / {capacity} <span className="text-slate-400 font-normal">({pct}%)</span>
+              </span>
             </div>
-            <div className="w-full bg-slate-200 h-2.5 overflow-hidden border border-slate-300">
+            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
               <div
-                className={`h-full transition-all duration-300 ${
-                  isFull ? "bg-red-600" : isElectiveView ? "bg-purple-700" : pct > 75 ? "bg-amber-500" : "bg-[#002060]"
+                className={`h-full rounded-full transition-all duration-300 ${
+                  isFull ? "bg-rose-600" : isElectiveView ? "bg-purple-600" : pct > 75 ? "bg-amber-500" : "bg-[#002060]"
                 }`}
                 style={{ width: `${pct}%` }}
               />
@@ -1181,48 +1198,61 @@ export default function SectionQuotaConsole() {
           </div>
 
           {/* Slots Remaining */}
-          <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs mt-3">
-            <span className="text-slate-500">Available Slots:</span>
+          <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs mt-3">
+            <span className="text-slate-500 font-medium">Available Slots:</span>
             <span
-              className={`font-bold font-mono px-2 py-0.5 border ${
+              className={`inline-flex items-center gap-1.5 font-bold font-mono px-2.5 py-0.5 rounded-full border text-[11px] shadow-2xs ${
                 isFull
-                  ? "bg-red-50 text-red-700 border-red-300"
-                  : "bg-emerald-50 text-emerald-900 border-emerald-300"
+                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                  : "bg-emerald-50 text-emerald-800 border-emerald-200"
               }`}
             >
+              <span className={`w-1.5 h-1.5 rounded-full ${isFull ? "bg-rose-500" : "bg-emerald-500"}`} />
               {isFull ? "FULL (0 SLOTS)" : `${capacity - count} SLOTS REMAINING`}
             </span>
           </div>
         </div>
 
         {/* Card Action Buttons */}
-        <div className="pt-3 border-t border-slate-200 space-y-2">
+        <div className="pt-3.5 border-t border-slate-100 space-y-2 mt-4">
           <button
             type="button"
             onClick={() => fetchRoster(sec)}
-            className={`w-full py-2 text-white text-xs font-bold uppercase tracking-wider text-center transition-colors shadow-2xs cursor-pointer ${
-              isElectiveView ? "bg-purple-900 hover:bg-purple-950" : "bg-[#002060] hover:bg-blue-950"
+            className={`w-full py-2 px-3 rounded-lg text-white text-xs font-bold tracking-wide text-center transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+              isElectiveView ? "bg-purple-800 hover:bg-purple-900" : "bg-[#002060] hover:bg-blue-950"
             }`}
           >
-            View {isElectiveView ? "Elective" : "Class"} Roster ({count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} in Roster` : ""})
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span>View {isElectiveView ? "Elective" : "Class"} Roster</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/20 font-mono">
+              {count} Enrolled{sec.totalRosterCount && sec.totalRosterCount > count ? ` • ${sec.totalRosterCount} Roster` : ""}
+            </span>
           </button>
 
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => openEditModal(sec)}
-              className="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-[11px] font-bold uppercase tracking-wider text-center transition-colors cursor-pointer"
+              className="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               title={isElectiveView ? "Assign room or instructor" : "Edit capacity and details"}
             >
-              {isElectiveView ? "Assign Facility" : "Edit Capacity"}
+              <svg className="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span>{isElectiveView ? "Assign Facility" : "Edit Capacity"}</span>
             </button>
             <button
               type="button"
               onClick={() => setDeleteSectionTarget(sec)}
-              className="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-300 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="py-1.5 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               title="Remove section"
             >
-              Delete
+              <svg className="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              <span>Delete</span>
             </button>
           </div>
         </div>
@@ -1292,117 +1322,161 @@ export default function SectionQuotaConsole() {
         )}
 
         {/* Active Academic Term Banner */}
-        <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold bg-[#002060] text-amber-300 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+        <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#002060] p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold bg-[#002060] text-amber-300 px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Active Academic Term
             </span>
-            <span className="text-xs font-bold text-[#002060]">
+            <span className="text-xs font-extrabold text-[#002060] flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               S.Y. {activeTerm.schoolYear} &bull; {activeTerm.termName}
             </span>
           </div>
-          <div className="text-[11px] text-slate-600">
+          <div className="text-[11px] text-slate-600 font-medium">
             {activeTerm.termNumber === 1 ? (
               <span>Semester 1: Section counts begin at 0. Assign learners as they enroll.</span>
             ) : (
-            <span>Semester {activeTerm.termNumber}: Section rosters fixed from Sem 1. Active term enrollment automatically tracked.</span>
-          )}
+              <span>Semester {activeTerm.termNumber}: Section rosters fixed from Sem 1. Active term enrollment automatically tracked.</span>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* KPI Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
-              Total Sections
+        {/* KPI Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {/* Total Sections */}
+          <div className="p-4 sm:p-5 bg-white rounded-xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Total Sections
+                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mt-1">
+                  {totalSections}
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#002060] flex items-center justify-center border border-blue-100 shrink-0 shadow-2xs">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </div>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium block mt-2 pt-2 border-t border-slate-100">
+              {gradeFilter === "ALL" ? "All Grades Combined" : `Grade ${gradeFilter} Only`}
             </span>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-1">
-              {totalSections}
+          </div>
+
+          {/* Total Capacity */}
+          <div className="p-4 sm:p-5 bg-white rounded-xl border border-blue-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">
+                  Total Capacity
+                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-[#002060] mt-1">
+                  {totalCapacity}
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#002060] flex items-center justify-center border border-blue-200 shrink-0 shadow-2xs">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+            </div>
+            <span className="text-[11px] text-blue-700 font-medium block mt-2 pt-2 border-t border-blue-100/60">
+              Configured Max Seats
+            </span>
+          </div>
+
+          {/* Officially Enrolled */}
+          <div className="p-4 sm:p-5 bg-white rounded-xl border border-emerald-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider block">
+                  Officially Enrolled ({activeTerm.termName})
+                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-950 mt-1">
+                  {totalEnrolled}
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200 shrink-0 shadow-2xs">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <div className="mt-2 pt-2 border-t border-emerald-100/60 flex items-center justify-between text-[11px]">
+              <span className="text-emerald-700 font-medium">Capacity Utilized:</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                {overallPct}%
+              </span>
             </div>
           </div>
-          <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">
-            {gradeFilter === "ALL" ? "All Grades Combined" : `Grade ${gradeFilter} Only`}
-          </span>
-        </div>
 
-        <div className="p-3.5 sm:p-4 bg-blue-50/70 border-2 border-blue-300 shadow-xs flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-              Total Capacity
-            </span>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-[#002060] mt-1">
-              {totalCapacity}
+          {/* Available Slots */}
+          <div className="p-4 sm:p-5 bg-white rounded-xl border border-amber-200/90 shadow-xs hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold text-amber-950 uppercase tracking-wider block">
+                  Available Slots
+                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono text-amber-950 mt-1">
+                  {totalAvailable}
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200 shrink-0 shadow-2xs">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+              </div>
             </div>
-          </div>
-          <span className="text-[10px] text-blue-900 block leading-tight mt-1.5 break-words">
-            Configured Max Seats
-          </span>
-        </div>
-
-        <div className="p-3.5 sm:p-4 bg-emerald-50/70 border-2 border-emerald-500 shadow-xs flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-emerald-950 uppercase block">
-              Officially Enrolled ({activeTerm.termName})
+            <span className="text-[11px] text-amber-800 font-medium block mt-2 pt-2 border-t border-amber-100/60">
+              Unfilled Seats Remaining
             </span>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-950 mt-1">
-              {totalEnrolled}
-            </div>
           </div>
-          <span className="text-[10px] text-emerald-900 block leading-tight mt-1.5 break-words">
-            {overallPct}% Capacity Utilized
-          </span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-amber-50/70 border-2 border-amber-400 shadow-xs flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] font-mono font-bold text-amber-950 uppercase block">
-              Available Slots
+        {/* Filter Bar */}
+        <div className="p-4 bg-white rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="w-full sm:w-auto">
+            <CustomSelect
+              label="Grade Level:"
+              value={gradeFilter}
+              onChange={setGradeFilter}
+              options={[
+                { value: "ALL", label: "All Grade Levels" },
+                { value: "7", label: "Grade 7" },
+                { value: "8", label: "Grade 8" },
+                { value: "9", label: "Grade 9" },
+                { value: "10", label: "Grade 10" },
+                { value: "11", label: "Grade 11 (SHS)" },
+                { value: "12", label: "Grade 12 (SHS)" },
+              ]}
+              fullWidth
+            />
+          </div>
+
+          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
+              <span>Showing</span>
+              <strong className="text-slate-900 font-mono">{filteredSections.length}</strong>
+              <span>section{filteredSections.length === 1 ? "" : "s"}</span>
             </span>
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-950 mt-1">
-              {totalAvailable}
-            </div>
+            <button
+              type="button"
+              onClick={() => fetchSections(false)}
+              className="px-3.5 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+              title="Refresh sections"
+            >
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh List</span>
+            </button>
           </div>
-          <span className="text-[10px] text-amber-900 block leading-tight mt-1.5 break-words">
-            Unfilled Seats Remaining
-          </span>
         </div>
-      </div>
-
-      {/* Filter Bar */}
-      <div className="p-4 bg-white border-2 border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div className="w-full sm:w-auto">
-          <CustomSelect
-            label="Grade Level:"
-            value={gradeFilter}
-            onChange={setGradeFilter}
-            options={[
-              { value: "ALL", label: "All Grade Levels" },
-              { value: "7", label: "Grade 7" },
-              { value: "8", label: "Grade 8" },
-              { value: "9", label: "Grade 9" },
-              { value: "10", label: "Grade 10" },
-              { value: "11", label: "Grade 11 (SHS)" },
-              { value: "12", label: "Grade 12 (SHS)" },
-            ]}
-            fullWidth
-          />
-        </div>
-
-        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-          <span className="text-xs text-slate-500 font-mono">
-            Showing <strong>{filteredSections.length}</strong> section{filteredSections.length === 1 ? "" : "s"}
-          </span>
-          <button
-            type="button"
-            onClick={() => fetchSections(false)}
-            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-mono font-bold border border-slate-300 uppercase cursor-pointer"
-            title="Refresh sections"
-          >
-            Refresh List
-          </button>
-        </div>
-      </div>
 
       {/* Sections Grid */}
       {isLoading ? (
@@ -1410,17 +1484,22 @@ export default function SectionQuotaConsole() {
           <div className="w-5 h-5 border-2 border-[#002060] border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       ) : filteredSections.length === 0 && allElectivesMerged.length === 0 ? (
-        <div className="p-12 bg-white border-2 border-slate-300 text-center space-y-3">
-          <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
-            NO SECTIONS FOUND
+        <div className="p-12 bg-white rounded-xl border border-slate-200 text-center space-y-3 shadow-xs">
+          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <span className="text-sm font-bold text-slate-800 uppercase block tracking-wider">
+            No Sections Found
           </span>
-          <p className="text-xs text-slate-600">No sections exist for the selected grade filter.</p>
+          <p className="text-xs text-slate-500 max-w-md mx-auto">No sections exist for the selected grade filter. Create a new section to begin allocating learners.</p>
           <button
             type="button"
             onClick={openAddModal}
-            className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase tracking-wider cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer inline-flex items-center gap-2"
           >
-            + Add Section for {gradeFilter === "ALL" ? "All Grades" : `Grade ${gradeFilter}`}
+            <span>+ Add Section for {gradeFilter === "ALL" ? "All Grades" : `Grade ${gradeFilter}`}</span>
           </button>
         </div>
       ) : (
@@ -1430,34 +1509,39 @@ export default function SectionQuotaConsole() {
           {/* ========================================================================= */}
           {shouldShowJhs && (
             <div className="space-y-6">
-              <div className="border-b-2 border-[#002060] pb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-wider block">
-                    SECONDARY EDUCATION - JHS
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-bold uppercase text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-600" />
+                    <span className="text-[11px] font-bold text-[#002060] uppercase tracking-wider">
+                      Secondary Education • JHS
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
                     Junior High School (JHS)
                   </h3>
                 </div>
-                <span className="text-xs font-mono font-bold bg-[#002060] text-white px-3 py-1 self-start sm:self-auto">
+                <span className="text-xs font-bold bg-[#002060] text-white px-3 py-1.5 rounded-lg shadow-2xs self-start sm:self-auto">
                   Grades 7 - 10 Core Curricula
                 </span>
               </div>
 
               {/* Grade 7 Sub-block */}
               {shouldShowGrade(7) && (
-                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
-                      Grade 7 Sections
-                    </h4>
-                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between bg-slate-50/80 px-3.5 py-2.5 rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-[#002060]" />
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wide">
+                        Grade 7 Sections
+                      </h4>
+                    </div>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-2xs">
                       {g7Sections.length} {g7Sections.length === 1 ? "Section" : "Sections"}
                     </span>
                   </div>
                   {g7Sections.length === 0 ? (
-                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                    <div className="p-6 bg-slate-50/60 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
                       No Grade 7 sections created yet. Click "+ Add New Class Section" to register one.
                     </div>
                   ) : (
@@ -1470,18 +1554,20 @@ export default function SectionQuotaConsole() {
 
               {/* Grade 8 Sub-block */}
               {shouldShowGrade(8) && (
-                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
-                      Grade 8 Sections
-                    </h4>
-                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between bg-slate-50/80 px-3.5 py-2.5 rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-[#002060]" />
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wide">
+                        Grade 8 Sections
+                      </h4>
+                    </div>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-2xs">
                       {g8Sections.length} {g8Sections.length === 1 ? "Section" : "Sections"}
                     </span>
                   </div>
                   {g8Sections.length === 0 ? (
-                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                    <div className="p-6 bg-slate-50/60 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
                       No Grade 8 sections created yet. Click "+ Add New Class Section" to register one.
                     </div>
                   ) : (
@@ -1494,18 +1580,20 @@ export default function SectionQuotaConsole() {
 
               {/* Grade 9 Sub-block */}
               {shouldShowGrade(9) && (
-                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
-                      Grade 9 Sections
-                    </h4>
-                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between bg-slate-50/80 px-3.5 py-2.5 rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-[#002060]" />
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wide">
+                        Grade 9 Sections
+                      </h4>
+                    </div>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-2xs">
                       {g9Sections.length} {g9Sections.length === 1 ? "Section" : "Sections"}
                     </span>
                   </div>
                   {g9Sections.length === 0 ? (
-                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                    <div className="p-6 bg-slate-50/60 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
                       No Grade 9 sections created yet. Click "+ Add New Class Section" to register one.
                     </div>
                   ) : (
@@ -1518,18 +1606,20 @@ export default function SectionQuotaConsole() {
 
               {/* Grade 10 Sub-block */}
               {shouldShowGrade(10) && (
-                <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-slate-300">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
-                      Grade 10 Sections
-                    </h4>
-                    <span className="text-xs font-mono text-slate-600 font-bold bg-slate-100 px-2 py-0.5 border border-slate-300">
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between bg-slate-50/80 px-3.5 py-2.5 rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-[#002060]" />
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wide">
+                        Grade 10 Sections
+                      </h4>
+                    </div>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-2xs">
                       {g10Sections.length} {g10Sections.length === 1 ? "Section" : "Sections"}
                     </span>
                   </div>
                   {g10Sections.length === 0 ? (
-                    <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                    <div className="p-6 bg-slate-50/60 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
                       No Grade 10 sections created yet. Click "+ Add New Class Section" to register one.
                     </div>
                   ) : (
@@ -1547,42 +1637,45 @@ export default function SectionQuotaConsole() {
           {/* ========================================================================= */}
           {shouldShowShs && (
             <div className="space-y-8">
-              <div className="border-b-2 border-blue-900 pb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-blue-900 uppercase tracking-wider block">
-                    POST-SECONDARY EDUCATION - SHS
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-bold uppercase text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-indigo-600" />
+                    <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider">
+                      Post-Secondary Education • SHS
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
                     Senior High School (SHS)
                   </h3>
                 </div>
-                <span className="text-xs font-mono font-bold bg-blue-900 text-white px-3 py-1 self-start sm:self-auto">
+                <span className="text-xs font-bold bg-indigo-950 text-white px-3 py-1.5 rounded-lg shadow-2xs self-start sm:self-auto">
                   Grades 11 - 12 Academic &amp; Tech-Pro
                 </span>
               </div>
 
               {/* Grade 11 Block */}
               {shouldShowGrade(11) && (
-                <div className="space-y-6 pl-2 sm:pl-4 border-l-2 border-blue-400">
+                <div className="space-y-6">
                   {/* Grade 11 Track Sections (Academic at Tech-Pro) */}
-                  <div className="space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-blue-50/70 p-3 border border-blue-200">
+                  <div className="space-y-3.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-blue-50/60 p-3.5 rounded-xl border border-blue-200/80">
                       <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-[#002060] uppercase tracking-tight flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
-                          Grade 11 Academic at Tech-Pro (Track Sections)
+                        <h4 className="text-xs sm:text-sm font-extrabold text-[#002060] uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-[#002060]" />
+                          Grade 11 Academic &amp; Tech-Pro (Track Sections)
                         </h4>
-                        <p className="text-[11px] text-slate-600">
+                        <p className="text-[11px] text-slate-600 mt-0.5">
                           Primary homeroom cohorts for core curriculum. Students in the same track are classmates here.
                         </p>
                       </div>
-                      <span className="text-xs font-mono font-bold text-blue-900 bg-white px-2.5 py-0.5 border border-blue-300 self-start sm:self-auto">
+                      <span className="text-xs font-bold text-[#002060] bg-white px-3 py-1 rounded-full border border-blue-200 shadow-2xs self-start sm:self-auto shrink-0">
                         {g11TrackSections.length} {g11TrackSections.length === 1 ? "Track Section" : "Track Sections"}
                       </span>
                     </div>
 
                     {g11TrackSections.length === 0 ? (
-                      <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                      <div className="p-6 bg-slate-50/60 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
                         No Grade 11 track sections found. Click "+ Add New Class Section" to add Academic or TechPro sections.
                       </div>
                     ) : (
@@ -1593,24 +1686,24 @@ export default function SectionQuotaConsole() {
                   </div>
 
                   {/* Electives Subheading -> Grade 11 mga section ulit */}
-                  <div className="space-y-3 pt-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-purple-50/80 p-3 border border-purple-200">
+                  <div className="space-y-3.5 pt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/70 p-3.5 rounded-xl border border-purple-200/80">
                       <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-purple-950 uppercase tracking-tight flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 bg-purple-700 inline-block" />
+                        <h4 className="text-xs sm:text-sm font-extrabold text-purple-950 uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-purple-600" />
                           Electives — Grade 11 Elective Sections
                         </h4>
-                        <p className="text-[11px] text-purple-900">
+                        <p className="text-[11px] text-purple-900 mt-0.5">
                           Specialized subject sections. Students taking the same elective are classmates during elective periods.
                         </p>
                       </div>
-                      <span className="text-xs font-mono font-bold text-purple-900 bg-white px-2.5 py-0.5 border border-purple-300 self-start sm:self-auto">
+                      <span className="text-xs font-bold text-purple-900 bg-white px-3 py-1 rounded-full border border-purple-200 shadow-2xs self-start sm:self-auto shrink-0">
                         {g11ElectiveSections.length} {g11ElectiveSections.length === 1 ? "Elective Class" : "Elective Classes"}
                       </span>
                     </div>
 
                     {g11ElectiveSections.length === 0 ? (
-                      <div className="p-4 bg-purple-50/40 border border-purple-200 text-xs text-purple-800 font-mono">
+                      <div className="p-6 bg-purple-50/40 rounded-xl border border-dashed border-purple-300 text-center text-xs text-purple-800">
                         No Grade 11 elective classes currently populated. As SHS students select electives during enrollment, sections appear here automatically.
                       </div>
                     ) : (
@@ -1624,26 +1717,26 @@ export default function SectionQuotaConsole() {
 
               {/* Grade 12 Block */}
               {shouldShowGrade(12) && (
-                <div className="space-y-6 pl-2 sm:pl-4 border-l-2 border-blue-400">
+                <div className="space-y-6">
                   {/* Grade 12 Track Sections (Academic at Tech-Pro) */}
-                  <div className="space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-blue-50/70 p-3 border border-blue-200">
+                  <div className="space-y-3.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-blue-50/60 p-3.5 rounded-xl border border-blue-200/80">
                       <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-[#002060] uppercase tracking-tight flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 bg-[#002060] inline-block" />
-                          Grade 12 Academic at Tech-Pro (Track Sections)
+                        <h4 className="text-xs sm:text-sm font-extrabold text-[#002060] uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-[#002060]" />
+                          Grade 12 Academic &amp; Tech-Pro (Track Sections)
                         </h4>
-                        <p className="text-[11px] text-slate-600">
+                        <p className="text-[11px] text-slate-600 mt-0.5">
                           Primary homeroom cohorts for core curriculum. Students in the same track are classmates here.
                         </p>
                       </div>
-                      <span className="text-xs font-mono font-bold text-blue-900 bg-white px-2.5 py-0.5 border border-blue-300 self-start sm:self-auto">
+                      <span className="text-xs font-bold text-[#002060] bg-white px-3 py-1 rounded-full border border-blue-200 shadow-2xs self-start sm:self-auto shrink-0">
                         {g12TrackSections.length} {g12TrackSections.length === 1 ? "Track Section" : "Track Sections"}
                       </span>
                     </div>
 
                     {g12TrackSections.length === 0 ? (
-                      <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 font-mono">
+                      <div className="p-6 bg-slate-50/60 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
                         No Grade 12 track sections found. Click "+ Add New Class Section" to add Academic or TechPro sections.
                       </div>
                     ) : (
@@ -1654,24 +1747,24 @@ export default function SectionQuotaConsole() {
                   </div>
 
                   {/* Electives Subheading -> Grade 12 mga section ulit */}
-                  <div className="space-y-3 pt-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-purple-50/80 p-3 border border-purple-200">
+                  <div className="space-y-3.5 pt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/70 p-3.5 rounded-xl border border-purple-200/80">
                       <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-purple-950 uppercase tracking-tight flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 bg-purple-700 inline-block" />
+                        <h4 className="text-xs sm:text-sm font-extrabold text-purple-950 uppercase tracking-tight flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-purple-600" />
                           Electives — Grade 12 Elective Sections
                         </h4>
-                        <p className="text-[11px] text-purple-900">
+                        <p className="text-[11px] text-purple-900 mt-0.5">
                           Specialized subject sections. Students taking the same elective are classmates during elective periods.
                         </p>
                       </div>
-                      <span className="text-xs font-mono font-bold text-purple-900 bg-white px-2.5 py-0.5 border border-purple-300 self-start sm:self-auto">
+                      <span className="text-xs font-bold text-purple-900 bg-white px-3 py-1 rounded-full border border-purple-200 shadow-2xs self-start sm:self-auto shrink-0">
                         {g12ElectiveSections.length} {g12ElectiveSections.length === 1 ? "Elective Class" : "Elective Classes"}
                       </span>
                     </div>
 
                     {g12ElectiveSections.length === 0 ? (
-                      <div className="p-4 bg-purple-50/40 border border-purple-200 text-xs text-purple-800 font-mono">
+                      <div className="p-6 bg-purple-50/40 rounded-xl border border-dashed border-purple-300 text-center text-xs text-purple-800">
                         No Grade 12 elective classes currently populated. As SHS students select electives during enrollment, sections appear here automatically.
                       </div>
                     ) : (
@@ -1693,7 +1786,7 @@ export default function SectionQuotaConsole() {
       {/* ========================================================================= */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-lg shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-lg shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between shrink-0">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200 block">
@@ -1996,7 +2089,7 @@ export default function SectionQuotaConsole() {
       {/* ========================================================================= */}
       {editingSection && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-lg shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-lg shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between shrink-0">
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200 block">
@@ -2369,7 +2462,7 @@ export default function SectionQuotaConsole() {
       {/* ========================================================================= */}
       {selectedRosterSection && (
         <div className="roster-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="roster-modal-container bg-white border-2 sm:border-4 border-[#002060] w-full max-w-4xl max-h-[94vh] sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+          <div className="roster-modal-container bg-white rounded-2xl border border-slate-200 w-full max-w-4xl max-h-[94vh] sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             {/* DepEd Official Letterhead for Printout */}
             <div className="hidden print:block p-6 text-center border-b-2 border-slate-900 text-slate-900">
               <div className="text-[10px] font-mono uppercase tracking-widest text-slate-600">
@@ -2744,7 +2837,7 @@ export default function SectionQuotaConsole() {
       {/* Modern Confirm Delete Section Modal */}
       {deleteSectionTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
             <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
@@ -2855,7 +2948,7 @@ export default function SectionQuotaConsole() {
       {/* Modern Reassign Capacity Override Modal */}
       {reassignOverridePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
             <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
