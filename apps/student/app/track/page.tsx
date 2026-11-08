@@ -8,7 +8,7 @@ import { FullEnrollmentFormData } from "@/components/forms/enrollment/Enrollment
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/authContext";
 import { useEnrollmentControl } from "@/lib/hooks/useEnrollmentControl";
-import { isApplicationInTerm } from "@/lib/utils/academicTerm";
+import { isApplicationInTerm, normalizeSchoolYear } from "@/lib/utils/academicTerm";
 import { CopyChip, PageCardSkeleton, EmptyStateCard, PrintPageButton } from "@/components/ui/PortalUI";
 
 interface ApplicationRecord {
@@ -620,11 +620,6 @@ function TrackApplicationContent() {
             />
           </div>
           <div>
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-300">
-              <span>Dumalneg National High School</span>
-              <span className="text-blue-300">&bull;</span>
-              <span>Application Status Tracker</span>
-            </div>
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
               My Enrollment Application Status
             </h1>
@@ -655,8 +650,12 @@ function TrackApplicationContent() {
            SCENARIO 1: ENROLLMENT APPLICATION FOUND (AUTOMATIC LIVE TRACKING CARD)
            ========================================================================= */
         <div className="space-y-4">
-          {/* Active Academic Term Enrollment Open Advisory */}
-          {!allRecords.some((r) => isApplicationInTerm(r.rawApp, schoolYear, termNumber || semester)) && isEnrollmentOpen && (
+          {/* Active Academic Term Enrollment Open Advisory (only if user has no pending or active application for this year) */}
+          {!allRecords.some((r) => {
+            if (r.status === "Pending") return true;
+            const isSameSY = normalizeSchoolYear(r.schoolYear) === normalizeSchoolYear(schoolYear);
+            return isSameSY || isApplicationInTerm(r.rawApp, schoolYear, termNumber || semester);
+          }) && isEnrollmentOpen && (
             <div className="p-4 bg-emerald-50 border-2 border-emerald-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs rounded-[4px]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
@@ -666,10 +665,10 @@ function TrackApplicationContent() {
                 </div>
                 <div>
                   <span className="text-xs font-bold text-emerald-950 block">
-                    S.Y. {schoolYear} &bull; {semester} Enrollment is Open
+                    Enrollment is Open for S.Y. {schoolYear}
                   </span>
                   <p className="text-[11px] text-emerald-800 font-medium">
-                    Viewing previous term record. Submit your continuing enrollment for {semester}.
+                    Submit your enrollment application for the active academic term.
                   </p>
                 </div>
               </div>
@@ -677,7 +676,7 @@ function TrackApplicationContent() {
                 href="/enroll"
                 className="btn-primary text-xs font-bold py-2 px-4 shrink-0 inline-flex items-center justify-center gap-1.5 rounded-[4px]"
               >
-                <span>Enroll Now for {semester}</span>
+                <span>Enroll Now</span>
                 <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
@@ -704,7 +703,7 @@ function TrackApplicationContent() {
                         : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
                     }`}
                   >
-                    {rec.referenceNumber} &bull; S.Y. {rec.schoolYear} ({rec.semester}) ({rec.status})
+                    {rec.referenceNumber} &bull; S.Y. {rec.schoolYear} ({rec.status})
                   </button>
                 );
               })}
@@ -723,7 +722,7 @@ function TrackApplicationContent() {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                    Application Reference &bull; S.Y. {record.schoolYear} ({record.semester})
+                    Application Reference &bull; S.Y. {record.schoolYear}
                   </span>
                   <div className="flex flex-wrap items-center gap-2 mt-0.5">
                     <span className="text-xl sm:text-2xl font-black text-[#002060] tracking-tight">
@@ -758,7 +757,7 @@ function TrackApplicationContent() {
 
             {/* Compact Status Callout + Primary Action */}
             {record.status === "Pending" && (
-              <div className="p-4 bg-amber-50/80 border border-amber-300 flex items-center gap-3 rounded-[4px]">
+              <div className="p-3.5 bg-amber-50/80 border border-amber-300 flex items-center gap-3 rounded-[4px]">
                 <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -769,7 +768,7 @@ function TrackApplicationContent() {
                     Under School Administrator Evaluation
                   </span>
                   <span className="text-[11px] text-amber-900">
-                    Your application and documents are queued for verification. Official DepEd PDF forms unlock upon approval.
+                    Your application and documents are queued for verification.
                   </span>
                 </div>
               </div>
@@ -1169,7 +1168,7 @@ function TrackApplicationContent() {
             <span className="w-3 h-3 rounded-full bg-emerald-600 shrink-0" />
             <div>
               <span className="text-xs font-bold text-emerald-950 block">Approved</span>
-              <span className="text-[11px] text-emerald-800">Verified &bull; PDF Form &amp; Section Ready</span>
+              <span className="text-[11px] text-emerald-800">Verified &bull; Section Ready</span>
             </div>
           </div>
 
@@ -1177,7 +1176,7 @@ function TrackApplicationContent() {
             <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
             <div>
               <span className="text-xs font-bold text-amber-950 block">Pending</span>
-              <span className="text-[11px] text-amber-800">Queued for Administrator Review</span>
+              <span className="text-[11px] text-amber-800">Under Review</span>
             </div>
           </div>
 
@@ -1185,7 +1184,7 @@ function TrackApplicationContent() {
             <span className="w-3 h-3 rounded-full bg-red-600 shrink-0" />
             <div>
               <span className="text-xs font-bold text-red-950 block">Needs Revision</span>
-              <span className="text-[11px] text-red-800">Action Required &bull; Form Unlocked</span>
+              <span className="text-[11px] text-red-800">Action Required</span>
             </div>
           </div>
         </div>
