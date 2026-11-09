@@ -554,20 +554,22 @@ export default function EnrollmentStepper({
   const stepperTopRef = useRef<HTMLDivElement>(null);
 
   const scrollToTop = () => {
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    if (typeof window === "undefined") return;
+    const performScroll = () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      } catch {
+        window.scrollTo(0, 0);
+      }
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-      if (stepperTopRef.current) {
-        stepperTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-      setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-        if (stepperTopRef.current) {
-          stepperTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 60);
-    }
+    };
+    performScroll();
+    requestAnimationFrame(performScroll);
+    setTimeout(performScroll, 60);
   };
 
   const nextStep = () => {
