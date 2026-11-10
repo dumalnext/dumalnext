@@ -15,7 +15,7 @@ interface AccountCreationTutorialProps {
 export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationTutorialProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoId = "TNUpt-GdB3w";
+  const videoId = "83rt42uW6SQ";
   const youtubeUrl = `https://youtube.com/shorts/${videoId}`;
   const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&autoplay=1`;
 
@@ -224,8 +224,8 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     badgeLabel: "Incoming JHS",
     title: "INCOMING GRADE 7 (2026) | DUMALNEXT SYSTEM",
     description: "Official enrollment guide for students entering Grade 7 Junior High School. This covers enrolling under the Regular JHS Curriculum, verifying feeder elementary school information, and uploading documentary requirements (PSA Birth Certificate and Form 138 / SF9).",
-    videoId: "Iyo_kWGFDqg",
-    youtubeUrl: "https://youtube.com/shorts/Iyo_kWGFDqg",
+    videoId: "JFPLd7LvRjA",
+    youtubeUrl: "https://youtube.com/shorts/JFPLd7LvRjA",
     targetAudience: "For Grade 6 graduates from Dumalneg Elementary School and other feeder elementary schools.",
     keyPoints: [
       "Prepare your 12-digit Learner Reference Number (LRN) from your elementary SF9.",
@@ -239,8 +239,8 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     badgeLabel: "Continuing JHS",
     title: "INCOMING GRADE 8, 9, 10 (2026) | DUMALNEXT SYSTEM",
     description: "Enrollment guide for continuing Junior High School learners of Dumalneg NHS (Grade 8, Grade 9, and Grade 10). With a prescribed core curriculum in JHS, enrollment is fast and seamless using 1-Click Continuing Enrollment.",
-    videoId: "nU3-Fay9bfo",
-    youtubeUrl: "https://youtube.com/shorts/nU3-Fay9bfo",
+    videoId: "tpKsGllwW90",
+    youtubeUrl: "https://youtube.com/shorts/tpKsGllwW90",
     targetAudience: "For current Dumalneg NHS Junior High School learners.",
     keyPoints: [
       "JHS follows a prescribed core curriculum, so no elective subjects are required.",
@@ -254,8 +254,8 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     badgeLabel: "Incoming SHS",
     title: "INCOMING GRADE 11 (2026) | DUMALNEXT SYSTEM",
     description: "Comprehensive tutorial for students entering Senior High School (Grade 11). Learn how to select your Senior High School track, Academic or Technical-Professional (Tech-Pro) strand, and trimester elective subjects.",
-    videoId: "ZwLoIS8yR7I",
-    youtubeUrl: "https://youtube.com/shorts/ZwLoIS8yR7I",
+    videoId: "PIOFFgGF6Y4",
+    youtubeUrl: "https://youtube.com/shorts/PIOFFgGF6Y4",
     targetAudience: "For Grade 10 Completers enrolling in Senior High School at Dumalneg NHS.",
     keyPoints: [
       "Select a Track and Strand aligned with your career and higher education pathways.",
@@ -269,8 +269,8 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     badgeLabel: "Continuing SHS",
     title: "INCOMING GRADE 12 (2026) | DUMALNEXT SYSTEM",
     description: "Guide for Grade 12 Senior High School learners on completing enrollment for the active academic trimester, choosing advanced specialized electives, and reviewing graduation credential requirements.",
-    videoId: "CTaKRl-5tj8",
-    youtubeUrl: "https://youtube.com/shorts/CTaKRl-5tj8",
+    videoId: "fD7pE-lY18k",
+    youtubeUrl: "https://youtube.com/shorts/fD7pE-lY18k",
     targetAudience: "For current Grade 11 learners progressing to Grade 12 Senior High School.",
     keyPoints: [
       "Review your past trimester grades and accumulated course units.",
