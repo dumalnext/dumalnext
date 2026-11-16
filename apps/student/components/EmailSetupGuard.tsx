@@ -101,22 +101,22 @@ export default function EmailSetupGuard({
   };
 
   return (
-    <div className="max-w-xl mx-auto my-8 p-6 sm:p-8 bg-white border-2 border-amber-400 rounded-xl shadow-lg space-y-6">
+    <div className="max-w-xl mx-auto my-8 p-6 sm:p-8 bg-white border border-amber-300 border-t-4 border-t-amber-500 rounded-2xl shadow-lg space-y-6">
       {/* Header Banner */}
       <div className="border-b border-slate-200 pb-4">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 bg-amber-500 text-slate-950 text-[10px] font-bold rounded uppercase tracking-wider">
-            Required Security Action
+          <span className="px-3 py-0.5 bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold rounded-full">
+            Email Needed
           </span>
           <span className="text-xs text-slate-500 font-semibold">
             Dumalneg NHS Learner Account
           </span>
         </div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
-          Action Required: No Linked Email Address
+          Please Add Your Email Address
         </h1>
         <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-          Your account email address was reset by IT Support. To secure your account and receive DepEd enrollment updates and verification codes, please link your active email address now.
+          Your email needs to be updated so you can receive school updates and login codes. Please enter your active Gmail address below.
         </p>
       </div>
 
@@ -177,7 +177,7 @@ export default function EmailSetupGuard({
             </button>
           </div>
           <p className="text-[11px] text-slate-500 mt-1">
-            The system will dispatch a 6-digit verification code to confirm that you own this email address.
+            We will send a 6-digit code to this email to make sure it belongs to you.
           </p>
         </div>
 

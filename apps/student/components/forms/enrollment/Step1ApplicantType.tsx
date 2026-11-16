@@ -222,7 +222,7 @@ export default function Step1ApplicantType({
     const newErrors: Record<string, string> = {};
 
     if (!data.applicantType) {
-      newErrors.applicantType = "Please select a learner classification category.";
+      newErrors.applicantType = "Please select a student category.";
     }
 
     if (!data.targetGradeLevel) {
@@ -236,7 +236,7 @@ export default function Step1ApplicantType({
       typeof data.targetGradeLevel === "number" &&
       Number(data.lastGradeCompleted) > Number(data.targetGradeLevel)
     ) {
-      newErrors.lastGradeCompleted = `Invalid academic sequence: Cannot enroll in Grade ${data.targetGradeLevel} after completing Grade ${data.lastGradeCompleted}.`;
+      newErrors.lastGradeCompleted = `Please check your grade levels: You cannot enroll in Grade ${data.targetGradeLevel} right after Grade ${data.lastGradeCompleted}.`;
     }
 
     if (!data.lastSchoolYearCompleted || data.lastSchoolYearCompleted.trim() === "") {
@@ -271,7 +271,7 @@ export default function Step1ApplicantType({
           </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-          Learner Classification &amp; Grade Level
+          Grade Level &amp; Student Type
         </h2>
       </div>
 
@@ -279,7 +279,7 @@ export default function Step1ApplicantType({
       <div className="space-y-3">
         <div className="border-l-4 border-[#002060] pl-3">
           <label className="text-xs font-bold text-slate-900 tracking-wider block">
-            1. Curriculum Program (DepEd Section 2)
+            1. School Program (Junior or Senior High)
           </label>
         </div>
 
@@ -303,7 +303,7 @@ export default function Step1ApplicantType({
       <div className="space-y-3 pt-1">
         <div className="border-l-4 border-[#002060] pl-3">
           <label className="text-xs font-bold text-slate-900 tracking-wider block">
-            2. Learner Classification Category
+            2. Student Category
           </label>
         </div>
 
@@ -455,7 +455,7 @@ export default function Step1ApplicantType({
         <div className="space-y-4 p-5 sm:p-6 bg-slate-50/80 border border-slate-200 rounded-xl">
           <div className="border-b border-slate-200 pb-2.5">
             <span className="text-xs font-bold text-[#002060] tracking-wider block">
-              DepEd Section 6: Previous School Attended &amp; Academic History
+              3. Previous School Attended
             </span>
           </div>
 
@@ -646,7 +646,7 @@ export default function Step1ApplicantType({
                         }`}
                       />
                       <span className="text-xs text-slate-500">
-                        Official 6-digit DepEd School ID registered in LIS. Found on the report card header.
+                        Official 6-digit DepEd School ID found on the top of your report card.
                       </span>
                     </div>
                     {errors.lastSchoolId && (

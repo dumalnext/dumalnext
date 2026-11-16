@@ -16,7 +16,7 @@ interface InvitationData {
 
 const CURRENT_PORTAL_ROLE: string = "admin";
 const CURRENT_PORTAL_NAME: string = "School Administrator";
-const CURRENT_PORTAL_TITLE: string = "Admin Workstation";
+const CURRENT_PORTAL_TITLE: string = "Admin Portal";
 const CURRENT_PORTAL_THEME_FROM: string = "from-[#002060]";
 const CURRENT_PORTAL_THEME_TO: string = "to-[#001744]";
 const DEFAULT_REDIRECT_PATH: string = "/adjudication";
@@ -299,7 +299,7 @@ function AcceptInviteContent() {
         }
       } catch (err: any) {
         if (isMounted) {
-          setErrorMessage("Network error verifying your invitation credentials.");
+          setErrorMessage("Network error checking your invite link.");
           setIsLoading(false);
         }
       }
@@ -371,7 +371,7 @@ function AcceptInviteContent() {
 
         const targetUrl = json.redirectUrl || DEFAULT_REDIRECT_PATH;
         setSuccessInfo({
-          message: "Account created and activated successfully! Redirecting you to your workstation...",
+          message: "Your account is ready! Taking you to the Admin Portal...",
           redirectUrl: targetUrl,
         });
 
@@ -408,15 +408,15 @@ function AcceptInviteContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
         <div className="max-w-md w-full mx-auto bg-white rounded-xl border-2 border-amber-400 p-8 shadow-md text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto text-xl font-bold font-mono">
+          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto text-xl font-bold font-semibold">
             !
           </div>
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase text-amber-800 tracking-wider block">
-              CROSS-PORTAL ROLE GUARD &bull; ERROR TRAPPING
+            <span className="text-[10px] font-semibold font-bold uppercase text-amber-800 tracking-wider block">
+              Wrong Portal Link
             </span>
             <h2 className="text-base font-bold text-slate-900 mt-1">
-              Designated Role: {wrongPortalMeta.name}
+              This link is for the {wrongPortalMeta.name}
             </h2>
           </div>
           <p className="text-xs text-slate-600 leading-relaxed">
@@ -488,7 +488,7 @@ function AcceptInviteContent() {
             DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS
           </span>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#002060] tracking-tight">
-            Official Staff Onboarding &amp; Password Setup
+            Staff Account &amp; Password Setup
           </h1>
         </div>
 
@@ -519,7 +519,7 @@ function AcceptInviteContent() {
             </span>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-1">
               <span className="text-base font-extrabold tracking-tight">
-                Setup Credentials: {CURRENT_PORTAL_NAME}
+                Set Up Your Account: {CURRENT_PORTAL_NAME}
               </span>
               <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase border rounded-full ${roleMeta.badgeColor}`}>
                 Role: {CURRENT_PORTAL_ROLE}
@@ -531,7 +531,7 @@ function AcceptInviteContent() {
             {/* Email Address (Read-only) */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Authorized Staff Email (Locked)
+                Your Assigned Work Email
               </label>
               <input
                 type="text"

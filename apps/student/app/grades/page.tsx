@@ -199,7 +199,7 @@ function StudentGradesContent() {
     return (
       <div className="max-w-4xl mx-auto space-y-6 animate-pulse" aria-busy="true" aria-label="Checking Student Authentication">
         {/* Header Skeleton */}
-        <div className="bg-white border-2 border-slate-300 p-5 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="h-4 w-44 bg-slate-200 rounded" />
             <div className="h-6 w-60 bg-slate-200 rounded" />
@@ -208,14 +208,14 @@ function StudentGradesContent() {
         </div>
 
         {/* Tab strip skeleton */}
-        <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-[4px] border border-slate-300">
+        <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-300">
           <div className="h-10 bg-slate-200 rounded" />
           <div className="h-10 bg-slate-200 rounded" />
           <div className="h-10 bg-slate-200 rounded" />
         </div>
 
         {/* Content Skeleton */}
-        <div className="bg-white border-2 border-slate-300 p-8 rounded-[4px] space-y-4">
+        <div className="bg-white border border-slate-200 p-8 rounded-2xl space-y-4">
           <div className="h-6 w-48 bg-slate-200 rounded" />
           <div className="h-40 bg-slate-100 rounded" />
         </div>
@@ -226,7 +226,7 @@ function StudentGradesContent() {
   // Not logged in guard
   if (!user) {
     return (
-      <div className="max-w-xl mx-auto p-8 bg-amber-50 border-2 border-amber-300 text-center space-y-3 rounded-[4px] shadow-xs">
+      <div className="max-w-xl mx-auto p-8 bg-amber-50 border-2 border-amber-300 text-center space-y-3 rounded-2xl shadow-xs">
         <span className="text-xs font-mono font-bold text-amber-900 uppercase block">
           Access Restricted: Authentication Required
         </span>
@@ -255,13 +255,13 @@ function StudentGradesContent() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 font-sans">
       {/* Page Header */}
-      <div className="bg-white border-2 border-slate-300 p-5 sm:p-6 rounded-[4px] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 p-5 sm:p-6 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#002060] text-white">
-              Official DepEd Grades
+            <span className="px-2.5 py-0.5 rounded text-xs font-semibold rounded-full px-3 bg-[#002060] text-white">
+              Report Card
             </span>
-            <span className="text-[11px] font-mono text-slate-500 font-bold">
+            <span className="text-[11px] text-slate-500 font-semibold">
               School Year {activeSY}
             </span>
           </div>
@@ -271,7 +271,7 @@ function StudentGradesContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
               My Academic Grades
             </h1>
           </div>
@@ -279,9 +279,9 @@ function StudentGradesContent() {
 
         {/* Student Badge Card */}
         {studentDetails && (
-          <div className="bg-slate-50 border border-slate-200 p-3 rounded-[4px] text-xs font-mono shrink-0 space-y-0.5">
+          <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl text-xs shrink-0 rounded-xl space-y-0.5">
             <div className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">
-              Learner Information
+              Student Details
             </div>
             <div className="font-bold text-[#002060] text-sm">
               {studentDetails.fullName}
@@ -300,7 +300,7 @@ function StudentGradesContent() {
 
       {/* Administrative Closed Banner (if turned off by admin) */}
       {!isGradeOpen && (
-        <div className="p-4 bg-amber-50 border-2 border-amber-400 rounded-[4px] text-xs text-amber-950 flex items-start gap-3 shadow-xs">
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl text-xs text-amber-950 flex items-start gap-3 shadow-xs">
           <div className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
             !
           </div>
@@ -309,14 +309,14 @@ function StudentGradesContent() {
               Grade Submission &amp; Evaluation Notice
             </span>
             <p className="leading-relaxed">
-              The School Administrator has closed online grade submissions in the Control Room. Teachers cannot upload new grade snapshots at this time. Existing released records remain accessible below.
+              Grade uploading is paused right now while teachers finalize ratings. Report cards already uploaded remain available below.
             </p>
           </div>
         </div>
       )}
 
       {/* Trimester Tabs */}
-      <div className="bg-white border-2 border-slate-300 p-2 rounded-[4px] shadow-xs flex flex-wrap gap-2">
+      <div className="bg-white border border-slate-200 p-2 rounded-2xl shadow-xs flex flex-wrap gap-2">
         {[1, 2, 3].map((tNum) => {
           const hasGradeForTerm = activeRecords.some((r) => r.trimester === tNum);
           const isSelected = selectedTrimester === tNum;
@@ -326,13 +326,13 @@ function StudentGradesContent() {
               key={tNum}
               type="button"
               onClick={() => setSelectedTrimester(tNum)}
-              className={`flex-1 min-w-[120px] py-2.5 px-3 text-xs font-bold rounded-[3px] transition-all flex items-center justify-between gap-2 cursor-pointer border ${
+              className={`flex-1 min-w-[120px] py-2.5 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-between gap-2 cursor-pointer border ${
                 isSelected
                   ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                   : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
               }`}
             >
-              <span className="uppercase tracking-wider">
+              <span className="font-bold">
                 Trimester {tNum}
               </span>
               {hasGradeForTerm ? (
@@ -343,7 +343,7 @@ function StudentGradesContent() {
                       : "bg-emerald-100 text-emerald-900 border border-emerald-300"
                   }`}
                 >
-                  Done
+                  Available
                 </span>
               ) : (
                 <span
@@ -351,7 +351,7 @@ function StudentGradesContent() {
                     isSelected ? "bg-white/20 text-white" : "bg-slate-200 text-slate-600"
                   }`}
                 >
-                  Pending
+                  Not Posted Yet
                 </span>
               )}
             </button>
@@ -361,7 +361,7 @@ function StudentGradesContent() {
 
       {/* Grade Card Content */}
       {isLoadingGrades ? (
-        <div className="bg-white border-2 border-slate-300 rounded-[4px] shadow-xs overflow-hidden animate-pulse" aria-busy="true" aria-label="Loading official grade records">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden animate-pulse" aria-busy="true" aria-label="Loading official grade records">
           {/* Grade Meta Header Skeleton */}
           <div className="bg-slate-50 border-b border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-2">
@@ -387,29 +387,29 @@ function StudentGradesContent() {
           </div>
         </div>
       ) : gradeError ? (
-        <div className="bg-red-50 border-2 border-red-300 p-6 rounded-[4px] text-xs text-red-950 font-mono space-y-2">
+        <div className="bg-red-50 border border-red-200 p-6 rounded-2xl text-xs text-red-950 font-mono space-y-2">
           <div className="font-bold uppercase tracking-wider text-red-900">
             Notice
           </div>
           <p>{gradeError}</p>
         </div>
       ) : currentGrade ? (
-        <div className="bg-white border-2 border-slate-300 rounded-[4px] shadow-sm overflow-hidden space-y-0">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden space-y-0">
           {/* Grade Meta Header */}
           <div className="bg-slate-50 border-b border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider rounded">
-                  Status: DONE
+                  Available
                 </span>
-                <span className="text-xs font-bold text-slate-900 font-mono uppercase">
+                <span className="text-xs font-bold text-slate-900 font-bold">
                   {currentGrade.termName} &bull; S.Y. {currentGrade.schoolYear}
                 </span>
               </div>
               <div className="text-xs text-slate-600">
                 Adviser: <strong>{currentGrade.uploadedByTeacherName || "Class Adviser"}</strong>
                 {currentGrade.uploadedAt && (
-                  <span className="ml-2 font-mono text-[11px] text-slate-500">
+                  <span className="ml-2 text-xs text-slate-500">
                     &bull; Released: {String(currentGrade.uploadedAt).slice(0, 10)}
                   </span>
                 )}
@@ -475,14 +475,14 @@ function StudentGradesContent() {
                 </span>
               </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-500 mt-2">
+            <span className="text-xs text-slate-500 mt-2">
               Click picture to enlarge or download an official copy.
             </span>
           </div>
         </div>
       ) : (
         /* Empty / Pending Evaluation State */
-        <div className="bg-white border-2 border-slate-300 p-8 sm:p-12 text-center rounded-[4px] shadow-sm space-y-3">
+        <div className="bg-white border border-slate-200 p-8 sm:p-12 text-center rounded-2xl shadow-sm space-y-3">
           <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center mx-auto text-slate-500">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -490,10 +490,10 @@ function StudentGradesContent() {
           </div>
           <div className="space-y-1">
             <h3 className="text-base font-bold text-slate-900 uppercase">
-              Trimester {selectedTrimester} Grade Not Yet Released
+              Trimester {selectedTrimester} Grade Not Posted Yet
             </h3>
             <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-              Your class adviser has not uploaded the grade snapshot for this term yet.
+              Your class adviser has not uploaded your report card for this term yet.
             </p>
           </div>
         </div>
@@ -506,11 +506,11 @@ function StudentGradesContent() {
           onClick={() => setPreviewImage(null)}
         >
           <div
-            className="bg-white rounded-[4px] max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+            className="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-[#002060] text-white px-4 py-3 flex items-center justify-between border-b border-blue-950">
-              <span className="text-xs font-bold uppercase font-mono tracking-wider truncate">
+              <span className="text-xs font-bold uppercase font-bold truncate">
                 {previewImage.title}
               </span>
               <button
@@ -530,8 +530,8 @@ function StudentGradesContent() {
               />
             </div>
             <div className="bg-slate-100 p-3 border-t border-slate-200 flex justify-between items-center text-xs">
-              <span className="font-mono text-[11px] text-slate-500">
-                Official Dumalneg National High School Electronic SF9
+              <span className="text-xs text-slate-500">
+                Dumalneg National High School • Student Report Card
               </span>
               <div className="flex items-center gap-2">
                 <a
@@ -562,14 +562,14 @@ export default function StudentGradesPage() {
     <Suspense
       fallback={
         <div className="max-w-4xl mx-auto space-y-6 animate-pulse p-4">
-          <div className="bg-white border-2 border-slate-300 p-5 rounded-[4px] shadow-xs flex justify-between items-center">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex justify-between items-center">
             <div className="space-y-2">
               <div className="h-4 w-44 bg-slate-200 rounded" />
               <div className="h-6 w-60 bg-slate-200 rounded" />
             </div>
             <div className="h-12 w-48 bg-slate-100 rounded" />
           </div>
-          <div className="bg-white border-2 border-slate-300 p-8 rounded-[4px] h-64" />
+          <div className="bg-white border border-slate-200 p-8 rounded-2xl h-64" />
         </div>
       }
     >

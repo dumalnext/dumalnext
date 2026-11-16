@@ -117,13 +117,13 @@ export default function VirtualWaitingRoom() {
         <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-5 text-center relative">
           <div className="inline-flex items-center gap-2 bg-amber-400/20 border border-amber-400/40 text-amber-300 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest mb-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
-            DepEd High-Traffic Virtual Queue
+            Busy Hours • Waiting Room
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            System at Maximum Capacity
+            Lots of Students Online Right Now
           </h2>
           <p className="text-xs text-blue-100 mt-1 max-w-sm mx-auto">
-            Dumalneg National High School &bull; Concurrency Traffic &amp; Database Protection
+            Please wait a moment while we make room for you
           </p>
         </div>
 
@@ -155,25 +155,25 @@ export default function VirtualWaitingRoom() {
           {/* Capacity Metrics */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-2 gap-3 text-left">
             <div className="border-r border-slate-200 pr-2">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                Server Capacity
+              <span className="text-xs font-bold text-slate-600 block">
+                People Online
               </span>
-              <span className="text-lg font-black text-slate-900 font-mono">
+              <span className="text-lg font-extrabold text-slate-900">
                 {activeCount} / {maxCapacity}
               </span>
               <span className="text-[10px] text-amber-700 font-semibold block mt-0.5">
-                ● 100% Slots Occupied
+                Full right now
               </span>
             </div>
             <div className="pl-2">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                Your Status
+              <span className="text-xs font-bold text-slate-600 block">
+                Your Place
               </span>
               <span className="text-base font-extrabold text-[#002060]">
                 In Queue
               </span>
-              <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
-                Rechecking in {pollCountdown}s
+              <span className="text-[10px] text-slate-500 block mt-0.5 text-xs">
+                Checking again in {pollCountdown}s
               </span>
             </div>
           </div>
@@ -181,17 +181,17 @@ export default function VirtualWaitingRoom() {
           {/* Explanation Text */}
           <div className="text-xs text-slate-600 space-y-2 text-left bg-blue-50/60 border border-blue-100 p-3.5 rounded-xl">
             <p className="font-semibold text-[#002060]">
-              Why is there a Virtual Waiting Room?
+              Why am I waiting?
             </p>
             <p className="leading-relaxed">
-              To preserve system responsiveness and prevent database over-saturation during peak enrollment traffic, the number of simultaneous active students is temporarily regulated.
+              Many students are using the portal right now. We limit visitors slightly so the website stays fast and does not crash while you fill out your form.
             </p>
             <div className="flex items-start gap-2 pt-1 text-[11px] text-slate-600">
               <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>
-                <strong>Please do not close or refresh this tab.</strong> You will automatically gain access as soon as an active session is completed and released.
+                <strong>Please do not close or refresh this tab.</strong> You will be let in automatically as soon as someone finishes.
               </span>
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function VirtualWaitingRoom() {
               type="button"
               onClick={checkStatus}
               disabled={isChecking}
-              className="w-full py-3 bg-[#002060] hover:bg-[#002b80] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 bg-[#002060] hover:bg-[#002b80] text-white font-extrabold text-sm rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isChecking ? (
                 <>
@@ -211,7 +211,7 @@ export default function VirtualWaitingRoom() {
                 </>
               ) : (
                 <>
-                  Recheck Queue Status Now
+                  Check Again Now
                 </>
               )}
             </button>

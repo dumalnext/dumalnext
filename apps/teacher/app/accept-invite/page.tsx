@@ -16,7 +16,7 @@ interface InvitationData {
 
 const CURRENT_PORTAL_ROLE: string = "teacher";
 const CURRENT_PORTAL_NAME: string = "Teacher / Faculty Member";
-const CURRENT_PORTAL_TITLE: string = "Faculty Workstation";
+const CURRENT_PORTAL_TITLE: string = "Teacher Portal";
 const CURRENT_PORTAL_THEME_FROM: string = "from-emerald-800";
 const CURRENT_PORTAL_THEME_TO: string = "to-emerald-950";
 const DEFAULT_REDIRECT_PATH: string = "/roster";
@@ -371,7 +371,7 @@ function AcceptInviteContent() {
 
         const targetUrl = json.redirectUrl || DEFAULT_REDIRECT_PATH;
         setSuccessInfo({
-          message: "Account created and activated successfully! Redirecting you to your workstation...",
+          message: "Account created and activated successfully! Opening the Teacher Portal...",
           redirectUrl: targetUrl,
         });
 
@@ -414,7 +414,7 @@ function AcceptInviteContent() {
           </div>
           <div>
             <span className="text-[10px] font-mono font-bold uppercase text-amber-800 tracking-wider block">
-              CROSS-PORTAL ROLE GUARD &bull; ERROR TRAPPING
+              Wrong Portal Link
             </span>
             <h2 className="text-base font-bold text-slate-900 mt-1">
               Designated Role: {wrongPortalMeta.name}
@@ -489,7 +489,7 @@ function AcceptInviteContent() {
             DepEd Region I &bull; SDO Ilocos Norte &bull; Dumalneg NHS
           </span>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#002060] tracking-tight">
-            Official Staff Onboarding &amp; Password Setup
+            Set Up Your Teacher Account
           </h1>
         </div>
 
@@ -520,7 +520,7 @@ function AcceptInviteContent() {
             </span>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-1">
               <span className="text-base font-extrabold tracking-tight">
-                Setup Credentials: {CURRENT_PORTAL_NAME}
+                Create Your Password &bull; {CURRENT_PORTAL_NAME}
               </span>
               <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase border rounded-full ${roleMeta.badgeColor}`}>
                 Role: {CURRENT_PORTAL_ROLE}
@@ -532,7 +532,7 @@ function AcceptInviteContent() {
             {/* Email Address (Read-only) */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Authorized Staff Email (Locked)
+                Assigned School Email
               </label>
               <input
                 type="text"

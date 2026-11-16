@@ -54,7 +54,7 @@ function ITSupportPortalContent() {
       </main>
 
       <footer className="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500">
-        Dumalneg National High School &bull; IT Support &amp; System Administration Desk &bull; DepEd Three-Term Academic Model
+        Dumalneg National High School &bull; IT Support Portal &bull; 3-Term School Year
       </footer>
     </div>
   );

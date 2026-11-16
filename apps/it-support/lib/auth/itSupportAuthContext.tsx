@@ -174,7 +174,7 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
       if (!itStaffUser) {
         return {
           success: false,
-          error: "Access Denied: Only authorized IT Support personnel of Dumalneg NHS are permitted to access this workstation.",
+          error: "Wrong portal. Only IT Support staff can sign in here.",
         };
       }
 
@@ -187,7 +187,7 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
       if (authErr) {
         return {
           success: false,
-          error: "Invalid IT Support password. Please check your credentials or reset your password.",
+          error: "Incorrect email or password. Please try again.",
         };
       }
 
@@ -210,7 +210,7 @@ export function ITSupportAuthProvider({ children }: { children: React.ReactNode 
     if (cleanPass !== AUTHORIZED_IT_PASS) {
       return {
         success: false,
-        error: "Invalid security password. Please enter the authorized password for dumalnext@gmail.com.",
+        error: "Incorrect password for dumalnext@gmail.com. Please try again.",
       };
     }
 

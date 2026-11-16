@@ -129,7 +129,7 @@ export default function SystemDiagnosticsMonitor() {
             />
             <div>
               <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
-                Database Health, Latency &amp; Security Diagnostics
+                System Health &amp; Privacy Check
               </h2>
             </div>
           </div>
@@ -139,24 +139,24 @@ export default function SystemDiagnosticsMonitor() {
               onClick={() => handleRunDiagnostics("edge")}
               disabled={isRunningPing}
               className="px-3.5 py-2 bg-blue-900/60 hover:bg-blue-800/80 text-blue-100 border border-blue-400/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shrink-0 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
-              title="Tests instantaneous Next.js Edge route response time"
+              title="Check how quickly the website responds"
             >
               <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>{isRunningPing && pingMode === "edge" ? "Testing..." : "Quick Edge Ping"}</span>
+              <span>{isRunningPing && pingMode === "edge" ? "Checking..." : "Quick Check"}</span>
             </button>
             <button
               type="button"
               onClick={() => handleRunDiagnostics("full")}
               disabled={isRunningPing}
               className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-colors shrink-0 disabled:opacity-50 shadow-sm cursor-pointer flex items-center gap-1.5"
-              title="Runs end-to-end latency test across Next.js API and PostgreSQL Database"
+              title="Check connection between website and school records"
             >
               <svg className="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
               </svg>
-              <span>{isRunningPing && pingMode === "full" ? "Testing Database..." : "Run Full System Ping"}</span>
+              <span>{isRunningPing && pingMode === "full" ? "Checking..." : "Check System Connection"}</span>
             </button>
           </div>
         </div>
@@ -172,7 +172,7 @@ export default function SystemDiagnosticsMonitor() {
             </svg>
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">
+            <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">
               Database Status
             </span>
             <div className="flex items-center gap-1.5 mt-0.5">
@@ -189,8 +189,8 @@ export default function SystemDiagnosticsMonitor() {
                 {pingResult?.status || "HEALTHY"}
               </span>
             </div>
-            <span className="text-[11px] font-mono text-slate-500 block mt-1">
-              Query: <strong className="text-slate-800 font-bold">{pingResult ? `${pingResult.dbLatencyMs} ms` : "--"}</strong>
+            <span className="text-[11px] font-medium text-slate-500 block mt-1">
+              Records Speed: <strong className="text-slate-800 font-bold">{pingResult ? `${pingResult.dbLatencyMs} ms` : "--"}</strong>
             </span>
           </div>
         </div>
@@ -203,13 +203,13 @@ export default function SystemDiagnosticsMonitor() {
             </svg>
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">
-              API Edge Latency
+            <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">
+              Website Response
             </span>
-            <div className="text-base font-black text-[#002060] font-mono mt-0.5">
+            <div className="text-base font-black text-[#002060] font-medium mt-0.5">
               {pingResult ? `${pingResult.apiLatencyMs} ms` : "--"}
             </div>
-            <span className="text-[11px] font-mono text-emerald-700 font-bold block mt-1">
+            <span className="text-[11px] font-medium text-emerald-700 font-bold block mt-1">
               Optimal (&lt; 50 ms)
             </span>
           </div>
@@ -224,8 +224,8 @@ export default function SystemDiagnosticsMonitor() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-1">
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">
-                Round-Trip Time
+              <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">
+                Total Speed
               </span>
               {currentTier && (
                 <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase ${currentTier.badge}`}>
@@ -237,10 +237,10 @@ export default function SystemDiagnosticsMonitor() {
                 </span>
               )}
             </div>
-            <div className="text-base font-black text-slate-900 font-mono mt-0.5">
+            <div className="text-base font-black text-slate-900 font-medium mt-0.5">
               {pingResult ? `${pingResult.totalLatencyMs} ms` : "--"}
             </div>
-            <div className="flex items-center gap-1 font-mono text-[9px] mt-1">
+            <div className="flex items-center gap-1 font-medium text-[9px] mt-1">
               {pingHistory.slice(0, 3).map((h, i) => (
                 <span key={i} className="px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded font-bold">
                   {h}ms
@@ -258,13 +258,13 @@ export default function SystemDiagnosticsMonitor() {
             </svg>
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">
+            <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">
               Last Verified
             </span>
-            <div className="text-sm font-mono font-bold text-[#002060] mt-0.5 truncate">
+            <div className="text-sm font-medium font-bold text-[#002060] mt-0.5 truncate">
               {pingResult ? new Date(pingResult.timestamp).toLocaleTimeString() : "--"}
             </div>
-            <span className="text-[10px] text-slate-500 font-mono block mt-1">
+            <span className="text-[10px] text-slate-500 font-medium block mt-1">
               {pingResult ? new Date(pingResult.timestamp).toLocaleDateString() : "--"}
             </span>
           </div>
@@ -285,7 +285,7 @@ export default function SystemDiagnosticsMonitor() {
             </div>
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-                Latency &amp; Regional Performance Guide
+                How System Speed Is Measured
               </h4>
             </div>
           </div>
@@ -312,11 +312,11 @@ export default function SystemDiagnosticsMonitor() {
               <div className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-blue-100 text-[#002060] text-[10px] font-black flex items-center justify-center">1</span>
                 <span className="font-extrabold text-[#002060] text-[11px] uppercase">
-                  Edge Diagnostic Probe
+                  1. Fast Health Check
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 leading-relaxed">
-                Zero-overhead diagnostic probe with indexed keys, reducing query latency to under 5ms.
+                Checks that the website can look up basic records smoothly without slowing users down.
               </p>
             </div>
 
@@ -324,11 +324,11 @@ export default function SystemDiagnosticsMonitor() {
               <div className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-indigo-100 text-indigo-800 text-[10px] font-black flex items-center justify-center">2</span>
                 <span className="font-extrabold text-[#002060] text-[11px] uppercase">
-                  HTTP Socket Pooling
+                  2. Steady Connection
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 leading-relaxed">
-                Persistent keep-alive socket reuse that eliminates TLS handshakes to achieve ~25–35ms responses.
+                Keeps the connection warm so pages open quickly when many students are online.
               </p>
             </div>
 
@@ -336,11 +336,11 @@ export default function SystemDiagnosticsMonitor() {
               <div className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black flex items-center justify-center">3</span>
                 <span className="font-extrabold text-[#002060] text-[11px] uppercase">
-                  Direct Regional Routing
+                  3. Nearby Server
                 </span>
               </div>
               <p className="text-[11px] text-slate-600 leading-relaxed">
-                Regional database peering minimizes physical fiber hops for seamless nationwide access.
+                Connects through a nearby data center so pages load reliably across the country.
               </p>
             </div>
           </div>
@@ -360,7 +360,7 @@ export default function SystemDiagnosticsMonitor() {
               Data Privacy Act (RA 10173) &amp; Security Compliance Audit
             </h3>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase font-mono border border-emerald-200">
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase font-medium border border-emerald-200">
             4 of 4 Verified
           </span>
         </div>
@@ -376,14 +376,14 @@ export default function SystemDiagnosticsMonitor() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 uppercase">
-                  Row-Level Security (RLS) Database Isolation
+                  Separate Access by Role
                 </div>
                 <p className="text-slate-500 text-[11px] mt-0.5">
-                  PostgreSQL policies isolate student, faculty, and administrator records.
+                  Students, teachers, and admins can only see the records meant for their account.
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
               <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
@@ -401,14 +401,14 @@ export default function SystemDiagnosticsMonitor() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 uppercase">
-                  Sensitive Personal Information (SPI) Shield
+                  Sensitive Info Protection
                 </div>
                 <p className="text-slate-500 text-[11px] mt-0.5">
                   Protection for IP ancestral identity, 4Ps beneficiary IDs, and SNEd records.
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
               <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
@@ -426,14 +426,14 @@ export default function SystemDiagnosticsMonitor() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 uppercase">
-                  Document Storage Isolation &amp; Validation
+                  Private Uploaded Documents
                 </div>
                 <p className="text-slate-500 text-[11px] mt-0.5">
                   Uploaded PSA certificates, SF9 Form 138 cards, and 2x2 IDs are secured.
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
               <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
@@ -451,14 +451,14 @@ export default function SystemDiagnosticsMonitor() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 uppercase">
-                  Multi-Role Authentication Perimeter
+                  Separate Portal Sign-In
                 </div>
                 <p className="text-slate-500 text-[11px] mt-0.5">
-                  Isolated role perimeters preventing unauthorized access or privilege escalation.
+                  Each user role signs into its own portal to prevent unauthorized access.
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium font-bold text-[10px] uppercase rounded-md shrink-0 self-start sm:self-auto">
               <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>

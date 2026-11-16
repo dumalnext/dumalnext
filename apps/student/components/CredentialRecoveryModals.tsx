@@ -133,15 +133,15 @@ export function PasswordResetModal({
         <div className="flex items-start justify-between border-b border-slate-200 pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold rounded uppercase">
-                Security Notice
+              <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold rounded-full">
+                Account Update
               </span>
               <span className="text-[11px] font-semibold text-slate-500">
                 Dumalneg NHS
               </span>
             </div>
             <h2 className="text-base font-bold text-slate-900 mt-1">
-              Password Reset by IT Support
+              Set a New Password
             </h2>
           </div>
           <button
@@ -156,7 +156,7 @@ export function PasswordResetModal({
         {/* Informative Note */}
         <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-950 space-y-1">
           <p className="font-bold">
-            Data Privacy & Security Notice:
+            Data Privacy & Account Update:
           </p>
           <p className="leading-relaxed text-[11px] text-amber-900">
             Your account password was reset by IT Support. IT Support personnel never have access to view your password. Please request a 6-digit verification code to set your own new password.
@@ -316,7 +316,7 @@ export function IdentityRecoveryModal({
   initialLrn = "",
   onSuccess,
 }: IdentityRecoveryModalProps) {
-  // Step 1 State: Identity Verification
+  // Step 1 State: Confirm It's You
   const [lrn, setLrn] = useState(initialLrn);
   const [lastName, setLastName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -487,15 +487,15 @@ export function IdentityRecoveryModal({
         <div className="flex items-start justify-between border-b border-slate-200 pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-red-100 text-red-900 border border-red-300 text-[10px] font-bold rounded uppercase">
-                Identity Verification
+              <span className="px-2 py-0.5 bg-red-100 text-red-900 border border-red-300 text-xs font-semibold rounded-full">
+                Confirm It's You
               </span>
               <span className="text-[11px] font-semibold text-slate-500">
-                Self-Service Recovery
+                Account Help
               </span>
             </div>
             <h2 className="text-base font-bold text-slate-900 mt-1">
-              Account Recovery via DepEd LRN
+              Recover Your Student Account
             </h2>
           </div>
           <button
@@ -513,7 +513,7 @@ export function IdentityRecoveryModal({
             Message from IT Support:
           </p>
           <p className="leading-relaxed text-[11px] text-red-900">
-            IT Support has reset the credentials for this account. To verify that you are the legitimate account owner, please confirm your identity using your 12-digit LRN and Last Name or Date of Birth.
+            Your login was reset by school IT Support. Please confirm your 12-digit LRN and your Last Name or Date of Birth to set up your new email and password.
           </p>
         </div>
 
@@ -529,7 +529,7 @@ export function IdentityRecoveryModal({
           </div>
         )}
 
-        {/* STEP 1: Identity Verification Form */}
+        {/* STEP 1: Confirm It's You Form */}
         {!isVerified ? (
           <form onSubmit={handleVerifyIdentity} className="space-y-3.5">
             <div>
@@ -615,7 +615,7 @@ export function IdentityRecoveryModal({
                   disabled={isSendingEmailOtp || cooldown > 0}
                   className="px-3 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg disabled:opacity-60 whitespace-nowrap cursor-pointer"
                 >
-                  {isSendingEmailOtp ? "Dispatched..." : cooldown > 0 ? `${cooldown}s` : emailOtpSent ? "Resend" : "Send OTP"}
+                  {isSendingEmailOtp ? "Sending..." : cooldown > 0 ? `${cooldown}s` : emailOtpSent ? "Resend Code" : "Send Code"}
                 </button>
               </div>
             </div>

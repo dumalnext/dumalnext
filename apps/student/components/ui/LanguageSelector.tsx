@@ -33,12 +33,12 @@ export default function LanguageSelector({ className = "", variant = "header" }:
 
   if (variant === "drawer") {
     return (
-      <div className={`p-3 bg-blue-50/70 border border-blue-200 rounded-[4px] space-y-2 ${className}`}>
+      <div className={`p-3 bg-blue-50/70 border border-blue-200 rounded-xl space-y-2 ${className}`}>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#002060] uppercase tracking-wider">
+          <span className="text-xs font-bold text-[#002060]">
             {t("nav.selectLanguage", "Language")}
           </span>
-          <span className="text-[10px] font-mono text-slate-500 uppercase">{activeOption.code}</span>
+          
         </div>
         <div className="grid grid-cols-3 gap-1.5">
           {LANGUAGE_OPTIONS.map((opt) => (
@@ -46,7 +46,7 @@ export default function LanguageSelector({ className = "", variant = "header" }:
               key={opt.code}
               type="button"
               onClick={() => setLanguage(opt.code)}
-              className={`py-1.5 px-2 text-xs font-bold rounded-[4px] border transition-all cursor-pointer text-center ${
+              className={`py-1.5 px-2 text-xs font-bold rounded-lg border transition-all cursor-pointer text-center ${
                 language === opt.code
                   ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                   : "bg-white text-slate-700 border-slate-300 hover:border-[#002060] hover:text-[#002060]"
@@ -65,7 +65,7 @@ export default function LanguageSelector({ className = "", variant = "header" }:
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/30 hover:border-blue-300 text-white rounded-[4px] text-xs font-bold transition-colors cursor-pointer shadow-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-400/30 hover:border-blue-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
         title="Select Portal Language (English, Ilokano, Tagalog)"
         aria-haspopup="true"
         aria-expanded={isOpen}
@@ -101,11 +101,11 @@ export default function LanguageSelector({ className = "", variant = "header" }:
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-1.5 w-36 bg-white border-2 border-[#002060] rounded-[4px] shadow-xl z-[100] py-1 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
+          className="absolute right-0 mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] py-1 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
           role="menu"
           aria-orientation="vertical"
         >
-          <div className="px-3 py-1 bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-[#002060] uppercase tracking-wider">
+          <div className="px-3 py-1 bg-slate-50 border-b border-slate-200 text-xs font-bold text-[#002060]">
             {t("nav.selectLanguage", "Language")}
           </div>
           {LANGUAGE_OPTIONS.map((opt) => {

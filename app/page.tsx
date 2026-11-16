@@ -13,25 +13,23 @@ export default function Home() {
               className="w-14 h-14 rounded-full object-cover border-2 border-amber-400 shadow-md shrink-0 hidden sm:block mt-0.5"
             />
             <div>
-              <span className="text-xs font-bold tracking-widest text-amber-300 uppercase">
-                Official School Announcement
+                <span className="text-xs font-bold tracking-wide text-amber-300 uppercase">
+                School Announcement
               </span>
               <h2 className="text-xl sm:text-2xl font-extrabold text-white mt-1 tracking-tight">
-                Online Enrollment is Now Open for Incoming and Returning Students
+                Online Enrollment is Open for New and Returning Students
               </h2>
-              <p className="text-xs sm:text-sm text-blue-100 mt-2 max-w-3xl leading-relaxed">
-                This official web portal serves the students and parents of Dumalneg National High School, 
-                particularly across remote and far-flung barangays, eliminating geographical barriers for enrollment. 
-                Equipped with client-side image compression to guarantee rapid document submissions even under low-bandwidth network conditions.
+              <p className="text-sm text-blue-100 mt-2 max-w-3xl leading-relaxed">
+                Welcome to the Dumalneg National High School online portal. Students and parents from every barangay can easily enroll from home, upload report cards and birth certificates cleanly even with slow internet, and check their application updates online.
               </p>
             </div>
           </div>
           <div className="shrink-0">
             <Link
               href="/student/enroll"
-              className="inline-block bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl text-center uppercase tracking-wider text-xs px-6 py-3.5 font-extrabold shadow-sm transition-colors"
+              className="inline-block bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl text-center text-sm px-6 py-3.5 font-bold shadow-sm transition-colors"
             >
-              Proceed to Online Enrollment
+              Start Enrollment
             </Link>
           </div>
         </div>
@@ -39,41 +37,41 @@ export default function Home() {
 
       {/* Target Audiences Grid: G7, G11, Transferees, Returning Students */}
       <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-        <h3 className="text-xs font-bold tracking-wider text-[#002060] uppercase mb-4">
-          Enrollment Classification Guidelines
+        <h3 className="text-sm font-bold text-[#002060] mb-4">
+          Who Can Enroll Online
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-            <div className="text-[11px] font-bold text-[#002060] uppercase tracking-wider mb-1">
-              01 &bull; Incoming Grade 7
+            <div className="text-xs font-bold text-[#002060] mb-1">
+              Incoming Grade 7
             </div>
             <h4 className="text-base font-bold text-slate-900 mb-2">Junior High School</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              For Grade 6 elementary completers. Upload official PSA Birth Certificate and Form 138 (Learner&apos;s Progress Report Card).
+              For Grade 6 graduates joining Dumalneg NHS. Please prepare a photo or scan of your PSA Birth Certificate and Grade 6 Report Card (Form 138).
             </p>
-            <span className="badge-status badge-pending">Online Registration Required</span>
+            <span className="badge-status badge-pending">Needs Online Form</span>
           </div>
 
           <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-            <div className="text-[11px] font-bold text-[#002060] uppercase tracking-wider mb-1">
-              02 &bull; Incoming Grade 11 &amp; Transferees
+            <div className="text-xs font-bold text-[#002060] mb-1">
+              Incoming Grade 11 &amp; Transferees
             </div>
             <h4 className="text-base font-bold text-slate-900 mb-2">Senior High School</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Select Senior High Track, Strand (STEM, TVL, HUMSS), and Cross-Strand Electives. Maximum of 5 core subjects per trimester.
+              Choose your Senior High Track, Strand (STEM, TVL, HUMSS), and preferred electives (up to 5 core subjects each term).
             </p>
-            <span className="badge-status badge-pending">Online Registration Required</span>
+            <span className="badge-status badge-pending">Needs Online Form</span>
           </div>
 
           <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-            <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-1">
-              03 &bull; Returning Students (Grades 8-10, Grade 12)
+            <div className="text-xs font-bold text-emerald-800 mb-1">
+              Returning Students (Grades 8–10 &amp; 12)
             </div>
             <h4 className="text-base font-bold text-slate-900 mb-2">Continuing Enrollment</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Regular continuing students of DNHS are automatically transcribed in the database. Verify record status via LRN lookup.
+              Current Dumalneg NHS students already have their school records on file. Simply sign in with your email or 12-digit LRN to confirm.
             </p>
-            <span className="badge-status badge-approved">Database Auto-Transcribed</span>
+            <span className="badge-status badge-approved">Fast Re-Enrollment</span>
           </div>
         </div>
       </section>
@@ -81,14 +79,14 @@ export default function Home() {
       {/* The 4 Core Portals (View Layer) */}
       <section className="space-y-4">
         <div>
-          <span className="text-xs font-bold tracking-widest text-[#002060] uppercase">
-            Portal Workstation Directory
+          <span className="text-xs font-bold text-[#002060]">
+            School Portals
           </span>
           <h3 className="text-lg font-extrabold text-slate-900">
-            Select Your Designated Workstation Portal
+            Choose Your Portal
           </h3>
-          <p className="text-xs text-slate-500">
-            Strictly segregated role-based access control for students, faculty, school administrators, and IT systems staff.
+          <p className="text-sm text-slate-500">
+            Select the portal that matches your role at Dumalneg National High School.
           </p>
         </div>
 
@@ -96,18 +94,18 @@ export default function Home() {
           {/* 1. Student Portal */}
           <div className="bg-white rounded-xl p-5 border border-slate-200 border-t-4 border-t-[#002060] hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1.5">Portal 01</div>
+              <div className="text-xs font-semibold text-amber-600 mb-1.5">Students &amp; Parents</div>
               <h4 className="text-base font-bold text-[#002060] mb-2">Student Portal</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Online registration, client-side document upload, elective selection, and real-time application status tracking.
+                Enroll online, upload required documents, view your section and class schedule, and see your grades.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100">
               <Link
                 href="/student"
-                className="btn-primary rounded-lg w-full text-center text-xs uppercase tracking-wider block"
+                className="btn-primary rounded-lg w-full text-center text-xs block"
               >
-                Enter Student Portal
+                Open Student Portal
               </Link>
             </div>
           </div>
@@ -115,18 +113,18 @@ export default function Home() {
           {/* 2. Teacher Portal */}
           <div className="bg-white rounded-xl p-5 border border-slate-200 border-t-4 border-t-[#002060] hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1.5">Portal 02</div>
-              <h4 className="text-base font-bold text-[#002060] mb-2">Faculty / Teacher</h4>
+              <div className="text-xs font-semibold text-amber-600 mb-1.5">Faculty &amp; Advisers</div>
+              <h4 className="text-base font-bold text-[#002060] mb-2">Teacher Portal</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Review assigned teaching loads (JHS &amp; SHS cross-level loads), schedules, and generate student class rosters.
+                Check your teaching schedule, manage your advisory class student list, and upload report cards.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100">
               <Link
                 href="/teacher"
-                className="btn-secondary rounded-lg w-full text-center text-xs uppercase tracking-wider block"
+                className="btn-secondary rounded-lg w-full text-center text-xs block"
               >
-                Faculty Login
+                Teacher Sign In
               </Link>
             </div>
           </div>
@@ -134,18 +132,18 @@ export default function Home() {
           {/* 3. Administrator Dashboard */}
           <div className="bg-white rounded-xl p-5 border border-slate-200 border-t-4 border-t-[#002060] hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1.5">Portal 03</div>
-              <h4 className="text-base font-bold text-[#002060] mb-2">School Administrator</h4>
+              <div className="text-xs font-semibold text-amber-600 mb-1.5">Registrar &amp; Principal</div>
+              <h4 className="text-base font-bold text-[#002060] mb-2">Administrator Portal</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Review enrollment applications (Approve / Needs Revision), master records, automated deconfliction, and section quotas.
+                Review student enrollment applications, manage class sections and slots, and build conflict-free schedules.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100">
               <Link
                 href="/admin"
-                className="btn-secondary rounded-lg w-full text-center text-xs uppercase tracking-wider block"
+                className="btn-secondary rounded-lg w-full text-center text-xs block"
               >
-                Administrator Portal
+                Administrator Sign In
               </Link>
             </div>
           </div>
@@ -153,18 +151,18 @@ export default function Home() {
           {/* 4. IT Support Portal */}
           <div className="bg-white rounded-xl p-5 border border-slate-200 border-t-4 border-t-[#002060] hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1.5">Portal 04</div>
-              <h4 className="text-base font-bold text-[#002060] mb-2">IT Support &amp; System</h4>
+              <div className="text-xs font-semibold text-amber-600 mb-1.5">School IT Coordinator</div>
+              <h4 className="text-base font-bold text-[#002060] mb-2">IT Support Portal</h4>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                Dynamic academic year and trimester calendar configuration, RBAC permissions, session control, and audit logs.
+                Set school years and grading terms, manage classrooms and staff accounts, and answer student help messages.
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100">
               <Link
                 href="/it-support"
-                className="btn-secondary rounded-lg w-full text-center text-xs uppercase tracking-wider block"
+                className="btn-secondary rounded-lg w-full text-center text-xs block"
               >
-                IT Support Portal
+                IT Support Sign In
               </Link>
             </div>
           </div>
@@ -173,25 +171,25 @@ export default function Home() {
 
       {/* System Specifications Compliance Section */}
       <section className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-        <h3 className="text-xs font-bold tracking-wider text-[#002060] uppercase mb-3">
-          Institutional Academic Policies &amp; System Specifications
+        <h3 className="text-sm font-bold text-[#002060] mb-3">
+          How Enrollment &amp; Classes Work
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600">
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <strong className="text-slate-900 block mb-1">1. Three-Term (Trimester) Academic Calendar:</strong>
-            The school year is structured into three instructional terms to support comprehensive mastery of core and specialized subjects.
+            <strong className="text-slate-900 block mb-1">1. Three-Term School Year:</strong>
+            The school year has three terms so students can focus well on their core and track subjects.
           </div>
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <strong className="text-slate-900 block mb-1">2. Senior High School Core Subject Limit:</strong>
-            Senior High School students are strictly limited to a maximum of five (5) core subjects per trimester in accordance with school policy.
+            <strong className="text-slate-900 block mb-1">2. Senior High Subject Limit:</strong>
+            Senior High School students take up to five (5) core subjects each term, following school policy.
           </div>
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <strong className="text-slate-900 block mb-1">3. Automated Schedule Deconfliction:</strong>
-            The scheduling engine automatically validates and resolves conflicts across faculty cross-level teaching loads, rooms, and subjects.
+            <strong className="text-slate-900 block mb-1">3. Automatic Conflict-Free Schedules:</strong>
+            Class schedules are checked automatically so no teacher or classroom is double-booked.
           </div>
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <strong className="text-slate-900 block mb-1">4. Cross-Strand Electives &amp; Strand Switching:</strong>
-            Senior High students may elect interdisciplinary subjects, and may request strand realignment prior to entering Grade 12.
+            <strong className="text-slate-900 block mb-1">4. Electives &amp; Changing Strands:</strong>
+            Senior High students can pick elective subjects and may request to change their strand before Grade 12.
           </div>
         </div>
       </section>

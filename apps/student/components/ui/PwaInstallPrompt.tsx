@@ -264,7 +264,7 @@ export function PwaInstallModal({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border-2 border-[#002060] overflow-hidden"
+        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -276,8 +276,8 @@ export function PwaInstallModal({
               className="w-10 h-10 rounded-full object-contain border-2 border-amber-400 shadow-xs shrink-0"
             />
             <div>
-              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
-                Progressive Web App
+              <span className="text-xs font-semibold text-amber-300 block">
+                School Portal App
               </span>
               <h3 className="text-base font-extrabold text-white tracking-tight leading-snug">
                 Install DNHS Student Portal
@@ -289,7 +289,7 @@ export function PwaInstallModal({
         {/* Modal Body: Clean Institutional Instructions */}
         <div className="p-5 sm:p-6 space-y-4 text-xs text-slate-800">
           <p className="text-slate-600 leading-relaxed">
-            Install the official <strong>Dumalneg National High School Portal</strong> directly on your home screen. Enjoy fast 1-tap launch, standalone screen view, and offline-ready access.
+            Install the official <strong>Dumalneg National High School Portal</strong> directly on your home screen. Open the school portal directly from your home screen or desktop with one tap.
           </p>
 
           {isIos ? (
@@ -431,11 +431,11 @@ export function PwaInstallHeaderButton() {
   if (isStandalone || isInstalled) {
     return (
       <span
-        className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-950/70 border border-blue-400/30 text-blue-200 text-[10px] font-bold uppercase rounded-[4px]"
-        title="Dumalneg NHS Portal is running in standalone app mode"
+        className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-950/70 border border-blue-400/30 text-blue-100 text-xs font-semibold rounded-lg"
+        title="Dumalneg NHS app is installed on this device"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        App Active
+        App Installed
       </span>
     );
   }
@@ -452,7 +452,7 @@ export function PwaInstallHeaderButton() {
       <button
         type="button"
         onClick={handleClick}
-        className="hidden lg:inline-flex items-center px-3 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-[4px] shadow-xs transition-all cursor-pointer shrink-0"
+        className="hidden lg:inline-flex items-center px-3 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-bold rounded-lg shadow-xs transition-all cursor-pointer shrink-0"
         title="Install Dumalneg NHS Student Portal on your PC or Laptop"
       >
         <span>Install App</span>
@@ -488,9 +488,9 @@ export function PwaInstallDrawerCard() {
 
   return (
     <>
-      <div className="p-2.5 bg-amber-50/90 border border-amber-300 rounded-[6px] shadow-2xs flex items-center justify-between gap-2.5">
+      <div className="p-3 bg-amber-50/90 border border-amber-200 rounded-xl shadow-2xs flex items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-[5px] bg-amber-400/90 text-slate-950 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-8 h-8 rounded-lg bg-amber-400/90 text-slate-950 flex items-center justify-center shrink-0 shadow-2xs">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -498,8 +498,8 @@ export function PwaInstallDrawerCard() {
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-slate-900 truncate">Install DNHS App</span>
-              <span className="px-1 py-0.2 bg-amber-200/80 text-amber-950 font-mono text-[8px] font-bold rounded uppercase shrink-0">
-                1-Tap
+              <span className="px-1.5 py-0.5 bg-amber-200/80 text-amber-950 text-[10px] font-bold rounded-full shrink-0">
+                Quick
               </span>
             </div>
             <p className="text-[10px] text-slate-600 truncate">
@@ -510,7 +510,7 @@ export function PwaInstallDrawerCard() {
         <button
           type="button"
           onClick={handleClick}
-          className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 active:scale-95 text-white text-[11px] font-bold uppercase tracking-wider rounded-[4px] transition-all cursor-pointer shrink-0 shadow-2xs"
+          className="px-3 py-1.5 bg-[#002060] hover:bg-blue-900 active:scale-95 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shrink-0 shadow-2xs"
         >
           Install
         </button>

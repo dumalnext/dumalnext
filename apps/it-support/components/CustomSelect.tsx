@@ -229,7 +229,7 @@ export default function CustomSelect({
       >
         <div className="flex items-center gap-2 text-left min-w-0 flex-1">
           {label && (
-            <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-wider shrink-0">
+            <span className="text-[10px] font-medium font-bold text-slate-600 uppercase tracking-wider shrink-0">
               {label}
             </span>
           )}
@@ -278,11 +278,11 @@ export default function CustomSelect({
               maxHeight: `${dropdownPosition.maxHeight}px`,
               zIndex: 99999,
             }}
-            className={`bg-white border-2 border-[#002060] shadow-2xl py-1 rounded-lg flex flex-col overflow-hidden overscroll-contain animate-in fade-in-0 duration-100 ${dropdownClassName}`}
+            className={`bg-white border border-[#002060]/40 shadow-2xl py-1 rounded-lg flex flex-col overflow-hidden overscroll-contain animate-in fade-in-0 duration-100 ${dropdownClassName}`}
           >
             {/* Subtle Dropdown Title Bar */}
             {label && (
-              <div className="px-3 py-1 bg-slate-100 border-b border-slate-200 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-wider flex items-center justify-between shrink-0">
+              <div className="px-3 py-1 bg-slate-100 border-b border-slate-200 text-[10px] font-medium font-bold text-slate-600 uppercase tracking-wider flex items-center justify-between shrink-0">
                 <span>{label.replace(/:/g, "")}</span>
                 <span className="text-[9px] text-[#002060] font-bold">DepEd DNHS</span>
               </div>
@@ -323,7 +323,7 @@ export default function CustomSelect({
                 return (
                   <React.Fragment key={`${option.value}-${idx}`}>
                     {showCategoryHeader && (
-                      <div className="px-3 py-1.5 bg-slate-100 border-b border-slate-200 text-[10px] font-mono font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between sticky top-0 z-10 shrink-0">
+                      <div className="px-3 py-1.5 bg-slate-100 border-b border-slate-200 text-[10px] font-medium font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between sticky top-0 z-10 shrink-0">
                         <span>{option.category}</span>
                         <span className="text-[9px] text-slate-400 font-normal">Facility</span>
                       </div>
@@ -364,7 +364,7 @@ export default function CustomSelect({
                       <div className="flex items-center gap-1.5 shrink-0">
                         {option.badge && (
                           <span
-                            className={`text-[9px] px-1.5 py-0.5 font-mono uppercase font-bold border rounded-[4px] ${badgeClasses}`}
+                            className={`text-[9px] px-1.5 py-0.5 font-medium uppercase font-bold border rounded-lg ${badgeClasses}`}
                           >
                             {option.badge}
                           </span>

@@ -334,10 +334,10 @@ export async function sendStaffInvitationEmail(
           Greetings, <strong>${fullName || "Colleague"}</strong>,
         </p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
-          You have been formally invited by the Dumalneg NHS IT Support Desk to activate your digital workstation account as a <strong>${roleTitle}</strong>.
+          You have been formally invited by the Dumalneg NHS IT Support Desk to activate your school account as a <strong>${roleTitle}</strong>.
         </p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 20px 0;">
-          Please click the button below to accept your invitation, confirm your registered email, and configure your official workstation password:
+          Please click the button below to accept your invitation, confirm your registered email, and create your account password:
         </p>
         <div style="text-align: center; margin: 28px 0;">
           <a href="${inviteUrl}" target="_blank" style="display: inline-block; background-color: #002060; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 14px; padding: 14px 32px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">

@@ -75,13 +75,13 @@ function DocumentDropBox({
   };
 
   return (
-    <div className="p-4 bg-white border-2 border-slate-300 space-y-2.5 rounded-[4px] shadow-2xs hover:border-slate-400 transition-colors">
+    <div className="p-4 bg-white border-2 border-slate-300 space-y-2.5 rounded-xl shadow-2xs hover:border-slate-400 transition-colors">
       <div className="flex items-center justify-between gap-2">
         <label htmlFor={id} className="text-xs font-bold text-slate-900 cursor-pointer">
           {label} {isMandatory && <span className="text-red-700">*</span>}
         </label>
         <span
-          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-[4px] ${
+          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-xl ${
             badgeType === "blue"
               ? "bg-blue-100 text-[#002060] border border-blue-200"
               : badgeType === "amber"
@@ -130,7 +130,7 @@ function DocumentDropBox({
                 {uploadedDoc.file.name}
               </span>
               <span className="text-[10px] text-slate-500 block mt-0.5">
-                {uploadedDoc.compressedSizeKb} KB &bull; Compressed from {uploadedDoc.originalSizeKb} KB
+                {uploadedDoc.compressedSizeKb} KB &bull; Ready to upload
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -157,7 +157,7 @@ function DocumentDropBox({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-[4px] p-4 transition-all text-center cursor-pointer group flex flex-col items-center justify-center gap-1.5 ${
+          className={`border-2 border-dashed rounded-xl p-4 transition-all text-center cursor-pointer group flex flex-col items-center justify-center gap-1.5 ${
             isDragging
               ? "border-[#002060] bg-blue-50/70 scale-[1.01]"
               : "border-slate-300 hover:border-[#002060] bg-slate-50/60 hover:bg-blue-50/30"
@@ -410,7 +410,7 @@ export default function Step5DocumentsReview({
     } catch {
       setErrors((prev) => ({
         ...prev,
-        [docKey]: "Compression failed. Please ensure the file is a valid image (JPG, PNG) or PDF.",
+        [docKey]: "Could not read this file. Please choose a clear photo (JPG/PNG) or PDF.",
       }));
       setDocs((prev) => ({ ...prev, [docKey]: null }));
     }
@@ -707,13 +707,13 @@ export default function Step5DocumentsReview({
   // =========================================================================
   if (isSubmitted) {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 rounded-[4px] shadow-sm">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 space-y-8 rounded-xl shadow-sm">
         {/* Acknowledgment Header */}
         <div className="border-b-2 border-slate-200 pb-5 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Dumalneg National High School
           </h2>
-          <div className="mt-2 inline-block bg-[#002060] text-white text-xs font-bold px-4 py-1 tracking-wide rounded-[4px]">
+          <div className="mt-2 inline-block bg-[#002060] text-white text-xs font-bold px-4 py-1 tracking-wide rounded-xl">
             {existingApplication
               ? "Online Enrollment Resubmission Slip"
               : "Online Enrollment Acknowledgment Slip"}
@@ -721,9 +721,9 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Status Banner */}
-        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-[4px] shadow-xs">
+        <div className="p-5 bg-amber-50 border-2 border-amber-400 space-y-2 rounded-xl shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-[4px]">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-900 bg-amber-200/80 px-3 py-1 border border-amber-400 rounded-xl">
               {existingApplication
                 ? "STATUS: REVISED APPLICATION SUBMITTED"
                 : "STATUS: PENDING VERIFICATION"}
@@ -740,7 +740,7 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Reference Code Box */}
-        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-[4px] shadow-xs">
+        <div className="p-6 bg-slate-50 border-2 border-[#002060] text-center space-y-2 rounded-xl shadow-xs">
           <div className="text-xs font-bold text-slate-600 tracking-wide">
             Application Reference Number
           </div>
@@ -753,7 +753,7 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Learner & Enrollment Summary */}
-        <div className="border-2 border-slate-300 p-5 space-y-4 rounded-[4px] shadow-xs">
+        <div className="border-2 border-slate-300 p-5 space-y-4 rounded-xl shadow-xs">
           <div className="text-xs font-bold text-[#002060] border-b border-slate-200 pb-2">
             Official Application Summary
           </div>
@@ -808,7 +808,7 @@ export default function Step5DocumentsReview({
         </div>
 
         {/* Next Steps for Student / Parent */}
-        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3 rounded-[4px] shadow-xs">
+        <div className="p-5 bg-slate-50 border-2 border-slate-300 space-y-3 rounded-xl shadow-xs">
           <div className="text-xs font-bold text-[#002060]">
             Instructions &amp; Next Steps for Dumalneg NHS Enrollees
           </div>
@@ -823,7 +823,7 @@ export default function Step5DocumentsReview({
               <strong>Official DepEd PDF Release</strong>: Once your application is marked as <strong>APPROVED &amp; OFFICIALLY ENROLLED</strong> by the school administrator, your official accomplished DepEd Enrollment Form (PDF) and Certificate of Enrollment will be immediately unlocked for download.
             </li>
             <li>
-              <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Administration Office during the first week of classes for physical civil registry validation.
+              <strong>Hard Copy Requirements</strong>: Bring original hard copies of your Form 138 and PSA Birth Certificate to the Dumalneg NHS Administration Office during the first week of classes so the school can verify your birth certificate.
             </li>
           </ol>
         </div>
@@ -833,13 +833,13 @@ export default function Step5DocumentsReview({
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-[4px]"
+            className="px-6 py-2.5 bg-white border-2 border-slate-400 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors rounded-xl"
           >
             Print Acknowledgment Slip
           </button>
           <a
             href={`/track?ref=${referenceNumber}`}
-            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors text-center shadow-xs rounded-[4px]"
+            className="px-8 py-2.5 bg-[#002060] border-2 border-[#002060] text-xs font-bold text-white hover:bg-blue-950 transition-colors text-center shadow-xs rounded-xl"
           >
             Track Application Live
           </a>
@@ -852,11 +852,11 @@ export default function Step5DocumentsReview({
   // RENDER: STEP 5 FORM (DOCUMENTS UPLOAD & ONLINE REVIEW CARD)
   // =========================================================================
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-xl">
       {/* Header Banner */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-xl">
             Step 05 of 05
           </span>
           <span className="text-xs font-semibold text-slate-500 tracking-wider">
@@ -870,7 +870,7 @@ export default function Step5DocumentsReview({
 
       {/* Global Error Banner */}
       {Object.keys(errors).length > 0 && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-[4px]">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-xl">
           <p className="text-xs font-bold text-red-800 leading-normal">
             Submission Requirement Notice: Please resolve the highlighted required items below before submitting your application.
           </p>
@@ -880,7 +880,7 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION A: OFFICIAL DOCUMENT UPLOAD SLOTS                                  */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-xl">
         <div className="border-b-2 border-slate-200 pb-3">
           <span className="text-xs font-bold text-[#002060] block">
             Official Document Upload
@@ -972,14 +972,14 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION B: ONLINE APPLICATION REVIEW CARD (NO PRE-APPROVAL PDF)           */}
       {/* ========================================================================= */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-xl">
         <div className="border-b-2 border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="text-xs font-bold text-[#002060] block">
               Online Application Review Card
             </span>
           </div>
-          <span className="text-[11px] bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded-[4px]">
+          <span className="text-[11px] bg-blue-100 text-[#002060] px-3 py-1 font-bold border border-blue-300 shrink-0 rounded-xl">
             PRE-SUBMISSION VERIFICATION
           </span>
         </div>
@@ -987,9 +987,9 @@ export default function Step5DocumentsReview({
         {/* Review Card Grid */}
         <div className="space-y-4">
           {/* Card 1: Learner Identity */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-xl">
             <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
-              1. Learner Civil Registry &amp; Personal Details
+              1. Student Personal Details
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
@@ -1040,7 +1040,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 2: Academic Classification & Feeder School */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-xl">
             <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               2. Enrollment Placement &amp; Academic Background
             </div>
@@ -1054,7 +1054,7 @@ export default function Step5DocumentsReview({
                 <span className="font-bold text-slate-900">{data.step1.applicantType}</span>
               </div>
               <div className="col-span-2">
-                <span className="text-[10px] font-bold text-slate-500 block">Curricular Program / Track</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Grade Program / Track</span>
                 <span className="font-bold text-[#002060]">
                   {isG7 ? "Regular Junior High School Curriculum" : `${data.targetTrack} - ${data.targetStrand} (${data.targetSemester})`}
                 </span>
@@ -1074,7 +1074,7 @@ export default function Step5DocumentsReview({
               {data.selectedElectives && data.selectedElectives.length > 0 && (
                 <div className="col-span-2">
                   <span className="text-[10px] font-bold text-slate-500 block">
-                    Elective / Prescribed Course Offerings
+                    Chosen Electives / Subjects
                   </span>
                   <span className="font-bold text-[#002060]">
                     {data.selectedElectives.join(", ")}
@@ -1099,7 +1099,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 3: Residential Address */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-xl">
             <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               3. Residential Address
             </div>
@@ -1126,7 +1126,7 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 4: Parent & Guardian Information */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-xl">
             <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
               4. Parents &amp; Legal Guardian
             </div>
@@ -1168,7 +1168,7 @@ export default function Step5DocumentsReview({
               </div>
             </div>
             <div className="pt-2 border-t border-slate-100 text-xs">
-              <span className="text-[10px] font-bold text-slate-500 block">Primary Emergency Contact Dispatcher</span>
+              <span className="text-[10px] font-bold text-slate-500 block">Emergency Contact Person</span>
               <span className="font-bold text-[#002060]">
                 {data.primaryContactPerson} &bull; Contact Number:{" "}
                 {data.primaryContactPerson === "Father"
@@ -1181,13 +1181,13 @@ export default function Step5DocumentsReview({
           </div>
 
           {/* Card 5: Preferred Modality */}
-          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-300 space-y-3 rounded-xl">
             <div className="text-xs font-bold text-[#002060] border-b border-slate-100 pb-1.5">
-              5. Preferred Learning Modality
+              5. Preferred Learning Setup
             </div>
             <div className="text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 block">Preferred Distance Learning Modalities</span>
+                <span className="text-[10px] font-bold text-slate-500 block">Learning Setup</span>
                 <span className="font-bold text-slate-900">
                   {(data.preferredModalities || ["Modular (Print)"]).join(", ")}
                 </span>
@@ -1200,15 +1200,15 @@ export default function Step5DocumentsReview({
       {/* ========================================================================= */}
       {/* SECTION C: DATA PRIVACY ACT OF 2012 (RA 10173) & DEPED CERTIFICATION      */}
       {/* ========================================================================= */}
-      <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-[4px]">
+      <div className="p-5 bg-blue-50/70 border-2 border-blue-200 space-y-3 rounded-xl">
         <div className="text-xs font-bold text-[#002060]">
-          DepEd Data Privacy &amp; Sworn Certification
+          Privacy Agreement &amp; Confirmation
         </div>
         <p className="text-xs text-slate-700 leading-relaxed">
           I hereby certify that all information provided in this application is true, accurate, and complete. I authorize the Department of Education and Dumalneg National High School to process and store this data in compliance with the Data Privacy Act of 2012 (Republic Act No. 10173).
         </p>
 
-        <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300 rounded-[4px]">
+        <label className="flex items-start gap-3 cursor-pointer pt-2 bg-white p-3 border border-blue-300 rounded-xl">
           <input
             type="checkbox"
             checked={data.dataPrivacyAccepted}
@@ -1234,7 +1234,7 @@ export default function Step5DocumentsReview({
       </div>
 
       {/* Notice About Official PDF Release */}
-      <div className="p-3 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-[4px]">
+      <div className="p-3 bg-slate-100 border border-slate-300 text-xs text-slate-600 leading-relaxed rounded-xl">
         <strong>Note</strong>: The official DepEd Enrollment Form (PDF) will be available once your application is verified and approved.
       </div>
 

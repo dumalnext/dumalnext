@@ -338,7 +338,7 @@ export default function StudentConcernsManager() {
   return (
     <div className="space-y-6">
       {/* DepEd Region I Institutional Header & Banner */}
-      <div className="bg-white border-2 border-[#002060] rounded-xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
         <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-5 sm:px-8 sm:py-6 border-b-4 border-amber-400">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1 min-w-0">
@@ -402,10 +402,10 @@ export default function StudentConcernsManager() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">
+              <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">
                 Total Inquiries
               </span>
-              <span className="text-xl font-black text-[#002060] mt-0.5 block font-mono">
+              <span className="text-xl font-black text-[#002060] mt-0.5 block font-medium">
                 {isLoading ? <span className="inline-block w-10 h-6 bg-slate-200 animate-pulse rounded" /> : metrics.total}
               </span>
             </div>
@@ -419,10 +419,10 @@ export default function StudentConcernsManager() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-mono font-bold text-amber-800 uppercase block tracking-wider">
+              <span className="text-[10px] font-medium font-bold text-amber-800 uppercase block tracking-wider">
                 Pending Reply
               </span>
-              <span className="text-xl font-black text-amber-700 mt-0.5 block font-mono">
+              <span className="text-xl font-black text-amber-700 mt-0.5 block font-medium">
                 {isLoading ? <span className="inline-block w-10 h-6 bg-amber-200 animate-pulse rounded" /> : metrics.pending}
               </span>
             </div>
@@ -436,10 +436,10 @@ export default function StudentConcernsManager() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-mono font-bold text-blue-800 uppercase block tracking-wider">
+              <span className="text-[10px] font-medium font-bold text-blue-800 uppercase block tracking-wider">
                 In Progress
               </span>
-              <span className="text-xl font-black text-blue-700 mt-0.5 block font-mono">
+              <span className="text-xl font-black text-blue-700 mt-0.5 block font-medium">
                 {isLoading ? <span className="inline-block w-10 h-6 bg-blue-200 animate-pulse rounded" /> : metrics.inProgress}
               </span>
             </div>
@@ -453,10 +453,10 @@ export default function StudentConcernsManager() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase block tracking-wider">
+              <span className="text-[10px] font-medium font-bold text-emerald-800 uppercase block tracking-wider">
                 Resolved
               </span>
-              <span className="text-xl font-black text-emerald-700 mt-0.5 block font-mono">
+              <span className="text-xl font-black text-emerald-700 mt-0.5 block font-medium">
                 {isLoading ? <span className="inline-block w-10 h-6 bg-emerald-200 animate-pulse rounded" /> : metrics.resolved}
               </span>
             </div>
@@ -520,7 +520,7 @@ export default function StudentConcernsManager() {
               <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span>Sync / Ingest Gmail</span>
+              <span>Add Email Concern</span>
             </button>
 
             {(searchQuery || statusFilter !== "ALL" || categoryFilter !== "ALL") && (
@@ -589,7 +589,7 @@ export default function StudentConcernsManager() {
                     >
                       {/* Ticket & Date */}
                       <td className="py-3.5 px-4 align-top whitespace-nowrap">
-                        <span className="font-mono font-extrabold text-[#002060] block">
+                        <span className="font-medium font-extrabold text-[#002060] block">
                           {c.ticketNumber}
                         </span>
                         <span className="text-[10px] text-slate-500 block mt-0.5">
@@ -614,7 +614,7 @@ export default function StudentConcernsManager() {
                           {c.lrn && (
                             <>
                               <span>&bull;</span>
-                              <span className="font-mono">LRN: {c.lrn}</span>
+                              <span className="font-medium">LRN: {c.lrn}</span>
                             </>
                           )}
                         </div>
@@ -720,7 +720,7 @@ export default function StudentConcernsManager() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={safeCurrentPage <= 1}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage <= 1
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -744,7 +744,7 @@ export default function StudentConcernsManager() {
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
                     aria-current={isActive ? "page" : undefined}
-                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                       isActive
                         ? "bg-[#002060] border-[#002060] text-white"
                         : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
@@ -759,7 +759,7 @@ export default function StudentConcernsManager() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safeCurrentPage >= totalPages}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage >= totalPages
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -786,7 +786,7 @@ export default function StudentConcernsManager() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-black text-amber-300">
+                    <span className="font-medium text-xs font-black text-amber-300">
                       {activeConcern.ticketNumber}
                     </span>
                     <span className="text-[10px] text-blue-200 uppercase tracking-wider">
@@ -827,7 +827,7 @@ export default function StudentConcernsManager() {
                   </button>
                 )}
                 {activeConcern.lrn && (
-                  <span>LRN: <strong className="text-slate-800 font-mono">{activeConcern.lrn}</strong></span>
+                  <span>LRN: <strong className="text-slate-800 font-medium">{activeConcern.lrn}</strong></span>
                 )}
                 {activeConcern.gradeLevel && (
                   <span>Grade: <strong className="text-slate-800">{activeConcern.gradeLevel}</strong></span>
@@ -928,10 +928,10 @@ export default function StudentConcernsManager() {
                 <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Presets:</span>
                 <button
                   type="button"
-                  onClick={() => insertPresetReply("Good day! We have reviewed your account in User Accounts & Roles. Your credentials have been successfully updated.")}
+                  onClick={() => insertPresetReply("Good day! We have updated your account details as requested.")}
                   className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold rounded cursor-pointer transition-colors"
                 >
-                  Credentials Updated
+                  Account Updated
                 </button>
                 <button
                   type="button"
@@ -1069,7 +1069,7 @@ export default function StudentConcernsManager() {
                     Gmail Integration &bull; dumalnext@gmail.com
                   </span>
                   <h2 className="text-base font-bold text-white">
-                    Sync &amp; Ingest Inbound Student Emails
+                    Add Student Email Concern
                   </h2>
                 </div>
               </div>
@@ -1098,7 +1098,7 @@ export default function StudentConcernsManager() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>Paste Email (Quick Ingest)</span>
+                <span>Paste Email Here</span>
               </button>
               <button
                 type="button"
@@ -1113,7 +1113,7 @@ export default function StudentConcernsManager() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Automated Forwarding Setup</span>
+                <span>Auto-Forward Setup</span>
               </button>
             </div>
 
@@ -1175,7 +1175,7 @@ export default function StudentConcernsManager() {
                       value={ingestEmailBody}
                       onChange={(e) => setIngestEmailBody(e.target.value)}
                       placeholder="Paste the message received from the student here..."
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#002060] outline-none leading-relaxed"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-medium focus:border-[#002060] outline-none leading-relaxed"
                     />
                   </div>
 
@@ -1195,14 +1195,14 @@ export default function StudentConcernsManager() {
                       {isIngestingEmail ? (
                         <>
                           <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
-                          <span>Ingesting...</span>
+                          <span>Adding...</span>
                         </>
                       ) : (
                         <>
                           <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span>Process & Add to Concerns</span>
+                          <span>Save to Concerns List</span>
                         </>
                       )}
                     </button>
@@ -1211,12 +1211,17 @@ export default function StudentConcernsManager() {
               ) : (
                 <div className="space-y-3.5 text-xs text-slate-700 leading-relaxed">
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-950 font-medium">
-                    Want every email received at <span className="font-bold text-[#002060]">dumalnext@gmail.com</span> to automatically flow into the Concerns Desk without manual copy-pasting?
+                    Need student emails sent to <span className="font-bold text-[#002060]">dumalnext@gmail.com</span> to appear here automatically? Use the technical setup guide below if not yet enabled.
                   </div>
 
-                  <div className="space-y-2">
+                  <details className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                    <summary className="cursor-pointer font-bold text-[#002060] text-xs select-none">
+                      Show Technical Setup Guide (Optional - For School IT Maintainer)
+                    </summary>
+                    <div className="mt-3 space-y-3">
+                    <div className="space-y-2">
                     <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                      Quick 3-Step Google Apps Script Automation Setup:
+                      3-Step Google Apps Script Auto-Forward Setup:
                     </h4>
                     <ol className="list-decimal pl-5 space-y-1.5 text-[11px] text-slate-700">
                       <li>
@@ -1230,7 +1235,7 @@ export default function StudentConcernsManager() {
                   </div>
 
                   <div className="relative">
-                    <pre className="p-3 bg-slate-900 text-slate-100 rounded-lg text-[10px] font-mono overflow-x-auto max-h-48 leading-relaxed">
+                    <pre className="p-3 bg-slate-900 text-slate-100 rounded-lg text-[10px] font-medium overflow-x-auto max-h-48 leading-relaxed">
 {`function forwardDumalnegEmails() {
   var threads = GmailApp.search('is:unread to:dumalnext@gmail.com');
   for (var i = 0; i < threads.length; i++) {
@@ -1305,9 +1310,11 @@ export default function StudentConcernsManager() {
                       <li>Type of time based trigger: <strong>Minutes timer</strong> then <strong>Every 1 minute</strong></li>
                     </ul>
                     <p className="text-emerald-700 font-bold pt-1">
-                      All inbound emails sent to dumalnext@gmail.com will now automatically synchronize to the Concerns Desk within 60 seconds!
+                      All inbound emails sent to dumalnext@gmail.com will now appear in Student Concerns within 60 seconds!
                     </p>
                   </div>
+                    </div>
+                  </details>
                 </div>
               )}
             </div>

@@ -109,7 +109,7 @@ function TeacherLoginFormInner() {
 
       const json = await res.json();
       if (res.ok && json.success) {
-        setActivationSuccess("Faculty account created and activated successfully! Entering Faculty Workstation...");
+        setActivationSuccess("Your teacher account is ready! Opening the Teacher Portal...");
         if (json.cookieName && json.sessionUser) {
           const serialized = encodeURIComponent(JSON.stringify(json.sessionUser));
           document.cookie = `${json.cookieName}=${serialized}; path=/; max-age=604800; SameSite=Lax`;
@@ -149,7 +149,7 @@ function TeacherLoginFormInner() {
     try {
       const res = await login(identifier, password);
       if (!res.success) {
-        setErrorMsg(res.error || "Authentication failed. Please verify your credentials.");
+        setErrorMsg(res.error || "Wrong email/ID or password. Please try again.");
         if (res.unconfirmedEmail) {
           setUnconfirmedEmail(res.unconfirmedEmail);
         }
@@ -177,7 +177,7 @@ function TeacherLoginFormInner() {
 
   if (isCheckingToken) {
     return (
-      <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 text-center space-y-4 rounded-[4px] shadow-sm animate-pulse" aria-busy="true" aria-label="Verifying Faculty Invitation Clearance">
+      <div className="max-w-xl mx-auto p-12 bg-white border border-slate-200 border-t-4 border-t-amber-400 text-center space-y-4 rounded-2xl shadow-sm animate-pulse" aria-busy="true" aria-label="Opening teacher invitation">
         <div className="w-12 h-12 bg-slate-200 rounded-full mx-auto" />
         <div className="space-y-2">
           <div className="h-3 w-48 bg-slate-200 rounded mx-auto" />
@@ -193,7 +193,7 @@ function TeacherLoginFormInner() {
       {/* LEFT COLUMN (7 cols): Institutional Hero & Faculty Workstation Features */}
       <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
         {/* Institutional Hero Card */}
-        <section className="bg-gradient-to-br from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-6 sm:p-8 rounded-[4px] shadow-md space-y-5">
+        <section className="bg-gradient-to-br from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-6 sm:p-8 rounded-2xl shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-blue-800/80 pb-5">
             <div className="w-16 h-16 rounded-full border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-sm overflow-hidden">
               <img
@@ -203,24 +203,24 @@ function TeacherLoginFormInner() {
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-400/20 text-amber-200 border border-amber-300/40 text-[11px] font-bold rounded-[4px] mb-1.5">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-400/20 text-amber-200 border border-amber-300/40 text-[11px] font-bold rounded-2xl mb-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 DepEd Region I &bull; Schools Division of Ilocos Norte
               </div>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                Faculty &amp; Academic Staff Portal
+                Teacher &amp; Adviser Portal
               </h2>
             </div>
           </div>
 
           <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-            Access certified teaching schedules, advisory class rosters, and academic credentials.
+            View your class schedule, check your advisory student list, and upload student report cards.
           </p>
 
           {/* 3 Feature Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <div className="bg-white/10 border border-white/15 p-3 rounded-[4px] flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[4px] bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
+            <div className="bg-white/10 border border-white/15 p-3 rounded-2xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-2xl bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -230,8 +230,8 @@ function TeacherLoginFormInner() {
               </h3>
             </div>
 
-            <div className="bg-white/10 border border-white/15 p-3 rounded-[4px] flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[4px] bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
+            <div className="bg-white/10 border border-white/15 p-3 rounded-2xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-2xl bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -241,8 +241,8 @@ function TeacherLoginFormInner() {
               </h3>
             </div>
 
-            <div className="bg-white/10 border border-white/15 p-3 rounded-[4px] flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[4px] bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
+            <div className="bg-white/10 border border-white/15 p-3 rounded-2xl flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-2xl bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-300 shrink-0">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -255,7 +255,7 @@ function TeacherLoginFormInner() {
         </section>
 
         {/* Faculty Guidelines Card */}
-        <section className="bg-white border border-slate-300 p-5 sm:p-6 rounded-[4px] shadow-xs space-y-3">
+        <section className="bg-white border border-slate-300 p-5 sm:p-6 rounded-2xl shadow-xs space-y-3">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,7 +296,7 @@ function TeacherLoginFormInner() {
       <div className="lg:col-span-5 order-1 lg:order-2 space-y-4">
         {/* Invalid Token Alert if token was passed but invalid */}
         {inviteError && (
-          <div className="p-4 bg-red-50 border-2 border-red-400 text-xs text-red-950 space-y-1 rounded-[4px] shadow-xs">
+          <div className="p-4 bg-red-50 border-2 border-red-400 text-xs text-red-950 space-y-1 rounded-2xl shadow-xs">
             <div className="font-bold text-red-900">
               Invitation Verification Notice
             </div>
@@ -306,27 +306,27 @@ function TeacherLoginFormInner() {
 
         {/* CASE 1: INVITATION VERIFIED -> SHOW CREATE PASSWORD FORM */}
         {invitation ? (
-          <div className="bg-white border-2 border-emerald-700 border-t-4 border-t-amber-400 rounded-[4px] shadow-md overflow-hidden">
+          <div className="bg-white border-2 border-emerald-700 border-t-4 border-t-amber-400 rounded-2xl shadow-md overflow-hidden">
             <div className="bg-[#002060] text-white p-5 flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold text-white">
                   Activate Faculty Account
                 </h3>
               </div>
-              <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 rounded-[4px]">
+              <span className="px-2.5 py-1 text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 rounded-2xl">
                 Teacher Role
               </span>
             </div>
 
             <div className="p-6 space-y-5">
               {errorMsg && (
-                <div className="p-3.5 bg-red-50 border border-red-400 text-xs text-red-900 font-semibold rounded-[4px]">
+                <div className="p-3.5 bg-red-50 border border-red-400 text-xs text-red-900 font-semibold rounded-2xl">
                   {errorMsg}
                 </div>
               )}
 
               {activationSuccess && (
-                <div className="p-3.5 bg-emerald-50 border border-emerald-500 text-xs text-emerald-900 font-semibold rounded-[4px]">
+                <div className="p-3.5 bg-emerald-50 border border-emerald-500 text-xs text-emerald-900 font-semibold rounded-2xl">
                   {activationSuccess}
                 </div>
               )}
@@ -340,7 +340,7 @@ function TeacherLoginFormInner() {
                     type="email"
                     value={invitation.email}
                     disabled
-                    className="w-full p-2.5 bg-slate-100 border border-slate-300 text-slate-700 cursor-not-allowed select-all rounded-[4px]"
+                    className="w-full p-2.5 bg-slate-100 border border-slate-300 text-slate-700 cursor-not-allowed select-all rounded-2xl"
                   />
                 </div>
 
@@ -353,7 +353,7 @@ function TeacherLoginFormInner() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Maria Santos"
-                    className="w-full p-2.5 bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px]"
+                    className="w-full p-2.5 bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-2xl"
                   />
                 </div>
 
@@ -364,7 +364,7 @@ function TeacherLoginFormInner() {
                   <select
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px]"
+                    className="w-full p-2.5 bg-white border border-slate-300 font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-2xl"
                   >
                     <option value="Junior High School (JHS)">Junior High School (JHS)</option>
                     <option value="Senior High School (SHS)">Senior High School (SHS)</option>
@@ -409,7 +409,7 @@ function TeacherLoginFormInner() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter minimum 6 characters"
-                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px] transition-colors"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-2xl transition-colors"
                   />
                 </div>
 
@@ -424,7 +424,7 @@ function TeacherLoginFormInner() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter your new password"
-                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px] transition-colors"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-2xl transition-colors"
                   />
                 </div>
 
@@ -432,7 +432,7 @@ function TeacherLoginFormInner() {
                   <button
                     type="submit"
                     disabled={isActivating || Boolean(activationSuccess)}
-                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer disabled:opacity-50 rounded-[4px]"
+                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer disabled:opacity-50 rounded-2xl"
                   >
                     {isActivating ? "Activating Faculty Account..." : "Activate Teacher Account & Sign In"}
                   </button>
@@ -442,11 +442,11 @@ function TeacherLoginFormInner() {
           </div>
         ) : (
           /* CASE 2: NORMAL LOGIN FORM */
-          <div className="bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 rounded-[4px] shadow-md overflow-hidden">
+          <div className="bg-white border border-slate-200 border-t-4 border-t-amber-400 rounded-2xl shadow-md overflow-hidden">
             {/* Top Card Header */}
             <div className="bg-[#002060] text-white px-6 py-4 flex items-center justify-between gap-3 border-b border-blue-950">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300">
+                <div className="w-8 h-8 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
@@ -459,7 +459,7 @@ function TeacherLoginFormInner() {
 
             <div className="p-6 space-y-5">
               {errorMsg && (
-                <div className="p-3.5 bg-red-50 border border-red-400 text-xs text-red-950 space-y-2 rounded-[4px]">
+                <div className="p-3.5 bg-red-50 border border-red-400 text-xs text-red-950 space-y-2 rounded-2xl">
                   <div className="font-bold text-red-900">
                     Sign-In Notice: {errorMsg}
                   </div>
@@ -471,7 +471,7 @@ function TeacherLoginFormInner() {
                       <button
                         type="button"
                         onClick={handleResend}
-                        className="px-3 py-1.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors cursor-pointer shrink-0 rounded-[4px]"
+                        className="px-3 py-1.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors cursor-pointer shrink-0 rounded-2xl"
                       >
                         Resend Verification Email
                       </button>
@@ -481,7 +481,7 @@ function TeacherLoginFormInner() {
               )}
 
               {resendStatus && (
-                <div className="p-3 bg-blue-50 border border-blue-300 text-xs text-blue-950 font-medium rounded-[4px]">
+                <div className="p-3 bg-blue-50 border border-blue-300 text-xs text-blue-950 font-medium rounded-2xl">
                   {resendStatus}
                 </div>
               )}
@@ -497,7 +497,7 @@ function TeacherLoginFormInner() {
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="e.g. faculty@dnhs.edu.ph or DepEd ID"
                     required
-                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-2xl transition-colors"
                   />
                 </div>
 
@@ -536,7 +536,7 @@ function TeacherLoginFormInner() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your account password"
                     required
-                    className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                    className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-2xl transition-colors"
                   />
                 </div>
 
@@ -544,12 +544,12 @@ function TeacherLoginFormInner() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold text-center transition-colors shadow-xs cursor-pointer disabled:opacity-50 rounded-[4px] flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-[#002060] hover:bg-[#001744] text-white text-xs font-bold text-center transition-colors shadow-xs cursor-pointer disabled:opacity-50 rounded-2xl flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
-                    <span>{isSubmitting ? "Signing In to Faculty Portal..." : "Sign In to Faculty Workstation"}</span>
+                    <span>{isSubmitting ? "Signing In..." : "Sign In"}</span>
                   </button>
                 </div>
               </form>
@@ -567,12 +567,12 @@ export default function TeacherLoginForm() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-xl mx-auto p-12 bg-white border-2 border-[#002060] border-t-4 border-t-amber-400 text-center space-y-3 rounded-[4px] shadow-sm">
+        <div className="max-w-xl mx-auto p-12 bg-white border border-slate-200 border-t-4 border-t-amber-400 text-center space-y-3 rounded-2xl shadow-sm">
           <span className="text-xs font-bold text-[#002060] block">
             Dumalneg National High School
           </span>
           <p className="text-xs text-slate-500">
-            Loading Faculty Workstation...
+            Loading Teacher Portal...
           </p>
         </div>
       }

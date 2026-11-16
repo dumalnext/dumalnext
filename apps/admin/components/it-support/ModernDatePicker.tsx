@@ -180,7 +180,7 @@ export default function ModernDatePicker({
 
           {formattedDate && (
             <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-              <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-[4px] font-sans shadow-2xs">
+              <span className="text-[11px] font-bold text-[#002060] bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-lg font-sans shadow-2xs">
                 {formattedDate}
               </span>
               {!disabled && (

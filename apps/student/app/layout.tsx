@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Student Portal | Dumalneg National High School",
-  description: "Official Student Online Enrollment and Academic Workstation for Dumalneg National High School",
+  description: "Official Student Enrollment, Grades, and Class Schedule Portal for Dumalneg National High School",
   manifest: "/manifest.json",
   icons: {
     icon: [

@@ -16,7 +16,7 @@ const GUARDIAN_RELATIONSHIPS = [
   "Aunt / Uncle",
   "Older Sibling (Ate / Kuya)",
   "Authorized Relative",
-  "Legal Custodian / Foster Parent",
+  "Legal Guardian / Relative / Foster Parent",
   "Other Authorized Adult",
 ] as const;
 
@@ -253,7 +253,7 @@ export default function Step3FamilyBackground({
 
     if (!validFatherContact && !validMotherContact && !validGuardianContact) {
       newErrors.emergencyContact =
-        "Official School Requirement: At least one active 11-digit mobile contact number (09XXXXXXXXX) must be provided across Father, Mother, or Guardian for emergency dispatch and academic notices.";
+        "Official School Requirement: At least one active 11-digit mobile contact number (09XXXXXXXXX) must be provided across Father, Mother, or Guardian for urgent calls and school announcements.";
     }
 
     setErrors(newErrors);
@@ -265,11 +265,11 @@ export default function Step3FamilyBackground({
   };
 
   return (
-    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-[4px]">
+    <div className="space-y-8 bg-white p-6 sm:p-10 border-2 border-slate-300 shadow-sm rounded-xl">
       {/* Step Header */}
       <div className="border-b-2 border-slate-200 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-[4px]">
+          <span className="text-xs font-bold bg-[#002060] text-white px-2.5 py-1 tracking-wider rounded-xl">
             Step 03 of 05
           </span>
           <span className="text-xs font-semibold text-slate-500 tracking-wider">
@@ -283,7 +283,7 @@ export default function Step3FamilyBackground({
 
       {/* Global Error Banner */}
       {(errors.general || errors.emergencyContact) && (
-        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-[4px]">
+        <div className="p-4 bg-red-50 border-2 border-red-300 space-y-1 rounded-xl">
           {errors.general && (
             <p className="text-xs font-bold text-red-800 leading-normal">
               Validation Notice: {errors.general}
@@ -298,16 +298,16 @@ export default function Step3FamilyBackground({
       )}
 
       {/* Primary Emergency Contact Dispatcher */}
-      <div className="p-5 bg-blue-50/50 border-2 border-blue-200 space-y-3 rounded-[4px]">
+      <div className="p-5 bg-blue-50/50 border-2 border-blue-200 space-y-3 rounded-xl">
         <div>
           <span className="text-xs font-bold text-[#002060] tracking-wider block">
-            Primary School Contact / Designated Custodian
+            Who Should the School Contact First?
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
           <label
-            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-[4px] ${
+            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-xl ${
               primaryContact === "Father" && !isFatherNotAvailable
                 ? "bg-[#002060] text-white border-[#002060]"
                 : isFatherNotAvailable
@@ -333,7 +333,7 @@ export default function Step3FamilyBackground({
           </label>
 
           <label
-            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-[4px] ${
+            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-xl ${
               primaryContact === "Mother" && !isMotherNotAvailable
                 ? "bg-[#002060] text-white border-[#002060]"
                 : isMotherNotAvailable
@@ -359,7 +359,7 @@ export default function Step3FamilyBackground({
           </label>
 
           <label
-            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-[4px] ${
+            className={`p-3 border-2 flex items-center gap-3 cursor-pointer transition-colors rounded-xl ${
               primaryContact === "Guardian"
                 ? "bg-[#002060] text-white border-[#002060]"
                 : "bg-white text-slate-800 border-slate-300 hover:border-slate-400"
@@ -376,7 +376,7 @@ export default function Step3FamilyBackground({
             <div className="text-xs">
               <div className="font-bold">Legal Guardian</div>
               <div className={primaryContact === "Guardian" ? "text-blue-200 text-[10px]" : "text-slate-500 text-[10px]"}>
-                {isBothParentsUnavailable ? "Mandatory Custodian" : "Authorized Custodian"}
+                {isBothParentsUnavailable ? "Legal Guardian (Required)" : "Legal Guardian"}
               </div>
             </div>
           </label>
@@ -384,14 +384,14 @@ export default function Step3FamilyBackground({
       </div>
 
       {/* Section A: Father's Information */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] tracking-wider block">
               Father&apos;s Information
             </span>
           </div>
-          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded-[4px]">
+          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded-xl">
             <input
               type="checkbox"
               checked={isFatherNotAvailable}
@@ -403,7 +403,7 @@ export default function Step3FamilyBackground({
         </div>
 
         {isFatherNotAvailable ? (
-          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic rounded-xl">
             Father information is designated as Not Available. The school will reference the Mother or Legal Guardian.
           </div>
         ) : (
@@ -428,7 +428,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. DELA CRUZ"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                     errors.fatherLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -456,7 +456,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. JUAN"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                     errors.fatherFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -511,7 +511,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder={hasNoFatherMiddleName ? "N/A" : "e.g. RAMOS"}
-                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-xl ${
                     hasNoFatherMiddleName
                       ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
                       : errors.fatherMiddleName
@@ -547,7 +547,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-xl ${
                     errors.fatherContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -561,14 +561,14 @@ export default function Step3FamilyBackground({
       </div>
 
       {/* Section B: Mother's Maiden Information */}
-      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-[4px]">
+      <div className="space-y-5 p-6 bg-slate-50 border-2 border-slate-300 rounded-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
           <div>
             <span className="text-xs font-bold text-[#002060] tracking-wider block">
               Mother&apos;s Maiden Information
             </span>
           </div>
-          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded-[4px]">
+          <label className="text-xs text-slate-700 flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-slate-300 rounded-xl">
             <input
               type="checkbox"
               checked={isMotherNotAvailable}
@@ -580,7 +580,7 @@ export default function Step3FamilyBackground({
         </div>
 
         {isMotherNotAvailable ? (
-          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic rounded-[4px]">
+          <div className="p-4 bg-white border border-slate-200 text-xs text-slate-600 italic rounded-xl">
             Mother information is designated as Not Available. The school will reference the Father or Legal Guardian.
           </div>
         ) : (
@@ -605,7 +605,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. SANTOS"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                     errors.motherMaidenLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -633,7 +633,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="e.g. MARIA"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                     errors.motherFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -688,7 +688,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder={hasNoMotherMiddleName ? "N/A" : "e.g. GARCIA"}
-                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-xl ${
                     hasNoMotherMiddleName
                       ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
                       : errors.motherMiddleName
@@ -724,7 +724,7 @@ export default function Step3FamilyBackground({
                     }
                   }}
                   placeholder="09XXXXXXXXX"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-xl ${
                     errors.motherContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                   }`}
                 />
@@ -737,8 +737,8 @@ export default function Step3FamilyBackground({
         )}
       </div>
 
-      {/* Section C: Legal Guardian / Authorized Custodian (SMART OPTIONAL / REQUIRED) */}
-      <div className={`space-y-5 p-6 border-2 transition-colors rounded-[4px] ${
+      {/* Section C: Legal Guardian (SMART OPTIONAL / REQUIRED) */}
+      <div className={`space-y-5 p-6 border-2 transition-colors rounded-xl ${
         isBothParentsUnavailable ? "bg-red-50/40 border-red-400" : "bg-slate-50 border-slate-300"
       }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
@@ -747,14 +747,14 @@ export default function Step3FamilyBackground({
               <span className={`text-xs font-bold tracking-wider block ${
                 isBothParentsUnavailable ? "text-red-900" : "text-[#002060]"
               }`}>
-                Legal Guardian / Authorized Custodian
+                Legal Guardian
               </span>
               {isBothParentsUnavailable ? (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-red-700 text-white rounded-[4px]">
+                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-red-700 text-white rounded-xl">
                   Required by DepEd
                 </span>
               ) : (
-                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-slate-200 text-slate-700 border border-slate-300 rounded-[4px]">
+                <span className="px-2.5 py-0.5 text-[10px] font-bold tracking-wider bg-slate-200 text-slate-700 border border-slate-300 rounded-xl">
                   Optional
                 </span>
               )}
@@ -821,7 +821,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="e.g. AGCAOILI"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                   errors.guardianLastName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -851,7 +851,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="e.g. EDUARDO"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                   errors.guardianFirstName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -906,7 +906,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder={hasNoGuardianMiddleName ? "N/A" : "e.g. BALAGAT"}
-                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-xl ${
                   hasNoGuardianMiddleName
                     ? "bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed"
                     : errors.guardianMiddleName
@@ -942,7 +942,7 @@ export default function Step3FamilyBackground({
                   }
                 }}
                 placeholder="09XXXXXXXXX"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-xl ${
                   errors.guardianContactNumber ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />

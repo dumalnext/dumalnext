@@ -131,7 +131,7 @@ function TrackApplicationContent() {
         ? studentRecord.student_id
         : (user?.lrn && /^\d{12}$/.test(user.lrn))
         ? user.lrn
-        : "Pending LIS Assignment",
+        : "To be assigned by school",
       fullName,
       gradeLevel: suApp.target_grade_level || 7,
       applicantType: suApp.applicant_type || "Grade 7",
@@ -589,16 +589,16 @@ function TrackApplicationContent() {
   if (isAuthLoading) {
     return (
       <div className="max-w-4xl mx-auto">
-        <PageCardSkeleton title="Verifying authorized student session and application records..." rows={3} />
+        <PageCardSkeleton title="Loading your application status..." rows={3} />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="max-w-4xl mx-auto p-8 bg-amber-50 border-2 border-amber-400 text-center space-y-3 rounded-[4px] shadow-sm">
+      <div className="max-w-4xl mx-auto p-8 bg-amber-50 border border-amber-300 text-center space-y-3 rounded-2xl shadow-sm">
         <span className="text-xs font-bold text-amber-900 block">
-          Access Restricted: Authentication Required
+          Please Sign In First
         </span>
         <p className="text-xs text-amber-800">
           You must create an account or sign in before tracking your enrollment status. Redirecting to sign in...
@@ -610,7 +610,7 @@ function TrackApplicationContent() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Institutional Enrollment System Header Banner */}
-      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-2xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-full border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs overflow-hidden">
             <img
@@ -632,12 +632,12 @@ function TrackApplicationContent() {
           {record && <PrintPageButton label="Print Status & Schedule" />}
           <Link
             href="/"
-            className="no-print px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold rounded-[4px] transition-colors inline-flex items-center gap-1.5"
+            className="no-print px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold rounded-xl transition-colors inline-flex items-center gap-1.5"
           >
             <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span>Portal Home</span>
+            <span>Dashboard</span>
           </Link>
         </div>
       </div>
@@ -652,7 +652,7 @@ function TrackApplicationContent() {
         <div className="space-y-4">
           {/* Multi-Term Application Selector */}
           {allRecords.length > 1 && (
-            <div className="p-3 bg-white border border-slate-300 flex flex-wrap items-center gap-2 text-xs rounded-[4px]">
+            <div className="p-3 bg-white border border-slate-300 flex flex-wrap items-center gap-2 text-xs rounded-xl">
               <span className="font-bold text-slate-600 shrink-0">
                 Term Records:
               </span>
@@ -663,7 +663,7 @@ function TrackApplicationContent() {
                     key={rec.referenceNumber}
                     type="button"
                     onClick={() => setRecord(rec)}
-                    className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer shrink-0 rounded-[4px] ${
+                    className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer shrink-0 rounded-xl ${
                       isSelected
                         ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                         : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
@@ -677,7 +677,7 @@ function TrackApplicationContent() {
           )}
 
           {/* UNIFIED APPLICATION DOSSIER & STATUS CARD */}
-          <div className="bg-white border border-slate-200/90 p-5 sm:p-6 space-y-5 shadow-sm rounded-[4px]">
+          <div className="bg-white border border-slate-200/90 p-5 sm:p-6 space-y-5 shadow-sm rounded-2xl">
             {/* Top Row: Reference Number & Status Pill */}
             <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -701,19 +701,19 @@ function TrackApplicationContent() {
 
               <div>
                 {record.status === "Pending" && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border border-amber-400 shadow-2xs rounded-[4px]">
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border border-amber-400 shadow-2xs rounded-xl">
                     <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0" />
                     Pending
                   </span>
                 )}
                 {record.status === "Approved" && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-500 shadow-2xs rounded-[4px]">
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-500 shadow-2xs rounded-xl">
                     <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" />
                     Approved
                   </span>
                 )}
                 {record.status === "Needs Revision" && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-red-50 text-red-900 border border-red-500 shadow-2xs rounded-[4px]">
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold bg-red-50 text-red-900 border border-red-500 shadow-2xs rounded-xl">
                     <span className="w-2 h-2 rounded-full bg-red-600 inline-block shrink-0" />
                     Needs Revision
                   </span>
@@ -723,7 +723,7 @@ function TrackApplicationContent() {
 
             {/* Compact Status Callout + Primary Action */}
             {record.status === "Pending" && (
-              <div className="p-3.5 bg-amber-50/80 border border-amber-300 flex items-center gap-3 rounded-[4px]">
+              <div className="p-3.5 bg-amber-50/80 border border-amber-300 flex items-center gap-3 rounded-xl">
                 <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -731,17 +731,17 @@ function TrackApplicationContent() {
                 </div>
                 <div>
                   <span className="text-xs font-bold text-amber-950 block">
-                    Under School Administrator Evaluation
+                    Waiting for School Review
                   </span>
                   <span className="text-[11px] text-amber-900">
-                    Your application and documents are queued for verification.
+                    The school registrar is currently checking your form and documents.
                   </span>
                 </div>
               </div>
             )}
 
             {record.status === "Approved" && (
-              <div className="p-4 bg-emerald-50/90 border border-emerald-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+              <div className="p-4 bg-emerald-50/90 border border-emerald-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -761,7 +761,7 @@ function TrackApplicationContent() {
                   type="button"
                   onClick={handleDownloadApprovedPdf}
                   disabled={isDownloadingPdf}
-                  className="px-4 py-2.5 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs rounded-[4px] inline-flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                  className="px-4 py-2.5 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs rounded-xl inline-flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                 >
                   <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -776,7 +776,7 @@ function TrackApplicationContent() {
             )}
 
             {record.status === "Needs Revision" && (
-              <div className="p-4 bg-red-50 border border-red-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+              <div className="p-4 bg-red-50 border border-red-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center shrink-0 mt-0.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -785,41 +785,41 @@ function TrackApplicationContent() {
                   </div>
                   <div>
                     <span className="text-xs font-bold text-red-950 block">
-                      Administrator Feedback &bull; Action Required
+                      Needs Correction
                     </span>
                     <span className="text-[11px] text-red-900">
-                      {record.remarks || "One or more submitted details or documents require correction before approval."}
+                      {record.remarks || "Please check the school’s message below, update your form, and send it again."}
                     </span>
                   </div>
                 </div>
                 <Link
                   href="/enroll"
-                  className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs shadow-xs shrink-0 inline-flex items-center gap-1.5 rounded-[4px]"
+                  className="px-4 py-2 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs shadow-xs shrink-0 inline-flex items-center gap-1.5 rounded-xl"
                 >
-                  <span>Edit &amp; Resubmit</span>
+                  <span>Fix &amp; Send Again</span>
                 </Link>
               </div>
             )}
 
             {/* Consolidated 4-Column Learner & Placement Dossier Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Learner Full Name</span>
                 <span className="font-bold text-slate-900 mt-0.5 block truncate">{record.fullName}</span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">12-Digit DepEd LRN</span>
-                {/^d{12}$/.test(record.lrn) ? (
+                {/^\d{12}$/.test(record.lrn) ? (
                   <div className="mt-0.5">
                     <CopyChip value={record.lrn} label="12-Digit LRN" />
                   </div>
                 ) : (
-                  <span className="font-bold text-slate-900 mt-0.5 block">Pending LIS Assignment</span>
+                  <span className="font-bold text-slate-900 mt-0.5 block">To be assigned by school</span>
                 )}
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Grade Level &amp; Type</span>
                 <span className="font-bold text-slate-900 mt-0.5 block">
                   Grade {record.gradeLevel} &bull;{" "}
@@ -829,8 +829,8 @@ function TrackApplicationContent() {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Curriculum Program</span>
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Grade Program</span>
                 <span className="font-bold text-slate-900 mt-0.5 block truncate">
                   {Number(record.gradeLevel) >= 11 && record.targetStrand && record.targetStrand !== "Regular"
                     ? `SHS (${record.targetStrand})`
@@ -838,21 +838,21 @@ function TrackApplicationContent() {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Class Section</span>
                 <span className="font-bold text-[#002060] mt-0.5 block truncate">
-                  {record.sectionName || "Pending Placement"}
+                  {record.sectionName || "No section yet"}
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Class Adviser</span>
                 <span className="font-bold text-slate-900 mt-0.5 block truncate">
-                  {record.adviserName || "To Be Designated"}
+                  {record.adviserName || "To be assigned"}
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Classroom</span>
                 <span className="font-bold text-slate-900 mt-0.5 block truncate">
                   {record.room
@@ -863,7 +863,7 @@ function TrackApplicationContent() {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px]">
+              <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Date Submitted</span>
                 <span className="font-bold text-slate-900 mt-0.5 block">
                   {new Date(record.applicationDate).toLocaleDateString("en-PH", {
@@ -879,14 +879,14 @@ function TrackApplicationContent() {
           {/* =========================================================================
              UNIFIED ACADEMIC TIMETABLE & ENROLLED SUBJECTS CARD (TABBED & COMPACT)
              ========================================================================= */}
-          <div id="timetable" className="border border-slate-200/90 bg-white p-5 sm:p-6 space-y-4 shadow-sm scroll-mt-6 rounded-[4px]">
+          <div id="timetable" className="border border-slate-200/90 bg-white p-5 sm:p-6 space-y-4 shadow-sm scroll-mt-6 rounded-xl">
             {/* Top Bar: Switcher Tabs + Section/Room Badges */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-[5px] border border-slate-200 self-start">
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 self-start">
                 <button
                   type="button"
                   onClick={() => setActiveScheduleTab("timetable")}
-                  className={`px-3 py-1.5 rounded-[4px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                     activeScheduleTab === "timetable"
                       ? "bg-[#002060] text-white shadow-2xs"
                       : "text-slate-600 hover:text-slate-900"
@@ -901,7 +901,7 @@ function TrackApplicationContent() {
                 <button
                   type="button"
                   onClick={() => setActiveScheduleTab("subjects")}
-                  className={`px-3 py-1.5 rounded-[4px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                     activeScheduleTab === "subjects"
                       ? "bg-[#002060] text-white shadow-2xs"
                       : "text-slate-600 hover:text-slate-900"
@@ -915,11 +915,11 @@ function TrackApplicationContent() {
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-bold bg-[#002060] text-white px-2.5 py-1 uppercase rounded-[4px]">
+                <span className="text-[10px] font-bold bg-[#002060] text-white px-2.5 py-1 uppercase rounded-xl">
                   {record.sectionName || "Section Pending"}
                 </span>
                 {record.room && (
-                  <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2.5 py-1 border border-slate-300 rounded-[4px]">
+                  <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2.5 py-1 border border-slate-300 rounded-xl">
                     {/^room\b/i.test(record.room.trim()) ? record.room.trim() : `Room ${record.room.trim()}`}
                   </span>
                 )}
@@ -944,7 +944,7 @@ function TrackApplicationContent() {
                           key={day}
                           type="button"
                           onClick={() => setSelectedDayFilter(day)}
-                          className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer rounded-[4px] ${
+                          className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer rounded-xl ${
                             isDayActive
                               ? "bg-[#002060] text-white border-[#002060] shadow-2xs"
                               : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
@@ -963,27 +963,27 @@ function TrackApplicationContent() {
                 {isLoadingTimetable && timetableSchedules.length === 0 ? (
                   <div className="space-y-2 p-4 animate-pulse">
                     {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="h-10 bg-slate-100 rounded-[4px] w-full" />
+                      <div key={i} className="h-10 bg-slate-100 rounded-xl w-full" />
                     ))}
                   </div>
                 ) : filteredTimetable.length === 0 ? (
-                  <div className="p-6 bg-slate-50 border border-slate-200 text-center space-y-1 rounded-[4px]">
+                  <div className="p-6 bg-slate-50 border border-slate-200 text-center space-y-1 rounded-xl">
                     <span className="text-xs font-bold text-slate-700 block">
                       Schedule Under Preparation
                     </span>
                     <p className="text-[11px] text-slate-500">
-                      Weekly timetable periods for this section are being finalized by the registrar.
+                      Your class timetable will appear here once finalized by the school.
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold text-[11px]">
                           {selectedDayFilter === "All" && <th className="py-2.5 px-3">Day</th>}
-                          <th className="py-2.5 px-3">Time Window</th>
+                          <th className="py-2.5 px-3">Class Time</th>
                           <th className="py-2.5 px-3">Subject &amp; Code</th>
-                          <th className="py-2.5 px-3">Assigned Faculty</th>
+                          <th className="py-2.5 px-3">Teacher</th>
                           <th className="py-2.5 px-3">Classroom</th>
                         </tr>
                       </thead>
@@ -1002,7 +1002,7 @@ function TrackApplicationContent() {
                                 </td>
                               )}
                               <td className="py-2.5 px-3 whitespace-nowrap">
-                                <span className="inline-block px-2 py-0.5 text-[11px] font-bold bg-[#002060]/10 text-[#002060] rounded-[3px]">
+                                <span className="inline-block px-2 py-0.5 text-[11px] font-bold bg-[#002060]/10 text-[#002060] rounded-full">
                                   {formatTimeRange(item.start_time, item.end_time)}
                                 </span>
                               </td>
@@ -1010,14 +1010,14 @@ function TrackApplicationContent() {
                                 <div className="flex flex-wrap items-center gap-1.5">
                                   <span className="font-bold text-slate-900">{item.subject_name}</span>
                                   {item.subject_code && (
-                                    <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 border border-slate-200 rounded-[3px]">
+                                    <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 border border-slate-200 rounded-full">
                                       {item.subject_code}
                                     </span>
                                   )}
                                 </div>
                               </td>
                               <td className="py-2.5 px-3 text-slate-700 font-medium">
-                                {item.teacher_name || record.adviserName || "Assigned Faculty"}
+                                {item.teacher_name || record.adviserName || "Subject Teacher"}
                               </td>
                               <td className="py-2.5 px-3 text-slate-600 text-[11px]">
                                 {cleanRoom}
@@ -1036,21 +1036,21 @@ function TrackApplicationContent() {
                 {isLoadingTimetable && enrolledSubjects.length === 0 ? (
                   <div className="space-y-2 p-4 animate-pulse">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="h-10 bg-slate-100 rounded-[4px] w-full" />
+                      <div key={i} className="h-10 bg-slate-100 rounded-xl w-full" />
                     ))}
                   </div>
                 ) : enrolledSubjects.length === 0 ? (
-                  <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center rounded-[4px]">
-                    No prescribed course subjects registered for this grade level
+                  <div className="p-5 bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center rounded-xl">
+                    Your subjects will appear here soon.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold text-[11px]">
                           <th className="p-2.5">Subject Code</th>
-                          <th className="p-2.5">Learning Area / Course Title</th>
-                          <th className="p-2.5">Classification</th>
+                          <th className="p-2.5">Subject Name</th>
+                          <th className="p-2.5">Type</th>
                           <th className="p-2.5">Grade Level</th>
                           <th className="p-2.5">Curriculum / Program</th>
                         </tr>
@@ -1066,7 +1066,7 @@ function TrackApplicationContent() {
                             </td>
                             <td className="p-2.5">
                               <span
-                                className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-[4px] ${
+                                className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-xl ${
                                   subj.subject_type === "Core"
                                     ? "bg-blue-50 text-blue-900 border border-blue-300"
                                     : subj.subject_type === "Specialized"
@@ -1112,7 +1112,7 @@ function TrackApplicationContent() {
       {/* =========================================================================
          OFFICIAL STATUS EVALUATION LEGEND (CLEAN ENGLISH & SOFT BORDERS)
          ========================================================================= */}
-      <section className="no-print bg-white border border-slate-200/90 p-5 sm:p-6 space-y-4 shadow-xs rounded-[4px]">
+      <section className="no-print bg-white border border-slate-200/90 p-5 sm:p-6 space-y-4 shadow-xs rounded-xl">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-[#002060]/10 text-[#002060] flex items-center justify-center shrink-0">
@@ -1124,13 +1124,13 @@ function TrackApplicationContent() {
               Application Status Guide
             </span>
           </div>
-          <span className="text-[10px] font-bold text-slate-500 uppercase bg-slate-100 px-2.5 py-1 border border-slate-200 rounded-[4px]">
+          <span className="text-[10px] font-bold text-slate-500 uppercase bg-slate-100 px-2.5 py-1 border border-slate-200 rounded-xl">
             3 Status Levels
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-          <div className="p-3.5 bg-emerald-50/60 border border-emerald-300 flex items-center gap-3 rounded-[4px]">
+          <div className="p-3.5 bg-emerald-50/60 border border-emerald-300 flex items-center gap-3 rounded-xl">
             <span className="w-3 h-3 rounded-full bg-emerald-600 shrink-0" />
             <div>
               <span className="text-xs font-bold text-emerald-950 block">Approved</span>
@@ -1138,7 +1138,7 @@ function TrackApplicationContent() {
             </div>
           </div>
 
-          <div className="p-3.5 bg-amber-50/60 border border-amber-300 flex items-center gap-3 rounded-[4px]">
+          <div className="p-3.5 bg-amber-50/60 border border-amber-300 flex items-center gap-3 rounded-xl">
             <span className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />
             <div>
               <span className="text-xs font-bold text-amber-950 block">Pending</span>
@@ -1146,7 +1146,7 @@ function TrackApplicationContent() {
             </div>
           </div>
 
-          <div className="p-3.5 bg-red-50/60 border border-red-300 flex items-center gap-3 rounded-[4px]">
+          <div className="p-3.5 bg-red-50/60 border border-red-300 flex items-center gap-3 rounded-xl">
             <span className="w-3 h-3 rounded-full bg-red-600 shrink-0" />
             <div>
               <span className="text-xs font-bold text-red-950 block">Needs Revision</span>

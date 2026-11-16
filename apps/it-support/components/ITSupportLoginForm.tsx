@@ -120,7 +120,7 @@ function ITSupportLoginFormInner() {
 
       const json = await res.json();
       if (res.ok && json.success) {
-        setActivationSuccess("IT Support account created and activated! Entering IT Support Console...");
+        setActivationSuccess("Your IT Support account is ready! Opening the portal...");
         if (json.cookieName && json.sessionUser) {
           const serialized = encodeURIComponent(JSON.stringify(json.sessionUser));
           document.cookie = `${json.cookieName}=${serialized}; path=/; max-age=604800; SameSite=Lax`;
@@ -196,22 +196,22 @@ function ITSupportLoginFormInner() {
                   </span>
                   <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-snug">
                     {invitation
-                      ? "IT Support Account Onboarding"
-                      : "System Administration & Identity Desk"}
+                      ? "IT Support Account Setup"
+                      : "School Systems &amp; User Accounts"}
                   </h2>
                 </div>
               </div>
               <p className="text-xs sm:text-sm text-blue-100/90 mt-4 leading-relaxed">
                 {invitation
-                  ? "Create your security password to activate your system administration clearance."
-                  : "Manage dynamic academic calendars, campus facilities, role permissions, and staff onboarding."}
+                  ? "Choose a password to activate your IT Support account."
+                  : "Set school year dates, manage classrooms, help users with accounts, and invite school staff."}
               </p>
             </div>
 
             <div className="p-6 sm:p-8 bg-white space-y-5">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <h3 className="text-base font-bold text-slate-900">
-                  Enrollment System Governance &amp; Security Controls
+                  What You Can Manage Here
                 </h3>
                 <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
                   System Admin
@@ -225,7 +225,7 @@ function ITSupportLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">Dynamic Trisemester Calendar</span>
+                  <span className="text-[#002060] font-bold text-xs">School Year &amp; Term Dates</span>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
@@ -234,7 +234,7 @@ function ITSupportLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">Classroom &amp; Facility Registry</span>
+                  <span className="text-[#002060] font-bold text-xs">Classrooms &amp; Seat Limits</span>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
@@ -243,7 +243,7 @@ function ITSupportLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">User Role &amp; Access Auditor</span>
+                  <span className="text-[#002060] font-bold text-xs">Users &amp; Accounts</span>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
@@ -252,7 +252,7 @@ function ITSupportLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">Staff Invitations &amp; Onboarding</span>
+                  <span className="text-[#002060] font-bold text-xs">Staff Account Invites</span>
                 </div>
               </div>
             </div>
@@ -334,7 +334,7 @@ function ITSupportLoginFormInner() {
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold text-slate-800">
-                        Create Security Password <span className="text-red-700">*</span>
+                        Create Password <span className="text-red-700">*</span>
                       </label>
                       <button
                         type="button"
@@ -367,7 +367,7 @@ function ITSupportLoginFormInner() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter minimum 6 characters"
-                      className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px] transition-colors"
+                      className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-xl transition-colors"
                     />
                   </div>
 
@@ -382,7 +382,7 @@ function ITSupportLoginFormInner() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Re-enter your password"
-                      className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-[4px] transition-colors"
+                      className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none rounded-xl transition-colors"
                     />
                   </div>
 
@@ -401,7 +401,7 @@ function ITSupportLoginFormInner() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      Authorized Administrator Email <span className="text-red-600">*</span>
+                      Email Address <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="email"
@@ -409,7 +409,7 @@ function ITSupportLoginFormInner() {
                       onChange={(e) => setIdentifier(e.target.value)}
                       required
                       placeholder="e.g. itsupport@dnhs.edu.ph or Gmail"
-                      className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                      className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl transition-colors"
                     />
                   </div>
 
@@ -448,7 +448,7 @@ function ITSupportLoginFormInner() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       placeholder="Enter your account password"
-                      className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                      className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-200 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl transition-colors"
                     />
                   </div>
 
@@ -460,7 +460,7 @@ function ITSupportLoginFormInner() {
                     <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
-                    <span>{isSubmitting ? "Verifying Credentials..." : "Sign In to IT Support Console"}</span>
+                    <span>{isSubmitting ? "Signing In..." : "Sign In"}</span>
                   </button>
 
 
@@ -482,7 +482,7 @@ export default function ITSupportLoginForm() {
           <span className="text-xs font-bold tracking-wider text-[#002060] uppercase block">
             IT Support &amp; System Governance
           </span>
-          <p className="text-xs text-slate-500">Loading IT Support Authentication Desk...</p>
+          <p className="text-xs text-slate-500">Opening the IT Support sign-in page...</p>
         </div>
       }
     >

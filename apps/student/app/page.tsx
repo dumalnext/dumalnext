@@ -85,7 +85,7 @@ function StudentHomeContent() {
     const res = await resendVerification(target);
     if (res.success) {
       setResendCooldown(60);
-      setResendStatus("A new 6-digit verification code has been dispatched to your Gmail!");
+      setResendStatus("We sent a new 6-digit code to your Gmail!");
     } else {
       setResendStatus(res.error || "Failed to resend verification code.");
     }
@@ -621,13 +621,13 @@ function StudentHomeContent() {
 
     setIsLoggingIn(true);
     setLoginProgress(20);
-    setLoginStatusText("Validating student account credentials...");
+    setLoginStatusText("Checking your account details...");
 
     try {
       // Realistic Institutional Verification Delay
       await new Promise((resolve) => setTimeout(resolve, 450));
       setLoginProgress(55);
-      setLoginStatusText("Verifying credentials with Dumalneg NHS learner database...");
+      setLoginStatusText("Signing you in...");
 
       const res = await login(loginEmail, loginPassword);
       if (!res.success) {
@@ -660,11 +660,11 @@ function StudentHomeContent() {
       }
 
       setLoginProgress(90);
-      setLoginStatusText("Credentials verified. Initializing student dashboard session...");
+      setLoginStatusText("Opening your student dashboard...");
       await new Promise((resolve) => setTimeout(resolve, 450));
 
       setLoginProgress(100);
-      setLoginStatusText("Welcome! Redirecting to Student Console...");
+      setLoginStatusText("Welcome! Opening your portal...");
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       // Successfully authenticated
@@ -709,13 +709,13 @@ function StudentHomeContent() {
 
     setIsRegistering(true);
     setRegProgress(20);
-    setRegStatusText("Validating learner applicant information...");
+    setRegStatusText("Checking your name and email...");
 
     try {
       // Step 1: Pre-save verification delay
       await new Promise((resolve) => setTimeout(resolve, 450));
       setRegProgress(55);
-      setRegStatusText("Sending official verification link to your Gmail address...");
+      setRegStatusText("Sending a 6-digit code to your Gmail...");
 
       const res = await register(
         {
@@ -739,7 +739,7 @@ function StudentHomeContent() {
       }
 
       setRegProgress(85);
-      setRegStatusText("6-Digit security code dispatched! Opening verification window...");
+      setRegStatusText("Code sent! Opening verification box...");
       await new Promise((resolve) => setTimeout(resolve, 450));
 
       setRegProgress(100);
@@ -814,7 +814,7 @@ function StudentHomeContent() {
     const res = await resendVerification(otpEmail);
     if (res.success) {
       setResendCooldown(60);
-      setOtpSuccess("A new 6-digit verification code has been dispatched to your Gmail!");
+      setOtpSuccess("We sent a new 6-digit code to your Gmail!");
     } else {
       setOtpError(res.error || "Failed to resend verification code. Please try again.");
     }
@@ -827,13 +827,13 @@ function StudentHomeContent() {
         {/* LEFT COLUMN (4 COLS): ID CARD & QUICK LINKS SKELETON */}
         <div className="lg:col-span-4 space-y-5">
           {/* Official Digital Learner ID Card Skeleton */}
-          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+          <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
             <div className="bg-[#002060] text-white px-5 py-3.5 border-b-4 border-amber-400 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[4px] bg-white/20" />
+                <div className="w-7 h-7 rounded-xl bg-white/20" />
                 <div className="h-4 w-32 bg-white/30 rounded" />
               </div>
-              <div className="h-5 w-14 bg-white/20 rounded-[4px]" />
+              <div className="h-5 w-14 bg-white/20 rounded-xl" />
             </div>
             <div className="p-5 space-y-4">
               <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
@@ -856,10 +856,10 @@ function StudentHomeContent() {
           </div>
 
           {/* Quick Links Nav Skeleton */}
-          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm p-4 space-y-2">
+          <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm p-4 space-y-2">
             <div className="h-3.5 w-36 bg-slate-200 rounded mb-3" />
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-9 w-full bg-slate-100 rounded-[4px]" />
+              <div key={i} className="h-9 w-full bg-slate-100 rounded-xl" />
             ))}
           </div>
         </div>
@@ -869,8 +869,8 @@ function StudentHomeContent() {
           {/* Top 3 KPI Cards Skeleton */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white border border-slate-200/90 border-l-4 border-l-slate-300 rounded-[4px] p-4 shadow-xs flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[4px] bg-slate-100 shrink-0" />
+              <div key={i} className="bg-white border border-slate-200/90 border-l-4 border-l-slate-300 rounded-xl p-4 shadow-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 shrink-0" />
                 <div className="space-y-1.5 flex-1">
                   <div className="h-2.5 w-20 bg-slate-200 rounded" />
                   <div className="h-4 w-28 bg-slate-200 rounded" />
@@ -880,13 +880,13 @@ function StudentHomeContent() {
           </div>
 
           {/* Schedule Preview Skeleton */}
-          <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+          <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
             <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="h-4 w-48 bg-slate-200 rounded" />
-              <div className="h-7 w-32 bg-slate-200 rounded-[4px]" />
+              <div className="h-7 w-32 bg-slate-200 rounded-xl" />
             </div>
             <div className="p-5 space-y-3">
-              <div className="h-10 bg-slate-100 rounded-[4px]" />
+              <div className="h-10 bg-slate-100 rounded-xl" />
               <div className="space-y-2">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="h-8 bg-slate-50 rounded" />
@@ -896,7 +896,7 @@ function StudentHomeContent() {
           </div>
 
           {/* Enrollment CTA Skeleton */}
-          <div className="p-6 bg-white border border-slate-200/90 rounded-[4px] space-y-3 text-center">
+          <div className="p-6 bg-white border border-slate-200/90 rounded-xl space-y-3 text-center">
             <div className="h-3.5 w-48 bg-slate-200 rounded mx-auto" />
             <div className="h-5 w-64 bg-slate-200 rounded mx-auto" />
             <div className="h-9 w-44 bg-slate-200 rounded mx-auto" />
@@ -910,7 +910,7 @@ function StudentHomeContent() {
     <div className="w-full space-y-8">
       {/* Access Restriction Notice (When redirected from protected routes) */}
       {noticeQuery === "auth_required" && (
-        <div className="p-4 bg-amber-50 border-l-4 border-amber-500 border border-amber-300 shadow-xs rounded-[4px] flex items-start gap-3">
+        <div className="p-4 bg-amber-50 border-l-4 border-amber-500 border border-amber-300 shadow-xs rounded-xl flex items-start gap-3">
           <div className="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
             !
           </div>
@@ -919,7 +919,7 @@ function StudentHomeContent() {
               Student Portal Sign-In Required
             </span>
             <p className="text-xs text-amber-900 leading-relaxed">
-              Please <strong>Sign In</strong> to your learner account or <strong>Create a New Account</strong> on the right to access the Online Enrollment Form or track your application status.
+              Please <strong>Sign In</strong> to your learner account or <strong>Create a New Account</strong> on the right to access the Enroll Online or track your application status.
             </p>
           </div>
         </div>
@@ -944,32 +944,32 @@ function StudentHomeContent() {
               ===================================================================== */}
           <div className="lg:col-span-4 space-y-5">
             {/* Official Digital Learner ID Card */}
-            <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
               <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-5 py-3.5 border-b-4 border-amber-400 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+                  <div className="w-7 h-7 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                     </svg>
                   </div>
                   <h2 className="text-sm font-extrabold text-white tracking-tight">
-                    Digital Student ID Card
+                    My Student Card
                   </h2>
                 </div>
                 {userApplication?.status === "Approved" ? (
-                  <span className="px-2 py-0.5 bg-emerald-500 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                  <span className="px-2 py-0.5 bg-emerald-500 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider rounded-full shrink-0">
                     Enrolled
                   </span>
                 ) : userApplication?.status === "Needs Revision" ? (
-                  <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                  <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-full shrink-0">
                     Revision
                   </span>
                 ) : userApplication?.status === "Pending" ? (
-                  <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                  <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider rounded-full shrink-0">
                     Pending
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 bg-white/15 border border-white/30 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-[3px] shrink-0">
+                  <span className="px-2 py-0.5 bg-white/15 border border-white/30 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-full shrink-0">
                     Active
                   </span>
                 )}
@@ -983,33 +983,33 @@ function StudentHomeContent() {
                       <img
                         src={photoUrl}
                         alt={`${user.firstName} ${user.lastName}`}
-                        className="w-16 h-16 rounded-[4px] object-cover border border-slate-300 bg-white shadow-xs"
+                        className="w-16 h-16 rounded-xl object-cover border border-slate-300 bg-white shadow-xs"
                       />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 rounded-[4px] bg-[#002060] text-white border border-blue-900 flex items-center justify-center text-lg font-black shrink-0 shadow-xs">
+                    <div className="w-16 h-16 rounded-xl bg-[#002060] text-white border border-blue-900 flex items-center justify-center text-lg font-black shrink-0 shadow-xs">
                       {(user.firstName?.[0] || "S")}{(user.lastName?.[0] || "P")}
                     </div>
                   )}
                   <div className="min-w-0 space-y-1">
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      Dumalneg NHS Learner
+                      Student
                     </div>
                     <h1 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug break-words">
                       {user.firstName} {user.middleName ? `${user.middleName[0]}. ` : ""}{user.lastName}
                     </h1>
                     {sectionMode === "ASSIGNED" && assignedSection ? (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-900 border border-emerald-300 text-xs font-bold rounded-[3px]">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-900 border border-emerald-300 text-xs font-bold rounded-full">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                         {assignedSection.name}
                       </span>
                     ) : userApplication?.gradeLevel ? (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold rounded-[3px]">
-                        Grade {userApplication.gradeLevel} &bull; Section Pending
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold rounded-full">
+                        Grade {userApplication.gradeLevel} &bull; No Section Yet
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold rounded-[3px]">
-                        Section Unassigned
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold rounded-full">
+                        No Section Yet
                       </span>
                     )}
                   </div>
@@ -1018,16 +1018,12 @@ function StudentHomeContent() {
                 {/* Official ID Attributes List */}
                 <div className="border-t border-slate-200 pt-3.5 space-y-2.5 text-xs">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-slate-500 font-medium">Learner Ref. No. (LRN):</span>
+                    <span className="text-slate-500 font-medium">LRN:</span>
                     {user.lrn && /^\d{12}$/.test(user.lrn) ? (
                       <CopyChip value={user.lrn} label="12-Digit LRN" />
                     ) : (
                       <span className="font-semibold text-slate-700">{userApplication?.lrn || "On File"}</span>
                     )}
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-slate-500 font-medium">Account ID:</span>
-                    <CopyChip value={user.userId} label="Account ID" />
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-slate-500 font-medium shrink-0">Email:</span>
@@ -1044,7 +1040,7 @@ function StudentHomeContent() {
                     </strong>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-slate-500 font-medium">Academic Term:</span>
+                    <span className="text-slate-500 font-medium">School Term:</span>
                     <strong className="text-[#002060]">
                       S.Y. {schoolYear || "2026-2027"} &bull; {semester || "Trimester 1"}
                     </strong>
@@ -1055,13 +1051,13 @@ function StudentHomeContent() {
                 <div className="pt-2 border-t border-slate-200">
                   <Link
                     href="/profile"
-                    className="w-full py-2 px-3 bg-slate-100 hover:bg-[#002060] hover:text-white text-slate-800 border border-slate-300 text-xs font-bold rounded-[4px] transition-colors flex items-center justify-between shadow-2xs group"
+                    className="w-full py-2 px-3 bg-slate-100 hover:bg-[#002060] hover:text-white text-slate-800 border border-slate-300 text-xs font-bold rounded-xl transition-colors flex items-center justify-between shadow-2xs group"
                   >
                     <span className="flex items-center gap-2">
                       <svg className="w-3.5 h-3.5 text-[#002060] group-hover:text-amber-300 transition-colors shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
-                      <span>Account &amp; Security Settings</span>
+                      <span>My Profile &amp; Password</span>
                     </span>
                     <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1072,25 +1068,25 @@ function StudentHomeContent() {
             </div>
 
             {/* Student Portal Quick Links Card */}
-            <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm p-4 space-y-3">
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm p-4 space-y-3">
               <div className="border-b border-slate-200 pb-2 flex items-center gap-2">
                 <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
                 <h3 className="text-xs font-bold text-slate-900">
-                  Student Portal Navigation
+                  Quick Links
                 </h3>
               </div>
               <div className="space-y-1.5 text-xs">
                 <Link
                   href="/section"
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <span>My Class Section &amp; Roster</span>
+                    <span>My Section &amp; Classmates</span>
                   </span>
                   <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1098,13 +1094,13 @@ function StudentHomeContent() {
                 </Link>
                 <Link
                   href="/enroll"
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span>Online Enrollment Form</span>
+                    <span>Enroll Online</span>
                   </span>
                   <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1112,13 +1108,13 @@ function StudentHomeContent() {
                 </Link>
                 <Link
                   href={userApplication ? `/track?ref=${userApplication.referenceNumber}` : "/track"}
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
-                    <span>Track Application Status</span>
+                    <span>Check Enrollment Status</span>
                   </span>
                   <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1126,13 +1122,13 @@ function StudentHomeContent() {
                 </Link>
                 <Link
                   href="/grades"
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors group"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    <span>My Academic Grades</span>
+                    <span>My Grades</span>
                   </span>
                   <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1144,13 +1140,13 @@ function StudentHomeContent() {
                     setConcernModalMode("submit");
                     setShowConcernModal(true);
                   }}
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left group"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left group"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <span>IT Support &amp; Learner Helpdesk</span>
+                    <span>Ask for Help (IT Support)</span>
                   </span>
                   <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1159,13 +1155,13 @@ function StudentHomeContent() {
                 <button
                   type="button"
                   onClick={() => setShowPushModal(true)}
-                  className="w-full px-3 py-2 rounded-[4px] bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-[#002060] border border-slate-200 font-bold flex items-center justify-between transition-colors cursor-pointer text-left"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                    <span>Device Push Alerts (PC &amp; Mobile)</span>
+                    <span>Phone &amp; Computer Alerts</span>
                   </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 </button>
@@ -1180,8 +1176,8 @@ function StudentHomeContent() {
             {/* Top 3 Academic Summary KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               {/* KPI 1: Assigned Section */}
-              <div className="bg-white border border-slate-200/90 border-l-4 border-l-[#002060] rounded-[4px] p-4 shadow-xs flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[4px] bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
+              <div className="bg-white border border-slate-200/90 border-l-4 border-l-[#002060] rounded-xl p-4 shadow-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#002060]/10 border border-[#002060]/20 text-[#002060] flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
@@ -1195,14 +1191,14 @@ function StudentHomeContent() {
                       ? assignedSection.name
                       : sectionMode === "ENROLLMENT_REQUIRED"
                       ? "Enrollment Required"
-                      : "Pending Placement"}
+                      : "No section yet"}
                   </div>
                 </div>
               </div>
 
               {/* KPI 2: Enrollment Status */}
               <div
-                className={`bg-white border border-slate-200/90 border-l-4 rounded-[4px] p-4 shadow-xs flex items-center gap-3 ${
+                className={`bg-white border border-slate-200/90 border-l-4 rounded-xl p-4 shadow-xs flex items-center gap-3 ${
                   userApplication?.status === "Approved"
                     ? "border-l-emerald-600"
                     : userApplication?.status === "Needs Revision"
@@ -1211,7 +1207,7 @@ function StudentHomeContent() {
                 }`}
               >
                 <div
-                  className={`w-9 h-9 rounded-[4px] flex items-center justify-center shrink-0 border ${
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
                     userApplication?.status === "Approved"
                       ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                       : userApplication?.status === "Needs Revision"
@@ -1241,25 +1237,25 @@ function StudentHomeContent() {
                         ? "Approved & Enrolled"
                         : userApplication.status === "Needs Revision"
                         ? "Needs Revision"
-                        : "Pending Evaluation"
-                      : "Not Yet Enrolled"}
+                        : "Waiting for review"
+                      : "Not enrolled yet"}
                   </div>
                 </div>
               </div>
 
               {/* KPI 3: Application Reference */}
-              <div className="bg-white border border-slate-200/90 border-l-4 border-l-amber-400 rounded-[4px] p-4 shadow-xs flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[4px] bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0">
+              <div className="bg-white border border-slate-200/90 border-l-4 border-l-amber-400 rounded-xl p-4 shadow-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
                 <div className="min-w-0 space-y-0.5">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                    Application Ref.
+                    Reference No.
                   </span>
                   <div className="text-sm font-extrabold text-[#002060] truncate">
-                    {userApplication ? userApplication.referenceNumber : "No Active Submission"}
+                    {userApplication ? userApplication.referenceNumber : "None yet"}
                   </div>
                 </div>
               </div>
@@ -1268,10 +1264,10 @@ function StudentHomeContent() {
             {/* =================================================================
                 LIVE CLASS TIMETABLE & ENROLLED SUBJECTS PREVIEW CARD
                 ================================================================= */}
-            <div className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
               <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-[4px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-[#002060] text-amber-300 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -1279,14 +1275,14 @@ function StudentHomeContent() {
                   <h3 className="text-sm sm:text-base font-bold text-slate-900">
                     {sectionMode === "ASSIGNED" && assignedSection
                       ? `Class Timetable & Subjects • ${assignedSection.name}`
-                      : "Class Section & Prescribed Subjects Preview"}
+                      : "Your Class Section & Subjects"}
                   </h3>
                 </div>
                 <Link
                   href="/section"
-                  className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs whitespace-nowrap flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-xl transition-colors shadow-xs whitespace-nowrap flex items-center gap-1.5"
                 >
-                  <span>Open Full Section &amp; Schedule</span>
+                  <span>View Full Schedule</span>
                   <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
@@ -1296,27 +1292,27 @@ function StudentHomeContent() {
               <div className="p-5 space-y-4">
                 {/* Section Placement Status Banner inside Schedule Card */}
                 {sectionMode === "ASSIGNED" && assignedSection ? (
-                  <div className="p-3 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[4px]">
+                  <div className="p-3 bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl">
                     <div className="text-xs text-emerald-950">
                       <span className="font-bold uppercase tracking-wider text-emerald-800 mr-2">
-                        OFFICIAL PLACEMENT:
+                        YOUR SECTION:
                       </span>
                       Assigned to <strong className="underline">{assignedSection.name}</strong> (Grade {assignedSection.gradeLevel}
                       {assignedSection.strand ? ` • ${assignedSection.strand}` : ""})
                     </div>
-                    <span className="px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase rounded-[3px] shrink-0 self-start sm:self-center">
-                      {activeTermNum >= 2 ? "Automatic Continuing Roster" : "Official Roster"}
+                    <span className="px-2 py-0.5 bg-emerald-200/80 text-emerald-950 text-[10px] font-bold uppercase rounded-full shrink-0 self-start sm:self-center">
+                      {activeTermNum >= 2 ? "Auto-Enrolled" : "Enrolled"}
                     </span>
                   </div>
                 ) : sectionMode === "ENROLLMENT_REQUIRED" ? (
-                  <div className="p-3 bg-blue-50 border border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                  <div className="p-3 bg-blue-50 border border-[#002060] flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl">
                     <div className="flex items-center gap-2 text-xs font-bold text-[#002060] uppercase">
                       <span className="w-2 h-2 rounded-full bg-[#002060] shrink-0" />
                       <span>Enrollment Required for Trimester {activeTermNum}</span>
                     </div>
                     <Link
                       href="/enroll"
-                      className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap flex items-center gap-1.5 self-start sm:self-auto"
+                      className="px-3 py-1.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-xl shrink-0 whitespace-nowrap flex items-center gap-1.5 self-start sm:self-auto"
                     >
                       <span>Complete Enrollment</span>
                       <svg className="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -1325,20 +1321,20 @@ function StudentHomeContent() {
                     </Link>
                   </div>
                 ) : (
-                  <div className="p-3 bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                  <div className="p-3 bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl">
                     <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
                       <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
                       <span>
                         {sectionMode === "NOT_ASSIGNED_TRANSFEREE"
-                          ? "Transferee Section Placement Pending Evaluation"
-                          : "Awaiting Official Class Section Placement"}
+                          ? "Your transfer papers are being checked"
+                          : "Waiting for your class section"}
                       </span>
                     </div>
                     <Link
                       href="/section"
-                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-[4px] shrink-0 whitespace-nowrap self-start sm:self-auto"
+                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shrink-0 whitespace-nowrap self-start sm:self-auto"
                     >
-                      Check Status
+                      Check Enrollment
                     </Link>
                   </div>
                 )}
@@ -1350,16 +1346,16 @@ function StudentHomeContent() {
                       <span className="font-bold text-slate-700">
                         Weekly Class Schedule ({dashboardSchedules.length} {dashboardSchedules.length === 1 ? "Class" : "Classes"})
                       </span>
-                      <span className="text-slate-500">Live Official Timetable</span>
+                      <span className="text-slate-500">Updated Class Schedule</span>
                     </div>
-                    <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
                           <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold">
                             <th className="py-2 px-3">Subject</th>
                             <th className="py-2 px-3">Day</th>
-                            <th className="py-2 px-3">Time Window</th>
-                            <th className="py-2 px-3">Assigned Faculty</th>
+                            <th className="py-2 px-3">Time</th>
+                            <th className="py-2 px-3">Teacher</th>
                             <th className="py-2 px-3">Room</th>
                           </tr>
                         </thead>
@@ -1391,11 +1387,11 @@ function StudentHomeContent() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold text-slate-700">
-                        Prescribed Curriculum Subjects ({dashboardSubjects.length})
+                        Your Subjects ({dashboardSubjects.length})
                       </span>
-                      <span className="text-slate-500">DepEd Standard Curriculum</span>
+                      <span className="text-slate-500">Required School Subjects</span>
                     </div>
-                    <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
                           <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold">
@@ -1415,7 +1411,7 @@ function StudentHomeContent() {
                                 {subj.subject_name || subj.name}
                               </td>
                               <td className="py-2 px-3">
-                                <span className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold uppercase rounded-[3px]">
+                                <span className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold uppercase rounded-full">
                                   {subj.subject_type || "Core"}
                                 </span>
                               </td>
@@ -1436,7 +1432,7 @@ function StudentHomeContent() {
                 SUBMITTED ENROLLMENT APPLICATION / START ENROLLMENT CARD
                 ================================================================= */}
             {userApplication ? (
-              <div className="p-5 bg-white border border-slate-200/90 space-y-4 rounded-[4px] shadow-sm">
+              <div className="p-5 bg-white border border-slate-200/90 space-y-4 rounded-2xl shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 block">
@@ -1451,19 +1447,19 @@ function StudentHomeContent() {
                   </div>
                   <div>
                     {userApplication.status === "Approved" ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-[4px]">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-xs rounded-xl">
                         <span className="w-2 h-2 rounded-full bg-emerald-600 border border-emerald-700 shrink-0" />
-                        Status: Approved &amp; Officially Enrolled
+                        Enrolled &amp; Approved
                       </span>
                     ) : userApplication.status === "Needs Revision" ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-[4px]">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-red-50 text-red-900 border-2 border-red-500 shadow-xs rounded-xl">
                         <span className="w-2 h-2 rounded-full bg-red-600 border border-red-700 shrink-0" />
-                        Status: Needs Revision / Action Required
+                        Needs Correction
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-[4px]">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-amber-50 text-amber-900 border-2 border-amber-400 shadow-xs rounded-xl">
                         <span className="w-2 h-2 rounded-full bg-amber-500 border border-amber-600 shrink-0" />
-                        Status: Pending Administrator Verification
+                        Waiting for School Review
                       </span>
                     )}
                   </div>
@@ -1471,17 +1467,17 @@ function StudentHomeContent() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-500 block">Learner Name:</span>
+                    <span className="text-slate-500 block">Student Name:</span>
                     <strong className="text-slate-900">{userApplication.fullName}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Grade &amp; Curriculum:</span>
+                    <span className="text-slate-500 block">Grade &amp; Program:</span>
                     <strong className="text-slate-900">
                       Grade {userApplication.gradeLevel} {userApplication.jhsProgram ? `(${userApplication.jhsProgram})` : ""}
                     </strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Submission Date:</span>
+                    <span className="text-slate-500 block">Date Sent:</span>
                     <strong className="text-slate-900 ">
                       {new Date(userApplication.applicationDate).toLocaleDateString()}
                     </strong>
@@ -1489,9 +1485,9 @@ function StudentHomeContent() {
                 </div>
 
                 {userApplication.remarks && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 text-xs rounded-[4px]">
+                  <div className="p-3 bg-slate-50 border border-slate-200 text-xs rounded-xl">
                     <span className="font-bold text-slate-700 block mb-0.5 tracking-wide">
-                      School Administrator Notes / Remarks:
+                      Message from the School:
                     </span>
                     <p className="text-slate-800">{userApplication.remarks}</p>
                   </div>
@@ -1501,26 +1497,26 @@ function StudentHomeContent() {
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link
                     href={`/track?ref=${userApplication.referenceNumber}`}
-                    className="px-4 py-2.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold rounded-[4px] shadow-xs inline-flex items-center gap-1 transition-colors"
+                    className="px-4 py-2.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-xs inline-flex items-center gap-1 transition-colors"
                   >
-                    View / Track Application Details
+                    View My Application
                   </Link>
 
                   {userApplication.status === "Approved" && (
                     <Link
                       href={`/track?ref=${userApplication.referenceNumber}#timetable`}
-                      className="px-4 py-2.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold rounded-[4px] shadow-xs inline-flex items-center gap-1 transition-colors"
+                      className="px-4 py-2.5 bg-[#002060] hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-xs inline-flex items-center gap-1 transition-colors"
                     >
-                      View Enrolled Subjects &amp; Timetable
+                      View Class Schedule
                     </Link>
                   )}
 
                   {userApplication.status === "Needs Revision" && (
                     <Link
                       href="/enroll"
-                      className="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold shadow-xs rounded-[4px]"
+                      className="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold shadow-xs rounded-xl"
                     >
-                      Edit &amp; Resubmit Application
+                      Fix &amp; Send Again
                     </Link>
                   )}
 
@@ -1615,16 +1611,16 @@ function StudentHomeContent() {
                         }
                       }}
                       disabled={isDownloadingPdf}
-                      className="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded-[4px] border border-amber-500 shadow-xs inline-flex items-center gap-1 transition-colors disabled:opacity-50"
+                      className="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded-xl border border-amber-500 shadow-xs inline-flex items-center gap-1 transition-colors disabled:opacity-50"
                     >
-                      {isDownloadingPdf ? "Generating Official PDF..." : "Download Official DepEd Form (PDF)"}
+                      {isDownloadingPdf ? "Generating Official PDF..." : "Download Enrollment Copy (PDF)"}
                     </button>
                   )}
                 </div>
               </div>
             ) : (
               /* User has not yet submitted an enrollment application for active term */
-              <div className={`p-6 border-2 space-y-4 text-center rounded-[4px] shadow-xs ${
+              <div className={`p-6 border-2 space-y-4 text-center rounded-xl shadow-xs ${
                 !isEnrollmentOpen ? "bg-red-50/60 border-red-300" : "bg-white border-slate-300"
               }`}>
                 {(() => {
@@ -1640,10 +1636,10 @@ function StudentHomeContent() {
                         {isEnrollmentOpen
                           ? priorApproved
                             ? isJhsContinuing
-                              ? "Ready to Complete Your Re-Enrollment? (Continuing JHS Learner)"
-                              : "Ready to Complete Your Re-Enrollment? (Continuing SHS Learner)"
-                            : "Ready to Complete Your Enrollment?"
-                          : "Basic Education Online Enrollment is Currently Closed"}
+                              ? "Ready to Enroll for Junior High?"
+                              : "Ready to Enroll for Senior High?"
+                            : "Ready to Enroll for This Term?"
+                          : "Online Enrollment is Closed Right Now"}
                       </h3>
 
                       {!isEnrollmentOpen && closedMessage && (
@@ -1655,7 +1651,7 @@ function StudentHomeContent() {
                       <div className="pt-1">
                         <Link
                           href="/enroll"
-                          className={`inline-flex items-center justify-center gap-2 text-xs font-bold py-3 px-6 rounded-[4px] ${
+                          className={`inline-flex items-center justify-center gap-2 text-xs font-bold py-3 px-6 rounded-xl ${
                             isEnrollmentOpen
                               ? "btn-primary"
                               : "bg-red-800 hover:bg-red-900 text-white shadow-xs"
@@ -1668,10 +1664,10 @@ function StudentHomeContent() {
                             {isEnrollmentOpen
                               ? priorApproved
                                 ? isJhsContinuing
-                                  ? `1-Click Re-Enroll (Grade ${targetContinuingGrade} JHS)`
+                                  ? `Confirm Enrollment (Grade ${targetContinuingGrade})`
                                   : "Continue Enrollment: Select Electives"
-                                : "Start Online Enrollment Form"
-                              : "View Official Enrollment Notice & Advisory"}
+                                : "Start Enroll Online"
+                              : "Read School Enrollment Notice"}
                           </span>
                         </Link>
                       </div>
@@ -1683,20 +1679,20 @@ function StudentHomeContent() {
 
             {/* Previous Academic Term Enrollment Records (Continuing Students) */}
             {pastApplications.length > 0 && (
-              <div className="p-4 bg-white border border-slate-200/90 space-y-3 rounded-[4px] shadow-sm">
+              <div className="p-4 bg-white border border-slate-200/90 space-y-3 rounded-2xl shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <span className="text-xs font-bold text-slate-700">
-                    Previous Academic Term Records ({pastApplications.length})
+                    Past Enrollments ({pastApplications.length})
                   </span>
                   <span className="text-[11px] text-slate-500 font-medium">
-                    Archived Term History
+                    Previous Terms
                   </span>
                 </div>
                 <div className="space-y-2">
                   {pastApplications.map((pApp) => (
                     <div
                       key={pApp.id}
-                      className="p-3 bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs rounded-[4px]"
+                      className="p-3 bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs rounded-xl"
                     >
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -1712,13 +1708,13 @@ function StudentHomeContent() {
                         </div>
                         {pApp.remarks && (
                           <p className="text-[11px] text-slate-600 mt-1 italic">
-                            School Administrator Feedback: {pApp.remarks}
+                            Note from School: {pApp.remarks}
                           </p>
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span
-                          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-[4px] ${
+                          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-xl ${
                             pApp.status === "Approved"
                               ? "bg-emerald-50 text-emerald-900 border border-emerald-400"
                               : pApp.status === "Needs Revision"
@@ -1730,7 +1726,7 @@ function StudentHomeContent() {
                         </span>
                         <Link
                           href={`/track?ref=${pApp.referenceNumber}`}
-                          className="px-2.5 py-1 text-[11px] font-bold text-[#002060] bg-white border border-slate-300 hover:bg-slate-100 transition-colors rounded-[4px]"
+                          className="px-2.5 py-1 text-[11px] font-bold text-[#002060] bg-white border border-slate-300 hover:bg-slate-100 transition-colors rounded-xl"
                         >
                           View Record
                         </Link>
@@ -1760,12 +1756,12 @@ function StudentHomeContent() {
             {/* LEFT COLUMN (7 COLS): UNIFIED WELCOME & 4-STEP ENROLLMENT GUIDE */}
             <div className="lg:col-span-7 space-y-5 order-2 lg:order-1">
               {/* Unified Institutional Welcome & 4-Step Roadmap Card */}
-              <section className="bg-white border border-slate-200/90 rounded-[4px] shadow-sm overflow-hidden">
+              <section className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
                 {/* Top Dark Navy Institutional Banner */}
                 <div className="bg-gradient-to-br from-[#002060] via-[#002b80] to-[#071739] text-white p-6 sm:p-7 border-b-4 border-amber-400 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div
-                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[11px] font-bold uppercase tracking-wider border ${
+                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider border ${
                         isEnrollmentOpen
                           ? "bg-emerald-500/20 text-emerald-200 border-emerald-400/40"
                           : "bg-red-500/20 text-red-200 border-red-400/40"
@@ -1783,7 +1779,7 @@ function StudentHomeContent() {
                           : `Enrollment Closed • S.Y. ${schoolYear || "2026-2027"}`}
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold text-blue-200 bg-white/10 border border-white/15 px-2.5 py-1 rounded-[4px]">
+                    <span className="text-[11px] font-bold text-blue-200 bg-white/10 border border-white/15 px-2.5 py-1 rounded-xl">
                       DepEd School ID: 300017
                     </span>
                   </div>
@@ -1793,7 +1789,7 @@ function StudentHomeContent() {
                       {t("hero.title", "Online Basic Education Admission & Continuing Enrollment")}
                     </h2>
                     <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                      {t("hero.desc", "Access online admission, continuing enrollment, class section rosters, and official academic grades.")}
+                      {t("hero.desc", "Enroll online, upload your requirements, check your class schedule, and view your grades.")}
                     </p>
                   </div>
                 </div>
@@ -1883,7 +1879,7 @@ function StudentHomeContent() {
                     FRONT FACE: SIGN IN (0deg)
                     ------------------------------------------------------------- */}
                 <div
-                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] ${
+                  className={`w-full bg-white border border-slate-200 shadow-lg rounded-2xl overflow-hidden ${
                     activeTab === "signin"
                       ? "relative z-10 pointer-events-auto"
                       : "absolute inset-x-0 top-0 z-0 pointer-events-none select-none"
@@ -1899,7 +1895,7 @@ function StudentHomeContent() {
                     {/* Portal Card Institutional Header */}
                     <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
@@ -1909,7 +1905,7 @@ function StudentHomeContent() {
                         </h2>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                        <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-xl shrink-0">
                           S.Y. {schoolYear || "2026-2027"}
                         </span>
                       </div>
@@ -1923,7 +1919,7 @@ function StudentHomeContent() {
                           setActiveTab("signin");
                           setLoginError("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs flex items-center justify-center gap-1.5"
+                        className="py-2.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer bg-[#002060] text-white shadow-xs flex items-center justify-center gap-1.5"
                       >
                         <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -1937,7 +1933,7 @@ function StudentHomeContent() {
                           setRegErrors({});
                           setRegSuccessNotice("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 flex items-center justify-center gap-1.5"
+                        className="py-2.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 flex items-center justify-center gap-1.5"
                       >
                         <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -1955,7 +1951,7 @@ function StudentHomeContent() {
                       </div>
 
                       {regSuccessNotice && (
-                        <div className="p-3.5 bg-emerald-50 border-l-4 border-emerald-600 border border-emerald-300 shadow-xs rounded-[4px]">
+                        <div className="p-3.5 bg-emerald-50 border-l-4 border-emerald-600 border border-emerald-300 shadow-xs rounded-xl">
                           <span className="text-xs font-bold text-emerald-950 block mb-0.5">
                             Registration Successful &bull; Verification Sent
                           </span>
@@ -1967,7 +1963,7 @@ function StudentHomeContent() {
 
                       {/* Gmail Verification Required Notice with 6-Digit Code Entry */}
                       {unconfirmedEmail && (
-                        <div className="p-3.5 bg-amber-50 border-l-4 border-amber-500 border border-amber-300 shadow-xs space-y-2.5 rounded-[4px]">
+                        <div className="p-3.5 bg-amber-50 border-l-4 border-amber-500 border border-amber-300 shadow-xs space-y-2.5 rounded-xl">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" />
                             <span className="text-xs font-bold text-amber-950">
@@ -1987,7 +1983,7 @@ function StudentHomeContent() {
                                 setOtpSuccess("");
                                 setShowOtpModal(true);
                               }}
-                              className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs rounded-[4px]"
+                              className="px-3.5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs rounded-xl"
                             >
                               Enter 6-Digit Code
                             </button>
@@ -1995,7 +1991,7 @@ function StudentHomeContent() {
                               type="button"
                               disabled={isResending || resendCooldown > 0}
                               onClick={handleResendVerification}
-                              className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold transition-colors disabled:opacity-60 cursor-pointer rounded-[4px]"
+                              className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold transition-colors disabled:opacity-60 cursor-pointer rounded-xl"
                             >
                               {isResending ? "Resending..." : resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : "Resend Code"}
                             </button>
@@ -2010,7 +2006,7 @@ function StudentHomeContent() {
 
                       {/* Real-time Authentication Progress Bar & Status */}
                       {isLoggingIn && (
-                        <div className="p-3.5 bg-blue-50 border border-[#002060] shadow-xs space-y-2 rounded-[4px]">
+                        <div className="p-3.5 bg-blue-50 border border-[#002060] shadow-xs space-y-2 rounded-xl">
                           <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
                             <span>Signing in to Student Portal...</span>
                             <span>{loginProgress}%</span>
@@ -2022,13 +2018,13 @@ function StudentHomeContent() {
                             />
                           </div>
                           <p className="text-xs text-slate-700 font-medium">
-                            {loginStatusText || "Verifying credentials with Dumalneg NHS learner database..."}
+                            {loginStatusText || "Signing you in..."}
                           </p>
                         </div>
                       )}
 
                       {loginError && (
-                        <div className="p-3 bg-red-50 border-l-4 border-red-600 border border-red-300 rounded-[4px]">
+                        <div className="p-3 bg-red-50 border-l-4 border-red-600 border border-red-300 rounded-xl">
                           <p className="text-xs font-bold text-red-900 leading-normal">
                             {loginError}
                           </p>
@@ -2053,7 +2049,7 @@ function StudentHomeContent() {
                               if (loginError) setLoginError("");
                             }}
                             placeholder={t("auth.emailPlaceholder", "e.g. learner@gmail.com or 12-digit LRN")}
-                            className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                            className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl transition-colors"
                             disabled={isLoggingIn}
                             required
                           />
@@ -2100,7 +2096,7 @@ function StudentHomeContent() {
                               if (loginError) setLoginError("");
                             }}
                             placeholder={t("auth.passwordPlaceholder", "Enter your account password")}
-                            className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                            className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl transition-colors"
                             disabled={isLoggingIn}
                             required
                           />
@@ -2110,7 +2106,7 @@ function StudentHomeContent() {
                           <button
                             type="submit"
                             disabled={isLoggingIn}
-                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs flex items-center justify-center gap-2"
+                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl shadow-xs flex items-center justify-center gap-2"
                           >
                             <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -2165,7 +2161,7 @@ function StudentHomeContent() {
                     BACK FACE: CREATE ACCOUNT (180deg)
                     ------------------------------------------------------------- */}
                 <div
-                  className={`w-full bg-white border-2 border-[#002060] shadow-md rounded-[4px] ${
+                  className={`w-full bg-white border border-slate-200 shadow-lg rounded-2xl overflow-hidden ${
                     activeTab === "register"
                       ? "relative z-10 pointer-events-auto"
                       : "absolute inset-x-0 top-0 z-0 pointer-events-none select-none"
@@ -2181,7 +2177,7 @@ function StudentHomeContent() {
                     {/* Portal Card Institutional Header */}
                     <div className="bg-[#002060] text-white px-5 py-4 border-t-4 border-amber-400 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                           </svg>
@@ -2191,7 +2187,7 @@ function StudentHomeContent() {
                         </h2>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-[4px] shrink-0">
+                        <span className="px-2 py-0.5 bg-white/10 border border-white/20 text-[10px] font-bold text-blue-100 rounded-xl shrink-0">
                           S.Y. {schoolYear || "2026-2027"}
                         </span>
                       </div>
@@ -2205,7 +2201,7 @@ function StudentHomeContent() {
                           setActiveTab("signin");
                           setLoginError("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 flex items-center justify-center gap-1.5"
+                        className="py-2.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 flex items-center justify-center gap-1.5"
                       >
                         <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -2219,7 +2215,7 @@ function StudentHomeContent() {
                           setRegErrors({});
                           setRegSuccessNotice("");
                         }}
-                        className="py-2.5 px-3 text-xs font-bold rounded-[4px] transition-all cursor-pointer bg-[#002060] text-white shadow-xs flex items-center justify-center gap-1.5"
+                        className="py-2.5 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer bg-[#002060] text-white shadow-xs flex items-center justify-center gap-1.5"
                       >
                         <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -2238,7 +2234,7 @@ function StudentHomeContent() {
 
                       {/* Real-time Registration Progress Bar & Status */}
                       {isRegistering && (
-                        <div className="p-3.5 bg-blue-50 border border-[#002060] shadow-xs space-y-2 rounded-[4px]">
+                        <div className="p-3.5 bg-blue-50 border border-[#002060] shadow-xs space-y-2 rounded-xl">
                           <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
                             <span>Registering Student Account...</span>
                             <span>{regProgress}%</span>
@@ -2250,13 +2246,13 @@ function StudentHomeContent() {
                             />
                           </div>
                           <p className="text-xs text-slate-700 font-medium">
-                            {regStatusText || "Saving applicant credentials in DepEd Dumalneg NHS registry..."}
+                            {regStatusText || "Saving your student account..."}
                           </p>
                         </div>
                       )}
 
                       {regErrors.form && (
-                        <div className="p-3 bg-red-50 border-l-4 border-red-600 border border-red-300 rounded-[4px]">
+                        <div className="p-3 bg-red-50 border-l-4 border-red-600 border border-red-300 rounded-xl">
                           <p className="text-xs font-bold text-red-900 leading-normal">
                             {regErrors.form}
                           </p>
@@ -2279,7 +2275,7 @@ function StudentHomeContent() {
                               value={regForm.lastName}
                               onChange={(e) => setRegForm({ ...regForm, lastName: e.target.value })}
                               placeholder="e.g. AGCAOILI"
-                              className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                              className="w-full p-2.5 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl"
                               disabled={isRegistering}
                               required
                             />
@@ -2301,7 +2297,7 @@ function StudentHomeContent() {
                               value={regForm.firstName}
                               onChange={(e) => setRegForm({ ...regForm, firstName: e.target.value })}
                               placeholder="e.g. MARK ANTHONY"
-                              className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                              className="w-full p-2.5 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl"
                               disabled={isRegistering}
                               required
                             />
@@ -2358,7 +2354,7 @@ function StudentHomeContent() {
                               }
                             }}
                             placeholder={noMiddleName ? "N/A" : "e.g. CASTRO"}
-                            className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                            className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-xl ${
                               noMiddleName
                                 ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
                                 : "bg-slate-50/70 focus:bg-white border-slate-300 focus:border-[#002060]"
@@ -2385,7 +2381,7 @@ function StudentHomeContent() {
                             value={regForm.email}
                             onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
                             placeholder="mark.agcaoili@gmail.com"
-                            className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                            className="w-full p-2.5 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl"
                             disabled={isRegistering}
                             required
                           />
@@ -2436,7 +2432,7 @@ function StudentHomeContent() {
                                 value={regForm.password}
                                 onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
                                 placeholder="Min. 6 characters"
-                                className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                                className="w-full p-2.5 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl"
                                 disabled={isRegistering}
                                 required
                               />
@@ -2456,7 +2452,7 @@ function StudentHomeContent() {
                                 value={regForm.confirmPassword}
                                 onChange={(e) => setRegForm({ ...regForm, confirmPassword: e.target.value })}
                                 placeholder="Confirm password"
-                                className="w-full p-2.5 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px]"
+                                className="w-full p-2.5 bg-slate-50/70 focus:bg-white border border-slate-300 text-xs focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl"
                                 disabled={isRegistering}
                                 required
                               />
@@ -2475,7 +2471,7 @@ function StudentHomeContent() {
                           <button
                             type="submit"
                             disabled={isRegistering}
-                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-[4px] shadow-xs flex items-center justify-center gap-2"
+                            className="btn-primary w-full text-xs font-bold py-3.5 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl shadow-xs flex items-center justify-center gap-2"
                           >
                             <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -2509,14 +2505,14 @@ function StudentHomeContent() {
           </div>
 
           {/* Bottom Institutional Section: Enrollment Classifications & Documentary Requirements */}
-          <section className="bg-white p-5 sm:p-6 border border-slate-200/90 rounded-[4px] shadow-sm space-y-4">
+          <section className="bg-white p-5 sm:p-6 border border-slate-200/90 rounded-2xl shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-[#002060] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <h2 className="text-sm sm:text-base font-bold text-slate-900">
-                  Learner Classifications &amp; Documentary Checklist
+                  What Documents You Need
                 </h2>
               </div>
               <span className="text-xs text-slate-500 font-semibold">
@@ -2525,9 +2521,9 @@ function StudentHomeContent() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-[#002060] rounded-[4px] space-y-3">
+              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-[#002060] rounded-xl space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-[4px] bg-[#002060] text-amber-300 flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#002060] text-amber-300 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
@@ -2544,13 +2540,13 @@ function StudentHomeContent() {
                 <div className="pt-2 border-t border-slate-200/80 flex flex-wrap gap-1.5">
                   <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">12-Digit LRN</span>
                   <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">PSA Birth Cert</span>
-                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Grade 6 SF9</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Grade 6 Report Card (SF9)</span>
                 </div>
               </div>
 
-              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-amber-500 rounded-[4px] space-y-3">
+              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-amber-500 rounded-xl space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-[4px] bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
@@ -2567,13 +2563,13 @@ function StudentHomeContent() {
                 <div className="pt-2 border-t border-slate-200/80 flex flex-wrap gap-1.5">
                   <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Track &amp; Electives</span>
                   <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">PSA Birth Cert</span>
-                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Grade 10 SF9</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Grade 10 Report Card (SF9)</span>
                 </div>
               </div>
 
-              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-emerald-600 rounded-[4px] space-y-3">
+              <div className="p-4 bg-slate-50/80 border border-slate-200/90 border-t-4 border-t-emerald-600 rounded-xl space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-[4px] bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -2583,14 +2579,14 @@ function StudentHomeContent() {
                       Grades 8–10 &amp; Grade 12
                     </span>
                     <h3 className="text-sm font-bold text-slate-900 leading-tight">
-                      Continuing Learners
+                      Returning Students
                     </h3>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-slate-200/80 flex flex-wrap gap-1.5">
-                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">1-Click Re-Enroll</span>
-                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Auto Section</span>
-                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">DepEd PDF</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">1-Click Confirm</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Fast Approval</span>
+                  <span className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px] font-semibold text-slate-700">Enrollment Copy</span>
                 </div>
               </div>
             </div>
@@ -2603,12 +2599,12 @@ function StudentHomeContent() {
       {/* ========================================================================= */}
       {showOtpModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs ">
-          <div className="bg-white border-4 border-[#002060] w-full max-w-md shadow-2xl overflow-hidden rounded-[4px]">
+          <div className="bg-white border border-slate-200 w-full max-w-md shadow-2xl overflow-hidden rounded-2xl">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold tracking-widest text-blue-200 block">
-                  Security Verification &bull; Step 2 of 2
+                  Confirm Gmail &bull; Step 2 of 2
                 </span>
                 <h3 className="text-lg font-bold tracking-tight text-white mt-0.5">
                   Enter 6-Digit Verification Code
@@ -2627,20 +2623,20 @@ function StudentHomeContent() {
             {/* Modal Body */}
             <div className="p-5 sm:p-6 space-y-4">
               <p className="text-xs text-slate-700 leading-relaxed">
-                An official 6-digit confirmation code has been dispatched to your Gmail address:
-                <strong className="block text-[#002060] text-sm mt-1 break-all bg-blue-50/60 p-2 border border-blue-200 rounded-[4px]">
+                We sent a 6-digit code to your Gmail address:
+                <strong className="block text-[#002060] text-sm mt-1 break-all bg-blue-50/60 p-2 border border-blue-200 rounded-xl">
                   {otpEmail}
                 </strong>
               </p>
 
               {otpSuccess && (
-                <div className="p-3 bg-emerald-50 border-2 border-emerald-500 text-emerald-950 text-xs font-bold rounded-[4px]">
+                <div className="p-3 bg-emerald-50 border-2 border-emerald-500 text-emerald-950 text-xs font-bold rounded-xl">
                   {otpSuccess}
                 </div>
               )}
 
               {otpError && (
-                <div className="p-3 bg-red-50 border-2 border-red-400 text-red-950 text-xs font-bold rounded-[4px]">
+                <div className="p-3 bg-red-50 border-2 border-red-400 text-red-950 text-xs font-bold rounded-xl">
                   {otpError}
                 </div>
               )}
@@ -2670,7 +2666,7 @@ function StudentHomeContent() {
                   <button
                     type="submit"
                     disabled={isVerifyingOtp || otpCode.replace(/\D/g, "").length < 6}
-                    className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer rounded-[4px]"
+                    className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer rounded-xl"
                   >
                     {isVerifyingOtp ? "Verifying Code..." : "Verify & Activate Account"}
                   </button>
@@ -2680,7 +2676,7 @@ function StudentHomeContent() {
                       type="button"
                       disabled={resendCooldown > 0 || isResending}
                       onClick={handleOtpResend}
-                      className="text-xs font-bold text-[#002060] hover:underline disabled:text-slate-400 disabled:no-underline cursor-pointer rounded-[4px]"
+                      className="text-xs font-bold text-[#002060] hover:underline disabled:text-slate-400 disabled:no-underline cursor-pointer rounded-xl"
                     >
                       {resendCooldown > 0
                         ? `Resend Code (${resendCooldown}s)`

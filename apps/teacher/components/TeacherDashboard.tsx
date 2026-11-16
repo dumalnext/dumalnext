@@ -341,7 +341,7 @@ export default function TeacherDashboard() {
               : "bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200"
           }`}
         >
-          Class Section Rosters
+          Advisory Class List
         </button>
 
         <button
@@ -353,7 +353,7 @@ export default function TeacherDashboard() {
               : "bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200"
           }`}
         >
-          Faculty Profile &amp; Credentials
+          My Profile &amp; Password
         </button>
       </div>
 
@@ -363,14 +363,14 @@ export default function TeacherDashboard() {
           <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                OFFICIAL TIMETABLE &amp; TEACHING LOAD STATUS
+                Teaching Schedule
               </span>
               <h3 className="text-base font-bold text-slate-900 uppercase">
                 School Year 2026–2027 Timetable
               </h3>
             </div>
             <span className="px-3 py-1 bg-amber-100 text-amber-950 font-mono text-xs font-bold uppercase border border-amber-400">
-              STATUS: PENDING TIMETABLE RELEASE
+              No Schedule Yet
             </span>
           </div>
 
@@ -382,7 +382,7 @@ export default function TeacherDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="inline-block px-3 py-1 bg-amber-50 border border-amber-300 font-mono font-bold text-xs text-amber-900 uppercase rounded-[4px]">
+              <span className="inline-block px-3 py-1 bg-amber-50 border border-amber-300 font-mono font-bold text-xs text-amber-900 uppercase rounded-xl">
                 No Class Schedule Assigned Yet
               </span>
               <h4 className="text-base font-bold text-slate-900 uppercase">
@@ -431,7 +431,7 @@ export default function TeacherDashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                  OFFICIAL ENROLLED CLASS ROSTER LOOKUP
+                  Class Student List
                 </span>
                 <h3 className="text-base font-bold text-slate-900 uppercase">
                   Class Sections &amp; Student Masterlists
@@ -537,7 +537,7 @@ export default function TeacherDashboard() {
                           <td className="p-2.5 text-center font-mono text-slate-500">
                             {startIndex + idx + 1}
                           </td>
-                          <td className="p-2.5 font-mono font-bold text-[#002060]">{st.student_id || "PENDING LIS"}</td>
+                          <td className="p-2.5 font-medium text-[#002060]">{st.student_id || "No LRN yet"}</td>
                           <td className="p-2.5 font-bold text-slate-900">
                             {st.last_name}, {st.first_name} {st.middle_name || ""}
                           </td>
@@ -568,7 +568,7 @@ export default function TeacherDashboard() {
                       type="button"
                       onClick={() => setCurrentPage((prev) => Math.max(1, Math.min(prev, totalPages) - 1))}
                       disabled={safeCurrentPage <= 1}
-                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-xl transition-colors ${
                         safeCurrentPage <= 1
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                           : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -585,7 +585,7 @@ Prev
                           type="button"
                           onClick={() => setCurrentPage(pageNum)}
                           aria-current={isActive ? "page" : undefined}
-                          className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                          className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-xl transition-colors cursor-pointer ${
                             isActive
                               ? "bg-[#002060] border-[#002060] text-white"
                               : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
@@ -600,7 +600,7 @@ Prev
                       type="button"
                       onClick={() => setCurrentPage((prev) => Math.min(totalPages, Math.min(prev, totalPages) + 1))}
                       disabled={safeCurrentPage >= totalPages}
-                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-xl transition-colors ${
                         safeCurrentPage >= totalPages
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                           : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"

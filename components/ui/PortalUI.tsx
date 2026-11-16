@@ -91,7 +91,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           return (
             <div
               key={t.id}
-              className={`pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-[4px] shadow-lg transition-all duration-200 ${styles}`}
+              className={`pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-xl shadow-lg transition-all duration-200 ${styles}`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span
@@ -158,7 +158,7 @@ export function CopyChip({
       type="button"
       onClick={handleCopy}
       title={`Click to copy ${label || value}`}
-      className={`no-print inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-bold rounded-[4px] border transition-all cursor-pointer active:scale-95 ${
+      className={`no-print inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer active:scale-95 ${
         copied
           ? "bg-emerald-600 text-white border-emerald-500"
           : variant === "dark"
@@ -167,7 +167,7 @@ export function CopyChip({
       }`}
     >
       <span>{value}</span>
-      <span className="text-[10px] opacity-85 uppercase tracking-wider">
+      <span className="text-xs opacity-85 font-medium">
         {copied ? "Copied" : "Copy"}
       </span>
     </button>
@@ -213,7 +213,7 @@ export function PasswordStrengthMeter({
       : "bg-emerald-600";
 
   return (
-    <div className="mt-2 p-2.5 bg-slate-50 border border-slate-200/90 rounded-[4px] space-y-1.5">
+    <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
       <div className="flex items-center justify-between text-[11px]">
         <span className="font-semibold text-slate-600">Password Strength:</span>
         <span
@@ -240,16 +240,16 @@ export function PasswordStrengthMeter({
           />
         ))}
       </div>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] pt-0.5">
-        <span className={hasMinLen ? "text-emerald-700 font-bold" : "text-slate-500"}>
-          {hasMinLen ? "[OK]" : "[-]"} Min. 6 characters
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pt-0.5">
+        <span className={hasMinLen ? "text-emerald-700 font-semibold" : "text-slate-500"}>
+          {hasMinLen ? "✓" : "•"} At least 6 characters
         </span>
         <span
           className={
-            hasLetter && hasNumber ? "text-emerald-700 font-bold" : "text-slate-500"
+            hasLetter && hasNumber ? "text-emerald-700 font-semibold" : "text-slate-500"
           }
         >
-          {hasLetter && hasNumber ? "[OK]" : "[-]"} Letters &amp; numbers
+          {hasLetter && hasNumber ? "✓" : "•"} Mix of letters &amp; numbers
         </span>
         {matchesConfirm !== null && (
           <span
@@ -269,30 +269,30 @@ export function PasswordStrengthMeter({
    4. SKELETON LOADING PLACEHOLDERS (UPGRADE #1)
    ============================================================================ */
 export function PageCardSkeleton({
-  title = "Synchronizing Official Learner Records...",
+  title = "Loading your school records...",
   rows = 3,
 }: {
   title?: string;
   rows?: number;
 }) {
   return (
-    <div className="bg-white border border-slate-200/90 p-6 sm:p-8 rounded-[4px] shadow-xs space-y-5">
+    <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm space-y-5">
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div className="space-y-2 flex-1">
-          <div className="h-3 w-40 bg-slate-200 rounded-[3px] animate-pulse" />
-          <div className="h-5 w-64 bg-slate-200 rounded-[3px] animate-pulse" />
+          <div className="h-3 w-40 bg-slate-200 rounded-md animate-pulse" />
+          <div className="h-5 w-64 bg-slate-200 rounded-md animate-pulse" />
         </div>
-        <div className="h-7 w-28 bg-slate-100 rounded-[4px] animate-pulse shrink-0" />
+        <div className="h-7 w-28 bg-slate-100 rounded-lg animate-pulse shrink-0" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}
-            className="p-4 bg-slate-50 border border-slate-200/60 rounded-[4px] space-y-2"
+            className="p-4 bg-slate-50 border border-slate-200/70 rounded-xl space-y-2"
           >
-            <div className="h-2.5 w-20 bg-slate-200 rounded-[3px] animate-pulse" />
-            <div className="h-4 w-32 bg-slate-200 rounded-[3px] animate-pulse" />
+            <div className="h-2.5 w-20 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
           </div>
         ))}
       </div>
@@ -309,7 +309,7 @@ export function PageCardSkeleton({
    5. ILLUSTRATED EMPTY STATE CARD (UPGRADE #4)
    ============================================================================ */
 export function EmptyStateCard({
-  badge = "Academic Record Notice",
+  badge = "Notice",
   title,
   description,
   actionLabel,
@@ -326,7 +326,7 @@ export function EmptyStateCard({
   secondaryHref?: string;
 }) {
   return (
-    <div className="bg-white border border-slate-200/90 p-7 sm:p-10 text-center rounded-[4px] shadow-xs max-w-2xl mx-auto space-y-4">
+    <div className="bg-white border border-slate-200 p-7 sm:p-10 text-center rounded-2xl shadow-sm max-w-2xl mx-auto space-y-4">
       {/* Minimalist Official Document Illustration */}
       <div className="w-12 h-12 mx-auto rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#002060]">
         <svg
@@ -346,7 +346,7 @@ export function EmptyStateCard({
       </div>
 
       <div className="space-y-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-[#002060] block">
+        <span className="text-xs font-bold text-[#002060] block">
           {badge}
         </span>
         <h2 className="text-base sm:text-lg font-bold text-slate-900">
@@ -362,7 +362,7 @@ export function EmptyStateCard({
           {actionLabel && actionHref && (
             <Link
               href={actionHref}
-              className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold rounded-[4px] transition-colors shadow-xs"
+              className="px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
             >
               {actionLabel}
             </Link>
@@ -370,7 +370,7 @@ export function EmptyStateCard({
           {secondaryLabel && secondaryHref && (
             <Link
               href={secondaryHref}
-              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold rounded-[4px] transition-colors"
+              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-sm font-semibold rounded-xl transition-colors"
             >
               {secondaryLabel}
             </Link>
@@ -384,11 +384,11 @@ export function EmptyStateCard({
 /* ============================================================================
    6. PRINT OFFICIAL COPY BUTTON (UPGRADE #6)
    ============================================================================ */
-export function PrintPageButton({ label = "Print Official Copy" }: { label?: string }) {
+export function PrintPageButton({ label = "Print Copy" }: { label?: string }) {
   const { showToast } = useToast();
 
   const handlePrint = () => {
-    showToast("Preparing print-friendly DepEd layout...", "info");
+    showToast("Opening print preview...", "info");
     setTimeout(() => {
       if (typeof window !== "undefined") {
         window.print();
@@ -400,8 +400,8 @@ export function PrintPageButton({ label = "Print Official Copy" }: { label?: str
     <button
       type="button"
       onClick={handlePrint}
-      className="no-print inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs font-bold rounded-[4px] transition-colors cursor-pointer shrink-0"
-      title="Print this official record (Ctrl+P)"
+      className="no-print inline-flex items-center gap-1.5 px-4 py-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs font-semibold rounded-lg transition-colors cursor-pointer shrink-0"
+      title="Print this page"
     >
       <svg
         className="w-3.5 h-3.5 shrink-0"

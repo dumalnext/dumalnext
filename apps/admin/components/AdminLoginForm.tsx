@@ -162,22 +162,22 @@ function AdminLoginFormInner() {
     setLoginError("");
 
     if (!adminId.trim() || !adminPassword) {
-      setLoginError("Please enter your Administrator Email and security password.");
+      setLoginError("Please enter your email address and password.");
       return;
     }
 
     setIsLoggingIn(true);
     setLoginProgress(20);
-    setLoginStatusText("Connecting to Dumalneg NHS Security Realm...");
+    setLoginStatusText("Signing you in...");
 
     try {
       await new Promise((res) => setTimeout(res, 400));
       setLoginProgress(55);
-      setLoginStatusText("Verifying administrative role permissions with Supabase database...");
+      setLoginStatusText("Checking your admin account...");
 
       const res = await login(adminId, adminPassword);
       if (!res.success) {
-        setLoginError(res.error || "Invalid administrator credentials.");
+        setLoginError(res.error || "Incorrect email or password.");
         if (res.unconfirmedEmail) {
           setUnconfirmedEmail(res.unconfirmedEmail);
         }
@@ -187,7 +187,7 @@ function AdminLoginFormInner() {
       }
 
       setLoginProgress(90);
-      setLoginStatusText("Access granted. Initializing School Administrator Console...");
+      setLoginStatusText("Signed in! Opening Admin Portal...");
       await new Promise((res) => setTimeout(res, 350));
 
       setLoginProgress(100);
@@ -244,14 +244,14 @@ function AdminLoginFormInner() {
                   <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-snug">
                     {invitation
                       ? "Administrator Account Onboarding"
-                      : "Enrollment Adjudication & Registrar Console"}
+                      : "Student Enrollment &amp; School Records"}
                   </h2>
                 </div>
               </div>
               <p className="text-xs sm:text-sm text-blue-100/90 mt-4 leading-relaxed">
                 {invitation
-                  ? "Create your security password to activate your administrative access."
-                  : "Evaluate learner applications, inspect PSA documents, manage section capacities, and resolve master timetables."}
+                  ? "Set up your password to start using the Admin Portal."
+                  : "Review student applications, check uploaded documents, manage class sections, and organize schedules."}
               </p>
             </div>
 
@@ -259,10 +259,10 @@ function AdminLoginFormInner() {
             <div className="p-6 sm:p-8 bg-white space-y-5">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <h3 className="text-base font-bold text-slate-900">
-                  Integrated Enrollment Administration Tools
+                  What You Can Manage Here
                 </h3>
                 <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[#002060] border border-blue-200 text-[11px] font-semibold">
-                  Audited Access
+                  Admin Access Only
                 </span>
               </div>
 
@@ -273,7 +273,7 @@ function AdminLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">Enrollment Adjudication Queue</span>
+                  <span className="text-[#002060] font-bold text-xs">Student Applications</span>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
@@ -282,7 +282,7 @@ function AdminLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">Section Quotas &amp; Capacity</span>
+                  <span className="text-[#002060] font-bold text-xs">Class Sections &amp; Limits</span>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
@@ -291,7 +291,7 @@ function AdminLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">3D Schedule Deconfliction</span>
+                  <span className="text-[#002060] font-bold text-xs">Class Schedules</span>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-[#002060]/40 transition-colors flex items-center gap-3">
@@ -301,7 +301,7 @@ function AdminLoginFormInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <span className="text-[#002060] font-bold text-xs">Enrollment &amp; Grade Control Room</span>
+                  <span className="text-[#002060] font-bold text-xs">Enrollment &amp; Grade Settings</span>
                 </div>
               </div>
             </div>
@@ -472,7 +472,7 @@ function AdminLoginFormInner() {
                 {isLoggingIn && (
                   <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-lg space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold text-[#002060]">
-                      <span>Verifying Administrative Credentials...</span>
+                      <span>Signing you in...</span>
                       <span>{loginProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
@@ -533,7 +533,7 @@ function AdminLoginFormInner() {
                       value={adminId}
                       onChange={(e) => setAdminId(e.target.value)}
                       placeholder="e.g. registrar@dnhs.edu.ph or Gmail"
-                      className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                      className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-200 text-xs font-medium text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl transition-colors"
                       disabled={isLoggingIn}
                       required
                     />
@@ -573,7 +573,7 @@ function AdminLoginFormInner() {
                       value={adminPassword}
                       onChange={(e) => setAdminPassword(e.target.value)}
                       placeholder="Enter your account password"
-                      className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-[4px] transition-colors"
+                      className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-200 text-xs font-medium text-slate-900 focus:border-[#002060] outline-none disabled:bg-slate-100 rounded-xl transition-colors"
                       disabled={isLoggingIn}
                       required
                     />
@@ -588,7 +588,7 @@ function AdminLoginFormInner() {
                       <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                       </svg>
-                      <span>{isLoggingIn ? "Signing In to Console..." : "Sign In to Administration Console"}</span>
+                      <span>{isLoggingIn ? "Signing In..." : "Sign In"}</span>
                     </button>
                   </div>
                 </form>
@@ -609,9 +609,9 @@ export default function AdminLoginForm() {
       fallback={
         <div className="max-w-md mx-auto my-20 p-8 bg-white rounded-xl border border-slate-200 border-t-4 border-t-[#002060] text-center font-sans space-y-2 shadow-sm">
           <span className="text-xs font-bold text-[#002060] uppercase tracking-wider block">
-            Loading Administrator Console
+            Loading Admin Portal
           </span>
-          <p className="text-xs text-slate-600">Preparing Registrar authentication workspace...</p>
+          <p className="text-xs text-slate-600">Opening the Admin sign-in page...</p>
         </div>
       }
     >

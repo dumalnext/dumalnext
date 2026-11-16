@@ -291,13 +291,13 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         if (!tchCheck || tchCheck.length === 0) {
           return {
             success: false,
-            error: "No faculty account found matching those credentials. Only authorized teachers of Dumalneg NHS may access this workstation.",
+            error: "No teacher account was found with that email or ID. Only authorized Dumalneg NHS teachers can sign in here.",
           };
         }
 
         return {
           success: false,
-          error: "Invalid password entered. Please check your credentials or click Resend Verification.",
+          error: "Wrong password. Please try again or click Resend Verification.",
         };
       }
 
@@ -327,7 +327,7 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         setUser(null);
         return {
           success: false,
-          error: `Access Denied: This account has role "${dbRole}". Only authorized teachers may access the Faculty Workstation.`,
+          error: `Wrong Portal: This account belongs to ${dbRole}. Please sign in on the right portal for your role.`,
         };
       }
 

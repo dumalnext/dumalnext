@@ -163,12 +163,12 @@ export default function StaffInvitationManager() {
         if (isEmailSent) {
           setStatusMessage({
             type: "success",
-            text: `Official Supabase invitation email successfully dispatched to ${json.invitation.email}. The recipient can now click "Accept invitation" in their email to access the ${targetPortalName} and set up their password.`,
+            text: `Invite email sent to ${json.invitation.email}. They can click "Accept invitation" in their inbox to open the ${targetPortalName} and set a password.`,
           });
         } else {
           setStatusMessage({
             type: "success",
-            text: `Invitation registered for ${json.invitation.email} (${targetPortalName}). Notice: For automated live email dispatch, ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel Environment Variables. A backup direct link is also available below.`,
+            text: `Invite created for ${json.invitation.email} (${targetPortalName}). Automated email is not active right now, so please copy the direct invite link below and send it to them.`,
           });
         }
 
@@ -291,7 +291,7 @@ export default function StaffInvitationManager() {
           />
           <div>
             <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
-              Faculty, Registrar &amp; IT Support Invitation Console
+              Send Staff Account Invites
             </h2>
           </div>
         </div>
@@ -323,13 +323,13 @@ export default function StaffInvitationManager() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span
-                className={`text-[10px] font-mono font-bold uppercase tracking-wider block ${
+                className={`text-[10px] font-medium font-bold uppercase tracking-wider block ${
                   lastGeneratedLink.emailSent ? "text-emerald-800" : "text-blue-900"
                 }`}
               >
                 {lastGeneratedLink.emailSent
-                  ? "Official Invitation Dispatched via Supabase Email"
-                  : "Staff Invitation Registered in System"}
+                  ? "Invite Email Sent"
+                  : "Invite Link Ready"}
               </span>
               <h3
                 className={`text-sm font-bold mt-0.5 ${
@@ -355,7 +355,7 @@ export default function StaffInvitationManager() {
           {lastGeneratedLink.emailSent ? (
             <div className="p-3 bg-white/90 border border-emerald-200 rounded-lg text-xs text-emerald-950 space-y-1.5 leading-relaxed">
               <p className="font-semibold text-emerald-900">
-                Official invitation email has been dispatched to <strong>{lastGeneratedLink.email}</strong>. The recipient can click the button in their email to access the {lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"} and set up their password.
+                An invite email was sent to <strong>{lastGeneratedLink.email}</strong>. The recipient can click the button in their email to access the {lastGeneratedLink.role === "teacher" ? "Teacher Portal" : lastGeneratedLink.role === "admin" ? "Admin Portal" : "IT Support Portal"} and set up their password.
               </p>
               <p className="text-[11px] text-emerald-800">
                 You may also copy the direct activation link below to send directly to the staff member.
@@ -367,7 +367,7 @@ export default function StaffInvitationManager() {
                 Staff invitation created for <strong>{lastGeneratedLink.email}</strong>.
               </p>
               <p className="text-[11px] text-amber-800">
-                If the email inbox does not receive the automated message (e.g. Supabase email quota or spam filter), <strong>copy and send the direct activation link below to the staff member</strong>. Clicking it allows them to set their password and activate their account immediately.
+                If they do not see the email in their inbox or spam folder, <strong>copy and send the invite link below</strong>. Clicking it allows them to set their password and activate their account immediately.
               </p>
             </div>
           )}
@@ -391,7 +391,7 @@ export default function StaffInvitationManager() {
                   type="text"
                   readOnly
                   value={lastGeneratedLink.url}
-                  className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-slate-300 rounded-lg select-all text-slate-900"
+                  className="flex-1 px-3 py-2 text-xs font-medium bg-white border border-slate-300 rounded-lg select-all text-slate-900"
                 />
                 <button
                   type="button"
@@ -782,7 +782,7 @@ export default function StaffInvitationManager() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-300 font-mono text-[11px] text-slate-700 uppercase">
+                <tr className="bg-slate-100 border-b border-slate-300 font-medium text-[11px] text-slate-700 uppercase">
                   <th className="p-3">Email &amp; Recipient</th>
                   <th className="p-3">Assigned Role</th>
                   <th className="p-3">Department / Unit</th>
@@ -815,17 +815,17 @@ export default function StaffInvitationManager() {
                       </td>
                       <td className="p-3">
                         {inv.role === "teacher" && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <span className="px-2 py-0.5 text-[10px] font-medium font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
                             Teacher
                           </span>
                         )}
                         {inv.role === "admin" && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
+                          <span className="px-2 py-0.5 text-[10px] font-medium font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
                             Administrator
                           </span>
                         )}
                         {inv.role === "it_support" && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-indigo-100 text-indigo-900 border border-indigo-300">
+                          <span className="px-2 py-0.5 text-[10px] font-medium font-bold uppercase bg-indigo-100 text-indigo-900 border border-indigo-300">
                             IT Support
                           </span>
                         )}
@@ -835,22 +835,22 @@ export default function StaffInvitationManager() {
                       </td>
                       <td className="p-3">
                         {inv.status === "pending" && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                          <span className="px-2 py-0.5 text-[10px] font-medium font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
                             Pending
                           </span>
                         )}
                         {inv.status === "accepted" && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-green-100 text-green-900 border border-green-300">
+                          <span className="px-2 py-0.5 text-[10px] font-medium font-bold uppercase bg-green-100 text-green-900 border border-green-300">
                             Accepted
                           </span>
                         )}
                         {inv.status === "revoked" && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-red-100 text-red-900 border border-red-300">
+                          <span className="px-2 py-0.5 text-[10px] font-medium font-bold uppercase bg-red-100 text-red-900 border border-red-300">
                             Revoked
                           </span>
                         )}
                       </td>
-                      <td className="p-3 font-mono text-[11px] text-slate-600">
+                      <td className="p-3 font-medium text-[11px] text-slate-600">
                         {new Date(inv.invitedAt).toLocaleDateString()} {new Date(inv.invitedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </td>
                       <td className="p-3 text-right">
@@ -891,7 +891,7 @@ export default function StaffInvitationManager() {
                             </>
                           )}
                           {!isPending && (
-                            <span className="text-[11px] font-mono text-slate-400 uppercase">
+                            <span className="text-[11px] font-medium text-slate-400 uppercase">
                               {inv.status}
                             </span>
                           )}
@@ -920,7 +920,7 @@ export default function StaffInvitationManager() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={safeCurrentPage <= 1}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage <= 1
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -944,7 +944,7 @@ export default function StaffInvitationManager() {
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
                     aria-current={isActive ? "page" : undefined}
-                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                       isActive
                         ? "bg-[#002060] border-[#002060] text-white"
                         : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
@@ -959,7 +959,7 @@ export default function StaffInvitationManager() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safeCurrentPage >= totalPages}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage >= totalPages
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"

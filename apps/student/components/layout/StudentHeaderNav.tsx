@@ -460,7 +460,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             <Link
               href={profileHref}
               className="hidden lg:flex border border-white/20 bg-white/10 hover:bg-white/15 backdrop-blur-xs px-3.5 py-1.5 text-xs rounded-lg min-w-0 transition-colors items-center gap-3 group"
-              title="View Student Profile & Credentials"
+              title="View My Profile"
             >
               {photoUrl ? (
                 <img
@@ -476,8 +476,8 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                  <span className="text-[10px] text-amber-300 font-semibold uppercase tracking-wider truncate">
-                    Active Learner Session
+                  <span className="text-[11px] text-amber-300 font-semibold truncate">
+                    Signed In
                   </span>
                 </div>
                 <div className="font-bold text-white tracking-wide truncate text-xs mt-0.5 group-hover:text-amber-200 transition-colors">
@@ -488,15 +488,15 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     {user.lrn ? `LRN: ${user.lrn}` : user.userId}
                   </span>
                   {appStatus === "Approved" ? (
-                    <span className="text-[9px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 px-1.5 py-0.2 font-bold uppercase rounded-[3px]">
+                    <span className="text-[10px] bg-emerald-500/25 text-emerald-200 border border-emerald-400/40 px-2 py-0.5 font-semibold rounded-full">
                       Approved
                     </span>
                   ) : appStatus === "Pending" ? (
-                    <span className="text-[9px] bg-amber-500/30 text-amber-300 border border-amber-400/50 px-1.5 py-0.2 font-bold uppercase rounded-[3px]">
+                    <span className="text-[10px] bg-amber-500/25 text-amber-200 border border-amber-400/40 px-2 py-0.5 font-semibold rounded-full">
                       Pending
                     </span>
                   ) : (
-                    <span className="text-[9px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 px-1.5 py-0.2 font-bold uppercase rounded-[3px]">
+                    <span className="text-[10px] bg-emerald-500/25 text-emerald-200 border border-emerald-400/40 px-2 py-0.5 font-semibold rounded-full">
                       Active
                     </span>
                   )}
@@ -542,7 +542,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           <div className="max-w-7xl mx-auto flex items-center overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth whitespace-nowrap gap-1 sm:gap-1.5 text-xs font-bold tracking-wide pt-1.5 sm:pt-2 touch-pan-x" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <Link
               href="/"
-              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-xl flex items-center gap-2 ${
                 pathname === "/"
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
                   : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
@@ -556,7 +556,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <Link
               href={enrollHref}
-              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-xl flex items-center gap-2 ${
                 pathname === "/enroll"
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
                   : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
@@ -570,7 +570,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <Link
               href={trackHref}
-              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-xl flex items-center gap-2 ${
                 pathname === "/track"
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
                   : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
@@ -584,7 +584,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <Link
               href={sectionHref}
-              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-xl flex items-center gap-2 ${
                 pathname === "/section"
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
                   : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
@@ -598,7 +598,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <Link
               href="/grades"
-              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-xl flex items-center gap-2 ${
                 pathname === "/grades"
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
                   : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
@@ -612,7 +612,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
 
             <Link
               href={profileHref}
-              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-md flex items-center gap-2 ${
+              className={`py-2.5 sm:py-3 px-3.5 sm:px-4 shrink-0 border-t-2 border-x-2 transition-all rounded-t-xl flex items-center gap-2 ${
                 pathname === "/profile"
                   ? "border-[#002060] bg-white text-[#002060] -mb-[1px] shadow-2xs"
                   : "border-transparent text-slate-600 hover:text-[#002060] hover:bg-slate-200/60"
@@ -685,7 +685,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(false)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/10 hover:bg-red-600/90 text-white border border-white/20 hover:border-red-400 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-[4px] active:scale-95"
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/10 hover:bg-red-600/90 text-white border border-white/20 hover:border-red-400 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-lg active:scale-95"
               >
                 <span>Close</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -716,24 +716,24 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                         {user.firstName} {user.lastName}
                       </h4>
                       {appStatus === "Approved" ? (
-                        <span className="text-[9px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 font-extrabold uppercase rounded-[3px] whitespace-nowrap shrink-0">
+                        <span className="text-[10px] bg-emerald-400 text-slate-950 px-2 py-0.5 font-bold rounded-full whitespace-nowrap shrink-0">
                           APPROVED
                         </span>
                       ) : appStatus === "Needs Revision" ? (
-                        <span className="text-[9px] bg-red-500 text-white px-1.5 py-0.5 font-extrabold uppercase rounded-[3px] whitespace-nowrap shrink-0">
+                        <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 font-bold rounded-full whitespace-nowrap shrink-0">
                           REVISION
                         </span>
                       ) : appStatus === "Pending" ? (
-                        <span className="text-[9px] bg-amber-400 text-slate-950 px-1.5 py-0.5 font-extrabold uppercase rounded-[3px] whitespace-nowrap shrink-0">
+                        <span className="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 font-bold rounded-full whitespace-nowrap shrink-0">
                           PENDING
                         </span>
                       ) : (
-                        <span className="text-[9px] bg-blue-400/25 text-blue-100 border border-blue-300/40 px-1.5 py-0.5 font-bold uppercase rounded-[3px] whitespace-nowrap shrink-0">
-                          NEW APPLICANT
+                        <span className="text-[10px] bg-blue-400/25 text-blue-100 border border-blue-300/40 px-2 py-0.5 font-semibold rounded-full whitespace-nowrap shrink-0">
+                          Not Enrolled
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-blue-200 font-mono truncate mt-0.5">
+                    <p className="text-[11px] text-blue-200 truncate mt-0.5">
                       LRN: <strong className="text-white">{user.lrn || user.userId || "Pending"}</strong>
                     </p>
                     <p className="text-[10px] text-blue-300/80 truncate">
@@ -747,7 +747,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   <Link
                     href={profileHref}
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex-1 py-1.5 px-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-[11px] font-bold rounded-[4px] transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5"
+                    className="flex-1 py-1.5 px-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -760,7 +760,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                       setIsMenuOpen(false);
                       logout();
                     }}
-                    className="py-1.5 px-3 bg-red-600/90 hover:bg-red-600 active:bg-red-700 border border-red-400/40 text-white text-[11px] font-bold uppercase tracking-wider rounded-[4px] cursor-pointer shrink-0 transition-colors inline-flex items-center justify-center gap-1.5"
+                    className="py-1.5 px-3 bg-red-600/90 hover:bg-red-600 active:bg-red-700 border border-red-400/40 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg cursor-pointer shrink-0 transition-colors inline-flex items-center justify-center gap-1.5"
                     title="Sign Out of Session"
                   >
                     <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -773,10 +773,10 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
             ) : (
               <div className="px-4 py-3 bg-blue-950/50">
                 <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                  GUEST VISITOR
+                  Not Signed In
                 </span>
                 <p className="text-[11px] text-blue-100 mt-0.5 leading-snug">
-                  Sign in with your verified email to access online basic education enrollment.
+                  Sign in with your email or LRN to enroll online or view your records.
                 </p>
               </div>
             )}
@@ -832,7 +832,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
                     <div className="truncate text-[11px] text-amber-950">
                       <span className="font-bold">Section Status:</span>{" "}
-                      <span>Pending administrator evaluation</span>
+                      <span>Waiting for school review</span>
                     </div>
                   </div>
                   <svg className="w-4 h-4 text-amber-700 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -853,11 +853,11 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
           >
             {/* 1. Primary Portal Navigation List */}
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-                PORTAL MODULES
+              <span className="text-xs font-bold text-slate-500 block px-1">
+                Menu
               </span>
 
-              <div className="bg-white border border-slate-200/90 rounded-[6px] divide-y divide-slate-100 overflow-hidden shadow-2xs">
+              <div className="bg-white border border-slate-200/90 rounded-xl divide-y divide-slate-100 overflow-hidden shadow-2xs">
                 {/* Home Dashboard */}
                 <Link
                   href="/"
@@ -869,7 +869,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       pathname === "/" ? "bg-[#002060] text-amber-300 shadow-2xs" : "bg-slate-100 text-[#002060]"
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -899,7 +899,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       pathname === "/enroll" ? "bg-[#002060] text-amber-300 shadow-2xs" : "bg-slate-100 text-[#002060]"
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -929,7 +929,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       pathname === "/track" ? "bg-[#002060] text-amber-300 shadow-2xs" : "bg-slate-100 text-[#002060]"
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -959,7 +959,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       pathname === "/section" ? "bg-[#002060] text-amber-300 shadow-2xs" : "bg-slate-100 text-[#002060]"
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -991,7 +991,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       pathname === "/grades" ? "bg-[#002060] text-amber-300 shadow-2xs" : "bg-slate-100 text-[#002060]"
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -1026,7 +1026,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-[5px] flex items-center justify-center shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       pathname === "/profile" ? "bg-[#002060] text-amber-300 shadow-2xs" : "bg-slate-100 text-[#002060]"
                     }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -1036,7 +1036,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
                     <div className="min-w-0">
                       <span className="text-xs font-bold block truncate">Student Profile</span>
                       <span className="text-[10px] text-slate-500 block truncate">
-                        Complete learner dossier, LRN &amp; family info
+                        Your student details, LRN, and family info
                       </span>
                     </div>
                   </div>
@@ -1072,7 +1072,7 @@ export default function StudentHeaderNav({ children }: StudentHeaderNavProps = {
               <Link
                 href="/?tab=signin"
                 onClick={() => setIsMenuOpen(false)}
-                className="w-full mb-2 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-[4px] active:scale-[0.99]"
+                className="w-full mb-2 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors text-center block shadow-xs rounded-lg active:scale-[0.99]"
               >
                 Sign In / Register Account
               </Link>

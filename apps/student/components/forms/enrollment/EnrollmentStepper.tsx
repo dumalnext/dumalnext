@@ -180,11 +180,11 @@ const initialFormData: FullEnrollmentFormData = {
 };
 
 const STEP_LABELS = [
-  { step: 1, label: "Classification", sublabel: "Learner Category" },
-  { step: 2, label: "Learner Profile", sublabel: "Personal & Address" },
-  { step: 3, label: "Family Background", sublabel: "Parent & Guardian" },
-  { step: 4, label: "Curriculum & Modality", sublabel: "Program & Modality" },
-  { step: 5, label: "Documents & Submit", sublabel: "Compression & Review" },
+  { step: 1, label: "Grade & Type", sublabel: "Student Category" },
+  { step: 2, label: "Personal Details", sublabel: "Name & Address" },
+  { step: 3, label: "Family Info", sublabel: "Parent & Guardian" },
+  { step: 4, label: "Subjects & Setup", sublabel: "Track & Learning Mode" },
+  { step: 5, label: "Documents & Submit", sublabel: "Upload & Review" },
 ];
 
 const STEP_STORAGE_KEY = "dumalnext_student_enrollment_step";
@@ -599,24 +599,24 @@ export default function EnrollmentStepper({
   // 1.5. Lockout State: Online Enrollment is Closed
   if (!isEnrollmentOpen) {
     return (
-      <div className="bg-white border-2 border-red-500 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
+      <div className="bg-white border-2 border-red-500 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-xl">
         <div className="border-b-2 border-red-200 pb-4">
           <span className="text-xs font-bold tracking-widest text-[#002060] block">
             Department of Education &bull; Region I &bull; Dumalneg NHS
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
-            Online Basic Education Enrollment is Currently Closed
+            Online Enrollment is Currently Closed
           </h2>
           <div className="text-xs text-slate-500 mt-1">
             School Year: <strong className="text-[#002060] text-sm">{schoolYear}</strong>
           </div>
         </div>
 
-        <div className="p-5 bg-red-50 border-2 border-red-400 text-left space-y-2 max-w-2xl mx-auto rounded-[4px]">
+        <div className="p-5 bg-red-50 border-2 border-red-400 text-left space-y-2 max-w-2xl mx-auto rounded-xl">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block shrink-0" />
             <span className="text-xs font-bold text-red-950">
-              DepEd Official Notice: Submission System Temporarily Locked
+              Notice: Enrollment Is Closed Right Now
             </span>
           </div>
           <p className="text-xs text-red-900 leading-relaxed whitespace-pre-line">
@@ -627,13 +627,13 @@ export default function EnrollmentStepper({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href="/"
-            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-xl"
           >
             Return to Student Home
           </Link>
           <Link
             href="/track"
-            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-[4px]"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-xl"
           >
             Track Existing Application
           </Link>
@@ -645,7 +645,7 @@ export default function EnrollmentStepper({
   // 2. Lockout State: Pending Verification (One-time submission rule)
   if (existingApp && existingApp.status === "Pending") {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-xl">
         <div className="border-b-2 border-slate-200 pb-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Enrollment Application Already Submitted
@@ -656,28 +656,28 @@ export default function EnrollmentStepper({
           </div>
         </div>
 
-        <div className="p-5 bg-amber-50 border-2 border-amber-300 text-left space-y-2 max-w-2xl mx-auto rounded-[4px]">
+        <div className="p-5 bg-amber-50 border-2 border-amber-300 text-left space-y-2 max-w-2xl mx-auto rounded-xl">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shrink-0" />
             <span className="text-xs font-bold text-amber-950">
-              Pending Administrator Verification
+              Waiting for School Review
             </span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed font-medium">
-            Your enrollment application for School Year {schoolYear} has been submitted and is currently queued for evaluation by the School Administrator.
+            We received your enrollment form for School Year {schoolYear}. The school office is reviewing it now.
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href={`/track?ref=${existingApp.application_id}`}
-            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-xl"
           >
             Track Application Status
           </Link>
           <Link
             href="/"
-            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-[4px]"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-xl"
           >
             Return to Student Home
           </Link>
@@ -689,7 +689,7 @@ export default function EnrollmentStepper({
   // 3. Lockout State: Officially Approved & Enrolled
   if (existingApp && existingApp.status === "Approved") {
     return (
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-[4px]">
+      <div className="bg-white border-2 border-slate-300 p-6 sm:p-10 text-center space-y-6 shadow-sm rounded-xl">
         <div className="border-b-2 border-slate-200 pb-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Official Enrollment Confirmed
@@ -700,7 +700,7 @@ export default function EnrollmentStepper({
           </div>
         </div>
 
-        <div className="p-5 bg-emerald-50 border-2 border-emerald-400 text-left space-y-2 max-w-2xl mx-auto rounded-[4px]">
+        <div className="p-5 bg-emerald-50 border-2 border-emerald-400 text-left space-y-2 max-w-2xl mx-auto rounded-xl">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shrink-0" />
             <span className="text-xs font-bold text-emerald-950">
@@ -715,13 +715,13 @@ export default function EnrollmentStepper({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href={`/track?ref=${existingApp.application_id}`}
-            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-[4px]"
+            className="w-full sm:w-auto px-6 py-3 bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs tracking-wider shadow-xs rounded-xl"
           >
             View Enrollment Slip &amp; Section Assignment
           </Link>
           <Link
             href="/"
-            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-[4px]"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold text-xs tracking-wider rounded-xl"
           >
             Return to Student Home
           </Link>
@@ -798,7 +798,7 @@ export default function EnrollmentStepper({
               <button
                 type="button"
                 onClick={handleResetDraft}
-                className="text-[11px] font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-[4px] active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
+                className="text-[11px] font-bold text-red-700 hover:text-red-950 border border-red-300 hover:bg-red-50 px-2.5 py-1 tracking-normal transition-all cursor-pointer rounded-xl active:scale-95 shrink-0 whitespace-nowrap shadow-xs"
                 title="Reset enrollment progress and start over from Step 1"
               >
                 Reset / Start Over
@@ -817,7 +817,7 @@ export default function EnrollmentStepper({
 
         {/* MOBILE VIEW (< sm): Clean Compact Step Navigation Pills */}
         <div className="sm:hidden space-y-2">
-          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200 rounded-[4px]">
+          <div className="flex items-center justify-between text-xs bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
             <span className="font-bold text-[#002060] text-[11px]">
               Active: {STEP_LABELS[currentStep - 1].label}
             </span>
@@ -840,7 +840,7 @@ export default function EnrollmentStepper({
                     }
                   }}
                   disabled={existingApp?.status !== "Needs Revision" && item.step > currentStep}
-                  className={`py-2 text-center text-xs font-bold border rounded-[4px] transition-all active:scale-95 ${
+                  className={`py-2 text-center text-xs font-bold border rounded-xl transition-all active:scale-95 ${
                     isActive
                       ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                       : isDone || existingApp?.status === "Needs Revision"
@@ -869,7 +869,7 @@ export default function EnrollmentStepper({
                     setCurrentStep(item.step);
                   }
                 }}
-                className={`p-2.5 border rounded-[4px] transition-all ${
+                className={`p-2.5 border rounded-xl transition-all ${
                   isActive
                     ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                     : isDone || existingApp?.status === "Needs Revision"

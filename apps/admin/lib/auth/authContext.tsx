@@ -340,7 +340,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       if (!suUsers || suUsers.length === 0) {
         return {
           success: false,
-          error: "No administrator account found matching those credentials. Please check your Employee ID or Email.",
+          error: "No admin account found for that email. Please check and try again.",
         };
       }
 
@@ -349,7 +349,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       if (adminUserRecord.user_role !== "admin") {
         return {
           success: false,
-          error: `Access denied. Account role is "${adminUserRecord.user_role}". Administrator credentials are required.`,
+          error: `Wrong portal. This account is registered as "${adminUserRecord.user_role}". Please sign in using that portal instead.`,
         };
       }
 
@@ -450,7 +450,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       if (authErr) {
         return {
           success: false,
-          error: "Supabase Auth error: " + authErr.message,
+          error: "Sign-in issue: " + authErr.message,
         };
       }
 

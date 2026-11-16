@@ -5,8 +5,8 @@ import TeacherHeaderNav from "@/components/TeacherHeaderNav";
 import SessionTimeoutModal from "@/components/SessionTimeoutModal";
 
 export const metadata: Metadata = {
-  title: "Faculty Portal | Dumalneg National High School",
-  description: "Official Faculty & Teacher Workstation for Dumalneg National High School",
+  title: "Teacher Portal | Dumalneg National High School",
+  description: "Official Teacher & Class Adviser Portal for Dumalneg National High School",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -66,7 +66,7 @@ export default function TeacherLayout({
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
               <p className="font-semibold text-slate-200">
-                Dumalneg National High School - Faculty Workstation
+                Dumalneg National High School - Teacher Portal
               </p>
               <p className="mt-1">
                 Municipality of Dumalneg, Province of Ilocos Norte, Philippines

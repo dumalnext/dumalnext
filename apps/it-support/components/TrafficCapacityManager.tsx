@@ -84,7 +84,7 @@ export default function TrafficCapacityManager() {
 
   // Emergency Flush of Active Sessions
   const handleResetSessions = async () => {
-    if (!window.confirm("Confirm: Flush all current active student sessions?")) {
+    if (!window.confirm("Reset active visitor count back to 0?")) {
       return;
     }
 
@@ -106,11 +106,11 @@ export default function TrafficCapacityManager() {
       const data = await res.json().catch(() => null);
       if (res.ok && data?.success) {
         setActiveCount(0);
-        setStatusNotice("All active student sessions have been successfully flushed.");
+        setStatusNotice("Active visitor count has been reset.");
         setTimeout(() => setStatusNotice(""), 5000);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to flush active sessions.");
+      setErrorMessage(err.message || "Could not reset active visitor count.");
     } finally {
       setIsSaving(false);
     }
@@ -119,18 +119,18 @@ export default function TrafficCapacityManager() {
   const utilizationPercent = Math.min(100, Math.round((activeCount / Math.max(1, maxCapacity)) * 100));
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm overflow-hidden font-sans">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden font-sans">
       {/* Header Strip */}
       <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-300">
-              Live Concurrency &amp; Traffic Gatekeeper
+              Student Portal Visitor Limit
             </span>
           </div>
           <h3 className="text-lg font-black text-white tracking-tight mt-0.5">
-            Student Portal User Capacity Controller
+            Waiting Room &amp; Visitor Limit
           </h3>
         </div>
 
@@ -154,13 +154,13 @@ export default function TrafficCapacityManager() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Active Student Sessions
+                Students Online Now
               </span>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-3xl font-black text-[#002060] font-mono">
+                <span className="text-3xl font-black text-[#002060] font-medium">
                   {isLoading ? <span className="inline-block w-12 h-7 bg-slate-200 animate-pulse rounded" /> : activeCount}
                 </span>
-                <span className="text-slate-400 font-bold text-lg font-mono">
+                <span className="text-slate-400 font-bold text-lg font-medium">
                   / {maxCapacity} slots
                 </span>
                 <span
@@ -173,7 +173,7 @@ export default function TrafficCapacityManager() {
                   }`}
                 >
                   {utilizationPercent >= 100
-                    ? "AT CAPACITY / QUEUED"
+                    ? "FULL (WAITING ROOM ACTIVE)"
                     : utilizationPercent >= 75
                     ? "HEAVY LOAD"
                     : "OPTIMAL"}
@@ -183,9 +183,9 @@ export default function TrafficCapacityManager() {
 
             <div className="text-right">
               <span className="text-[11px] font-bold text-slate-500 uppercase block">
-                Server Capacity Load
+                Visitor Load
               </span>
-              <span className="text-xl font-black text-slate-900 font-mono">
+              <span className="text-xl font-black text-slate-900 font-medium">
                 {isLoading ? <span className="inline-block w-12 h-5 bg-slate-200 animate-pulse rounded" /> : `${utilizationPercent}%`}
               </span>
             </div>
@@ -208,7 +208,7 @@ export default function TrafficCapacityManager() {
           <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
             <span>0 Users</span>
             <span>50 Users</span>
-            <span>{maxCapacity} Users (Capacity Threshold)</span>
+            <span>{maxCapacity} Users (Visitor Limit)</span>
           </div>
         </div>
 
@@ -217,7 +217,7 @@ export default function TrafficCapacityManager() {
           {/* Stepper Control */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Adjust Maximum Active Capacity (Slots):
+              Max Students Allowed at Once:
             </label>
             <div className="flex items-center gap-3">
               <button
@@ -234,7 +234,7 @@ export default function TrafficCapacityManager() {
                 max={500}
                 value={tempCapacity}
                 onChange={(e) => setTempCapacity(Math.max(50, Number(e.target.value) || 50))}
-                className="flex-1 h-11 px-4 border-2 border-slate-300 focus:border-[#002060] rounded-lg text-center font-mono font-black text-xl text-[#002060] outline-none"
+                className="flex-1 h-11 px-4 border border-slate-200 rounded-xl focus:border-[#002060] rounded-lg text-center font-medium font-black text-xl text-[#002060] outline-none"
               />
               <button
                 type="button"
@@ -245,15 +245,15 @@ export default function TrafficCapacityManager() {
                 +10
               </button>
             </div>
-            <p className="text-[11px] text-slate-500 font-mono">
-              Automated queueing activates when concurrent sessions reach threshold.
+            <p className="text-[11px] text-slate-500 font-medium">
+              Extra visitors wait in line automatically when the limit above is reached.
             </p>
           </div>
 
           {/* Quick Presets for Defense & Operation */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Quick Presets (Operational Deployment):
+              Quick Limit Presets:
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -350,10 +350,10 @@ export default function TrafficCapacityManager() {
             />
             <div>
               <span className="text-xs font-extrabold uppercase text-slate-900 block">
-                Enable Virtual Waiting Room &amp; Queueing
+                Turn On Waiting Room
               </span>
               <span className="text-[11px] text-slate-500 block">
-                Holds excess learner sessions in an automated queue during peak surges.
+                Places extra students in a short waiting line if too many sign in at once.
               </span>
             </div>
           </label>
@@ -369,7 +369,7 @@ export default function TrafficCapacityManager() {
               <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              <span>Flush Sessions</span>
+              <span>Reset Visitor Count</span>
             </button>
             <button
               type="button"

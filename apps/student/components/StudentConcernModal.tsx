@@ -167,7 +167,7 @@ export default function StudentConcernModal({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden font-sans animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden font-sans animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white p-4 sm:p-5 flex items-center justify-between border-b-2 border-amber-400">
           <div className="flex items-center gap-3">
@@ -177,11 +177,11 @@ export default function StudentConcernModal({
               </svg>
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
-                Dumalneg NHS &bull; Student Helpdesk
+              <span className="text-xs font-semibold text-amber-300 block">
+                Student Helpdesk
               </span>
               <h2 className="text-base sm:text-lg font-bold text-white">
-                Learner Messages &amp; Concerns
+                Ask for Help / Send Message
               </h2>
             </div>
           </div>
@@ -214,7 +214,7 @@ export default function StudentConcernModal({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Submit a Concern / Inquiry</span>
+            <span>Ask a Question</span>
           </button>
           <button
             type="button"
@@ -228,7 +228,7 @@ export default function StudentConcernModal({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span>Track Concern &amp; Replies</span>
+            <span>Check Replies</span>
           </button>
         </div>
 
@@ -245,7 +245,7 @@ export default function StudentConcernModal({
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900">
-                      Inquiry Dispatched Successfully
+                      Your Message Was Sent!
                     </h3>
                     <p className="text-xs text-slate-600 mt-1 max-w-md mx-auto">
                       {submittedTicket.message}
@@ -256,7 +256,7 @@ export default function StudentConcernModal({
                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                       Your Reference Ticket Number
                     </span>
-                    <span className="text-lg font-mono font-extrabold text-[#002060] tracking-wider block mt-1">
+                    <span className="text-lg font-extrabold text-[#002060] block mt-1">
                       {submittedTicket.ticketNumber}
                     </span>
                     <p className="text-[11px] text-slate-500 mt-1">
@@ -322,10 +322,10 @@ export default function StudentConcernModal({
                   {/* Institutional Policy Notice */}
                   <div className="p-3 bg-blue-50 border-l-4 border-[#002060] border border-blue-200 rounded-md text-xs text-slate-700 leading-relaxed space-y-1">
                     <span className="font-bold text-[#002060] block">
-                      DepEd Learner Account Security &amp; Privacy Notice
+                      Your Privacy &amp; Help Notice
                     </span>
                     <p>
-                      Dumalneg NHS adheres to DepEd data governance. Passwords are never visible to IT Support staff and all credentials remain encrypted. Submit your inquiry below and IT Support will review and reply directly to your concern.
+                      Need help signing in or filling out your form? Your password always stays private. Write your question below and school IT Support will reply to you.
                     </p>
                   </div>
 
@@ -415,7 +415,7 @@ export default function StudentConcernModal({
                         value={lrn}
                         onChange={(e) => setLrn(e.target.value.replace(/\D/g, ""))}
                         placeholder="e.g. 101234567890 (optional)"
-                        className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs font-mono rounded-md focus:border-[#002060] focus:bg-white outline-none"
+                        className="w-full p-2.5 bg-slate-50 border border-slate-300 text-xs rounded-lg focus:border-[#002060] focus:bg-white outline-none"
                       />
                     </div>
 
@@ -541,7 +541,7 @@ export default function StudentConcernModal({
                         {/* Ticket Strip */}
                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-extrabold text-[#002060]">
+                            <span className="text-xs font-extrabold text-[#002060]">
                               {ticket.ticketNumber}
                             </span>
                             <span className="text-[10px] text-slate-400">&bull;</span>
@@ -580,7 +580,7 @@ export default function StudentConcernModal({
 
                         {/* Conversation Replies Stream */}
                         <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 space-y-2.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                          <span className="text-xs font-bold text-slate-600 block">
                             Conversation &amp; Responses
                           </span>
 

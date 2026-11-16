@@ -605,7 +605,7 @@ export default function AdjudicationConsole() {
 
     return (
       <tr key={app.id} className="hover:bg-slate-50 transition-colors">
-        <td className="p-3 font-mono font-bold text-[#002060]">
+        <td className="p-3 font-medium font-bold text-[#002060]">
           {app.application_id}
         </td>
         <td className="p-3 font-bold text-slate-900 uppercase">
@@ -616,11 +616,11 @@ export default function AdjudicationConsole() {
             </span>
           )}
         </td>
-        <td className="p-3 font-mono">
+        <td className="p-3 font-medium">
           {st?.student_id && /^\d{12}$/.test(st.student_id) ? (
             <span className="font-bold text-slate-900">{st.student_id}</span>
           ) : (
-            <span className="text-slate-400 italic font-sans text-[11px]">No LRN (Pending LIS)</span>
+            <span className="text-slate-400 italic font-sans text-[11px]">No LRN yet</span>
           )}
         </td>
         <td className="p-3">
@@ -634,7 +634,7 @@ export default function AdjudicationConsole() {
                   Elective: {singleElective}
                 </span>
               ) : shsInfo?.isTechPro ? (
-                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 border border-slate-200 rounded inline-block">
+                <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 border border-slate-200 rounded inline-block">
                   Fixed Tech-Pro Curriculum
                 </span>
               ) : (
@@ -649,7 +649,7 @@ export default function AdjudicationConsole() {
             </span>
           )}
         </td>
-        <td className="p-3 font-mono text-slate-600">
+        <td className="p-3 font-medium text-slate-600">
           {new Date(app.created_at).toLocaleDateString()}
         </td>
         <td className="p-3">
@@ -686,7 +686,7 @@ export default function AdjudicationConsole() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span>Review Dossier</span>
+            <span>Review Application</span>
           </button>
         </td>
       </tr>
@@ -731,7 +731,7 @@ export default function AdjudicationConsole() {
           />
           <div>
             <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-              Enrollment Adjudication &bull; Registrar Evaluation Queue
+              Student Enrollment Review
             </span>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
               Basic Education Enrollment Applications
@@ -774,12 +774,12 @@ export default function AdjudicationConsole() {
           </div>
         </div>
 
-        {/* Pending Verification */}
+        {/* Waiting for Review */}
         <div className="p-4 bg-white rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/30 to-white shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wide block">
-                Pending Verification
+                Waiting for Review
               </span>
               {isFetchingApps && !hasLoadedAppsOnce.current ? (
                 <div className="h-8 w-16 bg-amber-100 animate-pulse rounded-md mt-1.5" />
@@ -833,7 +833,7 @@ export default function AdjudicationConsole() {
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="text-[11px] font-semibold text-rose-800 uppercase tracking-wide block">
-                Needs Revision
+                Needs Changes
               </span>
               {isFetchingApps && !hasLoadedAppsOnce.current ? (
                 <div className="h-8 w-16 bg-rose-100 animate-pulse rounded-md mt-1.5" />
@@ -918,7 +918,7 @@ export default function AdjudicationConsole() {
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-              <span>Needs Revision</span>
+              <span>Needs Changes</span>
               <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${statusFilter === "Needs Revision" ? "bg-white/20 text-white" : "bg-rose-100 text-rose-900"}`}>
                 {isFetchingApps && !hasLoadedAppsOnce.current ? "-" : revisionCount}
               </span>
@@ -998,7 +998,7 @@ export default function AdjudicationConsole() {
         {searchQuery.trim() && (
           <div className="p-3 bg-blue-50/80 border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
-              <span className="font-mono font-bold text-[#002060] uppercase">
+              <span className="font-medium font-bold text-[#002060] uppercase">
                 SEARCH ACTIVE: &ldquo;{searchQuery.trim()}&rdquo;
               </span>
               <span className="text-slate-600">
@@ -1006,8 +1006,8 @@ export default function AdjudicationConsole() {
               </span>
             </div>
             {filteredApplications.length > 0 && (
-              <span className="text-[11px] font-mono text-[#002060] font-bold">
-                Click Review Dossier below to inspect full credentials.
+              <span className="text-[11px] font-medium text-[#002060] font-bold">
+                Click Review Application below to view full details and files.
               </span>
             )}
           </div>
@@ -1110,7 +1110,7 @@ export default function AdjudicationConsole() {
                           <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
                             Grade {grade}
                           </span>
-                          <span className="text-[11px] font-mono text-slate-500 font-semibold">
+                          <span className="text-[11px] font-medium text-slate-500 font-semibold">
                             ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
                           </span>
                         </div>
@@ -1123,8 +1123,8 @@ export default function AdjudicationConsole() {
                         </div>
                       ) : (
                         <div>
-                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
-                            <span>Swipe horizontally to view full dossier details</span>
+                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between">
+                            <span>Swipe left or right to see more columns</span>
                           </div>
                           <div className="overflow-x-auto touch-pan-x">
                             <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
@@ -1136,7 +1136,7 @@ export default function AdjudicationConsole() {
                                   <th className="p-2.5">Curriculum / Program</th>
                                   <th className="p-2.5">Date Submitted</th>
                                   <th className="p-2.5">Status</th>
-                                  <th className="p-2.5 text-right">Adjudication Action</th>
+                                  <th className="p-2.5 text-right">Action</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">
@@ -1186,7 +1186,7 @@ export default function AdjudicationConsole() {
                           <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
                             Grade {grade}
                           </span>
-                          <span className="text-[11px] font-mono text-slate-500 font-semibold">
+                          <span className="text-[11px] font-medium text-slate-500 font-semibold">
                             ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
                           </span>
                         </div>
@@ -1202,8 +1202,8 @@ export default function AdjudicationConsole() {
                         </div>
                       ) : (
                         <div>
-                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
-                            <span>Swipe horizontally to view full dossier details</span>
+                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between">
+                            <span>Swipe left or right to see more columns</span>
                           </div>
                           <div className="overflow-x-auto touch-pan-x">
                             <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
@@ -1215,7 +1215,7 @@ export default function AdjudicationConsole() {
                                   <th className="p-2.5">SHS Track &amp; Elective</th>
                                   <th className="p-2.5">Date Submitted</th>
                                   <th className="p-2.5">Status</th>
-                                  <th className="p-2.5 text-right">Adjudication Action</th>
+                                  <th className="p-2.5 text-right">Action</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">

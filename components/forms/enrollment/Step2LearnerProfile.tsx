@@ -134,7 +134,7 @@ export default function Step2LearnerProfile({
       delete next.dateOfBirth;
       if (typeof calculatedAge === "number") {
         if (calculatedAge < minRequiredAge) {
-          next.age = `Ineligible for Grade ${targetGrade}: Learners aged ${maxUnderageLimit} and below are not accepted. Minimum required age is ${minRequiredAge} years old.`;
+          next.age = `Age check: Students entering Grade ${targetGrade} must be at least ${minRequiredAge} years old.`;
         } else {
           delete next.age;
         }
@@ -212,7 +212,7 @@ export default function Step2LearnerProfile({
     if (data.age === "" || typeof data.age !== "number") {
       newErrors.age = "Valid age is required (automatically calculated from birthdate).";
     } else if (data.age < minRequiredAge) {
-      newErrors.age = `Ineligible for Grade ${targetGrade}: Learners aged ${maxUnderageLimit} and below cannot proceed. Minimum required age is ${minRequiredAge} years old.`;
+      newErrors.age = `Age check: Students entering Grade ${targetGrade} must be at least ${minRequiredAge} years old. Please check the birth date.`;
     }
 
     if (!data.gender) {
@@ -495,7 +495,7 @@ export default function Step2LearnerProfile({
             </span>
             {(isUnderage || errors.age) && (
               <span className="text-[11px] bg-red-100 text-red-800 border border-red-400 px-2 py-0.5 font-bold rounded-md">
-                Ineligible: Underage for Grade {targetGrade}
+                Under age requirement for Grade {targetGrade}
               </span>
             )}
           </div>
@@ -535,7 +535,7 @@ export default function Step2LearnerProfile({
             {(isUnderage || errors.age) && (
               <div className="mt-1.5 p-2.5 bg-red-100 border border-red-400 text-red-900 space-y-1 rounded-lg">
                 <div className="text-[11px] font-bold tracking-wider flex items-center gap-1.5 text-red-800">
-                  <span>Ineligible for Grade {targetGrade}</span>
+                  <span>Age limit notice for Grade {targetGrade}</span>
                 </div>
                 <p className="text-[11px] text-red-700 font-semibold leading-tight">
                   {errors.age || `Learners aged ${maxUnderageLimit} and below are not eligible for Grade ${targetGrade}. Minimum required age is ${minRequiredAge} years old.`}
@@ -659,7 +659,7 @@ export default function Step2LearnerProfile({
                     }
                   }}
                   placeholder="e.g. Pangasinense, Ibanag, Kankanaey"
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-xl ${
                     errors.motherTongue ? "border-red-600 bg-red-50 text-red-900" : "border-slate-300"
                   }`}
                 />
@@ -728,7 +728,7 @@ export default function Step2LearnerProfile({
                     }
                   }}
                   placeholder="e.g. Latter-day Saints (Mormon), Buddhism, etc."
-                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 bg-white border-2 text-xs font-bold focus:border-[#002060] outline-none rounded-xl ${
                     errors.religion ? "border-red-600 bg-red-50 text-red-900" : "border-slate-300"
                   }`}
                 />
@@ -947,7 +947,7 @@ export default function Step2LearnerProfile({
                 value={data.currentHouseNo || ""}
                 onChange={(e) => handleCurrentAddressChange({ currentHouseNo: e.target.value.toUpperCase() })}
                 placeholder="e.g. BLOCK 1 LOT 2"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-xl"
               />
             </div>
 
@@ -961,7 +961,7 @@ export default function Step2LearnerProfile({
                 value={data.currentSitio || ""}
                 onChange={(e) => handleCurrentAddressChange({ currentSitio: e.target.value.toUpperCase() })}
                 placeholder="e.g. PUROK MANGGA"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-xl"
               />
             </div>
 
@@ -1035,7 +1035,7 @@ export default function Step2LearnerProfile({
                       }
                     }}
                     placeholder="e.g. BANGUI, PAGUDPUD, ADAMS, LAOAG"
-                    className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                    className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                       errors.currentMunicipality
                         ? "border-red-600 bg-red-50 text-red-900"
                         : "border-slate-300"
@@ -1091,7 +1091,7 @@ export default function Step2LearnerProfile({
                     }
                   }}
                   placeholder="e.g. SAN NICOLAS / POBLACION"
-                  className={`w-full p-3 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                  className={`w-full p-3 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                     errors.currentBarangay
                       ? "border-red-600 bg-red-50 text-red-900"
                       : "border-slate-300"
@@ -1114,7 +1114,7 @@ export default function Step2LearnerProfile({
                 type="text"
                 value={data.currentProvince || "ILOCOS NORTE"}
                 onChange={(e) => handleCurrentAddressChange({ currentProvince: e.target.value.toUpperCase() })}
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl"
               />
               {errors.currentProvince && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -1132,7 +1132,7 @@ export default function Step2LearnerProfile({
                 type="text"
                 value={data.currentCountry || "Philippines"}
                 readOnly
-                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-700 cursor-not-allowed outline-none rounded-[4px]"
+                className="w-full p-3 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-700 cursor-not-allowed outline-none rounded-xl"
               />
             </div>
 
@@ -1146,7 +1146,7 @@ export default function Step2LearnerProfile({
                 value={data.currentZipCode || "2921"}
                 onChange={(e) => handleCurrentAddressChange({ currentZipCode: e.target.value })}
                 readOnly={currentMuniMode === "DUMALNEG"}
-                className={`w-full p-3 border-2 text-xs font-bold text-center outline-none rounded-[4px] ${
+                className={`w-full p-3 border-2 text-xs font-bold text-center outline-none rounded-xl ${
                   currentMuniMode === "DUMALNEG"
                     ? "bg-slate-100 border-slate-300 text-slate-700 cursor-not-allowed"
                     : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"
@@ -1168,7 +1168,7 @@ export default function Step2LearnerProfile({
                   onChange({ contactNumber: val });
                 }}
                 placeholder="09171234567"
-                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none text-center rounded-[4px]"
+                className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none text-center rounded-xl"
               />
               {errors.contactNumber && (
                 <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -1224,7 +1224,7 @@ export default function Step2LearnerProfile({
                   type="text"
                   value={data.permanentHouseNo || ""}
                   onChange={(e) => onChange({ permanentHouseNo: e.target.value.toUpperCase() })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-xl"
                 />
               </div>
               <div>
@@ -1235,7 +1235,7 @@ export default function Step2LearnerProfile({
                   type="text"
                   value={data.permanentSitio || ""}
                   onChange={(e) => onChange({ permanentSitio: e.target.value.toUpperCase() })}
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-medium uppercase focus:border-[#002060] outline-none rounded-xl"
                 />
               </div>
               <div>
@@ -1305,7 +1305,7 @@ export default function Step2LearnerProfile({
                         }
                       }}
                       placeholder="e.g. BANGUI, PAGUDPUD, ADAMS, LAOAG"
-                      className={`w-full p-2 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                      className={`w-full p-2 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                         errors.permanentMunicipality
                           ? "border-red-600 bg-red-50 text-red-900"
                           : "border-slate-300"
@@ -1359,7 +1359,7 @@ export default function Step2LearnerProfile({
                       }
                     }}
                     placeholder="e.g. CABARITAN / SAN NICOLAS"
-                    className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                    className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                       errors.permanentBarangay
                         ? "border-red-600 bg-red-50 text-red-900"
                         : "border-slate-300"
@@ -1381,7 +1381,7 @@ export default function Step2LearnerProfile({
                   value={data.permanentProvince || "ILOCOS NORTE"}
                   onChange={(e) => onChange({ permanentProvince: e.target.value.toUpperCase() })}
                   placeholder="e.g. ILOCOS NORTE"
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px]"
+                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-xl"
                 />
                 {errors.permanentProvince && (
                   <span className="text-xs text-red-700 font-semibold mt-1 block">
@@ -1398,7 +1398,7 @@ export default function Step2LearnerProfile({
                   value={data.permanentZipCode || "2921"}
                   onChange={(e) => onChange({ permanentZipCode: e.target.value })}
                   readOnly={permanentMuniMode === "DUMALNEG"}
-                  className={`w-full p-2.5 border-2 text-xs font-bold text-center outline-none rounded-[4px] ${
+                  className={`w-full p-2.5 border-2 text-xs font-bold text-center outline-none rounded-xl ${
                     permanentMuniMode === "DUMALNEG"
                       ? "bg-slate-100 border-slate-300 text-slate-700 cursor-not-allowed"
                       : "bg-white border-slate-300 text-slate-900 focus:border-[#002060]"

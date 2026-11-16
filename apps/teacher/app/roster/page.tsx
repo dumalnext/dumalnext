@@ -555,22 +555,22 @@ export default function ClassSectionRosterPage() {
     return (
       <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Advisory Roster">
         {/* Banner Skeleton */}
-        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-slate-200 border-t-4 border-amber-400 p-5 sm:p-6 rounded-xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-[4px] bg-slate-300 shrink-0" />
+            <div className="w-10 h-10 rounded-xl bg-slate-300 shrink-0" />
             <div className="space-y-2">
               <div className="h-6 w-56 bg-slate-300 rounded" />
               <div className="h-4 w-40 bg-slate-300 rounded" />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-8 w-28 bg-slate-300 rounded-[4px]" />
-            <div className="h-8 w-32 bg-slate-300 rounded-[4px]" />
+            <div className="h-8 w-28 bg-slate-300 rounded-xl" />
+            <div className="h-8 w-32 bg-slate-300 rounded-xl" />
           </div>
         </div>
 
         {/* Section Summary Bar Skeleton */}
-        <div className="p-3.5 bg-white border-2 border-slate-200 rounded-[4px] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="p-3.5 bg-white border-2 border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-4 w-36 bg-slate-200 rounded" />
             <div className="h-4 w-28 bg-slate-200 rounded" />
@@ -579,7 +579,7 @@ export default function ClassSectionRosterPage() {
         </div>
 
         {/* Table Container Skeleton */}
-        <div className="bg-white p-5 border-2 border-slate-200 rounded-[4px] space-y-4">
+        <div className="bg-white p-5 border-2 border-slate-200 rounded-xl space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="h-9 w-64 bg-slate-100 rounded" />
             <div className="h-4 w-32 bg-slate-200 rounded" />
@@ -655,7 +655,7 @@ export default function ClassSectionRosterPage() {
     }
 
     if (!isGradeOpen) {
-      setGradeModalError("Grade submission is currently closed by the School Administrator in the Control Room. Uploading grades is locked.");
+      setGradeModalError("Grade uploading is paused right now by the School Administrator.");
       return;
     }
 
@@ -690,9 +690,9 @@ export default function ClassSectionRosterPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setGradeModalError(data.error || "Failed to upload grade snapshot.");
+        setGradeModalError(data.error || "Could not upload the report card photo.");
       } else {
-        setGradeModalSuccess(`Grade successfully sent to ${selectedGradeStudent.last_name}, ${selectedGradeStudent.first_name} and marked as DONE!`);
+        setGradeModalSuccess(`Report card sent to ${selectedGradeStudent.last_name}, ${selectedGradeStudent.first_name}!`);
         
         // Update local state
         setGradesList((prev) => {
@@ -901,23 +901,23 @@ export default function ClassSectionRosterPage() {
   return (
     <div className="space-y-6 font-sans">
       {/* Title Bar */}
-      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-[4px] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print print:hidden">
+      <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 rounded-xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print print:hidden">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-[4px] bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Advisory Section Roster
+              Advisory Class List
             </h2>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
-              <span className="px-2 py-0.5 bg-white/10 text-blue-100 text-[11px] font-bold rounded-[4px]">
+              <span className="px-2 py-0.5 bg-white/10 text-blue-100 text-[11px] font-bold rounded-xl">
                 {user.fullName || user.email}
               </span>
               {currentSection && (
-                <span className="px-2 py-0.5 bg-amber-400/20 text-amber-200 text-[11px] font-bold rounded-[4px] border border-amber-300/30">
+                <span className="px-2 py-0.5 bg-amber-400/20 text-amber-200 text-[11px] font-bold rounded-xl border border-amber-300/30">
                   {currentSection.section_name} (Grade {currentSection.grade_level})
                 </span>
               )}
@@ -931,18 +931,18 @@ export default function ClassSectionRosterPage() {
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold cursor-pointer transition-colors rounded-[4px] shadow-xs shrink-0 flex items-center gap-1.5"
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#002060] text-xs font-bold cursor-pointer transition-colors rounded-xl shadow-xs shrink-0 flex items-center gap-1.5"
               title="Print official advisory class roster"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
-              <span>Print Class Roster</span>
+              <span>Print Class List</span>
             </button>
           )}
 
           {advisorySections.length > 1 && (
-            <div className="flex items-center gap-2 bg-white text-slate-900 px-2 py-1 rounded-[4px]">
+            <div className="flex items-center gap-2 bg-white text-slate-900 px-2 py-1 rounded-xl">
               <CustomSelect
                 label="Advisory:"
                 value={selectedSectionId}
@@ -962,14 +962,14 @@ export default function ClassSectionRosterPage() {
 
       {isLoadingSections ? (
         <div className="space-y-4 animate-pulse">
-          <div className="p-3.5 bg-white border-2 border-slate-200 rounded-[4px] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-3.5 bg-white border-2 border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="h-4 w-36 bg-slate-200 rounded" />
               <div className="h-4 w-28 bg-slate-200 rounded" />
             </div>
             <div className="h-4 w-28 bg-slate-200 rounded" />
           </div>
-          <div className="bg-white p-5 border-2 border-slate-200 rounded-[4px] space-y-3">
+          <div className="bg-white p-5 border-2 border-slate-200 rounded-xl space-y-3">
             <div className="h-9 w-64 bg-slate-100 rounded" />
             <div className="space-y-2">
               {[1, 2, 3, 4].map((i) => (
@@ -980,7 +980,7 @@ export default function ClassSectionRosterPage() {
         </div>
       ) : advisorySections.length === 0 ? (
         /* SCENARIO: NO ADVISORY SECTION CURRENTLY DESIGNATED BY ADMIN */
-        <div className="bg-white p-8 border-2 border-slate-300 rounded-[4px] text-center space-y-3 shadow-xs">
+        <div className="bg-white p-8 border-2 border-slate-300 rounded-xl text-center space-y-3 shadow-xs">
           <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-300 text-amber-700 flex items-center justify-center mx-auto">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -998,7 +998,7 @@ export default function ClassSectionRosterPage() {
         <>
           {/* Section Details Summary Bar */}
           {currentSection && (
-            <div className="p-3.5 bg-white border-2 border-slate-300 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono no-print print:hidden">
+            <div className="p-3.5 bg-white border-2 border-slate-300 rounded-xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono no-print print:hidden">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <div>
                   Advisory Class: <strong className="text-[#002060] text-sm uppercase">{currentSection.section_name}</strong> &bull; Grade: <strong>Grade {currentSection.grade_level}</strong>
@@ -1038,7 +1038,7 @@ export default function ClassSectionRosterPage() {
                 </div>
                 <div className="mt-4 pt-2 border-t border-slate-400 flex items-center justify-between text-xs font-mono">
                   <div>
-                    <strong>OFFICIAL ADVISORY CLASS ROSTER</strong> • SY 2025–2026
+                    <strong>OFFICIAL CLASS MASTERLIST</strong> • SY 2025–2026
                   </div>
                   <div>
                     Section: <strong>{currentSection.section_name}</strong> (Grade {currentSection.grade_level}{currentSection.strand ? ` • ${currentSection.strand}` : ""})
@@ -1077,16 +1077,16 @@ export default function ClassSectionRosterPage() {
 
             {/* 1-Click Continuing Enrollment Banner for Trimester 2 and 3 */}
             {activeTermNumber >= 2 && currentSection && (
-              <div className="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-500 rounded-[4px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
+              <div className="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-500 rounded-xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print print:hidden">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <div className="w-8 h-8 rounded-[4px] bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-emerald-700 text-white shadow-xs">
+                      <span className="px-2 py-0.5 rounded-xl text-[10px] font-mono font-bold uppercase bg-emerald-700 text-white shadow-xs">
                         Active: {activeTermName}
                       </span>
                       <span className="text-xs font-extrabold text-emerald-950 uppercase tracking-wide">
@@ -1104,7 +1104,7 @@ export default function ClassSectionRosterPage() {
                     type="button"
                     onClick={handleOneClickEnrollAll}
                     disabled={isEnrollingAll || Boolean(enrollingStudentId)}
-                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-[4px] text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 font-sans"
+                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 font-sans"
                   >
                     {isEnrollingAll ? (
                       <>
@@ -1121,7 +1121,7 @@ export default function ClassSectionRosterPage() {
                     )}
                   </button>
                 ) : (
-                  <div className="px-3 py-1.5 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-[4px] text-xs font-bold shrink-0 flex items-center gap-1.5 font-sans">
+                  <div className="px-3 py-1.5 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 font-sans">
                     <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider bg-emerald-200 px-1.5 py-0.5 rounded">Enrolled</span>
                     <span>All Learners Enrolled for {activeTermName}</span>
                   </div>
@@ -1131,7 +1131,7 @@ export default function ClassSectionRosterPage() {
 
             {/* Grade Submission Status Banner when Closed by Administrator */}
             {!isGradeOpen && (
-              <div className="p-3 bg-amber-50 border-2 border-amber-400 rounded-[4px] text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs no-print print:hidden">
+              <div className="p-3 bg-amber-50 border-2 border-amber-400 rounded-xl text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs no-print print:hidden">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
                   <strong className="uppercase font-mono text-[11px] text-amber-900">
@@ -1252,7 +1252,7 @@ export default function ClassSectionRosterPage() {
                             {startIndex + idx + 1}
                           </td>
                           <td className="p-2.5 font-mono font-bold text-[#002060]">
-                            {st.student_id || "PENDING LIS"}
+                            {st.student_id || "Pending LRN"}
                           </td>
                           <td className="p-2.5 font-bold text-slate-900 uppercase">
                             {st.last_name}, {st.first_name} {st.middle_name || ""}
@@ -1302,16 +1302,16 @@ export default function ClassSectionRosterPage() {
                                     }`}
                                     title={
                                       !isGradeOpen
-                                        ? "View submitted grade snapshot (Grade submissions locked)"
+                                        ? "View uploaded report card (Uploading is closed)"
                                         : currentGrade
-                                        ? "View or update grade snapshot"
+                                        ? "View or replace report card"
                                         : "Upload picture of student grade"
                                     }
                                   >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>{currentGrade ? "Grade: DONE" : "Upload Grade"}</span>
+                                    <span>{currentGrade ? "Grade Uploaded" : "Upload Grade"}</span>
                                   </button>
                                 );
                               })()}
@@ -1354,7 +1354,7 @@ export default function ClassSectionRosterPage() {
                         <tr key={`print-${st.id}`}>
                           <td className="p-2.5 text-center font-mono text-slate-500">{idx + 1}</td>
                           <td className="p-2.5 font-mono font-bold text-[#002060]">
-                            {st.student_id || "PENDING LIS"}
+                            {st.student_id || "Pending LRN"}
                           </td>
                           <td className="p-2.5 font-bold text-slate-900 uppercase">
                             {st.last_name}, {st.first_name} {st.middle_name || ""}
@@ -1390,7 +1390,7 @@ export default function ClassSectionRosterPage() {
                       type="button"
                       onClick={() => setCurrentPage((prev) => Math.max(1, Math.min(prev, totalPages) - 1))}
                       disabled={safeCurrentPage <= 1}
-                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-xl transition-colors ${
                         safeCurrentPage <= 1
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                           : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -1407,7 +1407,7 @@ Prev
                           type="button"
                           onClick={() => setCurrentPage(pageNum)}
                           aria-current={isActive ? "page" : undefined}
-                          className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                          className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-xl transition-colors cursor-pointer ${
                             isActive
                               ? "bg-[#002060] border-[#002060] text-white"
                               : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
@@ -1422,7 +1422,7 @@ Prev
                       type="button"
                       onClick={() => setCurrentPage((prev) => Math.min(totalPages, Math.min(prev, totalPages) + 1))}
                       disabled={safeCurrentPage >= totalPages}
-                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                      className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-xl transition-colors ${
                         safeCurrentPage >= totalPages
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                           : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -1471,13 +1471,13 @@ Prev
           }}
         >
           <div
-            className="bg-white rounded-[4px] border-2 border-[#002060] max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col my-6"
+            className="bg-white rounded-xl border-2 border-[#002060] max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col my-6"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="bg-[#002060] text-white px-5 py-3.5 flex items-center justify-between border-b border-blue-950">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[4px] bg-white/10 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -1522,7 +1522,7 @@ Prev
                     </span>
                   </div>
                   <span className="text-[10px] text-emerald-800 font-mono">
-                    Control Room: Enabled
+                    Grade Upload: Open
                   </span>
                 </div>
               )}
@@ -1594,7 +1594,7 @@ Prev
                         <span>Trimester {t}</span>
                         {hasDoneGrade ? (
                           <span className={`text-[9px] font-bold uppercase ${isSelected ? "text-emerald-300" : "text-emerald-700"}`}>
-                            DONE
+                            Uploaded
                           </span>
                         ) : (
                           <span className={`text-[9px] font-normal ${isSelected ? "text-slate-300" : "text-slate-500"}`}>
@@ -1622,7 +1622,7 @@ Prev
               {/* Picture Upload / Preview Card */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-slate-800 uppercase">
-                  Grade Picture / Report Card Snapshot <span className="text-red-600">*</span>
+                  Report Card Photo (Form 138) <span className="text-red-600">*</span>
                 </label>
 
                 {gradeImagePreview ? (
@@ -1680,10 +1680,10 @@ Prev
                       </svg>
                     </div>
                     <div className="text-xs font-bold text-slate-800">
-                      {isCompressingGrade ? "Optimizing image snapshot..." : "Take a photo or choose picture"}
+                      {isCompressingGrade ? "Preparing photo..." : "Take a photo or choose picture"}
                     </div>
                     <p className="text-[10px] text-slate-500">
-                      Accepts Camera snapshot, PNG, JPG, or WebP (Auto-compressed &lt; 350KB)
+                      Supports camera photos, JPG, or PNG
                     </p>
                   </div>
                 )}
@@ -1758,12 +1758,12 @@ Prev
           onClick={() => setViewFullGradeModal(null)}
         >
           <div
-            className="bg-white rounded-[4px] max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+            className="bg-white rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-[#002060] text-white px-4 py-3 flex items-center justify-between border-b border-blue-950">
               <span className="text-xs font-bold uppercase font-mono tracking-wider truncate">
-                Grade Snapshot: {viewFullGradeModal.studentName} ({viewFullGradeModal.termName})
+                Report Card: {viewFullGradeModal.studentName} ({viewFullGradeModal.termName})
               </span>
               <button
                 type="button"

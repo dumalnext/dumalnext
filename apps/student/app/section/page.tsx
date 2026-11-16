@@ -663,7 +663,7 @@ function SectionPageContent() {
   if (isAuthLoading || (isLoading && !studentRec)) {
     return (
       <div className="max-w-5xl mx-auto py-8 px-4">
-        <PageCardSkeleton title="Synchronizing official class section roster and timetable..." rows={3} />
+        <PageCardSkeleton title="Loading your class section and schedule..." rows={3} />
       </div>
     );
   }
@@ -671,7 +671,7 @@ function SectionPageContent() {
   return (
     <div className="max-w-5xl mx-auto py-6 px-4 space-y-6">
       {/* Institutional Top Banner */}
-      <section className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 shadow-md rounded-[4px]">
+      <section className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white border-t-4 border-amber-400 p-5 sm:p-6 shadow-md rounded-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-full border-2 border-amber-400 shrink-0 flex items-center justify-center shadow-xs overflow-hidden">
@@ -690,7 +690,7 @@ Home Dashboard
                 <span>DepEd Region I &bull; Dumalneg NHS</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
-                Class Section &amp; Advisory Placement
+                My Class Section &amp; Schedule
               </h1>
               <p className="text-xs text-blue-100 mt-0.5">
                 S.Y. {schoolYear} &bull; Trimester {activeTermNumber}
@@ -700,7 +700,7 @@ Home Dashboard
           {user && (
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
               <PrintPageButton label="Print Section & Schedule" />
-              <div className="text-left sm:text-right bg-white/10 border border-white/20 px-3 py-2 text-xs rounded-[4px]">
+              <div className="text-left sm:text-right bg-white/10 border border-white/20 px-3 py-2 text-xs rounded-xl">
                 <strong className="text-white block">{user.firstName} {user.lastName}</strong>
                 <div className="mt-0.5 flex items-center sm:justify-end gap-1.5 text-[11px] text-blue-100">
                   <span>LRN:</span>
@@ -718,16 +718,16 @@ Home Dashboard
       {sectionMode === "ASSIGNED" && assignedSection ? (
         <div className="space-y-6">
           {/* Main Hero Placement Banner */}
-          <div className="p-5 sm:p-6 bg-emerald-50 border-2 border-emerald-500 shadow-xs space-y-4 rounded-[4px]">
+          <div className="p-5 sm:p-6 bg-emerald-50 border border-emerald-200 border-t-4 border-t-emerald-600 shadow-sm space-y-4 rounded-2xl">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-emerald-200 pb-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest">
-                    SECTION ASSIGNED
+                    YOUR SECTION
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/90 text-emerald-950 text-[10px] font-bold uppercase border border-emerald-400 rounded-[4px]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-200/90 text-emerald-950 text-[10px] font-bold uppercase border border-emerald-400 rounded-xl">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />
-                    {activeTermNumber >= 2 ? "Automatic Continuing Roster" : "Official Roster Enrolled"}
+                    {activeTermNumber >= 2 ? "Auto-Enrolled" : "Enrolled"}
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-emerald-950 tracking-tight">
@@ -739,16 +739,16 @@ Home Dashboard
               </div>
 
               <div className="text-left sm:text-right shrink-0">
-                <span className="text-[10px] text-emerald-800 block">Class Advisory Status</span>
-                <span className="inline-block px-3 py-1 bg-white border border-emerald-300 text-xs font-bold text-emerald-900 shadow-xs rounded-[4px]">
-                  Confirmed Placement
+                <span className="text-[10px] text-emerald-800 block">Section Status</span>
+                <span className="inline-block px-3 py-1 bg-white border border-emerald-300 text-xs font-bold text-emerald-900 shadow-xs rounded-xl">
+                  Enrolled
                 </span>
               </div>
             </div>
 
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
-              <div className="bg-white p-3 border border-emerald-200 rounded-[4px] shadow-2xs">
+              <div className="bg-white p-3 border border-emerald-200 rounded-xl shadow-2xs">
                 <span className="text-[10px] text-slate-500 block">Grade &amp; Curriculum</span>
                 <strong className="text-slate-900 text-xs sm:text-sm">
                   Grade {assignedSection.grade_level}
@@ -757,45 +757,45 @@ Home Dashboard
                   {assignedSection.strand || "General / Regular"}
                 </span>
               </div>
-              <div className="bg-white p-3 border border-emerald-200 rounded-[4px] shadow-2xs">
+              <div className="bg-white p-3 border border-emerald-200 rounded-xl shadow-2xs">
                 <span className="text-[10px] text-slate-500 block">Classroom / Wing</span>
                 <strong className="text-slate-900 text-xs sm:text-sm">
                   {assignedSection.room || "Room 101 - Main Wing"}
                 </strong>
                 <span className="text-[10px] text-slate-500 block">Dumalneg NHS Campus</span>
               </div>
-              <div className="bg-white p-3 border border-emerald-200 rounded-[4px] shadow-2xs">
+              <div className="bg-white p-3 border border-emerald-200 rounded-xl shadow-2xs">
                 <span className="text-[10px] text-slate-500 block">Class Adviser</span>
                 <strong className="text-slate-900 text-xs sm:text-sm break-words block leading-tight">
                   {assignedSection.adviser_name || "Faculty Adviser Assigned"}
                 </strong>
                 <span className="text-[10px] text-slate-500 block">Homeroom Teacher</span>
               </div>
-              <div className="bg-white p-3 border border-emerald-200 rounded-[4px] shadow-2xs">
+              <div className="bg-white p-3 border border-emerald-200 rounded-xl shadow-2xs">
                 <span className="text-[10px] text-slate-500 block">Enrolled Learners</span>
                 <strong className="text-emerald-900 text-xs sm:text-sm ">
                   {classmates.length} {assignedSection.capacity ? `/ ${assignedSection.capacity} max` : "Learners"}
                 </strong>
-                <span className="text-[10px] text-emerald-700 block">Active Section Roster</span>
+                <span className="text-[10px] text-emerald-700 block">Current Classmates</span>
               </div>
             </div>
 
             {/* SHS Dual-Section Placement Card */}
             {assignedSection.grade_level >= 11 && (
-              <div className="p-4 bg-white border-2 border-blue-900/30 shadow-xs space-y-3 rounded-[4px]">
+              <div className="p-4 bg-white border-2 border-blue-900/30 shadow-xs space-y-3 rounded-xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-200 pb-2">
                   <span className="text-xs font-bold text-[#002060] tracking-wide block">
-                    SHS Dual Cohort Sectioning &bull; DepEd MATATAG
+                    Senior High Class Groups
                   </span>
-                  <span className="text-[10px] font-bold bg-blue-100 text-[#002060] px-2 py-0.5 border border-blue-300 self-start sm:self-auto rounded-[4px]">
-                    Dual Active Section Assignments
+                  <span className="text-[10px] font-bold bg-blue-100 text-[#002060] px-2 py-0.5 border border-blue-300 self-start sm:self-auto rounded-xl">
+                    2 Class Groups
                   </span>
                 </div>
                 <p className="text-xs text-slate-600">
-                  In Senior High School, you are assigned to <strong>2 distinct class cohorts</strong>: your Track Section with peers taking core/common subjects, and your Specialized Elective Section with peers who selected the same elective.
+                  In Senior High School, you belong to <strong>2 class groups</strong>: your main strand section for core subjects, and your elective class with students taking the same elective.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 bg-blue-50/70 border border-blue-300 space-y-1 rounded-[4px]">
+                  <div className="p-3 bg-blue-50/70 border border-blue-300 space-y-1 rounded-xl">
                     <span className="text-[10px] font-bold text-blue-950 block">
                       1. Primary Track Section (Core / Common Subjects)
                     </span>
@@ -807,7 +807,7 @@ Home Dashboard
                     </span>
                   </div>
 
-                  <div className="p-3 bg-purple-50/70 border border-purple-300 space-y-1 rounded-[4px]">
+                  <div className="p-3 bg-purple-50/70 border border-purple-300 space-y-1 rounded-xl">
                     <span className="text-[10px] font-bold text-purple-950 block">
                       2. Specialized Elective Section (Elective Period)
                     </span>
@@ -837,7 +837,7 @@ Home Dashboard
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
-              <span>Section Overview &amp; Advisory</span>
+              <span>Section Details</span>
             </button>
             <button
               type="button"
@@ -865,16 +865,16 @@ Home Dashboard
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span>Prescribed Schedule &amp; Subjects</span>
+              <span>Schedule &amp; Subjects</span>
             </button>
           </div>
 
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="bg-white border border-slate-200/90 p-6 space-y-6 rounded-[4px] shadow-sm">
+            <div className="bg-white border border-slate-200/90 p-6 space-y-6 rounded-xl shadow-sm">
               <div>
                 <span className="text-xs font-bold text-[#002060] block mb-1">
-                  Official Advisory Information
+                  Homeroom Details
                 </span>
                 <h3 className="text-base font-bold text-slate-900">
                   Class Profile &bull; {assignedSection.section_name}
@@ -882,7 +882,7 @@ Home Dashboard
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="p-4 bg-slate-50 border border-slate-200 space-y-3 rounded-[4px]">
+                <div className="p-4 bg-slate-50 border border-slate-200 space-y-3 rounded-xl">
                   <h4 className="font-bold text-slate-800 text-[11px] border-b border-slate-200 pb-1">
                     Class Advisory Details
                   </h4>
@@ -906,9 +906,9 @@ Home Dashboard
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 border border-slate-200 space-y-3 rounded-[4px]">
+                <div className="p-4 bg-slate-50 border border-slate-200 space-y-3 rounded-xl">
                   <h4 className="font-bold text-slate-800 text-[11px] border-b border-slate-200 pb-1">
-                    Faculty &amp; Facility Assignment
+                    Teacher &amp; Classroom
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
@@ -920,21 +920,21 @@ Home Dashboard
                       <strong className="text-slate-900">{assignedSection.room || "Room 101 - Main Campus"}</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Section Slot Cap:</span>
+                      <span className="text-slate-500">Class Size Limit:</span>
                       <span className="text-slate-900 font-bold">{assignedSection.capacity || 40} Maximum Students</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Placement Confirmation:</span>
-                      <span className="text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded-[4px]">Verified on DepEd System</span>
+                      <span className="text-slate-500">Enrollment Status:</span>
+                      <span className="text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded-xl">Confirmed</span>
                     </div>
                   </div>
                 </div>
 
                 {assignedSection.grade_level >= 11 && electiveInfo && (
-                  <div className="p-4 bg-purple-50/70 border border-purple-200 space-y-3 md:col-span-2 rounded-[4px]">
+                  <div className="p-4 bg-purple-50/70 border border-purple-200 space-y-3 md:col-span-2 rounded-xl">
                     <h4 className="font-bold text-purple-950 text-[11px] border-b border-purple-200 pb-1 flex items-center justify-between">
                       <span>Specialized Elective Section Details</span>
-                      <span className="text-[10px] bg-purple-200/80 px-2 py-0.5 font-bold rounded-[4px]">Elective Cohort</span>
+                      <span className="text-[10px] bg-purple-200/80 px-2 py-0.5 font-bold rounded-xl">Elective Class</span>
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
@@ -953,7 +953,7 @@ Home Dashboard
                           <strong className="text-purple-950">{electiveClassmates.length} Learners</strong>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-600">Grouping Mechanism:</span>
+                          <span className="text-slate-600">How Classes Are Grouped:</span>
                           <span className="text-purple-900 font-semibold">Shared period across all Grade {assignedSection.grade_level} sections</span>
                         </div>
                       </div>
@@ -967,19 +967,19 @@ Home Dashboard
                 <button
                   type="button"
                   onClick={() => setActiveTab("classmates")}
-                  className="btn-primary text-xs font-bold py-2.5 px-4 cursor-pointer rounded-[4px]"
+                  className="btn-primary text-xs font-bold py-2.5 px-4 cursor-pointer rounded-xl"
                 >
                   View Section Classmates List
                 </button>
                 <Link
                   href="/track"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-xl"
                 >
                   Track Full Application
                 </Link>
                 <Link
                   href="/"
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-xl"
                 >
                   Return to Home Dashboard
                 </Link>
@@ -989,7 +989,7 @@ Home Dashboard
 
           {/* TAB 2: CLASSMATES ROSTER */}
           {activeTab === "classmates" && (
-            <div className="bg-white border border-slate-200/90 p-6 space-y-5 rounded-[4px] shadow-sm">
+            <div className="bg-white border border-slate-200/90 p-6 space-y-5 rounded-xl shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
                   <span className="text-xs font-bold text-[#002060] block">
@@ -1003,7 +1003,7 @@ Home Dashboard
                       : `Classmates in ${assignedSection.section_name}`}
                   </h3>
                 </div>
-                <div className="text-xs text-slate-600 bg-slate-100 px-3 py-1 border border-slate-200 rounded-[4px]">
+                <div className="text-xs text-slate-600 bg-slate-100 px-3 py-1 border border-slate-200 rounded-xl">
                   Total Enrolled:{" "}
                   <strong className="text-slate-900">
                     {classmatesViewType === "track" ? classmates.length : electiveClassmates.length} Learners
@@ -1013,10 +1013,10 @@ Home Dashboard
 
               {/* SHS Dual Cohort Toggle Switcher */}
               {assignedSection.grade_level >= 11 && electiveInfo && (
-                <div className="p-3 bg-slate-50 border border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[4px]">
+                <div className="p-3 bg-slate-50 border border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold text-slate-600 block">
-                      Select Cohort Directory:
+                      Switch Class List:
                     </span>
                     <p className="text-xs text-slate-700">
                       {classmatesViewType === "track"
@@ -1028,24 +1028,24 @@ Home Dashboard
                     <button
                       type="button"
                       onClick={() => setClassmatesViewType("track")}
-                      className={`px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer border rounded-[4px] ${
+                      className={`px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer border rounded-xl ${
                         classmatesViewType === "track"
                           ? "bg-[#002060] text-white border-[#002060] shadow-xs"
                           : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
                       }`}
                     >
-                      Track Cohort ({classmates.length})
+                      Strand Classmates ({classmates.length})
                     </button>
                     <button
                       type="button"
                       onClick={() => setClassmatesViewType("elective")}
-                      className={`px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer border rounded-[4px] ${
+                      className={`px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer border rounded-xl ${
                         classmatesViewType === "elective"
                           ? "bg-purple-900 text-white border-purple-900 shadow-xs"
                           : "bg-white text-purple-950 border-purple-300 hover:bg-purple-50"
                       }`}
                     >
-                      Elective Cohort ({electiveClassmates.length})
+                      Elective Classmates ({electiveClassmates.length})
                     </button>
                   </div>
                 </div>
@@ -1054,13 +1054,13 @@ Home Dashboard
               {/* Table rendering */}
               {classmatesViewType === "track" ? (
                 classmates.length === 0 ? (
-                  <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-[4px]">
+                  <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl">
                     <p className="text-xs text-slate-600 ">
-                      No other learners currently slotted in this section yet.
+                      No other classmates have been added to this section yet.
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-100 border-b border-slate-300 text-[10px] text-slate-700">
@@ -1092,19 +1092,19 @@ Home Dashboard
                                   {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
                                 </span>
                                 {isCurrentLearner && (
-                                  <span className="ml-2 inline-block px-1.5 py-0.2 bg-emerald-200 text-emerald-950 text-[9px] uppercase font-bold border border-emerald-400 rounded-[4px]">
+                                  <span className="ml-2 inline-block px-1.5 py-0.2 bg-emerald-200 text-emerald-950 text-[9px] uppercase font-bold border border-emerald-400 rounded-xl">
                                     You
                                   </span>
                                 )}
                               </td>
                               <td className="py-2.5 px-3 text-slate-600">
-                                {cm.student_id ? cm.student_id : "LIS Pending"}
+                                {cm.student_id ? cm.student_id : "Pending LRN"}
                               </td>
                               <td className="py-2.5 px-3 text-slate-700 capitalize">
                                 {cm.gender || "—"}
                               </td>
                               <td className="py-2.5 px-3 text-right">
-                                <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] uppercase font-bold rounded-[4px]">
+                                <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] uppercase font-bold rounded-xl">
                                   Enrolled
                                 </span>
                               </td>
@@ -1117,13 +1117,13 @@ Home Dashboard
                 )
               ) : (
                 electiveClassmates.length === 0 ? (
-                  <div className="p-8 text-center bg-purple-50/40 border border-purple-200 rounded-[4px]">
+                  <div className="p-8 text-center bg-purple-50/40 border border-purple-200 rounded-xl">
                     <p className="text-xs text-purple-900 ">
                       No other learners currently enrolled in this elective class yet.
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border border-purple-200 rounded-[4px]">
+                  <div className="overflow-x-auto border border-purple-200 rounded-xl">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-purple-100/60 border-b border-purple-300 text-[10px] text-purple-950">
@@ -1156,16 +1156,16 @@ Home Dashboard
                                   {cm.last_name}, {cm.first_name} {cm.middle_name || ""}
                                 </span>
                                 {isCurrentLearner && (
-                                  <span className="ml-2 inline-block px-1.5 py-0.2 bg-purple-200 text-purple-950 text-[9px] uppercase font-bold border border-purple-400 rounded-[4px]">
+                                  <span className="ml-2 inline-block px-1.5 py-0.2 bg-purple-200 text-purple-950 text-[9px] uppercase font-bold border border-purple-400 rounded-xl">
                                     You
                                   </span>
                                 )}
                               </td>
                               <td className="py-2.5 px-3 text-slate-600">
-                                {cm.student_id ? cm.student_id : "LIS Pending"}
+                                {cm.student_id ? cm.student_id : "Pending LRN"}
                               </td>
                               <td className="py-2.5 px-3">
-                                <span className="inline-block px-2 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 font-bold text-[11px] rounded-[4px]">
+                                <span className="inline-block px-2 py-0.5 bg-blue-50 text-[#002060] border border-blue-200 font-bold text-[11px] rounded-xl">
                                   {cm.baseSectionName || "Academic Track"}
                                 </span>
                               </td>
@@ -1173,7 +1173,7 @@ Home Dashboard
                                 {cm.gender || "—"}
                               </td>
                               <td className="py-2.5 px-3 text-right">
-                                <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-900 text-[10px] uppercase font-bold rounded-[4px]">
+                                <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-900 text-[10px] uppercase font-bold rounded-xl">
                                   Elective Enrolled
                                 </span>
                               </td>
@@ -1190,10 +1190,10 @@ Home Dashboard
 
           {/* TAB 3: PRESCRIBED SCHEDULE & SUBJECTS */}
           {activeTab === "schedule" && (
-            <div className="bg-white border border-slate-200/90 p-6 space-y-6 rounded-[4px] shadow-sm">
+            <div className="bg-white border border-slate-200/90 p-6 space-y-6 rounded-xl shadow-sm">
               <div className="border-b border-slate-200 pb-3">
                 <span className="text-xs font-bold text-[#002060] block">
-                  Prescribed Class Curriculum
+                  Your Curriculum
                 </span>
                 <h3 className="text-base font-bold text-slate-900">
                   Subjects &amp; Timetable &bull; Grade {assignedSection.grade_level}
@@ -1203,17 +1203,17 @@ Home Dashboard
               {/* Prescribed Subjects Table */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-slate-700">
-                  Prescribed Curriculum Subjects
+                  Your Subjects
                 </h4>
                 {subjects.length > 0 ? (
-                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-100 border-b border-slate-300 text-[10px] text-slate-700">
                           <th className="py-2 px-3">Subject Code</th>
                           <th className="py-2 px-3">Subject Description</th>
-                          <th className="py-2 px-3">Classification</th>
-                          <th className="py-2 px-3 text-right">Credit Units</th>
+                          <th className="py-2 px-3">Type</th>
+                          <th className="py-2 px-3 text-right">Units</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200">
@@ -1226,7 +1226,7 @@ Home Dashboard
                               {subj.subject_name || subj.name}
                             </td>
                             <td className="py-2 px-3">
-                              <span className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] uppercase rounded-[4px]">
+                              <span className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] uppercase rounded-xl">
                                 {subj.subject_type || "Core"}
                               </span>
                             </td>
@@ -1239,8 +1239,8 @@ Home Dashboard
                     </table>
                   </div>
                 ) : (
-                  <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-600 rounded-[4px]">
-                    Official curriculum subjects will be synchronized by the registrar prior to school opening.
+                  <div className="p-4 bg-slate-50 border border-slate-200 text-xs text-slate-600 rounded-xl">
+                    Your subjects will appear here once posted by the school.
                   </div>
                 )}
               </div>
@@ -1251,7 +1251,7 @@ Home Dashboard
                   <h4 className="text-xs font-bold text-slate-700">
                     Weekly Class Timetable
                   </h4>
-                  <div className="overflow-x-auto border border-slate-200 rounded-[4px]">
+                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-100 border-b border-slate-300 text-[10px] text-slate-700">
@@ -1297,12 +1297,12 @@ Home Dashboard
            magpapakita sa section niya ay 'please enroll to see your section'"
            ========================================================================= */
         <div className="space-y-6">
-          <div className="p-6 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-4 rounded-[4px]">
+          <div className="p-6 bg-blue-50 border-2 border-[#002060] shadow-xs space-y-4 rounded-xl">
             <div className="flex flex-wrap items-center justify-between gap-2 border-blue-200 border-b pb-3">
               <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
                 ENROLLMENT REQUIRED
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-200 text-[#002060] text-xs font-bold uppercase border border-blue-400 whitespace-nowrap shrink-0 rounded-[4px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-200 text-[#002060] text-xs font-bold uppercase border border-blue-400 whitespace-nowrap shrink-0 rounded-xl">
                 <span className="w-2 h-2 rounded-full bg-[#002060] animate-pulse" />
                 Enrollment Needed
               </span>
@@ -1321,7 +1321,7 @@ Home Dashboard
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/enroll"
-                className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-[4px]"
+                className="btn-primary text-xs font-bold py-2.5 px-5 inline-flex items-center gap-2 rounded-xl"
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1330,7 +1330,7 @@ Home Dashboard
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-xl"
               >
                 Return to Home Dashboard
               </Link>
@@ -1339,7 +1339,7 @@ Home Dashboard
         </div>
       ) : sectionMode === "NOT_ASSIGNED_TRANSFEREE" ? (
         <div className="space-y-6">
-          <div className="p-6 bg-white border border-slate-200 shadow-xs space-y-4 rounded-[4px]">
+          <div className="p-6 bg-white border border-slate-200 shadow-xs space-y-4 rounded-xl">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
@@ -1360,7 +1360,7 @@ Home Dashboard
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs font-bold py-2.5 px-4 inline-flex items-center gap-1.5 rounded-[4px]"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-flex items-center gap-1.5 rounded-xl"
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -1369,7 +1369,7 @@ Home Dashboard
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-xl"
               >
                 Return to Home Dashboard
               </Link>
@@ -1378,7 +1378,7 @@ Home Dashboard
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="p-6 bg-white border border-slate-200 shadow-xs space-y-4 rounded-[4px]">
+          <div className="p-6 bg-white border border-slate-200 shadow-xs space-y-4 rounded-xl">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
@@ -1399,7 +1399,7 @@ Home Dashboard
             <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/track"
-                className="btn-primary text-xs font-bold py-2.5 px-4 inline-flex items-center gap-1.5 rounded-[4px]"
+                className="btn-primary text-xs font-bold py-2.5 px-4 inline-flex items-center gap-1.5 rounded-xl"
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -1408,7 +1408,7 @@ Home Dashboard
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-[4px]"
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/90 text-xs font-bold transition-colors inline-block rounded-xl"
               >
                 Return to Home Dashboard
               </Link>

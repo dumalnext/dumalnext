@@ -165,7 +165,7 @@ export default function ScheduleDeconflictionConsole() {
   // Audit Scan State
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [lastScanTime, setLastScanTime] = useState<string>("Just now");
-  const [scanSummary, setScanSummary] = useState<string>("0 Timetable Collisions Found across all active class programs.");
+  const [scanSummary, setScanSummary] = useState<string>("No schedule conflicts found across active classes.");
 
   // Add Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -380,7 +380,7 @@ export default function ScheduleDeconflictionConsole() {
             conflicts.push({
               day,
               type: "teacher",
-              message: `Teacher Collision (${day}): Faculty is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
+              message: `Teacher Conflict (${day}): Faculty is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
             });
             break;
           }
@@ -388,7 +388,7 @@ export default function ScheduleDeconflictionConsole() {
             conflicts.push({
               day,
               type: "room",
-              message: `Room Collision (${day}): ${sc.classroom_name || "Selected Room"} is already booked by ${sc.section_name || "another class"} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
+              message: `Room Conflict (${day}): ${sc.classroom_name || "Selected Room"} is already booked by ${sc.section_name || "another class"} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
             });
             break;
           }
@@ -396,7 +396,7 @@ export default function ScheduleDeconflictionConsole() {
             conflicts.push({
               day,
               type: "section",
-              message: `Section Collision (${day}): ${sc.section_name || "This Section"} already has ${sc.subject_name || sc.subject_code} scheduled at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
+              message: `Section Conflict (${day}): ${sc.section_name || "This Section"} already has ${sc.subject_name || sc.subject_code} scheduled at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`,
             });
             break;
           }
@@ -514,11 +514,11 @@ export default function ScheduleDeconflictionConsole() {
     setActionNotice({ type: "error", text: `${title}: ${message}` });
 
     let conflictType: "faculty" | "room" | "section" | "error" = "error";
-    if (message.includes("Faculty Collision")) {
+    if (message.includes("Teacher Conflict")) {
       conflictType = "faculty";
-    } else if (message.includes("Room Collision")) {
+    } else if (message.includes("Room Conflict")) {
       conflictType = "room";
-    } else if (message.includes("Section Collision")) {
+    } else if (message.includes("Section Conflict")) {
       conflictType = "section";
     }
 
@@ -690,13 +690,13 @@ export default function ScheduleDeconflictionConsole() {
         if (excludeIds.includes(sc.id)) continue;
         if (sc.day_of_week.toLowerCase() === day.toLowerCase() && timesOverlap(sc.start_time, sc.end_time, start, end)) {
           if (item.teacher_id && sc.teacher_id && sc.teacher_id === item.teacher_id) {
-            return `Faculty Collision: ${item.teacher_name || "Faculty"} is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
+            return `Teacher Conflict: ${item.teacher_name || "Faculty"} is already assigned to teach ${sc.subject_name || sc.subject_code} in ${sc.section_name || "another class"} on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
           }
           if (item.classroom_id && sc.classroom_id && item.classroom_id !== "unassigned" && sc.classroom_id !== "unassigned" && sc.classroom_id === item.classroom_id) {
-            return `Room Collision: ${item.classroom_name || "Facility"} is already occupied by ${sc.section_name || "another class"} on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
+            return `Room Conflict: ${item.classroom_name || "Facility"} is already occupied by ${sc.section_name || "another class"} on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
           }
           if (item.section_id && sc.section_id && sc.section_id === item.section_id) {
-            return `Section Collision: ${item.section_name || "Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
+            return `Section Conflict: ${item.section_name || "Section"} already has ${sc.subject_name || sc.subject_code} scheduled on ${day} at ${formatTimeRange12h(sc.start_time, sc.end_time)}.`;
           }
         }
       }
@@ -1071,13 +1071,13 @@ export default function ScheduleDeconflictionConsole() {
           />
           <div>
             <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest block">
-              Automated Schedule Deconfliction Hub
+              Class Schedules
             </span>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
-              Timetable Conflict-Free Evaluation Hub
+              School Class Schedule Builder
             </h2>
             <p className="text-xs text-blue-100/85 mt-0.5">
-              Structured timetable matrix preventing scheduling collisions across faculty loads, classrooms, and section programs.
+              Build and view weekly class schedules while automatically preventing double-booked teachers, rooms, or sections.
             </p>
           </div>
         </div>
@@ -1090,18 +1090,18 @@ export default function ScheduleDeconflictionConsole() {
               setIsAutoModalOpen(true);
             }}
             className="w-full sm:w-auto px-3.5 sm:px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold tracking-wide transition-colors shadow-xs cursor-pointer border border-emerald-400/30 text-center"
-            title="One-click automated timetable deconfliction engine for JHS and SHS"
+            title="Automatically fill class schedules with zero conflicts"
           >
-            Smart Auto-Generate
+            Auto-Build Schedules
           </button>
           <button
             type="button"
             onClick={runAuditScan}
             disabled={isScanning}
             className="w-full sm:w-auto px-3 sm:px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold tracking-wide transition-colors cursor-pointer disabled:opacity-60 text-center"
-            title="Scan database for any schedule collisions"
+            title="Check all schedules for double-bookings"
           >
-            {isScanning ? "Scanning..." : "Run Audit Scan"}
+            {isScanning ? "Checking..." : "Check for Conflicts"}
           </button>
           <button
             type="button"
@@ -1164,7 +1164,7 @@ export default function ScheduleDeconflictionConsole() {
           <button
             type="button"
             onClick={() => setActionNotice(null)}
-            className="font-mono text-sm px-2 cursor-pointer"
+            className="font-medium text-sm px-2 cursor-pointer"
           >
             &times;
           </button>
@@ -1173,25 +1173,25 @@ export default function ScheduleDeconflictionConsole() {
 
       {/* 3 Pillars of Conflict Checking Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print print:hidden">
-        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono text-slate-500 uppercase block">Active Timetable Slots</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase block">Scheduled Periods</span>
             {isLoading ? (
               <div className="h-7 w-16 bg-slate-200 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-bold text-[#002060] font-mono mt-1">{schedules.length}</div>
+              <div className="text-2xl font-bold text-[#002060] font-medium mt-1">{schedules.length}</div>
             )}
           </div>
           <span className="text-[11px] text-slate-600 block leading-tight mt-1">Total instructional periods assigned</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono text-slate-500 uppercase block">Class Sections Programmed</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase block">Sections with Schedules</span>
             {isLoading ? (
               <div className="h-7 w-20 bg-emerald-100 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-bold text-emerald-800 font-mono mt-1">
+              <div className="text-2xl font-bold text-emerald-800 font-medium mt-1">
                 {uniqueSectionsScheduled} / {sections.length}
               </div>
             )}
@@ -1199,13 +1199,13 @@ export default function ScheduleDeconflictionConsole() {
           <span className="text-[11px] text-slate-600 block leading-tight mt-1">Sections with active schedules</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono text-slate-500 uppercase block">Faculty Teaching Deployed</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase block">Teachers with Schedules</span>
             {isLoading ? (
               <div className="h-7 w-20 bg-blue-100 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-bold text-blue-900 font-mono mt-1">
+              <div className="text-2xl font-bold text-blue-900 font-medium mt-1">
                 {uniqueTeachersAssigned} / {teachers.length}
               </div>
             )}
@@ -1213,13 +1213,13 @@ export default function ScheduleDeconflictionConsole() {
           <span className="text-[11px] text-slate-600 block leading-tight mt-1">Teachers with scheduled classes</span>
         </div>
 
-        <div className="p-3.5 sm:p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-col justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono text-slate-500 uppercase block">Collision Protection</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase block">Conflict Check</span>
             {isLoading ? (
               <div className="h-7 w-16 bg-emerald-100 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-bold text-emerald-700 font-mono mt-1">100%</div>
+              <div className="text-2xl font-bold text-emerald-700 font-medium mt-1">100%</div>
             )}
           </div>
           <span className="text-[11px] text-emerald-900 font-semibold block leading-tight mt-1">Zero overlapping double-assignments</span>
@@ -1229,7 +1229,7 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {/* VIEW SELECTOR TABS */}
       {/* ========================================================================= */}
-      <div className="bg-white border-2 border-slate-300 shadow-xs no-print print:hidden">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-xs no-print print:hidden">
         <div className="flex overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap border-b border-slate-200 text-xs font-bold uppercase tracking-wider touch-pan-x">
           <button
             type="button"
@@ -1240,7 +1240,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            View by Class Section (Timetable Matrix)
+            By Class Section
           </button>
           <button
             type="button"
@@ -1251,7 +1251,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            View by Teacher Load (Timetable Matrix)
+            By Teacher
           </button>
           <button
             type="button"
@@ -1262,7 +1262,7 @@ export default function ScheduleDeconflictionConsole() {
                 : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            Master Timetable Registry ({isLoading ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : schedules.length})
+            All Scheduled Classes ({isLoading ? <span className="inline-block w-3.5 h-3 bg-current/25 animate-pulse rounded align-middle" /> : schedules.length})
           </button>
         </div>
 
@@ -1305,7 +1305,7 @@ export default function ScheduleDeconflictionConsole() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search Subject, Teacher, Section, Room..."
-                className="p-1.5 bg-white border border-slate-400 text-xs font-mono w-64 outline-none"
+                className="p-1.5 bg-white border border-slate-400 text-xs font-medium w-64 outline-none"
               />
               <CustomSelect
                 label="Day:"
@@ -1322,10 +1322,10 @@ export default function ScheduleDeconflictionConsole() {
           <button
             type="button"
             onClick={handlePrintTimetable}
-            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-mono font-bold uppercase tracking-wider border border-slate-400 cursor-pointer"
+            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium font-bold uppercase tracking-wider border border-slate-400 cursor-pointer"
             title="Print printable class timetable program"
           >
-            Print Official Timetable
+            Print Schedule
           </button>
         </div>
       </div>
@@ -1335,7 +1335,7 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       <div className="hidden print:block pb-2 mb-3 text-center border-b-2 border-slate-900 text-slate-900">
         {/* LINE 1: Government and DepEd Hierarchy */}
-        <div className="text-[10px] font-mono uppercase tracking-widest text-slate-700 leading-tight">
+        <div className="text-[10px] font-medium uppercase tracking-widest text-slate-700 leading-tight">
           Republic of the Philippines • Department of Education • Region I • Schools Division of Ilocos Norte
         </div>
 
@@ -1345,7 +1345,7 @@ export default function ScheduleDeconflictionConsole() {
         </h1>
 
         {/* LINE 3: School ID, Document Title, and Target Section/Faculty */}
-        <div className="text-[10px] font-mono text-slate-700 flex items-center justify-between border-t border-slate-400 pt-1 mt-1 leading-tight">
+        <div className="text-[10px] font-medium text-slate-700 flex items-center justify-between border-t border-slate-400 pt-1 mt-1 leading-tight">
           <div>
             Dumalneg, Ilocos Norte • School ID: 300017
           </div>
@@ -1399,7 +1399,7 @@ export default function ScheduleDeconflictionConsole() {
           {viewMode === "bySection" && (
             <div className="space-y-4">
               {currentSection && (
-                <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono no-print print:hidden">
+                <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-medium no-print print:hidden">
                   <div>
                     Class Program: <strong className="text-[#002060] text-sm uppercase">{currentSection.section_name}</strong>
                   </div>
@@ -1416,14 +1416,14 @@ export default function ScheduleDeconflictionConsole() {
               )}
 
               {/* Matrix Table with Time Column on the Left */}
-              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between no-print">
                 <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
-              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
                 <table className="w-full border-collapse text-xs font-sans min-w-[650px] md:min-w-0">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-mono border-r border-blue-900">
+                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-medium border-r border-blue-900">
                         Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
@@ -1438,7 +1438,7 @@ export default function ScheduleDeconflictionConsole() {
                       // Institutional Break Row (Recess / Lunch Break)
                       if (slot.isBreak) {
                         return (
-                          <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
+                          <tr key={slot.id} className="bg-slate-100 font-medium text-[11px] font-bold">
                             <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
                               <div>{formatTimeRange12h(slot.start, slot.end)}</div>
                               <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
@@ -1454,7 +1454,7 @@ export default function ScheduleDeconflictionConsole() {
                       return (
                         <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
                           {/* Left Time Column */}
-                          <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
+                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
                             <div className="font-bold text-[#002060] text-xs">
                               {formatTimeRange12h(slot.start, slot.end)}
                             </div>
@@ -1516,7 +1516,7 @@ export default function ScheduleDeconflictionConsole() {
                                 {/* Swap indicator overlay when hovering over occupied cell */}
                                 {isDragOver && matchedItem && !isCurrentlyDragged && (
                                   <div className="absolute inset-0 z-20 bg-blue-950/25 backdrop-blur-[1px] border-2 border-dashed border-[#002060] flex flex-col items-center justify-center p-1 text-center pointer-events-none animate-pulse">
-                                    <span className="bg-[#002060] text-white font-mono font-bold text-[10px] px-2 py-0.5 shadow-sm uppercase tracking-wider">
+                                    <span className="bg-[#002060] text-white font-medium font-bold text-[10px] px-2 py-0.5 shadow-sm uppercase tracking-wider">
                                       ⇄ Drop to Swap
                                     </span>
                                     <span className="text-[10px] text-white font-semibold mt-0.5 drop-shadow-sm line-clamp-1">
@@ -1557,14 +1557,14 @@ export default function ScheduleDeconflictionConsole() {
                                           }}
                                           onTouchMove={handleTouchMove}
                                           onTouchEnd={handleTouchEnd}
-                                          className="touch-none text-slate-400 group-hover:text-[#002060] font-mono text-xs px-0.5 cursor-grab active:cursor-grabbing select-none hover:bg-blue-100/70 rounded-xs"
+                                          className="touch-none text-slate-400 group-hover:text-[#002060] font-medium text-xs px-0.5 cursor-grab active:cursor-grabbing select-none hover:bg-blue-100/70 rounded-xs"
                                           title="Drag or touch to reschedule/swap"
                                         >
                                           ⠿
                                         </div>
                                         
                                         {isElective && (
-                                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
+                                          <span className="text-[9px] font-medium font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
                                             Elective
                                           </span>
                                         )}
@@ -1579,7 +1579,7 @@ export default function ScheduleDeconflictionConsole() {
                                             const foundSlot = ACADEMIC_TIME_SLOTS.find((s) => s.start === matchedItem.start_time);
                                             if (foundSlot) setMoveTargetSlotId(foundSlot.id);
                                           }}
-                                          className="text-slate-400 hover:text-[#002060] font-mono text-xs px-1 hover:bg-blue-100/70 rounded-xs cursor-pointer"
+                                          className="text-slate-400 hover:text-[#002060] font-medium text-xs px-1 hover:bg-blue-100/70 rounded-xs cursor-pointer"
                                           title="Move or swap to another time slot"
                                         >
                                           ⇄
@@ -1590,7 +1590,7 @@ export default function ScheduleDeconflictionConsole() {
                                             e.stopPropagation();
                                             setDeleteTargetItem(matchedItem);
                                           }}
-                                          className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 hover:bg-red-50 rounded-xs cursor-pointer"
+                                          className="text-slate-400 hover:text-red-700 font-medium text-xs px-1 hover:bg-red-50 rounded-xs cursor-pointer"
                                           title="Remove this class period"
                                         >
                                           &times;
@@ -1603,7 +1603,7 @@ export default function ScheduleDeconflictionConsole() {
                                     <div className="text-[11px] text-slate-700">
                                       Faculty: <strong className="text-slate-900">{matchedItem.teacher_name}</strong>
                                     </div>
-                                    <div className="text-[10px] font-mono text-slate-500">
+                                    <div className="text-[10px] font-medium text-slate-500">
                                       Room: {matchedItem.classroom_name}
                                     </div>
                                   </div>
@@ -1633,7 +1633,7 @@ export default function ScheduleDeconflictionConsole() {
                                   >
                                     {isDragOver ? (
                                       <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-[#002060] bg-blue-100/90 flex flex-col items-center justify-center text-center animate-pulse pointer-events-none">
-                                        <span className="font-mono text-xs font-bold text-[#002060]">
+                                        <span className="font-medium text-xs font-bold text-[#002060]">
                                           Drop to Move Here
                                         </span>
                                         <span className="text-[10px] text-blue-900 mt-0.5 font-medium">
@@ -1645,7 +1645,7 @@ export default function ScheduleDeconflictionConsole() {
                                         <button
                                           type="button"
                                           onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                          className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
+                                          className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-medium flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
                                             draggedSchedule ? "border-blue-400 bg-blue-50/40 text-blue-800" : ""
                                           }`}
                                           title={`Assign class to ${currentSection?.section_name || "Section"} on ${day} at ${formatTimeRange12h(slot.start, slot.end)}`}
@@ -1656,7 +1656,7 @@ export default function ScheduleDeconflictionConsole() {
                                             {draggedSchedule ? "+ Drop to Move Here" : "+ Assign Slot"}
                                           </span>
                                         </button>
-                                        <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
+                                        <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-medium text-slate-300">
                                           —
                                         </div>
                                       </>
@@ -1681,7 +1681,7 @@ export default function ScheduleDeconflictionConsole() {
           {viewMode === "byTeacher" && (
             <div className="space-y-4">
               {currentTeacher && (
-                <div className="p-4 bg-white border-2 border-slate-300 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono no-print print:hidden">
+                <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-medium no-print print:hidden">
                   <div>
                     Faculty: <strong className="text-[#002060] text-sm uppercase">{currentTeacher.fullName}</strong> &bull; Dept: <strong>{currentTeacher.department}</strong>
                     {currentTeacher.email && <> &bull; Email: <strong>{currentTeacher.email}</strong></>}
@@ -1699,14 +1699,14 @@ export default function ScheduleDeconflictionConsole() {
               )}
 
               {/* Matrix Table with Time Column on the Left */}
-              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between no-print">
                 <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
-              <div className="bg-white border-2 border-slate-300 shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
                 <table className="w-full border-collapse text-xs font-sans min-w-[650px] md:min-w-0">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-mono border-r border-blue-900">
+                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-medium border-r border-blue-900">
                         Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
@@ -1720,7 +1720,7 @@ export default function ScheduleDeconflictionConsole() {
                     {ACADEMIC_TIME_SLOTS.map((slot) => {
                       if (slot.isBreak) {
                         return (
-                          <tr key={slot.id} className="bg-slate-100 font-mono text-[11px] font-bold">
+                          <tr key={slot.id} className="bg-slate-100 font-medium text-[11px] font-bold">
                             <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
                               <div>{formatTimeRange12h(slot.start, slot.end)}</div>
                               <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
@@ -1735,7 +1735,7 @@ export default function ScheduleDeconflictionConsole() {
                       return (
                         <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
                           {/* Left Time Column */}
-                          <td className="p-3 font-mono border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
+                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
                             <div className="font-bold text-[#002060] text-xs">
                               {formatTimeRange12h(slot.start, slot.end)}
                             </div>
@@ -1797,7 +1797,7 @@ export default function ScheduleDeconflictionConsole() {
                                 {/* Swap indicator overlay when hovering over occupied cell */}
                                 {isDragOver && matchedItem && !isCurrentlyDragged && (
                                   <div className="absolute inset-0 z-20 bg-emerald-950/25 backdrop-blur-[1px] border-2 border-dashed border-emerald-700 flex flex-col items-center justify-center p-1 text-center pointer-events-none animate-pulse">
-                                    <span className="bg-emerald-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 shadow-sm uppercase tracking-wider">
+                                    <span className="bg-emerald-800 text-white font-medium font-bold text-[10px] px-2 py-0.5 shadow-sm uppercase tracking-wider">
                                       ⇄ Drop to Swap
                                     </span>
                                     <span className="text-[10px] text-white font-semibold mt-0.5 drop-shadow-sm line-clamp-1">
@@ -1838,14 +1838,14 @@ export default function ScheduleDeconflictionConsole() {
                                           }}
                                           onTouchMove={handleTouchMove}
                                           onTouchEnd={handleTouchEnd}
-                                          className="touch-none text-slate-400 group-hover:text-emerald-800 font-mono text-xs px-0.5 cursor-grab active:cursor-grabbing select-none hover:bg-emerald-100/70 rounded-xs"
+                                          className="touch-none text-slate-400 group-hover:text-emerald-800 font-medium text-xs px-0.5 cursor-grab active:cursor-grabbing select-none hover:bg-emerald-100/70 rounded-xs"
                                           title="Drag or touch to reschedule/swap"
                                         >
                                           ⠿
                                         </div>
                                         
                                         {isElective && (
-                                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
+                                          <span className="text-[9px] font-medium font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
                                             Elective
                                           </span>
                                         )}
@@ -1860,7 +1860,7 @@ export default function ScheduleDeconflictionConsole() {
                                             const foundSlot = ACADEMIC_TIME_SLOTS.find((s) => s.start === matchedItem.start_time);
                                             if (foundSlot) setMoveTargetSlotId(foundSlot.id);
                                           }}
-                                          className="text-slate-400 hover:text-emerald-800 font-mono text-xs px-1 hover:bg-emerald-100/70 rounded-xs cursor-pointer"
+                                          className="text-slate-400 hover:text-emerald-800 font-medium text-xs px-1 hover:bg-emerald-100/70 rounded-xs cursor-pointer"
                                           title="Move or swap to another time slot"
                                         >
                                           ⇄
@@ -1871,7 +1871,7 @@ export default function ScheduleDeconflictionConsole() {
                                             e.stopPropagation();
                                             setDeleteTargetItem(matchedItem);
                                           }}
-                                          className="text-slate-400 hover:text-red-700 font-mono text-xs px-1 hover:bg-red-50 rounded-xs cursor-pointer"
+                                          className="text-slate-400 hover:text-red-700 font-medium text-xs px-1 hover:bg-red-50 rounded-xs cursor-pointer"
                                           title="Remove this class period"
                                         >
                                           &times;
@@ -1884,7 +1884,7 @@ export default function ScheduleDeconflictionConsole() {
                                     <div className="text-[11px] text-slate-700">
                                       Class: <strong className="text-[#002060]">{matchedItem.section_name}</strong>
                                     </div>
-                                    <div className="text-[10px] font-mono text-slate-500">
+                                    <div className="text-[10px] font-medium text-slate-500">
                                       Facility: {matchedItem.classroom_name}
                                     </div>
                                   </div>
@@ -1914,7 +1914,7 @@ export default function ScheduleDeconflictionConsole() {
                                   >
                                     {isDragOver ? (
                                       <div className="w-full h-full min-h-[58px] p-2 border-2 border-dashed border-emerald-700 bg-emerald-100/90 flex flex-col items-center justify-center text-center animate-pulse pointer-events-none">
-                                        <span className="font-mono text-xs font-bold text-emerald-900">
+                                        <span className="font-medium text-xs font-bold text-emerald-900">
                                           Drop to Move Here
                                         </span>
                                         <span className="text-[10px] text-emerald-800 mt-0.5 font-medium">
@@ -1926,7 +1926,7 @@ export default function ScheduleDeconflictionConsole() {
                                         <button
                                           type="button"
                                           onClick={() => openAddModalWithDefaults(day, slot.start, slot.end)}
-                                          className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-mono flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
+                                          className={`w-full h-full min-h-[58px] p-2 border border-dashed border-slate-200 hover:border-slate-400 hover:bg-slate-100/70 text-slate-400 hover:text-[#002060] text-[11px] font-medium flex items-center justify-center transition-colors cursor-pointer group no-print print:hidden ${
                                             draggedSchedule ? "border-emerald-400 bg-emerald-50/40 text-emerald-800" : ""
                                           }`}
                                           title={`Assign load to ${currentTeacher?.fullName || "Faculty"} on ${day} at ${formatTimeRange12h(slot.start, slot.end)}`}
@@ -1937,7 +1937,7 @@ export default function ScheduleDeconflictionConsole() {
                                             {draggedSchedule ? "+ Drop to Move Here" : "+ Vacant (Assign)"}
                                           </span>
                                         </button>
-                                        <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-mono text-slate-300">
+                                        <div className="hidden print:flex items-center justify-center min-h-[36px] text-[10px] font-medium text-slate-300">
                                           —
                                         </div>
                                       </>
@@ -1960,22 +1960,22 @@ export default function ScheduleDeconflictionConsole() {
           {/* VIEW 3: MASTER TIMETABLE REGISTRY TABLE */}
           {/* ===================================================================== */}
           {viewMode === "all" && (
-            <div className="bg-white border-2 border-slate-300 shadow-xs overflow-hidden print:border-none print:shadow-none">
-              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between no-print">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden print:border-none print:shadow-none">
+              <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between no-print">
                 <span>Swipe horizontally to view all columns</span>
               </div>
               <div className="overflow-x-auto touch-pan-x">
                 <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print print:hidden">
-                  <span className="text-xs font-mono font-bold text-slate-700 uppercase">
+                  <span className="text-xs font-medium font-bold text-slate-700 uppercase">
                     MASTER TIMETABLE ALLOCATIONS &bull; {masterlistFiltered.length} ITEMS
                   </span>
-                  <span className="text-[10px] font-mono text-slate-500 uppercase">
-                    DepEd Conflict-Free Timetable Engine
+                  <span className="text-[10px] font-medium text-slate-500 uppercase">
+                    Weekly Class Schedule
                   </span>
                 </div>
 
               {masterlistFiltered.length === 0 ? (
-                <div className="p-12 text-center text-xs font-mono text-slate-500 uppercase">
+                <div className="p-12 text-center text-xs font-medium text-slate-500 uppercase">
                   No schedules matching your filter query.
                 </div>
               ) : (
@@ -1995,13 +1995,13 @@ export default function ScheduleDeconflictionConsole() {
                     {masterlistFiltered.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                         <td className="p-3 font-bold text-[#002060]">{item.day_of_week}</td>
-                        <td className="p-3 font-mono font-bold text-slate-700">
+                        <td className="p-3 font-medium font-bold text-slate-700">
                           {formatTimeRange12h(item.start_time, item.end_time)}
                         </td>
                         <td className="p-3 font-bold text-slate-900 uppercase">{item.subject_name}</td>
                         <td className="p-3 text-[#002060] font-semibold">{item.section_name}</td>
                         <td className="p-3 text-slate-900">{item.teacher_name}</td>
-                        <td className="p-3 font-mono text-slate-600">{item.classroom_name}</td>
+                        <td className="p-3 font-medium text-slate-600">{item.classroom_name}</td>
                         <td className="p-3 text-right no-print print:hidden">
                           <button
                             type="button"
@@ -2026,7 +2026,7 @@ export default function ScheduleDeconflictionConsole() {
               <div className="border-b border-slate-900 pb-1 font-bold uppercase">
                 {viewMode === "byTeacher" && currentTeacher ? currentTeacher.fullName : "HEAD TEACHER / SCHEDULER"}
               </div>
-              <div className="text-[10px] font-mono text-slate-600 uppercase mt-1">
+              <div className="text-[10px] font-medium text-slate-600 uppercase mt-1">
                 Prepared By: Timetable Committee
               </div>
             </div>
@@ -2034,7 +2034,7 @@ export default function ScheduleDeconflictionConsole() {
               <div className="border-b border-slate-900 pb-1 font-bold uppercase">
                 OFFICE OF THE SCHOOL PRINCIPAL
               </div>
-              <div className="text-[10px] font-mono text-slate-600 uppercase mt-1">
+              <div className="text-[10px] font-medium text-slate-600 uppercase mt-1">
                 Approved Correct • DepEd DNHS
               </div>
             </div>
@@ -2047,21 +2047,21 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-2xl shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[94vh] sm:max-h-[92vh] overflow-hidden">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
               <div>
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-200">
-                  SCHEDULE BUILDER &bull; DECONFLICTION GUARD
+                <span className="text-xs font-medium font-bold uppercase tracking-wider text-blue-200">
+                  ADD CLASS PERIOD
                 </span>
                 <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-white mt-0.5">
-                  Assign Class Timetable Period
+                  Add Class to Schedule
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-white hover:text-slate-300 font-mono text-2xl font-bold px-2 cursor-pointer"
+                className="text-white hover:text-slate-300 font-medium text-2xl font-bold px-2 cursor-pointer"
               >
                 &times;
               </button>
@@ -2078,10 +2078,10 @@ export default function ScheduleDeconflictionConsole() {
 
               {/* REAL-TIME PRE-FLIGHT COLLISION ALERT */}
               {preFlightConflicts.length > 0 && (
-                <div className="p-3.5 bg-amber-50 border-2 border-amber-600 text-amber-950 text-xs font-sans space-y-1.5 shadow-xs rounded-[4px]">
+                <div className="p-3.5 bg-amber-50 border-2 border-amber-600 text-amber-950 text-xs font-sans space-y-1.5 shadow-xs rounded-xl">
                   <div className="font-bold flex items-center gap-1.5 uppercase tracking-wide text-amber-900">
                     <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
-                    Automated Collision Warning ({preFlightConflicts.length} {preFlightConflicts.length === 1 ? "Day Conflict" : "Day Conflicts"} Detected)
+                    Schedule Conflict Warning ({preFlightConflicts.length} {preFlightConflicts.length === 1 ? "Day Conflict" : "Day Conflicts"} Detected)
                   </div>
                   <div className="space-y-1 pl-3.5 border-l-2 border-amber-500">
                     {preFlightConflicts.map((c, idx) => (
@@ -2117,8 +2117,8 @@ export default function ScheduleDeconflictionConsole() {
                   <div className="flex items-center gap-2.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#002060] shrink-0 animate-pulse" />
                     <div>
-                      <span className="font-mono text-[#002060] font-bold text-[11px] uppercase block">
-                        SMART AUTOMATION ACTIVE: Grade {selectedFormSection.grade_level} Filter Enforced
+                      <span className="font-medium text-[#002060] font-bold text-[11px] uppercase block">
+                        Grade Filter Active: Grade {selectedFormSection.grade_level} Filter Enforced
                       </span>
                       <span className="text-slate-700 text-[11px] block mt-0.5">
                         Detected Section: <strong>{selectedFormSection.section_name}</strong> (Grade {selectedFormSection.grade_level}
@@ -2222,21 +2222,21 @@ export default function ScheduleDeconflictionConsole() {
                     <button
                       type="button"
                       onClick={() => setFormDaysOfWeek(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])}
-                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-[3px] cursor-pointer"
+                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
                     >
                       All (Mon–Fri)
                     </button>
                     <button
                       type="button"
                       onClick={() => setFormDaysOfWeek(["Monday", "Wednesday", "Friday"])}
-                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-[3px] cursor-pointer"
+                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
                     >
                       MWF
                     </button>
                     <button
                       type="button"
                       onClick={() => setFormDaysOfWeek(["Tuesday", "Thursday"])}
-                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-[3px] cursor-pointer"
+                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
                     >
                       TTh
                     </button>
@@ -2249,7 +2249,7 @@ export default function ScheduleDeconflictionConsole() {
                     return (
                       <label
                         key={day}
-                        className={`flex items-center gap-2 p-2.5 border-2 rounded-[4px] cursor-pointer transition-all select-none text-xs font-bold ${
+                        className={`flex items-center gap-2 p-2.5 border-2 rounded-xl cursor-pointer transition-all select-none text-xs font-bold ${
                           isChecked
                             ? "bg-blue-50/90 border-[#002060] text-[#002060] shadow-xs"
                             : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
@@ -2291,7 +2291,7 @@ export default function ScheduleDeconflictionConsole() {
                     type="time"
                     value={formStartTime}
                     onChange={(e) => setFormStartTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060] rounded-[4px]"
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-medium font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
                     required
                   />
                 </div>
@@ -2304,7 +2304,7 @@ export default function ScheduleDeconflictionConsole() {
                     type="time"
                     value={formEndTime}
                     onChange={(e) => setFormEndTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#002060] rounded-[4px]"
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-medium font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
                     required
                   />
                 </div>
@@ -2312,7 +2312,7 @@ export default function ScheduleDeconflictionConsole() {
 
               {/* Preset Period Quick Pickers */}
               <div className="space-y-1 pt-1">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block">
+                <span className="text-[10px] font-medium text-slate-500 uppercase block">
                   Quick Select DepEd Standard Class Periods:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -2324,7 +2324,7 @@ export default function ScheduleDeconflictionConsole() {
                         setFormStartTime(period.start);
                         setFormEndTime(period.end);
                       }}
-                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-mono border border-slate-300 uppercase cursor-pointer"
+                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-medium border border-slate-300 uppercase cursor-pointer"
                     >
                       {period.name} ({formatTimeRange12h(period.start, period.end)})
                     </button>
@@ -2363,11 +2363,11 @@ export default function ScheduleDeconflictionConsole() {
             {/* Modal Header */}
             <div className="bg-[#002060] p-4 text-white flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono tracking-widest uppercase opacity-80 block">
+                <span className="text-[10px] font-medium tracking-widest uppercase opacity-80 block">
                   Dumalneg NHS • Intelligent Timetable Engine
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight">
-                  One-Click Smart Automated Scheduling Deconfliction
+                  Auto-Build Conflict-Free Schedules
                 </h3>
               </div>
               <button
@@ -2379,7 +2379,7 @@ export default function ScheduleDeconflictionConsole() {
                   }
                 }}
                 disabled={isGeneratingAuto}
-                className="text-white hover:text-slate-300 font-mono text-xl px-2 cursor-pointer disabled:opacity-40"
+                className="text-white hover:text-slate-300 font-medium text-xl px-2 cursor-pointer disabled:opacity-40"
               >
                 &times;
               </button>
@@ -2388,21 +2388,21 @@ export default function ScheduleDeconflictionConsole() {
             {/* Modal Body */}
             <div className="p-6 space-y-5 max-h-[calc(85vh-120px)] overflow-y-auto stable-gutter custom-scrollbar">
               {/* Algorithm Specifications Card */}
-              <div className="p-4 bg-slate-50 border-2 border-slate-300 space-y-3">
-                <span className="text-xs font-mono font-bold text-[#002060] uppercase block">
-                  Automated Deconfliction Logic &amp; Constraints
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <span className="text-xs font-medium font-bold text-[#002060] uppercase block">
+                  How Auto-Build Works
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
                   <div className="p-2.5 bg-white border border-slate-200">
-                    <strong className="text-slate-900 block font-mono text-[11px] uppercase mb-1">
+                    <strong className="text-slate-900 block font-medium text-[11px] uppercase mb-1">
                       1. Junior High School (Grades 7–10)
                     </strong>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Temporal-invariant 4-day academic cadence (240 mins/week per core subject) anchored to fixed daily time blocks, plus Friday Homeroom Guidance (HGP), afternoon ARAL / Remediation &amp; Enrichment, and Co-Curricular Activities.
+                      Places Junior High core classes on consistent Mon–Thu time slots, plus Friday Homeroom, Remediation, and Activities.
                     </p>
                   </div>
                   <div className="p-2.5 bg-white border border-slate-200">
-                    <strong className="text-slate-900 block font-mono text-[11px] uppercase mb-1">
+                    <strong className="text-slate-900 block font-medium text-[11px] uppercase mb-1">
                       2. Senior High School (Grades 11–12)
                     </strong>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -2410,8 +2410,8 @@ export default function ScheduleDeconflictionConsole() {
                     </p>
                   </div>
                 </div>
-                <div className="p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 font-mono">
-                  Guaranteed Conflict-Free &amp; Temporal Invariance: Each subject stays in its anchored time slot across the week with consistent faculty assignment, zero vacant gaps, and zero room or teacher collisions.
+                <div className="p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 font-medium">
+                  Each class stays in a consistent weekly slot with zero double-booked teachers, rooms, or sections.
                 </div>
               </div>
 
@@ -2420,37 +2420,37 @@ export default function ScheduleDeconflictionConsole() {
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-200/80 pb-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-                    <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider">
-                      ACTIVE TERM CONFIGURED BY IT SUPPORT
+                    <span className="text-xs font-medium font-bold text-[#002060] uppercase tracking-wider">
+                      CURRENT SCHOOL YEAR &amp; TERM
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase tracking-wider">
+                  <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase tracking-wider">
                     Synced with IT Support
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                    <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">
+                    <span className="text-[10px] font-medium text-slate-500 uppercase block font-semibold">
                       Target Academic Year:
                     </span>
-                    <div className="text-sm font-bold font-mono text-[#002060] mt-0.5">
+                    <div className="text-sm font-bold font-medium text-[#002060] mt-0.5">
                       {activeTermInfo ? activeTermInfo.schoolYear : autoSchoolYear}
                     </div>
                   </div>
 
                   <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                    <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">
+                    <span className="text-[10px] font-medium text-slate-500 uppercase block font-semibold">
                       Target Academic Term:
                     </span>
-                    <div className="text-sm font-bold font-mono text-[#002060] mt-0.5">
+                    <div className="text-sm font-bold font-medium text-[#002060] mt-0.5">
                       {activeTermInfo ? activeTermInfo.termName : `Trimester ${autoTrimester}`}
                     </div>
                   </div>
                 </div>
 
                 <p className="text-[11px] text-slate-600 font-sans">
-                  Automatically synchronized with the current active enrollment cycle configured by IT Support in the Control Room. Manual selection is not required.
+                  Uses the active school year and term set by the school.
                 </p>
               </div>
 
@@ -2475,15 +2475,15 @@ export default function ScheduleDeconflictionConsole() {
               {autoAuditResult && (
                 <div className="p-4 bg-emerald-50 border-2 border-emerald-500 space-y-3 animate-in fade-in duration-200">
                   <div className="flex items-center justify-between border-b border-emerald-300 pb-2">
-                    <span className="text-xs font-mono font-bold text-emerald-950 uppercase">
-                      AUDIT REPORT: 100% CONFLICT-FREE TIMETABLE CERTIFIED
+                    <span className="text-xs font-medium font-bold text-emerald-950 uppercase">
+                      SCHEDULE CHECK PASSED: NO CONFLICTS
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase">
-                      Zero Collisions
+                    <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase">
+                      0 Conflicts
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-mono">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-medium">
                     <div className="p-2 bg-white border border-emerald-200">
                       <div className="text-base font-bold text-[#002060]">{autoAuditResult.totalScheduled}</div>
                       <div className="text-[10px] text-slate-600 uppercase">Total Periods</div>
@@ -2502,15 +2502,15 @@ export default function ScheduleDeconflictionConsole() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-center pt-1 border-t border-emerald-200">
+                  <div className="grid grid-cols-3 gap-2 text-[11px] font-medium text-center pt-1 border-t border-emerald-200">
                     <div className="text-emerald-900">
-                      Faculty Collisions: <strong className="text-emerald-950 font-bold">{autoAuditResult.teacherCollisions}</strong>
+                      Teacher Conflicts: <strong className="text-emerald-950 font-bold">{autoAuditResult.teacherCollisions}</strong>
                     </div>
                     <div className="text-emerald-900">
-                      Facility Collisions: <strong className="text-emerald-950 font-bold">{autoAuditResult.roomCollisions}</strong>
+                      Room Conflicts: <strong className="text-emerald-950 font-bold">{autoAuditResult.roomCollisions}</strong>
                     </div>
                     <div className="text-emerald-900">
-                      Section Collisions: <strong className="text-emerald-950 font-bold">{autoAuditResult.sectionCollisions}</strong>
+                      Section Conflicts: <strong className="text-emerald-950 font-bold">{autoAuditResult.sectionCollisions}</strong>
                     </div>
                   </div>
                 </div>
@@ -2548,9 +2548,9 @@ export default function ScheduleDeconflictionConsole() {
                   type="button"
                   onClick={handleRunAutoGeneration}
                   disabled={isGeneratingAuto}
-                  className="w-full sm:w-auto px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs border border-emerald-900 text-center"
+                  className="w-full sm:w-auto px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-medium font-bold uppercase tracking-wider transition-colors disabled:opacity-60 cursor-pointer shadow-xs border border-emerald-900 text-center"
                 >
-                  {isGeneratingAuto ? "Generating & Validating..." : "Execute Smart Timetable Generation"}
+                  {isGeneratingAuto ? "Generating & Validating..." : "Build Schedules Now"}
                 </button>
               </div>
             </div>
@@ -2563,10 +2563,10 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {isResetConfirmOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto no-print print:hidden">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="bg-[#002060] p-4 text-white flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono tracking-widest uppercase opacity-80 block">
+                <span className="text-[10px] font-medium tracking-widest uppercase opacity-80 block">
                   Dumalneg NHS Administrative Action
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight">
@@ -2577,7 +2577,7 @@ export default function ScheduleDeconflictionConsole() {
                 type="button"
                 onClick={() => !isResetting && setIsResetConfirmOpen(false)}
                 disabled={isResetting}
-                className="text-white hover:text-slate-300 font-mono text-xl px-2 cursor-pointer disabled:opacity-40"
+                className="text-white hover:text-slate-300 font-medium text-xl px-2 cursor-pointer disabled:opacity-40"
               >
                 &times;
               </button>
@@ -2587,8 +2587,8 @@ export default function ScheduleDeconflictionConsole() {
               <p className="text-xs text-slate-700 leading-relaxed">
                 Are you sure you want to clear all active class schedule timetables? This will remove scheduled periods for both Junior and Senior High School sections.
               </p>
-              <div className="p-3 bg-amber-50 border border-amber-300 text-amber-950 text-[11px] font-mono">
-                Notice: You can instantly regenerate a 100% conflict-free timetable at any time using the Smart Auto-Generate Timetable engine.
+              <div className="p-3 bg-amber-50 border border-amber-300 text-amber-950 text-[11px] font-medium">
+                Notice: You can instantly regenerate a 100% conflict-free timetable at any time using the Auto-Build Schedules Timetable engine.
               </div>
             </div>
 
@@ -2605,7 +2605,7 @@ export default function ScheduleDeconflictionConsole() {
                 type="button"
                 onClick={handleResetAllSchedules}
                 disabled={isResetting}
-                className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
+                className="w-full sm:w-auto px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-medium font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
               >
                 {isResetting ? "Clearing..." : "Yes, Clear All Schedules"}
               </button>
@@ -2617,11 +2617,11 @@ export default function ScheduleDeconflictionConsole() {
       {/* Modern Confirm Delete Schedule Period Modal */}
       {deleteTargetItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-[4px]">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4 rounded-xl">
             <div className="border-b-2 border-slate-200 pb-2.5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#002060] block">
-                  Schedule Deconfliction Registry
+                <span className="text-[10px] font-medium font-bold uppercase tracking-wider text-[#002060] block">
+                  Confirm Action
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-slate-900 mt-0.5">
                   Remove Schedule Period
@@ -2631,7 +2631,7 @@ export default function ScheduleDeconflictionConsole() {
                 type="button"
                 onClick={() => setDeleteTargetItem(null)}
                 disabled={isDeletingSchedule}
-                className="text-slate-400 hover:text-slate-600 font-mono text-xl font-bold px-2 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 font-medium text-xl font-bold px-2 cursor-pointer"
               >
                 &times;
               </button>
@@ -2643,20 +2643,20 @@ export default function ScheduleDeconflictionConsole() {
               </p>
               <div className="bg-white p-3 border border-red-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-sm text-[#002060]">
+                  <span className="font-medium font-bold text-sm text-[#002060]">
                     {deleteTargetItem.subject_name}
                   </span>
-                  <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
+                  <span className="font-medium text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
                     {deleteTargetItem.day_of_week}
                   </span>
                 </div>
                 <div className="font-bold text-slate-900 text-xs">
                   Section: {deleteTargetItem.section_name}
                 </div>
-                <div className="text-[11px] text-slate-600 font-mono">
+                <div className="text-[11px] text-slate-600 font-medium">
                   {deleteTargetItem.teacher_name} &bull; Room: {deleteTargetItem.classroom_name || "Unassigned"}
                 </div>
-                <div className="text-[11px] text-slate-500 font-mono">
+                <div className="text-[11px] text-slate-500 font-medium">
                   Time: {formatTimeRange12h(deleteTargetItem.start_time, deleteTargetItem.end_time)}
                 </div>
               </div>
@@ -2692,7 +2692,7 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {draggedSchedule && (
         <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-[#002060] text-white px-4 py-3 shadow-2xl border-2 border-white rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-150 no-print print:hidden">
-          <div className="flex items-center gap-2 text-xs font-mono">
+          <div className="flex items-center gap-2 text-xs font-medium">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping inline-block" />
             <span>
               Moving: <strong className="text-white uppercase">{draggedSchedule.subject_name}</strong> ({draggedSchedule.day_of_week} &bull; {formatTimeRange12h(draggedSchedule.start_time, draggedSchedule.end_time)})
@@ -2707,7 +2707,7 @@ export default function ScheduleDeconflictionConsole() {
               setDraggedSchedule(null);
               setDragOverSlot(null);
             }}
-            className="text-xs font-mono font-bold bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded cursor-pointer transition-colors"
+            className="text-xs font-medium font-bold bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded cursor-pointer transition-colors"
           >
             Cancel Drag
           </button>
@@ -2719,11 +2719,11 @@ export default function ScheduleDeconflictionConsole() {
       {/* ========================================================================= */}
       {moveModalItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs font-sans animate-in fade-in duration-150 no-print print:hidden">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden rounded-[4px]">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden rounded-xl">
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between shrink-0">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-200 block">
-                  Timetable Rescheduling &bull; Deconfliction Guard
+                <span className="text-[10px] font-medium font-bold uppercase tracking-wider text-blue-200 block">
+                  MOVE OR SWAP CLASS
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight text-white mt-0.5">
                   Move or Swap Class Period
@@ -2732,7 +2732,7 @@ export default function ScheduleDeconflictionConsole() {
               <button
                 type="button"
                 onClick={() => setMoveModalItem(null)}
-                className="text-white hover:text-slate-300 font-mono text-2xl font-bold px-2 cursor-pointer"
+                className="text-white hover:text-slate-300 font-medium text-2xl font-bold px-2 cursor-pointer"
               >
                 &times;
               </button>
@@ -2745,14 +2745,14 @@ export default function ScheduleDeconflictionConsole() {
                   <span className="font-bold text-slate-900 uppercase text-xs">
                     {moveModalItem.subject_name}
                   </span>
-                  <span className="font-mono text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
+                  <span className="font-medium text-[10px] bg-blue-100 text-[#002060] px-2 py-0.5 font-bold uppercase">
                     Current: {moveModalItem.day_of_week} &bull; {formatTimeRange12h(moveModalItem.start_time, moveModalItem.end_time)}
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-700">
                   Section: <strong>{moveModalItem.section_name}</strong> &bull; Faculty: <strong>{moveModalItem.teacher_name}</strong>
                 </div>
-                <div className="text-[10px] font-mono text-slate-500">
+                <div className="text-[10px] font-medium text-slate-500">
                   Facility: {moveModalItem.classroom_name || "Unassigned"}
                 </div>
               </div>
@@ -2768,7 +2768,7 @@ export default function ScheduleDeconflictionConsole() {
                       key={day}
                       type="button"
                       onClick={() => setMoveTargetDay(day)}
-                      className={`p-2 text-xs font-mono font-bold uppercase border transition-colors cursor-pointer text-center ${
+                      className={`p-2 text-xs font-medium font-bold uppercase border transition-colors cursor-pointer text-center ${
                         moveTargetDay === day
                           ? "bg-[#002060] text-white border-[#002060]"
                           : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
@@ -2809,24 +2809,24 @@ export default function ScheduleDeconflictionConsole() {
                         }`}
                       >
                         <div>
-                          <div className="font-mono text-xs font-bold text-slate-800">
+                          <div className="font-medium text-xs font-bold text-slate-800">
                             {slot.name} ({formatTimeRange12h(slot.start, slot.end)})
                           </div>
                           <div className="text-[10px] mt-0.5">
                             {isCurrent ? (
-                              <span className="text-blue-700 font-bold font-mono">Current Slot</span>
+                              <span className="text-blue-700 font-bold font-medium">Current Slot</span>
                             ) : occupant ? (
                               <span className="text-amber-700 font-semibold">
-                                Occupied by: {occupant.subject_name} &bull; <strong className="font-mono uppercase text-indigo-700">Will Swap</strong>
+                                Occupied by: {occupant.subject_name} &bull; <strong className="font-medium uppercase text-indigo-700">Will Swap</strong>
                               </span>
                             ) : (
-                              <span className="text-emerald-700 font-semibold font-mono">
+                              <span className="text-emerald-700 font-semibold font-medium">
                                 Vacant Slot &bull; Will Move
                               </span>
                             )}
                           </div>
                         </div>
-                        <div className="font-mono text-xs font-bold text-[#002060]">
+                        <div className="font-medium text-xs font-bold text-[#002060]">
                           {isSelected ? "●" : "○"}
                         </div>
                       </button>
@@ -2859,7 +2859,7 @@ export default function ScheduleDeconflictionConsole() {
                   handleDropOnSlot(moveTargetDay, targetSlot.start, targetSlot.end, occupant, itemToMove);
                 }}
                 disabled={isDropping}
-                className="w-full sm:w-auto px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
+                className="w-full sm:w-auto px-5 py-2 bg-[#002060] hover:bg-blue-950 text-white text-xs font-medium font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer shadow-xs text-center order-1 sm:order-2"
               >
                 {isDropping ? "Saving..." : "Apply Rescheduling"}
               </button>
@@ -2878,7 +2878,7 @@ export default function ScheduleDeconflictionConsole() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white border-2 border-red-700 w-full max-w-lg shadow-2xl overflow-hidden rounded-[4px] animate-in zoom-in-95 duration-150 flex flex-col"
+            className="bg-white border-2 border-red-700 w-full max-w-lg shadow-2xl overflow-hidden rounded-xl animate-in zoom-in-95 duration-150 flex flex-col"
           >
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-red-800 via-rose-700 to-red-800 px-4 sm:px-5 py-3 text-white flex items-center justify-between shadow-xs">
@@ -2889,8 +2889,8 @@ export default function ScheduleDeconflictionConsole() {
                   </svg>
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-200 block">
-                    Deconfliction Guard &bull; Collision Alert
+                  <span className="text-[10px] font-medium font-bold uppercase tracking-wider text-rose-200 block">
+                    Schedule Conflict Found
                   </span>
                   <h3 id="conflict-modal-title" className="text-sm sm:text-base font-bold uppercase tracking-tight text-white leading-tight">
                     {conflictModal.title}
@@ -2900,7 +2900,7 @@ export default function ScheduleDeconflictionConsole() {
               <button
                 type="button"
                 onClick={() => setConflictModal(null)}
-                className="text-white/80 hover:text-white font-mono text-2xl font-bold px-2 py-0.5 hover:bg-white/10 rounded-xs transition-colors cursor-pointer"
+                className="text-white/80 hover:text-white font-medium text-2xl font-bold px-2 py-0.5 hover:bg-white/10 rounded-xs transition-colors cursor-pointer"
                 title="Close dialog (Esc)"
               >
                 &times;
@@ -2912,46 +2912,46 @@ export default function ScheduleDeconflictionConsole() {
               {/* Collision Type Badge */}
               <div className="flex items-center justify-between flex-wrap gap-2">
                 {conflictModal.conflictType === "room" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 text-red-900 border border-red-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 text-red-900 border border-red-300 font-medium text-[11px] font-bold uppercase tracking-wide rounded-lg">
                     <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                    Room / Facility Collision
+                    Room Already Booked
                   </span>
                 )}
                 {conflictModal.conflictType === "faculty" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-950 border border-amber-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-950 border border-amber-300 font-medium text-[11px] font-bold uppercase tracking-wide rounded-lg">
                     <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                    Faculty / Teacher Collision
+                    Teacher Conflict
                   </span>
                 )}
                 {conflictModal.conflictType === "section" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-[#002060] border border-blue-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-[#002060] border border-blue-300 font-medium text-[11px] font-bold uppercase tracking-wide rounded-lg">
                     <span className="w-2 h-2 rounded-full bg-[#002060] animate-pulse"></span>
-                    Section Timetable Collision
+                    Section Already Has Class
                   </span>
                 )}
                 {conflictModal.conflictType === "error" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-100 text-rose-950 border border-rose-300 font-mono text-[11px] font-bold uppercase tracking-wide rounded-[3px]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-100 text-rose-950 border border-rose-300 font-medium text-[11px] font-bold uppercase tracking-wide rounded-lg">
                     <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
-                    Scheduling Rule Violation
+                    Cannot Save Schedule
                   </span>
                 )}
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-[2px]">
+                <span className="text-[10px] font-medium font-bold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
                   Operation Blocked
                 </span>
               </div>
 
               {/* Action Description */}
               {conflictModal.actionDescription && (
-                <div className="p-3 bg-white border border-slate-300 text-slate-800 text-xs font-semibold leading-relaxed shadow-xs rounded-[3px]">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase block mb-0.5">Attempted Action:</span>
+                <div className="p-3 bg-white border border-slate-300 text-slate-800 text-xs font-semibold leading-relaxed shadow-xs rounded-lg">
+                  <span className="text-slate-500 font-medium text-[10px] uppercase block mb-0.5">Attempted Action:</span>
                   {conflictModal.actionDescription}
                 </div>
               )}
 
               {/* Collision Details Box */}
-              <div className="p-3.5 bg-rose-50 border-l-4 border-l-rose-600 border border-rose-200 rounded-[3px] space-y-1.5">
-                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1">
-                  Collision Diagnostic:
+              <div className="p-3.5 bg-rose-50 border-l-4 border-l-rose-600 border border-rose-200 rounded-lg space-y-1.5">
+                <div className="text-[10px] font-medium font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1">
+                  Why it cannot be saved:
                 </div>
                 <p className="text-xs text-rose-950 font-medium leading-relaxed">
                   {conflictModal.conflictDetail}
@@ -2959,7 +2959,7 @@ export default function ScheduleDeconflictionConsole() {
               </div>
 
               {/* Helpful Recommendation Card */}
-              <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-[3px] flex items-start gap-2.5 text-xs text-amber-950">
+              <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-lg flex items-start gap-2.5 text-xs text-amber-950">
                 <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">!</span>
                 <div className="space-y-0.5">
                   <div className="font-bold text-[11px] uppercase tracking-wide text-amber-900">
@@ -2974,14 +2974,14 @@ export default function ScheduleDeconflictionConsole() {
 
             {/* Modal Footer */}
             <div className="px-4 sm:px-5 py-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-              <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
+              <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
                 Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded-xs text-[10px] font-bold">ESC</kbd> or <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded-xs text-[10px] font-bold">ENTER</kbd> to close
               </span>
               <button
                 type="button"
                 autoFocus
                 onClick={() => setConflictModal(null)}
-                className="w-full sm:w-auto px-6 py-2.5 bg-[#002060] hover:bg-blue-950 active:scale-95 text-white text-xs font-mono font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer shadow-sm rounded-[3px] text-center"
+                className="w-full sm:w-auto px-6 py-2.5 bg-[#002060] hover:bg-blue-950 active:scale-95 text-white text-xs font-medium font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer shadow-sm rounded-lg text-center"
               >
                 OK &bull; Understood
               </button>

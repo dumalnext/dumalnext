@@ -199,7 +199,7 @@ export default function UserRoleAuditor() {
 
   const handleRemovePassword = async () => {
     if (!viewingUser) return;
-    const confirm = window.confirm(`Remove password for ${viewingUser.fullName}? For security, IT Support NEVER views passwords. The password will be immediately invalidated and removed from Supabase Auth.`);
+    const confirm = window.confirm(`Remove password for ${viewingUser.fullName}? For privacy, IT Support cannot view passwords. The password will be removed right away so the user can create a new one.`);
     if (!confirm) return;
 
     setIsRemovingPassword(true);
@@ -218,7 +218,7 @@ export default function UserRoleAuditor() {
 
       setCredentialNotice({
         type: "success",
-        text: "Password successfully removed & invalidated in Supabase Auth. For student security, no password was shown. The student must verify via OTP to set a new password.",
+        text: "Password removed. The user will receive a 6-digit email code to set a new password.",
       });
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("dumalnext:data-changed"));
@@ -336,7 +336,7 @@ export default function UserRoleAuditor() {
       if (json.success) {
         setStatusMessage({
           type: "success",
-          text: `User ${formData.userId} provisioned successfully with role ${formData.userRole}. An onboarding invitation link has been generated for ${formData.email}.`,
+          text: `Account created for ${formData.userId} (${formData.userRole}). Send the invite link below to ${formData.email}.`,
         });
         if (json.inviteUrl) {
           setProvisionedLink({
@@ -355,10 +355,10 @@ export default function UserRoleAuditor() {
         });
         fetchUsers(true);
       } else {
-        setStatusMessage({ type: "error", text: json.error || "Failed to provision user." });
+        setStatusMessage({ type: "error", text: json.error || "Could not create account." });
       }
     } catch (err: any) {
-      setStatusMessage({ type: "error", text: "Error submitting user provisioning." });
+      setStatusMessage({ type: "error", text: "Error creating account." });
     } finally {
       setIsSubmitting(false);
     }
@@ -378,7 +378,7 @@ export default function UserRoleAuditor() {
       if (json.success) {
         setStatusMessage({
           type: "success",
-          text: `Account ${userToDelete.email} (${userToDelete.userId}) was deleted successfully from Supabase.`,
+          text: `Account ${userToDelete.email} (${userToDelete.userId}) has been deleted.`,
         });
         setUserToDelete(null);
         setViewingUser(null);
@@ -386,7 +386,7 @@ export default function UserRoleAuditor() {
       } else {
         setStatusMessage({
           type: "error",
-          text: json.error || "Failed to delete account from Supabase.",
+          text: json.error || "Could not delete account.",
         });
       }
     } catch (err: any) {
@@ -472,7 +472,7 @@ export default function UserRoleAuditor() {
             <svg className="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
             </svg>
-            <span>Provision User Account</span>
+            <span>+ Add New Account</span>
           </button>
         </div>
       </div>
@@ -494,7 +494,7 @@ export default function UserRoleAuditor() {
         <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-500 space-y-2 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
-              Onboarding Invitation Link Ready for {provisionedLink.email}
+              Invite Link Ready for {provisionedLink.email}
             </span>
             <button
               type="button"
@@ -512,7 +512,7 @@ export default function UserRoleAuditor() {
               type="text"
               readOnly
               value={provisionedLink.url}
-              className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-emerald-400 rounded-lg select-all text-slate-900"
+              className="flex-1 px-3 py-2 text-xs font-medium bg-white border border-emerald-400 rounded-lg select-all text-slate-900"
             />
             <button
               type="button"
@@ -701,7 +701,7 @@ export default function UserRoleAuditor() {
 
                   return (
                     <tr key={user.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="p-3 font-mono font-bold text-[#002060]">{user.userId}</td>
+                      <td className="p-3 font-medium font-bold text-[#002060]">{user.userId}</td>
                       <td className="p-3">
                         <div className="flex items-center gap-3">
                           <div
@@ -720,7 +720,7 @@ export default function UserRoleAuditor() {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full bg-[#002060] text-white flex items-center justify-center font-mono font-bold text-xs">
+                              <div className="w-full h-full bg-[#002060] text-white flex items-center justify-center font-medium font-bold text-xs">
                                 {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
                               </div>
                             )}
@@ -729,7 +729,7 @@ export default function UserRoleAuditor() {
                             <div className="font-bold text-slate-900 uppercase truncate">
                               {user.fullName || "DNHS USER"}
                             </div>
-                            <div className="text-[11px] font-mono text-slate-500 truncate">{user.email}</div>
+                            <div className="text-[11px] font-medium text-slate-500 truncate">{user.email}</div>
                           </div>
                         </div>
                       </td>
@@ -739,12 +739,12 @@ export default function UserRoleAuditor() {
                         </span>
                       </td>
                       <td className="p-3 text-[11px] text-slate-600">
-                        {user.userRole === "admin" && "Adjudication & Timetables"}
+                        {user.userRole === "admin" && "Applications &amp; Schedules"}
                         {user.userRole === "teacher" && "Class Rosters & Schedules"}
                         {user.userRole === "student" && "Remote Enrollment & Status"}
                         {user.userRole === "it_support" && "System Calendar & Facilities"}
                       </td>
-                      <td className="p-3 font-mono text-slate-500">
+                      <td className="p-3 font-medium text-slate-500">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="p-3 text-right">
@@ -753,7 +753,7 @@ export default function UserRoleAuditor() {
                           onClick={() => handleOpenDossier(user)}
                           className="px-3 py-1 rounded text-[11px] font-bold border border-[#002060] bg-blue-50 text-[#002060] hover:bg-[#002060] hover:text-white transition-colors cursor-pointer"
                         >
-                          View Dossier
+                          View Details
                         </button>
                       </td>
                     </tr>
@@ -779,7 +779,7 @@ export default function UserRoleAuditor() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={safeCurrentPage <= 1}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage <= 1
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -803,7 +803,7 @@ export default function UserRoleAuditor() {
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
                     aria-current={isActive ? "page" : undefined}
-                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                       isActive
                         ? "bg-[#002060] border-[#002060] text-white"
                         : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
@@ -818,7 +818,7 @@ export default function UserRoleAuditor() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safeCurrentPage >= totalPages}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage >= totalPages
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -880,13 +880,13 @@ export default function UserRoleAuditor() {
 
                 <div>
                   <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
-                    DNHS Credential &amp; Profile Dossier
+                    Account Details
                   </span>
                   <h3 className="text-lg font-black text-slate-900 uppercase mt-0.5">
                     {viewingUser.fullName || viewingUser.userId}
                   </h3>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <span className="font-mono text-xs text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
+                    <span className="font-medium text-xs text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
                       {viewingUser.userId}
                     </span>
                     <span className="text-slate-300">&bull;</span>
@@ -922,14 +922,14 @@ export default function UserRoleAuditor() {
 
               <div>
                 <span className="text-[10px] uppercase text-slate-500 block font-bold">Registration Timestamp</span>
-                <span className="font-mono text-slate-800 font-bold mt-1 block">
+                <span className="font-medium text-slate-800 font-bold mt-1 block">
                   {new Date(viewingUser.createdAt).toLocaleString()}
                 </span>
               </div>
 
               <div>
                 <span className="text-[10px] uppercase text-slate-500 block font-bold">Official Login Email</span>
-                <span className="font-mono text-slate-900 font-bold mt-1 block">
+                <span className="font-medium text-slate-900 font-bold mt-1 block">
                   {viewingUser.email}
                 </span>
               </div>
@@ -937,7 +937,7 @@ export default function UserRoleAuditor() {
               <div>
                 <span className="text-[10px] uppercase text-slate-500 block font-bold">System Access Level</span>
                 <span className="text-slate-800 font-bold mt-1 block">
-                  {viewingUser.userRole === "admin" && "Adjudication & Timetables"}
+                  {viewingUser.userRole === "admin" && "Applications &amp; Schedules"}
                   {viewingUser.userRole === "teacher" && "Class Rosters & Schedules"}
                   {viewingUser.userRole === "student" && "Remote Enrollment & Status"}
                   {viewingUser.userRole === "it_support" && "System Calendar & Facilities"}
@@ -949,12 +949,12 @@ export default function UserRoleAuditor() {
             {viewingUser.userRole === "student" && (
               <div className="space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
-                  Learner Academic &amp; Enrollment Dossier
+                  Student Details
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
                   <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[10px] uppercase text-slate-500 block font-bold">Learner Reference Number (LRN)</span>
-                    <span className="font-mono font-bold text-slate-900 mt-1 block">
+                    <span className="font-medium font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.lrn || "Not Assigned"}
                     </span>
                   </div>
@@ -984,7 +984,7 @@ export default function UserRoleAuditor() {
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[10px] uppercase text-slate-500 block font-bold">Contact Number</span>
-                    <span className="font-mono font-bold text-slate-900 mt-1 block">
+                    <span className="font-medium font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.contactNumber || "None Provided"}
                     </span>
                   </div>
@@ -995,12 +995,12 @@ export default function UserRoleAuditor() {
             {viewingUser.userRole === "teacher" && (
               <div className="space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
-                  Faculty Credentials &amp; Department Dossier
+                  Teacher Details
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
                   <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[10px] uppercase text-slate-500 block font-bold">Faculty Identifier</span>
-                    <span className="font-mono font-bold text-slate-900 mt-1 block">
+                    <span className="font-medium font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.teacherId || viewingUser.userId}
                     </span>
                   </div>
@@ -1015,7 +1015,7 @@ export default function UserRoleAuditor() {
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[10px] uppercase text-slate-500 block font-bold">Official Faculty Email</span>
-                    <span className="font-mono font-bold text-slate-900 mt-1 block">
+                    <span className="font-medium font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.facultyEmail || viewingUser.email}
                     </span>
                   </div>
@@ -1026,12 +1026,12 @@ export default function UserRoleAuditor() {
             {viewingUser.userRole === "admin" && (
               <div className="space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
-                  Administrative Officer Dossier
+                  Admin Details
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 text-xs">
                   <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[10px] uppercase text-slate-500 block font-bold">Administrator ID</span>
-                    <span className="font-mono font-bold text-slate-900 mt-1 block">
+                    <span className="font-medium font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.adminId || viewingUser.userId}
                     </span>
                   </div>
@@ -1048,12 +1048,12 @@ export default function UserRoleAuditor() {
             {viewingUser.userRole === "it_support" && (
               <div className="space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#002060] border-b pb-1">
-                  IT Systems Desk Dossier
+                  IT Support Details
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 text-xs">
                   <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[10px] uppercase text-slate-500 block font-bold">IT Personnel Identifier</span>
-                    <span className="font-mono font-bold text-slate-900 mt-1 block">
+                    <span className="font-medium font-bold text-slate-900 mt-1 block">
                       {viewingUser.details?.itsupportId || viewingUser.userId}
                     </span>
                   </div>
@@ -1154,7 +1154,7 @@ export default function UserRoleAuditor() {
                 <span className="font-bold text-[#002060] block mb-0.5">
                   Real-Time Synchronization Active
                 </span>
-                Any modifications or removals made here take effect immediately in Supabase and sync live to Student Portal, Teacher Rosters, Admin, and IT Support.
+                Changes saved here update the student, teacher, admin, and IT portals right away.
               </div>
 
               {credentialNotice && (
@@ -1190,7 +1190,7 @@ export default function UserRoleAuditor() {
                 <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
                   <div>
                     <span className="text-[10px] text-slate-500 block">Current LRN:</span>
-                    <span className="font-mono text-sm font-extrabold text-[#002060]">
+                    <span className="font-medium text-sm font-extrabold text-[#002060]">
                       {viewingUser.details?.lrn && viewingUser.details.lrn !== "Not assigned"
                         ? viewingUser.details.lrn
                         : "None / Not Assigned"}
@@ -1235,7 +1235,7 @@ export default function UserRoleAuditor() {
                         value={editLrn}
                         onChange={(e) => setEditLrn(e.target.value.replace(/\D/g, ""))}
                         placeholder="e.g. 101234567890"
-                        className="flex-1 p-2 bg-white border border-slate-300 rounded text-xs font-mono font-bold focus:border-[#002060] outline-none"
+                        className="flex-1 p-2 bg-white border border-slate-300 rounded text-xs font-medium font-bold focus:border-[#002060] outline-none"
                         required
                       />
                       <button
@@ -1269,7 +1269,7 @@ export default function UserRoleAuditor() {
                 <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
                   <div>
                     <span className="text-[10px] text-slate-500 block">Current Email:</span>
-                    <span className="font-mono text-sm font-bold text-slate-900">
+                    <span className="font-medium text-sm font-bold text-slate-900">
                       {viewingUser.email || "No email registered"}
                     </span>
                   </div>
@@ -1308,7 +1308,7 @@ export default function UserRoleAuditor() {
                 <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
                   <div>
                     <span className="text-[10px] text-slate-500 block">Password Status:</span>
-                    <span className="font-mono text-xs font-bold text-slate-700 tracking-widest">
+                    <span className="font-medium text-xs font-bold text-slate-700 tracking-widest">
                       ● ● ● ● ● ● ● ● (Protected)
                     </span>
                   </div>
@@ -1328,7 +1328,7 @@ export default function UserRoleAuditor() {
                   </div>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-normal">
-                  Security Policy: Passwords are NEVER revealed to IT Support. Removing the password instantly wipes and revokes access in Supabase Auth. The student must verify via 6-digit OTP code to create a new password.
+                  Security Policy: Passwords are NEVER revealed to IT Support. Removing the password signs the user out right away. They can set a new password using a 6-digit email code.
                 </p>
               </div>
             </div>
@@ -1340,7 +1340,7 @@ export default function UserRoleAuditor() {
                 onClick={() => setShowCredentialModal(false)}
                 className="px-5 py-2 bg-[#002060] hover:bg-[#002b80] text-white text-xs font-bold rounded-lg cursor-pointer"
               >
-                Done / Back to Dossier
+                Back to Details
               </button>
             </div>
           </div>
@@ -1354,7 +1354,7 @@ export default function UserRoleAuditor() {
             <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest block">
-                  Security Confirmation &bull; Supabase Sync
+                  Confirm Delete
                 </span>
                 <h3 className="text-base font-bold text-slate-900">
                   Confirm Account Deletion
@@ -1372,7 +1372,7 @@ export default function UserRoleAuditor() {
 
             <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
               <p>
-                Are you sure you want to permanently delete the following account from Supabase?
+                Are you sure you want to permanently delete this account?
               </p>
               <div className="p-3 bg-red-50 rounded-lg border border-red-200 space-y-1">
                 <div>
@@ -1386,7 +1386,7 @@ export default function UserRoleAuditor() {
                 </div>
               </div>
               <p className="text-[11px] text-red-800 font-bold">
-                This action will delete their profile from the Supabase database and revoke access.
+                This removes the account and signs them out permanently.
               </p>
             </div>
 
@@ -1474,7 +1474,7 @@ export default function UserRoleAuditor() {
                   placeholder="e.g. DNHS-TCH-004"
                   value={formData.userId}
                   onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
-                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-mono font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-medium font-bold focus:border-[#002060] outline-none"
                 />
               </div>
 
@@ -1506,8 +1506,8 @@ export default function UserRoleAuditor() {
               </div>
 
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-[11px] text-[#002060]">
-                <strong className="block uppercase font-bold">Zero Initial Password Policy:</strong>
-                <span>IT Support does not set passwords. Saving this account will generate a secure onboarding invitation link for the user to create their own password upon first visit.</span>
+                <strong className="block uppercase font-bold">Set Password by Link:</strong>
+                <span>Staff choose their own password. Saving this creates a private invite link you can send to them.</span>
               </div>
 
               {formData.userRole === "teacher" && (
@@ -1542,7 +1542,7 @@ export default function UserRoleAuditor() {
                   disabled={isSubmitting}
                   className="px-5 py-2 rounded-lg bg-[#002060] hover:bg-[#001845] text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
                 >
-                  {isSubmitting ? "Provisioning..." : "+ Save & Issue Invitation"}
+                  {isSubmitting ? "Saving..." : "+ Create Account & Invite Link"}
                 </button>
               </div>
             </form>

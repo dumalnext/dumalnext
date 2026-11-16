@@ -250,7 +250,7 @@ export default function ClassroomFacilityManager() {
           </div>
         ) : classrooms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
-            No classrooms registered. Click &quot;Add New Classroom&quot; to initialize physical school rooms.
+            No classrooms added yet. Click "Add New Classroom" to add a room.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -261,21 +261,21 @@ export default function ClassroomFacilityManager() {
                   <th className="p-3">Room Name</th>
                   <th className="p-3">Building Location</th>
                   <th className="p-3">Seating Capacity</th>
-                  <th className="p-3">Deconfliction Status</th>
+                  <th className="p-3">Schedule Check</th>
                   <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {paginatedClassrooms.map((room) => (
                   <tr key={room.id} className="hover:bg-slate-50">
-                    <td className="p-3 font-mono font-bold text-[#002060]">{room.classroomId}</td>
+                    <td className="p-3 font-medium font-bold text-[#002060]">{room.classroomId}</td>
                     <td className="p-3 font-bold text-slate-900">{room.roomName}</td>
                     <td className="p-3 text-slate-700">{room.building}</td>
-                    <td className="p-3 font-mono font-bold text-slate-900">{room.capacity} seats</td>
+                    <td className="p-3 font-medium font-bold text-slate-900">{room.capacity} seats</td>
                     <td className="p-3">
                       <span
                         className="px-2 py-0.5 bg-blue-100 border border-blue-300 text-[#002060] rounded font-bold text-[10px] uppercase"
-                        title="Monitored by Automated Deconfliction Engine: Active Double-Booking and Room Overcrowding Guard"
+                        title="Checked automatically so two classes cannot book this room at the same time"
                       >
                         Monitored
                       </span>
@@ -321,7 +321,7 @@ export default function ClassroomFacilityManager() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={safeCurrentPage <= 1}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage <= 1
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -338,7 +338,7 @@ export default function ClassroomFacilityManager() {
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
                     aria-current={isActive ? "page" : undefined}
-                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-[4px] transition-colors cursor-pointer ${
+                    className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                       isActive
                         ? "bg-[#002060] border-[#002060] text-white"
                         : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
@@ -353,7 +353,7 @@ export default function ClassroomFacilityManager() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safeCurrentPage >= totalPages}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-[4px] transition-colors ${
+                className={`px-3 py-1.5 border text-xs font-bold uppercase rounded-lg transition-colors ${
                   safeCurrentPage >= totalPages
                     ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                     : "bg-white hover:bg-slate-100 border-slate-300 text-[#002060] cursor-pointer"
@@ -399,7 +399,7 @@ export default function ClassroomFacilityManager() {
                   placeholder="e.g. RM-101, SCI-LAB"
                   value={formData.classroomId}
                   onChange={(e) => setFormData({ ...formData, classroomId: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#002060]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium font-bold focus:outline-none focus:ring-2 focus:ring-[#002060]"
                 />
               </div>
 
@@ -439,7 +439,7 @@ export default function ClassroomFacilityManager() {
                   required
                   value={formData.capacity}
                   onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 40 })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#002060]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium font-bold focus:outline-none focus:ring-2 focus:ring-[#002060]"
                 />
                 <span className="text-[10px] text-slate-500 mt-1 block">
                   Capacity is checked by the scheduler when allocating section sizes.
@@ -479,7 +479,7 @@ export default function ClassroomFacilityManager() {
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] font-bold text-red-600 uppercase tracking-widest block">
-                  Delete Instructional Space Confirmation
+                  Remove Classroom
                 </span>
                 <h3 className="text-base font-extrabold text-slate-900">
                   Delete Classroom {deletingRoom.classroomId}?
@@ -488,7 +488,7 @@ export default function ClassroomFacilityManager() {
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to delete instructional space <strong className="text-slate-900 font-mono">{deletingRoom.classroomId}</strong> {deletingRoom.roomName ? `(${deletingRoom.roomName})` : ""}? This will permanently remove this room from the physical school facility directory and the Automated Schedule Deconfliction Hub.
+              Are you sure you want to remove classroom <strong className="text-slate-900 font-medium">{deletingRoom.classroomId}</strong> {deletingRoom.roomName ? `(${deletingRoom.roomName})` : ""}? This will permanently remove this room from the school classroom list and class schedules.
             </p>
 
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-amber-900 flex items-start gap-2">

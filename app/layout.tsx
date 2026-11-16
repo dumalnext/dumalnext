@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Dumal-NEXT | Dumalneg National High School",
-  description: "Official Web-Based Enrollment and Schedule Deconfliction System for Dumalneg National High School",
+  description: "Online Student Enrollment, Class Schedules, and School Portal for Dumalneg National High School",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -73,20 +73,20 @@ export default function RootLayout({
                 className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-md shrink-0"
               />
               <div>
-                <p className="text-[11px] font-bold tracking-widest text-amber-300 uppercase">
+                <p className="text-xs font-semibold text-amber-300">
                   Republic of the Philippines &bull; Department of Education &bull; Region I
                 </p>
                 <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-white mt-0.5">
                   DUMALNEG NATIONAL HIGH SCHOOL
                 </h1>
                 <p className="text-xs text-blue-100 font-medium">
-                  Dumal-NEXT: Web-Based Enrollment &amp; Schedule Deconfliction System
+                  Dumal-NEXT: Online Enrollment &amp; Class Schedule System
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="bg-white/10 border border-white/20 text-white px-3.5 py-1.5 rounded-full font-semibold tracking-wide">
-                Official Institutional Portal &bull; Trimester System
+                Official School Portal &bull; 3-Term Year
               </span>
             </div>
           </div>

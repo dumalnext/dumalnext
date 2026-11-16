@@ -506,10 +506,10 @@ export default function StudentProfilePage() {
               Home
             </Link>
             <span>/</span>
-            <span className="font-bold text-[#002060]">Learner Profile</span>
+            <span className="font-bold text-[#002060]">My Profile</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">
-            Official Learner Profile
+            My Student Profile
           </h1>
         </div>
 
@@ -521,7 +521,7 @@ export default function StudentProfilePage() {
             <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>Track Application / COE</span>
+            <span>Check Enrollment Status</span>
           </Link>
 
           {assignedSection && (
@@ -539,7 +539,7 @@ export default function StudentProfilePage() {
       </div>
 
       {/* Hero Profile Banner */}
-      <div className="bg-gradient-to-br from-[#002060] to-[#001845] text-white rounded-xl p-5 sm:p-6 shadow-md border-t-4 border-amber-400 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#002060] to-[#001845] text-white rounded-2xl p-5 sm:p-6 shadow-md border-t-4 border-amber-400 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-start sm:items-center gap-4">
             {/* 2x2 Official Learner Photo from Enrollment or Fallback Initial Circle */}
@@ -570,7 +570,7 @@ export default function StudentProfilePage() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-blue-100">
                 <span className="flex items-center gap-1">
                   <span className="text-amber-300 font-bold">LRN:</span>
-                  <strong className="font-mono text-white tracking-wider">{lrnNumber}</strong>
+                  <strong className="text-white">{lrnNumber}</strong>
                 </span>
                 <span className="hidden sm:inline text-blue-300/40">&bull;</span>
                 <span className="flex items-center gap-1">
@@ -628,7 +628,7 @@ export default function StudentProfilePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
           </svg>
-          <span>Academic &amp; Section Placement</span>
+          <span>Section &amp; Grade</span>
         </button>
 
         <button
@@ -689,12 +689,12 @@ export default function StudentProfilePage() {
           <svg className="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <span>Account Credentials &amp; Security</span>
+          <span>Email &amp; Password</span>
         </button>
       </div>
 
       {/* Tab Contents Card */}
-      <div className="bg-white border border-slate-200 rounded-b-xl shadow-xs p-5 sm:p-7 min-h-[400px]">
+      <div className="bg-white border border-slate-200 rounded-b-2xl shadow-sm p-5 sm:p-7 min-h-[400px]">
         {isLoadingData ? (
           <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading Learner Profile Details">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -724,7 +724,7 @@ export default function StudentProfilePage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                    Official Academic Standing &amp; Placement
+                    Your Grade &amp; Section
                   </h3>
                 </div>
 
@@ -733,7 +733,7 @@ export default function StudentProfilePage() {
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                       <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
-                        Class Section Advisory
+                        Your Class Section
                       </span>
                       {assignedSection ? (
                         <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 font-bold uppercase rounded">
@@ -768,7 +768,7 @@ export default function StudentProfilePage() {
                             href="/section"
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002060] hover:text-blue-800 underline cursor-pointer"
                           >
-                            <span>View Class Schedule &amp; Section Roster</span>
+                            <span>View Section &amp; Classmates</span>
                           </Link>
                         </div>
                       </div>
@@ -822,7 +822,7 @@ export default function StudentProfilePage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                    Learner Demographic Details
+                    Personal Information
                   </h3>
                 </div>
 
@@ -843,7 +843,7 @@ export default function StudentProfilePage() {
                         Official 2x2 ID Photo
                       </span>
                       <span className="font-bold text-slate-900 block text-sm">
-                        Certified Learner Photo On File
+                        Your Uploaded 2x2 Photo
                       </span>
                       <p className="text-[11px] text-slate-500">
 
@@ -902,7 +902,7 @@ export default function StudentProfilePage() {
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Contact Mobile Number
                     </span>
-                    <span className="text-sm font-mono font-bold text-slate-900 mt-0.5 block">
+                    <span className="text-sm font-bold text-slate-900 mt-0.5 block">
                       {studentRec?.contact_number || formData?.contactNumber || formData?.learnerContact || "09181234567"}
                     </span>
                   </div>
@@ -984,7 +984,7 @@ export default function StudentProfilePage() {
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase block">Contact Number:</span>
-                        <span className="font-bold text-slate-700 font-mono">
+                        <span className="font-bold text-slate-700">
                           {formData?.fatherContactNumber || "09181234567"}
                         </span>
                       </div>
@@ -1007,7 +1007,7 @@ export default function StudentProfilePage() {
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase block">Contact Number:</span>
-                        <span className="font-bold text-slate-700 font-mono">
+                        <span className="font-bold text-slate-700">
                           {formData?.motherContactNumber || "09201234567"}
                         </span>
                       </div>
@@ -1022,7 +1022,7 @@ export default function StudentProfilePage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                    Student Account Credentials &amp; Security
+                    Login Email &amp; Password
                   </h3>
                 </div>
 
@@ -1091,17 +1091,6 @@ export default function StudentProfilePage() {
                   </div>
                 </div>
 
-                {/* System ID & Session Info */}
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Learner Account Database ID
-                    </span>
-                    <span className="text-sm font-mono font-bold text-[#002060] block mt-0.5">
-                      {studentId}
-                    </span>
-                  </div>
-                </div>
               </div>
             )}
           </>
@@ -1351,7 +1340,7 @@ export default function StudentProfilePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
                 <h3 className="text-sm font-bold tracking-tight">
-                  Modify Registered Email Address
+                  Change Email Address
                 </h3>
               </div>
               <button
@@ -1397,7 +1386,7 @@ export default function StudentProfilePage() {
                       type="text"
                       value={emailAddress}
                       disabled
-                      className="w-full p-2.5 border border-slate-200 rounded-lg bg-slate-100 text-slate-600 font-mono text-xs cursor-not-allowed"
+                      className="w-full p-2.5 border border-slate-200 rounded-lg bg-slate-100 text-slate-600 text-xs cursor-not-allowed"
                     />
                   </div>
 
@@ -1410,7 +1399,7 @@ export default function StudentProfilePage() {
                       value={newEmailInput}
                       onChange={(e) => setNewEmailInput(e.target.value)}
                       placeholder="new.email@gmail.com"
-                      className="w-full p-2.5 border-2 border-slate-300 focus:border-[#002060] rounded-lg text-slate-900 text-xs focus:outline-hidden"
+                      className="w-full p-2.5 border border-slate-300 focus:border-[#002060] rounded-lg text-slate-900 text-xs focus:outline-hidden"
                       required
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
@@ -1452,7 +1441,7 @@ export default function StudentProfilePage() {
                       type="text"
                       value={newEmailInput}
                       disabled
-                      className="w-full p-2 border border-slate-200 rounded-lg bg-slate-100 text-slate-700 font-mono text-xs cursor-not-allowed"
+                      className="w-full p-2 border border-slate-200 rounded-lg bg-slate-100 text-slate-700 text-xs cursor-not-allowed"
                     />
                   </div>
 

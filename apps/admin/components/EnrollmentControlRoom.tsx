@@ -108,14 +108,14 @@ export default function EnrollmentControlRoom() {
         const isGradeAction = targetSettings.isGradeOpen !== settings.isGradeOpen;
         setSettings(data.settings);
         if (isGradeAction) {
-          const gStatus = data.settings.isGradeOpen !== false ? "OPEN (Active)" : "CLOSED / LOCKED (Off)";
+          const gStatus = data.settings.isGradeOpen !== false ? "OPEN" : "CLOSED";
           setSaveSuccess(
-            `Real-Time Broadcast: Grade Management is now ${gStatus} for School Year ${data.settings.schoolYear}. Teacher portal updated instantly.`
+            `Saved! Teachers can ${data.settings.isGradeOpen !== false ? "now" : "no longer"} upload grades for School Year ${data.settings.schoolYear}.`
           );
         } else {
-          const statusText = data.settings.isEnrollmentOpen ? "OPEN (Active)" : "CLOSED (Offline)";
+          const statusText = data.settings.isEnrollmentOpen ? "OPEN" : "CLOSED";
           setSaveSuccess(
-            `Real-Time Broadcast: Online Enrollment is now ${statusText} for School Year ${data.settings.schoolYear}. Student portal updated instantly.`
+            `Saved! Online Enrollment is now ${statusText} for School Year ${data.settings.schoolYear}.`
           );
         }
 
@@ -204,7 +204,7 @@ export default function EnrollmentControlRoom() {
           />
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-              Online Enrollment &amp; Grade Master Control Room
+              Enrollment &amp; Grade Settings
             </h2>
           </div>
         </div>
@@ -252,7 +252,7 @@ export default function EnrollmentControlRoom() {
           1. MASTER ENROLLMENT ON/OFF TOGGLE CARD
           ===================================================================== */}
       <div
-        className={`p-5 sm:p-6 rounded-xl border-2 transition-all shadow-sm ${
+        className={`p-5 sm:p-6 rounded-2xl border transition-all shadow-sm ${
           settings.isEnrollmentOpen
             ? "bg-emerald-50/70 border-emerald-500"
             : "bg-red-50/70 border-red-500"
@@ -286,7 +286,7 @@ export default function EnrollmentControlRoom() {
               }`}
             >
               {isSaving ? (
-                "Broadcasting Real-Time Status..."
+                "Saving Changes..."
               ) : settings.isEnrollmentOpen ? (
                 "Turn Off / Close Online Enrollment"
               ) : (
@@ -301,7 +301,7 @@ export default function EnrollmentControlRoom() {
           1.1 MASTER GRADE ON/OFF TOGGLE CARD
           ===================================================================== */}
       <div
-        className={`p-5 sm:p-6 rounded-xl border-2 transition-all shadow-sm ${
+        className={`p-5 sm:p-6 rounded-2xl border transition-all shadow-sm ${
           settings.isGradeOpen !== false
             ? "bg-emerald-50/70 border-emerald-500"
             : "bg-red-50/70 border-red-500"
@@ -310,9 +310,6 @@ export default function EnrollmentControlRoom() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-2xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-sm bg-[#002060] text-amber-300 font-mono font-bold text-xs uppercase tracking-wider">
-                GRADE
-              </span>
               <span className="text-xs font-medium text-slate-600">
                 School Year: <strong>{settings.schoolYear}</strong>
               </span>
@@ -385,7 +382,7 @@ export default function EnrollmentControlRoom() {
         <div className="space-y-2 pt-2 border-t border-slate-200">
           <div className="flex flex-wrap items-center justify-between gap-1">
             <label className="text-xs font-bold text-slate-900 uppercase">
-              Official DepEd Closed Advisory Message (Visible to Students when System is OFF):
+              Closed Message Shown to Students (When Enrollment is OFF):
             </label>
           </div>
 
@@ -394,12 +391,12 @@ export default function EnrollmentControlRoom() {
             value={settings.closedMessage}
             onChange={(e) => setSettings({ ...settings, closedMessage: e.target.value })}
             placeholder="Enter the official advisory message shown to students when online enrollment is turned OFF..."
-            className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-sans text-slate-900 focus:border-[#002060] outline-none leading-relaxed"
+            className="w-full p-3.5 bg-white border border-slate-200 rounded-xl text-xs font-sans text-slate-900 focus:border-[#002060] outline-none leading-relaxed"
           />
 
           {/* Quick Notice Presets */}
           <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-            <span className="font-mono font-bold text-slate-500 uppercase">Notice Presets:</span>
+            <span className="font-semibold text-slate-600">Quick Templates:</span>
             <button
               type="button"
               onClick={() =>
@@ -408,7 +405,7 @@ export default function EnrollmentControlRoom() {
                   closedMessage: `DepEd Official Advisory: Dumalneg National High School Online Enrollment for School Year ${settings.schoolYear} is currently closed at this time. Please await further announcements from the Registrar's Office.`,
                 })
               }
-              className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer"
             >
               Standard Closed Advisory
             </button>
@@ -420,7 +417,7 @@ export default function EnrollmentControlRoom() {
                   closedMessage: `The official DepEd enrollment window for School Year ${settings.schoolYear} has officially concluded. For late enrollment inquiries, please proceed in-person to the Dumalneg NHS Registrar's Office.`,
                 })
               }
-              className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer"
             >
               Enrollment Window Concluded
             </button>
@@ -429,23 +426,23 @@ export default function EnrollmentControlRoom() {
               onClick={() =>
                 setSettings({
                   ...settings,
-                  closedMessage: `Online enrollment is temporarily paused for section quota rebalancing and class schedule finalization for S.Y. ${settings.schoolYear}. Re-opening will be announced shortly.`,
+                  closedMessage: `Online enrollment is temporarily paused while we organize class sections and finalize schedules for S.Y. ${settings.schoolYear}. Re-opening will be announced shortly.`,
                 })
               }
-              className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer"
             >
-              Section Quota Paused
+              Paused to Organize Sections
             </button>
           </div>
         </div>
 
         {/* Live Student Portal Preview */}
-        <div className="p-4 bg-slate-50 border border-slate-300 space-y-2">
-          <span className="text-[10px] font-mono font-bold text-[#002060] uppercase block">
-            Live Student Portal Preview: What Students Will See at /enroll
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <span className="text-xs font-bold text-[#002060] block">
+            Preview: What Students Will See
           </span>
           <div
-            className={`p-4 border-2 ${
+            className={`p-4 border rounded-xl ${
               settings.isEnrollmentOpen
                 ? "bg-emerald-50 border-emerald-400 text-emerald-950"
                 : "bg-amber-50 border-amber-400 text-amber-950"
@@ -473,7 +470,7 @@ export default function EnrollmentControlRoom() {
 
         {/* Action Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200">
-          <div className="text-[11px] font-mono text-slate-500">
+          <div className="text-xs text-slate-500">
             {settings.updatedAt && (
               <>Last updated: {new Date(settings.updatedAt).toLocaleString()}</>
             )}
@@ -484,7 +481,7 @@ export default function EnrollmentControlRoom() {
               type="button"
               onClick={loadSettings}
               disabled={isLoading || isSaving}
-              className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase border border-slate-300 transition-colors cursor-pointer text-center"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors cursor-pointer text-center"
             >
               Discard / Reload
             </button>
@@ -493,9 +490,9 @@ export default function EnrollmentControlRoom() {
               type="button"
               onClick={() => handleSave()}
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-center"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-center"
             >
-              {isSaving ? "Saving Settings..." : "Save & Broadcast Enrollment Controls"}
+              {isSaving ? "Saving Settings..." : "Save Settings"}
             </button>
           </div>
         </div>

@@ -252,7 +252,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cleanPass = password.trim();
 
     if (!cleanId || !cleanPass) {
-      return { success: false, error: "Please enter your Email Address or 12-Digit LRN and password." };
+      return { success: false, error: "Please enter your email or 12-digit LRN and your password." };
     }
 
     try {
@@ -351,7 +351,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           return {
             success: false,
-            error: `Access Denied: This email address is officially registered as a ${roleTitle} account. Please sign in via your designated portal: ${portalLink}.`,
+            error: `Wrong Portal: This email is registered as a ${roleTitle} account. Please sign in via your designated portal: ${portalLink}.`,
           };
         }
 
@@ -365,14 +365,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (errMsg.includes("email not confirmed") || errMsg.includes("unconfirmed")) {
             return {
               success: false,
-              error: "Your Gmail account is not yet verified. Please check your inbox (and Spam folder) for the verification link sent by Dumalneg NHS.",
+              error: "Please verify your Gmail first. Check your inbox (and Spam folder) for the link we sent you.",
               unconfirmedEmail: cleanId,
             };
           }
           if (errMsg.includes("invalid login credentials")) {
             return {
               success: false,
-              error: "Invalid email or password entered. Please check your credentials.",
+              error: "Wrong email or password. Please try again.",
             };
           }
           return { success: false, error: authErr.message };
@@ -393,7 +393,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(null);
             return {
               success: false,
-              error: `Access Denied: This account is officially registered as ${postRole}. Only enrolled learners and student applicants can access this portal.`,
+              error: `Wrong Portal: This account belongs to a ${postRole}. Only enrolled learners and student applicants can access this portal.`,
             };
           }
 
@@ -432,7 +432,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!suUser) {
         return {
           success: false,
-          error: "No student account found in Supabase for that email or LRN. Please check your credentials or register a new account.",
+          error: "We could not find a student account with that email or LRN. Please double-check what you typed or create a new account.",
         };
       }
 
@@ -509,13 +509,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (cleanEmail === "dumalnext@gmail.com") {
       return {
         success: false,
-        error: "Access Denied: dumalnext@gmail.com is permanently reserved as the Master IT Support account. It cannot be registered as a Student account.",
+        error: "dumalnext@gmail.com is reserved for school IT Support and cannot be used for a student account. It cannot be registered as a Student account.",
       };
     }
     if (cleanEmail === "heartistrichford@gmail.com") {
       return {
         success: false,
-        error: "Access Denied: heartistrichford@gmail.com is permanently reserved as the School Administrator account. It cannot be registered as a Student account.",
+        error: "heartistrichford@gmail.com is reserved for the School Administrator and cannot be used for a student account. It cannot be registered as a Student account.",
       };
     }
 
@@ -596,7 +596,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               : "IT Support";
           return {
             success: false,
-            error: `Error: This email address has been provisioned under an official ${roleLabel} invitation. It cannot be used to register a Student account. Please check your invitation email.`,
+            error: `This email was invited as a ${roleLabel} account. It cannot be used to register a Student account. Please check your invitation email.`,
           };
         }
       }
@@ -623,7 +623,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (authErr) {
         return {
           success: false,
-          error: "Supabase Auth error: " + authErr.message,
+          error: authErr.message,
         };
       }
 
@@ -646,7 +646,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (finalCheck && finalCheck.user_role && finalCheck.user_role !== "student") {
         return {
           success: false,
-          error: `Critical Error: Account collision detected. This email is assigned to role "${finalCheck.user_role}".`,
+          error: `Account conflict: This email is assigned to role "${finalCheck.user_role}".`,
         };
       }
 

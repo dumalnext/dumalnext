@@ -75,10 +75,10 @@ export function PushNotificationModal({
             </div>
             <div>
               <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">
-                Progressive Web App Push
+                School Alerts
               </span>
               <h3 className="text-base font-extrabold text-white tracking-tight leading-snug">
-                Device Push Notifications
+                School Notification Settings
               </h3>
             </div>
           </div>
@@ -87,10 +87,10 @@ export function PushNotificationModal({
         {/* Modal Body */}
         <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
           {/* Device & Status Card */}
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-[4px] space-y-2">
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-600 font-medium">Detected Device:</span>
-              <span className="font-bold text-[#002060] px-2 py-0.5 bg-blue-100 rounded-[3px]">
+              <span className="font-bold text-[#002060] px-2.5 py-0.5 bg-blue-100 rounded-full text-xs">
                 {deviceType}
               </span>
             </div>
@@ -98,17 +98,17 @@ export function PushNotificationModal({
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-600 font-medium">Notification Status:</span>
               {permission === "granted" ? (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-950 font-bold rounded-[3px] text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-950 font-bold rounded-full text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Active on this Device
                 </span>
               ) : permission === "denied" ? (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-red-100 text-red-950 font-bold rounded-[3px] text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-red-100 text-red-950 font-bold rounded-full text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                   Blocked in Browser
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-950 font-bold rounded-[3px] text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-950 font-bold rounded-full text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   Permission Required
                 </span>
@@ -118,12 +118,12 @@ export function PushNotificationModal({
 
           {/* Explanation */}
           <p className="text-xs text-slate-700 leading-relaxed">
-            Enable instant DepEd system push notifications to stay informed on your{" "}
-            <strong>{isMobile ? "cellphone (CP)" : "PC / Laptop"}</strong> even when the browser tab is closed or in the background.
+            Turn on school notifications on your{" "}
+            <strong>{isMobile ? "phone" : "computer"}</strong> so you receive updates even when this page is closed.
           </p>
 
           {/* Notification Perks */}
-          <div className="space-y-1.5 p-3 bg-blue-50/60 border border-blue-200 rounded-[4px] text-xs text-slate-700">
+          <div className="space-y-1.5 p-3 bg-blue-50/60 border border-blue-200 rounded-xl text-xs text-slate-700">
             <div className="font-bold text-[#002060] mb-1">Alerts Included:</div>
             <div className="flex items-start gap-2">
               <span className="text-emerald-700 font-bold shrink-0">•</span>
@@ -131,7 +131,7 @@ export function PushNotificationModal({
             </div>
             <div className="flex items-start gap-2">
               <span className="text-emerald-700 font-bold shrink-0">•</span>
-              <span>Official section placement &amp; weekly timetable synchronization</span>
+              <span>Your assigned class section and schedule updates</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-emerald-700 font-bold shrink-0">•</span>
@@ -146,23 +146,23 @@ export function PushNotificationModal({
                 type="button"
                 onClick={handleEnable}
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-[#002060] hover:bg-blue-900 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-[4px] transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-[#002060] hover:bg-blue-900 text-white text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-50"
               >
-                {isLoading ? "Requesting Permission..." : "Enable Push Notifications"}
+                {isLoading ? "Requesting Permission..." : "Turn On Notifications"}
               </button>
             ) : (
               <button
                 type="button"
                 onClick={handleTest}
                 disabled={isTesting}
-                className="w-full py-2.5 px-4 bg-amber-400 hover:bg-amber-300 text-slate-950 active:scale-[0.99] text-xs font-bold uppercase tracking-wider rounded-[4px] transition-all cursor-pointer shadow-xs border border-amber-500 disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-xs border border-amber-500 disabled:opacity-50"
               >
-                {isTesting ? "Sending Test Push..." : `Send Test Alert to this ${isMobile ? "CP" : "PC"}`}
+                {isTesting ? "Sending Test Push..." : `Send Test Message to This ${isMobile ? "Phone" : "Computer"}`}
               </button>
             )}
 
             {permission === "denied" && (
-              <div className="p-3 bg-red-50 border border-red-300 text-xs text-red-900 rounded-[4px]">
+              <div className="p-3 bg-red-50 border border-red-200 text-xs text-red-900 rounded-xl">
                 <strong>How to unblock:</strong> Click the lock icon beside the URL in your browser&apos;s address bar, find <em>Notifications</em>, change it to <em>Allow</em>, and refresh the page.
               </div>
             )}
@@ -172,11 +172,11 @@ export function PushNotificationModal({
           <div className="text-[11px] text-slate-500 border-t border-slate-100 pt-3">
             {isMobile ? (
               <p>
-                <strong>Cellphone (CP) Tip:</strong> On Android Chrome, alerts arrive directly in your phone&apos;s notification shade. On iPhone (iOS), install the app to your Home Screen to activate Web Push.
+                <strong>Phone Tip:</strong> On Android Chrome, alerts arrive directly in your phone&apos;s notification shade. On iPhone (iOS), install the app to your Home Screen to activate Web Push.
               </p>
             ) : (
               <p>
-                <strong>PC / Desktop Tip:</strong> Notifications arrive as native Windows/macOS notification banners with school seal and 1-click action buttons.
+                <strong>Computer Tip:</strong> Notifications arrive as native Windows/macOS notification banners with school seal and 1-click action buttons.
               </p>
             )}
           </div>
@@ -187,7 +187,7 @@ export function PushNotificationModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 bg-[#002060] hover:bg-blue-900 text-white rounded-[4px] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            className="px-5 py-2 bg-[#002060] hover:bg-blue-900 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
           >
             Close
           </button>
@@ -212,7 +212,7 @@ export function PushNotificationHeaderButton() {
       <button
         type="button"
         onClick={() => setShowModal(true)}
-        className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-[4px] transition-all cursor-pointer shadow-xs ${
+        className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs ${
           isGranted
             ? "bg-blue-950/80 hover:bg-blue-900 text-blue-100 border border-blue-400/30"
             : "bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-300/40"
@@ -278,55 +278,62 @@ export function PushNotificationDrawerCard() {
 
   return (
     <>
-      <div className="p-3.5 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-[#002060]/30 rounded-[4px] shadow-xs space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <span className="text-[9px] font-black text-[#002060] uppercase tracking-widest block">
-              DEVICE PUSH ALERTS
-            </span>
-            <h4 className="text-xs font-extrabold text-slate-950 leading-tight mt-0.5">
-              Cellphone Notifications
-            </h4>
+      <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl shadow-2xs flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-2xs ${
+            isGranted ? "bg-emerald-600 text-white" : "bg-[#002060] text-amber-300"
+          }`}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
           </div>
-          <span
-            className={`px-1.5 py-0.5 text-[9px] font-bold rounded-[3px] uppercase ${
-              isGranted
-                ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
-                : "bg-amber-100 text-amber-950 border border-amber-300"
-            }`}
-          >
-            {isGranted ? "ACTIVE" : "OFF"}
-          </span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-slate-900 truncate">Push Alerts</span>
+              <span
+                className={`px-1.5 py-0.2 text-[10px] font-semibold rounded-full shrink-0 ${
+                  isGranted
+                    ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                    : "bg-amber-100 text-amber-900 border border-amber-300"
+                }`}
+              >
+                {isGranted ? "Active" : "Off"}
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-500 truncate">
+              {isGranted ? "Receiving real-time advisories" : "Enable enrollment notifications"}
+            </p>
+          </div>
         </div>
-        <p className="text-[11px] text-slate-700 leading-snug">
-          Receive real-time alerts for enrollment status, section assignments, and DepEd advisories directly on this phone.
-        </p>
-        <div className="flex items-center gap-2 pt-1">
+
+        <div className="flex items-center gap-1.5 shrink-0">
           {!isGranted ? (
             <button
               type="button"
               onClick={requestPermission}
-              className="flex-1 py-2 bg-[#002060] hover:bg-blue-900 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-[4px] transition-colors cursor-pointer text-center shadow-xs"
+              className="px-2.5 py-1.5 bg-[#002060] hover:bg-blue-900 active:scale-95 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-2xs"
             >
-              Turn On Alerts
+              Turn On
             </button>
           ) : (
             <button
               type="button"
               onClick={handleTest}
               disabled={isTesting}
-              className="flex-1 py-2 bg-amber-400 hover:bg-amber-300 active:scale-[0.99] text-slate-950 text-xs font-bold uppercase tracking-wider rounded-[4px] transition-colors cursor-pointer text-center shadow-xs border border-amber-500 disabled:opacity-50"
+              className="px-2.5 py-1.5 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-2xs border border-amber-500/60 disabled:opacity-50"
             >
-              {isTesting ? "Sending..." : "Test CP Alert"}
+              {isTesting ? "Wait..." : "Test"}
             </button>
           )}
           <button
             type="button"
             onClick={() => setShowModal(true)}
-            className="px-2.5 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-[4px] hover:bg-slate-50 transition-colors"
-            title="Notification Options & Help"
+            className="w-7 h-7 flex items-center justify-center bg-white border border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            title="Notification Settings & Help"
           >
-            Info
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </button>
         </div>
       </div>

@@ -397,7 +397,7 @@ export default function CurriculumSubjectsConsole() {
     if (list.length === 0) {
       return (
         <div className="p-6 text-center space-y-2 bg-slate-50/50">
-          <span className="text-xs font-mono font-bold text-slate-500 uppercase block">
+          <span className="text-xs font-bold text-slate-500 uppercase block">
             {emptyMessage}
           </span>
           <p className="text-xs text-slate-600 max-w-md mx-auto">
@@ -420,13 +420,13 @@ export default function CurriculumSubjectsConsole() {
 
     return (
       <div>
-        <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-mono text-[#002060] flex items-center justify-between">
+        <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between">
           <span>Swipe horizontally to view full subject details</span>
         </div>
         <div className="overflow-x-auto touch-pan-x">
           <table className="w-full min-w-[650px] text-left text-xs border-collapse font-sans">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-mono text-slate-700 uppercase">
+            <tr className="bg-slate-50 border-b border-slate-300 text-[11px] font-medium text-slate-700 uppercase">
               <th className="p-3 w-40">Subject Code</th>
               <th className="p-3 min-w-[240px]">Descriptive Title</th>
               <th className="p-3 w-32">Classification</th>
@@ -443,7 +443,7 @@ export default function CurriculumSubjectsConsole() {
                   className="hover:bg-blue-50/40 transition-colors"
                 >
                   {/* Subject Code */}
-                  <td className="p-3 font-mono font-bold text-[#002060]">
+                  <td className="p-3 font-bold text-[#002060]">
                     {sub.subject_code}
                   </td>
 
@@ -462,23 +462,23 @@ export default function CurriculumSubjectsConsole() {
                   {/* Classification Badge */}
                   <td className="p-3">
                     {sub.subject_type === "Core" ? (
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-blue-100 text-[#002060] border border-blue-300">
                         CORE
                       </span>
                     ) : sub.subject_type === "Elective" ? (
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-purple-100 text-purple-900 border border-purple-300">
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-purple-100 text-purple-900 border border-purple-300">
                         ELECTIVE
                       </span>
                     ) : sub.subject_type === "Specialized" ? (
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-amber-100 text-amber-950 border border-amber-400">
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-amber-100 text-amber-950 border border-amber-400">
                         SPECIALIZED
                       </span>
                     ) : sub.subject_type === "Applied" ? (
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400">
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-emerald-100 text-emerald-950 border border-emerald-400">
                         APPLIED
                       </span>
                     ) : (
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase bg-red-100 text-red-950 border border-red-300">
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-red-100 text-red-950 border border-red-300">
                         INTERVENTION
                       </span>
                     )}
@@ -486,7 +486,7 @@ export default function CurriculumSubjectsConsole() {
 
                   {/* Program / Track */}
                   <td className="p-3">
-                    <span className="text-[11px] font-mono font-bold text-slate-800 block">
+                    <span className="text-[11px] font-bold text-slate-800 block">
                       {isJhs
                         ? "Regular Basic Education"
                         : sub.strand
@@ -533,7 +533,7 @@ export default function CurriculumSubjectsConsole() {
     addBtnLabel: string
   ) => {
     return (
-      <div className="bg-white border-2 border-slate-300 shadow-xs mb-6 overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-xs mb-6 overflow-hidden">
         {/* Sub-Heading Header Bar */}
         <div className="bg-slate-100 border-b-2 border-slate-300 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -542,7 +542,7 @@ export default function CurriculumSubjectsConsole() {
               <h4 className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#002060]">
                 {subHeadingTitle}
               </h4>
-              <span className="text-[10px] font-mono text-slate-500 block uppercase">
+              <span className="text-[10px] font-medium text-slate-500 block uppercase">
                 {gradeSubjects.length}{" "}
                 {gradeSubjects.length === 1 ? "Subject Offering" : "Subject Offerings"}
               </span>
@@ -581,7 +581,7 @@ export default function CurriculumSubjectsConsole() {
     const defaultElectiveType = trackStrand === "TechPro" ? "Specialized" : "Elective";
 
     return (
-      <div className="bg-white border-2 border-slate-300 shadow-xs mb-6 overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-xs mb-6 overflow-hidden">
         {/* Main Subheading Header Bar */}
         <div className="bg-slate-100 border-b-2 border-slate-300 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -590,7 +590,7 @@ export default function CurriculumSubjectsConsole() {
               <h4 className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#002060]">
                 {subHeadingTitle}
               </h4>
-              <span className="text-[10px] font-mono text-slate-500 block uppercase">
+              <span className="text-[10px] font-medium text-slate-500 block uppercase">
                 {totalCount} Total Subject Offerings ({coreSubjects.length} Core • {electiveSubjects.length} Elective / Specialized)
               </span>
             </div>
@@ -630,10 +630,10 @@ export default function CurriculumSubjectsConsole() {
         <div className="border-b-4 border-slate-300">
           <div className="bg-blue-50/70 border-b border-blue-200 px-4 sm:px-6 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-[#002060] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#002060] uppercase tracking-wider">
                 Core Subjects
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 bg-blue-100 text-[#002060] font-bold border border-blue-300">
+              <span className="text-[10px] font-medium px-2 py-0.5 bg-blue-100 text-[#002060] font-bold border border-blue-300">
                 {coreSubjects.length} {coreSubjects.length === 1 ? "COURSE" : "COURSES"}
               </span>
             </div>
@@ -646,7 +646,7 @@ export default function CurriculumSubjectsConsole() {
                   grade: gradeLevel,
                 })
               }
-              className="text-[11px] font-mono font-bold text-[#002060] hover:underline uppercase cursor-pointer"
+              className="text-[11px] font-bold text-[#002060] hover:underline uppercase cursor-pointer"
             >
               + Add Core
             </button>
@@ -669,10 +669,10 @@ export default function CurriculumSubjectsConsole() {
         <div>
           <div className="bg-purple-50/60 border-b border-purple-200 px-4 sm:px-6 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-purple-950 uppercase tracking-wider">
+              <span className="text-xs font-bold text-purple-950 uppercase tracking-wider">
                 Elective Part
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 bg-purple-100 text-purple-950 font-bold border border-purple-300">
+              <span className="text-[10px] font-medium px-2 py-0.5 bg-purple-100 text-purple-950 font-bold border border-purple-300">
                 {electiveSubjects.length} {electiveSubjects.length === 1 ? "COURSE" : "COURSES"}
               </span>
             </div>
@@ -685,7 +685,7 @@ export default function CurriculumSubjectsConsole() {
                   grade: gradeLevel,
                 })
               }
-              className="text-[11px] font-mono font-bold text-purple-900 hover:underline uppercase cursor-pointer"
+              className="text-[11px] font-bold text-purple-900 hover:underline uppercase cursor-pointer"
             >
               + Add Elective
             </button>
@@ -719,7 +719,7 @@ export default function CurriculumSubjectsConsole() {
           />
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
-              Curriculum &amp; Subjects Management Console
+              School Subjects
             </h2>
           </div>
         </div>
@@ -744,7 +744,7 @@ export default function CurriculumSubjectsConsole() {
 
       {/* Success Notification Banner */}
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-500 text-emerald-950 text-xs font-bold uppercase tracking-wide flex items-center justify-between">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-950 text-xs font-bold uppercase tracking-wide flex items-center justify-between">
           <span>{successMessage}</span>
           <button
             type="button"
@@ -758,7 +758,7 @@ export default function CurriculumSubjectsConsole() {
 
       {/* Error Notification Banner */}
       {errorMessage && (
-        <div className="p-4 bg-red-50 border-2 border-red-500 text-red-950 text-xs font-bold uppercase tracking-wide flex items-center justify-between">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-950 text-xs font-bold uppercase tracking-wide flex items-center justify-between">
           <span>{errorMessage}</span>
           <button
             type="button"
@@ -772,57 +772,57 @@ export default function CurriculumSubjectsConsole() {
 
       {/* Metrics Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-sans">
-        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
               Total Active Subjects
             </span>
             {isLoading ? (
               <div className="h-7 w-16 bg-slate-200 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-mono font-bold text-[#002060] mt-1">{totalCount}</div>
+              <div className="text-2xl font-bold text-[#002060] mt-1">{totalCount}</div>
             )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Across all Grade 7-12 levels</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
               JHS Subjects (Grades 7–10)
             </span>
             {isLoading ? (
               <div className="h-7 w-16 bg-emerald-100 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-mono font-bold text-emerald-800 mt-1">{jhsTotal}</div>
+              <div className="text-2xl font-bold text-emerald-800 mt-1">{jhsTotal}</div>
             )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Regular Basic Education</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
               SHS Subjects (Grades 11–12)
             </span>
             {isLoading ? (
               <div className="h-7 w-16 bg-blue-100 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-mono font-bold text-blue-800 mt-1">{shsTotal}</div>
+              <div className="text-2xl font-bold text-blue-800 mt-1">{shsTotal}</div>
             )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Academic, TechPro &amp; Core Tracks</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-300 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest block">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
               Specialized &amp; Electives
             </span>
             {isLoading ? (
               <div className="h-7 w-16 bg-purple-100 animate-pulse rounded mt-1" />
             ) : (
-              <div className="text-2xl font-mono font-bold text-indigo-800 mt-1">{electivesCount}</div>
+              <div className="text-2xl font-bold text-indigo-800 mt-1">{electivesCount}</div>
             )}
           </div>
           <span className="text-[10px] text-slate-500 block leading-tight mt-1.5 break-words">Applied, Specialized &amp; Track Electives</span>
@@ -830,7 +830,7 @@ export default function CurriculumSubjectsConsole() {
       </div>
 
       {/* Global Filter & Search Bar */}
-      <div className="bg-white border-2 border-slate-300 p-4 space-y-3 shadow-xs">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3 shadow-xs">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           {/* Search Box */}
           <div className="relative flex-1 w-full">
@@ -839,7 +839,7 @@ export default function CurriculumSubjectsConsole() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by Subject Code, Title, or Track..."
-              className="w-full pl-3 pr-7 py-2 bg-white border border-slate-300 text-xs font-mono font-bold focus:border-[#002060] outline-none"
+              className="w-full pl-3 pr-7 py-2 bg-white border border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
             />
             {searchQuery && (
               <button
@@ -897,7 +897,7 @@ export default function CurriculumSubjectsConsole() {
         {/* Active Filter Indicator */}
         {(typeFilter !== "ALL" || strandFilter !== "ALL" || searchQuery.trim()) && (
           <div className="p-2.5 bg-blue-50/80 border border-blue-200 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="font-mono text-[#002060]">
+            <span className="font-medium text-[#002060]">
               Active Filter: Showing <strong>{filteredSubjects.length}</strong> of{" "}
               <strong>{totalCount}</strong> subjects across all levels.
             </span>
@@ -931,7 +931,7 @@ export default function CurriculumSubjectsConsole() {
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="p-3 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-5 w-20 bg-slate-200 rounded font-mono" />
+                    <div className="h-5 w-20 bg-slate-200 rounded font-medium" />
                     <div className="h-4 w-48 bg-slate-200 rounded" />
                   </div>
                   <div className="flex items-center gap-2">
@@ -949,7 +949,7 @@ export default function CurriculumSubjectsConsole() {
       {/* 1. JHS SECTION */}
       {/* ========================================================================= */}
       {!isLoading && (
-        <section className="border-4 border-[#002060] bg-slate-50 shadow-md">
+        <section className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 shadow-md">
           {/* Main JHS Heading Bar */}
           <div className="bg-[#002060] text-white p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
             <div>
@@ -959,7 +959,7 @@ export default function CurriculumSubjectsConsole() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 text-white border border-white/20">
+              <span className="text-xs font-bold bg-white/10 px-3 py-1.5 text-white border border-white/20">
                 {jhsTotal} Subjects on Record
               </span>
               <button
@@ -1017,7 +1017,7 @@ export default function CurriculumSubjectsConsole() {
       {/* 2. SHS SECTION */}
       {/* ========================================================================= */}
       {!isLoading && (
-        <section className="border-4 border-[#0b3c7e] bg-slate-50 shadow-md">
+        <section className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 shadow-md">
           {/* Main SHS Heading Bar */}
           <div className="bg-[#0b3c7e] text-white p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-4 border-amber-400">
             <div>
@@ -1027,7 +1027,7 @@ export default function CurriculumSubjectsConsole() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 text-white border border-white/20">
+              <span className="text-xs font-bold bg-white/10 px-3 py-1.5 text-white border border-white/20">
                 {shsTotal} Subjects on Record
               </span>
               <button
@@ -1086,12 +1086,12 @@ export default function CurriculumSubjectsConsole() {
       {/* ========================================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[90vh]">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[90vh]">
             {/* Modal Header */}
             <div className="bg-[#002060] text-white p-4 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-widest block">
-                  DEPED SUBJECT MANAGEMENT
+                <span className="text-[10px] font-bold text-blue-200 uppercase tracking-widest block">
+                  SUBJECT DETAILS
                 </span>
                 <h3 className="text-base font-bold uppercase tracking-tight">
                   {isEditing
@@ -1114,16 +1114,16 @@ export default function CurriculumSubjectsConsole() {
 
             {/* Locked Track Banner */}
             {modalLockedTrack && (
-              <div className="bg-blue-50 border-b-2 border-blue-200 px-6 py-2.5 flex items-center justify-between text-xs">
+              <div className="bg-blue-50 border-b border-blue-200 px-6 py-2.5 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-[#002060] uppercase">
-                    Track Mode: Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track.toUpperCase()}
+                  <span className="font-bold text-[#002060] uppercase">
+                    For: Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track.toUpperCase()}
                   </span>
                   <span className="text-slate-600 font-bold uppercase">
                     • {modalLockedTrack.category === "Core" ? "Core Subject" : "Elective / Specialized"}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono font-bold uppercase bg-[#002060] text-white px-2 py-0.5">
+                <span className="text-[10px] font-bold uppercase bg-[#002060] text-white px-2 py-0.5">
                   Locked
                 </span>
               </div>
@@ -1132,7 +1132,7 @@ export default function CurriculumSubjectsConsole() {
             {/* Modal Form Body */}
             <form onSubmit={handleSaveSubject} className="p-6 space-y-4 overflow-y-auto text-xs stable-gutter custom-scrollbar">
               {formError && (
-                <div className="p-3 bg-red-50 border-2 border-red-400 text-red-900 font-bold text-xs">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-900 font-bold text-xs">
                   {formError}
                 </div>
               )}
@@ -1153,7 +1153,7 @@ export default function CurriculumSubjectsConsole() {
                       ? "e.g., Introduction to Philosophy, Creative Writing, Philippine Politics"
                       : "e.g., Computer Systems Servicing, Work Immersion, Electrical Installation Maintenance"
                   }
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs font-bold focus:border-[#002060] outline-none"
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:border-[#002060] outline-none"
                   required
                 />
               </div>
@@ -1167,7 +1167,7 @@ export default function CurriculumSubjectsConsole() {
                   <button
                     type="button"
                     onClick={handleAutoGenerateCode}
-                    className="text-[10px] font-mono text-[#002060] hover:underline font-bold cursor-pointer"
+                    className="text-[10px] font-medium text-[#002060] hover:underline font-bold cursor-pointer"
                   >
                     Auto-Generate Code
                   </button>
@@ -1188,14 +1188,14 @@ export default function CurriculumSubjectsConsole() {
                       : "e.g., JHS-MATH7, SHS-STEM-PRECAL11"
                   }
                   disabled={isEditing}
-                  className={`w-full p-2.5 border-2 text-xs font-mono font-bold outline-none uppercase ${
+                  className={`w-full p-2.5 border-2 text-xs font-bold outline-none uppercase ${
                     isEditing
                       ? "bg-slate-100 border-slate-300 text-slate-600 cursor-not-allowed"
                       : "bg-white border-slate-300 focus:border-[#002060]"
                   }`}
                   required
                 />
-                <span className="text-[10px] text-slate-500 block mt-0.5 font-mono">
+                <span className="text-[10px] text-slate-500 block mt-0.5 font-medium">
                   Standard format: LEVEL-STRAND-TITLE-GRADE
                 </span>
               </div>
@@ -1208,11 +1208,11 @@ export default function CurriculumSubjectsConsole() {
                     Grade Level <span className="text-red-700">*</span>
                   </label>
                   {modalLockedTrack ? (
-                    <div className="w-full p-2.5 bg-slate-100 border-2 border-slate-300 text-xs font-bold text-slate-800 flex items-center justify-between">
-                      <span className="font-mono text-slate-900">
+                    <div className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 flex items-center justify-between">
+                      <span className="font-medium text-slate-900">
                         Grade {modalLockedTrack.grade || formGrade} (SHS)
                       </span>
-                      <span className="text-[10px] font-mono uppercase bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-300 font-bold">
+                      <span className="text-[10px] font-medium uppercase bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-300 font-bold">
                         Locked
                       </span>
                     </div>
@@ -1262,7 +1262,7 @@ export default function CurriculumSubjectsConsole() {
                           : "Elective Subject"}
                       </span>
                       <span
-                        className={`text-[10px] font-mono uppercase px-2 py-0.5 text-white font-bold ${
+                        className={`text-[10px] font-medium uppercase px-2 py-0.5 text-white font-bold ${
                           modalLockedTrack.category === "Core" ? "bg-[#002060]" : "bg-purple-800"
                         }`}
                       >
@@ -1292,18 +1292,18 @@ export default function CurriculumSubjectsConsole() {
                   Program / Strand Designation <span className="text-red-700">*</span>
                 </label>
                 {modalLockedTrack ? (
-                  <div className="w-full p-2.5 bg-amber-50 border-2 border-amber-500 text-xs font-bold text-slate-950 flex items-center justify-between">
+                  <div className="w-full p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-xs font-bold text-slate-950 flex items-center justify-between">
                     <div>
                       <span className="block text-slate-900 font-bold">
                         {modalLockedTrack.track === "Academic"
                           ? "Academic Track (Strengthened SHS)"
                           : "Technical-Professional Track (TechPro)"}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-600 font-normal block mt-0.5">
+                      <span className="text-[10px] font-medium text-slate-600 font-normal block mt-0.5">
                         Automatic designation for Grade {modalLockedTrack.grade || formGrade} {modalLockedTrack.track}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono uppercase bg-amber-400 text-slate-950 px-2 py-0.5 font-bold border border-amber-600">
+                    <span className="text-[10px] font-medium uppercase bg-amber-400 text-slate-950 px-2 py-0.5 font-bold border border-amber-600">
                       Auto-Assigned
                     </span>
                   </div>
@@ -1346,7 +1346,7 @@ export default function CurriculumSubjectsConsole() {
                   onChange={(e) => setFormDescription(e.target.value)}
                   rows={2}
                   placeholder="Notes, course objectives, or learning area scope..."
-                  className="w-full p-2.5 bg-white border-2 border-slate-300 text-xs focus:border-[#002060] outline-none font-sans"
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:border-[#002060] outline-none font-sans"
                 />
               </div>
 
@@ -1382,10 +1382,10 @@ export default function CurriculumSubjectsConsole() {
       {/* ========================================================================= */}
       {deleteSubjectTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-          <div className="bg-white border-2 sm:border-4 border-[#002060] w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden w-full max-w-md shadow-2xl p-4 sm:p-6 space-y-4">
             <div className="border-b-2 border-slate-200 pb-2">
-              <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
-                CONFIRM REMOVAL OF SUBJECT
+              <span className="text-[10px] font-bold text-[#002060] uppercase tracking-widest block">
+                CONFIRM ACTION
               </span>
               <h3 className="text-base font-bold text-slate-900 uppercase">
                 Remove Subject?
@@ -1394,7 +1394,7 @@ export default function CurriculumSubjectsConsole() {
 
             <div className="p-3 bg-red-50 border border-red-300 text-xs space-y-1 text-red-950">
               <p>Are you sure you want to remove the following subject?</p>
-              <div className="font-mono font-bold text-sm text-[#002060]">
+              <div className="font-bold text-sm text-[#002060]">
                 {deleteSubjectTarget.subject_code}
               </div>
               <div className="font-bold text-slate-900">

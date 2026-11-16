@@ -91,19 +91,19 @@ export default function RegisterPage() {
 
       {/* Global Error Notice */}
       {errors.form && (
-        <div className="p-4 bg-red-50 border-2 border-red-400 rounded-[4px]">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
           <p className="text-xs font-bold text-red-900 leading-normal">
-            Registration Notice: {errors.form}
+            {errors.form}
           </p>
         </div>
       )}
 
       {/* Registration Form Card */}
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-[4px] shadow-sm">
+      <div className="bg-white border border-slate-200 p-6 sm:p-8 space-y-6 rounded-2xl shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="border-b border-slate-200 pb-2">
             <span className="text-xs font-bold text-[#002060]">
-              1. Official Learner Identification
+              1. Your Full Name (as written on Birth Certificate)
             </span>
           </div>
 
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                   if (errors.lastName) setErrors({ ...errors, lastName: "" });
                 }}
                 placeholder="e.g. AGCAOILI"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border text-sm font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                   errors.lastName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -143,7 +143,7 @@ export default function RegisterPage() {
                   if (errors.firstName) setErrors({ ...errors, firstName: "" });
                 }}
                 placeholder="e.g. MARK ANTHONY"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold uppercase focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border text-sm font-bold uppercase focus:border-[#002060] outline-none rounded-xl ${
                   errors.firstName ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -198,7 +198,7 @@ export default function RegisterPage() {
                 }}
                 placeholder={noMiddleName ? "N/A" : "e.g. DELA CRUZ"}
                 disabled={noMiddleName}
-                className={`w-full p-2.5 border-2 text-xs font-bold uppercase outline-none rounded-[4px] ${
+                className={`w-full p-2.5 border text-sm font-bold uppercase outline-none rounded-xl ${
                   noMiddleName
                     ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
                     : "bg-white border-slate-300 focus:border-[#002060]"
@@ -224,7 +224,7 @@ export default function RegisterPage() {
                   if (errors.lrn) setErrors({ ...errors, lrn: "" });
                 }}
                 placeholder="e.g. 100050123456"
-                className={`w-full p-2.5 bg-white border-2 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border text-sm font-bold tracking-wider focus:border-[#002060] outline-none rounded-xl ${
                   errors.lrn ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -236,7 +236,7 @@ export default function RegisterPage() {
 
           <div className="border-b border-slate-200 pt-2 pb-2">
             <span className="text-xs font-bold text-[#002060]">
-              2. Account Access Credentials
+              2. Email & Password
             </span>
           </div>
 
@@ -253,7 +253,7 @@ export default function RegisterPage() {
                 if (errors.email) setErrors({ ...errors, email: "" });
               }}
               placeholder="e.g. student.name@gmail.com"
-              className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none rounded-[4px] ${
+              className={`w-full p-2.5 bg-white border text-sm focus:border-[#002060] outline-none rounded-xl ${
                 errors.email ? "border-red-600 bg-red-50" : "border-slate-300"
               }`}
             />
@@ -277,7 +277,7 @@ export default function RegisterPage() {
                   if (errors.password) setErrors({ ...errors, password: "" });
                 }}
                 placeholder="Minimum 6 characters"
-                className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border text-sm focus:border-[#002060] outline-none rounded-xl ${
                   errors.password ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -299,7 +299,7 @@ export default function RegisterPage() {
                   if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: "" });
                 }}
                 placeholder="Re-type password"
-                className={`w-full p-2.5 bg-white border-2 text-xs focus:border-[#002060] outline-none rounded-[4px] ${
+                className={`w-full p-2.5 bg-white border text-sm focus:border-[#002060] outline-none rounded-xl ${
                   errors.confirmPassword ? "border-red-600 bg-red-50" : "border-slate-300"
                 }`}
               />
@@ -314,12 +314,12 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px] flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-xl flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
-              <span>{isSubmitting ? "Creating Official Account..." : "Register Account & Proceed to Enrollment"}</span>
+              <span>{isSubmitting ? "Creating Account..." : "Create Account & Continue"}</span>
             </button>
           </div>
         </form>

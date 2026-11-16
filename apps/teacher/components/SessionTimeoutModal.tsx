@@ -153,7 +153,7 @@ export default function SessionTimeoutModal() {
   return (
     <>
       {timeoutNotice && !user && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998] max-w-lg w-[92%] bg-amber-50 border-2 border-amber-500 text-amber-950 p-4 rounded-[4px] shadow-xl flex items-start justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-200">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998] max-w-lg w-[92%] bg-amber-50 border-2 border-amber-500 text-amber-950 p-4 rounded-xl shadow-xl flex items-start justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex items-start gap-2.5">
             <svg
               className="w-5 h-5 text-amber-600 shrink-0 mt-0.5"
@@ -194,7 +194,7 @@ export default function SessionTimeoutModal() {
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="inactivity-title-teacher"
-            className="bg-white rounded-[4px] border-2 border-[#002060] border-t-4 border-t-amber-400 shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-amber-400 shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200"
           >
             <div className="bg-[#002060] text-white px-6 py-4 flex items-center justify-between border-b border-blue-950">
               <div className="flex items-center gap-3">
@@ -215,7 +215,7 @@ export default function SessionTimeoutModal() {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                    Faculty Workstation Security
+                    Teacher Portal Notice
                   </span>
                   <h3 id="inactivity-title-teacher" className="text-base font-bold text-white leading-tight">
                     Are you still working?
@@ -226,10 +226,10 @@ export default function SessionTimeoutModal() {
 
             <div className="p-6 space-y-5 text-slate-800">
               <p className="text-xs leading-relaxed text-slate-700">
-                You have been inactive for <strong>15 minutes</strong>. To protect advisory rosters, learner attendance, and grading records, your Faculty Workstation session will automatically terminate in:
+                You have been inactive for <strong>15 minutes</strong>. To protect student privacy and class records, your session will close automatically in:
               </p>
 
-              <div className="bg-amber-50/80 border-2 border-amber-300 rounded-[4px] p-4 text-center space-y-2">
+              <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-4 text-center space-y-2">
                 <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider block">
                   Time Remaining Before Auto Logout
                 </span>
@@ -252,7 +252,7 @@ export default function SessionTimeoutModal() {
                 <button
                   type="button"
                   onClick={handleStaySignedIn}
-                  className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer rounded-[4px] shadow-xs flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold transition-colors cursor-pointer rounded-xl shadow-xs flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -262,7 +262,7 @@ export default function SessionTimeoutModal() {
                 <button
                   type="button"
                   onClick={handleSignOutNow}
-                  className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer rounded-[4px]"
+                  className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer rounded-xl"
                 >
                   Log Out Now
                 </button>

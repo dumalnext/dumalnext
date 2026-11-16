@@ -39,7 +39,7 @@ export default function LoginPage() {
       if (res.success) {
         router.push("/enroll");
       } else {
-        setError(res.error || "Authentication failed. Please check your credentials.");
+        setError(res.error || "Wrong email/LRN or password. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -57,15 +57,15 @@ export default function LoginPage() {
 
       {/* Error Alert Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border-2 border-red-400 rounded-[4px]">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
           <p className="text-xs font-bold text-red-900 leading-normal">
-            Authentication Error: {error}
+            {error}
           </p>
         </div>
       )}
 
       {/* Sign In Card */}
-      <div className="bg-white border-2 border-slate-300 p-6 sm:p-8 space-y-6 rounded-[4px] shadow-sm">
+      <div className="bg-white border border-slate-200 p-6 sm:p-8 space-y-6 rounded-2xl shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Identifier: Email First */}
           <div>
@@ -80,7 +80,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="e.g. student@example.com"
-              className="w-full p-3 bg-white border-2 border-slate-300 text-xs font-bold tracking-wider focus:border-[#002060] outline-none rounded-[4px]"
+              className="w-full p-3 bg-white border border-slate-300 text-sm font-medium focus:border-[#002060] outline-none rounded-xl"
               required
             />
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
                 if (error) setError("");
               }}
               placeholder="Enter your account password"
-              className="w-full p-3 bg-slate-50/70 focus:bg-white border-2 border-slate-300 text-xs font-semibold focus:border-[#002060] outline-none rounded-[4px] transition-colors"
+              className="w-full p-3 bg-slate-50/70 focus:bg-white border border-slate-300 text-sm font-medium focus:border-[#002060] outline-none rounded-xl transition-colors"
               required
             />
           </div>
@@ -134,12 +134,12 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-[4px] flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#002060] text-white text-xs font-bold hover:bg-blue-950 transition-colors shadow-xs disabled:bg-slate-400 rounded-xl flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
               </svg>
-              <span>{isSubmitting ? "Authenticating Account..." : "Sign In to Student Portal"}</span>
+              <span>{isSubmitting ? "Signing in..." : "Sign In"}</span>
             </button>
           </div>
         </form>

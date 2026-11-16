@@ -20,18 +20,18 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
   const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&autoplay=1`;
 
   return (
-    <section className="bg-white border border-slate-200/90 shadow-sm rounded-[4px] overflow-hidden">
+    <section className="bg-white border border-slate-200/90 shadow-sm rounded-xl overflow-hidden">
       {/* Compact Interactive Banner Header */}
       <div className="bg-gradient-to-r from-[#002060] to-[#0d3882] text-white px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-950">
         <div className="flex items-start sm:items-center gap-3.5">
-          <div className="w-10 h-10 rounded-[4px] bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
             </svg>
           </div>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block">
-              First-Time Applicant Video Walkthrough
+            <span className="text-xs font-semibold text-amber-300 block">
+              Step-by-Step Video Help
             </span>
             <h3 className="text-sm font-bold text-white tracking-tight mt-0.5">
               Need Help Creating Your Student Account? (Step-by-Step Guide)
@@ -50,7 +50,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
                 setIsPlaying(false);
               }
             }}
-            className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors rounded-[4px] cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
+            className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors rounded-xl cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
           >
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               {isExpanded ? (
@@ -66,7 +66,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
             target="_blank"
             rel="noopener noreferrer"
             title="Watch full walkthrough video on YouTube"
-            className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold transition-colors rounded-[4px] inline-flex items-center gap-1.5 shadow-xs"
+            className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold transition-colors rounded-xl inline-flex items-center gap-1.5 shadow-xs"
           >
             {/* YouTube Red Icon Badge */}
             <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
@@ -90,12 +90,12 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
 
         {/* Expandable Video Container */}
         {isExpanded && (
-          <div className={`relative w-full rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs ${
+          <div className={`relative w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-xs ${
             !isPlaying ? "min-h-[235px] sm:min-h-0 sm:aspect-video aspect-video" : "aspect-video"
           }`}>
             {!isPlaying ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-3 sm:p-6 text-center bg-slate-900 text-white">
-                <div className="mb-1.5 sm:mb-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+                <div className="mb-1.5 sm:mb-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-lg">
                   Official Video Tutorial
                 </div>
                 <h4 className="text-xs sm:text-base font-bold max-w-md mb-1 sm:mb-2 line-clamp-2 sm:line-clamp-none">
@@ -108,7 +108,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
                   <button
                     type="button"
                     onClick={() => setIsPlaying(true)}
-                    className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center justify-center gap-2 shrink-0"
+                    className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-xl cursor-pointer inline-flex items-center justify-center gap-2 shrink-0"
                   >
                     <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 20 20">
                       <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
@@ -119,7 +119,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
                     href={youtubeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full sm:w-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px] inline-flex items-center justify-center gap-1.5 shrink-0"
+                    className="w-full sm:w-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-xl inline-flex items-center justify-center gap-1.5 shrink-0"
                   >
                     <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
                       <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
@@ -148,28 +148,28 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
 
         {/* Quick 4 Steps */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Select &ldquo;Create Account&rdquo;</strong>
               <span className="text-slate-600 text-[11px] leading-snug block">Open the Create Account tab on the student portal login card.</span>
             </div>
           </div>
-          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Enter Full Legal Name</strong>
               <span className="text-slate-600 text-[11px] leading-snug block">Enter your legal name as indicated on your PSA Birth Certificate.</span>
             </div>
           </div>
-          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Provide Active Gmail</strong>
               <span className="text-slate-600 text-[11px] leading-snug block">Use your active personal Gmail address and a secure password.</span>
             </div>
           </div>
-          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-[4px] text-xs flex items-start gap-2.5">
+          <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-[#002060] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
             <div>
               <strong className="text-slate-900 block font-bold mb-0.5">Verify 6-Digit Code</strong>
@@ -186,7 +186,7 @@ export function AccountCreationTutorial({ onSwitchToRegister }: AccountCreationT
             <button
               type="button"
               onClick={onSwitchToRegister}
-              className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-[4px] shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors rounded-xl shrink-0 cursor-pointer"
             >
               Create Student Account
             </button>
@@ -238,13 +238,13 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     tabLabel: "Grade 8, 9, or 10",
     badgeLabel: "Continuing JHS",
     title: "INCOMING GRADE 8, 9, 10 (2026) | DUMALNEXT SYSTEM",
-    description: "Enrollment guide for continuing Junior High School learners of Dumalneg NHS (Grade 8, Grade 9, and Grade 10). With a prescribed core curriculum in JHS, enrollment is fast and seamless using 1-Click Continuing Enrollment.",
+    description: "Enrollment guide for continuing Junior High School learners of Dumalneg NHS (Grade 8, Grade 9, and Grade 10). Because Junior High follows standard required subjects, you can confirm your enrollment in just one click.",
     videoId: "tpKsGllwW90",
     youtubeUrl: "https://youtube.com/shorts/tpKsGllwW90",
     targetAudience: "For current Dumalneg NHS Junior High School learners.",
     keyPoints: [
-      "JHS follows a prescribed core curriculum, so no elective subjects are required.",
-      "The system automatically retrieves and syncs your previously approved academic records.",
+      "Junior High subjects are already set, so you don&apos;t need to pick electives.",
+      "Your saved student information from last year will appear automatically.",
       "Verify your contact details and submit to receive prompt section and schedule assignments.",
     ],
   },
@@ -268,14 +268,14 @@ const ENROLLMENT_TUTORIALS: TutorialItem[] = [
     tabLabel: "Grade 12",
     badgeLabel: "Continuing SHS",
     title: "INCOMING GRADE 12 (2026) | DUMALNEXT SYSTEM",
-    description: "Guide for Grade 12 Senior High School learners on completing enrollment for the active academic trimester, choosing advanced specialized electives, and reviewing graduation credential requirements.",
+    description: "Guide for Grade 12 Senior High School learners on completing enrollment for the active academic trimester, choosing advanced specialized electives, and checking what you need for Grade 12.",
     videoId: "fD7pE-lY18k",
     youtubeUrl: "https://youtube.com/shorts/fD7pE-lY18k",
     targetAudience: "For current Grade 11 learners progressing to Grade 12 Senior High School.",
     keyPoints: [
       "Review your past trimester grades and accumulated course units.",
       "Select authorized electives for the active trimester according to your strand.",
-      "Ensure all required documentary records are complete for DepEd graduation clearance.",
+      "Make sure your school requirements are up to date for Grade 12.",
     ],
   },
 ];
@@ -316,12 +316,12 @@ export function GradeLevelEnrollmentTutorials({
   };
 
   return (
-    <section className="bg-white border border-slate-200/90 shadow-xs rounded-[4px] overflow-hidden">
+    <section className="bg-white border border-slate-200/90 shadow-xs rounded-xl overflow-hidden">
       {/* Compact Collapsible Header Banner */}
       <div className="bg-gradient-to-r from-[#002060] via-[#002b80] to-[#0a1936] text-white px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
-            Student Guidance &amp; Video Walkthroughs
+          <span className="text-xs font-semibold text-amber-300 block">
+            Helpful Video Guides
           </span>
           <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
             Need Help Enrolling? Watch Step-by-Step Video Guides by Grade Level
@@ -336,7 +336,7 @@ export function GradeLevelEnrollmentTutorials({
                 return !prev;
               });
             }}
-            className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors rounded-[4px] cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
+            className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors rounded-xl cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
           >
             {isExpanded ? "Hide Video Guides" : "Watch Video Guides"}
           </button>
@@ -392,12 +392,12 @@ export function GradeLevelEnrollmentTutorials({
         </div>
 
         {/* Responsive Video Player */}
-        <div className={`relative w-full rounded-[4px] overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xs ${
+        <div className={`relative w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-xs ${
           !isPlaying ? "min-h-[235px] sm:min-h-0 sm:aspect-video aspect-video" : "aspect-video"
         }`}>
           {!isPlaying ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-3 sm:p-6 text-center bg-slate-900 text-white">
-              <div className="mb-1.5 sm:mb-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-[3px]">
+              <div className="mb-1.5 sm:mb-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#002060] border border-blue-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-lg">
                 {currentTutorial.tabLabel} Enrollment Guide
               </div>
               <h4 className="text-xs sm:text-base font-bold max-w-md mb-1 sm:mb-2 line-clamp-2 sm:line-clamp-none">
@@ -410,7 +410,7 @@ export function GradeLevelEnrollmentTutorials({
                 <button
                   type="button"
                   onClick={() => setIsPlaying(true)}
-                  className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] cursor-pointer inline-flex items-center justify-center gap-2 shrink-0"
+                  className="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-red-700 hover:bg-red-800 text-white text-xs font-bold transition-colors shadow-xs rounded-xl cursor-pointer inline-flex items-center justify-center gap-2 shrink-0"
                 >
                   <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 20 20">
                     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
@@ -421,7 +421,7 @@ export function GradeLevelEnrollmentTutorials({
                   href={currentTutorial.youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-[4px] inline-flex items-center justify-center gap-1.5 shrink-0"
+                  className="w-full sm:w-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold transition-colors rounded-xl inline-flex items-center justify-center gap-1.5 shrink-0"
                 >
                   <span className="w-4 h-3 bg-red-600 rounded-[2px] flex items-center justify-center shrink-0">
                     <svg className="w-2 h-2 text-white fill-current ml-0.5" viewBox="0 0 10 10">
@@ -448,7 +448,7 @@ export function GradeLevelEnrollmentTutorials({
         </div>
 
         {/* Key Reminders & Checklist */}
-        <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-[4px] space-y-2">
+        <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-xl space-y-2">
           <strong className="text-xs font-bold text-[#002060] block tracking-wide">
             Important Reminders for {currentTutorial.tabLabel}:
           </strong>
@@ -469,7 +469,7 @@ export function GradeLevelEnrollmentTutorials({
           </p>
           <Link
             href="/enroll"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors shadow-xs rounded-[4px] shrink-0"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#002060] hover:bg-[#001540] text-white text-xs font-bold transition-colors shadow-xs rounded-xl shrink-0"
           >
             {isEnrollmentOpen ? (
               <>

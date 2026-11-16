@@ -73,8 +73,8 @@ export default function AdminLayout({
                   Municipality of Dumalneg, Province of Ilocos Norte, Philippines &bull; DepEd School ID: 300017
                 </p>
               </div>
-              <div className="text-right font-mono text-[11px]">
-                <p className="text-slate-300">Dumal-NEXT Management Console</p>
+              <div className="text-right text-xs">
+                <p className="text-slate-300">Dumal-NEXT School Administration Portal</p>
                 <p className="text-slate-500 mt-0.5">MMSU CCIS Capstone Project</p>
               </div>
             </div>

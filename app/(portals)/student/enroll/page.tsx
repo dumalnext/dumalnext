@@ -15,10 +15,10 @@ export default function StudentEnrollPage() {
     <AuthProvider>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Top Breadcrumb & Navigation */}
-        <div className="flex items-center justify-between text-xs text-slate-600 bg-white p-3 border border-slate-300 rounded-[4px]">
+        <div className="flex items-center justify-between text-xs text-slate-600 bg-white px-4 py-3 border border-slate-200 rounded-xl shadow-xs">
           <div className="flex items-center space-x-2">
             <Link href="/" className="font-bold text-[#002060] hover:underline">
-              DNHS Home
+              Home
             </Link>
             <span>/</span>
             <Link href="/student" className="font-bold text-[#002060] hover:underline">
@@ -27,8 +27,8 @@ export default function StudentEnrollPage() {
             <span>/</span>
             <span className="text-slate-800 font-medium">Online Enrollment Form</span>
           </div>
-          <div className="font-mono text-[11px] text-slate-500">
-            DEPED FORM: REVISED 06/01/2025
+          <div className="text-xs text-slate-500">
+            DepEd Form &bull; Revised 2025
           </div>
         </div>
 

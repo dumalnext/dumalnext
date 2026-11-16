@@ -362,7 +362,7 @@ export default function AcademicCalendarManager() {
             />
             <div>
               <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
-                Academic Year &amp; Trimester Schedule Control
+                School Year &amp; Grading Terms
               </h2>
             </div>
           </div>
@@ -375,7 +375,7 @@ export default function AcademicCalendarManager() {
               <svg className="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
               </svg>
-              <span>Configure New Term</span>
+              <span>Add School Term</span>
             </button>
           </div>
         </div>
@@ -405,7 +405,7 @@ export default function AcademicCalendarManager() {
               </svg>
             </div>
             <div>
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 font-mono">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 font-medium">
                 Currently Active Term
               </div>
               <h3 className="text-base sm:text-lg font-black text-slate-950 uppercase tracking-tight">
@@ -444,11 +444,11 @@ export default function AcademicCalendarManager() {
                 </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">Term Duration</span>
+                <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">Term Duration</span>
                 <div className="font-bold text-slate-900 text-xs mt-0.5 truncate">
                   {activeTerm.startDate || "---"} to {activeTerm.endDate || "---"}
                 </div>
-                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
+                <span className="text-[10px] text-slate-500 font-medium mt-0.5 block">
                   {activeTerm.totalClassDays ? `${activeTerm.totalClassDays} Class Days` : "---"}
                 </span>
               </div>
@@ -462,11 +462,11 @@ export default function AcademicCalendarManager() {
                 </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">Instructional Block</span>
+                <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">Instructional Block</span>
                 <div className="font-bold text-slate-900 text-xs mt-0.5 truncate">
                   {activeTerm.instructionalStart || "---"} to {activeTerm.instructionalEnd || "---"}
                 </div>
-                <span className="text-[10px] text-indigo-700 font-mono mt-0.5 block">
+                <span className="text-[10px] text-indigo-700 font-medium mt-0.5 block">
                   Active Classes
                 </span>
               </div>
@@ -480,11 +480,11 @@ export default function AcademicCalendarManager() {
                 </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">Late Cutoff (Summative 2)</span>
-                <div className="font-bold text-[#002060] text-xs mt-0.5 font-mono truncate">
+                <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">Late Cutoff (Summative 2)</span>
+                <div className="font-bold text-[#002060] text-xs mt-0.5 font-medium truncate">
                   {activeTerm.summative2Date || "---"}
                 </div>
-                <span className="text-[10px] text-amber-700 font-mono mt-0.5 block">
+                <span className="text-[10px] text-amber-700 font-medium mt-0.5 block">
                   Enrollment Deadline
                 </span>
               </div>
@@ -498,11 +498,11 @@ export default function AcademicCalendarManager() {
                 </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider">Card Day / PTC</span>
-                <div className="font-bold text-[#002060] text-xs mt-0.5 font-mono truncate">
+                <span className="text-[10px] font-medium font-bold text-slate-500 uppercase block tracking-wider">Card Day / PTC</span>
+                <div className="font-bold text-[#002060] text-xs mt-0.5 font-medium truncate">
                   {activeTerm.reportCardDate || "---"}
                 </div>
-                <span className="text-[10px] text-emerald-700 font-mono mt-0.5 block">
+                <span className="text-[10px] text-emerald-700 font-medium mt-0.5 block">
                   Distribution Day
                 </span>
               </div>
@@ -530,7 +530,7 @@ export default function AcademicCalendarManager() {
             {isLoading ? (
               <span className="inline-block w-6 h-4 bg-slate-300 animate-pulse rounded-full" />
             ) : (
-              <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-mono text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-medium text-[10px] font-bold">
                 {terms.length}
               </span>
             )}
@@ -577,14 +577,14 @@ export default function AcademicCalendarManager() {
           </div>
         ) : terms.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-600">
-            No academic terms configured yet. Click &quot;Configure New Term&quot; to initialize a School Year.
+            No academic terms configured yet. Click &quot;Add School Term&quot; to initialize a School Year.
           </div>
         ) : viewMode === "table" ? (
           /* TABLE VIEW WITH INLINE VERTICALLY SCROLLABLE EXPANDED BOX */
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-100 border-b border-slate-300 font-mono text-[11px] uppercase text-slate-700">
+                <tr className="bg-slate-100 border-b border-slate-300 font-medium text-[11px] uppercase text-slate-700">
                   <th className="p-3">SCHOOL YEAR</th>
                   <th className="p-3">TRIMESTER</th>
                   <th className="p-3">START DATE</th>
@@ -611,7 +611,7 @@ export default function AcademicCalendarManager() {
                         }`}
                       >
                         {/* Fixed School Year */}
-                        <td className="p-3 font-black text-slate-950 font-mono text-xs">
+                        <td className="p-3 font-black text-slate-950 font-medium text-xs">
                           {term.schoolYear}
                         </td>
 
@@ -621,17 +621,17 @@ export default function AcademicCalendarManager() {
                         </td>
 
                         {/* Start Date */}
-                        <td className="p-3 font-mono text-slate-800">
+                        <td className="p-3 font-medium text-slate-800">
                           {term.startDate || "---"}
                         </td>
 
                         {/* End Date */}
-                        <td className="p-3 font-mono text-slate-800">
+                        <td className="p-3 font-medium text-slate-800">
                           {term.endDate || "---"}
                         </td>
 
                         {/* Late Cutoff */}
-                        <td className="p-3 font-mono font-bold text-[#002060]">
+                        <td className="p-3 font-medium font-bold text-[#002060]">
                           {term.summative2Date || "---"}
                         </td>
 
@@ -641,14 +641,14 @@ export default function AcademicCalendarManager() {
                         </td>
 
                         {/* Card Day (PTC) */}
-                        <td className="p-3 font-mono text-slate-800">
+                        <td className="p-3 font-medium text-slate-800">
                           {term.reportCardDate || "---"}
                         </td>
 
                         {/* Status */}
                         <td className="p-3">
                           {term.isActive ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase tracking-wider rounded-md">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white font-medium font-bold text-[10px] uppercase tracking-wider rounded-md">
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                               </svg>
@@ -658,7 +658,7 @@ export default function AcademicCalendarManager() {
                             <button
                               type="button"
                               onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
-                              className="px-2.5 py-1 bg-slate-100 hover:bg-[#002060] text-slate-700 hover:text-white font-mono font-bold text-[10px] uppercase tracking-wider rounded-md transition-colors cursor-pointer border border-slate-300"
+                              className="px-2.5 py-1 bg-slate-100 hover:bg-[#002060] text-slate-700 hover:text-white font-medium font-bold text-[10px] uppercase tracking-wider rounded-md transition-colors cursor-pointer border border-slate-300"
                               title="Click to activate this trimester for the school"
                             >
                               SET ACTIVE
@@ -700,20 +700,20 @@ export default function AcademicCalendarManager() {
                       {isExpanded && editingTerm && (
                         <tr className="bg-slate-50">
                           <td colSpan={9} className="p-4 border-t-2 border-b-2 border-[#002060]">
-                            <div className="bg-white border-2 border-[#002060] p-4 space-y-4 shadow-md">
+                            <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-4 shadow-md">
                               {/* Header inside Expanded Box */}
                               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b-2 border-slate-200">
                                 <div className="flex flex-wrap items-center gap-3">
-                                  <span className="px-2.5 py-1 bg-[#002060] text-white font-mono font-bold text-[10px] uppercase tracking-wider">
-                                    EXPANDED TRIMESTER BOX
+                                  <span className="px-2.5 py-1 bg-[#002060] text-white font-medium font-bold text-[10px] uppercase tracking-wider">
+                                    EDIT TERM DATES
                                   </span>
-                                  <div className="font-mono text-xs">
+                                  <div className="font-medium text-xs">
                                     <span className="text-slate-500 uppercase mr-1">SCHOOL YEAR:</span>
                                     <strong className="text-slate-950 font-black">{editingTerm.schoolYear}</strong>
                                     <span className="ml-1 text-[10px] text-slate-500 font-bold">(FIXED)</span>
                                   </div>
                                   <span className="text-slate-300">|</span>
-                                  <div className="font-mono text-xs">
+                                  <div className="font-medium text-xs">
                                     <span className="text-slate-500 uppercase mr-1">TRIMESTER:</span>
                                     <strong className="text-[#002060] font-black">{editingTerm.termName}</strong>
                                     <span className="ml-1 text-[10px] text-slate-500 font-bold">(FIXED)</span>
@@ -725,17 +725,17 @@ export default function AcademicCalendarManager() {
                                     setExpandedTermId(null);
                                     setEditingTerm(null);
                                   }}
-                                  className="text-xs font-mono font-bold text-slate-600 hover:text-slate-950 cursor-pointer"
+                                  className="text-xs font-medium font-bold text-slate-600 hover:text-slate-950 cursor-pointer"
                                 >
-                                  COLLAPSE BOX ▲
+                                  Close ▲
                                 </button>
                               </div>
 
                               {/* VERTICALLY SCROLLABLE BOX CONTAINER (SCROLLABLE PABABA) */}
-                              <div className="max-h-[460px] overflow-y-auto pr-2 space-y-4 border-2 border-slate-300 bg-slate-50/70 p-4 shadow-inner">
+                              <div className="max-h-[460px] overflow-y-auto pr-2 space-y-4 border border-slate-200 rounded-xl bg-slate-50/70 p-4 shadow-inner">
                                 {/* 1. TOTAL CLASS DAYS */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                                  <label className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                                     TOTAL CLASS DAYS
                                   </label>
                                   <input
@@ -743,13 +743,13 @@ export default function AcademicCalendarManager() {
                                     value={editingTerm.totalClassDays || ""}
                                     onChange={(e) => setEditingTerm({ ...editingTerm, totalClassDays: Number(e.target.value) })}
                                     placeholder="e.g. 68"
-                                    className="w-full sm:w-60 p-2.5 border-2 border-slate-300 font-mono text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
+                                    className="w-full sm:w-60 p-2.5 border border-slate-200 rounded-xl font-medium text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white focus:border-[#002060] outline-none"
                                   />
                                 </div>
 
                                 {/* 2. TERM DATE */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                  <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     TERM DATE
                                   </span>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
@@ -772,7 +772,7 @@ export default function AcademicCalendarManager() {
 
                                 {/* 3. INSTRUCTIONAL PERIOD */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                  <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     INSTRUCTIONAL PERIOD
                                   </span>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
@@ -795,7 +795,7 @@ export default function AcademicCalendarManager() {
 
                                 {/* 4. SUMMATIVE TEST DATE */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                  <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     SUMMATIVE TEST DATE
                                   </span>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-3 border-l-4 border-[#002060]">
@@ -818,7 +818,7 @@ export default function AcademicCalendarManager() {
 
                                 {/* 5. TERM EXAMINATION */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                  <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     TERM EXAMINATION
                                   </span>
                                   {(() => {
@@ -852,7 +852,7 @@ export default function AcademicCalendarManager() {
 
                                 {/* 6. REPORT CARD DISTRIBUTION (PTC) */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                  <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     REPORT CARD DISTRIBUTION (PTC)
                                   </span>
                                   <div className="pl-3 border-l-4 border-[#002060]">
@@ -868,7 +868,7 @@ export default function AcademicCalendarManager() {
 
                                 {/* 7. STATUS (CLICKABLE) */}
                                 <div className="p-3 bg-white border border-slate-300 shadow-2xs">
-                                  <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-2">
+                                  <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-2">
                                     STATUS (CLICKABLE)
                                   </span>
                                   <div className="pl-3 border-l-4 border-[#002060] flex flex-wrap items-center gap-3">
@@ -876,24 +876,24 @@ export default function AcademicCalendarManager() {
                                       <button
                                         type="button"
                                         onClick={() => setEditingTerm({ ...editingTerm, isActive: false })}
-                                        className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+                                        className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white font-medium font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                                         title="Click to deactivate"
                                       >
-                                        ACTIVE OFFICIAL CALENDAR &bull; CLICK TO SET INACTIVE
+                                        CURRENT ACTIVE TERM (Click to Turn Off)
                                       </button>
                                     ) : (
                                       <button
                                         type="button"
                                         onClick={() => setEditingTerm({ ...editingTerm, isActive: true })}
-                                        className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+                                        className="px-4 py-2 bg-[#002060] hover:bg-[#001845] text-white font-medium font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                                         title="Click to activate"
                                       >
-                                        CLICK TO ACTIVATE THIS TRIMESTER
+                                        SET AS ACTIVE TERM
                                       </button>
                                     )}
-                                    <span className="text-[11px] text-slate-600 font-mono">
+                                    <span className="text-[11px] text-slate-600 font-medium">
                                       {editingTerm.isActive
-                                        ? "Currently active for school enrollment and scheduling."
+                                        ? "Currently active for enrollment and schedules."
                                         : "Currently inactive. Click button to activate."}
                                     </span>
                                   </div>
@@ -902,7 +902,7 @@ export default function AcademicCalendarManager() {
 
                               {/* Action Footer for Expanded Box */}
                               <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
-                                <div className="text-xs text-slate-600 font-mono">
+                                <div className="text-xs text-slate-600 font-medium">
                                   Scroll up/down inside the box above to verify all dates before saving.
                                 </div>
 
@@ -913,7 +913,7 @@ export default function AcademicCalendarManager() {
                                       setExpandedTermId(null);
                                       setEditingTerm(null);
                                     }}
-                                    className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                                    className="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
                                   >
                                     CANCEL
                                   </button>
@@ -923,7 +923,7 @@ export default function AcademicCalendarManager() {
                                     onClick={handleSaveTermDates}
                                     className="px-4 py-2 bg-[#002060] text-white text-xs font-bold uppercase hover:bg-[#001845] disabled:opacity-50 cursor-pointer shadow-xs"
                                   >
-                                    {isSubmitting ? "SAVING TO DATABASE..." : `SAVE ${editingTerm.termName.toUpperCase()} DATES`}
+                                    {isSubmitting ? "SAVING..." : `SAVE ${editingTerm.termName.toUpperCase()} DATES`}
                                   </button>
                                 </div>
                               </div>
@@ -967,14 +967,14 @@ export default function AcademicCalendarManager() {
                   {/* Trimester Box Header */}
                   <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-black text-slate-950 bg-slate-200 px-2 py-0.5">
+                      <span className="font-medium text-xs font-black text-slate-950 bg-slate-200 px-2 py-0.5">
                         SY {term.schoolYear}
                       </span>
                       <h4 className="text-sm font-black text-[#002060] uppercase">
                         {term.termName}
                       </h4>
                       {term.isActive ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase tracking-wider rounded-md">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-600 text-white font-medium font-bold text-[10px] uppercase tracking-wider rounded-md">
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                           </svg>
@@ -984,7 +984,7 @@ export default function AcademicCalendarManager() {
                         <button
                           type="button"
                           onClick={() => handleActivate(term.id, `${term.schoolYear} ${term.termName}`)}
-                          className="px-2.5 py-0.5 bg-slate-100 hover:bg-[#002060] text-slate-700 hover:text-white font-mono font-bold text-[10px] uppercase tracking-wider rounded-md transition-colors cursor-pointer border border-slate-300"
+                          className="px-2.5 py-0.5 bg-slate-100 hover:bg-[#002060] text-slate-700 hover:text-white font-medium font-bold text-[10px] uppercase tracking-wider rounded-md transition-colors cursor-pointer border border-slate-300"
                         >
                           SET ACTIVE
                         </button>
@@ -1023,7 +1023,7 @@ export default function AcademicCalendarManager() {
                     <div className="max-h-[460px] overflow-y-auto pr-2 space-y-3 border border-slate-200 bg-slate-50/70 p-4">
                       {/* 1. Total Class Days */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1">
                           TOTAL CLASS DAYS
                         </span>
                         <input
@@ -1036,13 +1036,13 @@ export default function AcademicCalendarManager() {
                             )
                           }
                           placeholder="e.g. 68"
-                          className="w-full sm:w-48 p-2 border border-slate-300 font-mono text-xs font-bold text-slate-900 bg-white focus:border-[#002060] outline-none rounded-[4px]"
+                          className="w-full sm:w-48 p-2 border border-slate-300 font-medium text-xs font-bold text-slate-900 bg-white focus:border-[#002060] outline-none rounded-lg"
                         />
                       </div>
 
                       {/* 2. Term Date */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                           TERM DATE
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
@@ -1065,7 +1065,7 @@ export default function AcademicCalendarManager() {
 
                       {/* 3. Instructional Period */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                           INSTRUCTIONAL PERIOD
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
@@ -1088,7 +1088,7 @@ export default function AcademicCalendarManager() {
 
                       {/* 4. Summative Test Date */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                           SUMMATIVE TEST DATE
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 border-l-2 border-[#002060]">
@@ -1111,7 +1111,7 @@ export default function AcademicCalendarManager() {
 
                       {/* 5. Term Examination */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                           TERM EXAMINATION
                         </span>
                         <div className="pl-2 border-l-2 border-[#002060]">
@@ -1147,7 +1147,7 @@ export default function AcademicCalendarManager() {
 
                       {/* 6. Report Card Distribution (PTC) */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1">
                           REPORT CARD DISTRIBUTION (PTC)
                         </span>
                         <div className="pl-2 border-l-2 border-[#002060]">
@@ -1163,7 +1163,7 @@ export default function AcademicCalendarManager() {
 
                       {/* 7. Status (Clickable) */}
                       <div className="p-2.5 bg-white border border-slate-300">
-                        <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[#002060] mb-1.5">
+                        <span className="block text-xs font-medium font-bold uppercase tracking-wider text-[#002060] mb-1.5">
                           STATUS (CLICKABLE)
                         </span>
                         <div className="pl-2 border-l-2 border-[#002060] flex items-center gap-3">
@@ -1177,7 +1177,7 @@ export default function AcademicCalendarManager() {
                                   handleActivate(term.id, `${term.schoolYear} ${term.termName}`);
                                 }
                               }}
-                              className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-mono font-bold text-xs uppercase cursor-pointer"
+                              className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-medium font-bold text-xs uppercase cursor-pointer"
                             >
                               ACTIVE &bull; {isExpanded ? "CLICK TO SET INACTIVE" : "CURRENT SCHOOL TERM"}
                             </button>
@@ -1191,7 +1191,7 @@ export default function AcademicCalendarManager() {
                                   handleActivate(term.id, `${term.schoolYear} ${term.termName}`);
                                 }
                               }}
-                              className="px-3 py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-mono font-bold text-xs uppercase cursor-pointer transition-colors"
+                              className="px-3 py-1.5 bg-slate-200 hover:bg-[#002060] hover:text-white text-slate-800 font-medium font-bold text-xs uppercase cursor-pointer transition-colors"
                             >
                               CLICK TO SET ACTIVE
                             </button>
@@ -1203,7 +1203,7 @@ export default function AcademicCalendarManager() {
                     {/* Bottom Save Bar when Box is Expanded */}
                     {isExpanded && editingTerm && (
                       <div className="mt-3 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-[11px] font-mono text-slate-600">
+                        <span className="text-[11px] font-medium text-slate-600">
                           Editing {term.termName}. Click save to apply changes.
                         </span>
                         <div className="flex gap-2">
@@ -1213,7 +1213,7 @@ export default function AcademicCalendarManager() {
                               setExpandedTermId(null);
                               setEditingTerm(null);
                             }}
-                            className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                            className="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 text-xs font-bold uppercase hover:bg-slate-100 cursor-pointer"
                           >
                             CANCEL
                           </button>
@@ -1242,7 +1242,7 @@ export default function AcademicCalendarManager() {
           <div className="bg-white border-4 border-[#002060] max-w-md w-full p-6 space-y-4 shadow-xl">
             <div className="border-b-2 border-slate-200 pb-3 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#002060] uppercase tracking-widest block">
+                <span className="text-[10px] font-medium font-bold text-[#002060] uppercase tracking-widest block">
                   IT SUPPORT INITIALIZATION
                 </span>
                 <h3 className="text-base font-black text-slate-900 uppercase">
@@ -1252,7 +1252,7 @@ export default function AcademicCalendarManager() {
               <button
                 type="button"
                 onClick={() => setIsAddSYModalOpen(false)}
-                className="text-xs font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
+                className="text-xs font-medium font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
               >
                 CLOSE X
               </button>
@@ -1273,9 +1273,9 @@ export default function AcademicCalendarManager() {
                   onChange={(e) => setNewSchoolYear(e.target.value)}
                   required
                   placeholder="e.g. 2027-2028"
-                  className="w-full p-3 border-2 border-slate-300 font-mono font-bold text-sm text-slate-900 focus:border-[#002060] outline-none"
+                  className="w-full p-3 border border-slate-200 rounded-xl font-medium font-bold text-sm text-slate-900 focus:border-[#002060] outline-none"
                 />
-                <span className="text-[10px] text-slate-500 font-mono mt-1 block">
+                <span className="text-[10px] text-slate-500 font-medium mt-1 block">
                   Format: YYYY-YYYY (e.g. 2026-2027, 2027-2028)
                 </span>
               </div>
@@ -1284,7 +1284,7 @@ export default function AcademicCalendarManager() {
                 <button
                   type="button"
                   onClick={() => setIsAddSYModalOpen(false)}
-                  className="px-4 py-2 border-2 border-slate-300 text-slate-700 font-bold uppercase hover:bg-slate-100 cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 font-bold uppercase hover:bg-slate-100 cursor-pointer"
                 >
                   Cancel
                 </button>

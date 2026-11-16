@@ -1219,7 +1219,7 @@ export default function FacultyProfilePage() {
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-bold text-[#002060] uppercase tracking-wider">
-                Faculty Account Credentials &amp; Security
+                Login Email &amp; Password
               </h3>
             </div>
 
@@ -1288,21 +1288,6 @@ export default function FacultyProfilePage() {
               </div>
             </div>
 
-            {/* System ID & Session Info */}
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Faculty Account Database ID
-                </span>
-                <span className="text-sm font-mono font-bold text-[#002060] block mt-0.5">
-                  {user.id}
-                </span>
-              </div>
-              <div className="text-xs text-slate-500 sm:text-right">
-                <span>DepEd Personnel Status: </span>
-                <span className="font-bold text-emerald-700">Verified &bull; Active Faculty</span>
-              </div>
-            </div>
           </div>
         )}
       </div>
@@ -1362,7 +1347,7 @@ export default function FacultyProfilePage() {
                     <span className="font-bold text-slate-900 block">Registered Faculty Account:</span>
                     <strong className="font-mono text-sm text-[#002060] block">{user.email}</strong>
                     <p className="text-[11px] text-slate-500 mt-1">
-                      A 6-digit one-time verification code will be dispatched to your registered email to authorize this change.
+                      We will send a 6-digit code to your email to confirm this change.
                     </p>
                   </div>
 
@@ -1372,7 +1357,7 @@ export default function FacultyProfilePage() {
                     disabled={securityLoading}
                     className="w-full py-2.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    {securityLoading ? "Dispatching 6-Digit Code..." : "Send Verification Code"}
+                    {securityLoading ? "Sending Code..." : "Send Verification Code"}
                   </button>
                 </div>
               )}
@@ -1579,7 +1564,7 @@ export default function FacultyProfilePage() {
                       required
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
-                      A 6-digit one-time verification code will be dispatched to this new email to verify ownership.
+                      We will send a 6-digit code to this new email to verify it belongs to you.
                     </p>
                   </div>
 
@@ -1589,7 +1574,7 @@ export default function FacultyProfilePage() {
                     disabled={securityLoading}
                     className="w-full py-2.5 bg-[#002060] hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    {securityLoading ? "Dispatching 6-Digit Code..." : "Send Verification Code"}
+                    {securityLoading ? "Sending Code..." : "Send Verification Code"}
                   </button>
                 </div>
               )}

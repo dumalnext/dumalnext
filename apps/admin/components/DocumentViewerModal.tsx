@@ -69,7 +69,7 @@ export default function DocumentViewerModal({
         <div className="flex items-center gap-3">
           <div className="border-r border-blue-400/40 pr-3">
             <span className="text-[10px] font-mono tracking-wider uppercase text-blue-200 block">
-              OFFICIAL DOCUMENT INSPECTION
+              UPLOADED DOCUMENT
             </span>
             <h2 className="text-sm sm:text-base font-bold uppercase tracking-tight text-white">
               {document.docTitle}
@@ -78,31 +78,31 @@ export default function DocumentViewerModal({
           <div className="hidden md:block text-xs">
             <span className="text-slate-300">Learner:</span>{" "}
             <strong className="text-white uppercase">{learnerName}</strong>{" "}
-            <span className="text-blue-300 font-mono">({lrn})</span>
+            <span className="text-blue-300">({lrn === "Pending LIS" || lrn === "Pending LIS Assignment" ? "No LRN yet" : lrn})</span>
           </div>
         </div>
 
         {/* Zoom & Rotation Toolset */}
-        <div className="flex items-center gap-1.5 text-xs font-mono">
+        <div className="flex items-center gap-1.5 text-xs">
           {!isPdf && (
             <>
               <button
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoom <= 0.5}
-                className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 disabled:opacity-40"
+                className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 disabled:opacity-40 rounded-lg cursor-pointer"
                 title="Zoom Out"
               >
                 -
               </button>
-              <span className="px-2 py-1 bg-blue-950 text-blue-200 border border-blue-400/40 min-w-16 text-center">
+              <span className="px-2.5 py-1 bg-blue-950 text-blue-200 border border-blue-400/40 min-w-16 text-center rounded-lg">
                 {Math.round(zoom * 100)}%
               </span>
               <button
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoom >= 3}
-                className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 disabled:opacity-40"
+                className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 disabled:opacity-40 rounded-lg cursor-pointer"
                 title="Zoom In"
               >
                 +
@@ -110,7 +110,7 @@ export default function DocumentViewerModal({
               <button
                 type="button"
                 onClick={handleRotate}
-                className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800"
+                className="px-2.5 py-1 bg-blue-900 border border-blue-400/50 hover:bg-blue-800 rounded-lg cursor-pointer"
                 title="Rotate 90 Degrees"
               >
                 Rotate 90&deg;
@@ -118,7 +118,7 @@ export default function DocumentViewerModal({
               <button
                 type="button"
                 onClick={handleResetZoom}
-                className="px-2 py-1 bg-blue-950 border border-blue-400/40 text-[11px] hover:bg-blue-900"
+                className="px-2.5 py-1 bg-blue-950 border border-blue-400/40 text-[11px] hover:bg-blue-900 rounded-lg cursor-pointer"
               >
                 Reset
               </button>
@@ -129,7 +129,7 @@ export default function DocumentViewerModal({
             <button
               type="button"
               onClick={handleDownload}
-              className="px-3 py-1 bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white font-bold ml-1"
+              className="px-3 py-1 bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white font-semibold ml-1 rounded-lg cursor-pointer"
             >
               Download
             </button>
@@ -138,7 +138,7 @@ export default function DocumentViewerModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1 bg-red-700 hover:bg-red-800 text-white font-bold ml-2 border border-red-500"
+            className="px-3 py-1 bg-red-700 hover:bg-red-800 text-white font-semibold ml-2 border border-red-500 rounded-lg cursor-pointer"
           >
             Close (Esc)
           </button>
@@ -179,13 +179,13 @@ export default function DocumentViewerModal({
                 className="max-h-[82vh] max-w-[92vw] object-contain shadow-2xl border-2 border-slate-600 bg-white"
               />
             ) : (
-              <div className="p-8 bg-white border-2 border-slate-400 text-center max-w-md space-y-2 text-slate-900">
+              <div className="p-8 bg-white border border-slate-200 rounded-2xl shadow-lg text-center max-w-md space-y-2 text-slate-900">
                 <span className="font-mono font-bold text-xs text-[#002060] uppercase block">
-                  DOCUMENT RECORD FOUND
+                  Document On File
                 </span>
                 <p className="text-xs font-bold">{document.fileName}</p>
                 <p className="text-[11px] text-slate-600">
-                  Document metadata confirmed in Supabase admissions registry.
+                  This document record is saved in the school system.
                 </p>
               </div>
             )}
@@ -202,13 +202,13 @@ export default function DocumentViewerModal({
           </div>
           {document.sizeKb && (
             <div className="border-l border-slate-800 pl-3 sm:pl-4">
-              <span className="text-slate-500 text-[10px] uppercase block">Compressed Size</span>
+              <span className="text-slate-500 text-[10px] uppercase block">File Size</span>
               <span className="font-mono font-bold text-slate-200 text-[11px]">{document.sizeKb} KB</span>
             </div>
           )}
           <div className="border-l border-slate-800 pl-3 sm:pl-4">
-            <span className="text-slate-500 text-[10px] uppercase block">Authentication</span>
-            <span className="text-emerald-400 font-bold font-mono text-[11px]">VALID CREDENTIAL</span>
+            <span className="text-slate-500 text-[10px] uppercase block">Status</span>
+            <span className="text-emerald-400 font-bold font-mono text-[11px]">Verified Copy</span>
           </div>
         </div>
 
@@ -221,9 +221,9 @@ export default function DocumentViewerModal({
                 onFlagRevision(document.docTitle);
                 onClose();
               }}
-              className="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 bg-red-900/80 hover:bg-red-800 border border-red-600 text-white font-bold uppercase tracking-wider text-[11px] cursor-pointer text-center"
+              className="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 bg-red-800 hover:bg-red-700 rounded-lg text-white font-semibold text-xs cursor-pointer text-center"
             >
-              Flag: Request Clearer Copy
+              Ask for Clearer Copy
             </button>
           )}
 
@@ -234,9 +234,9 @@ export default function DocumentViewerModal({
                 onVerify(document.docTitle);
                 onClose();
               }}
-              className="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 bg-emerald-800 hover:bg-emerald-700 border border-emerald-500 text-white font-bold uppercase tracking-wider text-[11px] cursor-pointer text-center"
+              className="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 bg-emerald-700 hover:bg-emerald-600 rounded-lg text-white font-semibold text-xs cursor-pointer text-center"
             >
-              Mark Verified &amp; Legible
+              Looks Clear &amp; Valid
             </button>
           )}
         </div>
