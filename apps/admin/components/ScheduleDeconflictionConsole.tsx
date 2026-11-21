@@ -3,6 +3,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import CustomSelect, { CustomSelectOption } from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
+import {
+  SUBJECT_AREA_OPTIONS,
+  TeacherSpecializationsMap,
+  TeacherSpecializationEntry,
+  resolveTeacherSpecialization,
+  doesSubjectAreaMatchCourse,
+} from "@/lib/teacherSpecializations";
 
 export interface ScheduleItem {
   id: string;
@@ -251,19 +258,115 @@ export default function ScheduleDeconflictionConsole() {
   const [moveTargetDay, setMoveTargetDay] = useState<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday">("Monday");
   const [moveTargetSlotId, setMoveTargetSlotId] = useState<string>("P1");
 
+  // Teacher Subjects / Specializations (Main + Backup subjects per teacher)
+  const [teacherSpecs, setTeacherSpecs] = useState<TeacherSpecializationsMap>({});
+  const [isTeacherSpecsModalOpen, setIsTeacherSpecsModalOpen] = useState<boolean>(false);
+  const [editingSpecTeacherId, setEditingSpecTeacherId] = useState<string | null>(null);
+  const [specSearchQuery, setSpecSearchQuery] = useState<string>("");
+  const [specDeptFilter, setSpecDeptFilter] = useState<"ALL" | "JHS" | "SHS">("ALL");
+  const [isSavingSpecs, setIsSavingSpecs] = useState<boolean>(false);
+  const [specsNotice, setSpecsNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const getTeacherSpec = (tch: TeacherRef): TeacherSpecializationEntry => {
+    return resolveTeacherSpecialization(tch, teacherSpecs);
+  };
+
+  const toggleTeacherSubjectArea = (
+    tch: TeacherRef,
+    areaId: string,
+    tier: "main" | "secondary"
+  ) => {
+    const current = getTeacherSpec(tch);
+    let nextMain = [...current.mainSubjects];
+    let nextSecondary = [...current.secondarySubjects];
+
+    if (tier === "main") {
+      if (nextMain.includes(areaId)) {
+        nextMain = nextMain.filter((s) => s !== areaId);
+      } else {
+        nextMain.push(areaId);
+        nextSecondary = nextSecondary.filter((s) => s !== areaId);
+      }
+    } else {
+      if (nextSecondary.includes(areaId)) {
+        nextSecondary = nextSecondary.filter((s) => s !== areaId);
+      } else {
+        nextSecondary.push(areaId);
+        nextMain = nextMain.filter((s) => s !== areaId);
+      }
+    }
+
+    const updatedEntry: TeacherSpecializationEntry = {
+      mainSubjects: nextMain,
+      secondarySubjects: nextSecondary,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setTeacherSpecs((prev) => {
+      const next = { ...prev, [tch.id]: updatedEntry };
+      if (tch.teacher_id) next[tch.teacher_id.toUpperCase()] = updatedEntry;
+      if (tch.email) next[tch.email.toLowerCase()] = updatedEntry;
+      return next;
+    });
+  };
+
+  const handleSaveTeacherSpecializations = async () => {
+    setIsSavingSpecs(true);
+    setSpecsNotice(null);
+    try {
+      const payloadMap: TeacherSpecializationsMap = {};
+      teachers.forEach((tch) => {
+        const spec = getTeacherSpec(tch);
+        payloadMap[tch.id] = spec;
+        if (tch.teacher_id) payloadMap[tch.teacher_id.toUpperCase()] = spec;
+        if (tch.email) payloadMap[tch.email.toLowerCase()] = spec;
+      });
+
+      const res = await fetch("/api/teacher-specializations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ specializations: payloadMap }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to save teacher subjects");
+      }
+      setTeacherSpecs(data.specializations || payloadMap);
+      setSpecsNotice({
+        type: "success",
+        text: "Saved! Each teacher's main and backup subjects are now updated in the school system.",
+      });
+    } catch (err: any) {
+      setSpecsNotice({
+        type: "error",
+        text: err?.message || "Could not save teacher subjects. Please try again.",
+      });
+    } finally {
+      setIsSavingSpecs(false);
+    }
+  };
+
   // 1. Fetch data on mount
   const loadData = async (silent = false) => {
     try {
       if (!silent) setIsLoading(true);
 
-      const [schedRes, secRes, subRes, tchRes, rmRes, termsRes] = await Promise.all([
+      const [schedRes, secRes, subRes, specRes, tchRes, rmRes, termsRes] = await Promise.all([
         fetch(`/api/schedules?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/subjects?_t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/teacher-specializations?_t=${Date.now()}`, { cache: "no-store" }),
         supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department").order("last_name"),
         supabase.from("classrooms").select("id, classroom_id, room_name, building").order("room_name"),
         supabase.from("academic_terms").select("*").order("schoolYear", { ascending: false }),
       ]);
+
+      if (specRes.ok) {
+        const specData = await specRes.json();
+        if (specData.success && specData.specializations) {
+          setTeacherSpecs(specData.specializations);
+        }
+      }
 
       if (schedRes.ok) {
         const data = await schedRes.json();
@@ -1083,6 +1186,17 @@ export default function ScheduleDeconflictionConsole() {
         </div>
 
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              setSpecsNotice(null);
+              setIsTeacherSpecsModalOpen(true);
+            }}
+            className="w-full sm:w-auto px-3.5 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-white border border-amber-300/40 text-xs font-bold tracking-wide transition-colors cursor-pointer text-center"
+            title="Assign main and backup subjects for each teacher"
+          >
+            Teacher Subjects
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -2184,12 +2298,17 @@ export default function ScheduleDeconflictionConsole() {
                   placeholder="-- Choose Faculty Member --"
                   value={formTeacherId}
                   onChange={(val) => setFormTeacherId(val)}
-                  options={teachers.map((tch) => ({
-                    value: tch.id,
-                    label: tch.fullName,
-                    sublabel: `${tch.department} • ${tch.email}`,
-                    badge: tch.department,
-                  }))}
+                  options={teachers.map((tch) => {
+                    const spec = getTeacherSpec(tch);
+                    const mainStr = spec.mainSubjects.length > 0 ? `Main: ${spec.mainSubjects.join(", ")}` : "No main subject assigned yet";
+                    const secStr = spec.secondarySubjects.length > 0 ? ` • Backup: ${spec.secondarySubjects.join(", ")}` : "";
+                    return {
+                      value: tch.id,
+                      label: tch.fullName,
+                      sublabel: `${tch.department} • ${mainStr}${secStr}`,
+                      badge: spec.mainSubjects[0] || tch.department,
+                    };
+                  })}
                 />
               </div>
 
@@ -2413,6 +2532,28 @@ export default function ScheduleDeconflictionConsole() {
                 <div className="p-2 bg-blue-50 border border-blue-200 text-[11px] text-blue-950 font-medium">
                   Each class stays in a consistent weekly slot with zero double-booked teachers, rooms, or sections.
                 </div>
+              </div>
+
+              {/* Teacher Subjects Quick Summary & Link */}
+              <div className="p-3.5 bg-amber-50/80 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-amber-950 block">
+                    Teacher Subject Assignments ({teachers.filter((t) => getTeacherSpec(t).mainSubjects.length > 0).length} of {teachers.length} teachers configured)
+                  </span>
+                  <span className="text-[11px] text-amber-800 block">
+                    Set each teacher&apos;s Main Subject and optional Backup Subject before building schedules.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSpecsNotice(null);
+                    setIsTeacherSpecsModalOpen(true);
+                  }}
+                  className="px-3.5 py-2 rounded-lg bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold shrink-0 cursor-pointer transition-colors"
+                >
+                  Manage Teacher Subjects
+                </button>
               </div>
 
               {/* Active Academic Term Card (Automatically Synced with IT Support) */}
@@ -2985,6 +3126,261 @@ export default function ScheduleDeconflictionConsole() {
               >
                 OK &bull; Understood
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: TEACHER SUBJECTS (MAIN SUBJECTS & OPTIONAL BACKUP SUBJECTS) */}
+      {/* ========================================================================= */}
+      {isTeacherSpecsModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto no-print print:hidden">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="bg-[#002060] p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+              <div>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-amber-300 block">
+                  Teacher Subject Assignments &bull; No Coding Needed
+                </span>
+                <h3 className="text-base sm:text-lg font-extrabold tracking-tight mt-0.5">
+                  Assign Main &amp; Backup Subjects per Teacher
+                </h3>
+                <p className="text-xs text-blue-100/90 mt-0.5">
+                  Choose what each teacher teaches so Auto-Build assigns them to the right subjects.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTeacherSpecsModalOpen(false)}
+                className="text-white/80 hover:text-white text-2xl font-bold px-2.5 py-0.5 rounded-lg hover:bg-white/10 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Filter & Status Bar */}
+            <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-3 shrink-0">
+              {specsNotice && (
+                <div
+                  className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-between ${
+                    specsNotice.type === "success"
+                      ? "bg-emerald-50 border-emerald-300 text-emerald-950"
+                      : "bg-red-50 border-red-300 text-red-950"
+                  }`}
+                >
+                  <span>{specsNotice.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSpecsNotice(null)}
+                    className="px-2 text-sm cursor-pointer"
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-1.5">
+                  {(["ALL", "JHS", "SHS"] as const).map((dept) => (
+                    <button
+                      key={dept}
+                      type="button"
+                      onClick={() => setSpecDeptFilter(dept)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                        specDeptFilter === dept
+                          ? "bg-[#002060] text-white border-[#002060]"
+                          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {dept === "ALL" ? `All Teachers (${teachers.length})` : `${dept} Teachers`}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={specSearchQuery}
+                    onChange={(e) => setSpecSearchQuery(e.target.value)}
+                    placeholder="Search teacher name or subject..."
+                    className="w-full sm:w-64 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 outline-none focus:border-[#002060]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Teachers List */}
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 stable-gutter custom-scrollbar">
+              {teachers
+                .filter((t) => {
+                  if (specDeptFilter !== "ALL" && (t.department || "").toUpperCase() !== specDeptFilter) {
+                    return false;
+                  }
+                  if (!specSearchQuery.trim()) return true;
+                  const q = specSearchQuery.toLowerCase().trim();
+                  const spec = getTeacherSpec(t);
+                  return (
+                    t.fullName.toLowerCase().includes(q) ||
+                    (t.teacher_id || "").toLowerCase().includes(q) ||
+                    (t.email || "").toLowerCase().includes(q) ||
+                    spec.mainSubjects.some((s) => s.toLowerCase().includes(q)) ||
+                    spec.secondarySubjects.some((s) => s.toLowerCase().includes(q))
+                  );
+                })
+                .map((tch) => {
+                  const spec = getTeacherSpec(tch);
+                  const isExpanded = editingSpecTeacherId === tch.id;
+                  return (
+                    <div
+                      key={tch.id}
+                      className="rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-2xs space-y-3"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-extrabold text-slate-900 text-xs sm:text-sm">
+                              {tch.fullName}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              {tch.department || "JHS"}
+                            </span>
+                            {tch.teacher_id && (
+                              <span className="text-[11px] text-slate-500">
+                                {tch.teacher_id}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            {spec.mainSubjects.length === 0 && spec.secondarySubjects.length === 0 ? (
+                              <span className="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full font-semibold">
+                                No subjects assigned yet — click Edit Subjects
+                              </span>
+                            ) : (
+                              <>
+                                {spec.mainSubjects.map((subj) => (
+                                  <span
+                                    key={`main-${subj}`}
+                                    className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-[#002060] border border-blue-200"
+                                  >
+                                    Main: {subj}
+                                  </span>
+                                ))}
+                                {spec.secondarySubjects.map((subj) => (
+                                  <span
+                                    key={`sec-${subj}`}
+                                    className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200"
+                                  >
+                                    Backup: {subj}
+                                  </span>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingSpecTeacherId((prev) => (prev === tch.id ? null : tch.id))
+                          }
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer shrink-0 self-start sm:self-center ${
+                            isExpanded
+                              ? "bg-slate-200 text-slate-800 border-slate-300"
+                              : "bg-blue-50 hover:bg-blue-100 text-[#002060] border-blue-200"
+                          }`}
+                        >
+                          {isExpanded ? "Done Picking" : "Edit Subjects"}
+                        </button>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="pt-3 border-t border-slate-200 space-y-3 bg-slate-50/70 p-3 rounded-xl">
+                          {/* 1. Main Subjects Picker */}
+                          <div className="space-y-1.5">
+                            <span className="text-[11px] font-bold text-[#002060] block">
+                              1. Main Subject(s) This Teacher Teaches (Click to select or unselect):
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {SUBJECT_AREA_OPTIONS.map((opt) => {
+                                const isSelected = spec.mainSubjects.includes(opt.id);
+                                return (
+                                  <button
+                                    key={`pick-main-${opt.id}`}
+                                    type="button"
+                                    onClick={() => toggleTeacherSubjectArea(tch, opt.id, "main")}
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer ${
+                                      isSelected
+                                        ? "bg-[#002060] text-white border-[#002060] shadow-2xs"
+                                        : "bg-white text-slate-700 border-slate-200 hover:bg-blue-50"
+                                    }`}
+                                  >
+                                    {isSelected ? `✓ ${opt.shortLabel}` : opt.shortLabel}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* 2. Optional Backup Subjects Picker */}
+                          <div className="space-y-1.5 pt-2 border-t border-slate-200/80">
+                            <span className="text-[11px] font-bold text-amber-900 block">
+                              2. Optional Backup / Minor Subject(s) (Used only if short on main teachers):
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {SUBJECT_AREA_OPTIONS.map((opt) => {
+                                const isMain = spec.mainSubjects.includes(opt.id);
+                                const isBackup = spec.secondarySubjects.includes(opt.id);
+                                return (
+                                  <button
+                                    key={`pick-sec-${opt.id}`}
+                                    type="button"
+                                    disabled={isMain}
+                                    onClick={() => toggleTeacherSubjectArea(tch, opt.id, "secondary")}
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${
+                                      isMain
+                                        ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                        : isBackup
+                                        ? "bg-amber-500 text-slate-950 border-amber-600 font-bold cursor-pointer"
+                                        : "bg-white text-slate-700 border-slate-200 hover:bg-amber-50 cursor-pointer"
+                                    }`}
+                                  >
+                                    {isBackup ? `✓ ${opt.shortLabel}` : opt.shortLabel}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-slate-100 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
+              <span className="text-xs text-slate-600">
+                Changes are saved to the database so Auto-Build knows what each teacher teaches.
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsTeacherSpecsModalOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveTeacherSpecializations}
+                  disabled={isSavingSpecs}
+                  className="px-5 py-2 rounded-lg bg-[#002060] hover:bg-blue-950 text-white text-xs font-bold cursor-pointer disabled:opacity-50 shadow-xs"
+                >
+                  {isSavingSpecs ? "Saving..." : "Save Teacher Subjects"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
