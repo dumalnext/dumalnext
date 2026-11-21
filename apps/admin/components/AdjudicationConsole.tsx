@@ -15,16 +15,22 @@ export default function AdjudicationConsole() {
   const [isFetchingApps, setIsFetchingApps] = useState<boolean>(true);
   const hasLoadedAppsOnce = useRef<boolean>(false);
 
-  // Filters
+  // Filters & Pagination
+  const PAGE_SIZE = 10;
   const [statusFilter, setStatusFilter] = useState<"ALL" | "Pending" | "Approved" | "Needs Revision">("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [gradeFilter, setGradeFilter] = useState<string>("ALL");
+  const [gradePages, setGradePages] = useState<Record<number, number>>({});
 
   // Academic Terms & Calendar Period State
   const [academicTerms, setAcademicTerms] = useState<any[]>([]);
   const [activeTerm, setActiveTerm] = useState<{ schoolYear: string; termName: string; termNumber: number } | null>(null);
   const [selectedSY, setSelectedSY] = useState<string>("ACTIVE");
   const [selectedTerm, setSelectedTerm] = useState<string>("ACTIVE");
+
+  useEffect(() => {
+    setGradePages({});
+  }, [statusFilter, searchQuery, gradeFilter, selectedSY, selectedTerm]);
 
   // Selected Application for Review Modal
   const [selectedApp, setSelectedApp] = useState<ApplicationDetail | null>(null);
@@ -693,6 +699,155 @@ export default function AdjudicationConsole() {
     );
   };
 
+  const getVisiblePageNumbers = (currentPage: number, totalPages: number): number[] => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const delta = 2;
+    const range: number[] = [];
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+    if (currentPage - delta > 2) range.unshift(-1);
+    if (currentPage + delta < totalPages - 1) range.push(-2);
+    range.unshift(1);
+    if (totalPages > 1) range.push(totalPages);
+    return range;
+  };
+
+  const renderGradeBlock = (grade: number, isShsSection: boolean) => {
+    const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
+    const totalPages = Math.max(1, Math.ceil(gradeApps.length / PAGE_SIZE));
+    const safePage = Math.min(Math.max(1, gradePages[grade] || 1), totalPages);
+    const startIndex = (safePage - 1) * PAGE_SIZE;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, gradeApps.length);
+    const paginatedApps = gradeApps.slice(startIndex, endIndex);
+    const setPage = (nextPage: number) =>
+      setGradePages((prev) => ({
+        ...prev,
+        [grade]: Math.min(Math.max(1, nextPage), totalPages),
+      }));
+
+    return (
+      <div key={grade} className="bg-white">
+        <div className="bg-slate-50 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
+              Grade {grade}
+            </span>
+            <span className="text-[11px] font-medium text-slate-500 font-semibold">
+              ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
+            </span>
+          </div>
+          {isShsSection && (
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
+              Academic &amp; Tech-Pro Tracks
+            </span>
+          )}
+        </div>
+
+        {gradeApps.length === 0 ? (
+          <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/50">
+            No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
+          </div>
+        ) : (
+          <div>
+            <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between">
+              <span>Swipe left or right to see more columns</span>
+            </div>
+            <div className="overflow-x-auto touch-pan-x">
+              <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
+                <thead>
+                  <tr className="bg-slate-100/75 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                    <th className="p-2.5">Reference No.</th>
+                    <th className="p-2.5">Learner Full Name</th>
+                    <th className="p-2.5">12-Digit LRN</th>
+                    <th className="p-2.5">{isShsSection ? "SHS Track & Elective" : "Curriculum / Program"}</th>
+                    <th className="p-2.5">Date Submitted</th>
+                    <th className="p-2.5">Status</th>
+                    <th className="p-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {paginatedApps.map((app) => renderApplicationRow(app))}
+                </tbody>
+              </table>
+            </div>
+
+            {gradeApps.length > PAGE_SIZE && (
+              <div className="px-4 py-3 border-t border-slate-200 bg-slate-50/80 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs font-sans">
+                <div className="text-slate-600">
+                  Page <strong className="text-[#002060]">{safePage}</strong> of{" "}
+                  <strong className="text-[#002060]">{totalPages}</strong> &bull; Showing{" "}
+                  <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{" "}
+                  <strong>{gradeApps.length}</strong> enrollee{gradeApps.length === 1 ? "" : "s"} ({PAGE_SIZE} per page)
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setPage(safePage - 1)}
+                    disabled={safePage <= 1}
+                    className={`px-3 py-1.5 border text-xs font-semibold rounded-lg transition-colors ${
+                      safePage <= 1
+                        ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                        : "bg-white hover:bg-slate-100 border-slate-200 text-[#002060] cursor-pointer"
+                    }`}
+                  >
+                    Prev
+                  </button>
+
+                  {getVisiblePageNumbers(safePage, totalPages).map((pageNum, idx) => {
+                    if (pageNum < 0) {
+                      return (
+                        <span key={`ellipsis-${grade}-${idx}`} className="px-1.5 py-1 text-slate-400 font-bold">
+                          &hellip;
+                        </span>
+                      );
+                    }
+                    const isActive = pageNum === safePage;
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setPage(pageNum)}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`min-w-[32px] px-2.5 py-1.5 border text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                          isActive
+                            ? "bg-[#002060] border-[#002060] text-white"
+                            : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    onClick={() => setPage(safePage + 1)}
+                    disabled={safePage >= totalPages}
+                    className={`px-3 py-1.5 border text-xs font-semibold rounded-lg transition-colors ${
+                      safePage >= totalPages
+                        ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                        : "bg-white hover:bg-slate-100 border-slate-200 text-[#002060] cursor-pointer"
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const syOptions: CustomSelectOption[] = [
     { value: "ACTIVE", label: `Active (${activeTerm?.schoolYear || "2026-2027"})`, badge: "Current" },
     ...availableSchoolYears
@@ -1100,55 +1255,7 @@ export default function AdjudicationConsole() {
 
               {/* JHS SUB-HEADINGS */}
               <div className="divide-y divide-slate-200">
-                {activeJhsGrades.map((grade) => {
-                  const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
-                  return (
-                    <div key={grade} className="bg-white">
-                      {/* SUB-HEADING */}
-                      <div className="bg-slate-50 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
-                            Grade {grade}
-                          </span>
-                          <span className="text-[11px] font-medium text-slate-500 font-semibold">
-                            ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Content: Table or Empty state */}
-                      {gradeApps.length === 0 ? (
-                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/50">
-                          No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between">
-                            <span>Swipe left or right to see more columns</span>
-                          </div>
-                          <div className="overflow-x-auto touch-pan-x">
-                            <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
-                              <thead>
-                                <tr className="bg-slate-100/75 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
-                                  <th className="p-2.5">Reference No.</th>
-                                  <th className="p-2.5">Learner Full Name</th>
-                                  <th className="p-2.5">12-Digit LRN</th>
-                                  <th className="p-2.5">Curriculum / Program</th>
-                                  <th className="p-2.5">Date Submitted</th>
-                                  <th className="p-2.5">Status</th>
-                                  <th className="p-2.5 text-right">Action</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-100">
-                                {gradeApps.map((app) => renderApplicationRow(app))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                {activeJhsGrades.map((grade) => renderGradeBlock(grade, false))}
               </div>
             </div>
           )}
@@ -1176,58 +1283,7 @@ export default function AdjudicationConsole() {
 
               {/* SHS SUB-HEADINGS */}
               <div className="divide-y divide-slate-200">
-                {activeShsGrades.map((grade) => {
-                  const gradeApps = filteredApplications.filter((a) => Number(a.target_grade_level) === grade);
-                  return (
-                    <div key={grade} className="bg-white">
-                      {/* SUB-HEADING */}
-                      <div className="bg-slate-50 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#002060] text-xs uppercase tracking-wider">
-                            Grade {grade}
-                          </span>
-                          <span className="text-[11px] font-medium text-slate-500 font-semibold">
-                            ({gradeApps.length} {gradeApps.length === 1 ? "Enrollee" : "Enrollees"})
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
-                          Academic &amp; Tech-Pro Tracks
-                        </span>
-                      </div>
-
-                      {/* Content: Table or Empty state */}
-                      {gradeApps.length === 0 ? (
-                        <div className="p-4 text-center text-xs text-slate-500 italic bg-slate-50/50">
-                          No applicants registered for Grade {grade} {statusFilter !== "ALL" ? `under "${statusFilter}" status` : ""} for this period.
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="sm:hidden px-3 py-1 bg-blue-50/70 border-b border-blue-200 text-[10px] font-medium text-[#002060] flex items-center justify-between">
-                            <span>Swipe left or right to see more columns</span>
-                          </div>
-                          <div className="overflow-x-auto touch-pan-x">
-                            <table className="w-full min-w-[760px] text-left border-collapse text-xs font-sans">
-                              <thead>
-                                <tr className="bg-slate-100/75 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
-                                  <th className="p-2.5">Reference No.</th>
-                                  <th className="p-2.5">Learner Full Name</th>
-                                  <th className="p-2.5">12-Digit LRN</th>
-                                  <th className="p-2.5">SHS Track &amp; Elective</th>
-                                  <th className="p-2.5">Date Submitted</th>
-                                  <th className="p-2.5">Status</th>
-                                  <th className="p-2.5 text-right">Action</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-100">
-                                {gradeApps.map((app) => renderApplicationRow(app))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                {activeShsGrades.map((grade) => renderGradeBlock(grade, true))}
               </div>
             </div>
           )}
