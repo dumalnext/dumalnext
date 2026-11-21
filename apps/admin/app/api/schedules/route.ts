@@ -282,8 +282,8 @@ export async function POST(req: Request) {
     ] = await Promise.all([
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
       supabase.from("class_schedules").select("*"),
-      supabase.from("teachers").select("id, first_name, last_name"),
-      supabase.from("classrooms").select("id, room_name"),
+      supabase.from("teachers").select("id, first_name, middle_name, last_name, email, department"),
+      supabase.from("classrooms").select("id, classroom_id, room_name, building"),
       supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("sections").select("id, section_name"),
     ]);
@@ -431,7 +431,18 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { action = "move", id, day_of_week, start_time, end_time, swapWithId } = body;
+    const {
+      action = "move",
+      id,
+      day_of_week,
+      start_time,
+      end_time,
+      swapWithId,
+      teacher_id,
+      classroom_id,
+      subject_code,
+      subject_name,
+    } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -451,8 +462,8 @@ export async function PATCH(req: Request) {
     ] = await Promise.all([
       supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
       supabase.from("class_schedules").select("*"),
-      supabase.from("teachers").select("id, first_name, last_name"),
-      supabase.from("classrooms").select("id, room_name"),
+      supabase.from("teachers").select("id, first_name, middle_name, last_name, email, department"),
+      supabase.from("classrooms").select("id, classroom_id, room_name, building"),
       supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("sections").select("id, section_name"),
     ]);
@@ -577,6 +588,109 @@ export async function PATCH(req: Request) {
         {
           success: true,
           message: `Successfully swapped "${item1.subject_name}" with "${item2.subject_name}".`,
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
+    } else if (action === "update") {
+      const item = activeList.find((s) => s.id === id);
+      if (!item) {
+        return NextResponse.json(
+          { success: false, error: "Schedule item not found." },
+          { status: 404, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      const targetDay = day_of_week || item.day_of_week;
+      const cleanStart = (start_time || item.start_time).slice(0, 5);
+      const cleanEnd = (end_time || item.end_time).slice(0, 5);
+      const nextTeacherId = teacher_id || item.teacher_id;
+      const nextClassroomId = classroom_id || item.classroom_id;
+      const nextSubjectCode = subject_code || item.subject_code;
+      const nextSubjectName = subject_name || item.subject_name;
+
+      if (toMinutes(cleanStart) >= toMinutes(cleanEnd)) {
+        return NextResponse.json(
+          { success: false, error: "Invalid time range: Start time must precede End time." },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      const teacherObj: any = (teachersData || []).find((t: any) => t.id === nextTeacherId);
+      const middle = teacherObj?.middle_name ? ` ${teacherObj.middle_name}` : "";
+      const resolvedTeacherName = teacherObj
+        ? `${teacherObj.first_name || ""}${middle} ${teacherObj.last_name || ""}`.trim()
+        : item.teacher_name || "Faculty Member";
+
+      const roomObj: any =
+        (classroomsData || []).find((r: any) => r.id === nextClassroomId) ||
+        (sysClassroomsData?.value?.customClassrooms || []).find(
+          (r: any) => r.id === nextClassroomId || r.classroomId === nextClassroomId || r.classroom_id === nextClassroomId
+        );
+      const resolvedRoomName = roomObj
+        ? roomObj.room_name || roomObj.roomName
+        : item.classroom_name || "Assigned Room";
+      const resolvedBuilding = roomObj ? roomObj.building : item.building;
+
+      const candidateItem: ScheduleItem = {
+        ...item,
+        day_of_week: targetDay,
+        start_time: cleanStart,
+        end_time: cleanEnd,
+        teacher_id: nextTeacherId,
+        teacher_name: resolvedTeacherName,
+        teacher_email: teacherObj?.email || item.teacher_email,
+        department: teacherObj?.department || item.department,
+        classroom_id: nextClassroomId,
+        classroom_name: resolvedRoomName,
+        building: resolvedBuilding,
+        subject_code: nextSubjectCode,
+        subject_name: nextSubjectName,
+      };
+
+      const col = checkCollision(candidateItem, targetDay, cleanStart, cleanEnd, [item.id]);
+      if (col) {
+        return NextResponse.json(
+          { success: false, conflictType: "update_conflict", message: col },
+          { status: 409, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      const idx = currentSchedules.findIndex((s) => s.id === item.id);
+      if (idx >= 0) {
+        currentSchedules[idx] = candidateItem;
+      } else {
+        currentSchedules.push(candidateItem);
+      }
+
+      await supabase.from("system_settings").upsert(
+        {
+          key: "class_schedules_config",
+          value: { schedules: currentSchedules, lastUpdated: new Date().toISOString() },
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "key" }
+      );
+
+      try {
+        await supabase
+          .from("class_schedules")
+          .update({
+            day_of_week: targetDay,
+            start_time: cleanStart,
+            end_time: cleanEnd,
+            teacher_id: nextTeacherId,
+            classroom_id: nextClassroomId,
+            subject_code: nextSubjectCode,
+            subject_name: nextSubjectName,
+          })
+          .eq("id", item.id);
+      } catch {}
+
+      return NextResponse.json(
+        {
+          success: true,
+          item: candidateItem,
+          message: `Updated "${candidateItem.subject_name}" (${candidateItem.day_of_week} ${cleanStart}–${cleanEnd}).`,
         },
         { headers: NO_CACHE_HEADERS }
       );

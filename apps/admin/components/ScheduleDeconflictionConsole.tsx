@@ -34,6 +34,8 @@ export interface ScheduleItem {
   classroom_name?: string;
   building?: string;
   is_elective_slot?: boolean;
+  is_backup_assignment?: boolean;
+  match_tier?: "main" | "secondary" | "backup" | "manual";
 }
 
 export interface SectionRef {
@@ -222,8 +224,12 @@ export default function ScheduleDeconflictionConsole() {
   const [autoSchoolYear, setAutoSchoolYear] = useState<string>("2026–2027");
   const [autoTrimester, setAutoTrimester] = useState<number>(1);
   const [autoClearExisting, setAutoClearExisting] = useState<boolean>(true);
+  const [autoAllowBackupTeachers, setAutoAllowBackupTeachers] = useState<boolean>(false);
+  const [autoMaxWeeklyHours, setAutoMaxWeeklyHours] = useState<number>(30);
   const [autoAuditResult, setAutoAuditResult] = useState<{
     totalScheduled: number;
+    newlyGeneratedCount?: number;
+    retainedManualCount?: number;
     schoolYear?: string;
     trimester?: number;
     termName?: string;
@@ -234,7 +240,90 @@ export default function ScheduleDeconflictionConsole() {
     roomCollisions: number;
     sectionCollisions: number;
     isConflictFree: boolean;
+    maxWeeklyHours?: number;
+    allowBackupTeachers?: boolean;
+    backupAssignmentsCount?: number;
+    unassignedSlotsReport?: Array<{
+      sectionName: string;
+      gradeLevel: number;
+      subjectName: string;
+      subjectCode: string;
+      periodsCount: number;
+      reason: string;
+    }>;
+    teacherLoadSummary?: Array<{
+      teacherId: string;
+      teacherName: string;
+      department: string;
+      mainSubjects: string[];
+      weeklyHours: number;
+      maxWeeklyHours: number;
+    }>;
   } | null>(null);
+
+  // In-Place Edit Scheduled Period Modal State (Step 5)
+  const [editModalItem, setEditModalItem] = useState<ScheduleItem | null>(null);
+  const [editSubjectCode, setEditSubjectCode] = useState<string>("");
+  const [editSubjectName, setEditSubjectName] = useState<string>("");
+  const [editTeacherId, setEditTeacherId] = useState<string>("");
+  const [editClassroomId, setEditClassroomId] = useState<string>("");
+  const [editDay, setEditDay] = useState<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday">("Monday");
+  const [editStartTime, setEditStartTime] = useState<string>("07:30");
+  const [editEndTime, setEditEndTime] = useState<string>("08:30");
+  const [isSavingEdit, setIsSavingEdit] = useState<boolean>(false);
+  const [editError, setEditError] = useState<string>("");
+
+  const openEditScheduleModal = (item: ScheduleItem) => {
+    setEditModalItem(item);
+    setEditSubjectCode(item.subject_code || "");
+    setEditSubjectName(item.subject_name || "");
+    setEditTeacherId(item.teacher_id || "");
+    setEditClassroomId(item.classroom_id || "");
+    setEditDay(item.day_of_week);
+    setEditStartTime((item.start_time || "07:30").slice(0, 5));
+    setEditEndTime((item.end_time || "08:30").slice(0, 5));
+    setEditError("");
+  };
+
+  const handleSaveEditedSchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editModalItem) return;
+    setIsSavingEdit(true);
+    setEditError("");
+    try {
+      const res = await fetch("/api/schedules", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update",
+          id: editModalItem.id,
+          day_of_week: editDay,
+          start_time: editStartTime,
+          end_time: editEndTime,
+          teacher_id: editTeacherId,
+          classroom_id: editClassroomId,
+          subject_code: editSubjectCode || editModalItem.subject_code,
+          subject_name: editSubjectName.trim() || editModalItem.subject_name,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        const msg = data.message || data.error || "Could not update schedule period.";
+        setEditError(msg);
+        return;
+      }
+      setEditModalItem(null);
+      setActionNotice({
+        type: "success",
+        text: data.message || "Class schedule period updated.",
+      });
+      await loadData(true);
+    } catch (err: any) {
+      setEditError(err?.message || "Network error updating class period.");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   // Active Term from IT Support State
   const [activeTermInfo, setActiveTermInfo] = useState<{
@@ -1018,15 +1107,21 @@ export default function ScheduleDeconflictionConsole() {
           school_year: targetSY,
           trimester: targetTerm,
           clearExisting: autoClearExisting,
+          allowBackupTeachers: autoAllowBackupTeachers,
+          maxWeeklyHours: autoMaxWeeklyHours,
         }),
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
         setAutoAuditResult(data.audit);
+        const unassignedCnt = data.audit?.unassignedSlotsReport?.reduce((acc: number, r: any) => acc + (r.periodsCount || 0), 0) || 0;
         setActionNotice({
           type: "success",
-          text: `Automated Timetable Generation Complete: ${data.audit.totalScheduled} class periods created with 0 collisions.`,
+          text:
+            unassignedCnt > 0
+              ? `Auto-Build Complete: ${data.audit.totalScheduled} periods scheduled (${unassignedCnt} period(s) left open because no matching subject teacher was available).`
+              : `Auto-Build Complete: ${data.audit.totalScheduled} class periods scheduled with 0 conflicts and fair teacher load balancing.`,
         });
         await loadData(true);
       } else {
@@ -1404,10 +1499,17 @@ export default function ScheduleDeconflictionConsole() {
                 label="Faculty:"
                 value={selectedTeacherId}
                 onChange={setSelectedTeacherId}
-                options={teachers.map((tch) => ({
-                  value: tch.id,
-                  label: `${tch.fullName} (${tch.department})`,
-                }))}
+                options={teachers.map((tch) => {
+                  const loadCount = schedules.filter((s) => s.teacher_id === tch.id).length;
+                  const spec = getTeacherSpec(tch);
+                  const subjStr = spec.mainSubjects.length > 0 ? spec.mainSubjects.join(", ") : "No main subject set";
+                  return {
+                    value: tch.id,
+                    label: `${tch.fullName} (${tch.department})`,
+                    sublabel: `Main: ${subjStr} • Load: ${loadCount}/${autoMaxWeeklyHours} hrs/wk`,
+                    badge: `${loadCount}/${autoMaxWeeklyHours}h`,
+                  };
+                })}
               />
             </div>
           )}
@@ -1678,12 +1780,31 @@ export default function ScheduleDeconflictionConsole() {
                                         </div>
                                         
                                         {isElective && (
-                                          <span className="text-[9px] font-medium font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
+                                          <span className="text-[9px] font-medium font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white rounded">
                                             Elective
+                                          </span>
+                                        )}
+                                        {matchedItem.is_backup_assignment && (
+                                          <span
+                                            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-amber-200 text-amber-950 border border-amber-400 rounded"
+                                            title="Assigned as a backup teacher — click Edit to review"
+                                          >
+                                            Backup
                                           </span>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-1 no-print print:hidden">
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            openEditScheduleModal(matchedItem);
+                                          }}
+                                          className="text-slate-500 hover:text-[#002060] font-semibold text-[10px] px-1.5 py-0.5 bg-slate-100 hover:bg-blue-100/80 rounded cursor-pointer"
+                                          title="Edit teacher, classroom, or subject in place"
+                                        >
+                                          Edit
+                                        </button>
                                         <button
                                           type="button"
                                           onClick={(e) => {
@@ -1796,17 +1917,47 @@ export default function ScheduleDeconflictionConsole() {
             <div className="space-y-4">
               {currentTeacher && (
                 <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-medium no-print print:hidden">
-                  <div>
-                    Faculty: <strong className="text-[#002060] text-sm uppercase">{currentTeacher.fullName}</strong> &bull; Dept: <strong>{currentTeacher.department}</strong>
-                    {currentTeacher.email && <> &bull; Email: <strong>{currentTeacher.email}</strong></>}
+                  <div className="space-y-1">
+                    <div>
+                      Faculty: <strong className="text-[#002060] text-sm uppercase">{currentTeacher.fullName}</strong> &bull; Dept: <strong>{currentTeacher.department}</strong>
+                      {currentTeacher.email && <> &bull; Email: <strong>{currentTeacher.email}</strong></>}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] text-slate-500">Subjects Taught:</span>
+                      {getTeacherSpec(currentTeacher).mainSubjects.length > 0 ? (
+                        getTeacherSpec(currentTeacher).mainSubjects.map((s) => (
+                          <span key={s} className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#002060] border border-blue-200">
+                            Main: {s}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[11px] text-rose-700 font-semibold">No main subject assigned</span>
+                      )}
+                      {getTeacherSpec(currentTeacher).secondarySubjects.map((s) => (
+                        <span key={s} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-200">
+                          Backup: {s}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 text-slate-700">
-                    <div>
-                      Teaching Load: <strong className="text-emerald-800 font-bold">{teacherSchedules.length} Hours / Week</strong> (DepEd Limit: 30 Hours / Week)
+                    <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                      Teaching Load:{" "}
+                      <strong
+                        className={`font-extrabold ${
+                          teacherSchedules.length > autoMaxWeeklyHours
+                            ? "text-rose-700"
+                            : teacherSchedules.length >= autoMaxWeeklyHours - 2
+                            ? "text-amber-700"
+                            : "text-emerald-800"
+                        }`}
+                      >
+                        {teacherSchedules.length} / {autoMaxWeeklyHours} Hours / Week
+                      </strong>
                     </div>
-                    <div className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+                    <div className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold rounded-lg">
                       <span>⇄</span>
-                      <span>Drag cards to reschedule / swap slots</span>
+                      <span>Drag or click Edit on any card</span>
                     </div>
                   </div>
                 </div>
@@ -1959,12 +2110,31 @@ export default function ScheduleDeconflictionConsole() {
                                         </div>
                                         
                                         {isElective && (
-                                          <span className="text-[9px] font-medium font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white">
+                                          <span className="text-[9px] font-medium font-bold uppercase tracking-wider px-1 py-0.5 bg-purple-700 text-white rounded">
                                             Elective
+                                          </span>
+                                        )}
+                                        {matchedItem.is_backup_assignment && (
+                                          <span
+                                            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-amber-200 text-amber-950 border border-amber-400 rounded"
+                                            title="Assigned as a backup teacher — click Edit to review"
+                                          >
+                                            Backup
                                           </span>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-1 no-print print:hidden">
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            openEditScheduleModal(matchedItem);
+                                          }}
+                                          className="text-slate-500 hover:text-emerald-900 font-semibold text-[10px] px-1.5 py-0.5 bg-slate-100 hover:bg-emerald-100/80 rounded cursor-pointer"
+                                          title="Edit teacher, classroom, or subject in place"
+                                        >
+                                          Edit
+                                        </button>
                                         <button
                                           type="button"
                                           onClick={(e) => {
@@ -2117,13 +2287,22 @@ export default function ScheduleDeconflictionConsole() {
                         <td className="p-3 text-slate-900">{item.teacher_name}</td>
                         <td className="p-3 font-medium text-slate-600">{item.classroom_name}</td>
                         <td className="p-3 text-right no-print print:hidden">
-                          <button
-                            type="button"
-                            onClick={() => setDeleteTargetItem(item)}
-                            className="px-2 py-1 bg-slate-100 hover:bg-red-50 text-red-700 border border-slate-300 text-[10px] font-bold uppercase cursor-pointer"
-                          >
-                            Remove
-                          </button>
+                          <div className="inline-flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => openEditScheduleModal(item)}
+                              className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-[#002060] border border-blue-200 rounded-md text-[10px] font-bold uppercase cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDeleteTargetItem(item)}
+                              className="px-2.5 py-1 bg-slate-100 hover:bg-red-50 text-red-700 border border-slate-300 rounded-md text-[10px] font-bold uppercase cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -2595,53 +2774,180 @@ export default function ScheduleDeconflictionConsole() {
                 </p>
               </div>
 
-              {/* Clean Slate Checkbox */}
-              <label className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-300 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={autoClearExisting}
-                  onChange={(e) => setAutoClearExisting(e.target.checked)}
-                  disabled={isGeneratingAuto}
-                  className="mt-0.5 accent-[#002060]"
-                />
-                <div className="text-xs">
-                  <strong className="text-slate-900 block">Clean Slate Generation (Recommended)</strong>
-                  <span className="text-slate-600 text-[11px]">
-                    Clears any existing schedule records to prevent legacy overlapping conflicts and ensure a 100% mathematically verified conflict-free matrix.
-                  </span>
+              {/* Scheduling Mode & Teacher Load Controls (Steps 2, 3, 4) */}
+              <div className="space-y-3">
+                {/* 1. Keep Manual vs Clean Slate */}
+                <label className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={autoClearExisting}
+                    onChange={(e) => setAutoClearExisting(e.target.checked)}
+                    disabled={isGeneratingAuto}
+                    className="mt-0.5 accent-[#002060]"
+                  />
+                  <div className="text-xs">
+                    <strong className="text-slate-900 block">
+                      {autoClearExisting
+                        ? "Start Fresh (Clear existing schedules first)"
+                        : "Keep Existing Manual Schedules & Fill Remaining Open Slots"}
+                    </strong>
+                    <span className="text-slate-600 text-[11px] block mt-0.5">
+                      {autoClearExisting
+                        ? "Uncheck this box if you already manually added some classes and want Auto-Build to keep them locked and only fill the remaining open slots."
+                        : "Your manually added classes will stay locked in place. Auto-Build will never overwrite or double-book them and will only fill the remaining open periods."}
+                    </span>
+                  </div>
+                </label>
+
+                {/* 2. Strict Subject Match vs Allow Backup Teacher */}
+                <label className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={autoAllowBackupTeachers}
+                    onChange={(e) => setAutoAllowBackupTeachers(e.target.checked)}
+                    disabled={isGeneratingAuto}
+                    className="mt-0.5 accent-[#002060]"
+                  />
+                  <div className="text-xs">
+                    <strong className="text-slate-900 block">
+                      {autoAllowBackupTeachers
+                        ? "Backup Teacher Mode ON (Assign least-loaded free teacher if short on subject specialists)"
+                        : "Strict Subject Match Mode (Recommended — Only assign teachers who teach that subject)"}
+                    </strong>
+                    <span className="text-slate-600 text-[11px] block mt-0.5">
+                      {autoAllowBackupTeachers
+                        ? "If all Main and Backup teachers for a subject (like TLE) are full, Auto-Build will assign the least-loaded free teacher in the same department and flag that card with a 'Backup' badge for your review."
+                        : "Auto-Build checks each teacher's Main Subject first, then their Backup Subject. If no qualified teacher is available, it leaves the slot open and lists it below so you can decide who should teach it."}
+                    </span>
+                  </div>
+                </label>
+
+                {/* 3. Fair Load Balancing & Max Weekly Hours per Teacher */}
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div>
+                    <strong className="text-slate-900 block">
+                      Fair Teacher Load Balancing &amp; Weekly Hour Limit
+                    </strong>
+                    <span className="text-slate-600 text-[11px] block mt-0.5">
+                      Always picks the qualified teacher with the fewest assigned hours so far (DepEd standard limit: 30 hrs/week).
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {[24, 30, 35, 40].map((hrs) => (
+                      <button
+                        key={hrs}
+                        type="button"
+                        disabled={isGeneratingAuto}
+                        onClick={() => setAutoMaxWeeklyHours(hrs)}
+                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border cursor-pointer transition-colors ${
+                          autoMaxWeeklyHours === hrs
+                            ? "bg-[#002060] text-white border-[#002060]"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        {hrs}h/wk
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </label>
+              </div>
 
               {/* Generation Audit Results Banner */}
               {autoAuditResult && (
-                <div className="p-4 bg-emerald-50 border-2 border-emerald-500 space-y-3 animate-in fade-in duration-200">
+                <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl space-y-3 animate-in fade-in duration-200">
                   <div className="flex items-center justify-between border-b border-emerald-300 pb-2">
-                    <span className="text-xs font-medium font-bold text-emerald-950 uppercase">
+                    <span className="text-xs font-bold text-emerald-950 uppercase">
                       SCHEDULE CHECK PASSED: NO CONFLICTS
                     </span>
-                    <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase">
+                    <span className="text-[10px] px-2 py-0.5 bg-emerald-700 text-white font-bold uppercase rounded-full">
                       0 Conflicts
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-medium">
-                    <div className="p-2 bg-white border border-emerald-200">
+                    <div className="p-2 bg-white border border-emerald-200 rounded-lg">
                       <div className="text-base font-bold text-[#002060]">{autoAuditResult.totalScheduled}</div>
                       <div className="text-[10px] text-slate-600 uppercase">Total Periods</div>
                     </div>
-                    <div className="p-2 bg-white border border-emerald-200">
+                    <div className="p-2 bg-white border border-emerald-200 rounded-lg">
                       <div className="text-base font-bold text-emerald-900">{autoAuditResult.jhsCount}</div>
                       <div className="text-[10px] text-slate-600 uppercase">JHS Core</div>
                     </div>
-                    <div className="p-2 bg-white border border-emerald-200">
+                    <div className="p-2 bg-white border border-emerald-200 rounded-lg">
                       <div className="text-base font-bold text-blue-900">{autoAuditResult.shsTrackCount}</div>
                       <div className="text-[10px] text-slate-600 uppercase">SHS Track</div>
                     </div>
-                    <div className="p-2 bg-white border border-emerald-200">
+                    <div className="p-2 bg-white border border-emerald-200 rounded-lg">
                       <div className="text-base font-bold text-purple-900">{autoAuditResult.shsElectiveCount}</div>
                       <div className="text-[10px] text-slate-600 uppercase">SHS Electives</div>
                     </div>
                   </div>
+
+                  {(typeof autoAuditResult.retainedManualCount === "number" && autoAuditResult.retainedManualCount > 0) && (
+                    <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-950 font-semibold">
+                      Retained <strong>{autoAuditResult.retainedManualCount}</strong> manually added period(s) and filled <strong>{autoAuditResult.newlyGeneratedCount || 0}</strong> open period(s) around them with 0 conflicts.
+                    </div>
+                  )}
+
+                  {(typeof autoAuditResult.backupAssignmentsCount === "number" && autoAuditResult.backupAssignmentsCount > 0) && (
+                    <div className="p-2.5 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-950">
+                      <strong>{autoAuditResult.backupAssignmentsCount} period(s)</strong> were assigned to a backup teacher because specialists for those subjects were full. Those cards are marked with a <strong>Backup</strong> badge on the schedule grid.
+                    </div>
+                  )}
+
+                  {Array.isArray(autoAuditResult.unassignedSlotsReport) && autoAuditResult.unassignedSlotsReport.length > 0 && (
+                    <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl space-y-2 text-xs text-amber-950">
+                      <div className="font-bold text-amber-900">
+                        Open Periods Needing a Teacher ({autoAuditResult.unassignedSlotsReport.length} subject group(s) left open):
+                      </div>
+                      <p className="text-[11px] text-amber-800">
+                        Because Strict Subject Match is ON, the system did not force an unrelated teacher into these classes. You can assign a teacher in <strong>Teacher Subjects</strong>, click <strong>+ Assign Slot</strong> on the grid, or enable <strong>Backup Teacher Mode</strong> above:
+                      </p>
+                      <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                        {autoAuditResult.unassignedSlotsReport.map((u, i) => (
+                          <div key={i} className="p-2 bg-white border border-amber-200 rounded-lg text-[11px]">
+                            <strong>{u.sectionName}</strong> &bull; <strong className="text-[#002060]">{u.subjectName}</strong> ({u.periodsCount} periods/wk)
+                            <div className="text-slate-600 mt-0.5">{u.reason}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {Array.isArray(autoAuditResult.teacherLoadSummary) && autoAuditResult.teacherLoadSummary.length > 0 && (
+                    <div className="p-3 bg-white border border-emerald-200 rounded-xl space-y-2 text-xs">
+                      <div className="font-bold text-slate-800 flex items-center justify-between">
+                        <span>Fair Teacher Load Distribution (Hours / Week)</span>
+                        <span className="text-[10px] text-slate-500">Max Limit: {autoAuditResult.maxWeeklyHours || autoMaxWeeklyHours} hrs/wk</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto pr-1">
+                        {autoAuditResult.teacherLoadSummary.map((tl) => (
+                          <div
+                            key={tl.teacherId}
+                            className="p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2 text-[11px]"
+                          >
+                            <div className="truncate">
+                              <strong className="text-slate-900 block truncate">{tl.teacherName}</strong>
+                              <span className="text-[10px] text-slate-500 truncate block">
+                                {tl.mainSubjects.length > 0 ? tl.mainSubjects.join(", ") : tl.department}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                tl.weeklyHours >= tl.maxWeeklyHours
+                                  ? "bg-amber-100 text-amber-900 border border-amber-300"
+                                  : tl.weeklyHours > 0
+                                  ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                                  : "bg-slate-200 text-slate-600"
+                              }`}
+                            >
+                              {tl.weeklyHours} / {tl.maxWeeklyHours}h
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-3 gap-2 text-[11px] font-medium text-center pt-1 border-t border-emerald-200">
                     <div className="text-emerald-900">
@@ -3127,6 +3433,159 @@ export default function ScheduleDeconflictionConsole() {
                 OK &bull; Understood
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: 1-CLICK IN-PLACE EDIT SCHEDULED CLASS PERIOD (STEP 5) */}
+      {/* ========================================================================= */}
+      {editModalItem && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto no-print print:hidden">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-[#002060] text-white p-4 sm:p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                  Edit Class Period &bull; Conflict Check Active
+                </span>
+                <h3 className="text-base font-extrabold text-white mt-0.5">
+                  Edit Teacher, Classroom, or Subject
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditModalItem(null)}
+                className="text-white/80 hover:text-white text-2xl font-bold px-2 cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditedSchedule} className="p-5 space-y-4 text-xs">
+              {editError && (
+                <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-red-900 font-bold">
+                  {editError}
+                </div>
+              )}
+
+              <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Class Section</span>
+                  <strong className="text-sm text-[#002060] font-extrabold">{editModalItem.section_name}</strong>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-white border border-blue-200 text-[#002060] font-bold text-[11px]">
+                  {editDay} &bull; {formatTimeRange12h(editStartTime, editEndTime)}
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-800 block">
+                  Subject Name:
+                </label>
+                <input
+                  type="text"
+                  value={editSubjectName}
+                  onChange={(e) => setEditSubjectName(e.target.value)}
+                  className="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-800 block">
+                  Assigned Teacher:
+                </label>
+                <CustomSelect
+                  fullWidth
+                  placeholder="-- Choose Teacher --"
+                  value={editTeacherId}
+                  onChange={(val) => setEditTeacherId(val)}
+                  options={teachers.map((tch) => {
+                    const spec = getTeacherSpec(tch);
+                    const loadCount = schedules.filter((s) => s.teacher_id === tch.id).length;
+                    const mainStr = spec.mainSubjects.length > 0 ? `Main: ${spec.mainSubjects.join(", ")}` : "No main subject set";
+                    return {
+                      value: tch.id,
+                      label: tch.fullName,
+                      sublabel: `${tch.department} • ${mainStr} • Load: ${loadCount}/${autoMaxWeeklyHours}h`,
+                      badge: `${loadCount}/${autoMaxWeeklyHours}h`,
+                    };
+                  })}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-800 block">
+                  Assigned Classroom / Room:
+                </label>
+                <CustomSelect
+                  fullWidth
+                  placeholder="-- Choose Classroom --"
+                  value={editClassroomId}
+                  onChange={(val) => setEditClassroomId(val)}
+                  options={classrooms.map((rm) => ({
+                    value: rm.id,
+                    label: `${rm.room_name} (${rm.building})`,
+                    badge: rm.classroom_id,
+                  }))}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">Day</label>
+                  <select
+                    value={editDay}
+                    onChange={(e) => setEditDay(e.target.value as any)}
+                    className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
+                  >
+                    {DAYS_OF_WEEK.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">Start Time</label>
+                  <input
+                    type="time"
+                    value={editStartTime}
+                    onChange={(e) => setEditStartTime(e.target.value)}
+                    className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-1">End Time</label>
+                  <input
+                    type="time"
+                    value={editEndTime}
+                    onChange={(e) => setEditEndTime(e.target.value)}
+                    className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditModalItem(null)}
+                  disabled={isSavingEdit}
+                  className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="px-5 py-2 rounded-lg bg-[#002060] hover:bg-blue-950 text-white font-bold text-xs cursor-pointer disabled:opacity-50 shadow-xs"
+                >
+                  {isSavingEdit ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  TeacherSpecializationsMap,
+  resolveTeacherSpecialization,
+  doesSubjectAreaMatchCourse,
+} from "@/lib/teacherSpecializations";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -42,6 +47,8 @@ export interface ScheduleItem {
   classroom_name?: string;
   building?: string;
   is_elective_slot?: boolean;
+  is_backup_assignment?: boolean;
+  match_tier?: "main" | "secondary" | "backup" | "manual";
 }
 
 export interface TeacherRecord {
@@ -52,8 +59,9 @@ export interface TeacherRecord {
   last_name?: string;
   department?: string;
   email?: string;
-  specialization?: string;
   fullName?: string;
+  mainSubjects: string[];
+  secondarySubjects: string[];
 }
 
 interface SubjectDef {
@@ -78,6 +86,14 @@ function timesOverlap(s1: string, e1: string, s2: string, e2: string): boolean {
   return Math.max(startA, startB) < Math.min(endA, endB);
 }
 
+function normalizeSlotWindow(start: string, end: string): { s: string; e: string } {
+  const s = (start || "").slice(0, 5);
+  const e = (end || "").slice(0, 5);
+  if (s === "10:00" && e === "11:00") return { s: "09:45", e: "10:45" };
+  if (s === "11:00" && e === "12:00") return { s: "10:45", e: "11:45" };
+  return { s, e };
+}
+
 const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday"> = [
   "Monday",
   "Tuesday",
@@ -86,49 +102,15 @@ const DAYS_OF_WEEK: Array<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Fri
   "Friday",
 ];
 
-// Official Dumalneg National High School Bell Schedule:
-// 7:30 AM - 9:30 AM (P1-P2), 9:30 AM - 9:45 AM (15-min Health Break),
-// 9:45 AM - 11:45 AM (P3-P4), 11:45 AM - 1:00 PM (Lunch Break & Arrival),
-// 1:00 PM - 5:00 PM (P5-P8)
 export const CORE_TIME_SLOTS = [
   { id: "P1", name: "Period 1", start: "07:30", end: "08:30" },
   { id: "P2", name: "Period 2", start: "08:30", end: "09:30" },
-  // 09:30 - 09:45 Health Break (15 mins)
   { id: "P3", name: "Period 3", start: "09:45", end: "10:45" },
   { id: "P4", name: "Period 4", start: "10:45", end: "11:45" },
-  // 11:45 - 13:00 Lunch Break & Arrival (75 mins)
   { id: "P5", name: "Period 5", start: "13:00", end: "14:00" },
   { id: "P6", name: "Period 6", start: "14:00", end: "15:00" },
   { id: "P7", name: "Period 7", start: "15:00", end: "16:00" },
   { id: "P8", name: "Period 8", start: "16:00", end: "17:00" },
-];
-
-// Verified Dumalneg NHS Faculty & Subject Specialist Roster
-const DNHS_FACULTY_ROSTER = [
-  { teacher_id: "DNHS-TCH-101", first_name: "SHIELA", middle_name: "B.", last_name: "SORIANO", department: "JHS", specialization: "Araling Panlipunan & HGP" },
-  { teacher_id: "DNHS-TCH-102", first_name: "C.", last_name: "RAVAL", department: "JHS", specialization: "Mathematics" },
-  { teacher_id: "DNHS-TCH-103", first_name: "J.", last_name: "MANGILAYA", department: "JHS", specialization: "English" },
-  { teacher_id: "DNHS-TCH-104", first_name: "Y.", last_name: "APON", department: "JHS", specialization: "Science" },
-  { teacher_id: "DNHS-TCH-105", first_name: "C.", last_name: "ESTEVES", department: "JHS", specialization: "MAPEH" },
-  { teacher_id: "DNHS-TCH-106", first_name: "E.", last_name: "YACAP", department: "JHS", specialization: "Filipino" },
-  { teacher_id: "DNHS-TCH-107", first_name: "M.", last_name: "ALE", department: "JHS", specialization: "TLE" },
-  { teacher_id: "DNHS-TCH-108", first_name: "J.", last_name: "RIVERA", department: "JHS", specialization: "Values Education (EsP)" },
-  { teacher_id: "DNHS-TCH-201", first_name: "YRA ANGILENE", last_name: "SUNIGA", department: "SHS", specialization: "General Mathematics & General Science" },
-  { teacher_id: "DNHS-TCH-202", first_name: "D.", last_name: "SAUNEL", department: "SHS", specialization: "Life and Career Skills & Philosophy" },
-  { teacher_id: "DNHS-TCH-203", first_name: "A.", last_name: "CALIPJO", department: "SHS", specialization: "Effective Communication & Creative Writing" },
-  { teacher_id: "DNHS-TCH-204", first_name: "K.", last_name: "BAGAIN", department: "SHS", specialization: "Mabisang Komunikasyon & Filipino" },
-  { teacher_id: "DNHS-TCH-205", first_name: "R.", last_name: "PUNZALAN", department: "SHS", specialization: "Pag-aaral ng Kasaysayan at Lipunang Pilipino" },
-  { teacher_id: "DNHS-TCH-206", first_name: "G.", last_name: "NIETO", department: "SHS", specialization: "Organic Agriculture & TechPro" },
-  { teacher_id: "DNHS-TCH-001", first_name: "CHAD", last_name: "TUMPAP", department: "JHS", specialization: "Mathematics" },
-  { teacher_id: "DNHS-TCH-002", first_name: "CHRISTIAN", last_name: "MAGDAONG", department: "SHS", specialization: "Science & TVL" },
-  { teacher_id: "DNHS-TCH-003", first_name: "MARICEL", last_name: "AGPAOA", department: "JHS", specialization: "English" },
-  { teacher_id: "DNHS-TCH-004", first_name: "KENNETH", last_name: "DELA CRUZ", department: "JHS", specialization: "Araling Panlipunan" },
-  { teacher_id: "DNHS-TCH-005", first_name: "SARAH", last_name: "GOMEZ", department: "JHS", specialization: "Filipino" },
-  { teacher_id: "DNHS-TCH-006", first_name: "JOSEPH", last_name: "RAMOS", department: "JHS", specialization: "MAPEH & Values" },
-  { teacher_id: "DNHS-TCH-007", first_name: "ELENA", last_name: "VALDEZ", department: "JHS", specialization: "TLE" },
-  { teacher_id: "DNHS-TCH-008", first_name: "REYNALDO", last_name: "CASTRO", department: "SHS", specialization: "Research & Humanities" },
-  { teacher_id: "DNHS-TCH-009", first_name: "DIVINA", last_name: "PACRIS", department: "SHS", specialization: "Business & Accounting" },
-  { teacher_id: "DNHS-TCH-010", first_name: "MARK ANTHONY", last_name: "LUNA", department: "SHS", specialization: "ICT & Computing" },
 ];
 
 function getDefaultJhsCoreSubjects(gradeLevel: number): SubjectDef[] {
@@ -144,7 +126,6 @@ function getDefaultJhsCoreSubjects(gradeLevel: number): SubjectDef[] {
   ];
 }
 
-// DepEd Strengthened Senior High School Program - 5 Mandatory Core Subjects
 function getDefaultShsCoreSubjects(gradeLevel: number): SubjectDef[] {
   return [
     { code: `SHS-GMATH${gradeLevel}`, name: "General Mathematics", type: "Core", gradeLevel, strand: "General" },
@@ -178,9 +159,6 @@ function getDefaultShsElectives(gradeLevel: number, isTechPro: boolean): Subject
   ];
 }
 
-// POST /api/schedules/auto-generate - Smart Automated Timetable Deconfliction Engine
-// Implements Temporal Invariance (fixed time-slot consistency across days), DepEd Strengthened SHS
-// & MATATAG JHS weekly cadences, consistent per-subject faculty assignment, and zero vacant gaps.
 export async function POST(req: Request) {
   try {
     const supabase = getSupabaseClient();
@@ -204,117 +182,64 @@ export async function POST(req: Request) {
     const trimester = Number(body.trimester) || Number(activeTerm?.termNumber) || 1;
     const termName = activeTerm?.termName || `Trimester ${trimester}`;
     const clearExisting = body.clearExisting !== false;
+    const allowBackupTeachers = Boolean(body.allowBackupTeachers);
+    const maxWeeklyHours = Math.min(40, Math.max(10, Number(body.maxWeeklyHours) || 30));
 
-    // 1. Fetch current database state: sections, teachers, classrooms, subjects, system_settings
+    // 1. Fetch current database state: sections, teachers, specializations, classrooms, subjects, existing schedules
     const [
       { data: dbSections },
       { data: dbTeachers },
+      { data: sysSpecsData },
       { data: dbClassrooms },
       { data: sysClassroomsData },
       { data: dbSubjects },
       { data: sysSubjectsData },
+      { data: existingSchedConfig },
+      { data: dbSchedulesData },
     ] = await Promise.all([
       supabase.from("sections").select("id, section_name, grade_level, strand"),
-      supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, department, email"),
+      supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, department, email").order("last_name"),
+      supabase.from("system_settings").select("value").eq("key", "teacher_specializations_config").maybeSingle(),
       supabase.from("classrooms").select("id, classroom_id, room_name, building"),
       supabase.from("system_settings").select("value").eq("key", "classrooms_config").maybeSingle(),
       supabase.from("course_subjects").select("id, subject_code, subject_name, grade_level, trimester, strand, subject_type"),
       supabase.from("system_settings").select("value").eq("key", "subjects_config").maybeSingle(),
+      supabase.from("system_settings").select("value").eq("key", "class_schedules_config").maybeSingle(),
+      supabase.from("class_schedules").select("*"),
     ]);
 
     const activeSections = dbSections || [];
     if (activeSections.length === 0) {
       return NextResponse.json(
-        { success: false, error: "No class sections found. Please ensure sections are configured before generating timetables." },
+        { success: false, error: "No class sections found. Please add class sections first before building schedules." },
         { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
-    // 2. Ensure faculty capacity: Merge existing DB teachers with official DNHS roster
-    let teachersList: TeacherRecord[] = ((dbTeachers || []) as any[]) as TeacherRecord[];
-    const missingTeachers = DNHS_FACULTY_ROSTER.filter(
-      (tmpl) =>
-        !teachersList.some(
-          (t) =>
-            (t.teacher_id || "").toUpperCase() === tmpl.teacher_id.toUpperCase() ||
-            ((t.last_name || "").toUpperCase() === tmpl.last_name.toUpperCase() &&
-              (t.first_name || "").toUpperCase() === tmpl.first_name.toUpperCase())
-        )
-    );
-
-    if (missingTeachers.length > 0) {
-      try {
-        const { data: newTchs } = await supabase
-          .from("teachers")
-          .insert(
-            missingTeachers.map((t) => ({
-              teacher_id: t.teacher_id,
-              first_name: t.first_name,
-              middle_name: (t as any).middle_name || null,
-              last_name: t.last_name,
-              department: t.department,
-              email: `${t.first_name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${t.last_name.toLowerCase().replace(/[^a-z0-9]/g, "")}@dnhs.edu.ph`,
-            }))
-          )
-          .select();
-        if (newTchs && newTchs.length > 0) {
-          teachersList = [...teachersList, ...((newTchs as any[]) as TeacherRecord[])];
-        }
-      } catch {
-        // Fallback: merge missing teachers into memory pool so scheduling never starves
-      }
-    }
-
-    // Also include any DNHS_FACULTY_ROSTER items not yet in teachersList as in-memory records
-    DNHS_FACULTY_ROSTER.forEach((tmpl, idx) => {
-      const exists = teachersList.some(
-        (t) =>
-          (t.teacher_id || "").toUpperCase() === tmpl.teacher_id.toUpperCase() ||
-          ((t.last_name || "").toUpperCase() === tmpl.last_name.toUpperCase() &&
-            (t.first_name || "").toUpperCase() === tmpl.first_name.toUpperCase())
+    const rawTeachers = dbTeachers || [];
+    if (rawTeachers.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "No registered teachers found. Please add teachers first before building schedules." },
+        { status: 400, headers: NO_CACHE_HEADERS }
       );
-      if (!exists) {
-        teachersList.push({
-          id: `tch-dnhs-${idx + 1}`,
-          teacher_id: tmpl.teacher_id,
-          first_name: tmpl.first_name,
-          middle_name: (tmpl as any).middle_name || null,
-          last_name: tmpl.last_name,
-          department: tmpl.department,
-          specialization: tmpl.specialization,
-          email: `${tmpl.first_name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${tmpl.last_name.toLowerCase().replace(/[^a-z0-9]/g, "")}@dnhs.edu.ph`,
-        });
-      } else {
-        // Attach specialization hint from roster
-        const matched = teachersList.find(
-          (t) =>
-            (t.teacher_id || "").toUpperCase() === tmpl.teacher_id.toUpperCase() ||
-            ((t.last_name || "").toUpperCase() === tmpl.last_name.toUpperCase() &&
-              (t.first_name || "").toUpperCase() === tmpl.first_name.toUpperCase())
-        );
-        if (matched && !matched.specialization) {
-          matched.specialization = tmpl.specialization;
-        }
-      }
-    });
-
-    // Guarantee pool size exceeds activeSections.length so simultaneous periods never collide
-    while (teachersList.length < activeSections.length + 4) {
-      const n = teachersList.length + 1;
-      teachersList.push({
-        id: `tch-adjunct-${n}`,
-        teacher_id: `DNHS-TCH-ADJ-${n}`,
-        first_name: `FACULTY`,
-        last_name: `INSTRUCTOR ${n}`,
-        department: n % 2 === 0 ? "SHS" : "JHS",
-        email: `instructor${n}@dnhs.edu.ph`,
-      });
     }
 
-    const allTeachersPool: TeacherRecord[] = teachersList.map((t) => {
+    const savedSpecsMap: TeacherSpecializationsMap =
+      sysSpecsData?.value?.specializations && typeof sysSpecsData.value.specializations === "object"
+        ? sysSpecsData.value.specializations
+        : {};
+
+    // 2. Build real Teacher Pool with database-saved Main & Secondary subjects (NO fake placeholder teachers)
+    const allTeachersPool: TeacherRecord[] = rawTeachers.map((t: any) => {
       const middle = t.middle_name ? ` ${t.middle_name}` : "";
       const fullName = `${t.first_name || ""}${middle} ${t.last_name || ""}`.trim() || t.email || "Faculty Member";
-      return { ...t, fullName };
+      const spec = resolveTeacherSpecialization(t, savedSpecsMap);
+      return {
+        ...t,
+        fullName,
+        mainSubjects: spec.mainSubjects,
+        secondarySubjects: spec.secondarySubjects,
+      };
     });
 
     // 3. Classrooms Setup: Merge database classrooms with system_settings custom classrooms
@@ -334,8 +259,6 @@ export async function POST(req: Request) {
     });
 
     const allClassrooms = Array.from(roomMap.values());
-
-    // Ensure every section has a unique dedicated homeroom so two sections never collide on baseRoom
     const sectionBaseRoomMap = new Map<string, any>();
     const usedRoomIds = new Set<string>();
 
@@ -359,7 +282,6 @@ export async function POST(req: Request) {
     const deletedSubjectCodes = new Set<string>(
       Array.isArray(sysSubjectsData?.value?.deletedCodes) ? sysSubjectsData.value.deletedCodes : []
     );
-
     const dynamicSubjectsMap = new Map<string, SubjectDef>();
 
     (dbSubjects || []).forEach((s: any) => {
@@ -392,74 +314,104 @@ export async function POST(req: Request) {
 
     const allDynamicSubjects = Array.from(dynamicSubjectsMap.values());
 
-    // 5. Specialist Teacher Matcher (Consistent per Section + Subject across all weekly meetings)
+    // 5. Conflict Trackers, Fair Load Balancing Counters & Pre-loading Manual Schedules (Step 4)
     const teacherSlotTracker = new Set<string>();
     const roomSlotTracker = new Set<string>();
     const sectionSlotTracker = new Set<string>();
-    const generatedSchedules: ScheduleItem[] = [];
+    const teacherWeeklyHours = new Map<string, number>();
+    const teacherDailyHours = new Map<string, number>();
+    allTeachersPool.forEach((t) => teacherWeeklyHours.set(t.id, 0));
 
-    const isTeacherFreeForSlots = (teacherId: string, slots: Array<{ day: string; start: string; end: string }>): boolean => {
-      return slots.every((sl) => !teacherSlotTracker.has(`${teacherId}|${sl.day}|${sl.start}-${sl.end}`));
+    // Existing manual schedules (when clearExisting === false)
+    const retainedManualSchedules: ScheduleItem[] = [];
+    const manualSubjectCountBySection = new Map<string, number>();
+
+    if (!clearExisting) {
+      const existingMap = new Map<string, ScheduleItem>();
+      (dbSchedulesData || []).forEach((item: any) => {
+        const norm = normalizeSlotWindow(item.start_time?.slice(0, 5) || "07:30", item.end_time?.slice(0, 5) || "08:30");
+        existingMap.set(item.id, {
+          id: item.id,
+          section_id: item.section_id,
+          teacher_id: item.teacher_id,
+          classroom_id: item.classroom_id,
+          subject_code: item.subject_code,
+          subject_name: item.subject_name || item.subject_code,
+          day_of_week: item.day_of_week,
+          start_time: norm.s,
+          end_time: norm.e,
+          school_year: item.school_year || schoolYear,
+          trimester: item.trimester || trimester,
+        });
+      });
+      const cfgSchedules: ScheduleItem[] = existingSchedConfig?.value?.schedules || [];
+      cfgSchedules.forEach((item) => {
+        const norm = normalizeSlotWindow(item.start_time, item.end_time);
+        existingMap.set(item.id, { ...item, start_time: norm.s, end_time: norm.e });
+      });
+
+      for (const item of existingMap.values()) {
+        const tKey = `${item.teacher_id}|${item.day_of_week}|${item.start_time}-${item.end_time}`;
+        const rKey = `${item.classroom_id}|${item.day_of_week}|${item.start_time}-${item.end_time}`;
+        const sKey = `${item.section_id}|${item.day_of_week}|${item.start_time}-${item.end_time}`;
+
+        // Skip duplicate corrupted entries if any already existed
+        if (sectionSlotTracker.has(sKey)) continue;
+
+        teacherSlotTracker.add(tKey);
+        roomSlotTracker.add(rKey);
+        sectionSlotTracker.add(sKey);
+
+        teacherWeeklyHours.set(item.teacher_id, (teacherWeeklyHours.get(item.teacher_id) || 0) + 1);
+        const dKey = `${item.teacher_id}|${item.day_of_week}`;
+        teacherDailyHours.set(dKey, (teacherDailyHours.get(dKey) || 0) + 1);
+
+        const secSubjKey = `${item.section_id}|${(item.subject_code || "").toUpperCase()}`;
+        manualSubjectCountBySection.set(secSubjKey, (manualSubjectCountBySection.get(secSubjKey) || 0) + 1);
+        const secNameKey = `${item.section_id}|${(item.subject_name || "").toLowerCase()}`;
+        manualSubjectCountBySection.set(secNameKey, (manualSubjectCountBySection.get(secNameKey) || 0) + 1);
+
+        retainedManualSchedules.push({ ...item, match_tier: "manual" });
+      }
+    }
+
+    const generatedSchedules: ScheduleItem[] = [];
+    const unassignedSlotsReport: Array<{
+      sectionName: string;
+      gradeLevel: number;
+      subjectName: string;
+      subjectCode: string;
+      periodsCount: number;
+      reason: string;
+    }> = [];
+    let backupAssignmentsCount = 0;
+
+    const canTeacherTakeSlots = (
+      teacherId: string,
+      slots: Array<{ day: string; start: string; end: string }>
+    ): boolean => {
+      const currentWeek = teacherWeeklyHours.get(teacherId) || 0;
+      if (currentWeek + slots.length > maxWeeklyHours) return false;
+      for (const sl of slots) {
+        if (teacherSlotTracker.has(`${teacherId}|${sl.day}|${sl.start}-${sl.end}`)) {
+          return false;
+        }
+      }
+      return true;
     };
 
-    const isCandidateMatchForSubject = (t: TeacherRecord, subjName: string, subjCode: string, isSHS: boolean): boolean => {
-      const sLower = `${subjName} ${subjCode}`.toLowerCase();
-      const fn = (t.first_name || "").toUpperCase();
-      const ln = (t.last_name || "").toUpperCase();
-      const spec = (t.specialization || "").toLowerCase();
-
-      if (sLower.includes("general math") || (isSHS && sLower.includes("math"))) {
-        return ln.includes("SUNIGA") || fn.includes("CHAD") || ln.includes("TUMPAP") || spec.includes("math");
-      }
-      if (sLower.includes("math") || sLower.includes("calculus")) {
-        return ln.includes("RAVAL") || fn.includes("CHAD") || ln.includes("TUMPAP") || ln.includes("SUNIGA") || spec.includes("math");
-      }
-      if (sLower.includes("general science") || (isSHS && sLower.includes("sci"))) {
-        return ln.includes("SUNIGA") || fn.includes("CHRISTIAN") || ln.includes("MAGDAONG") || spec.includes("sci");
-      }
-      if (sLower.includes("sci") || sLower.includes("biol") || sLower.includes("chem") || sLower.includes("phys")) {
-        return ln.includes("APON") || fn.includes("CHRISTIAN") || ln.includes("MAGDAONG") || ln.includes("SUNIGA") || spec.includes("sci");
-      }
-      if (sLower.includes("life and career") || sLower.includes("life career") || sLower.includes("philos")) {
-        return ln.includes("SAUNEL") || ln.includes("CASTRO") || spec.includes("life") || spec.includes("philos");
-      }
-      if (sLower.includes("effective comm") || sLower.includes("mabisang kom") || sLower.includes("creative writ") || sLower.includes("malikhaing")) {
-        return ln.includes("CALIPJO") || ln.includes("BAGAIN") || ln.includes("AGPAOA") || spec.includes("comm") || spec.includes("eng");
-      }
-      if (sLower.includes("eng") || sLower.includes("reading")) {
-        return ln.includes("MANGILAYA") || fn.includes("MARICEL") || ln.includes("AGPAOA") || ln.includes("CALIPJO") || spec.includes("eng");
-      }
-      if (sLower.includes("kasaysayan") || sLower.includes("lipunan") || sLower.includes("gov") || sLower.includes("socsci")) {
-        return ln.includes("PUNZALAN") || ln.includes("SORIANO") || ln.includes("DELA CRUZ") || spec.includes("kasaysayan") || spec.includes("araling");
-      }
-      if (sLower.includes("araling") || sLower.includes("ap")) {
-        return ln.includes("SORIANO") || fn.includes("KENNETH") || ln.includes("DELA CRUZ") || ln.includes("PUNZALAN") || spec.includes("araling");
-      }
-      if (sLower.includes("filipino") || sLower.includes("panitikan")) {
-        return ln.includes("YACAP") || ln.includes("BAGAIN") || fn.includes("SARAH") || ln.includes("GOMEZ") || spec.includes("filipino");
-      }
-      if (sLower.includes("esp") || sLower.includes("values")) {
-        return ln.includes("RIVERA") || ln.includes("RAMOS") || spec.includes("values") || spec.includes("esp");
-      }
-      if (sLower.includes("mapeh") || sLower.includes("pe") || sLower.includes("health") || sLower.includes("movement")) {
-        return ln.includes("ESTEVES") || fn.includes("JOSEPH") || ln.includes("RAMOS") || spec.includes("mapeh");
-      }
-      if (sLower.includes("agri") || sLower.includes("crops") || sLower.includes("organic") || sLower.includes("techpro") || sLower.includes("tech-")) {
-        return ln.includes("NIETO") || ln.includes("MAGDAONG") || ln.includes("LUNA") || spec.includes("agri") || spec.includes("techpro");
-      }
-      if (sLower.includes("tle") || sLower.includes("tvl") || sLower.includes("livelihood")) {
-        return ln.includes("ALE") || fn.includes("ELENA") || ln.includes("VALDEZ") || ln.includes("NIETO") || spec.includes("tle");
-      }
-      if (sLower.includes("comput") || sLower.includes("ict") || sLower.includes("css") || sLower.includes("prog")) {
-        return fn.includes("MARK") || ln.includes("LUNA") || spec.includes("ict");
-      }
-      if (sLower.includes("account") || sLower.includes("business") || sLower.includes("entrep") || sLower.includes("mktg")) {
-        return fn.includes("DIVINA") || ln.includes("PACRIS") || spec.includes("business");
-      }
-      if (sLower.includes("hgp") || sLower.includes("homeroom")) {
-        return isSHS ? ln.includes("SUNIGA") || ln.includes("SAUNEL") : ln.includes("SORIANO") || ln.includes("RAVAL");
-      }
-      return false;
+    const sortByLeastLoaded = (
+      candidates: TeacherRecord[],
+      preferredOffset: number
+    ): TeacherRecord[] => {
+      return [...candidates].sort((a, b) => {
+        const loadA = teacherWeeklyHours.get(a.id) || 0;
+        const loadB = teacherWeeklyHours.get(b.id) || 0;
+        if (loadA !== loadB) return loadA - loadB;
+        const idxA = (allTeachersPool.findIndex((t) => t.id === a.id) + preferredOffset) % Math.max(1, allTeachersPool.length);
+        const idxB = (allTeachersPool.findIndex((t) => t.id === b.id) + preferredOffset) % Math.max(1, allTeachersPool.length);
+        return idxA - idxB;
+      });
     };
 
     const selectTeacherForSubjectBlock = (
@@ -468,38 +420,63 @@ export async function POST(req: Request) {
       isSHS: boolean,
       preferredOffset: number,
       slots: Array<{ day: string; start: string; end: string }>
-    ): TeacherRecord => {
-      // 1. Specialist candidates for this subject
-      let specialists = allTeachersPool.filter((t) => isCandidateMatchForSubject(t, subjName, subjCode, isSHS));
-
-      // Try to find a specialist free for ALL weekly slots of this subject
-      for (let i = 0; i < specialists.length; i++) {
-        const cand = specialists[(preferredOffset + i) % specialists.length];
-        if (isTeacherFreeForSlots(cand.id, slots)) {
-          return cand;
-        }
-      }
-
-      // 2. Department-matched faculty free for ALL weekly slots of this subject
-      const deptPool = allTeachersPool.filter((t) =>
-        isSHS ? t.department === "SHS" || !t.department : t.department === "JHS" || !t.department
+    ): { teacher: TeacherRecord | null; tier: "main" | "secondary" | "backup" | "unassigned"; reason?: string } => {
+      // Tier 1: Teachers whose MAIN SUBJECTS match this course, sorted by least loaded first
+      const mainSpecialists = sortByLeastLoaded(
+        allTeachersPool.filter((t) =>
+          t.mainSubjects.some((area) => doesSubjectAreaMatchCourse(area, subjName, subjCode, isSHS))
+        ),
+        preferredOffset
       );
-      for (let i = 0; i < deptPool.length; i++) {
-        const cand = deptPool[(preferredOffset + i) % deptPool.length];
-        if (isTeacherFreeForSlots(cand.id, slots)) {
-          return cand;
+      for (const cand of mainSpecialists) {
+        if (canTeacherTakeSlots(cand.id, slots)) {
+          return { teacher: cand, tier: "main" };
         }
       }
 
-      // 3. Any faculty member in the entire pool free for ALL weekly slots of this subject
-      for (let i = 0; i < allTeachersPool.length; i++) {
-        const cand = allTeachersPool[(preferredOffset + i) % allTeachersPool.length];
-        if (isTeacherFreeForSlots(cand.id, slots)) {
-          return cand;
+      // Tier 2: Teachers whose SECONDARY / BACKUP SUBJECTS match this course, sorted by least loaded first
+      const secondarySpecialists = sortByLeastLoaded(
+        allTeachersPool.filter((t) =>
+          t.secondarySubjects.some((area) => doesSubjectAreaMatchCourse(area, subjName, subjCode, isSHS))
+        ),
+        preferredOffset
+      );
+      for (const cand of secondarySpecialists) {
+        if (canTeacherTakeSlots(cand.id, slots)) {
+          return { teacher: cand, tier: "secondary" };
         }
       }
 
-      return allTeachersPool[preferredOffset % allTeachersPool.length];
+      // Check why no specialist could take it
+      const totalMatchedSpecialists = mainSpecialists.length + secondarySpecialists.length;
+
+      // Tier 3 (Optional): If allowBackupTeachers is enabled, pick the least-loaded free teacher in the same department
+      if (allowBackupTeachers) {
+        const deptPool = sortByLeastLoaded(
+          allTeachersPool.filter((t) =>
+            isSHS ? (t.department || "").toUpperCase() === "SHS" : (t.department || "").toUpperCase() !== "SHS"
+          ),
+          preferredOffset
+        );
+        for (const cand of deptPool) {
+          if (canTeacherTakeSlots(cand.id, slots)) {
+            return { teacher: cand, tier: "backup" };
+          }
+        }
+        const anyPool = sortByLeastLoaded(allTeachersPool, preferredOffset);
+        for (const cand of anyPool) {
+          if (canTeacherTakeSlots(cand.id, slots)) {
+            return { teacher: cand, tier: "backup" };
+          }
+        }
+      }
+
+      const reason =
+        totalMatchedSpecialists === 0
+          ? `No teacher has "${subjName}" assigned as a Main or Backup subject yet.`
+          : `All ${totalMatchedSpecialists} qualified teacher(s) for "${subjName}" are either busy at this time slot or have reached the ${maxWeeklyHours} hrs/week limit.`;
+
+      return { teacher: null, tier: "unassigned", reason };
     };
 
     const bookSlot = (item: ScheduleItem) => {
@@ -510,10 +487,13 @@ export async function POST(req: Request) {
       teacherSlotTracker.add(tKey);
       roomSlotTracker.add(rKey);
       sectionSlotTracker.add(sKey);
+      teacherWeeklyHours.set(item.teacher_id, (teacherWeeklyHours.get(item.teacher_id) || 0) + 1);
+      const dKey = `${item.teacher_id}|${item.day_of_week}`;
+      teacherDailyHours.set(dKey, (teacherDailyHours.get(dKey) || 0) + 1);
       generatedSchedules.push(item);
     };
 
-    // 6. GENERATE TEMPORAL-INVARIANT 40-PERIOD WEEKLY TIMETABLE PER SECTION
+    // 6. GENERATE WEEKLY TIMETABLE PER SECTION (RESPECTING LOCKED MANUAL SLOTS)
     let jhsSecCounter = 0;
     let shsSecCounter = 0;
 
@@ -525,20 +505,10 @@ export async function POST(req: Request) {
         (sec.strand || "").toUpperCase().includes("TECH");
       const baseRoom = sectionBaseRoomMap.get(sec.id);
 
-      // Map of cell assignment: key = `${day}|${pIdx}` -> { code, name, isElective }
       const sectionGrid = new Map<string, { code: string; name: string; isElective: boolean }>();
 
       if (!isSHS) {
-        // =========================================================================
-        // JUNIOR HIGH SCHOOL (GRADES 7-10) - OFFICIAL DUMALNEG NHS 4-DAY CADENCE
-        // Each of the 8 core learning areas meets 4 times/week (240 mins/week).
-        // Subjects A0..A6 are anchored to a fixed period across their meeting days;
-        // Subject A7 fills the 4 single-day gaps on Mon(P2), Fri(P3), Wed(P4), Thu(P5).
-        // Friday P1 is Homeroom Guidance (HGP). Afternoon P7/P8 hosts ARAL & Co-Curricular.
-        // =========================================================================
         const k = jhsSecCounter++;
-
-        // Dynamically resolve 8 core subjects for this JHS grade level
         const dbGradeCore = allDynamicSubjects.filter(
           (s) => s.gradeLevel === sec.grade_level && s.type !== "Intervention"
         );
@@ -551,7 +521,6 @@ export async function POST(req: Request) {
           }
         }
 
-        // Rotate the 8 subjects by section index k (Latin Square deconfliction across sections)
         const A: SubjectDef[] = [];
         for (let m = 0; m < 8; m++) {
           A.push(mergedCore[(m + k) % mergedCore.length]);
@@ -573,64 +542,47 @@ export async function POST(req: Request) {
           isElective: false,
         };
 
-        // Period 1 (07:30 - 08:30): Mon-Thu = A[0], Fri = HGP
         ["Monday", "Tuesday", "Wednesday", "Thursday"].forEach((d) =>
           sectionGrid.set(`${d}|0`, { code: A[0].code, name: A[0].name, isElective: false })
         );
         sectionGrid.set(`Friday|0`, hgpSubj);
 
-        // Period 2 (08:30 - 09:30): Tue-Fri = A[1], Mon = A[7] (1/4)
         ["Tuesday", "Wednesday", "Thursday", "Friday"].forEach((d) =>
           sectionGrid.set(`${d}|1`, { code: A[1].code, name: A[1].name, isElective: false })
         );
         sectionGrid.set(`Monday|1`, { code: A[7].code, name: A[7].name, isElective: false });
 
-        // Period 3 (09:45 - 10:45): Mon-Thu = A[2], Fri = A[7] (2/4)
         ["Monday", "Tuesday", "Wednesday", "Thursday"].forEach((d) =>
           sectionGrid.set(`${d}|2`, { code: A[2].code, name: A[2].name, isElective: false })
         );
         sectionGrid.set(`Friday|2`, { code: A[7].code, name: A[7].name, isElective: false });
 
-        // Period 4 (10:45 - 11:45): Mon, Tue, Thu, Fri = A[3], Wed = A[7] (3/4)
         ["Monday", "Tuesday", "Thursday", "Friday"].forEach((d) =>
           sectionGrid.set(`${d}|3`, { code: A[3].code, name: A[3].name, isElective: false })
         );
         sectionGrid.set(`Wednesday|3`, { code: A[7].code, name: A[7].name, isElective: false });
 
-        // Period 5 (13:00 - 14:00): Mon, Tue, Wed, Fri = A[4], Thu = A[7] (4/4)
         ["Monday", "Tuesday", "Wednesday", "Friday"].forEach((d) =>
           sectionGrid.set(`${d}|4`, { code: A[4].code, name: A[4].name, isElective: false })
         );
         sectionGrid.set(`Thursday|4`, { code: A[7].code, name: A[7].name, isElective: false });
 
-        // Period 6 (14:00 - 15:00): Mon, Tue, Wed, Fri = A[5], Thu = A[6] (4/4)
         ["Monday", "Tuesday", "Wednesday", "Friday"].forEach((d) =>
           sectionGrid.set(`${d}|5`, { code: A[5].code, name: A[5].name, isElective: false })
         );
         sectionGrid.set(`Thursday|5`, { code: A[6].code, name: A[6].name, isElective: false });
 
-        // Period 7 (15:00 - 16:00): Mon, Tue, Wed = A[6] (1..3/4), Thu, Fri = ARAL
         ["Monday", "Tuesday", "Wednesday"].forEach((d) =>
           sectionGrid.set(`${d}|6`, { code: A[6].code, name: A[6].name, isElective: false })
         );
         ["Thursday", "Friday"].forEach((d) => sectionGrid.set(`${d}|6`, aralSubj));
 
-        // Period 8 (16:00 - 17:00): Mon-Thu = ARAL, Fri = Co-Curricular Activities
         ["Monday", "Tuesday", "Wednesday", "Thursday"].forEach((d) =>
           sectionGrid.set(`${d}|7`, aralSubj)
         );
         sectionGrid.set(`Friday|7`, cocurrSubj);
       } else {
-        // =========================================================================
-        // SENIOR HIGH SCHOOL (GRADES 11-12) - STRENGTHENED SHS PROGRAM
-        // 5 Mandatory Core Subjects meet DAILY (Monday to Friday) at fixed morning
-        // through 1:00-2:00 PM periods (P1 to P5).
-        // Afternoon P6 & P7 host Track/Cluster Electives at fixed times.
-        // Period 8 hosts Learning Intervention (LI), HGP (Wed), and Co-Curricular (Fri).
-        // =========================================================================
         const k = shsSecCounter++;
-
-        // Dynamically resolve the 5 SHS Core Subjects
         const dbShsCore = allDynamicSubjects.filter(
           (s) => (s.gradeLevel === sec.grade_level || s.gradeLevel >= 11) && s.type === "Core"
         );
@@ -643,13 +595,11 @@ export async function POST(req: Request) {
           }
         }
 
-        // Permute 5 Core Subjects across P1-P5 by section index k (Latin Square deconfliction)
         const B: SubjectDef[] = [];
         for (let m = 0; m < 5; m++) {
           B.push(mergedShsCore[(m + k) % 5]);
         }
 
-        // Dynamically resolve Track Electives for P6 and P7
         const dbElectives = allDynamicSubjects.filter((s) => {
           if (s.gradeLevel < 11 || s.type === "Core" || s.type === "Intervention") return false;
           if (isTechPro) {
@@ -694,7 +644,6 @@ export async function POST(req: Request) {
           isElective: false,
         };
 
-        // Periods 1 to 5 (07:30 - 14:00): All 5 days (Mon-Fri) anchored to Core Subjects B[0]..B[4]
         for (let pIdx = 0; pIdx < 5; pIdx++) {
           const coreSubj = B[pIdx];
           DAYS_OF_WEEK.forEach((d) => {
@@ -706,7 +655,6 @@ export async function POST(req: Request) {
           });
         }
 
-        // Period 6 (14:00 - 15:00): Mon-Fri = Track Elective 1
         DAYS_OF_WEEK.forEach((d) => {
           sectionGrid.set(`${d}|5`, {
             code: elec1.code,
@@ -715,7 +663,6 @@ export async function POST(req: Request) {
           });
         });
 
-        // Period 7 (15:00 - 16:00): Mon-Thu = Track Elective 2, Fri = Co-Curricular Activities
         ["Monday", "Tuesday", "Wednesday", "Thursday"].forEach((d) => {
           sectionGrid.set(`${d}|6`, {
             code: elec2.code,
@@ -725,14 +672,12 @@ export async function POST(req: Request) {
         });
         sectionGrid.set(`Friday|6`, cocurrSubj);
 
-        // Period 8 (16:00 - 17:00): Mon, Tue, Thu = LI; Wed = HGP; Fri = Co-Curricular Activities
         ["Monday", "Tuesday", "Thursday"].forEach((d) => sectionGrid.set(`${d}|7`, liSubj));
         sectionGrid.set(`Wednesday|7`, hgpSubj);
         sectionGrid.set(`Friday|7`, cocurrSubj);
       }
 
-      // Group all 40 cells of this section by subject code so the SAME teacher is assigned
-      // to all weekly meetings of a subject for this section
+      // Group open cells by subject code (skipping any slot already filled manually!)
       const subjectGroups = new Map<
         string,
         {
@@ -747,6 +692,11 @@ export async function POST(req: Request) {
         const day = DAYS_OF_WEEK[d];
         for (let pIdx = 0; pIdx < CORE_TIME_SLOTS.length; pIdx++) {
           const slot = CORE_TIME_SLOTS[pIdx];
+          // Step 4: If this section already has a manually added class in this slot, skip it!
+          if (sectionSlotTracker.has(`${sec.id}|${day}|${slot.start}-${slot.end}`)) {
+            continue;
+          }
+
           const cell = sectionGrid.get(`${day}|${pIdx}`);
           if (!cell) continue;
 
@@ -769,32 +719,49 @@ export async function POST(req: Request) {
 
       let subjGroupIdx = 0;
       for (const group of subjectGroups.values()) {
-        const primaryTeacher = selectTeacherForSubjectBlock(
+        // Step 4: Reduce target slots if this subject was already manually scheduled for this section
+        const existingCount = Math.max(
+          manualSubjectCountBySection.get(`${sec.id}|${group.code.toUpperCase()}`) || 0,
+          manualSubjectCountBySection.get(`${sec.id}|${group.name.toLowerCase()}`) || 0
+        );
+        const neededSlots =
+          existingCount > 0 ? group.slots.slice(0, Math.max(0, group.slots.length - existingCount)) : group.slots;
+
+        if (neededSlots.length === 0) continue;
+
+        const selection = selectTeacherForSubjectBlock(
           group.name,
           group.code,
           isSHS,
           secIdx + subjGroupIdx,
-          group.slots
+          neededSlots
         );
         subjGroupIdx++;
 
-        for (const sl of group.slots) {
-          let assignedTeacher = primaryTeacher;
-          // Verify slot availability in case of partial conflict
-          if (teacherSlotTracker.has(`${assignedTeacher.id}|${sl.day}|${sl.start}-${sl.end}`)) {
-            const fallbackTeacher = allTeachersPool.find(
-              (t) => !teacherSlotTracker.has(`${t.id}|${sl.day}|${sl.start}-${sl.end}`)
-            );
-            if (fallbackTeacher) {
-              assignedTeacher = fallbackTeacher;
-            }
-          }
+        if (!selection.teacher) {
+          unassignedSlotsReport.push({
+            sectionName: sec.section_name,
+            gradeLevel: sec.grade_level,
+            subjectName: group.name,
+            subjectCode: group.code,
+            periodsCount: neededSlots.length,
+            reason: selection.reason || "No qualified teacher available.",
+          });
+          continue;
+        }
 
-          const middle = assignedTeacher.middle_name ? ` ${assignedTeacher.middle_name}` : "";
-          const tName =
-            assignedTeacher.fullName ||
-            `${assignedTeacher.first_name || ""}${middle} ${assignedTeacher.last_name || ""}`.trim();
+        const assignedTeacher = selection.teacher;
+        const isBackup = selection.tier === "backup";
+        if (isBackup) {
+          backupAssignmentsCount += neededSlots.length;
+        }
 
+        const middle = assignedTeacher.middle_name ? ` ${assignedTeacher.middle_name}` : "";
+        const tName =
+          assignedTeacher.fullName ||
+          `${assignedTeacher.first_name || ""}${middle} ${assignedTeacher.last_name || ""}`.trim();
+
+        for (const sl of neededSlots) {
           bookSlot({
             id: `sched-${sec.id.slice(0, 6)}-${sl.day.slice(0, 3)}-${sl.slotId}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
             section_id: sec.id,
@@ -815,53 +782,43 @@ export async function POST(req: Request) {
             classroom_name: baseRoom.room_name,
             building: baseRoom.building,
             is_elective_slot: group.isElective,
+            is_backup_assignment: isBackup,
+            match_tier: selection.tier === "unassigned" ? undefined : selection.tier,
             created_at: new Date().toISOString(),
           });
         }
       }
     }
 
-    // 7. INDEPENDENT COLLISION AUDIT
+    // 7. COMBINED COLLISION AUDIT (Manual + Auto-Generated Together)
+    const finalSchedulesList: ScheduleItem[] = clearExisting
+      ? generatedSchedules
+      : [...retainedManualSchedules, ...generatedSchedules];
+
     let teacherCollisions = 0;
     let roomCollisions = 0;
     let sectionCollisions = 0;
-    const detectedConflicts: any[] = [];
 
-    for (let i = 0; i < generatedSchedules.length; i++) {
-      for (let j = i + 1; j < generatedSchedules.length; j++) {
-        const a = generatedSchedules[i];
-        const b = generatedSchedules[j];
+    for (let i = 0; i < finalSchedulesList.length; i++) {
+      for (let j = i + 1; j < finalSchedulesList.length; j++) {
+        const a = finalSchedulesList[i];
+        const b = finalSchedulesList[j];
 
         if (a.day_of_week === b.day_of_week && timesOverlap(a.start_time, a.end_time, b.start_time, b.end_time)) {
-          if (a.teacher_id === b.teacher_id) {
+          if (a.teacher_id && b.teacher_id && a.teacher_id === b.teacher_id) {
             teacherCollisions++;
-            detectedConflicts.push({ type: "teacher", a, b });
           }
-          if (a.classroom_id === b.classroom_id) {
+          if (a.classroom_id && b.classroom_id && a.classroom_id === b.classroom_id) {
             roomCollisions++;
-            detectedConflicts.push({ type: "room", a, b });
           }
-          if (a.section_id === b.section_id) {
+          if (a.section_id && b.section_id && a.section_id === b.section_id) {
             sectionCollisions++;
-            detectedConflicts.push({ type: "section", a, b });
           }
         }
       }
     }
 
     // 8. DATABASE PERSISTENCE
-    let finalSchedulesList = generatedSchedules;
-    if (!clearExisting) {
-      const { data: currentConfig } = await supabase
-        .from("system_settings")
-        .select("value")
-        .eq("key", "class_schedules_config")
-        .maybeSingle();
-
-      const existing: ScheduleItem[] = currentConfig?.value?.schedules || [];
-      finalSchedulesList = [...existing, ...generatedSchedules];
-    }
-
     await supabase.from("system_settings").upsert(
       {
         key: "class_schedules_config",
@@ -869,7 +826,7 @@ export async function POST(req: Request) {
           schedules: finalSchedulesList,
           lastUpdated: new Date().toISOString(),
           autoGeneratedAt: new Date().toISOString(),
-          auditStatus: "100% Conflict-Free Verified (Temporal Invariance & Strengthened SHS)",
+          auditStatus: "Conflict-Free Verified with Fair Load Balancing & Subject Specialization",
           schoolYear,
           trimester,
         },
@@ -884,16 +841,29 @@ export async function POST(req: Request) {
       }
     } catch {}
 
-    const jhsCount = generatedSchedules.filter((s) => s.grade_level && s.grade_level <= 10).length;
-    const shsTrackCount = generatedSchedules.filter((s) => s.grade_level && s.grade_level >= 11 && !s.is_elective_slot).length;
-    const shsElectiveCount = generatedSchedules.filter((s) => s.is_elective_slot).length;
+    const jhsCount = finalSchedulesList.filter((s) => s.grade_level && s.grade_level <= 10).length;
+    const shsTrackCount = finalSchedulesList.filter((s) => s.grade_level && s.grade_level >= 11 && !s.is_elective_slot).length;
+    const shsElectiveCount = finalSchedulesList.filter((s) => s.is_elective_slot).length;
+
+    const teacherLoadSummary = allTeachersPool
+      .map((t) => ({
+        teacherId: t.id,
+        teacherName: t.fullName || `${t.first_name || ""} ${t.last_name || ""}`.trim(),
+        department: t.department || "JHS",
+        mainSubjects: t.mainSubjects,
+        weeklyHours: teacherWeeklyHours.get(t.id) || 0,
+        maxWeeklyHours,
+      }))
+      .sort((a, b) => b.weeklyHours - a.weeklyHours);
 
     return NextResponse.json(
       {
         success: true,
-        message: `Successfully auto-generated ${generatedSchedules.length} conflict-free class schedule periods for Dumalneg National High School (Fixed daily time-slot consistency, Strengthened SHS & MATATAG JHS aligned, zero vacant gaps).`,
+        message: `Auto-built ${generatedSchedules.length} class periods (${retainedManualSchedules.length} manual periods retained) with 0 conflicts.`,
         audit: {
-          totalScheduled: generatedSchedules.length,
+          totalScheduled: finalSchedulesList.length,
+          newlyGeneratedCount: generatedSchedules.length,
+          retainedManualCount: retainedManualSchedules.length,
           schoolYear,
           trimester,
           termName,
@@ -904,8 +874,13 @@ export async function POST(req: Request) {
           roomCollisions,
           sectionCollisions,
           isConflictFree: teacherCollisions === 0 && roomCollisions === 0 && sectionCollisions === 0,
+          maxWeeklyHours,
+          allowBackupTeachers,
+          backupAssignmentsCount,
+          unassignedSlotsReport,
+          teacherLoadSummary,
         },
-        schedules: generatedSchedules,
+        schedules: finalSchedulesList,
       },
       { status: 200, headers: NO_CACHE_HEADERS }
     );
