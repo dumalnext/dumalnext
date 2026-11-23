@@ -178,6 +178,7 @@ export default function ScheduleDeconflictionConsole() {
 
   // Add Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isSlotLockedAdd, setIsSlotLockedAdd] = useState<boolean>(false);
   const [formSectionId, setFormSectionId] = useState<string>("");
   const [formTeacherId, setFormTeacherId] = useState<string>("");
   const [formClassroomId, setFormClassroomId] = useState<string>("");
@@ -745,6 +746,7 @@ export default function ScheduleDeconflictionConsole() {
   // Open modal with pre-filled day & time slot from clicking a grid cell
   const openAddModalWithDefaults = (day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday", start: string, end: string) => {
     setAddError("");
+    setIsSlotLockedAdd(true);
     setFormDaysOfWeek([day]);
     setFormStartTime(start);
     setFormEndTime(end);
@@ -762,7 +764,25 @@ export default function ScheduleDeconflictionConsole() {
       setFormTeacherId(teachers[0].id);
     }
 
-    if (!formClassroomId && classrooms.length > 0) {
+    const existingSectionSched = schedules.find(
+      (s) => s.section_id === targetSecId && (s.classroom_id || s.classroom_name)
+    );
+    if (existingSectionSched) {
+      const cleanRoomName = (existingSectionSched.classroom_name || "").trim().toLowerCase();
+      const matchedRoom = classrooms.find(
+        (r) =>
+          r.id === existingSectionSched.classroom_id ||
+          (existingSectionSched.classroom_id &&
+            r.classroom_id &&
+            r.classroom_id.toLowerCase() === existingSectionSched.classroom_id.toLowerCase()) ||
+          (cleanRoomName && r.room_name.trim().toLowerCase() === cleanRoomName)
+      );
+      if (matchedRoom) {
+        setFormClassroomId(matchedRoom.id);
+      } else if (existingSectionSched.classroom_id) {
+        setFormClassroomId(existingSectionSched.classroom_id);
+      }
+    } else if (!formClassroomId && classrooms.length > 0) {
       setFormClassroomId(classrooms[0].id);
     }
 
@@ -1429,6 +1449,7 @@ export default function ScheduleDeconflictionConsole() {
                 setFormCustomSubject("");
               }
 
+              setIsSlotLockedAdd(false);
               setIsAddModalOpen(true);
             }}
             className="w-full sm:w-auto px-3.5 sm:px-4 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold tracking-wide transition-colors shadow-xs cursor-pointer text-center"
@@ -2456,6 +2477,25 @@ export default function ScheduleDeconflictionConsole() {
                 </div>
               )}
 
+              {/* Locked Slot Summary Pill when opened from a specific grid cell */}
+              {isSlotLockedAdd && (
+                <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-xl flex items-center justify-between shadow-2xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-bold block">
+                      Scheduled Slot
+                    </span>
+                    <strong className="text-sm text-[#002060] font-extrabold">
+                      {formDaysOfWeek[0]} &bull; {formatTimeRange12h(formStartTime, formEndTime)}
+                    </strong>
+                  </div>
+                  {selectedFormSection && (
+                    <span className="px-3 py-1 rounded-full bg-white border border-blue-200 text-[#002060] font-bold text-xs">
+                      {selectedFormSection.section_name} (Grade {selectedFormSection.grade_level})
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* 1. Section Selection */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-800 uppercase block">
@@ -2580,125 +2620,129 @@ export default function ScheduleDeconflictionConsole() {
                 />
               </div>
 
-              {/* 5. Day(s) of Week Selection (Checkboxes) */}
-              <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                  <label className="text-xs font-bold text-slate-800 uppercase block">
-                    Days of the Week: <span className="text-red-600">*</span>
-                  </label>
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold">
-                    <button
-                      type="button"
-                      onClick={() => setFormDaysOfWeek(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])}
-                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
-                    >
-                      All (Mon–Fri)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormDaysOfWeek(["Monday", "Wednesday", "Friday"])}
-                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
-                    >
-                      MWF
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormDaysOfWeek(["Tuesday", "Thursday"])}
-                      className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
-                    >
-                      TTh
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                  {DAYS_OF_WEEK.map((day) => {
-                    const isChecked = formDaysOfWeek.includes(day);
-                    return (
-                      <label
-                        key={day}
-                        className={`flex items-center gap-2 p-2.5 border-2 rounded-xl cursor-pointer transition-all select-none text-xs font-bold ${
-                          isChecked
-                            ? "bg-blue-50/90 border-[#002060] text-[#002060] shadow-xs"
-                            : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormDaysOfWeek((prev) => [...prev, day]);
-                            } else {
-                              if (formDaysOfWeek.length > 1) {
-                                setFormDaysOfWeek((prev) => prev.filter((d) => d !== day));
-                              }
-                            }
-                          }}
-                          className="w-4 h-4 text-[#002060] rounded border-slate-300 focus:ring-[#002060] cursor-pointer"
-                        />
-                        <span>{day}</span>
+              {!isSlotLockedAdd && (
+                <>
+                  {/* 5. Day(s) of Week Selection (Checkboxes) */}
+                  <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                      <label className="text-xs font-bold text-slate-800 uppercase block">
+                        Days of the Week: <span className="text-red-600">*</span>
                       </label>
-                    );
-                  })}
-                </div>
-                {formDaysOfWeek.length === 0 && (
-                  <p className="text-[11px] text-red-600 font-bold">
-                    Please select at least one day of the week.
-                  </p>
-                )}
-              </div>
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setFormDaysOfWeek(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])}
+                          className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
+                        >
+                          All (Mon–Fri)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormDaysOfWeek(["Monday", "Wednesday", "Friday"])}
+                          className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
+                        >
+                          MWF
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormDaysOfWeek(["Tuesday", "Thursday"])}
+                          className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 uppercase rounded-lg cursor-pointer"
+                        >
+                          TTh
+                        </button>
+                      </div>
+                    </div>
 
-              {/* Start & End Time Inputs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-800 uppercase block">
-                    Start Time: <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    value={formStartTime}
-                    onChange={(e) => setFormStartTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-medium font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
-                    required
-                  />
-                </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {DAYS_OF_WEEK.map((day) => {
+                        const isChecked = formDaysOfWeek.includes(day);
+                        return (
+                          <label
+                            key={day}
+                            className={`flex items-center gap-2 p-2.5 border-2 rounded-xl cursor-pointer transition-all select-none text-xs font-bold ${
+                              isChecked
+                                ? "bg-blue-50/90 border-[#002060] text-[#002060] shadow-xs"
+                                : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormDaysOfWeek((prev) => [...prev, day]);
+                                } else {
+                                  if (formDaysOfWeek.length > 1) {
+                                    setFormDaysOfWeek((prev) => prev.filter((d) => d !== day));
+                                  }
+                                }
+                              }}
+                              className="w-4 h-4 text-[#002060] rounded border-slate-300 focus:ring-[#002060] cursor-pointer"
+                            />
+                            <span>{day}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {formDaysOfWeek.length === 0 && (
+                      <p className="text-[11px] text-red-600 font-bold">
+                        Please select at least one day of the week.
+                      </p>
+                    )}
+                  </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-800 uppercase block">
-                    End Time: <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    value={formEndTime}
-                    onChange={(e) => setFormEndTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-medium font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
-                    required
-                  />
-                </div>
-              </div>
+                  {/* Start & End Time Inputs */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-800 uppercase block">
+                        Start Time: <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="time"
+                        value={formStartTime}
+                        onChange={(e) => setFormStartTime(e.target.value)}
+                        className="w-full p-2 bg-white border border-slate-300 text-xs font-medium font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
+                        required
+                      />
+                    </div>
 
-              {/* Preset Period Quick Pickers */}
-              <div className="space-y-1 pt-1">
-                <span className="text-[10px] font-medium text-slate-500 uppercase block">
-                  Quick Select DepEd Standard Class Periods:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {ACADEMIC_TIME_SLOTS.filter((s) => !s.isBreak).map((period) => (
-                    <button
-                      key={period.id}
-                      type="button"
-                      onClick={() => {
-                        setFormStartTime(period.start);
-                        setFormEndTime(period.end);
-                      }}
-                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-medium border border-slate-300 uppercase cursor-pointer"
-                    >
-                      {period.name} ({formatTimeRange12h(period.start, period.end)})
-                    </button>
-                  ))}
-                </div>
-              </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-800 uppercase block">
+                        End Time: <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="time"
+                        value={formEndTime}
+                        onChange={(e) => setFormEndTime(e.target.value)}
+                        className="w-full p-2 bg-white border border-slate-300 text-xs font-medium font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Preset Time Quick Pickers */}
+                  <div className="space-y-1 pt-1">
+                    <span className="text-[10px] font-medium text-slate-500 uppercase block">
+                      Quick Select Standard Class Hours:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {ACADEMIC_TIME_SLOTS.filter((s) => !s.isBreak).map((period) => (
+                        <button
+                          key={period.id}
+                          type="button"
+                          onClick={() => {
+                            setFormStartTime(period.start);
+                            setFormEndTime(period.end);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold border border-slate-300 uppercase cursor-pointer"
+                        >
+                          {formatTimeRange12h(period.start, period.end)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* Modal Actions */}
               <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 shrink-0">
@@ -3327,7 +3371,7 @@ export default function ScheduleDeconflictionConsole() {
                       >
                         <div>
                           <div className="font-medium text-xs font-bold text-slate-800">
-                            {slot.name} ({formatTimeRange12h(slot.start, slot.end)})
+                            {formatTimeRange12h(slot.start, slot.end)}
                           </div>
                           <div className="text-[10px] mt-0.5">
                             {isCurrent ? (
@@ -3624,83 +3668,6 @@ export default function ScheduleDeconflictionConsole() {
                     })),
                   ]}
                 />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 block">
-                  Time Period:
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                  {ACADEMIC_TIME_SLOTS.filter((s) => !s.isBreak).map((period) => {
-                    const isSelected =
-                      editSelectedPeriodId === period.id ||
-                      (editStartTime === period.start && editEndTime === period.end);
-                    return (
-                      <button
-                        key={period.id}
-                        type="button"
-                        onClick={() => {
-                          setEditSelectedPeriodId(period.id);
-                          setEditStartTime(period.start);
-                          setEditEndTime(period.end);
-                        }}
-                        className={`p-2 text-left border rounded-xl transition-all text-xs cursor-pointer ${
-                          isSelected
-                            ? "bg-blue-50 border-[#002060] ring-1 ring-[#002060] text-[#002060] font-bold shadow-xs"
-                            : "bg-white border-slate-300 hover:bg-slate-50 text-slate-700 font-medium"
-                        }`}
-                      >
-                        <div className="text-[11px] font-bold leading-tight">{period.name}</div>
-                        <div className="text-[10px] text-slate-500 whitespace-nowrap">
-                          {formatTimeRange12h(period.start, period.end)}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2.5 pt-1">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">Day</label>
-                  <select
-                    value={editDay}
-                    onChange={(e) => setEditDay(e.target.value as any)}
-                    className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                  >
-                    {DAYS_OF_WEEK.map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">Start Time</label>
-                  <input
-                    type="time"
-                    value={editStartTime}
-                    onChange={(e) => {
-                      setEditStartTime(e.target.value);
-                      setEditSelectedPeriodId("");
-                    }}
-                    className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">End Time</label>
-                  <input
-                    type="time"
-                    value={editEndTime}
-                    onChange={(e) => {
-                      setEditEndTime(e.target.value);
-                      setEditSelectedPeriodId("");
-                    }}
-                    className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
-                    required
-                  />
-                </div>
               </div>
 
               <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
