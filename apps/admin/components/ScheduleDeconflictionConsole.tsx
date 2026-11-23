@@ -2488,48 +2488,58 @@ export default function ScheduleDeconflictionConsole() {
                       {formDaysOfWeek[0]} &bull; {formatTimeRange12h(formStartTime, formEndTime)}
                     </strong>
                   </div>
-                  {selectedFormSection && (
+                  {viewMode === "byTeacher" ? (
                     <span className="px-3 py-1 rounded-full bg-white border border-blue-200 text-[#002060] font-bold text-xs">
-                      {selectedFormSection.section_name} (Grade {selectedFormSection.grade_level})
+                      {teachers.find((t) => t.id === formTeacherId)?.fullName || "Selected Teacher"}
                     </span>
+                  ) : (
+                    selectedFormSection && (
+                      <span className="px-3 py-1 rounded-full bg-white border border-blue-200 text-[#002060] font-bold text-xs">
+                        {selectedFormSection.section_name} (Grade {selectedFormSection.grade_level})
+                      </span>
+                    )
                   )}
                 </div>
               )}
 
-              {/* 1. Section Selection */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-800 uppercase block">
-                  Target Class Section: <span className="text-red-600">*</span>
-                </label>
-                <CustomSelect
-                  fullWidth
-                  placeholder="-- Choose Class Section --"
-                  value={formSectionId}
-                  onChange={(val) => handleSectionChange(val)}
-                  options={sections.map((sec) => ({
-                    value: sec.id,
-                    label: `${sec.section_name} (Grade ${sec.grade_level}${sec.strand ? ` • ${sec.strand}` : ""})`,
-                    badge: `Gr. ${sec.grade_level}`,
-                  }))}
-                />
-              </div>
-
-              {/* Smart Automation Status Banner */}
-              {selectedFormSection && (
-                <div className="p-3 bg-blue-50 border-2 border-blue-400 text-xs flex items-center justify-between shadow-2xs">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#002060] shrink-0 animate-pulse" />
-                    <div>
-                      <span className="font-medium text-[#002060] font-bold text-[11px] uppercase block">
-                        Grade Filter Active: Grade {selectedFormSection.grade_level} Filter Enforced
-                      </span>
-                      <span className="text-slate-700 text-[11px] block mt-0.5">
-                        Detected Section: <strong>{selectedFormSection.section_name}</strong> (Grade {selectedFormSection.grade_level}
-                        {selectedFormSection.strand ? ` • ${selectedFormSection.strand}` : ""}). Subject offerings are strictly restricted to Grade {selectedFormSection.grade_level} ({filteredFormSubjects.length} available).
-                      </span>
-                    </div>
+              {/* 1. Section Selection (Hidden when clicking a slot inside By Class Section view) */}
+              {(!isSlotLockedAdd || viewMode !== "bySection") && (
+                <>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-800 uppercase block">
+                      Target Class Section: <span className="text-red-600">*</span>
+                    </label>
+                    <CustomSelect
+                      fullWidth
+                      placeholder="-- Choose Class Section --"
+                      value={formSectionId}
+                      onChange={(val) => handleSectionChange(val)}
+                      options={sections.map((sec) => ({
+                        value: sec.id,
+                        label: `${sec.section_name} (Grade ${sec.grade_level}${sec.strand ? ` • ${sec.strand}` : ""})`,
+                        badge: `Gr. ${sec.grade_level}`,
+                      }))}
+                    />
                   </div>
-                </div>
+
+                  {/* Smart Automation Status Banner */}
+                  {selectedFormSection && (
+                    <div className="p-3 bg-blue-50 border-2 border-blue-400 text-xs flex items-center justify-between shadow-2xs rounded-xl">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#002060] shrink-0 animate-pulse" />
+                        <div>
+                          <span className="font-medium text-[#002060] font-bold text-[11px] uppercase block">
+                            Grade Filter Active: Grade {selectedFormSection.grade_level} Filter Enforced
+                          </span>
+                          <span className="text-slate-700 text-[11px] block mt-0.5">
+                            Detected Section: <strong>{selectedFormSection.section_name}</strong> (Grade {selectedFormSection.grade_level}
+                            {selectedFormSection.strand ? ` • ${selectedFormSection.strand}` : ""}). Subject offerings are strictly restricted to Grade {selectedFormSection.grade_level} ({filteredFormSubjects.length} available).
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* 2. Subject Selection */}
@@ -2572,34 +2582,36 @@ export default function ScheduleDeconflictionConsole() {
                     value={formCustomSubject}
                     onChange={(e) => setFormCustomSubject(e.target.value)}
                     placeholder="e.g. Science 7, General Biology 1..."
-                    className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
+                    className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-[#002060] rounded-xl"
                   />
                 </div>
               </div>
 
-              {/* 3. Teacher Selection */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-800 uppercase block">
-                  Assigned Faculty Member (Teacher): <span className="text-red-600">*</span>
-                </label>
-                <CustomSelect
-                  fullWidth
-                  placeholder="-- Choose Faculty Member --"
-                  value={formTeacherId}
-                  onChange={(val) => setFormTeacherId(val)}
-                  options={teachers.map((tch) => {
-                    const spec = getTeacherSpec(tch);
-                    const mainStr = spec.mainSubjects.length > 0 ? `Main: ${spec.mainSubjects.join(", ")}` : "No main subject assigned yet";
-                    const secStr = spec.secondarySubjects.length > 0 ? ` • Backup: ${spec.secondarySubjects.join(", ")}` : "";
-                    return {
-                      value: tch.id,
-                      label: tch.fullName,
-                      sublabel: `${tch.department} • ${mainStr}${secStr}`,
-                      badge: spec.mainSubjects[0] || tch.department,
-                    };
-                  })}
-                />
-              </div>
+              {/* 3. Teacher Selection (Hidden when clicking a slot inside By Teacher view) */}
+              {(!isSlotLockedAdd || viewMode !== "byTeacher") && (
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-800 uppercase block">
+                    Assigned Faculty Member (Teacher): <span className="text-red-600">*</span>
+                  </label>
+                  <CustomSelect
+                    fullWidth
+                    placeholder="-- Choose Faculty Member --"
+                    value={formTeacherId}
+                    onChange={(val) => setFormTeacherId(val)}
+                    options={teachers.map((tch) => {
+                      const spec = getTeacherSpec(tch);
+                      const mainStr = spec.mainSubjects.length > 0 ? `Main: ${spec.mainSubjects.join(", ")}` : "No main subject assigned yet";
+                      const secStr = spec.secondarySubjects.length > 0 ? ` • Backup: ${spec.secondarySubjects.join(", ")}` : "";
+                      return {
+                        value: tch.id,
+                        label: tch.fullName,
+                        sublabel: `${tch.department} • ${mainStr}${secStr}`,
+                        badge: spec.mainSubjects[0] || tch.department,
+                      };
+                    })}
+                  />
+                </div>
+              )}
 
               {/* 4. Classroom Facility Selection */}
               <div className="space-y-1">
