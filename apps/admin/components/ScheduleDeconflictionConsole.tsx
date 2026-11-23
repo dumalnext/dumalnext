@@ -277,8 +277,31 @@ export default function ScheduleDeconflictionConsole() {
     setEditModalItem(item);
     setEditSubjectCode(item.subject_code || "");
     setEditSubjectName(item.subject_name || "");
-    setEditTeacherId(item.teacher_id || "");
-    setEditClassroomId(item.classroom_id || "");
+
+    // Resolve teacher ID by id, teacher_id, or fullName
+    const matchedTeacher = teachers.find(
+      (t) =>
+        t.id === item.teacher_id ||
+        (item.teacher_id && t.teacher_id && t.teacher_id.toLowerCase() === item.teacher_id.toLowerCase()) ||
+        (item.teacher_name && t.fullName.toLowerCase() === item.teacher_name.toLowerCase())
+    );
+    setEditTeacherId(matchedTeacher ? matchedTeacher.id : item.teacher_id || "");
+
+    // Resolve classroom ID by id, classroom_id, or room_name
+    const cleanRoomName = (item.classroom_name || "").trim().toLowerCase();
+    const matchedRoom = classrooms.find(
+      (r) =>
+        r.id === item.classroom_id ||
+        (item.classroom_id && r.classroom_id && r.classroom_id.toLowerCase() === item.classroom_id.toLowerCase()) ||
+        (cleanRoomName && r.room_name.trim().toLowerCase() === cleanRoomName) ||
+        (cleanRoomName && `${r.room_name} (${r.building})`.trim().toLowerCase() === cleanRoomName)
+    );
+    setEditClassroomId(
+      matchedRoom
+        ? matchedRoom.id
+        : item.classroom_id || item.classroom_name || ""
+    );
+
     setEditDay(item.day_of_week);
     setEditStartTime((item.start_time || "07:30").slice(0, 5));
     setEditEndTime((item.end_time || "08:30").slice(0, 5));
@@ -440,11 +463,12 @@ export default function ScheduleDeconflictionConsole() {
     try {
       if (!silent) setIsLoading(true);
 
-      const [schedRes, secRes, subRes, specRes, tchRes, rmRes, termsRes] = await Promise.all([
+      const [schedRes, secRes, subRes, specRes, rmApiRes, tchRes, rmRes, termsRes] = await Promise.all([
         fetch(`/api/schedules?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/sections?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/subjects?_t=${Date.now()}`, { cache: "no-store" }),
         fetch(`/api/teacher-specializations?_t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/classrooms?_t=${Date.now()}`, { cache: "no-store" }),
         supabase.from("teachers").select("id, teacher_id, first_name, middle_name, last_name, email, department").order("last_name"),
         supabase.from("classrooms").select("id, classroom_id, room_name, building").order("room_name"),
         supabase.from("academic_terms").select("*").order("schoolYear", { ascending: false }),
@@ -457,9 +481,11 @@ export default function ScheduleDeconflictionConsole() {
         }
       }
 
+      let loadedSchedules: ScheduleItem[] = [];
       if (schedRes.ok) {
         const data = await schedRes.json();
         if (data.success && Array.isArray(data.schedules)) {
+          loadedSchedules = data.schedules;
           setSchedules(data.schedules);
         }
       }
@@ -527,8 +553,53 @@ export default function ScheduleDeconflictionConsole() {
         }
       }
 
+      const mergedRoomsMap = new Map<string, ClassroomRef>();
       if (rmRes.data) {
-        setClassrooms(rmRes.data);
+        rmRes.data.forEach((r: any) => {
+          mergedRoomsMap.set(r.id, {
+            id: r.id,
+            classroom_id: r.classroom_id || r.id,
+            room_name: r.room_name || `Room ${r.classroom_id || r.id}`,
+            building: r.building || "Main Academic Building",
+          });
+        });
+      }
+      if (rmApiRes.ok) {
+        const rmApiData = await rmApiRes.json().catch(() => null);
+        if (rmApiData?.classrooms && Array.isArray(rmApiData.classrooms)) {
+          rmApiData.classrooms.forEach((r: any) => {
+            const rId = r.id || r.classroomId || r.classroom_id;
+            if (rId && !mergedRoomsMap.has(rId)) {
+              mergedRoomsMap.set(rId, {
+                id: rId,
+                classroom_id: r.classroomId || r.classroom_id || rId,
+                room_name: r.roomName || r.room_name || `Room ${rId}`,
+                building: r.building || "Main Academic Building",
+              });
+            }
+          });
+        }
+      }
+      loadedSchedules.forEach((s) => {
+        const rId = s.classroom_id || s.classroom_name;
+        if (rId && !mergedRoomsMap.has(rId)) {
+          const matchedExisting = Array.from(mergedRoomsMap.values()).find(
+            (rm) =>
+              rm.classroom_id?.toLowerCase() === String(s.classroom_id || "").toLowerCase() ||
+              rm.room_name?.toLowerCase() === String(s.classroom_name || "").toLowerCase()
+          );
+          if (!matchedExisting) {
+            mergedRoomsMap.set(rId, {
+              id: rId,
+              classroom_id: s.classroom_id || rId,
+              room_name: s.classroom_name || `Room ${rId}`,
+              building: s.building || "Main Academic Building",
+            });
+          }
+        }
+      });
+      if (mergedRoomsMap.size > 0) {
+        setClassrooms(Array.from(mergedRoomsMap.values()));
       }
 
       if (termsRes?.data) {
@@ -3500,17 +3571,29 @@ export default function ScheduleDeconflictionConsole() {
                   placeholder="-- Choose Teacher --"
                   value={editTeacherId}
                   onChange={(val) => setEditTeacherId(val)}
-                  options={teachers.map((tch) => {
-                    const spec = getTeacherSpec(tch);
-                    const loadCount = schedules.filter((s) => s.teacher_id === tch.id).length;
-                    const mainStr = spec.mainSubjects.length > 0 ? `Main: ${spec.mainSubjects.join(", ")}` : "No main subject set";
-                    return {
-                      value: tch.id,
-                      label: tch.fullName,
-                      sublabel: `${tch.department} • ${mainStr} • Load: ${loadCount}/${autoMaxWeeklyHours}h`,
-                      badge: `${loadCount}/${autoMaxWeeklyHours}h`,
-                    };
-                  })}
+                  options={[
+                    ...(editTeacherId && !teachers.some((t) => t.id === editTeacherId)
+                      ? [
+                          {
+                            value: editTeacherId,
+                            label: editModalItem.teacher_name || "Assigned Teacher",
+                            sublabel: editModalItem.department || "Current Assignment",
+                            badge: "CURRENT",
+                          },
+                        ]
+                      : []),
+                    ...teachers.map((tch) => {
+                      const spec = getTeacherSpec(tch);
+                      const loadCount = schedules.filter((s) => s.teacher_id === tch.id).length;
+                      const mainStr = spec.mainSubjects.length > 0 ? `Main: ${spec.mainSubjects.join(", ")}` : "No main subject set";
+                      return {
+                        value: tch.id,
+                        label: tch.fullName,
+                        sublabel: `${tch.department} • ${mainStr} • Load: ${loadCount}/${autoMaxWeeklyHours}h`,
+                        badge: `${loadCount}/${autoMaxWeeklyHours}h`,
+                      };
+                    }),
+                  ]}
                 />
               </div>
 
@@ -3523,11 +3606,24 @@ export default function ScheduleDeconflictionConsole() {
                   placeholder="-- Choose Classroom --"
                   value={editClassroomId}
                   onChange={(val) => setEditClassroomId(val)}
-                  options={classrooms.map((rm) => ({
-                    value: rm.id,
-                    label: `${rm.room_name} (${rm.building})`,
-                    badge: rm.classroom_id,
-                  }))}
+                  options={[
+                    ...(editClassroomId && !classrooms.some((r) => r.id === editClassroomId)
+                      ? [
+                          {
+                            value: editClassroomId,
+                            label: `${editModalItem.classroom_name || editClassroomId}${
+                              editModalItem.building ? ` (${editModalItem.building})` : ""
+                            }`,
+                            badge: "CURRENT ROOM",
+                          },
+                        ]
+                      : []),
+                    ...classrooms.map((rm) => ({
+                      value: rm.id,
+                      label: `${rm.room_name} (${rm.building})`,
+                      badge: rm.classroom_id,
+                    })),
+                  ]}
                 />
               </div>
 

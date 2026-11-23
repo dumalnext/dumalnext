@@ -622,14 +622,21 @@ export async function PATCH(req: Request) {
         : item.teacher_name || "Faculty Member";
 
       const roomObj: any =
-        (classroomsData || []).find((r: any) => r.id === nextClassroomId) ||
+        (classroomsData || []).find((r: any) => r.id === nextClassroomId || r.classroom_id === nextClassroomId) ||
         (sysClassroomsData?.value?.customClassrooms || []).find(
           (r: any) => r.id === nextClassroomId || r.classroomId === nextClassroomId || r.classroom_id === nextClassroomId
         );
+      const existingScheduleRoom = activeList.find(
+        (s: ScheduleItem) => s.classroom_id === nextClassroomId && s.classroom_name
+      );
       const resolvedRoomName = roomObj
         ? roomObj.room_name || roomObj.roomName
+        : existingScheduleRoom
+        ? existingScheduleRoom.classroom_name
         : item.classroom_name || "Assigned Room";
-      const resolvedBuilding = roomObj ? roomObj.building : item.building;
+      const resolvedBuilding = roomObj
+        ? roomObj.building
+        : existingScheduleRoom?.building || item.building;
 
       const candidateItem: ScheduleItem = {
         ...item,
