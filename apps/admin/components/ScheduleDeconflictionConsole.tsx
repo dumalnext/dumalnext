@@ -1717,8 +1717,8 @@ export default function ScheduleDeconflictionConsole() {
                 <table className="w-full border-collapse text-xs font-sans min-w-[880px]">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-44 min-w-[170px] text-left font-bold border-r border-blue-900 whitespace-nowrap">
-                        Time Period
+                      <th className="p-3 w-36 min-w-[140px] text-center font-bold border-r border-blue-900 whitespace-nowrap">
+                        Time
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
                         <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0 min-w-[135px]">
@@ -1733,11 +1733,10 @@ export default function ScheduleDeconflictionConsole() {
                       if (slot.isBreak) {
                         return (
                           <tr key={slot.id} className="bg-slate-100 font-medium text-[11px] font-bold">
-                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800 w-44 min-w-[170px] whitespace-nowrap">
-                              <div className="whitespace-nowrap">{formatTimeRange12h(slot.start, slot.end)}</div>
-                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal whitespace-nowrap">{slot.name}</div>
+                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800 text-center w-36 min-w-[140px] whitespace-nowrap align-middle">
+                              <div className="font-bold text-xs whitespace-nowrap">{formatTimeRange12h(slot.start, slot.end)}</div>
                             </td>
-                            <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
+                            <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-600 font-bold bg-slate-100/90 border-r border-slate-300 last:border-r-0">
                               {formatTimeRange12h(slot.start, slot.end)} &bull; {slot.name}
                             </td>
                           </tr>
@@ -1748,12 +1747,9 @@ export default function ScheduleDeconflictionConsole() {
                       return (
                         <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
                           {/* Left Time Column */}
-                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top w-44 min-w-[170px] whitespace-nowrap">
+                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-middle text-center w-36 min-w-[140px] whitespace-nowrap">
                             <div className="font-bold text-[#002060] text-xs whitespace-nowrap">
                               {formatTimeRange12h(slot.start, slot.end)}
-                            </div>
-                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold whitespace-nowrap">
-                              {slot.name}
                             </div>
                           </td>
 
@@ -2049,8 +2045,8 @@ export default function ScheduleDeconflictionConsole() {
                 <table className="w-full border-collapse text-xs font-sans min-w-[880px]">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-44 min-w-[170px] text-left font-bold border-r border-blue-900 whitespace-nowrap">
-                        Time Period
+                      <th className="p-3 w-36 min-w-[140px] text-center font-bold border-r border-blue-900 whitespace-nowrap">
+                        Time
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
                         <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0 min-w-[135px]">
@@ -2064,11 +2060,10 @@ export default function ScheduleDeconflictionConsole() {
                       if (slot.isBreak) {
                         return (
                           <tr key={slot.id} className="bg-slate-100 font-medium text-[11px] font-bold">
-                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800 w-44 min-w-[170px] whitespace-nowrap">
-                              <div className="whitespace-nowrap">{formatTimeRange12h(slot.start, slot.end)}</div>
-                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal whitespace-nowrap">{slot.name}</div>
+                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800 text-center w-36 min-w-[140px] whitespace-nowrap align-middle">
+                              <div className="font-bold text-xs whitespace-nowrap">{formatTimeRange12h(slot.start, slot.end)}</div>
                             </td>
-                            <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
+                            <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-600 font-bold bg-slate-100/90 border-r border-slate-300 last:border-r-0">
                               {formatTimeRange12h(slot.start, slot.end)} &bull; {slot.name}
                             </td>
                           </tr>
@@ -2078,12 +2073,9 @@ export default function ScheduleDeconflictionConsole() {
                       return (
                         <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
                           {/* Left Time Column */}
-                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top w-44 min-w-[170px] whitespace-nowrap">
+                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-middle text-center w-36 min-w-[140px] whitespace-nowrap">
                             <div className="font-bold text-[#002060] text-xs whitespace-nowrap">
                               {formatTimeRange12h(slot.start, slot.end)}
-                            </div>
-                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold whitespace-nowrap">
-                              {slot.name}
                             </div>
                           </td>
 
