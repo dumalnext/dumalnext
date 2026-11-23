@@ -270,6 +270,7 @@ export default function ScheduleDeconflictionConsole() {
   const [editDay, setEditDay] = useState<"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday">("Monday");
   const [editStartTime, setEditStartTime] = useState<string>("07:30");
   const [editEndTime, setEditEndTime] = useState<string>("08:30");
+  const [editSelectedPeriodId, setEditSelectedPeriodId] = useState<string>("P1");
   const [isSavingEdit, setIsSavingEdit] = useState<boolean>(false);
   const [editError, setEditError] = useState<string>("");
 
@@ -303,8 +304,14 @@ export default function ScheduleDeconflictionConsole() {
     );
 
     setEditDay(item.day_of_week);
-    setEditStartTime((item.start_time || "07:30").slice(0, 5));
-    setEditEndTime((item.end_time || "08:30").slice(0, 5));
+    const startStr = (item.start_time || "07:30").slice(0, 5);
+    const endStr = (item.end_time || "08:30").slice(0, 5);
+    setEditStartTime(startStr);
+    setEditEndTime(endStr);
+    const matchedSlot = ACADEMIC_TIME_SLOTS.find(
+      (s) => !s.isBreak && (s.start === startStr || normalizeSlotWindow(s.start, s.end).s === startStr)
+    );
+    setEditSelectedPeriodId(matchedSlot ? matchedSlot.id : "");
     setEditError("");
   };
 
@@ -1707,14 +1714,14 @@ export default function ScheduleDeconflictionConsole() {
                 <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
               <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
-                <table className="w-full border-collapse text-xs font-sans min-w-[650px] md:min-w-0">
+                <table className="w-full border-collapse text-xs font-sans min-w-[880px]">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-medium border-r border-blue-900">
+                      <th className="p-3 w-44 min-w-[170px] text-left font-bold border-r border-blue-900 whitespace-nowrap">
                         Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
-                        <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
+                        <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0 min-w-[135px]">
                           {day}
                         </th>
                       ))}
@@ -1726,9 +1733,9 @@ export default function ScheduleDeconflictionConsole() {
                       if (slot.isBreak) {
                         return (
                           <tr key={slot.id} className="bg-slate-100 font-medium text-[11px] font-bold">
-                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
-                              <div>{formatTimeRange12h(slot.start, slot.end)}</div>
-                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
+                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800 w-44 min-w-[170px] whitespace-nowrap">
+                              <div className="whitespace-nowrap">{formatTimeRange12h(slot.start, slot.end)}</div>
+                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal whitespace-nowrap">{slot.name}</div>
                             </td>
                             <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
                               {formatTimeRange12h(slot.start, slot.end)} &bull; {slot.name}
@@ -1741,11 +1748,11 @@ export default function ScheduleDeconflictionConsole() {
                       return (
                         <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
                           {/* Left Time Column */}
-                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
-                            <div className="font-bold text-[#002060] text-xs">
+                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top w-44 min-w-[170px] whitespace-nowrap">
+                            <div className="font-bold text-[#002060] text-xs whitespace-nowrap">
                               {formatTimeRange12h(slot.start, slot.end)}
                             </div>
-                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
+                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold whitespace-nowrap">
                               {slot.name}
                             </div>
                           </td>
@@ -2039,14 +2046,14 @@ export default function ScheduleDeconflictionConsole() {
                 <span>Swipe horizontally to view full Mon–Fri schedule</span>
               </div>
               <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-x-auto touch-pan-x print:border print:shadow-none">
-                <table className="w-full border-collapse text-xs font-sans min-w-[650px] md:min-w-0">
+                <table className="w-full border-collapse text-xs font-sans min-w-[880px]">
                   <thead>
                     <tr className="bg-[#002060] text-white text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 w-28 sm:w-32 md:w-36 text-left font-medium border-r border-blue-900">
+                      <th className="p-3 w-44 min-w-[170px] text-left font-bold border-r border-blue-900 whitespace-nowrap">
                         Time Period
                       </th>
                       {DAYS_OF_WEEK.map((day) => (
-                        <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0">
+                        <th key={day} className="p-3 text-center border-r border-blue-900 last:border-r-0 min-w-[135px]">
                           {day}
                         </th>
                       ))}
@@ -2057,9 +2064,9 @@ export default function ScheduleDeconflictionConsole() {
                       if (slot.isBreak) {
                         return (
                           <tr key={slot.id} className="bg-slate-100 font-medium text-[11px] font-bold">
-                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800">
-                              <div>{formatTimeRange12h(slot.start, slot.end)}</div>
-                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal">{slot.name}</div>
+                            <td className="p-2.5 font-bold border-r border-slate-300 bg-slate-200/80 text-slate-800 w-44 min-w-[170px] whitespace-nowrap">
+                              <div className="whitespace-nowrap">{formatTimeRange12h(slot.start, slot.end)}</div>
+                              <div className="text-[10px] text-slate-500 uppercase font-sans font-normal whitespace-nowrap">{slot.name}</div>
                             </td>
                             <td colSpan={5} className="p-2.5 text-center tracking-wider uppercase text-slate-500 bg-slate-100/90 border-r border-slate-300 last:border-r-0">
                               {formatTimeRange12h(slot.start, slot.end)} &bull; {slot.name}
@@ -2071,11 +2078,11 @@ export default function ScheduleDeconflictionConsole() {
                       return (
                         <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
                           {/* Left Time Column */}
-                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top">
-                            <div className="font-bold text-[#002060] text-xs">
+                          <td className="p-3 font-medium border-r-2 border-slate-300 bg-slate-50 text-slate-800 align-top w-44 min-w-[170px] whitespace-nowrap">
+                            <div className="font-bold text-[#002060] text-xs whitespace-nowrap">
                               {formatTimeRange12h(slot.start, slot.end)}
                             </div>
-                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold">
+                            <div className="text-[10px] text-slate-500 uppercase mt-0.5 font-sans font-semibold whitespace-nowrap">
                               {slot.name}
                             </div>
                           </td>
@@ -2338,7 +2345,7 @@ export default function ScheduleDeconflictionConsole() {
                   <thead>
                     <tr className="bg-slate-100 border-b-2 border-slate-300 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                       <th className="p-3">Day</th>
-                      <th className="p-3">Time Period</th>
+                      <th className="p-3 whitespace-nowrap">Time Period</th>
                       <th className="p-3">Subject</th>
                       <th className="p-3">Class Section</th>
                       <th className="p-3">Assigned Faculty</th>
@@ -2350,7 +2357,7 @@ export default function ScheduleDeconflictionConsole() {
                     {masterlistFiltered.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                         <td className="p-3 font-bold text-[#002060]">{item.day_of_week}</td>
-                        <td className="p-3 font-medium font-bold text-slate-700">
+                        <td className="p-3 font-medium font-bold text-slate-700 whitespace-nowrap">
                           {formatTimeRange12h(item.start_time, item.end_time)}
                         </td>
                         <td className="p-3 font-bold text-slate-900 uppercase">{item.subject_name}</td>
@@ -3627,7 +3634,41 @@ export default function ScheduleDeconflictionConsole() {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-800 block">
+                  Time Period:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  {ACADEMIC_TIME_SLOTS.filter((s) => !s.isBreak).map((period) => {
+                    const isSelected =
+                      editSelectedPeriodId === period.id ||
+                      (editStartTime === period.start && editEndTime === period.end);
+                    return (
+                      <button
+                        key={period.id}
+                        type="button"
+                        onClick={() => {
+                          setEditSelectedPeriodId(period.id);
+                          setEditStartTime(period.start);
+                          setEditEndTime(period.end);
+                        }}
+                        className={`p-2 text-left border rounded-xl transition-all text-xs cursor-pointer ${
+                          isSelected
+                            ? "bg-blue-50 border-[#002060] ring-1 ring-[#002060] text-[#002060] font-bold shadow-xs"
+                            : "bg-white border-slate-300 hover:bg-slate-50 text-slate-700 font-medium"
+                        }`}
+                      >
+                        <div className="text-[11px] font-bold leading-tight">{period.name}</div>
+                        <div className="text-[10px] text-slate-500 whitespace-nowrap">
+                          {formatTimeRange12h(period.start, period.end)}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5 pt-1">
                 <div>
                   <label className="text-[11px] font-bold text-slate-700 block mb-1">Day</label>
                   <select
@@ -3647,7 +3688,10 @@ export default function ScheduleDeconflictionConsole() {
                   <input
                     type="time"
                     value={editStartTime}
-                    onChange={(e) => setEditStartTime(e.target.value)}
+                    onChange={(e) => {
+                      setEditStartTime(e.target.value);
+                      setEditSelectedPeriodId("");
+                    }}
                     className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
                     required
                   />
@@ -3657,7 +3701,10 @@ export default function ScheduleDeconflictionConsole() {
                   <input
                     type="time"
                     value={editEndTime}
-                    onChange={(e) => setEditEndTime(e.target.value)}
+                    onChange={(e) => {
+                      setEditEndTime(e.target.value);
+                      setEditSelectedPeriodId("");
+                    }}
                     className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-[#002060]"
                     required
                   />
